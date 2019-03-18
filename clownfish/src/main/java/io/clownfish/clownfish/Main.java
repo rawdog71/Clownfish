@@ -31,24 +31,24 @@ public class Main extends SpringBootServletInitializer implements ServletContext
      * @return
      */
     @Override
-    protected SpringApplicationBuilder configure(
-            SpringApplicationBuilder application) {
-        return application.sources(new Class[]{Main.class, Initializer.class});
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(new Class[]{Main.class, Initializer.class, ContainerInitializer.class});
     }
 
     @Bean
     public ServletRegistrationBean servletRegistrationBean() {
-        FacesServlet servlet = new FacesServlet();
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(servlet, "*.jsf");
+        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new FacesServlet(), "*.jsf");
+        servletRegistrationBean.setName("JSF Faces Servlet");
+        servletRegistrationBean.setLoadOnStartup(1);
         return servletRegistrationBean;
     }
 
     @Bean
     public ServletRegistrationBean facesServletRegistraiton() {
-        ServletRegistrationBean registration = new ServletRegistrationBean(new FacesServlet(), new String[]{"*.xhtml"});
-        registration.setName("Faces Servlet");
-        registration.setLoadOnStartup(1);
-        return registration;
+        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new FacesServlet(), new String[]{"*.xhtml"});
+        servletRegistrationBean.setName("XHTML Faces Servlet");
+        servletRegistrationBean.setLoadOnStartup(1);
+        return servletRegistrationBean;
     }
 
     @Override
