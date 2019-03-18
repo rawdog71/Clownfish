@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class CfUserDAOImpl implements CfUserDAO {
 
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
     
     @Autowired 
     public CfUserDAOImpl(SessionFactory sessionFactory) {
@@ -40,7 +40,7 @@ public class CfUserDAOImpl implements CfUserDAO {
     @Override
     public CfUser findById(Long id) {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("findCfUserById");  
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfUser.findById");  
         query.setParameter("id", id);
         CfUser cfuser = (CfUser) query.getSingleResult();
         return cfuser;

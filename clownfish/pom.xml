@@ -70,11 +70,13 @@
             <artifactId>primefaces</artifactId>
             <version>6.2</version>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.primefaces.themes</groupId>
             <artifactId>all-themes</artifactId>
             <version>1.0.10</version>
         </dependency>
+        -->
         <dependency>
             <groupId>net.bootsfaces</groupId>
             <artifactId>bootsfaces</artifactId>
@@ -122,6 +124,7 @@
             <groupId>hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>3.4.0.GA</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
@@ -132,11 +135,5 @@
             </plugin>
         </plugins>
     </build>
-    <repositories>
-        <repository>
-            <id>prime-repo</id>
-            <name>Prime Repo</name>
-            <url>http://repository.primefaces.org</url>
-        </repository>
-    </repositories>
+    
 </project>
