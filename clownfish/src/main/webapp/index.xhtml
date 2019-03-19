@@ -5,13 +5,39 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui"
 >
-    <head>
-        <title>TODO supply a title</title>
+    <h:head>
+        <title>Clownfish CMS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    </head>
+    </h:head>
     <body>
-        <h:form id="form1">
-            <h:commandButton id="btn1" type="text" value="Button" />
+        <h:outputScript library="js" name="main.js" target="head" />
+        
+        <h:form id="form">
+            <p:growl id="msgs" showDetail="true" />
+            
+            <p:outputLabel value="Clownfish CMS " />
+            
+            <p:commandButton id="userButton" value="User" type="button" icon="fa fa-home" rendered="#{loginBean.login}" />
+            <p:menu overlay="true" trigger="userButton" my="left top" at="left bottom">
+                <p:menuitem value="Profil" update="msgs" icon="fa fa-user"/>
+                <p:menuitem value="Logout" actionListener="#{loginBean.onLogout}" update=":form" icon="fa fa-times"/>
+            </p:menu>
+            
+            <p:outputLabel rendered="#{loginBean.login}" value="#{loginBean.cfuser.vorname}" /> <p:outputLabel rendered="#{loginBean.login}" value="#{loginBean.cfuser.nachname}" />
+            
+            <p:tabView id="tabview">
+                <p:tab title="Login" rendered="#{!loginBean.login}">
+                    <h:panelGrid columns="2" columnClasses="label, value">
+                        <h:outputText value="E-Mail: *" />
+                        <p:inputText value="#{loginBean.email}" required="true" requiredMessage="Bitte E-Mail eingeben" />
+
+                        <h:outputText value="Passwort: *" />
+                        <p:inputText type="password" value="#{loginBean.passwort}" required="true" requiredMessage="Bitte Passwort eingeben" />
+
+                        <p:commandButton id="LoginButton" value="Login" actionListener="#{loginBean.onLogin}" update=":form" />
+                    </h:panelGrid>
+                </p:tab>
+            </p:tabView>
         </h:form>
     </body>
 </html>

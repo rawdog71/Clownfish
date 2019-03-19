@@ -29,8 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class CfUserServiceImpl implements CfUserService {
-
-    private CfUserDAO cfuserDAO;
+    private final CfUserDAO cfuserDAO;
     
     @Autowired
     public CfUserServiceImpl(CfUserDAO cfuserDAO) {
@@ -40,6 +39,11 @@ public class CfUserServiceImpl implements CfUserService {
     @Override
     public CfUser findById(Long id) {
         return this.cfuserDAO.findById(id);
+    }
+
+    @Override
+    public CfUser findByEmail(String email) {
+        return this.cfuserDAO.findByEmail(email);
     }
     
 }

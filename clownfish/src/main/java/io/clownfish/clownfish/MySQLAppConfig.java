@@ -40,7 +40,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     @PropertySource("classpath:application.properties")
 })
 public class MySQLAppConfig {
-    //@Value("${app.datasource.driverClassName}") String driverClassName;
     @Value("${app.datasource.url}") String url;
     @Value("${app.datasource.username}") String username;
     @Value("${app.datasource.password}") String password;
@@ -52,7 +51,6 @@ public class MySQLAppConfig {
                 .username(username)
                 .password(password)
                 .url(url)
-                //.driverClassName(driverClassName)
                 .build();
         return dataSource;
     }

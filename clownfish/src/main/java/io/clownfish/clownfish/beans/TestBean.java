@@ -13,15 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.serviceinterface;
-
-import io.clownfish.clownfish.dbentities.CfUser;
+package io.clownfish.clownfish.beans;
 
 /**
  *
  * @author sulzbachr
  */
-public interface CfUserService {
-    CfUser findById(Long id);
-    CfUser findByEmail(String email);
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
+import org.springframework.stereotype.Component;
+
+@ManagedBean(name = "testtBean", eager = true)
+@RequestScoped
+@Component
+public class TestBean {
+    private String name;
+
+    public TestBean() {
+        name = "Rainer";
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    
 }

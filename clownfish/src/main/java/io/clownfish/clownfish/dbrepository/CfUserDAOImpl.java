@@ -45,5 +45,14 @@ public class CfUserDAOImpl implements CfUserDAO {
         CfUser cfuser = (CfUser) query.getSingleResult();
         return cfuser;
     }
+
+    @Override
+    public CfUser findByEmail(String email) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfUser.findByEmail");  
+        query.setParameter("email", email);
+        CfUser cfuser = (CfUser) query.getSingleResult();
+        return cfuser;
+    }
     
 }

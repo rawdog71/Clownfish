@@ -23,4 +23,5 @@ import io.clownfish.clownfish.dbentities.CfUser;
  */
 public interface CfUserDAO {
     CfUser findById(Long id);
+    CfUser findByEmail(String email);
 }
