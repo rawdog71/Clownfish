@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.daointerface;
+package io.clownfish.clownfish.serviceinterface;
 
-import io.clownfish.clownfish.dbentities.CfUser;
+import io.clownfish.clownfish.dbentities.CfTemplateversion;
+import java.util.List;
 
 /**
  *
  * @author sulzbachr
  */
-public interface CfUserDAO {
-    CfUser findById(Long id);
-    CfUser findByEmail(String email);
-    boolean create(CfUser entity);
-    boolean delete(CfUser entity);
-    boolean edit(CfUser entity);
+public interface CfTemplateversionService {
+    CfTemplateversion findByTemplateref(long ref);
+    long findMaxVersion(long ref);
+    CfTemplateversion findByPK(long ref, long version);
+    List<CfTemplateversion> findAll();
+    boolean create(CfTemplateversion entity);
+    boolean delete(CfTemplateversion entity);
+    boolean edit(CfTemplateversion entity);
 }

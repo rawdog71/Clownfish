@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 sulzbachr.
+ * Copyright 2019 rawdog.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,65 +15,71 @@
  */
 package io.clownfish.clownfish.dbrepository;
 
-import io.clownfish.clownfish.daointerface.CfUserDAO;
-import io.clownfish.clownfish.dbentities.CfUser;
+import io.clownfish.clownfish.daointerface.CfTemplateDAO;
+import io.clownfish.clownfish.dbentities.CfTemplate;
+import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author sulzbachr
+ * @author rawdog
  */
-@Repository
-public class CfUserDAOImpl implements CfUserDAO {
+public class CfTemplateDAOImpl implements CfTemplateDAO {
 
     private final SessionFactory sessionFactory;
-    
-    @Autowired 
-    public CfUserDAOImpl(SessionFactory sessionFactory) {
+
+    @Autowired
+    public CfTemplateDAOImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
     
     @Override
-    public CfUser findById(Long id) {
+    public List<CfTemplate> findAll() {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfUser.findById");  
-        query.setParameter("id", id);
-        CfUser cfuser = (CfUser) query.getSingleResult();
-        return cfuser;
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findAll");
+        List<CfTemplate> cftempaltelist = query.getResultList();
+        return cftempaltelist;
     }
 
     @Override
-    public CfUser findByEmail(String email) {
-        Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfUser.findByEmail");  
-        query.setParameter("email", email);
-        CfUser cfuser = (CfUser) query.getSingleResult();
-        return cfuser;
-    }
-
-    @Override
-    public boolean create(CfUser entity) {
+    public boolean create(CfTemplate entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
         return true;
     }
 
     @Override
-    public boolean delete(CfUser entity) {
+    public boolean delete(CfTemplate entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.delete(entity);
         return true;
     }
 
     @Override
-    public boolean edit(CfUser entity) {
+    public boolean edit(CfTemplate entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
         return true;
     }
-    
+
+    @Override
+    public CfTemplate findById(Long id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findById");
+        query.setParameter("id", id);
+        CfTemplate cftemplate = (CfTemplate) query.getSingleResult();
+        return cftemplate;
+    }
+
+    @Override
+    public CfTemplate findByName(String name) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findByName");
+        query.setParameter("name", name);
+        CfTemplate cftemplate = (CfTemplate) query.getSingleResult();
+        return cftemplate;
+    }
 }

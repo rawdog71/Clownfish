@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 sulzbachr.
+ * Copyright 2019 rawdog.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,62 +15,69 @@
  */
 package io.clownfish.clownfish.dbrepository;
 
-import io.clownfish.clownfish.daointerface.CfUserDAO;
-import io.clownfish.clownfish.dbentities.CfUser;
+import io.clownfish.clownfish.daointerface.CfPropertyDAO;
+import io.clownfish.clownfish.dbentities.CfProperty;
+import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author sulzbachr
+ * @author rawdog
  */
-@Repository
-public class CfUserDAOImpl implements CfUserDAO {
+public class CfPropertyDAOImpl implements CfPropertyDAO {
 
     private final SessionFactory sessionFactory;
-    
-    @Autowired 
-    public CfUserDAOImpl(SessionFactory sessionFactory) {
+
+    @Autowired
+    public CfPropertyDAOImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
     
     @Override
-    public CfUser findById(Long id) {
+    public CfProperty findByHashkey(String hashkey) {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfUser.findById");  
-        query.setParameter("id", id);
-        CfUser cfuser = (CfUser) query.getSingleResult();
-        return cfuser;
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfProperty.findByHashkey");
+        query.setParameter("hashkey", hashkey);
+        CfProperty cfproperty = (CfProperty) query.getSingleResult();
+        return cfproperty;
     }
 
     @Override
-    public CfUser findByEmail(String email) {
+    public CfProperty findByValue(String value) {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfUser.findByEmail");  
-        query.setParameter("email", email);
-        CfUser cfuser = (CfUser) query.getSingleResult();
-        return cfuser;
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfProperty.findByValue");
+        query.setParameter("value", value);
+        CfProperty cfproperty = (CfProperty) query.getSingleResult();
+        return cfproperty;
     }
 
     @Override
-    public boolean create(CfUser entity) {
+    public List<CfProperty> findAll() {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfProperty.findAll");
+        List<CfProperty> cfpropertylist = query.getResultList();
+        return cfpropertylist;
+    }
+
+    @Override
+    public boolean create(CfProperty entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
         return true;
     }
 
     @Override
-    public boolean delete(CfUser entity) {
+    public boolean delete(CfProperty entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.delete(entity);
         return true;
     }
 
     @Override
-    public boolean edit(CfUser entity) {
+    public boolean edit(CfProperty entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
         return true;

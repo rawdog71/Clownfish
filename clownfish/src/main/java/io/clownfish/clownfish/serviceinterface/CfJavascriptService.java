@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.daointerface;
+package io.clownfish.clownfish.serviceinterface;
 
-import io.clownfish.clownfish.dbentities.CfUser;
+import io.clownfish.clownfish.dbentities.CfJavascript;
+import java.util.List;
 
 /**
  *
  * @author sulzbachr
  */
-public interface CfUserDAO {
-    CfUser findById(Long id);
-    CfUser findByEmail(String email);
-    boolean create(CfUser entity);
-    boolean delete(CfUser entity);
-    boolean edit(CfUser entity);
+public interface CfJavascriptService {
+    List<CfJavascript> findAll();
+    CfJavascript findById(Long id);
+    CfJavascript findByName(String name);
+    boolean create(CfJavascript entity);
+    boolean delete(CfJavascript entity);
+    boolean edit(CfJavascript entity);
 }

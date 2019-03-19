@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 sulzbachr.
+ * Copyright 2019 rawdog.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,19 @@
  */
 package io.clownfish.clownfish.daointerface;
 
-import io.clownfish.clownfish.dbentities.CfUser;
+import io.clownfish.clownfish.dbentities.CfTemplateversion;
+import java.util.List;
 
 /**
  *
- * @author sulzbachr
+ * @author rawdog
  */
-public interface CfUserDAO {
-    CfUser findById(Long id);
-    CfUser findByEmail(String email);
-    boolean create(CfUser entity);
-    boolean delete(CfUser entity);
-    boolean edit(CfUser entity);
+public interface CfTemplateversionDAO {
+    CfTemplateversion findByTemplateref(long ref);
+    long findMaxVersion(long ref);
+    CfTemplateversion findByPK(long ref, long version);
+    List<CfTemplateversion> findAll();
+    boolean create(CfTemplateversion entity);
+    boolean delete(CfTemplateversion entity);
+    boolean edit(CfTemplateversion entity);
 }

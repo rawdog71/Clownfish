@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 sulzbachr.
+ * Copyright 2019 rawdog.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,18 @@
  */
 package io.clownfish.clownfish.daointerface;
 
-import io.clownfish.clownfish.dbentities.CfUser;
+import io.clownfish.clownfish.dbentities.CfJavascript;
+import java.util.List;
 
 /**
  *
- * @author sulzbachr
+ * @author rawdog
  */
-public interface CfUserDAO {
-    CfUser findById(Long id);
-    CfUser findByEmail(String email);
-    boolean create(CfUser entity);
-    boolean delete(CfUser entity);
-    boolean edit(CfUser entity);
+public interface CfJavascriptDAO {
+    CfJavascript findById(Long id);
+    CfJavascript findByName(String name);
+    List<CfJavascript> findAll();
+    boolean create(CfJavascript entity);
+    boolean delete(CfJavascript entity);
+    boolean edit(CfJavascript entity);
 }

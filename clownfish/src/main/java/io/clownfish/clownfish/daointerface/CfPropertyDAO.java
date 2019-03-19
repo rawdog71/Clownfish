@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 sulzbachr.
+ * Copyright 2019 rawdog.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,33 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.beans;
+package io.clownfish.clownfish.daointerface;
+
+import io.clownfish.clownfish.dbentities.CfProperty;
+import java.util.List;
 
 /**
  *
- * @author sulzbachr
+ * @author rawdog
  */
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.RequestScoped;
-import org.springframework.stereotype.Component;
-
-@ManagedBean(name = "testtBean", eager = true)
-@RequestScoped
-@Component
-public class TestBean {
-    private String name;
-
-    public TestBean() {
-        name = "Rainer";
-    }
-    
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    
+public interface CfPropertyDAO {
+    CfProperty findByHashkey(String hashkey);
+    CfProperty findByValue(String value);
+    List<CfProperty> findAll();
+    boolean create(CfProperty entity);
+    boolean delete(CfProperty entity);
+    boolean edit(CfProperty entity);
 }
