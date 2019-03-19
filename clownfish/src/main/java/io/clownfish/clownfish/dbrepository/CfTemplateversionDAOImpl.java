@@ -37,12 +37,12 @@ public class CfTemplateversionDAOImpl implements CfTemplateversionDAO {
     }
 
     @Override
-    public CfTemplateversion findByTemplateref(long ref) {
+    public List<CfTemplateversion> findByTemplateref(long ref) {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplateversion.findByTemplateref");
         query.setParameter("templateref", ref);
-        CfTemplateversion cftemplateversion = (CfTemplateversion) query.getSingleResult();
-        return cftemplateversion;
+        List<CfTemplateversion> cftemplateversionlist = query.getResultList();
+        return cftemplateversionlist;
     }
 
     @Override

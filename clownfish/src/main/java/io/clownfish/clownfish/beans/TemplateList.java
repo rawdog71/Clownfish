@@ -3,6 +3,8 @@ package io.clownfish.clownfish.beans;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.dbentities.CfTemplateversion;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
+import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.TemplateUtil;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -11,7 +13,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -20,9 +21,7 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
@@ -41,6 +40,7 @@ public class TemplateList {
     LoginBean loginbean;
     
     @Autowired CfTemplateService cftemplateService;
+    @Autowired CfTemplateversionService cftemplateversionService;
     
     private @Getter @Setter List<CfTemplate> templatelist;
     private @Getter @Setter CfTemplate selectedTemplate = null;
@@ -96,7 +96,8 @@ public class TemplateList {
         } else {
             selectedScriptlanguage = "velocity";
         }
-        versionlist = em.createNamedQuery("Kntemplateversion.findByTemplateref").setParameter("templateref", selectedTemplate.getId()).getResultList();
+        //versionlist = em.createNamedQuery("Kntemplateversion.findByTemplateref").setParameter("templateref", selectedTemplate.getId()).getResultList();
+        versionlist = cftemplateversionService.findByTemplateref(selectedTemplate.getId());
         difference = templateUtility.hasDifference(selectedTemplate);
         BigInteger co = selectedTemplate.getCheckedoutby();
         if (co != null) {
@@ -121,7 +122,8 @@ public class TemplateList {
     public void onSave(ActionEvent actionEvent) {
         if (selectedTemplate != null) {
             selectedTemplate.setContent(getTemplateContent());
-            kntemplateFacadeREST.edit(selectedTemplate);
+            //kntemplateFacadeREST.edit(selectedTemplate);
+            cftemplateService.edit(selectedTemplate);
             difference = templateUtility.hasDifference(selectedTemplate);
             
             FacesMessage message = new FacesMessage("Saved " + selectedTemplate.getName());
@@ -140,7 +142,8 @@ public class TemplateList {
                     String content = getTemplateContent();
                     byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
                     try {
-                        long maxversion = (long) em.createNamedQuery("Kntemplateversion.findMaxVersion").setParameter("templateref", selectedTemplate.getId()).getSingleResult();
+                        //long maxversion = (long) em.createNamedQuery("Kntemplateversion.findMaxVersion").setParameter("templateref", selectedTemplate.getId()).getSingleResult();
+                        long maxversion = cftemplateversionService.findMaxVersion(selectedTemplate.getId());
                         templateUtility.setCurrentVersion(maxversion + 1);
                         writeVersion(selectedTemplate.getId(), templateUtility.getCurrentVersion(), output);
                         difference = templateUtility.hasDifference(selectedTemplate);
@@ -171,7 +174,8 @@ public class TemplateList {
     public void onCheckOut(ActionEvent actionEvent) {
         if (selectedTemplate != null) {
             boolean canCheckout = false;
-            Kntemplate checktemplate = (Kntemplate) em.createNamedQuery("Kntemplate.findById").setParameter("id", selectedTemplate.getId()).getSingleResult();
+            //Kntemplate checktemplate = (Kntemplate) em.createNamedQuery("Kntemplate.findById").setParameter("id", selectedTemplate.getId()).getSingleResult();
+            CfTemplate checktemplate = cftemplateService.findById(selectedTemplate.getId());
             BigInteger co = checktemplate.getCheckedoutby();
             if (co != null) {
                 if (co.longValue() == 0) {
@@ -182,9 +186,10 @@ public class TemplateList {
             }
                     
             if (canCheckout) {
-                selectedTemplate.setCheckedoutby(BigInteger.valueOf(loginbean.getKnuser().getId()));
+                selectedTemplate.setCheckedoutby(BigInteger.valueOf(loginbean.getCfuser().getId()));
                 selectedTemplate.setContent(getTemplateContent());
-                kntemplateFacadeREST.edit(selectedTemplate);
+                //kntemplateFacadeREST.edit(selectedTemplate);
+                cftemplateService.edit(selectedTemplate);
                 difference = templateUtility.hasDifference(selectedTemplate);
                 checkedout = true;
 
@@ -202,7 +207,8 @@ public class TemplateList {
         if (selectedTemplate != null) {
             selectedTemplate.setCheckedoutby(BigInteger.valueOf(0));
             selectedTemplate.setContent(getTemplateContent());
-            kntemplateFacadeREST.edit(selectedTemplate);
+            //kntemplateFacadeREST.edit(selectedTemplate);
+            cftemplateService.edit(selectedTemplate);
             difference = templateUtility.hasDifference(selectedTemplate);
             checkedout = false;
             
@@ -213,7 +219,8 @@ public class TemplateList {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            Kntemplate validateTemplate = (Kntemplate) em.createNamedQuery("Kntemplate.findByName").setParameter("name", templateName).getSingleResult();
+            //Kntemplate validateTemplate = (Kntemplate) em.createNamedQuery("Kntemplate.findByName").setParameter("name", templateName).getSingleResult();
+            CfTemplate validateTemplate = cftemplateService.findByName(templateName);
             newButtonDisabled = true;
         } catch (NoResultException ex) {
             newButtonDisabled = templateName.isEmpty();
@@ -222,12 +229,14 @@ public class TemplateList {
     
     public void onCreate(ActionEvent actionEvent) {
         try {
-            Kntemplate newtemplate = new Kntemplate();
+            CfTemplate newtemplate = new CfTemplate();
             newtemplate.setName(templateName);
             newtemplate.setContent("//"+templateName);
             newtemplate.setScriptlanguage(templateScriptLanguage);
-            kntemplateFacadeREST.create(newtemplate);
-            templatelist = em.createNamedQuery("Kntemplate.findAll").getResultList();
+            //kntemplateFacadeREST.create(newtemplate);
+            cftemplateService.create(newtemplate);
+            //templatelist = em.createNamedQuery("Kntemplate.findAll").getResultList();
+            templatelist = cftemplateService.findAll();
             templateName = "";
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
@@ -236,8 +245,10 @@ public class TemplateList {
     
     public void onDelete(ActionEvent actionEvent) {
         if (selectedTemplate != null) {
-            kntemplateFacadeREST.remove(selectedTemplate);
-            templatelist = em.createNamedQuery("Kntemplate.findAll").getResultList();
+            //kntemplateFacadeREST.remove(selectedTemplate);
+            cftemplateService.delete(selectedTemplate);
+            //templatelist = em.createNamedQuery("Kntemplate.findAll").getResultList();
+            templatelist = cftemplateService.findAll();
             
             FacesMessage message = new FacesMessage("Deleted " + selectedTemplate.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);

@@ -23,7 +23,7 @@ import java.util.List;
  * @author sulzbachr
  */
 public interface CfTemplateversionService {
-    CfTemplateversion findByTemplateref(long ref);
+    List<CfTemplateversion> findByTemplateref(long ref);
     long findMaxVersion(long ref);
     CfTemplateversion findByPK(long ref, long version);
     List<CfTemplateversion> findAll();

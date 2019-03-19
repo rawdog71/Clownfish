@@ -58,7 +58,7 @@ public class CfTemplateversionServiceImpl implements CfTemplateversionService {
     }
 
     @Override
-    public CfTemplateversion findByTemplateref(long ref) {
+    public List<CfTemplateversion> findByTemplateref(long ref) {
         return this.cftemplateversionDAO.findByTemplateref(ref);
     }
 

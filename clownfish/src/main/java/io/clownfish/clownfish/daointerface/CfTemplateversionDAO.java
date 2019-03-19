@@ -23,7 +23,7 @@ import java.util.List;
  * @author rawdog
  */
 public interface CfTemplateversionDAO {
-    CfTemplateversion findByTemplateref(long ref);
+    List<CfTemplateversion> findByTemplateref(long ref);
     long findMaxVersion(long ref);
     CfTemplateversion findByPK(long ref, long version);
     List<CfTemplateversion> findAll();
