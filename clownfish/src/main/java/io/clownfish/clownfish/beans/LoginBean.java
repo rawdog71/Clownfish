@@ -9,9 +9,9 @@ import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.inject.Named;
 import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 
-@ManagedBean(name="loginBean")
+@Named("loginBean")
 @Component
 public class LoginBean implements Serializable {
     @Autowired CfUserService cfuserService;

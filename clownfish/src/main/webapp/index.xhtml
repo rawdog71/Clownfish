@@ -16,7 +16,7 @@
         <h:form id="form">
             <p:growl id="msgs" showDetail="true" />
             
-            <p:outputLabel value="K+N Gemini Projekt " />
+            <p:outputLabel value="Clownfish CMS " />
             
             <p:commandButton id="userButton" value="User" type="button" icon="fa fa-home" rendered="#{loginBean.login}" />
             <p:menu overlay="true" trigger="userButton" my="left top" at="left bottom">
@@ -96,7 +96,7 @@
                                             <p:selectOneMenu id="selecttemplate" value="#{sitetree.selectedTemplate}" required="false" converter="#{templateConverterBean}">
                                                 <p:ajax listener="#{sitetree.onChangeTemplate}" update=":form:tabview:templateview" />
                                                 <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                                <f:selectItems value="#{sitetree.templatelist}" />
+                                                <f:selectItems value="#{sitetree.templateList}" />
                                             </p:selectOneMenu>
                                         </p:column>
                                     </p:row>
@@ -106,7 +106,7 @@
                                             <p:selectOneMenu id="selectstylesheet" value="#{sitetree.selectedStylesheet}" required="false" converter="#{stylesheetConverterBean}">
                                                 <p:ajax listener="#{sitetree.onChangeStylesheet}" update=":form:tabview:cssview" />
                                                 <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                                <f:selectItems value="#{sitetree.stylesheetlist}" />
+                                                <f:selectItems value="#{sitetree.stylesheetList}" />
                                             </p:selectOneMenu>
                                         </p:column>
                                     </p:row>
@@ -216,43 +216,43 @@
                     </p:panelGrid>
                 </p:tab>
                 
-                <p:tab title="Templates" rendered="#{loginbean.login}">
-                    <p:selectOneMenu id="templatelist" value="#{templatelist.selectedTemplate}" converter="#{templateConverterBean}">
-                        <p:ajax listener="#{templatelist.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
+                <p:tab title="Templates" rendered="#{loginBean.login}">
+                    <p:selectOneMenu id="templatelist" value="#{templateList.selectedTemplate}" converter="#{templateConverterBean}">
+                        <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                        <f:selectItems value="#{templatelist.templatelist}" />
+                        <f:selectItems value="#{templateList.templateListe}" />
                     </p:selectOneMenu>
                     
-                    <p:commandButton id="deletetemplateButton" value="Delete" actionListener="#{templatelist.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:selecttemplate">
+                    <p:commandButton id="deletetemplateButton" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:selecttemplate">
                         <f:actionListener binding="#{sitetree.initTemplatelist()}" />
                     </p:commandButton>
 
                     <p:outputLabel for="templatename">Name</p:outputLabel>
-                    <p:inputText id="templatename" value="#{templatelist.templateName}" >
-                        <p:ajax event="keyup" listener="#{templatelist.onChangeName(changeEvent)}" update=":form:tabview:newtemplate" />
+                    <p:inputText id="templatename" value="#{templateList.templateName}" >
+                        <p:ajax event="keyup" listener="#{templateList.onChangeName(changeEvent)}" update=":form:tabview:newtemplate" />
                     </p:inputText>
-                    <p:selectOneMenu id="templatelanguage" value="#{templatelist.templateScriptLanguage}">
+                    <p:selectOneMenu id="templatelanguage" value="#{templateList.templateScriptLanguage}">
                         <f:selectItem itemValue="0" itemLabel="Freemarker" />
                         <f:selectItem itemValue="1" itemLabel="Velocity" />
                     </p:selectOneMenu>
-                    <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templatelist.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:selecttemplate" disabled="#{templatelist.newButtonDisabled}">
+                    <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:selecttemplate" disabled="#{templateList.newButtonDisabled}">
                         <f:actionListener binding="#{sitetree.initTemplatelist()}" />
                     </p:commandButton>
 
-                    <pe:codeMirror id="edittemplate" mode="#{templatelist.selectedScriptlanguage}" readonly="#{!templatelist.checkedout}" theme="ambiance" value="#{templatelist.templateContent}" lineNumbers="true" matchBrackets="true" />
+                    <pe:codeMirror id="edittemplate" mode="#{templateList.selectedScriptlanguage}" readonly="#{!templateList.checkedout}" theme="ambiance" value="#{templateList.templateContent}" lineNumbers="true" matchBrackets="true" />
                     <h:panelGroup id="difftemplateBtnGroup">
-                        <p:commandButton id="savetemplate" process="form" value="Save" rendered="#{templatelist.checkedout}" actionListener="#{templatelist.onSave}" update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
-                        <p:commandButton id="checkintemplate" process="form" value="CheckIn" rendered="#{templatelist.checkedout}" actionListener="#{templatelist.onCheckIn}"  update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
-                        <p:commandButton id="checkouttemplate" process="form" value="CheckOut" rendered="#{!templatelist.checkedout and templatelist.access}" actionListener="#{templatelist.onCheckOut}" update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
-                        <p:commandButton id="committemplate" process="form" value="Commit" rendered="#{templatelist.difference and !templatelist.checkedout and templatelist.access}" actionListener="#{templatelist.onCommit}"  update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup">
+                        <p:commandButton id="savetemplate" process="form" value="Save" rendered="#{templateList.checkedout}" actionListener="#{templateList.onSave}" update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
+                        <p:commandButton id="checkintemplate" process="form" value="CheckIn" rendered="#{templateList.checkedout}" actionListener="#{templateList.onCheckIn}"  update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
+                        <p:commandButton id="checkouttemplate" process="form" value="CheckOut" rendered="#{!templateList.checkedout and templateList.access}" actionListener="#{templateList.onCheckOut}" update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
+                        <p:commandButton id="committemplate" process="form" value="Commit" rendered="#{templateList.difference and !templateList.checkedout and templateList.access}" actionListener="#{templateList.onCommit}"  update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup">
                             <p:confirm header="Bestätigung" message="Sind Sie sicher?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
 
-                        <p:outputLabel> Version </p:outputLabel><p:outputLabel id="templateversion">#{templatelist.templateUtility.currentVersion}</p:outputLabel>
-                        <p:commandButton id="difftemplateBtn" type="button" value="Diff" rendered="#{templatelist.difference}" />
+                        <p:outputLabel> Version </p:outputLabel><p:outputLabel id="templateversion">#{templateList.templateUtility.currentVersion}</p:outputLabel>
+                        <p:commandButton id="difftemplateBtn" type="button" value="Diff" rendered="#{templateList.difference}" />
 
                         <p:overlayPanel id="difftemplatePanel" for="difftemplateBtn" hideEffect="fade" dynamic="false" style="width:600px" modal="true">
-                            <p:dataTable var="diff" value="#{templatelist.templateUtility.patch.deltas}" rows="#{templatelist.templateUtility.patch.deltas.size()}" paginator="false">
+                            <p:dataTable var="diff" value="#{templateList.templateUtility.patch.deltas}" rows="#{templateList.templateUtility.patch.deltas.size()}" paginator="false">
                                 <p:column headerText="DiffTyp">
                                     <h:outputText value="#{diff.type}" />
                                 </p:column>
@@ -273,40 +273,40 @@
                     
                 </p:tab>
                 
-                <p:tab title="Stylesheets" rendered="#{loginbean.login}">
-                    <p:selectOneMenu id="stylesheetlist" value="#{stylesheetlist.selectedStylesheet}" converter="#{stylesheetConverterBean}">
-                        <p:ajax listener="#{stylesheetlist.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:diffstylesheetPanel" />
+                <p:tab title="Stylesheets" rendered="#{loginBean.login}">
+                    <p:selectOneMenu id="stylesheetlist" value="#{stylesheetList.selectedStylesheet}" converter="#{stylesheetConverterBean}">
+                        <p:ajax listener="#{stylesheetList.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:diffstylesheetPanel" />
                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                        <f:selectItems value="#{stylesheetlist.stylesheetlist}" />
+                        <f:selectItems value="#{stylesheetList.stylesheetListe}" />
                     </p:selectOneMenu>
                     
-                    <p:commandButton id="deletestylesheetButton" value="Delete" actionListener="#{stylesheetlist.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:selectstylesheet">
+                    <p:commandButton id="deletestylesheetButton" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:selectstylesheet">
                         <f:actionListener binding="#{sitetree.initStylesheetlist()}" />
                     </p:commandButton>
 
                     <p:outputLabel for="stylesheetname">Name</p:outputLabel>
-                    <p:inputText id="stylesheetname" value="#{stylesheetlist.stylesheetName}" >
-                        <p:ajax event="keyup" listener="#{stylesheetlist.onChangeName(changeEvent)}" update=":form:tabview:newstylesheet" />
+                    <p:inputText id="stylesheetname" value="#{stylesheetList.stylesheetName}" >
+                        <p:ajax event="keyup" listener="#{stylesheetList.onChangeName(changeEvent)}" update=":form:tabview:newstylesheet" />
                     </p:inputText>
-                    <p:commandButton id="newstylesheet" process="form" value="New" actionListener="#{stylesheetlist.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:selectstylesheet" disabled="#{stylesheetlist.newButtonDisabled}">
+                    <p:commandButton id="newstylesheet" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}">
                         <f:actionListener binding="#{sitetree.initStylesheetlist()}" />
                     </p:commandButton>
 
-                    <pe:codeMirror id="editstylesheet" mode="css" theme="ambiance" readonly="#{!stylesheetlist.checkedout}" value="#{stylesheetlist.stylesheetContent}" lineNumbers="true" matchBrackets="true" />
+                    <pe:codeMirror id="editstylesheet" mode="css" theme="ambiance" readonly="#{!stylesheetList.checkedout}" value="#{stylesheetList.stylesheetContent}" lineNumbers="true" matchBrackets="true" />
                         <h:panelGroup id="diffstylesheetBtnGroup">
                             
-                        <p:commandButton id="savestylesheet" process="form" value="Save" rendered="#{stylesheetlist.checkedout}" actionListener="#{stylesheetlist.onSave}" update=":form:msgs :form:tabview:cssview :form:tabview:templateversion :form:tabview:diffstylesheetBtnGroup" />
-                        <p:commandButton id="checkinstylesheet" process="form" value="CheckIn" rendered="#{stylesheetlist.checkedout}" actionListener="#{stylesheetlist.onCheckIn}"  update=":form:msgs :form:tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
-                        <p:commandButton id="checkoutstylesheet" process="form" value="CheckOut" rendered="#{!stylesheetlist.checkedout and stylesheetlist.access}" actionListener="#{stylesheetlist.onCheckOut}" update=":form:msgs :form:tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
-                        <p:commandButton id="commitstylesheet" process="form" value="Commit" rendered="#{stylesheetlist.difference and !stylesheetlist.checkedout and stylesheetlist.access}" actionListener="#{stylesheetlist.onCommit}"  update=":form:msgs :form:tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup">
+                        <p:commandButton id="savestylesheet" process="form" value="Save" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onSave}" update=":form:msgs :form:tabview:cssview :form:tabview:templateversion :form:tabview:diffstylesheetBtnGroup" />
+                        <p:commandButton id="checkinstylesheet" process="form" value="CheckIn" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onCheckIn}"  update=":form:msgs :form:tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
+                        <p:commandButton id="checkoutstylesheet" process="form" value="CheckOut" rendered="#{!stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCheckOut}" update=":form:msgs :form:tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
+                        <p:commandButton id="commitstylesheet" process="form" value="Commit" rendered="#{stylesheetList.difference and !stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCommit}"  update=":form:msgs :form:tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup">
                             <p:confirm header="Bestätigung" message="Sind Sie sicher?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                             
-                        <p:outputLabel> Version </p:outputLabel><p:outputLabel id="stylesheetversion">#{stylesheetlist.stylesheetUtility.currentVersion}</p:outputLabel>
-                        <p:commandButton id="diffstylesheetBtn" type="button" value="Diff" rendered="#{stylesheetlist.difference}" />
+                        <p:outputLabel> Version </p:outputLabel><p:outputLabel id="stylesheetversion">#{stylesheetList.stylesheetUtility.currentVersion}</p:outputLabel>
+                        <p:commandButton id="diffstylesheetBtn" type="button" value="Diff" rendered="#{stylesheetList.difference}" />
                         
                         <p:overlayPanel id="diffstylesheetPanel" for="diffstylesheetBtn" hideEffect="fade" dynamic="false" style="width:600px" modal="true">
-                            <p:dataTable var="diff" value="#{stylesheetlist.stylesheetUtility.patch.deltas}" rows="#{stylesheetlist.stylesheetUtility.patch.deltas.size()}" paginator="false">
+                            <p:dataTable var="diff" value="#{stylesheetList.stylesheetUtility.patch.deltas}" rows="#{stylesheetList.stylesheetUtility.patch.deltas.size()}" paginator="false">
                                 <p:column headerText="DiffTyp">
                                     <h:outputText value="#{diff.type}" />
                                 </p:column>

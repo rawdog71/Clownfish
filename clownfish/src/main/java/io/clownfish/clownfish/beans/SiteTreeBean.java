@@ -129,7 +129,7 @@ public class SiteTreeBean implements Serializable {
         }
         root = new DefaultTreeNode("Root", null);
         loadTree();
-        templatelist =  cftemplateService.findAll();
+        templatelist = cftemplateService.findAll();
         stylesheetlist = cfstylesheetService.findAll();
         javascriptlist = cfjavascriptService.findAll();
         //datasources = em.createNamedQuery("Kndatasource.findAll").getResultList();

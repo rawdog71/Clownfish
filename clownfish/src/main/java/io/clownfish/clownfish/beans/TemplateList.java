@@ -15,27 +15,29 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
-@ManagedBean(name="templatelist")
+@Named("templateList")
 @Transactional
 @ViewScoped
+@Component
 public class TemplateList {
     @Inject
     LoginBean loginbean;
@@ -43,7 +45,7 @@ public class TemplateList {
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfTemplateversionService cftemplateversionService;
     
-    private @Getter @Setter List<CfTemplate> templatelist;
+    private @Getter @Setter List<CfTemplate> templateListe;
     private @Getter @Setter CfTemplate selectedTemplate = null;
     private @Getter @Setter String templateName;
     private @Getter @Setter boolean newButtonDisabled = false;
@@ -56,7 +58,6 @@ public class TemplateList {
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
     private @Getter @Setter TemplateUtil templateUtility;
-    
 
     public TemplateList() {
     }
@@ -81,7 +82,7 @@ public class TemplateList {
         templateUtility = new TemplateUtil();
         templateName = "";
         //templatelist = em.createNamedQuery("Kntemplate.findAll").getResultList();
-        templatelist = cftemplateService.findAll();
+        templateListe = cftemplateService.findAll();
         templateUtility.setTemplateContent("");
         checkedout = false;
         access = false;
@@ -237,7 +238,7 @@ public class TemplateList {
             //kntemplateFacadeREST.create(newtemplate);
             cftemplateService.create(newtemplate);
             //templatelist = em.createNamedQuery("Kntemplate.findAll").getResultList();
-            templatelist = cftemplateService.findAll();
+            templateListe = cftemplateService.findAll();
             templateName = "";
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
@@ -249,7 +250,7 @@ public class TemplateList {
             //kntemplateFacadeREST.remove(selectedTemplate);
             cftemplateService.delete(selectedTemplate);
             //templatelist = em.createNamedQuery("Kntemplate.findAll").getResultList();
-            templatelist = cftemplateService.findAll();
+            templateListe = cftemplateService.findAll();
             
             FacesMessage message = new FacesMessage("Deleted " + selectedTemplate.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);

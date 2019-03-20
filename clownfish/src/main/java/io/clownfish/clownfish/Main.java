@@ -1,6 +1,8 @@
 package io.clownfish.clownfish;
 
 import io.clownfish.clownfish.beans.LoginBean;
+import io.clownfish.clownfish.beans.StylesheetList;
+import io.clownfish.clownfish.beans.TemplateList;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import org.springframework.boot.SpringApplication;
@@ -21,7 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
  * @author rawdog71
  */
 @Configuration
-@ComponentScan("io.clownfish")
+@ComponentScan("io.clownfish.*")
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
 public class Main extends SpringBootServletInitializer implements ServletContextAware {
 
@@ -60,7 +62,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     public LoginBean loginbean() {
         return new LoginBean();
     }
-
+    
     @Override
     public void setServletContext(ServletContext servletContext) {
         servletContext.setInitParameter("com.sun.faces.forceLoadConfiguration", Boolean.TRUE.toString());
