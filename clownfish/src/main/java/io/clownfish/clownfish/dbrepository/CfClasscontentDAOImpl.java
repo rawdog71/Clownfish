@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 rawdog.
+ * Copyright 2019 sulzbachr.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package io.clownfish.clownfish.dbrepository;
 
-import io.clownfish.clownfish.daointerface.CfTemplateDAO;
-import io.clownfish.clownfish.dbentities.CfTemplate;
+import io.clownfish.clownfish.daointerface.CfClasscontentDAO;
+import io.clownfish.clownfish.dbentities.CfClasscontent;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -26,62 +26,62 @@ import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author rawdog
+ * @author sulzbachr
  */
 @Repository
-public class CfTemplateDAOImpl implements CfTemplateDAO {
+public class CfClasscontentDAOImpl implements CfClasscontentDAO {
 
     private final SessionFactory sessionFactory;
-
-    @Autowired
-    public CfTemplateDAOImpl(SessionFactory sessionFactory) {
+    
+    @Autowired 
+    public CfClasscontentDAOImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+    }
+
+    @Override
+    public List<CfClasscontent> findAll() {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findAll");
+        List<CfClasscontent> cfclasscontentlist = query.getResultList();
+        return cfclasscontentlist;
+    }
+
+    @Override
+    public CfClasscontent findById(Long id) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findById");
+        query.setParameter("id", id);
+        CfClasscontent cfclasscontent = (CfClasscontent) query.getSingleResult();
+        return cfclasscontent;
+    }
+
+    @Override
+    public CfClasscontent findByName(String name) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findByName");
+        query.setParameter("name", name);
+        CfClasscontent cfclasscontent = (CfClasscontent) query.getSingleResult();
+        return cfclasscontent;
     }
     
     @Override
-    public List<CfTemplate> findAll() {
-        Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findAll");
-        List<CfTemplate> cftempaltelist = query.getResultList();
-        return cftempaltelist;
-    }
-
-    @Override
-    public boolean create(CfTemplate entity) {
+    public boolean create(CfClasscontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
         return true;
     }
 
     @Override
-    public boolean delete(CfTemplate entity) {
+    public boolean delete(CfClasscontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.delete(entity);
         return true;
     }
 
     @Override
-    public boolean edit(CfTemplate entity) {
+    public boolean edit(CfClasscontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
         return true;
-    }
-
-    @Override
-    public CfTemplate findById(Long id) {
-        Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findById");
-        query.setParameter("id", id);
-        CfTemplate cftemplate = (CfTemplate) query.getSingleResult();
-        return cftemplate;
-    }
-
-    @Override
-    public CfTemplate findByName(String name) {
-        Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findByName");
-        query.setParameter("name", name);
-        CfTemplate cftemplate = (CfTemplate) query.getSingleResult();
-        return cftemplate;
     }
 }

@@ -15,9 +15,9 @@
  */
 package io.clownfish.clownfish.serviceimpl;
 
-import io.clownfish.clownfish.daointerface.CfPropertyDAO;
-import io.clownfish.clownfish.dbentities.CfProperty;
-import io.clownfish.clownfish.serviceinterface.CfPropertyService;
+import io.clownfish.clownfish.daointerface.CfJavascriptDAO;
+import io.clownfish.clownfish.dbentities.CfJavascript;
+import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,41 +29,41 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class CfJavascriptServiceImpl implements CfPropertyService {
-    private final CfPropertyDAO cfpropertyDAO;
+public class CfJavascriptServiceImpl implements CfJavascriptService {
+    private final CfJavascriptDAO cfjavascriptDAO;
     
     @Autowired
-    public CfJavascriptServiceImpl(CfPropertyDAO cfpropertyDAO) {
-        this.cfpropertyDAO = cfpropertyDAO;
+    public CfJavascriptServiceImpl(CfJavascriptDAO cfpropertyDAO) {
+        this.cfjavascriptDAO = cfpropertyDAO;
     }
 
     @Override
-    public List<CfProperty> findAll() {
-        return this.cfpropertyDAO.findAll();
+    public List<CfJavascript> findAll() {
+        return this.cfjavascriptDAO.findAll();
     }
 
     @Override
-    public CfProperty findByHashkey(String hashkey) {
-        return this.cfpropertyDAO.findByHashkey(hashkey);
+    public boolean create(CfJavascript entity) {
+        return this.cfjavascriptDAO.create(entity);
     }
 
     @Override
-    public CfProperty findByValue(String value) {
-        return this.cfpropertyDAO.findByValue(value);
+    public boolean delete(CfJavascript entity) {
+        return this.cfjavascriptDAO.delete(entity);
     }
 
     @Override
-    public boolean create(CfProperty entity) {
-        return this.cfpropertyDAO.create(entity);
+    public boolean edit(CfJavascript entity) {
+        return this.cfjavascriptDAO.edit(entity);
     }
 
     @Override
-    public boolean delete(CfProperty entity) {
-        return this.cfpropertyDAO.delete(entity);
+    public CfJavascript findById(Long id) {
+        return this.cfjavascriptDAO.findById(id);
     }
 
     @Override
-    public boolean edit(CfProperty entity) {
-        return this.cfpropertyDAO.edit(entity);
+    public CfJavascript findByName(String name) {
+        return this.cfjavascriptDAO.findByName(name);
     }
 }

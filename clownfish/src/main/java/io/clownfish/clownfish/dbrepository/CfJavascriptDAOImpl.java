@@ -17,17 +17,18 @@ package io.clownfish.clownfish.dbrepository;
 
 import io.clownfish.clownfish.daointerface.CfJavascriptDAO;
 import io.clownfish.clownfish.dbentities.CfJavascript;
-import io.clownfish.clownfish.dbentities.CfTemplate;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author rawdog
  */
+@Repository
 public class CfJavascriptDAOImpl implements CfJavascriptDAO {
 
     private final SessionFactory sessionFactory;

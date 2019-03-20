@@ -15,9 +15,9 @@
  */
 package io.clownfish.clownfish.serviceimpl;
 
-import io.clownfish.clownfish.daointerface.CfStylesheetDAO;
-import io.clownfish.clownfish.dbentities.CfStylesheet;
-import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
+import io.clownfish.clownfish.daointerface.CfSitelistDAO;
+import io.clownfish.clownfish.dbentities.CfSitelist;
+import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,41 +29,36 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class CfStylesheetServiceImpl implements CfStylesheetService {
-    private final CfStylesheetDAO cfstylesheetDAO;
+public class CfSitelistServiceImpl implements CfSitelistService {
+    private final CfSitelistDAO cfsitelistDAO;
     
     @Autowired
-    public CfStylesheetServiceImpl(CfStylesheetDAO cfpropertyDAO) {
-        this.cfstylesheetDAO = cfpropertyDAO;
+    public CfSitelistServiceImpl(CfSitelistDAO cfsitelistDAO) {
+        this.cfsitelistDAO = cfsitelistDAO;
     }
 
     @Override
-    public List<CfStylesheet> findAll() {
-        return this.cfstylesheetDAO.findAll();
+    public List<CfSitelist> findAll() {
+        return this.cfsitelistDAO.findAll();
     }
     
     @Override
-    public boolean create(CfStylesheet entity) {
-        return this.cfstylesheetDAO.create(entity);
+    public List<CfSitelist> findBySiteref(Long ref) {
+        return this.cfsitelistDAO.findBySiteref(ref);
     }
 
     @Override
-    public boolean delete(CfStylesheet entity) {
-        return this.cfstylesheetDAO.delete(entity);
+    public boolean create(CfSitelist entity) {
+        return this.cfsitelistDAO.create(entity);
     }
 
     @Override
-    public boolean edit(CfStylesheet entity) {
-        return this.cfstylesheetDAO.edit(entity);
+    public boolean delete(CfSitelist entity) {
+        return this.cfsitelistDAO.delete(entity);
     }
 
     @Override
-    public CfStylesheet findById(Long id) {
-        return this.cfstylesheetDAO.findById(id);
-    }
-
-    @Override
-    public CfStylesheet findByName(String name) {
-        return this.cfstylesheetDAO.findByName(name);
+    public boolean edit(CfSitelist entity) {
+        return this.cfsitelistDAO.edit(entity);
     }
 }

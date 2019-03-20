@@ -22,11 +22,13 @@ import javax.persistence.TypedQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author rawdog
  */
+@Repository
 public class CfStylesheetDAOImpl implements CfStylesheetDAO {
 
     private final SessionFactory sessionFactory;

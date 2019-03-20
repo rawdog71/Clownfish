@@ -2,6 +2,7 @@ package io.clownfish.clownfish.beans;
 
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.dbentities.CfTemplateversion;
+import io.clownfish.clownfish.dbentities.CfTemplateversionPK;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.utils.CompressionUtils;
@@ -264,21 +265,23 @@ public class TemplateList {
     }
     
     private void writeVersion(long templateref, long version, byte[] content) {
-        KntemplateversionPK templateversionpk = new KntemplateversionPK();
+        CfTemplateversionPK templateversionpk = new CfTemplateversionPK();
         templateversionpk.setTemplateref(templateref);
         templateversionpk.setVersion(version);
 
-        Kntemplateversion kntemplateversion = new Kntemplateversion();
-        kntemplateversion.setKntemplateversionPK(templateversionpk);
-        kntemplateversion.setContent(content);
-        kntemplateversion.setTstamp(new Date());
-        kntemplateversion.setCommitedby(BigInteger.valueOf(loginbean.getKnuser().getId()));
-        kntemplateversionFacadeREST.create(kntemplateversion);
+        CfTemplateversion cftemplateversion = new CfTemplateversion();
+        cftemplateversion.setCfTemplateversionPK(templateversionpk);
+        cftemplateversion.setContent(content);
+        cftemplateversion.setTstamp(new Date());
+        cftemplateversion.setCommitedby(BigInteger.valueOf(loginbean.getCfuser().getId()));
+        
+        //kntemplateversionFacadeREST.create(kntemplateversion);
+        cftemplateversionService.create(cftemplateversion);
     }
     
     public void onVersionSelect(ActionEvent actionEvent) {
         if (selectedTemplate != null) {
-            String versioncontent = templateUtility.getVersion(version.getKntemplateversionPK().getTemplateref(), version.getKntemplateversionPK().getVersion());
+            String versioncontent = templateUtility.getVersion(version.getCfTemplateversionPK().getTemplateref(), version.getCfTemplateversionPK().getVersion());
         }
     }
 }

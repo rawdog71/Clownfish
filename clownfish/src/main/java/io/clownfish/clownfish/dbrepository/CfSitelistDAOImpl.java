@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 rawdog.
+ * Copyright 2019 sulzbachr.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package io.clownfish.clownfish.dbrepository;
 
-import io.clownfish.clownfish.daointerface.CfTemplateDAO;
-import io.clownfish.clownfish.dbentities.CfTemplate;
+import io.clownfish.clownfish.daointerface.CfSitelistDAO;
+import io.clownfish.clownfish.dbentities.CfSitelist;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -26,62 +26,53 @@ import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author rawdog
+ * @author sulzbachr
  */
 @Repository
-public class CfTemplateDAOImpl implements CfTemplateDAO {
+public class CfSitelistDAOImpl implements CfSitelistDAO {
 
     private final SessionFactory sessionFactory;
-
-    @Autowired
-    public CfTemplateDAOImpl(SessionFactory sessionFactory) {
+    
+    @Autowired 
+    public CfSitelistDAOImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+    }
+
+    @Override
+    public List<CfSitelist> findAll() {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfSitelist.findAll");
+        List<CfSitelist> cfsitelistlist = query.getResultList();
+        return cfsitelistlist;
     }
     
     @Override
-    public List<CfTemplate> findAll() {
+    public List<CfSitelist> findBySiteref(Long ref) {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findAll");
-        List<CfTemplate> cftempaltelist = query.getResultList();
-        return cftempaltelist;
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfSitelist.findBySiteref");  
+        query.setParameter("siteref", ref);
+        List<CfSitelist> cfsitelistlist = query.getResultList();
+        return cfsitelistlist;
     }
 
     @Override
-    public boolean create(CfTemplate entity) {
+    public boolean create(CfSitelist entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
         return true;
     }
 
     @Override
-    public boolean delete(CfTemplate entity) {
+    public boolean delete(CfSitelist entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.delete(entity);
         return true;
     }
 
     @Override
-    public boolean edit(CfTemplate entity) {
+    public boolean edit(CfSitelist entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
         return true;
-    }
-
-    @Override
-    public CfTemplate findById(Long id) {
-        Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findById");
-        query.setParameter("id", id);
-        CfTemplate cftemplate = (CfTemplate) query.getSingleResult();
-        return cftemplate;
-    }
-
-    @Override
-    public CfTemplate findByName(String name) {
-        Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findByName");
-        query.setParameter("name", name);
-        CfTemplate cftemplate = (CfTemplate) query.getSingleResult();
-        return cftemplate;
     }
 }

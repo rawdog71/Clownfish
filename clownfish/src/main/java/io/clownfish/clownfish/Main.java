@@ -21,7 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
  * @author rawdog71
  */
 @Configuration
-@ComponentScan("io.clownfish.*")
+@ComponentScan("io.clownfish")
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
 public class Main extends SpringBootServletInitializer implements ServletContextAware {
 
