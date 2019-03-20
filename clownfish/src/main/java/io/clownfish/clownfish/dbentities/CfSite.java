@@ -87,6 +87,10 @@ public class CfSite implements Serializable {
     @Size(max = 255)
     @Column(name = "aliaspath")
     private String aliaspath;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "gzip")
+    private int gzip;
 
     public CfSite() {
     }
@@ -187,6 +191,14 @@ public class CfSite implements Serializable {
 
     public void setAliaspath(String aliaspath) {
         this.aliaspath = aliaspath;
+    }
+
+    public int getGzip() {
+        return gzip;
+    }
+
+    public void setGzip(int gzip) {
+        this.gzip = gzip;
     }
 
     @Override

@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -62,7 +61,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @ViewScoped
 @Named("sitetree")
-@ManagedBean(name = "sitetree")
 public class SiteTreeBean implements Serializable {
     public static final String SAPCONNECTION = "sapconnection.props";
     private static SAPConnection sapc = null;
@@ -91,6 +89,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter List<CfClasscontent> selectedclasscontentlist;
     private @Getter @Setter int sitehtmlcompression;
+    private @Getter @Setter int sitegzip;
     private @Getter @Setter String aliaspath;
     private @Getter @Setter String characterEncoding;
     private @Getter @Setter String contentType;

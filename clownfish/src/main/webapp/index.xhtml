@@ -4,18 +4,19 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
 >
     <h:head>
         <title>Clownfish CMS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     </h:head>
-    <body>
+    <h:body>
         <h:outputScript library="js" name="main.js" target="head" />
         
         <h:form id="form">
             <p:growl id="msgs" showDetail="true" />
             
-            <p:outputLabel value="Clownfish CMS " />
+            <p:outputLabel value="K+N Gemini Projekt " />
             
             <p:commandButton id="userButton" value="User" type="button" icon="fa fa-home" rendered="#{loginBean.login}" />
             <p:menu overlay="true" trigger="userButton" my="left top" at="left bottom">
@@ -37,7 +38,674 @@
                         <p:commandButton id="LoginButton" value="Login" actionListener="#{loginBean.onLogin}" update=":form" />
                     </h:panelGrid>
                 </p:tab>
+                
+                <p:tab title="Siteoverview" rendered="#{loginBean.login}">
+                    <p:panelGrid>
+                        <p:row>
+                            <p:column colspan="12" style="vertical-align: top;">
+                                <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                                    <p:tree id="sitetree" value="#{sitetree.root}" var="node" dynamic="true" selectionMode="single" draggable="true" droppable="true">
+                                        <p:ajax event="dragdrop" listener="#{sitetree.onDragDrop}" update=":form:msgs" />
+                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:templateview :form:tabview:cssview :form:tabview:sitepanel :form:tabview:jsview :form:tabview:sitelist :form:tabview:classcontentdroplist :form:tabview:newsite :form:tabview:saprfclist" />
+                                        <p:treeNode>
+                                            <h:outputText value="#{node}" />
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:column>
+                            <p:column colspan="12" style="vertical-align: top;">
+                                <p:panelGrid id="sitepanel">
+                                    <p:row>
+                                        <p:column>
+                                            <p:outputLabel for="sitename">Name</p:outputLabel>
+                                            <p:inputText id="sitename" value="#{sitetree.siteName}" >
+                                                <p:ajax event="keyup" listener="#{sitetree.onChangeName(changeEvent)}" update=":form:tabview:newsite" />
+                                            </p:inputText>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column>
+                                            <p:outputLabel for="sitedatasource" value="Datasource:" />
+                                            <p:selectCheckboxMenu id="sitedatasource" value="#{sitetree.selectedDatasources}" required="false" label="Datasources" converter="#{datasourceConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                <f:selectItems value="#{sitetree.datasources}" var="datasource" itemLabel="#{datasource.name}" itemValue="#{datasource}" />
+                                            </p:selectCheckboxMenu>
+                                        </p:column>
+                                    </p:row>
+                                    
+                                    <p:row>
+                                        <p:column>
+                                            <p:outputLabel for="sitelist" value="Datalist:" />
+                                            <p:selectCheckboxMenu id="sitelist" value="#{sitetree.selectedContentlist}" required="false" label="Datalist" converter="#{sitelistConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                <f:selectItems value="#{sitetree.contentlist}" var="contentlist" itemLabel="#{contentlist.name}" itemValue="#{contentlist}" />
+                                            </p:selectCheckboxMenu>
+                                        </p:column>
+                                    </p:row>
+                                    
+                                    <p:row>
+                                        <p:column>
+                                            <p:outputLabel for="classcontentdroplist" value="Contentlist:" />
+                                            <p:selectCheckboxMenu id="classcontentdroplist" value="#{sitetree.selectedclasscontentlist}" required="false" label="Contentlist" converter="#{classcontentConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                <f:selectItems value="#{sitetree.classcontentlist}" var="classcontent" itemLabel="#{classcontent.name}" itemValue="#{classcontent}" />
+                                            </p:selectCheckboxMenu>
+                                        </p:column>
+                                    </p:row>
+                                    
+                                    <p:row>
+                                        <p:column>    
+                                            <p:outputLabel for="selecttemplate" value="Template:" />
+                                            <p:selectOneMenu id="selecttemplate" value="#{sitetree.selectedTemplate}" required="false" converter="#{templateConverterBean}">
+                                                <p:ajax listener="#{sitetree.onChangeTemplate}" update=":form:tabview:templateview" />
+                                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                                <f:selectItems value="#{sitetree.templatelist}" />
+                                            </p:selectOneMenu>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column>    
+                                            <p:outputLabel for="selectstylesheet" value="Stylesheet:" />
+                                            <p:selectOneMenu id="selectstylesheet" value="#{sitetree.selectedStylesheet}" required="false" converter="#{stylesheetConverterBean}">
+                                                <p:ajax listener="#{sitetree.onChangeStylesheet}" update=":form:tabview:cssview" />
+                                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                                <f:selectItems value="#{sitetree.stylesheetlist}" />
+                                            </p:selectOneMenu>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column>    
+                                            <p:outputLabel for="selectjavascript" value="Javascript:" />
+                                            <p:selectOneMenu id="selectjavascript" value="#{sitetree.selectedJavascript}" required="false" converter="#{javascriptConverterBean}">
+                                                <p:ajax listener="#{sitetree.onChangeJavascript}" update=":form:tabview:jsview" />
+                                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                                <f:selectItems value="#{sitetree.javascriptlist}" />
+                                            </p:selectOneMenu>
+                                        </p:column>
+                                    </p:row>
+                                    
+                                    <p:row>
+                                        <p:column>    
+                                            <p:outputLabel for="selecthtmlcompression" value="HTML Compression:" />
+                                            <p:triStateCheckbox id="selecthtmlcompression" value="#{sitetree.sitehtmlcompression}"/>  
+                                        </p:column>
+                                    </p:row>
+                                    
+                                    <p:row>
+                                        <p:column>    
+                                            <p:outputLabel for="selectgzip" value="GZIP:" />
+                                            <p:triStateCheckbox id="selectgzip" value="#{sitetree.sitegzip}"/>  
+                                        </p:column>
+                                    </p:row>
+                                    
+                                    <p:row>
+                                        <p:column>    
+                                            <p:outputLabel for="contenttype" value="ContentType:" />
+                                            <p:inputText id="contenttype" value="#{sitetree.contentType}" maxlength="16" />
+                                        </p:column>
+                                    </p:row>
+                                    
+                                    <p:row>
+                                        <p:column>    
+                                            <p:outputLabel for="encoding" value="Encoding:" />
+                                            <p:inputText id="encoding" value="#{sitetree.characterEncoding}" maxlength="16" />
+                                        </p:column>
+                                    </p:row>
+                                    
+                                    <p:row>
+                                        <p:column>    
+                                            <p:outputLabel for="locale" value="Locale:" />
+                                            <p:inputText id="locale" value="#{sitetree.locale}" maxlength="16" />
+                                        </p:column>
+                                    </p:row>
+                                    
+                                    <p:row>
+                                        <p:column>    
+                                            <p:outputLabel for="aliaspath" value="Path:" />
+                                            <p:inputText id="aliaspath" value="#{sitetree.aliaspath}" maxlength="255" />
+                                        </p:column>
+                                    </p:row>
+                                    
+                                    <p:row>
+                                        <p:column>
+                                            <p:commandButton id="changeSiteButton" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs" />
+                                            <p:commandButton id="deleteSiteButton" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree" />
+                                            <p:commandButton id="newsite" process="form" value="New" actionListener="#{sitetree.onCreate}" update=":form:msgs :form:tabview:sitetree" disabled="#{sitetree.newButtonDisabled}" />
+                                        </p:column>
+                                    </p:row>
+                                </p:panelGrid>
+                            </p:column>
+                            <p:column colspan="12" style="vertical-align: top;" rendered="#{sitetree.sapSupport}">
+                                <p:dataTable id="saprfclist" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.knsitesaprfcPK}">
+                                    <p:ajax event="rowSelect" listener="#{sitetree.onRfcSelect}" update=":form:tabview:siterfcgroup :form:tabview:siterfcfunction" />
+                                    <p:column headerText="RFC GRUPPE">
+                                        <h:outputText value="#{rfclist.knsitesaprfcPK.rfcgroup}" />
+                                    </p:column>
+                                    <p:column headerText="RFC FUNKTION">
+                                        <h:outputText value="#{rfclist.knsitesaprfcPK.rfcfunction}" />
+                                    </p:column>
+                                </p:dataTable>
+                                <p:selectOneMenu id="siterfcgroup" value="#{sitetree.selectedrfcgroup}" required="false" label="RFCGROUP" converter="#{rfcGroupConverterBean}">
+                                    <p:ajax listener="#{sitetree.onChangeRfcGroup}" update=":form:tabview:siterfcfunction" />
+                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                    <f:selectItems value="#{sitetree.rfcgrouplist}" var="rfcgroup" itemLabel="#{rfcgroup.name}" itemValue="#{rfcgroup}" />
+                                </p:selectOneMenu>
+                                <p:selectOneMenu id="siterfcfunction" value="#{sitetree.selectedrfcfunction}" required="false" label="RFCFUNCTION" converter="#{rfcFunctionConverterBean}">
+                                    <p:ajax listener="#{sitetree.onChangeRfcFunction}" />
+                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                    <f:selectItems value="#{sitetree.rfcfunctionlist}" var="rfcfunction" itemLabel="#{rfcfunction.name}" itemValue="#{rfcfunction}" />
+                                </p:selectOneMenu>
+                                <p:commandButton id="newRfc" process="form" value="New" actionListener="#{sitetree.onNewRfc}" update=":form:tabview:saprfclist" />
+                                <p:commandButton id="deleteRfc" process="form" value="Delete" actionListener="#{sitetree.onDeleteRfc}" update=":form:tabview:saprfclist" />
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                    
+                    <p:panelGrid>
+                        <p:row>
+                            <p:column colspan="12">
+                            Template:
+                            <pe:codeMirror id="templateview" mode="#{sitetree.selectedTemplate.scriptLanguageTxt}" theme="ambiance" value="#{sitetree.template}" lineNumbers="true" matchBrackets="true" readonly="true" />
+                            </p:column>
+                            <p:column colspan="12">
+                            Stylesheet:
+                            <pe:codeMirror id="cssview" mode="css" theme="ambiance" value="#{sitetree.stylesheet}" lineNumbers="true" matchBrackets="true" readonly="true" />
+                            </p:column>
+                            <p:column colspan="12">
+                            Javascript:
+                            <pe:codeMirror id="jsview" mode="javascript" theme="ambiance" value="#{sitetree.javascript}" lineNumbers="true" matchBrackets="true" readonly="true" />
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                </p:tab>
+                
+                <p:tab title="Templates" rendered="#{loginbean.login}">
+                    <p:selectOneMenu id="templatelist" value="#{templatelist.selectedTemplate}" converter="#{templateConverterBean}">
+                        <p:ajax listener="#{templatelist.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
+                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                        <f:selectItems value="#{templatelist.templatelist}" />
+                    </p:selectOneMenu>
+                    
+                    <p:commandButton id="deletetemplateButton" value="Delete" actionListener="#{templatelist.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:selecttemplate">
+                        <f:actionListener binding="#{sitetree.initTemplatelist()}" />
+                    </p:commandButton>
+
+                    <p:outputLabel for="templatename">Name</p:outputLabel>
+                    <p:inputText id="templatename" value="#{templatelist.templateName}" >
+                        <p:ajax event="keyup" listener="#{templatelist.onChangeName(changeEvent)}" update=":form:tabview:newtemplate" />
+                    </p:inputText>
+                    <p:selectOneMenu id="templatelanguage" value="#{templatelist.templateScriptLanguage}">
+                        <f:selectItem itemValue="0" itemLabel="Freemarker" />
+                        <f:selectItem itemValue="1" itemLabel="Velocity" />
+                    </p:selectOneMenu>
+                    <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templatelist.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:selecttemplate" disabled="#{templatelist.newButtonDisabled}">
+                        <f:actionListener binding="#{sitetree.initTemplatelist()}" />
+                    </p:commandButton>
+
+                    <pe:codeMirror id="edittemplate" mode="#{templatelist.selectedScriptlanguage}" readonly="#{!templatelist.checkedout}" theme="ambiance" value="#{templatelist.templateContent}" lineNumbers="true" matchBrackets="true" />
+                    <h:panelGroup id="difftemplateBtnGroup">
+                        <p:commandButton id="savetemplate" process="form" value="Save" rendered="#{templatelist.checkedout}" actionListener="#{templatelist.onSave}" update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
+                        <p:commandButton id="checkintemplate" process="form" value="CheckIn" rendered="#{templatelist.checkedout}" actionListener="#{templatelist.onCheckIn}"  update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
+                        <p:commandButton id="checkouttemplate" process="form" value="CheckOut" rendered="#{!templatelist.checkedout and templatelist.access}" actionListener="#{templatelist.onCheckOut}" update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
+                        <p:commandButton id="committemplate" process="form" value="Commit" rendered="#{templatelist.difference and !templatelist.checkedout and templatelist.access}" actionListener="#{templatelist.onCommit}"  update=":form:msgs :form:tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup">
+                            <p:confirm header="Bestätigung" message="Sind Sie sicher?" icon="pi pi-exclamation-triangle" />
+                        </p:commandButton>
+
+                        <p:outputLabel> Version </p:outputLabel><p:outputLabel id="templateversion">#{templatelist.templateUtility.currentVersion}</p:outputLabel>
+                        <p:commandButton id="difftemplateBtn" type="button" value="Diff" rendered="#{templatelist.difference}" />
+
+                        <p:overlayPanel id="difftemplatePanel" for="difftemplateBtn" hideEffect="fade" dynamic="false" style="width:600px" modal="true">
+                            <p:dataTable var="diff" value="#{templatelist.templateUtility.patch.deltas}" rows="#{templatelist.templateUtility.patch.deltas.size()}" paginator="false">
+                                <p:column headerText="DiffTyp">
+                                    <h:outputText value="#{diff.type}" />
+                                </p:column>
+                                <p:column headerText="Local">
+                                    <h:outputText value="#{diff.source}" />
+                                </p:column>
+                                <p:column headerText="Repository">
+                                    <h:outputText value="#{diff.target}" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                        <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                    </p:confirmDialog> 
+                    
+                </p:tab>
+                
+                <p:tab title="Stylesheets" rendered="#{loginbean.login}">
+                    <p:selectOneMenu id="stylesheetlist" value="#{stylesheetlist.selectedStylesheet}" converter="#{stylesheetConverterBean}">
+                        <p:ajax listener="#{stylesheetlist.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:diffstylesheetPanel" />
+                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                        <f:selectItems value="#{stylesheetlist.stylesheetlist}" />
+                    </p:selectOneMenu>
+                    
+                    <p:commandButton id="deletestylesheetButton" value="Delete" actionListener="#{stylesheetlist.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:selectstylesheet">
+                        <f:actionListener binding="#{sitetree.initStylesheetlist()}" />
+                    </p:commandButton>
+
+                    <p:outputLabel for="stylesheetname">Name</p:outputLabel>
+                    <p:inputText id="stylesheetname" value="#{stylesheetlist.stylesheetName}" >
+                        <p:ajax event="keyup" listener="#{stylesheetlist.onChangeName(changeEvent)}" update=":form:tabview:newstylesheet" />
+                    </p:inputText>
+                    <p:commandButton id="newstylesheet" process="form" value="New" actionListener="#{stylesheetlist.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:selectstylesheet" disabled="#{stylesheetlist.newButtonDisabled}">
+                        <f:actionListener binding="#{sitetree.initStylesheetlist()}" />
+                    </p:commandButton>
+
+                    <pe:codeMirror id="editstylesheet" mode="css" theme="ambiance" readonly="#{!stylesheetlist.checkedout}" value="#{stylesheetlist.stylesheetContent}" lineNumbers="true" matchBrackets="true" />
+                        <h:panelGroup id="diffstylesheetBtnGroup">
+                            
+                        <p:commandButton id="savestylesheet" process="form" value="Save" rendered="#{stylesheetlist.checkedout}" actionListener="#{stylesheetlist.onSave}" update=":form:msgs :form:tabview:cssview :form:tabview:templateversion :form:tabview:diffstylesheetBtnGroup" />
+                        <p:commandButton id="checkinstylesheet" process="form" value="CheckIn" rendered="#{stylesheetlist.checkedout}" actionListener="#{stylesheetlist.onCheckIn}"  update=":form:msgs :form:tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
+                        <p:commandButton id="checkoutstylesheet" process="form" value="CheckOut" rendered="#{!stylesheetlist.checkedout and stylesheetlist.access}" actionListener="#{stylesheetlist.onCheckOut}" update=":form:msgs :form:tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
+                        <p:commandButton id="commitstylesheet" process="form" value="Commit" rendered="#{stylesheetlist.difference and !stylesheetlist.checkedout and stylesheetlist.access}" actionListener="#{stylesheetlist.onCommit}"  update=":form:msgs :form:tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup">
+                            <p:confirm header="Bestätigung" message="Sind Sie sicher?" icon="pi pi-exclamation-triangle" />
+                        </p:commandButton>
+                            
+                        <p:outputLabel> Version </p:outputLabel><p:outputLabel id="stylesheetversion">#{stylesheetlist.stylesheetUtility.currentVersion}</p:outputLabel>
+                        <p:commandButton id="diffstylesheetBtn" type="button" value="Diff" rendered="#{stylesheetlist.difference}" />
+                        
+                        <p:overlayPanel id="diffstylesheetPanel" for="diffstylesheetBtn" hideEffect="fade" dynamic="false" style="width:600px" modal="true">
+                            <p:dataTable var="diff" value="#{stylesheetlist.stylesheetUtility.patch.deltas}" rows="#{stylesheetlist.stylesheetUtility.patch.deltas.size()}" paginator="false">
+                                <p:column headerText="DiffTyp">
+                                    <h:outputText value="#{diff.type}" />
+                                </p:column>
+                                <p:column headerText="Local">
+                                    <h:outputText value="#{diff.source}" />
+                                </p:column>
+                                <p:column headerText="Repository">
+                                    <h:outputText value="#{diff.target}" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                    </p:confirmDialog> 
+                </p:tab>
+                
+                <p:tab title="Javascripts" rendered="#{loginbean.login}">
+                    <p:selectOneMenu id="javascriptlist" value="#{javascriptlist.selectedJavascript}" converter="#{javascriptConverterBean}">
+                        <p:ajax listener="#{javascriptlist.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:diffjavascriptPanel" />
+                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                        <f:selectItems value="#{javascriptlist.javascriptlist}" />
+                    </p:selectOneMenu>
+                    
+                    <p:commandButton id="deletejavascriptButton" value="Delete" actionListener="#{javascriptlist.onDelete}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:selectjavascript">
+                        <f:actionListener binding="#{sitetree.initJavascriptlist()}" />
+                    </p:commandButton>
+
+                    <p:outputLabel for="javascriptname">Name</p:outputLabel>
+                    <p:inputText id="javascriptname" value="#{javascriptlist.javascriptName}" >
+                        <p:ajax event="keyup" listener="#{javascriptlist.onChangeName(changeEvent)}" update=":form:tabview:newjavascript" />
+                    </p:inputText>
+                    <p:commandButton id="newjavascript" process="form" value="New" actionListener="#{javascriptlist.onCreate}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:selectjavascript" disabled="#{javascriptlist.newButtonDisabled}">
+                        <f:actionListener binding="#{sitetree.initJavascriptlist()}" />
+                    </p:commandButton>
+                    
+                    <pe:codeMirror id="editjavascript" mode="javascript" theme="ambiance" readonly="#{!javascriptlist.checkedout}" value="#{javascriptlist.javascriptContent}" lineNumbers="true" matchBrackets="true" />
+                    <h:panelGroup id="diffjavascriptBtnGroup">
+                        
+                        <p:commandButton id="savejavascript" process="form" value="Save" rendered="#{javascriptlist.checkedout}" actionListener="#{javascriptlist.onSave}" update=":form:msgs :form:tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup" />
+                        <p:commandButton id="checkinjavascript" process="form" value="CheckIn" rendered="#{javascriptlist.checkedout}" actionListener="#{javascriptlist.onCheckIn}"  update=":form:msgs :form:tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
+                        <p:commandButton id="checkoutjavascript" process="form" value="CheckOut" rendered="#{!javascriptlist.checkedout and javascriptlist.access}" actionListener="#{javascriptlist.onCheckOut}" update=":form:msgs :form:tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
+                        <p:commandButton id="commitjavascript" process="form" value="Commit" rendered="#{javascriptlist.difference and !javascriptlist.checkedout and javascriptlist.access}" actionListener="#{javascriptlist.onCommit}" update=":form:msgs :form:tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup">
+                            <p:confirm header="Bestätigung" message="Sind Sie sicher?" icon="pi pi-exclamation-triangle" />
+                        </p:commandButton>
+                        
+                        <p:outputLabel> Version </p:outputLabel><p:outputLabel id="javascriptversion">#{javascriptlist.javascriptUtility.currentVersion}</p:outputLabel>
+                        <p:commandButton id="diffjavascriptBtn" type="button" value="Diff" rendered="#{javascriptlist.difference}" />
+                        
+                        <p:overlayPanel id="diffjavascriptPanel" for="diffjavascriptBtn" hideEffect="fade" dynamic="false" style="width:600px" modal="true">
+                            <p:dataTable var="diff" value="#{javascriptlist.javascriptUtility.patch.deltas}" rows="#{javascriptlist.javascriptUtility.patch.deltas.size()}" paginator="false">
+                                <p:column headerText="DiffTyp">
+                                    <h:outputText value="#{diff.type}" />
+                                </p:column>
+                                <p:column headerText="Local">
+                                    <h:outputText value="#{diff.source}" />
+                                </p:column>
+                                <p:column headerText="Repository">
+                                    <h:outputText value="#{diff.target}" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                    </p:confirmDialog> 
+                    
+                </p:tab>
+                
+                <p:tab title="Klassen" rendered="#{loginbean.login}">
+                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                        <p:dataTable id="classlist" var="klasse" value="#{classlist.classlist}" selectionMode="single" selection="#{classlist.selectedClass}" rowKey="#{klasse.id}">
+                            <p:ajax event="rowSelect" listener="#{classlist.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:newclass" />
+                            <p:column headerText="Name">
+                                <h:outputText value="#{klasse.name}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:scrollPanel>
+
+                    <p:outputLabel for="classname">Name</p:outputLabel>
+                    <p:inputText id="classname" value="#{classlist.className}" >
+                        <p:ajax event="keyup" listener="#{classlist.onChangeName(changeEvent)}" update=":form:tabview:newclass" />
+                    </p:inputText>
+                    <p:commandButton id="newclass" process="form" value="New" actionListener="#{classlist.onCreate}" update=":form:msgs :form:tabview:classlist :form:tabview:classname" disabled="#{classlist.newButtonDisabled}" />
+
+                    <p:dataTable id="attributlist" var="attribut" value="#{classlist.selectedAttributList}" selectionMode="single" selection="#{classlist.selectedAttribut}" rowKey="#{attribut.id}">
+                        <p:ajax event="rowSelect" listener="#{classlist.onSelectAttribute}" update=":form:msgs :form:tabview:attributname :form:tabview:attributtype :form:tabview:attributidentity :form:tabview:attributautoinc" />
+                        <p:column headerText="Name">
+                            <h:outputText value="#{attribut.name}" />
+                        </p:column>
+                        <p:column headerText="Type">
+                            <h:outputText value="#{attribut.attributetype}" />
+                        </p:column>
+                        <p:column headerText="Identity">
+                            <h:outputText value="#{attribut.identity}" />
+                        </p:column>
+                        <p:column headerText="Autoinc">
+                            <h:outputText value="#{attribut.autoincrementor}" />
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:outputLabel for="attributname">Name</p:outputLabel>
+                    <p:inputText id="attributname" value="#{classlist.attributName}" >
+                        <p:ajax event="keyup" listener="#{classlist.onChangeAttributName(changeEvent)}" update=":form:tabview:newattribut" />
+                    </p:inputText>
+
+                    <p:outputLabel for="attributtype" value="Typ:" />
+                    <p:selectOneMenu id="attributtype" value="#{classlist.selectedAttributeType}" required="true" converter="#{attributetypeConverterBean}">
+                        <f:selectItems value="#{classlist.attributetypelist}" />
+                    </p:selectOneMenu>
+                    
+                    <p:outputLabel for="attributidentity" value="Identity:" />
+                    <p:selectBooleanCheckbox id="attributidentity" value="#{classlist.identity}" />
+                    
+                    <p:outputLabel for="attributautoinc" value="Autoinc:" />
+                    <p:selectBooleanCheckbox id="attributautoinc" value="#{classlist.autoinc}" />
+
+                    <p:commandButton id="newattribut" process="form" value="New" actionListener="#{classlist.onCreateAttribut}" update=":form:msgs :form:tabview:attributlist :form:tabview:classname" disabled="#{classlist.newAttributButtonDisabled}" />
+                    <p:commandButton id="changeattribut" process="form" value="Edit" actionListener="#{classlist.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" />
+                </p:tab>
+                
+                <p:tab title="Content" rendered="#{loginbean.login}">
+                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                        <p:dataTable id="classcontentlist" var="classcontent" value="#{classcontentlist.classcontentlist}" 
+                                     selectionMode="single" selection="#{classcontentlist.selectedContent}" rowKey="#{classcontent.id}"
+                                     emptyMessage="No content available" filteredValue="#{classcontentlist.filteredContent}" widgetVar="classcontentlist">
+                            <p:ajax event="rowSelect" listener="#{classcontentlist.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:newcontent" />
+                            <p:column headerText="Name" filterBy="#{classcontent.name}" filterMatchMode="contains">
+                                <h:outputText value="#{classcontent.name}" />
+                            </p:column>
+                            <p:column headerText="Klasse" filterBy="#{classcontent.classref}" filterMatchMode="exact">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('classcontentlist').filter()" styleClass="custom-filter">
+                                        <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{classcontentlist.classlist}" />
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{classcontent.classref}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:scrollPanel>
+                    
+                    <p:outputLabel for="contentname">Name</p:outputLabel>
+                    <p:inputText id="contentname" value="#{classcontentlist.contentName}" >
+                        <p:ajax event="keyup" listener="#{classcontentlist.onChangeName(changeEvent)}" update="newcontent" />
+                    </p:inputText>
+
+                    <p:outputLabel for="contentclass" value="Class:" />
+                    <p:selectOneMenu id="contentclass" value="#{classcontentlist.selectedClass}" required="true" converter="#{classConverterBean}">
+                        <f:selectItems value="#{classcontentlist.classlist}" />
+                    </p:selectOneMenu>
+                    
+                    <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentlist.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist" disabled="#{classcontentlist.newContentButtonDisabled}" />
+                    <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentlist.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist" />
+                    
+                    <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentlist.attributcontentlist}" selectionMode="single" selection="#{classcontentlist.selectedAttributContent}" rowKey="#{attributcontent.id}">
+                        <p:ajax event="rowSelect" listener="#{classcontentlist.onSelectAttribut}" update=":form:tabview:attributcontentlist" />
+                        <p:column headerText="Name">
+                            <h:outputText value="#{attributcontent.attributref.name}" />
+                        </p:column>
+                        <p:column headerText="Typ">
+                            <h:outputText value="#{attributcontent.attributref.attributetype}" />
+                        </p:column>
+                        <p:column headerText="Wert">
+                            <p:inputText id="attributvalueString" value="#{classcontentlist.editContent}" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isStringType}" />
+                            <p:password id="attributvalueHashString" value="#{classcontentlist.editContent}" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isHashStringType}" />
+                            <p:inputNumber id="attributvalueInt" value="#{classcontentlist.editContent}" decimalPlaces="0" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isIntegerType}" />
+                            <p:inputNumber id="attributvalueReal" value="#{classcontentlist.editContent}" decimalPlaces="2" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isRealType}" />
+                            <p:textEditor id="attributvalueHtmlText" widgetVar="editor1" value="#{classcontentlist.editContent}" height="300" style="margin-bottom:10px" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isHTMLTextType}" />
+                            <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentlist.editContent}" style="margin-bottom:10px" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isTextType}" />
+                            <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentlist.editContent}" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isBooleanType}" />
+                            <p:calendar id="attributvalueDatetime" value="#{classcontentlist.editContent}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isDatetimeType}" />
+                            <p:selectOneMenu id="media" value="#{classcontentlist.selectedMedia}" converter="#{mediaConverterBean}" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isMediaType}">
+                                <f:selectItems value="#{assetlist.assetlist}" />
+                            </p:selectOneMenu>
+                            
+                            <h:outputText value="#{attributcontent}" rendered="#{not classcontentlist.renderSelected(attributcontent)}" />
+                            <p:commandButton id="editattribut" process="form" value="Edit" actionListener="#{classcontentlist.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentlist.renderSelected(attributcontent)}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                
+                <p:tab title="Datalist" rendered="#{loginbean.login}">
+                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                        <p:dataTable id="datalistcontent" var="datalist" value="#{datacontentlist.datacontentlist}" selectionMode="single" selection="#{datacontentlist.selectedList}" rowKey="#{datalist.id}" widgetVar="datalistcontent">
+                            <p:ajax event="rowSelect" listener="#{datacontentlist.onSelect}" update=":form:msgs :form:tabview:datacontentname :form:tabview:datacontentclass :form:tabview:newcontentlist :form:tabview:datacontentlistbox" />
+                            <p:column headerText="Name" filterBy="#{datalist.name}" filterMatchMode="contains">
+                                <h:outputText value="#{datalist.name}" />
+                            </p:column>
+                            <p:column headerText="Klasse" filterBy="#{datalist.classref}" filterMatchMode="exact">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('datalistcontent').filter()" styleClass="custom-filter">
+                                        <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{datacontentlist.classlist}" />
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{datalist.classref}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:scrollPanel>    
+                    
+                    <p:outputLabel for="datacontentname">Name</p:outputLabel>
+                    <p:inputText id="datacontentname" value="#{datacontentlist.contentName}" >
+                        <p:ajax event="keyup" listener="#{datacontentlist.onChangeName(changeEvent)}" update="newcontentlist" />
+                    </p:inputText>
+
+                    <p:outputLabel for="datacontentclass" value="Class:" />
+                    <p:selectOneMenu id="datacontentclass" value="#{datacontentlist.selectedClass}" required="true" converter="#{classConverterBean}">
+                        <f:selectItems value="#{datacontentlist.classlist}" />
+                    </p:selectOneMenu>
+                    
+                    <p:commandButton id="newcontentlist" process="form" value="New" actionListener="#{datacontentlist.onCreateContent}" update=":form:msgs :form:tabview:sitelist :form:tabview:datalistcontent" disabled="#{datacontentlist.newContentButtonDisabled}">
+                        <f:actionListener binding="#{sitetree.initContentlist()}" />
+                    </p:commandButton>
+                    <p:commandButton id="deletecontentlist" process="form" value="Delete" actionListener="#{datacontentlist.onDeleteContent}" update=":form:msgs :form:tabview:sitelist :form:tabview:datalistcontent">
+                        <f:actionListener binding="#{sitetree.initContentlist()}" />
+                    </p:commandButton>
+                    
+                    <p:selectManyCheckbox id="datacontentlistbox" value="#{datacontentlist.selectedListcontent}" layout="responsive" columns="4" converter="#{classcontentConverterBean}">
+                        <f:selectItems value="#{datacontentlist.filteredclasscontentlist}" var="content" itemLabel="#{content.name}" itemValue="#{content}" />
+                        <p:ajax listener="#{datacontentlist.onChangeContent}" />
+                    </p:selectManyCheckbox>
+                </p:tab>
+                
+                <p:tab title="Datasources" rendered="#{loginbean.login}">
+                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                        <p:dataTable id="datasourcelist" var="datasource" value="#{datasourcelist.datasourcelist}" selectionMode="single" selection="#{datasourcelist.selectedDatasource}" rowKey="#{datasource.id}">
+                            <p:ajax event="rowSelect" listener="#{datasourcelist.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver" />
+                            <p:column headerText="Name">
+                                <h:outputText value="#{datasource.name}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:scrollPanel>    
+                    
+                    <p:panelGrid columns="2">
+                        <p:outputLabel for="datasourcename">Name</p:outputLabel>
+                        <p:inputText id="datasourcename" value="#{datasourcelist.datasourceName}" >
+                            <p:ajax event="keyup" listener="#{datasourcelist.onChangeName(changeEvent)}" update="newdatasource" />
+                        </p:inputText>
+
+                        <p:outputLabel for="datasourceserver">Server</p:outputLabel>
+                        <p:inputText id="datasourceserver" value="#{datasourcelist.datasourceServer}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourceurl">URL</p:outputLabel>
+                        <p:inputText id="datasourceurl" value="#{datasourcelist.datasourceURL}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourceport">Port</p:outputLabel>
+                        <p:inputText id="datasourceport" value="#{datasourcelist.datasourcePort}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourcedbname">Database Name</p:outputLabel>
+                        <p:inputText id="datasourcedbname" value="#{datasourcelist.datasourceDatabasename}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourceuser">User</p:outputLabel>
+                        <p:inputText id="datasourceuser" value="#{datasourcelist.datasourceUser}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourcepassword">Password</p:outputLabel>
+                        <p:inputText id="datasourcepassword" value="#{datasourcelist.datasourcePassword}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourcedriver">Driver Class</p:outputLabel>
+                        <p:inputText id="datasourcedriver" value="#{datasourcelist.datasourceDriverclass}" ></p:inputText>
+                    </p:panelGrid>
+                    
+                    <p:panelGrid columns="3">
+                        <p:commandButton id="newdatasource" process="form" value="New" actionListener="#{datasourcelist.onCreateContent}" update=":form:msgs :form:tabview:sitedatasource :form:tabview:datasourcelist" disabled="#{datasourcelist.newContentButtonDisabled}">
+                            <f:actionListener binding="#{sitetree.initDatasources()}" />
+                        </p:commandButton>
+                        <p:commandButton id="editdatasource" process="form" value="Edit" actionListener="#{datasourcelist.onEditContent}" update=":form:msgs :form:tabview:datalistcontent" />
+                        <p:commandButton id="deletedatasource" process="form" value="Delete" actionListener="#{datasourcelist.onDeleteContent}" update=":form:msgs :form:tabview:sitedatasource :form:tabview:datasourcelist">
+                            <f:actionListener binding="#{sitetree.initDatasources()}" />
+                        </p:commandButton>
+                    </p:panelGrid>
+                </p:tab>
+                
+                <p:tab title="Assets" rendered="#{loginbean.login}">
+                    <h:form enctype="multipart/form-data">
+                        <p:fileUpload fileUploadListener="#{assetlist.handleFileUpload}" mode="advanced" dragDropSupport="true"
+                                              update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx)$/" />
+                        <p:growl id="messages" showDetail="true" />
+                    </h:form>
+                    
+                    <p:dataGrid id="assetlist" var="media" value="#{assetlist.assetlist}" columns="4" layout="grid"
+                        rows="12" paginator="true"
+                        paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                        rowsPerPageTemplate="6,12,16">
+
+                        <f:facet name="header">
+                            Medien
+                        </f:facet>
+
+                        <p:panel header="#{media.id}" style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                <p:graphicImage url="../../GeminiProjekt/GetImage?mediaid=#{media.id}&amp;width=200" /> 
+                                <h:outputText value="#{media.name}" />
+                                <h:selectBooleanCheckbox value="#{assetlist.selectedAsset}" />
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+                    
+                    <p:pickList id="assetkeywordpicklist" value="#{assetlist.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" />
+                    <p:commandButton id="attachassetkeyword" process="form" value="Attach" actionListener="#{assetlist.onAttach}" />
+                </p:tab>
+                
+                <p:tab title="Keywords" rendered="#{loginbean.login}">
+                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                        <p:dataTable id="keywordlist" var="keywordcontent" value="#{keywordlist.keywordlist}" 
+                                     selectionMode="single" selection="#{keywordlist.selectedKeyword}" rowKey="#{keywordcontent.id}"
+                                     emptyMessage="No content available" filteredValue="#{keywordlist.filteredKeyword}" widgetVar="keywordlist">
+                            <p:column headerText="Name" filterBy="#{keywordcontent.name}" filterMatchMode="contains">
+                                <h:outputText value="#{keywordcontent.name}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:scrollPanel>    
+                    
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="keywords" value="Keywords: " />
+                        <p:chips id="keywords" value="#{keywordlist.items}" />
+                        
+                        <p:commandButton id="newkeyword" process="form" value="New" actionListener="#{keywordlist.onCreate}" update=":form:tabview:keywordlist :form:tabview:assetkeywordpicklist" />
+                    </h:panelGrid>
+                </p:tab>
+                
+                <p:tab title="Properties" rendered="#{loginbean.login}">
+                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                        <p:dataTable id="propertylist" var="propertycontent" value="#{propertylist.propertylist}" 
+                                     selectionMode="single" selection="#{propertylist.selectedProperty}" rowKey="#{propertycontent.hashkey}"
+                                     emptyMessage="No content available" filteredValue="#{propertylist.filteredProperty}" widgetVar="propertylist">
+                            <p:ajax event="rowSelect" listener="#{propertylist.onSelect}" update=":form:tabview:propertypanel :form:tabview:propertybtnpanel" />
+                            <p:column headerText="Key" filterBy="#{propertycontent.hashkey}" filterMatchMode="contains">
+                                <h:outputText value="#{propertycontent.hashkey}" />
+                            </p:column>
+                            <p:column headerText="Value" filterBy="#{propertycontent.value}" filterMatchMode="contains">
+                                <h:outputText value="#{propertycontent.value}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:scrollPanel>
+                    
+                    <p:panelGrid id="propertypanel" columns="2">
+                        <p:outputLabel for="propertykey">Property Key</p:outputLabel>
+                        <p:inputText id="propertykey" value="#{propertylist.propertykey}" >
+                            <p:ajax event="keyup" listener="#{propertylist.onChangeName(changeEvent)}" update=":form:tabview:propertybtnpanel" />
+                        </p:inputText>
+
+                        <p:outputLabel for="propertyvalue">Property Value</p:outputLabel>
+                        <p:inputText id="propertyvalue" value="#{propertylist.propertyvalue}" ></p:inputText>
+                    </p:panelGrid>
+                    
+                    <p:panelGrid id="propertybtnpanel" columns="3">
+                        <p:commandButton id="newproperty" process="form" value="New" actionListener="#{propertylist.onCreateProperty}" update=":form:msgs :form:tabview:propertylist" disabled="#{propertylist.newPropertyButtonDisabled}" />
+                        <p:commandButton id="editproperty" process="form" value="Edit" actionListener="#{propertylist.onEditProperty}" update=":form:msgs :form:tabview:propertylist" />
+                        <p:commandButton id="deleteproperty" process="form" value="Delete" actionListener="#{propertylist.onDeleteProperty}" update=":form:msgs :form:tabview:propertylist" />
+                    </p:panelGrid>
+                </p:tab>
+                
+                <p:tab title="User" rendered="#{loginbean.login}">
+                    <p:dataTable id="userlist" var="user" value="#{userlist.userlist}" 
+                                 selectionMode="single" selection="#{userlist.selectedUser}" rowKey="#{user.id}"
+                                 emptyMessage="No content available">
+                        <p:ajax event="rowSelect" listener="#{userlist.onSelect}" update=":form:tabview:userpanel :form:tabview:userbtnpanel" />
+                        <p:column headerText="E-Mail">
+                            <h:outputText value="#{user.email}" />
+                        </p:column>
+                        <p:column headerText="Vorname">
+                            <h:outputText value="#{user.vorname}" />
+                        </p:column>
+                        <p:column headerText="Nachname">
+                            <h:outputText value="#{user.nachname}" />
+                        </p:column>
+                    </p:dataTable>
+                    
+                    <p:panelGrid id="userpanel" columns="2">
+                        <p:outputLabel for="useremail">E-Mail</p:outputLabel>
+                        <p:inputText id="useremail" value="#{userlist.email}" >
+                            <p:ajax event="keyup" listener="#{userlist.onChangeName(changeEvent)}" update="newuser" />
+                        </p:inputText>
+
+                        <p:outputLabel for="uservorname">Vorname</p:outputLabel>
+                        <p:inputText id="uservorname" value="#{userlist.vorname}" ></p:inputText>
+                        
+                        <p:outputLabel for="uservorname">Nachname</p:outputLabel>
+                        <p:inputText id="usernachname" value="#{userlist.nachname}"></p:inputText>
+                        
+                        <p:outputLabel for="userpassword">Passwort</p:outputLabel>
+                        <p:inputText id="userpassword" type="password" value="#{userlist.passwort}"></p:inputText>
+                        
+                        <p:outputLabel for="userpassword_validate">Passwort</p:outputLabel>
+                        <p:inputText id="userpassword_validate" type="password" value="#{userlist.passwort_validate}"></p:inputText>
+                    </p:panelGrid>
+                    
+                    <p:panelGrid id="userbtnpanel" columns="3">
+                        <p:commandButton id="newuser" process="form" value="New" actionListener="#{userlist.onCreateUser}" update=":form:msgs :form:tabview:userlist" disabled="#{userlist.newUserButtonDisabled}" />
+                        <p:commandButton id="edituser" process="form" value="Edit" actionListener="#{userlist.onEditUser}" update=":form:msgs :form:tabview:userlist" />
+                        <p:commandButton id="deleteuser" process="form" value="Delete" actionListener="#{userlist.onDeleteUser}" update=":form:msgs :form:tabview:userlist" />
+                    </p:panelGrid>
+                </p:tab>
             </p:tabView>
         </h:form>
-    </body>
+    </h:body>
 </html>

@@ -261,6 +261,7 @@ CREATE TABLE IF NOT EXISTS `cf_site` (
   `contenttype` varchar(16) DEFAULT NULL,
   `locale` varchar(16) DEFAULT NULL,
   `aliaspath` varchar(255) DEFAULT NULL,
+  `gzip` int(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `alias` (`aliaspath`)
@@ -416,3 +417,18 @@ INSERT INTO `cf_attributetype` (`id`, `name`) VALUES
 (7, 'hashstring'),
 (8, 'media'),
 (9, 'text');
+
+INSERT INTO `knproperty` (`hashkey`, `value`) VALUES
+('cache.folder', ''),
+('html.compression', 'on'),
+('html.gzip', 'on'),
+('mail.password', ''),
+('mail.sendfrom', 'info@clownfish.io'),
+('mail.smtp.host', 'mail.clownfish.io'),
+('mail.transport.protocol', 'smtp'),
+('mail.user', 'Info'),
+('media.folder', ''),
+('response.characterencoding', 'UTF-8'),
+('response.contenttype', 'text/html'),
+('response.locale', 'de'),
+('sap.support', 'false');

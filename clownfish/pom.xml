@@ -70,6 +70,16 @@
             <artifactId>primefaces</artifactId>
             <version>6.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.primefaces.extensions</groupId>
+            <artifactId>primefaces-extensions</artifactId>
+            <version>6.2.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.primefaces.extensions</groupId>
+            <artifactId>resources-codemirror</artifactId>
+            <version>6.1.1</version>
+        </dependency>
         <!--
         <dependency>
             <groupId>org.primefaces.themes</groupId>
