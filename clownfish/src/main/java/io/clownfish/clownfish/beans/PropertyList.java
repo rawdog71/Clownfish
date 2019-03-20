@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
+import javax.inject.Named;
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Transactional
-@ManagedBean(name = "propertylist")
+@Named("propertylist")
 @ViewScoped
 @Component
 public class PropertyList {
