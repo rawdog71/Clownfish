@@ -418,7 +418,7 @@ INSERT INTO `cf_attributetype` (`id`, `name`) VALUES
 (8, 'media'),
 (9, 'text');
 
-INSERT INTO `knproperty` (`hashkey`, `value`) VALUES
+INSERT INTO `cf_property` (`hashkey`, `value`) VALUES
 ('cache.folder', ''),
 ('html.compression', 'on'),
 ('html.gzip', 'on'),
