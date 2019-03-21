@@ -96,7 +96,7 @@
                                             <p:selectOneMenu id="selecttemplate" value="#{sitetree.selectedTemplate}" required="false" converter="#{templateConverterBean}">
                                                 <p:ajax listener="#{sitetree.onChangeTemplate}" update=":form:tabview:templateview" />
                                                 <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                                <f:selectItems value="#{templatelist}" />
+                                                <f:selectItems value="#{templateList.templateListe}" />
                                             </p:selectOneMenu>
                                         </p:column>
                                     </p:row>
@@ -106,7 +106,7 @@
                                             <p:selectOneMenu id="selectstylesheet" value="#{sitetree.selectedStylesheet}" required="false" converter="#{stylesheetConverterBean}">
                                                 <p:ajax listener="#{sitetree.onChangeStylesheet}" update=":form:tabview:cssview" />
                                                 <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                                <f:selectItems value="#{stylesheetlist}" />
+                                                <f:selectItems value="#{stylesheetList.stylesheetListe}" />
                                             </p:selectOneMenu>
                                         </p:column>
                                     </p:row>

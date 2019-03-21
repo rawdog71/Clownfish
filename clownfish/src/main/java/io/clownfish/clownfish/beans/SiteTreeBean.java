@@ -72,10 +72,6 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter CfTemplate selectedTemplate = null;
     private @Getter @Setter CfStylesheet selectedStylesheet = null;
     private @Getter @Setter CfJavascript selectedJavascript = null;
-    /*
-    private @Getter @Setter List<CfTemplate> templatelist;
-    private @Getter @Setter List<CfStylesheet> stylesheetlist;
-    */
     private @Getter @Setter List<CfJavascript> javascriptlist;
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter List<CfDatasource> datasources;

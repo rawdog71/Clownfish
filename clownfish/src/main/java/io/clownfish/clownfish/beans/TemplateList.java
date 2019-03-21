@@ -91,7 +91,6 @@ public class TemplateList {
 
     @PostConstruct
     public void init() {
-        //templateUtility = new TemplateUtil();
         templateName = "";
         templateListe = cftemplateService.findAll();
         templateUtility.setTemplateContent("");
