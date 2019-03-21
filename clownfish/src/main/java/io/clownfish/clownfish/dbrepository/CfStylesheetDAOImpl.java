@@ -41,7 +41,7 @@ public class CfStylesheetDAOImpl implements CfStylesheetDAO {
     @Override
     public List<CfStylesheet> findAll() {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findAll");
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfStylesheet.findAll");
         List<CfStylesheet> cftempaltelist = query.getResultList();
         return cftempaltelist;
     }

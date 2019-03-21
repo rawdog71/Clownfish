@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
 public class Clownfish {
-    @Autowired CfUserService cfuserService;
+    //@Autowired CfUserService cfuserService;
 
     @RequestMapping("/")
     String home() {
-        CfUser cfUser = cfuserService.findById(1L);
+        //CfUser cfUser = cfuserService.findById(1L);
         
-        return "Hello Clownfish " + cfUser.getVorname();
+        return "Hello Clownfish ";
     }
 }

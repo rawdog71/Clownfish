@@ -1,8 +1,6 @@
 package io.clownfish.clownfish;
 
 import io.clownfish.clownfish.beans.LoginBean;
-import io.clownfish.clownfish.beans.StylesheetList;
-import io.clownfish.clownfish.beans.TemplateList;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import org.springframework.boot.SpringApplication;
@@ -57,11 +55,13 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         return servletRegistrationBean;
     }
     
+    /*
     @Bean
     @Scope(WebApplicationContext.SCOPE_SESSION)
     public LoginBean loginbean() {
         return new LoginBean();
     }
+*/
     
     @Override
     public void setServletContext(ServletContext servletContext) {

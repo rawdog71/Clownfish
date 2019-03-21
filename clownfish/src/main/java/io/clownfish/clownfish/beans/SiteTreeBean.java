@@ -72,8 +72,10 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter CfTemplate selectedTemplate = null;
     private @Getter @Setter CfStylesheet selectedStylesheet = null;
     private @Getter @Setter CfJavascript selectedJavascript = null;
+    /*
     private @Getter @Setter List<CfTemplate> templatelist;
     private @Getter @Setter List<CfStylesheet> stylesheetlist;
+    */
     private @Getter @Setter List<CfJavascript> javascriptlist;
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter List<CfDatasource> datasources;
@@ -113,7 +115,6 @@ public class SiteTreeBean implements Serializable {
     
     @PostConstruct
     public void init() {
-        //propertymap = new PropertyList().init(em);
         propertymap = propertylist.fillPropertyMap();
         String sapSupportProp = propertymap.get("sap.support");
         if (sapSupportProp == null) {
@@ -129,8 +130,10 @@ public class SiteTreeBean implements Serializable {
         }
         root = new DefaultTreeNode("Root", null);
         loadTree();
+        /*
         templatelist = cftemplateService.findAll();
         stylesheetlist = cfstylesheetService.findAll();
+        */
         javascriptlist = cfjavascriptService.findAll();
         //datasources = em.createNamedQuery("Kndatasource.findAll").getResultList();
         datasources = cfdatasourceService.findAll();
@@ -147,33 +150,29 @@ public class SiteTreeBean implements Serializable {
         characterEncoding = propertymap.get("response.characterencoding");
     }
     
+    /*
     public void initTemplatelist() {
-        //templatelist = em.createNamedQuery("Kntemplate.findAll").getResultList();
-        templatelist =  cftemplateService.findAll();
+        templatelist = cftemplateService.findAll();
     }
     
     public void initStylesheetlist() {
-        //stylesheetlist = em.createNamedQuery("Knstylesheet.findAll").getResultList();
         stylesheetlist = cfstylesheetService.findAll();
     }
+    */
     
     public void initJavascriptlist() {
-        //javascriptlist = em.createNamedQuery("Knjavascript.findAll").getResultList();
         javascriptlist = cfjavascriptService.findAll();
     }
     
     public void initDatasources() {
-        //datasources = em.createNamedQuery("Kndatasource.findAll").getResultList();
         datasources = cfdatasourceService.findAll();
     }
     
     public void initContentlist() {
-        //contentlist = em.createNamedQuery("Knlist.findAll").getResultList();
         contentlist = cflistService.findAll();
     }
 
     private void fillChildren(long parentid, TreeNode node) {
-        //List<CfSite> sitelist = em.createNamedQuery("Knsite.findByParentref").setParameter("parentref", parentid).getResultList();
         List<CfSite> sitelist = cfsiteService.findByParentref(parentid);
                 
         for (CfSite site : sitelist) {
@@ -184,9 +183,7 @@ public class SiteTreeBean implements Serializable {
     }
     
     private void loadTree() {
-        //List<CfSite> sitelist = em.createNamedQuery("Knsite.findByParentref").setParameter("parentref", 0).getResultList();
         List<CfSite> sitelist = cfsiteService.findByParentref(0L);
-        
         for (CfSite site : sitelist) {
             TreeNode tn = new DefaultTreeNode(site);
             root.getChildren().add(tn);
@@ -200,7 +197,6 @@ public class SiteTreeBean implements Serializable {
                 return selectedTemplate.getContent();
             } else {
                 try {
-                    //CfTemplate template = (CfTemplate) em.createNamedQuery("Kntemplate.findById").setParameter("id", selectedSite.getTemplateref()).getSingleResult();
                     CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().longValue());
                     return template.getContent();
                 } catch (NoResultException ex) {
@@ -218,7 +214,6 @@ public class SiteTreeBean implements Serializable {
                 return selectedStylesheet.getContent();
             } else {
                 try {
-                    //CfStylesheet stylesheet = (CfStylesheet) em.createNamedQuery("Knstylesheet.findById").setParameter("id", selectedSite.getStylesheetref()).getSingleResult();
                     CfStylesheet stylesheet = cfstylesheetService.findById(selectedSite.getStylesheetref().longValue());
                     return stylesheet.getContent();
                 } catch (NoResultException ex) {
@@ -236,7 +231,6 @@ public class SiteTreeBean implements Serializable {
                 return selectedJavascript.getContent();
             } else {
                 try {
-                    //Knjavascript javascript = (Knjavascript) em.createNamedQuery("Knjavascript.findById").setParameter("id", selectedSite.getJavascriptref()).getSingleResult();
                     CfJavascript javascript = cfjavascriptService.findById(selectedSite.getJavascriptref().longValue());
                     return javascript.getContent();
                 } catch (NoResultException ex) {
@@ -261,23 +255,25 @@ public class SiteTreeBean implements Serializable {
         selectedNode = event.getTreeNode();
         selectedSite = (CfSite) selectedNode.getData();
         if (selectedSite.getTemplateref() != null) {
-            //Kntemplate template = (Kntemplate) em.createNamedQuery("Kntemplate.findById").setParameter("id", selectedSite.getTemplateref()).getSingleResult();
             CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().longValue());
+            /*
             int idx = templatelist.indexOf(template);
             selectedTemplate = templatelist.get(idx);
+            */
         } else {
             selectedTemplate = null;
         }
         if (selectedSite.getStylesheetref() != null) {
             //Knstylesheet styleshet = (Knstylesheet) em.createNamedQuery("Knstylesheet.findById").setParameter("id", selectedSite.getStylesheetref()).getSingleResult();
             CfStylesheet styleshet = cfstylesheetService.findById(selectedSite.getStylesheetref().longValue());
+            /*
             int idx = stylesheetlist.indexOf(styleshet);
             selectedStylesheet = stylesheetlist.get(idx);
+            */
         } else {
             selectedStylesheet = null;
         }
         if (selectedSite.getJavascriptref() != null) {
-            //Knjavascript javascript = (Knjavascript) em.createNamedQuery("Knjavascript.findById").setParameter("id", selectedSite.getJavascriptref()).getSingleResult();
             CfJavascript javascript = cfjavascriptService.findById(selectedSite.getJavascriptref().longValue());
             int idx = javascriptlist.indexOf(javascript);
             selectedJavascript = javascriptlist.get(idx);
@@ -285,42 +281,32 @@ public class SiteTreeBean implements Serializable {
             selectedJavascript = null;
         }
         selectedDatasources.clear();
-        //List<CfSitedatasource> selectedSiteDatasources = em.createNamedQuery("Knsitedatasource.findBySiteref").setParameter("siteref", selectedSite.getId()).getResultList();
         List<CfSitedatasource> selectedSiteDatasources = cfsitedatasourceService.findBySiteref(selectedSite.getId());
         for (CfSitedatasource sitedatasource : selectedSiteDatasources) {
-            //CfDatasource ds = (CfDatasource) em.createNamedQuery("Kndatasource.findById").setParameter("id", sitedatasource.getKnsitedatasourcePK().getDatasourceref()).getSingleResult();
             CfDatasource ds = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
             selectedDatasources.add(ds);
         }
         
         selectedContentlist.clear();
-        //List<Knsitelist> selectedSitecontentlist = em.createNamedQuery("Knsitelist.findBySiteref").setParameter("siteref", selectedSite.getId()).getResultList();
         List<CfSitelist> selectedSitecontentlist = cfsitelistService.findBySiteref(selectedSite.getId());
         for (CfSitelist sitelist : selectedSitecontentlist) {
-            //Knlist cl = (Knlist) em.createNamedQuery("Knlist.findById").setParameter("id", sitelist.getKnsitelistPK().getListref()).getSingleResult();
             CfList cl = cflistService.findById(sitelist.getCfSitelistPK().getListref());
             selectedContentlist.add(cl);
         }
         
         selectedclasscontentlist.clear();
-        //List<CfSitecontent> selectedClasscontentlist = em.createNamedQuery("Knsitecontent.findBySiteref").setParameter("siteref", selectedSite.getId()).getResultList();
         List<CfSitecontent> selectedClasscontentlist = cfsitecontentService.findBySiteref(selectedSite.getId());
         for (CfSitecontent sitecontent : selectedClasscontentlist) {
-            //CfClasscontent cc = (Knclasscontent) em.createNamedQuery("Knclasscontent.findById").setParameter("id", sitecontent.getKnsitecontentPK().getClasscontentref()).getSingleResult();
             CfClasscontent cc = cfclasscontentService.findById(sitecontent.getCfSitecontentPK().getClasscontentref());
             selectedclasscontentlist.add(cc);
         }
-        
         siteName = selectedSite.getName();
         aliaspath = selectedSite.getAliaspath();
         sitehtmlcompression = selectedSite.getHtmlcompression();
         characterEncoding = selectedSite.getCharacterencoding();
         contentType = selectedSite.getContenttype();
         locale = selectedSite.getLocale();
-        
-        //saprfclist = em.createNamedQuery("Knsitesaprfc.findBySiteref").setParameter("siteref", selectedSite.getId()).getResultList();
         saprfclist = cfsitesaprfcService.findBySiteref(selectedSite.getId());
-        
         newButtonDisabled = true;
         
         FacesMessage message = new FacesMessage("Selected " + selectedSite.getName());
@@ -329,7 +315,6 @@ public class SiteTreeBean implements Serializable {
     
     public void onDelete(ActionEvent actionEvent) {
         if (selectedSite != null) {
-            //knsiteFacadeREST.remove(selectedSite);
             cfsiteService.delete(selectedSite);
             loadTree();
             
@@ -357,15 +342,12 @@ public class SiteTreeBean implements Serializable {
             }
             
             // Delete siteresources first
-            //List<Knsitedatasource> sitedatasourceList = em.createNamedQuery("Knsitedatasource.findBySiteref").setParameter("siteref", selectedSite.getId()).getResultList();
             List<CfSitedatasource> sitedatasourceList = cfsitedatasourceService.findBySiteref(selectedSite.getId());
             for (CfSitedatasource sitedatasource : sitedatasourceList) {
                 cfsitedatasourceService.delete(sitedatasource);
-                //knsitedatasourceFacadeREST.remove(sitedatasource);
             }
             // Add selected siteresources
             if (selectedDatasources.size() > 0) {
-                //for (int i = 0; i <= selectedDatasources.size(); i++) {
                 for (CfDatasource datasource : selectedDatasources) {
                     CfSitedatasource sitedatasource = new CfSitedatasource();
                     CfSitedatasourcePK cfsitedatasourcePK = new CfSitedatasourcePK();
@@ -373,48 +355,39 @@ public class SiteTreeBean implements Serializable {
                     cfsitedatasourcePK.setDatasourceref(datasource.getId());
                     sitedatasource.setCfSitedatasourcePK(cfsitedatasourcePK);
                     cfsitedatasourceService.create(sitedatasource);
-                    //cfsitedatasourceFacadeREST.create(sitedatasource);
                 }
             }
             
             // Delete sitelists first
-            //List<CfSitelist> sitelists = em.createNamedQuery("Knsitelist.findBySiteref").setParameter("siteref", selectedSite.getId()).getResultList();
             List<CfSitelist> sitelists = cfsitelistService.findBySiteref(selectedSite.getId());
             for (CfSitelist sitelist : sitelists) {
-                //CfSitelistFacadeREST.remove(sitelist);
                 cfsitelistService.delete(sitelist);
             }
             // Add selected sitelists
             if (selectedContentlist.size() > 0) {
-                //for (int i = 0; i <= selectedDatasources.size(); i++) {
                 for (CfList contentlist : selectedContentlist) {
                     CfSitelist sitelist = new CfSitelist();
                     CfSitelistPK knsitelistPK = new CfSitelistPK();
                     knsitelistPK.setSiteref(selectedSite.getId());
                     knsitelistPK.setListref(contentlist.getId());
                     sitelist.setCfSitelistPK(knsitelistPK);
-                    //knsitelistFacadeREST.create(sitelist);
                     cfsitelistService.create(sitelist);
                 }
             }
             
             // Delete sitecontent first
-            //List<CfSitecontent> contentlists = em.createNamedQuery("Knsitecontent.findBySiteref").setParameter("siteref", selectedSite.getId()).getResultList();
             List<CfSitecontent> contentlists = cfsitecontentService.findBySiteref(selectedSite.getId());
             for (CfSitecontent content : contentlists) {
-                //knsitecontentFacadeREST.remove(content);
                 cfsitecontentService.delete(content);
             }
             // Add selected sitecontent
             if (selectedclasscontentlist.size() > 0) {
-                //for (int i = 0; i <= selectedDatasources.size(); i++) {
                 for (CfClasscontent content : selectedclasscontentlist) {
                     CfSitecontent sitecontent = new CfSitecontent();
                     CfSitecontentPK knsitecontentPK = new CfSitecontentPK();
                     knsitecontentPK.setSiteref(selectedSite.getId());
                     knsitecontentPK.setClasscontentref(content.getId());
                     sitecontent.setCfSitecontentPK(knsitecontentPK);
-                    //knsitecontentFacadeREST.create(sitecontent);
                     cfsitecontentService.create(sitecontent);
                 }
             }
@@ -423,7 +396,6 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setContenttype(contentType);
             selectedSite.setLocale(locale);
             selectedSite.setAliaspath(aliaspath);
-            //knsiteFacadeREST.edit(selectedSite);
             cfsiteService.edit(selectedSite);
             loadTree();
             
@@ -452,7 +424,6 @@ public class SiteTreeBean implements Serializable {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            //CfSite validateSite = (CfSite) em.createNamedQuery("Knsite.findByName").setParameter("name", siteName).getSingleResult();
             CfSite validateSite = cfsiteService.findByName(siteName);
             newButtonDisabled = true;
         } catch (NoResultException ex) {
@@ -483,7 +454,6 @@ public class SiteTreeBean implements Serializable {
             newsite.setCharacterencoding(characterEncoding);
             newsite.setLocale(locale);
             newsite.setAliaspath(siteName);
-            //knsiteFacadeREST.create(newsite);
             cfsiteService.create(newsite);
             loadTree();
         } catch (ConstraintViolationException ex) {
@@ -505,10 +475,7 @@ public class SiteTreeBean implements Serializable {
     
     public void onDeleteRfc(ActionEvent actionEvent) {
         if (selectedrfc != null) {
-            //knsitesaprfcFacadeREST.remove(selectedrfc);
             cfsitesaprfcService.delete(selectedrfc);
-            
-            //saprfclist = em.createNamedQuery("Knsitesaprfc.findBySiteref").setParameter("siteref", selectedSite.getId()).getResultList();
             saprfclist = cfsitesaprfcService.findBySiteref(selectedSite.getId());
         }
     }
@@ -521,10 +488,7 @@ public class SiteTreeBean implements Serializable {
             cfsitesaprfcPK.setRfcgroup(selectedrfcgroup.getName());
             cfsitesaprfcPK.setRfcfunction(selectedrfcfunction.getName());
             sitesaprfc.setCfSitesaprfcPK(cfsitesaprfcPK);
-            //cfsitesaprfcFacadeREST.create(sitesaprfc);
             cfsitesaprfcService.create(sitesaprfc);
-            
-            //saprfclist = em.createNamedQuery("Knsitesaprfc.findBySiteref").setParameter("siteref", selectedSite.getId()).getResultList();
             saprfclist = cfsitesaprfcService.findBySiteref(selectedSite.getId());
         }
     }

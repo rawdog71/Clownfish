@@ -16,12 +16,14 @@
 package io.clownfish.clownfish.daointerface;
 
 import io.clownfish.clownfish.dbentities.CfUser;
+import java.util.List;
 
 /**
  *
  * @author sulzbachr
  */
 public interface CfUserDAO {
+    List<CfUser> findAll();
     CfUser findById(Long id);
     CfUser findByEmail(String email);
     boolean create(CfUser entity);

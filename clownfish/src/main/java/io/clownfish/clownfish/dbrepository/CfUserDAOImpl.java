@@ -17,6 +17,7 @@ package io.clownfish.clownfish.dbrepository;
 
 import io.clownfish.clownfish.daointerface.CfUserDAO;
 import io.clownfish.clownfish.dbentities.CfUser;
+import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -74,6 +75,14 @@ public class CfUserDAOImpl implements CfUserDAO {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
         return true;
+    }
+
+    @Override
+    public List<CfUser> findAll() {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfUser.findAll");
+        List<CfUser> cfuserlist = query.getResultList();
+        return cfuserlist;
     }
     
 }

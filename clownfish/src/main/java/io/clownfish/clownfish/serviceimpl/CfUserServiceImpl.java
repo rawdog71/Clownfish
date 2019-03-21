@@ -18,6 +18,7 @@ package io.clownfish.clownfish.serviceimpl;
 import io.clownfish.clownfish.daointerface.CfUserDAO;
 import io.clownfish.clownfish.dbentities.CfUser;
 import io.clownfish.clownfish.serviceinterface.CfUserService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +45,26 @@ public class CfUserServiceImpl implements CfUserService {
     @Override
     public CfUser findByEmail(String email) {
         return this.cfuserDAO.findByEmail(email);
+    }
+
+    @Override
+    public List<CfUser> findAll() {
+        return this.cfuserDAO.findAll();
+    }
+
+    @Override
+    public boolean create(CfUser entity) {
+        return this.cfuserDAO.create(entity);
+    }
+
+    @Override
+    public boolean delete(CfUser entity) {
+        return this.cfuserDAO.delete(entity);
+    }
+
+    @Override
+    public boolean edit(CfUser entity) {
+        return this.cfuserDAO.edit(entity);
     }
     
 }

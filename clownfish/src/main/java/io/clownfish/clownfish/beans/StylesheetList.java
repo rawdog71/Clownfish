@@ -23,7 +23,6 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
-import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +34,6 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("stylesheetList")
-@Transactional
 @ViewScoped
 @Component
 public class StylesheetList {
@@ -79,7 +77,6 @@ public class StylesheetList {
     public void init() {
         stylesheetUtility = new StylesheetUtil();
         stylesheetName = "";
-        //stylesheetlist = em.createNamedQuery("Knstylesheet.findAll").getResultList();
         stylesheetListe = cfstylesheetService.findAll();
         stylesheetUtility.setStyelsheetContent("");
         checkedout = false;
@@ -90,7 +87,6 @@ public class StylesheetList {
         difference = false;
         stylesheetName = selectedStylesheet.getName();
         stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
-        //versionlist = em.createNamedQuery("Knstylesheetversion.findByStylesheetref").setParameter("stylesheetref", selectedStylesheet.getId()).getResultList();
         versionlist = cfstylesheetversionService.findByStylesheetref(selectedStylesheet.getId());
         difference = stylesheetUtility.hasDifference(selectedStylesheet);
         BigInteger co = selectedStylesheet.getCheckedoutby();
@@ -116,9 +112,7 @@ public class StylesheetList {
     public void onSave(ActionEvent actionEvent) {
         if (selectedStylesheet != null) {
             selectedStylesheet.setContent(getStylesheetContent());
-            //knstylesheetFacadeREST.edit(selectedStylesheet);
             cfstylesheetService.edit(selectedStylesheet);
-            
             difference = stylesheetUtility.hasDifference(selectedStylesheet);
             
             FacesMessage message = new FacesMessage("Saved " + selectedStylesheet.getName());
@@ -137,7 +131,6 @@ public class StylesheetList {
                     String content = getStylesheetContent();
                     byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
                     try {
-                        //long maxversion = (long) em.createNamedQuery("Knstylesheetversion.findMaxVersion").setParameter("stylesheetref", selectedStylesheet.getId()).getSingleResult();
                         long maxversion = cfstylesheetversionService.findMaxVersion(selectedStylesheet.getId());
                         stylesheetUtility.setCurrentVersion(maxversion + 1);
                         writeVersion(selectedStylesheet.getId(), stylesheetUtility.getCurrentVersion(), output);
@@ -154,7 +147,7 @@ public class StylesheetList {
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(TemplateList.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(StylesheetList.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
                 difference = stylesheetUtility.hasDifference(selectedStylesheet);
@@ -170,7 +163,6 @@ public class StylesheetList {
         if (selectedStylesheet != null) {
             selectedStylesheet.setCheckedoutby(BigInteger.valueOf(0));
             selectedStylesheet.setContent(getStylesheetContent());
-            //knstylesheetFacadeREST.edit(selectedStylesheet);
             cfstylesheetService.edit(selectedStylesheet);
             
             difference = stylesheetUtility.hasDifference(selectedStylesheet);
@@ -184,7 +176,6 @@ public class StylesheetList {
     public void onCheckOut(ActionEvent actionEvent) {
         if (selectedStylesheet != null) {
             boolean canCheckout = false;
-            //Knstylesheet checktemplate = (Knstylesheet) em.createNamedQuery("Knstylesheet.findById").setParameter("id", selectedStylesheet.getId()).getSingleResult();
             CfStylesheet checkstylesheet = cfstylesheetService.findById(selectedStylesheet.getId());
             BigInteger co = checkstylesheet.getCheckedoutby();
             if (co != null) {
@@ -198,7 +189,6 @@ public class StylesheetList {
             if (canCheckout) {
                 selectedStylesheet.setCheckedoutby(BigInteger.valueOf(loginbean.getCfuser().getId()));
                 selectedStylesheet.setContent(getStylesheetContent());
-                //knstylesheetFacadeREST.edit(selectedStylesheet);
                 cfstylesheetService.edit(checkstylesheet);
                 
                 difference = stylesheetUtility.hasDifference(selectedStylesheet);
@@ -216,7 +206,6 @@ public class StylesheetList {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            //Knstylesheet validateStylesheet = (Knstylesheet) em.createNamedQuery("Knstylesheet.findByName").setParameter("name", stylesheetName).getSingleResult();
             CfStylesheet validateStylesheet = cfstylesheetService.findByName(stylesheetName);
             newButtonDisabled = true;
         } catch (NoResultException ex) {
@@ -229,9 +218,7 @@ public class StylesheetList {
             CfStylesheet newstylesheet = new CfStylesheet();
             newstylesheet.setName(stylesheetName);
             newstylesheet.setContent("//"+stylesheetName);
-            //knstylesheetFacadeREST.create(newstylesheet);
             cfstylesheetService.create(newstylesheet);
-            //stylesheetlist = em.createNamedQuery("Knstylesheet.findAll").getResultList();
             stylesheetListe = cfstylesheetService.findAll();
             stylesheetName = "";
         } catch (ConstraintViolationException ex) {
@@ -241,9 +228,7 @@ public class StylesheetList {
     
     public void onDelete(ActionEvent actionEvent) {
         if (selectedStylesheet != null) {
-            //knstylesheetFacadeREST.remove(selectedStylesheet);
             cfstylesheetService.delete(selectedStylesheet);
-            // stylesheetlist = em.createNamedQuery("Knstylesheet.findAll").getResultList();
             stylesheetListe = cfstylesheetService.findAll();
             FacesMessage message = new FacesMessage("Deleted " + selectedStylesheet.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -259,7 +244,6 @@ public class StylesheetList {
         cfstylesheetversion.setCfStylesheetversionPK(stylesheetversionpk);
         cfstylesheetversion.setContent(content);
         cfstylesheetversion.setTstamp(new Date());
-        //knstylesheetversionFacadeREST.create(knstylesheetversion);
         cfstylesheetversionService.create(cfstylesheetversion);
     }
     
