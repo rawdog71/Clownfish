@@ -69,7 +69,7 @@ public class TemplateList {
     private @Getter @Setter long checkedoutby = 0;
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
-    private @Getter @Setter TemplateUtil templateUtility;
+    @Autowired private @Getter @Setter TemplateUtil templateUtility;
 
     public TemplateList() {
     }
@@ -91,7 +91,7 @@ public class TemplateList {
 
     @PostConstruct
     public void init() {
-        templateUtility = new TemplateUtil();
+        //templateUtility = new TemplateUtil();
         templateName = "";
         templateListe = cftemplateService.findAll();
         templateUtility.setTemplateContent("");

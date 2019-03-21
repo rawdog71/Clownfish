@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfTemplateversion.findAll", query = "SELECT c FROM CfTemplateversion c"),
     @NamedQuery(name = "CfTemplateversion.findByTemplateref", query = "SELECT c FROM CfTemplateversion c WHERE c.cfTemplateversionPK.templateref = :templateref"),
     @NamedQuery(name = "CfTemplateversion.findByVersion", query = "SELECT c FROM CfTemplateversion c WHERE c.cfTemplateversionPK.version = :version"),
-    @NamedQuery(name = "Cftemplateversion.findByPK", query = "SELECT c FROM CfTemplateversion c WHERE c.cfTemplateversionPK.templateref = :templateref AND c.cfTemplateversionPK.version = :version"),
+    @NamedQuery(name = "CfTemplateversion.findByPK", query = "SELECT c FROM CfTemplateversion c WHERE c.cfTemplateversionPK.templateref = :templateref AND c.cfTemplateversionPK.version = :version"),
     @NamedQuery(name = "CfTemplateversion.findByTstamp", query = "SELECT c FROM CfTemplateversion c WHERE c.tstamp = :tstamp"),
     @NamedQuery(name = "CfTemplateversion.findByCommitedby", query = "SELECT c FROM CfTemplateversion c WHERE c.commitedby = :commitedby"),
     @NamedQuery(name = "CfTemplateversion.findMaxVersion", query = "SELECT MAX(c.cfTemplateversionPK.version) FROM CfTemplateversion c WHERE c.cfTemplateversionPK.templateref = :templateref")

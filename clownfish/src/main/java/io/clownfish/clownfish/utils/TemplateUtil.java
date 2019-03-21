@@ -19,15 +19,19 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
+import javax.faces.bean.ViewScoped;
 import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
+@ViewScoped
+@Component
 public class TemplateUtil {
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfTemplateversionService cftemplateversionService;
