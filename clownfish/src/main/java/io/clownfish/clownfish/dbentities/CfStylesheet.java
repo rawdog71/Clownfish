@@ -18,6 +18,7 @@ package io.clownfish.clownfish.dbentities;
 import java.io.Serializable;
 import java.math.BigInteger;
 import javax.persistence.Basic;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,6 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "cf_stylesheet", catalog = "clownfish", schema = "")
+@Cacheable(false)
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "CfStylesheet.findAll", query = "SELECT c FROM CfStylesheet c"),

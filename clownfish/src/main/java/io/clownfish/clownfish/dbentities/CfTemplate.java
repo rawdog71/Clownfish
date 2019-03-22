@@ -18,6 +18,7 @@ package io.clownfish.clownfish.dbentities;
 import java.io.Serializable;
 import java.math.BigInteger;
 import javax.persistence.Basic;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,6 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "cf_template", catalog = "clownfish", schema = "")
+@Cacheable(false)
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "CfTemplate.findAll", query = "SELECT c FROM CfTemplate c"),
@@ -146,7 +148,14 @@ public class CfTemplate implements Serializable {
 
     @Override
     public String toString() {
-        return "io.clownfish.clownfish.dbentities.CfTemplate[ id=" + id + " ]";
+        return name;
     }
     
+    public String getScriptLanguageTxt() {
+        if (getScriptlanguage() == 0) {
+            return "freemarker";
+        } else {
+            return "velocity";
+        }
+    }
 }

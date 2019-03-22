@@ -108,6 +108,8 @@ public class SiteTreeBean implements Serializable {
     @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired CfPropertyService cfpropertyService;
     @Autowired PropertyList propertylist;
+    @Autowired TemplateList templatelist;
+    @Autowired StylesheetList stylesheetlist;
     
     @PostConstruct
     public void init() {
@@ -126,10 +128,6 @@ public class SiteTreeBean implements Serializable {
         }
         root = new DefaultTreeNode("Root", null);
         loadTree();
-        /*
-        templatelist = cftemplateService.findAll();
-        stylesheetlist = cfstylesheetService.findAll();
-        */
         javascriptlist = cfjavascriptService.findAll();
         //datasources = em.createNamedQuery("Kndatasource.findAll").getResultList();
         datasources = cfdatasourceService.findAll();
@@ -145,16 +143,6 @@ public class SiteTreeBean implements Serializable {
         contentType = propertymap.get("response.contenttype");
         characterEncoding = propertymap.get("response.characterencoding");
     }
-    
-    /*
-    public void initTemplatelist() {
-        templatelist = cftemplateService.findAll();
-    }
-    
-    public void initStylesheetlist() {
-        stylesheetlist = cfstylesheetService.findAll();
-    }
-    */
     
     public void initJavascriptlist() {
         javascriptlist = cfjavascriptService.findAll();
@@ -195,7 +183,7 @@ public class SiteTreeBean implements Serializable {
                 try {
                     CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().longValue());
                     return template.getContent();
-                } catch (NoResultException ex) {
+                } catch (Exception ex) {
                     return "";
                 }    
             }
@@ -212,7 +200,7 @@ public class SiteTreeBean implements Serializable {
                 try {
                     CfStylesheet stylesheet = cfstylesheetService.findById(selectedSite.getStylesheetref().longValue());
                     return stylesheet.getContent();
-                } catch (NoResultException ex) {
+                } catch (Exception ex) {
                     return "";
                 }
             }
@@ -229,7 +217,7 @@ public class SiteTreeBean implements Serializable {
                 try {
                     CfJavascript javascript = cfjavascriptService.findById(selectedSite.getJavascriptref().longValue());
                     return javascript.getContent();
-                } catch (NoResultException ex) {
+                } catch (Exception ex) {
                     return "";
                 }
             }
@@ -252,20 +240,15 @@ public class SiteTreeBean implements Serializable {
         selectedSite = (CfSite) selectedNode.getData();
         if (selectedSite.getTemplateref() != null) {
             CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().longValue());
-            /*
-            int idx = templatelist.indexOf(template);
-            selectedTemplate = templatelist.get(idx);
-            */
+            int idx = templatelist.getTemplateListe().indexOf(template);
+            selectedTemplate = templatelist.getTemplateListe().get(idx);
         } else {
             selectedTemplate = null;
         }
         if (selectedSite.getStylesheetref() != null) {
-            //Knstylesheet styleshet = (Knstylesheet) em.createNamedQuery("Knstylesheet.findById").setParameter("id", selectedSite.getStylesheetref()).getSingleResult();
             CfStylesheet styleshet = cfstylesheetService.findById(selectedSite.getStylesheetref().longValue());
-            /*
-            int idx = stylesheetlist.indexOf(styleshet);
-            selectedStylesheet = stylesheetlist.get(idx);
-            */
+            int idx = stylesheetlist.getStylesheetListe().indexOf(styleshet);
+            selectedStylesheet = stylesheetlist.getStylesheetListe().get(idx);
         } else {
             selectedStylesheet = null;
         }
