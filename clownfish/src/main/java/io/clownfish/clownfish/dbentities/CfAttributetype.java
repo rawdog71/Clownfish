@@ -104,7 +104,7 @@ public class CfAttributetype implements Serializable {
 
     @Override
     public String toString() {
-        return "io.clownfish.clownfish.dbentities.CfAttributetype[ id=" + id + " ]";
+        return name;
     }
     
 }

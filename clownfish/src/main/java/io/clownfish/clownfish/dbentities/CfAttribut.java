@@ -22,6 +22,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -43,7 +45,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfAttribut.findByAttributetype", query = "SELECT c FROM CfAttribut c WHERE c.attributetype = :attributetype"),
     @NamedQuery(name = "CfAttribut.findByClassref", query = "SELECT c FROM CfAttribut c WHERE c.classref = :classref"),
     @NamedQuery(name = "CfAttribut.findByIdentity", query = "SELECT c FROM CfAttribut c WHERE c.identity = :identity"),
-    @NamedQuery(name = "CfAttribut.findByAutoincrementor", query = "SELECT c FROM CfAttribut c WHERE c.autoincrementor = :autoincrementor")})
+    @NamedQuery(name = "CfAttribut.findByAutoincrementor", query = "SELECT c FROM CfAttribut c WHERE c.autoincrementor = :autoincrementor"),
+    @NamedQuery(name = "CfAttribut.findByNameAndClassref", query = "SELECT c FROM CfAttribut c WHERE c.name = :name AND c.classref = :classref")
+})
 public class CfAttribut implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,14 +61,12 @@ public class CfAttribut implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "attributetype")
-    private long attributetype;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "classref")
-    private long classref;
+    @JoinColumn(name = "attributetype", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private CfAttributetype attributetype;
+    @JoinColumn(name = "classref", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private CfClass classref;
     @Column(name = "identity")
     private Boolean identity;
     @Column(name = "autoincrementor")
@@ -77,7 +79,7 @@ public class CfAttribut implements Serializable {
         this.id = id;
     }
 
-    public CfAttribut(Long id, String name, long attributetype, long classref) {
+    public CfAttribut(Long id, String name, CfClass classref, CfAttributetype attributetype) {
         this.id = id;
         this.name = name;
         this.attributetype = attributetype;
@@ -100,19 +102,19 @@ public class CfAttribut implements Serializable {
         this.name = name;
     }
 
-    public long getAttributetype() {
+    public CfAttributetype getAttributetype() {
         return attributetype;
     }
 
-    public void setAttributetype(long attributetype) {
+    public void setAttributetype(CfAttributetype attributetype) {
         this.attributetype = attributetype;
     }
 
-    public long getClassref() {
+    public CfClass getClassref() {
         return classref;
     }
 
-    public void setClassref(long classref) {
+    public void setClassref(CfClass classref) {
         this.classref = classref;
     }
 
