@@ -17,14 +17,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
+import javax.faces.bean.ViewScoped;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
+@ViewScoped
+@Component
 public class StylesheetUtil {
     @Autowired CfStylesheetService cfstylesheetService;
     @Autowired CfStylesheetversionService cfstylesheetversionService;
@@ -40,7 +44,6 @@ public class StylesheetUtil {
 
     public String getVersion(long stylesheetref, long version) {
         try {
-            //CfStylesheetversion stylesheet = (Knstylesheetversion) em.createNamedQuery("Knstylesheetversion.findByPK").setParameter("stylesheetref", stylesheetref).setParameter("version", version).getSingleResult();
             CfStylesheetversion stylesheet = cfstylesheetversionService.findByPK(stylesheetref, version);
             byte[] decompress = CompressionUtils.decompress(stylesheet.getContent());
             return new String(decompress, StandardCharsets.UTF_8);
@@ -54,7 +57,6 @@ public class StylesheetUtil {
         boolean diff = false;
         try {
             try {
-                //currentVersion = (long) em.createNamedQuery("Knstylesheetversion.findMaxVersion").setParameter("stylesheetref", selectedStylesheet.getId()).getSingleResult();
                 currentVersion = cfstylesheetversionService.findMaxVersion(selectedStylesheet.getId());
             } catch (NullPointerException ex) {
                 currentVersion = 0;

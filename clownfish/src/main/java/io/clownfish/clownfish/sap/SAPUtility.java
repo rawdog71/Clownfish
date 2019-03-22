@@ -47,7 +47,7 @@ public class SAPUtility {
                 JCoFunction function = sapc.getDestination().getRepository().getFunction(cfsitesaprfc.getCfSitesaprfcPK().getRfcfunction());
                 for (RfcFunctionParam rfcfunctionparam : paramlist) {
                     if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
-                        if (postmap != null) {
+                        if (null != postmap) {
                             for (JsonFormParameter jfp : postmap) {
                                 if (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0) {
                                     function.getImportParameterList().setValue(rfcfunctionparam.getParameter(), jfp.getValue());
@@ -85,7 +85,7 @@ public class SAPUtility {
                                     (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.TIMS) == 0)) {
                                     Date value = functions_table.getDate(rpytablereadentry.getFieldname());
                                     String datum = "";
-                                    if (value != null) {
+                                    if (null != value) {
                                         if (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) {
                                             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
                                             datum = sdf.format(value);

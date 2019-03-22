@@ -39,7 +39,6 @@ import org.springframework.stereotype.Component;
 public class StylesheetList {
     @Inject
     LoginBean loginbean;
-    
     @Autowired CfStylesheetService cfstylesheetService;
     @Autowired CfStylesheetversionService cfstylesheetversionService;
     
@@ -53,13 +52,13 @@ public class StylesheetList {
     private @Getter @Setter long checkedoutby = 0;
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
-    private @Getter @Setter StylesheetUtil stylesheetUtility;
+    @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
 
     public StylesheetList() {
     }
    
     public String getStylesheetContent() {
-        if (selectedStylesheet != null) {
+        if (null != selectedStylesheet) {
             stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
             return stylesheetUtility.getStyelsheetContent();
         } else {
@@ -68,14 +67,13 @@ public class StylesheetList {
     }
     
     public void setStylesheetContent(String content) {
-        if (selectedStylesheet != null) {
+        if (null != selectedStylesheet) {
             selectedStylesheet.setContent(content);
         }
     }
 
     @PostConstruct
     public void init() {
-        stylesheetUtility = new StylesheetUtil();
         stylesheetName = "";
         stylesheetListe = cfstylesheetService.findAll();
         stylesheetUtility.setStyelsheetContent("");
@@ -85,19 +83,24 @@ public class StylesheetList {
     
     public void onSelect(AjaxBehaviorEvent event) {
         difference = false;
-        stylesheetName = selectedStylesheet.getName();
-        stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
-        versionlist = cfstylesheetversionService.findByStylesheetref(selectedStylesheet.getId());
-        difference = stylesheetUtility.hasDifference(selectedStylesheet);
-        BigInteger co = selectedStylesheet.getCheckedoutby();
-        if (co != null) {
-            if (co.longValue() > 0) {
-                if (co.longValue() == loginbean.getCfuser().getId()) {
-                    checkedout = true;
-                    access = true;
+        if (null != selectedStylesheet) {
+            stylesheetName = selectedStylesheet.getName();
+            stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
+            versionlist = cfstylesheetversionService.findByStylesheetref(selectedStylesheet.getId());
+            difference = stylesheetUtility.hasDifference(selectedStylesheet);
+            BigInteger co = selectedStylesheet.getCheckedoutby();
+            if (null != co) {
+                if (co.longValue() > 0) {
+                    if (co.longValue() == loginbean.getCfuser().getId()) {
+                        checkedout = true;
+                        access = true;
+                    } else {
+                        checkedout = false;
+                        access = false;
+                    }
                 } else {
                     checkedout = false;
-                    access = false;
+                    access = true;
                 }
             } else {
                 checkedout = false;
@@ -105,12 +108,12 @@ public class StylesheetList {
             }
         } else {
             checkedout = false;
-            access = true;
+            access = false;
         }
     }
     
     public void onSave(ActionEvent actionEvent) {
-        if (selectedStylesheet != null) {
+        if (null != selectedStylesheet) {
             selectedStylesheet.setContent(getStylesheetContent());
             cfstylesheetService.edit(selectedStylesheet);
             difference = stylesheetUtility.hasDifference(selectedStylesheet);
@@ -121,7 +124,7 @@ public class StylesheetList {
     }
     
     public void onCommit(ActionEvent actionEvent) {
-        if (selectedStylesheet != null) {
+        if (null != selectedStylesheet) {
             boolean canCommit = false;
             if (stylesheetUtility.hasDifference(selectedStylesheet)) {
                 canCommit = true;
@@ -160,7 +163,7 @@ public class StylesheetList {
     }
     
     public void onCheckIn(ActionEvent actionEvent) {
-        if (selectedStylesheet != null) {
+        if (null != selectedStylesheet) {
             selectedStylesheet.setCheckedoutby(BigInteger.valueOf(0));
             selectedStylesheet.setContent(getStylesheetContent());
             cfstylesheetService.edit(selectedStylesheet);
@@ -174,11 +177,11 @@ public class StylesheetList {
     }
     
     public void onCheckOut(ActionEvent actionEvent) {
-        if (selectedStylesheet != null) {
+        if (null != selectedStylesheet) {
             boolean canCheckout = false;
             CfStylesheet checkstylesheet = cfstylesheetService.findById(selectedStylesheet.getId());
             BigInteger co = checkstylesheet.getCheckedoutby();
-            if (co != null) {
+            if (null != co) {
                 if (co.longValue() == 0) {
                     canCheckout = true;
                 } 
@@ -227,7 +230,7 @@ public class StylesheetList {
     }
     
     public void onDelete(ActionEvent actionEvent) {
-        if (selectedStylesheet != null) {
+        if (null != selectedStylesheet) {
             cfstylesheetService.delete(selectedStylesheet);
             stylesheetListe = cfstylesheetService.findAll();
             FacesMessage message = new FacesMessage("Deleted " + selectedStylesheet.getName());
@@ -248,7 +251,7 @@ public class StylesheetList {
     }
     
     public void onVersionSelect(ActionEvent actionEvent) {
-        if (selectedStylesheet != null) {
+        if (null != selectedStylesheet) {
             String versioncontent = stylesheetUtility.getVersion(version.getCfStylesheetversionPK().getStylesheetref(), version.getCfStylesheetversionPK().getVersion());
         }
     }

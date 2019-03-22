@@ -28,7 +28,7 @@ public class JavascriptConverter implements Converter, Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            Object o = cfjavascriptservice.findById(new Long(value));
+            Object o = cfjavascriptservice.findByName(value);
             return o;
         }
     }
@@ -38,7 +38,8 @@ public class JavascriptConverter implements Converter, Serializable {
         if (value == null) {
             return "-1";
         } else {
-            return ((CfJavascript) value).getId().toString(); 
+            String returnname = ((CfJavascript) value).getName();
+            return returnname; 
         }
     }
     

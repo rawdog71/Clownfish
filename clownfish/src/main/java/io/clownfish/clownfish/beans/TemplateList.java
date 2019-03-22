@@ -75,7 +75,7 @@ public class TemplateList {
     }
     
     public String getTemplateContent() {
-        if (selectedTemplate != null) {
+        if (null != selectedTemplate) {
             templateUtility.setTemplateContent(selectedTemplate.getContent());
             return templateUtility.getTemplateContent();
         } else {
@@ -84,7 +84,7 @@ public class TemplateList {
     }
     
     public void setTemplateContent(String content) {
-        if (selectedTemplate != null) {
+        if (null != selectedTemplate) {
             selectedTemplate.setContent(content);
         }
     }
@@ -100,25 +100,30 @@ public class TemplateList {
     
     public void onSelect(AjaxBehaviorEvent event) {
         difference = false;
-        templateName = selectedTemplate.getName();
-        templateUtility.setTemplateContent(selectedTemplate.getContent());
-        templateScriptLanguage = selectedTemplate.getScriptlanguage();
-        if (selectedTemplate.getScriptlanguage() == 0) {
-            selectedScriptlanguage = "freemarker";
-        } else {
-            selectedScriptlanguage = "velocity";
-        }
-        versionlist = cftemplateversionService.findByTemplateref(selectedTemplate.getId());
-        difference = templateUtility.hasDifference(selectedTemplate);
-        BigInteger co = selectedTemplate.getCheckedoutby();
-        if (co != null) {
-            if (co.longValue() > 0) {
-                if (co.longValue() == loginbean.getCfuser().getId()) {
-                    checkedout = true;
-                    access = true;
+        if (null != selectedTemplate) {
+            templateName = selectedTemplate.getName();
+            templateUtility.setTemplateContent(selectedTemplate.getContent());
+            templateScriptLanguage = selectedTemplate.getScriptlanguage();
+            if (selectedTemplate.getScriptlanguage() == 0) {
+                selectedScriptlanguage = "freemarker";
+            } else {
+                selectedScriptlanguage = "velocity";
+            }
+            versionlist = cftemplateversionService.findByTemplateref(selectedTemplate.getId());
+            difference = templateUtility.hasDifference(selectedTemplate);
+            BigInteger co = selectedTemplate.getCheckedoutby();
+            if (null != co) {
+                if (co.longValue() > 0) {
+                    if (co.longValue() == loginbean.getCfuser().getId()) {
+                        checkedout = true;
+                        access = true;
+                    } else {
+                        checkedout = false;
+                        access = false;
+                    }
                 } else {
                     checkedout = false;
-                    access = false;
+                    access = true;
                 }
             } else {
                 checkedout = false;
@@ -126,12 +131,12 @@ public class TemplateList {
             }
         } else {
             checkedout = false;
-            access = true;
+            access = false;
         }
     }
     
     public void onSave(ActionEvent actionEvent) {
-        if (selectedTemplate != null) {
+        if (null != selectedTemplate) {
             selectedTemplate.setContent(getTemplateContent());
             cftemplateService.edit(selectedTemplate);
             difference = templateUtility.hasDifference(selectedTemplate);
@@ -142,7 +147,7 @@ public class TemplateList {
     }
     
     public void onCommit(ActionEvent actionEvent) {
-        if (selectedTemplate != null) {
+        if (null != selectedTemplate) {
             boolean canCommit = false;
             if (templateUtility.hasDifference(selectedTemplate)) {
                 canCommit = true;
@@ -181,11 +186,11 @@ public class TemplateList {
     }
     
     public void onCheckOut(ActionEvent actionEvent) {
-        if (selectedTemplate != null) {
+        if (null != selectedTemplate) {
             boolean canCheckout = false;
             CfTemplate checktemplate = cftemplateService.findById(selectedTemplate.getId());
             BigInteger co = checktemplate.getCheckedoutby();
-            if (co != null) {
+            if (null != co) {
                 if (co.longValue() == 0) {
                     canCheckout = true;
                 } 
@@ -211,7 +216,7 @@ public class TemplateList {
     }
     
     public void onCheckIn(ActionEvent actionEvent) {
-        if (selectedTemplate != null) {
+        if (null != selectedTemplate) {
             selectedTemplate.setCheckedoutby(BigInteger.valueOf(0));
             selectedTemplate.setContent(getTemplateContent());
             cftemplateService.edit(selectedTemplate);
@@ -247,7 +252,7 @@ public class TemplateList {
     }
     
     public void onDelete(ActionEvent actionEvent) {
-        if (selectedTemplate != null) {
+        if (null != selectedTemplate) {
             cftemplateService.delete(selectedTemplate);
             templateListe = cftemplateService.findAll();
             
@@ -270,7 +275,7 @@ public class TemplateList {
     }
     
     public void onVersionSelect(ActionEvent actionEvent) {
-        if (selectedTemplate != null) {
+        if (null != selectedTemplate) {
             String versioncontent = templateUtility.getVersion(version.getCfTemplateversionPK().getTemplateref(), version.getCfTemplateversionPK().getVersion());
         }
     }

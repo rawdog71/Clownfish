@@ -116,7 +116,7 @@
                                             <p:selectOneMenu id="selectjavascript" value="#{sitetree.selectedJavascript}" required="false" converter="#{javascriptConverterBean}">
                                                 <p:ajax listener="#{sitetree.onChangeJavascript}" update=":form:tabview:jsview" />
                                                 <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                                <f:selectItems value="#{sitetree.javascriptlist}" />
+                                                <f:selectItems value="#{javascriptList.javascriptListe}" />
                                             </p:selectOneMenu>
                                         </p:column>
                                     </p:row>
@@ -276,17 +276,13 @@
                         <f:selectItems value="#{stylesheetList.stylesheetListe}" />
                     </p:selectOneMenu>
                     
-                    <p:commandButton id="deletestylesheetButton" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:selectstylesheet">
-                        <f:actionListener binding="#{sitetree.initStylesheetlist()}" />
-                    </p:commandButton>
+                    <p:commandButton id="deletestylesheetButton" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:selectstylesheet" />
 
                     <p:outputLabel for="stylesheetname">Name</p:outputLabel>
                     <p:inputText id="stylesheetname" value="#{stylesheetList.stylesheetName}" >
                         <p:ajax event="keyup" listener="#{stylesheetList.onChangeName(changeEvent)}" update=":form:tabview:newstylesheet" />
                     </p:inputText>
-                    <p:commandButton id="newstylesheet" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}">
-                        <f:actionListener binding="#{sitetree.initStylesheetlist()}" />
-                    </p:commandButton>
+                    <p:commandButton id="newstylesheet" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
 
                     <pe:codeMirror id="editstylesheet" mode="css" theme="ambiance" readonly="#{!stylesheetList.checkedout}" value="#{stylesheetList.stylesheetContent}" lineNumbers="true" matchBrackets="true" />
                         <h:panelGroup id="diffstylesheetBtnGroup">
@@ -320,6 +316,55 @@
                         <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                         <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
                     </p:confirmDialog> 
+                </p:tab>
+                
+                <p:tab title="Javascripts" rendered="#{loginBean.login}">
+                    <p:selectOneMenu id="javascriptlist" value="#{javascriptList.selectedJavascript}" converter="#{javascriptConverterBean}">
+                        <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:diffjavascriptPanel" />
+                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                        <f:selectItems value="#{javascriptList.javascriptListe}" />
+                    </p:selectOneMenu>
+                    
+                    <p:commandButton id="deletejavascriptButton" value="Delete" actionListener="#{javascriptList.onDelete}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:selectjavascript" />
+
+                    <p:outputLabel for="javascriptname">Name</p:outputLabel>
+                    <p:inputText id="javascriptname" value="#{javascriptList.javascriptName}" >
+                        <p:ajax event="keyup" listener="#{javascriptList.onChangeName(changeEvent)}" update=":form:tabview:newjavascript" />
+                    </p:inputText>
+                    <p:commandButton id="newjavascript" process="form" value="New" actionListener="#{javascriptList.onCreate}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
+                    
+                    <pe:codeMirror id="editjavascript" mode="javascript" theme="ambiance" readonly="#{!javascriptList.checkedout}" value="#{javascriptList.javascriptContent}" lineNumbers="true" matchBrackets="true" />
+                    <h:panelGroup id="diffjavascriptBtnGroup">
+                        <p:commandButton id="savejavascript" process="form" value="Save" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onSave}" update=":form:msgs :form:tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup" />
+                        <p:commandButton id="checkinjavascript" process="form" value="CheckIn" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onCheckIn}"  update=":form:msgs :form:tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
+                        <p:commandButton id="checkoutjavascript" process="form" value="CheckOut" rendered="#{!javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCheckOut}" update=":form:msgs :form:tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
+                        <p:commandButton id="commitjavascript" process="form" value="Commit" rendered="#{javascriptList.difference and !javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCommit}" update=":form:msgs :form:tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup">
+                            <p:confirm header="Bestätigung" message="Sind Sie sicher?" icon="pi pi-exclamation-triangle" />
+                        </p:commandButton>
+                        
+                        <p:outputLabel> Version </p:outputLabel><p:outputLabel id="javascriptversion">#{javascriptList.javascriptUtility.currentVersion}</p:outputLabel>
+                        <p:commandButton id="diffjavascriptBtn" type="button" value="Diff" rendered="#{javascriptList.difference}" />
+                        
+                        <p:overlayPanel id="diffjavascriptPanel" for="diffjavascriptBtn" hideEffect="fade" dynamic="false" style="width:600px" modal="true">
+                            <p:dataTable var="diff" value="#{javascriptList.javascriptUtility.patch.deltas}" rows="#{javascriptList.javascriptUtility.patch.deltas.size()}" paginator="false">
+                                <p:column headerText="DiffTyp">
+                                    <h:outputText value="#{diff.type}" />
+                                </p:column>
+                                <p:column headerText="Local">
+                                    <h:outputText value="#{diff.source}" />
+                                </p:column>
+                                <p:column headerText="Repository">
+                                    <h:outputText value="#{diff.target}" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                    </p:confirmDialog> 
+                    
                 </p:tab>
                 
                 <p:tab title="Properties" rendered="#{loginBean.login}">

@@ -134,7 +134,7 @@ public class CfStylesheet implements Serializable {
 
     @Override
     public String toString() {
-        return "io.clownfish.clownfish.dbentities.CfStylesheet[ id=" + id + " ]";
+        return name;
     }
     
 }

@@ -72,7 +72,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter CfTemplate selectedTemplate = null;
     private @Getter @Setter CfStylesheet selectedStylesheet = null;
     private @Getter @Setter CfJavascript selectedJavascript = null;
-    private @Getter @Setter List<CfJavascript> javascriptlist;
+    //private @Getter @Setter List<CfJavascript> javascriptlist;
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter List<CfDatasource> datasources;
     private @Getter @Setter List<CfDatasource> selectedDatasources;
@@ -110,6 +110,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired PropertyList propertylist;
     @Autowired TemplateList templatelist;
     @Autowired StylesheetList stylesheetlist;
+    @Autowired JavascriptList javascriptlist;
     
     @PostConstruct
     public void init() {
@@ -128,7 +129,7 @@ public class SiteTreeBean implements Serializable {
         }
         root = new DefaultTreeNode("Root", null);
         loadTree();
-        javascriptlist = cfjavascriptService.findAll();
+        //javascriptlist = cfjavascriptService.findAll();
         //datasources = em.createNamedQuery("Kndatasource.findAll").getResultList();
         datasources = cfdatasourceService.findAll();
         //contentlist = em.createNamedQuery("Knlist.findAll").getResultList();
@@ -142,10 +143,6 @@ public class SiteTreeBean implements Serializable {
         locale = propertymap.get("response.locale");
         contentType = propertymap.get("response.contenttype");
         characterEncoding = propertymap.get("response.characterencoding");
-    }
-    
-    public void initJavascriptlist() {
-        javascriptlist = cfjavascriptService.findAll();
     }
     
     public void initDatasources() {
@@ -176,8 +173,8 @@ public class SiteTreeBean implements Serializable {
     }
  
     public String getTemplate() {
-        if (selectedSite != null) {
-            if (selectedTemplate != null) {
+        if (null != selectedSite) {
+            if (null != selectedTemplate) {
                 return selectedTemplate.getContent();
             } else {
                 try {
@@ -193,8 +190,8 @@ public class SiteTreeBean implements Serializable {
     }
     
     public String getStylesheet() {
-        if (selectedSite != null) {
-            if (selectedStylesheet != null) {
+        if (null != selectedSite) {
+            if (null != selectedStylesheet) {
                 return selectedStylesheet.getContent();
             } else {
                 try {
@@ -210,8 +207,8 @@ public class SiteTreeBean implements Serializable {
     }
     
     public String getJavascript() {
-        if (selectedSite != null) {
-            if (selectedJavascript != null) {
+        if (null != selectedSite) {
+            if (null != selectedJavascript) {
                 return selectedJavascript.getContent();
             } else {
                 try {
@@ -238,24 +235,24 @@ public class SiteTreeBean implements Serializable {
     public void onSelect(NodeSelectEvent event) {
         selectedNode = event.getTreeNode();
         selectedSite = (CfSite) selectedNode.getData();
-        if (selectedSite.getTemplateref() != null) {
+        if (null != selectedSite.getTemplateref()) {
             CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().longValue());
             int idx = templatelist.getTemplateListe().indexOf(template);
             selectedTemplate = templatelist.getTemplateListe().get(idx);
         } else {
             selectedTemplate = null;
         }
-        if (selectedSite.getStylesheetref() != null) {
+        if (null != selectedSite.getStylesheetref()) {
             CfStylesheet styleshet = cfstylesheetService.findById(selectedSite.getStylesheetref().longValue());
             int idx = stylesheetlist.getStylesheetListe().indexOf(styleshet);
             selectedStylesheet = stylesheetlist.getStylesheetListe().get(idx);
         } else {
             selectedStylesheet = null;
         }
-        if (selectedSite.getJavascriptref() != null) {
+        if (null != selectedSite.getJavascriptref()) {
             CfJavascript javascript = cfjavascriptService.findById(selectedSite.getJavascriptref().longValue());
-            int idx = javascriptlist.indexOf(javascript);
-            selectedJavascript = javascriptlist.get(idx);
+            int idx = javascriptlist.getJavascriptListe().indexOf(javascript);
+            selectedJavascript = javascriptlist.getJavascriptListe().get(idx);
         } else {
             selectedJavascript = null;
         }
@@ -293,7 +290,7 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onDelete(ActionEvent actionEvent) {
-        if (selectedSite != null) {
+        if (null != selectedSite) {
             cfsiteService.delete(selectedSite);
             loadTree();
             
@@ -303,18 +300,18 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onChange(ActionEvent actionEvent) {
-        if (selectedSite != null) {
-            if (selectedStylesheet != null) {
+        if (null != selectedSite) {
+            if (null != selectedStylesheet) {
                 selectedSite.setStylesheetref(BigInteger.valueOf(selectedStylesheet.getId().intValue()));
             } else {
                 selectedSite.setStylesheetref(null);
             }
-            if (selectedTemplate != null) {
+            if (null != selectedTemplate) {
                 selectedSite.setTemplateref(BigInteger.valueOf(selectedTemplate.getId().intValue()));
             } else {
                 selectedSite.setTemplateref(null);
             }
-            if (selectedJavascript != null) {
+            if (null != selectedJavascript) {
                 selectedSite.setJavascriptref(BigInteger.valueOf(selectedJavascript.getId().intValue()));
             } else {
                 selectedSite.setJavascriptref(null);
@@ -384,19 +381,19 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onChangeTemplate() {
-        if (selectedTemplate != null) {
+        if (null != selectedTemplate) {
             
         }
     }
     
     public void onChangeStylesheet() {
-        if (selectedStylesheet != null) {
+        if (null != selectedStylesheet) {
             
         }
     }
     
     public void onChangeJavascript() {
-        if (selectedStylesheet != null) {
+        if (null != selectedStylesheet) {
             
         }
     }
@@ -414,18 +411,18 @@ public class SiteTreeBean implements Serializable {
         try {
             CfSite newsite = new CfSite();
             newsite.setName(siteName);
-            if (selectedSite != null) {
+            if (null != selectedSite) {
                 newsite.setParentref(BigInteger.valueOf(selectedSite.getId()));
             } else {
                 newsite.setParentref(BigInteger.ZERO);
             }
-            if (selectedTemplate != null) {
+            if (null != selectedTemplate) {
                 newsite.setTemplateref(BigInteger.valueOf(selectedTemplate.getId()));
             }
-            if (selectedStylesheet != null) {
+            if (null != selectedStylesheet) {
                 newsite.setStylesheetref(BigInteger.valueOf(selectedStylesheet.getId()));
             }
-            if (selectedJavascript != null) {
+            if (null != selectedJavascript) {
                 newsite.setJavascriptref(BigInteger.valueOf(selectedJavascript.getId()));
             }
             newsite.setHtmlcompression(sitehtmlcompression);
@@ -441,26 +438,26 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onChangeRfcGroup() {
-        if (selectedrfcgroup != null) {
+        if (null != selectedrfcgroup) {
             rfcfunctionlist = new RFC_FUNCTION_SEARCH(sapc).getRfcFunctionsList(selectedrfcgroup.getName());
         }
     }
     
     public void onChangeRfcFunction() {
-        if (selectedrfcfunction != null) {
+        if (null != selectedrfcfunction) {
             
         }
     }
     
     public void onDeleteRfc(ActionEvent actionEvent) {
-        if (selectedrfc != null) {
+        if (null != selectedrfc) {
             cfsitesaprfcService.delete(selectedrfc);
             saprfclist = cfsitesaprfcService.findBySiteref(selectedSite.getId());
         }
     }
     
     public void onNewRfc(ActionEvent actionEvent) {
-        if ((selectedrfcgroup != null) && (selectedrfcfunction != null)) {
+        if ((null != selectedrfcgroup) && (null != selectedrfcfunction)) {
             CfSitesaprfc sitesaprfc = new CfSitesaprfc();
             CfSitesaprfcPK cfsitesaprfcPK = new CfSitesaprfcPK();
             cfsitesaprfcPK.setSiteref(selectedSite.getId());

@@ -42,8 +42,11 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfStylesheetversion.findAll", query = "SELECT c FROM CfStylesheetversion c"),
     @NamedQuery(name = "CfStylesheetversion.findByStylesheetref", query = "SELECT c FROM CfStylesheetversion c WHERE c.cfStylesheetversionPK.stylesheetref = :stylesheetref"),
     @NamedQuery(name = "CfStylesheetversion.findByVersion", query = "SELECT c FROM CfStylesheetversion c WHERE c.cfStylesheetversionPK.version = :version"),
+    @NamedQuery(name = "CfStylesheetversion.findByPK", query = "SELECT c FROM CfStylesheetversion c WHERE c.cfStylesheetversionPK.stylesheetref = :stylesheetref AND c.cfStylesheetversionPK.version = :version"),
     @NamedQuery(name = "CfStylesheetversion.findByTstamp", query = "SELECT c FROM CfStylesheetversion c WHERE c.tstamp = :tstamp"),
-    @NamedQuery(name = "CfStylesheetversion.findByCommitedby", query = "SELECT c FROM CfStylesheetversion c WHERE c.commitedby = :commitedby")})
+    @NamedQuery(name = "CfStylesheetversion.findByCommitedby", query = "SELECT c FROM CfStylesheetversion c WHERE c.commitedby = :commitedby"),
+    @NamedQuery(name = "CfStylesheetversion.findMaxVersion", query = "SELECT MAX(c.cfStylesheetversionPK.version) FROM CfStylesheetversion c WHERE c.cfStylesheetversionPK.stylesheetref = :stylesheetref")
+})
 public class CfStylesheetversion implements Serializable {
 
     private static final long serialVersionUID = 1L;

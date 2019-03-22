@@ -79,7 +79,7 @@ public class UserList {
     
     public void onEditUser(ActionEvent actionEvent) {
         try {
-            if (selectedUser != null) {
+            if (null != selectedUser) {
                 String salt = PasswordUtil.getSalt(30);
                 String secure = PasswordUtil.generateSecurePassword(passwort, salt);
                 selectedUser.setSalt(salt);
@@ -93,7 +93,7 @@ public class UserList {
     }
     
     public void onDeleteUser(ActionEvent actionEvent) {
-        if (selectedUser != null) {
+        if (null != selectedUser) {
             cfuserService.delete(selectedUser);
             userlist = cfuserService.findAll();
         }

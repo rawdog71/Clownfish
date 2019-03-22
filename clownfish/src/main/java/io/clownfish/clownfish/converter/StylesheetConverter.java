@@ -28,7 +28,7 @@ public class StylesheetConverter implements Converter, Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            Object o = cfstylesheetservice.findById(new Long(value));
+            Object o = cfstylesheetservice.findByName(value);
             return o;
         }
     }
@@ -38,7 +38,8 @@ public class StylesheetConverter implements Converter, Serializable {
         if (value == null) {
             return "-1";
         } else {
-            return ((CfStylesheet) value).getId().toString(); 
+            String returnname = ((CfStylesheet) value).getName();
+            return returnname; 
         }
     }
     

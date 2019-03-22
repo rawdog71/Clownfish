@@ -47,7 +47,6 @@ public class TemplateUtil {
 
     public String getVersion(long templateref, long version) {
         try {
-            //Kntemplateversion template = (Kntemplateversion) em.createNamedQuery("Kntemplateversion.findByPK").setParameter("templateref", templateref).setParameter("version", version).getSingleResult();
             CfTemplateversion template = cftemplateversionService.findByPK(templateref, version);
             byte[] decompress = CompressionUtils.decompress(template.getContent());
             return new String(decompress, StandardCharsets.UTF_8);
@@ -61,7 +60,6 @@ public class TemplateUtil {
         boolean diff = false;
         try {
             try {
-                //currentVersion = (long) em.createNamedQuery("Kntemplateversion.findMaxVersion").setParameter("templateref", selectedTemplate.getId()).getSingleResult();
                 currentVersion = (long) cftemplateversionService.findMaxVersion(selectedTemplate.getId());
             } catch (NullPointerException ex) {
                 currentVersion = 0;
@@ -98,12 +96,10 @@ public class TemplateUtil {
                 } else {
                     long currentTemplateVersion = 0;
                     try {
-                        //currentTemplateVersion = (long) em.createNamedQuery("Kntemplateversion.findMaxVersion").setParameter("templateref", kntemplate.getId()).getSingleResult();
                         currentVersion = (long) cftemplateversionService.findMaxVersion(cftemplate.getId());
                     } catch (NullPointerException ex) {
                         currentTemplateVersion = 0;
                     }
-                    //TemplateUtil templateUtility = new TemplateUtil(em);
                     content = content.replace(lastmatch, getVersion(cftemplate.getId(), currentTemplateVersion));
                 }
                 matcher = pattern.matcher(content);

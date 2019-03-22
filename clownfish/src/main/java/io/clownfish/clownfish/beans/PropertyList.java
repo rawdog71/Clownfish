@@ -68,7 +68,6 @@ public class PropertyList {
             CfProperty newproperty = new CfProperty();
             newproperty.setHashkey(propertykey);
             newproperty.setValue(propertyvalue);
-            //knpropertyFacadeREST.create(newproperty);
             cfpropertyService.create(newproperty);
 
             propertylist = cfpropertyService.findAll();
@@ -79,10 +78,9 @@ public class PropertyList {
     
     public void onEditProperty(ActionEvent actionEvent) {
         try {
-            if (selectedProperty != null) {
+            if (null != selectedProperty) {
                 selectedProperty.setHashkey(propertykey);
                 selectedProperty.setValue(propertyvalue);
-                //knpropertyFacadeREST.edit(selectedProperty);
                 cfpropertyService.edit(selectedProperty);
                 propertylist = cfpropertyService.findAll();
             }
@@ -92,8 +90,7 @@ public class PropertyList {
     }
     
     public void onDeleteProperty(ActionEvent actionEvent) {
-        if (selectedProperty != null) {
-            //knpropertyFacadeREST.remove(selectedProperty);
+        if (null != selectedProperty) {
             cfpropertyService.delete(selectedProperty);
             propertylist = cfpropertyService.findAll();
         }

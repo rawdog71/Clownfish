@@ -42,8 +42,11 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfJavascriptversion.findAll", query = "SELECT c FROM CfJavascriptversion c"),
     @NamedQuery(name = "CfJavascriptversion.findByJavascriptref", query = "SELECT c FROM CfJavascriptversion c WHERE c.cfJavascriptversionPK.javascriptref = :javascriptref"),
     @NamedQuery(name = "CfJavascriptversion.findByVersion", query = "SELECT c FROM CfJavascriptversion c WHERE c.cfJavascriptversionPK.version = :version"),
+    @NamedQuery(name = "CfJavascriptversion.findByPK", query = "SELECT c FROM CfJavascriptversion c WHERE c.cfJavascriptversionPK.javascriptref = :javascriptref AND c.cfJavascriptversionPK.version = :version"),
     @NamedQuery(name = "CfJavascriptversion.findByTstamp", query = "SELECT c FROM CfJavascriptversion c WHERE c.tstamp = :tstamp"),
-    @NamedQuery(name = "CfJavascriptversion.findByCommitedby", query = "SELECT c FROM CfJavascriptversion c WHERE c.commitedby = :commitedby")})
+    @NamedQuery(name = "CfJavascriptversion.findByCommitedby", query = "SELECT c FROM CfJavascriptversion c WHERE c.commitedby = :commitedby"),
+    @NamedQuery(name = "CfJavascriptversion.findMaxVersion", query = "SELECT MAX(c.cfJavascriptversionPK.version) FROM CfJavascriptversion c WHERE c.cfJavascriptversionPK.javascriptref = :javascriptref")
+})
 public class CfJavascriptversion implements Serializable {
 
     private static final long serialVersionUID = 1L;
