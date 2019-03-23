@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.daointerface;
 
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import java.util.List;
  */
 public interface CfClasscontentDAO {
     List<CfClasscontent> findAll();
+    List<CfClasscontent> findByClassref(CfClass classref);
     CfClasscontent findById(Long id);
     CfClasscontent findByName(String name);
     boolean create(CfClasscontent entity);

@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.dbrepository;
 
 import io.clownfish.clownfish.daointerface.CfClasscontentDAO;
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import java.util.List;
 import javax.persistence.TypedQuery;
@@ -83,5 +84,14 @@ public class CfClasscontentDAOImpl implements CfClasscontentDAO {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
         return true;
+    }
+
+    @Override
+    public List<CfClasscontent> findByClassref(CfClass classref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findByClassref");
+        query.setParameter("classref", classref);
+        List<CfClasscontent> cfclasscontentlist = query.getResultList();
+        return cfclasscontentlist;
     }
 }

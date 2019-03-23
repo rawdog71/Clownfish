@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.serviceimpl;
 
 import io.clownfish.clownfish.daointerface.CfClasscontentDAO;
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import java.util.List;
@@ -63,6 +64,11 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
     @Override
     public boolean edit(CfClasscontent entity) {
         return this.cfclasscontentDAO.edit(entity);
+    }
+
+    @Override
+    public List<CfClasscontent> findByClassref(CfClass classref) {
+        return this.cfclasscontentDAO.findByClassref(classref);
     }
     
 }

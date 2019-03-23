@@ -24,9 +24,8 @@ public class AttributList {
     private @Getter @Setter List<CfAttribut> attributlist;
     private @Getter @Setter CfAttribut selectedAttribut = null;
 
-    public List<CfAttribut> init(CfClass knclass) {
-        //attributlist = em.createNamedQuery("Knattribut.findByClassref").setParameter("classref", knclass).getResultList();
-        attributlist = cfattributService.findByClassref(knclass.getId());
+    public List<CfAttribut> init(CfClass cfclass) {
+        attributlist = cfattributService.findByClassref(cfclass);
         
         return attributlist;
     }

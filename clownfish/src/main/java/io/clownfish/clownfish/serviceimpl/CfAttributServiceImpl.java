@@ -59,7 +59,7 @@ public class CfAttributServiceImpl implements CfAttributService {
     }
 
     @Override
-    public List<CfAttribut> findByClassref(Long classref) {
+    public List<CfAttribut> findByClassref(CfClass classref) {
         return this.cfattributDAO.findByClassref(classref);
     }
 

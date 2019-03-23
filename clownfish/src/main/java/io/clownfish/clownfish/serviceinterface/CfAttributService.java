@@ -24,7 +24,7 @@ import java.util.List;
  * @author sulzbachr
  */
 public interface CfAttributService {
-    List<CfAttribut> findByClassref(Long classref);
+    List<CfAttribut> findByClassref(CfClass classref);
     CfAttribut findById(Long id);
     CfAttribut findByNameAndClassref(String name, CfClass classref);
     boolean create(CfAttribut entity);

@@ -22,6 +22,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -49,10 +51,9 @@ public class CfClasscontent implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "classref")
-    private long classref;
+    @JoinColumn(name = "classref", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private CfClass classref;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 64)
@@ -66,7 +67,7 @@ public class CfClasscontent implements Serializable {
         this.id = id;
     }
 
-    public CfClasscontent(Long id, long classref, String name) {
+    public CfClasscontent(Long id, CfClass classref, String name) {
         this.id = id;
         this.classref = classref;
         this.name = name;
@@ -80,11 +81,11 @@ public class CfClasscontent implements Serializable {
         this.id = id;
     }
 
-    public long getClassref() {
+    public CfClass getClassref() {
         return classref;
     }
 
-    public void setClassref(long classref) {
+    public void setClassref(CfClass classref) {
         this.classref = classref;
     }
 

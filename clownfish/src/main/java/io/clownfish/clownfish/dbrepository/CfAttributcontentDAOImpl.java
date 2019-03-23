@@ -15,9 +15,8 @@
  */
 package io.clownfish.clownfish.dbrepository;
 
-import io.clownfish.clownfish.daointerface.CfAttributDAO;
-import io.clownfish.clownfish.dbentities.CfAttribut;
-import io.clownfish.clownfish.dbentities.CfClass;
+import io.clownfish.clownfish.daointerface.CfAttributcontentDAO;
+import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -30,62 +29,41 @@ import org.springframework.stereotype.Repository;
  * @author sulzbachr
  */
 @Repository
-public class CfAttributDAOImpl implements CfAttributDAO {
+public class CfAttributcontentDAOImpl implements CfAttributcontentDAO {
 
     private final SessionFactory sessionFactory;
     
     @Autowired 
-    public CfAttributDAOImpl(SessionFactory sessionFactory) {
+    public CfAttributcontentDAOImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-    }
-    
-    @Override
-    public CfAttribut findById(Long id) {
-        Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttribut.findById");  
-        query.setParameter("id", id);
-        CfAttribut cfattribut = (CfAttribut) query.getSingleResult();
-        return cfattribut;
     }
 
     @Override
-    public boolean create(CfAttribut entity) {
+    public List<CfAttributcontent> findAll() {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findAll");
+        List<CfAttributcontent> cfattributcontentlist = query.getResultList();
+        return cfattributcontentlist;
+    }
+    
+    @Override
+    public boolean create(CfAttributcontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
         return true;
     }
 
     @Override
-    public boolean delete(CfAttribut entity) {
+    public boolean delete(CfAttributcontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.delete(entity);
         return true;
     }
 
     @Override
-    public boolean edit(CfAttribut entity) {
+    public boolean edit(CfAttributcontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
         return true;
     }
-
-    @Override
-    public List<CfAttribut> findByClassref(CfClass classref) {
-        Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttribut.findByClassref");
-        query.setParameter("classref", classref);
-        List<CfAttribut> cfattributlist = query.getResultList();
-        return cfattributlist;
-    }
-
-    @Override
-    public CfAttribut findByNameAndClassref(String name, CfClass classref) {
-        Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttribut.findByNameAndClassref");  
-        query.setParameter("name", name);
-        query.setParameter("classref", classref);
-        CfAttribut cfattribut = (CfAttribut) query.getSingleResult();
-        return cfattribut;
-    }
-    
 }

@@ -24,7 +24,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -60,14 +62,12 @@ public class CfAttributcontent implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "attributref")
-    private long attributref;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "classcontentref")
-    private long classcontentref;
+    @JoinColumn(name = "attributref", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private CfAttribut attributref;
+    @JoinColumn(name = "classcontentref", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private CfClasscontent classcontentref;
     @Column(name = "content_boolean")
     private Boolean contentBoolean;
     @Column(name = "content_integer")
@@ -96,7 +96,7 @@ public class CfAttributcontent implements Serializable {
         this.id = id;
     }
 
-    public CfAttributcontent(Long id, long attributref, long classcontentref) {
+    public CfAttributcontent(Long id, CfAttribut attributref, CfClasscontent classcontentref) {
         this.id = id;
         this.attributref = attributref;
         this.classcontentref = classcontentref;
@@ -110,19 +110,19 @@ public class CfAttributcontent implements Serializable {
         this.id = id;
     }
 
-    public long getAttributref() {
+    public CfAttribut getAttributref() {
         return attributref;
     }
 
-    public void setAttributref(long attributref) {
+    public void setAttributref(CfAttribut attributref) {
         this.attributref = attributref;
     }
 
-    public long getClasscontentref() {
+    public CfClasscontent getClasscontentref() {
         return classcontentref;
     }
 
-    public void setClasscontentref(long classcontentref) {
+    public void setClasscontentref(CfClasscontent classcontentref) {
         this.classcontentref = classcontentref;
     }
 

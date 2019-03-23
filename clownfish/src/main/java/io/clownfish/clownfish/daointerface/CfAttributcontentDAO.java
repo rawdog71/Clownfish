@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.serviceinterface;
+package io.clownfish.clownfish.daointerface;
 
-import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import java.util.List;
 
 /**
  *
  * @author sulzbachr
  */
-public interface CfClasscontentService {
-    List<CfClasscontent> findAll();
-    List<CfClasscontent> findByClassref(CfClass classref);
-    CfClasscontent findById(Long id);
-    CfClasscontent findByName(String name);
-    boolean create(CfClasscontent entity);
-    boolean delete(CfClasscontent entity);
-    boolean edit(CfClasscontent entity);
+public interface CfAttributcontentDAO {
+    List<CfAttributcontent> findAll();
+    boolean create(CfAttributcontent entity);
+    boolean delete(CfAttributcontent entity);
+    boolean edit(CfAttributcontent entity);
 }
