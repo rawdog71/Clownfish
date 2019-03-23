@@ -15,7 +15,9 @@
  */
 package io.clownfish.clownfish.serviceinterface;
 
+import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
+import io.clownfish.clownfish.dbentities.CfClasscontent;
 import java.util.List;
 
 /**
@@ -24,6 +26,8 @@ import java.util.List;
  */
 public interface CfAttributcontentService {
     List<CfAttributcontent> findAll();
+    List<CfAttributcontent> findByClasscontentref(CfClasscontent classcontentref);
+    CfAttributcontent findByAttributrefAndClasscontentref(CfAttribut attributref, CfClasscontent classcontentref);
     boolean create(CfAttributcontent entity);
     boolean delete(CfAttributcontent entity);
     boolean edit(CfAttributcontent entity);

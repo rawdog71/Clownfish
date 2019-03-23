@@ -53,7 +53,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfAttributcontent.findByContentReal", query = "SELECT c FROM CfAttributcontent c WHERE c.contentReal = :contentReal"),
     @NamedQuery(name = "CfAttributcontent.findByContentString", query = "SELECT c FROM CfAttributcontent c WHERE c.contentString = :contentString"),
     @NamedQuery(name = "CfAttributcontent.findByContentDate", query = "SELECT c FROM CfAttributcontent c WHERE c.contentDate = :contentDate"),
-    @NamedQuery(name = "CfAttributcontent.findBySalt", query = "SELECT c FROM CfAttributcontent c WHERE c.salt = :salt")})
+    @NamedQuery(name = "CfAttributcontent.findBySalt", query = "SELECT c FROM CfAttributcontent c WHERE c.salt = :salt"),
+    @NamedQuery(name = "CfAttributcontent.findByAttributrefAndClasscontentref", query = "SELECT c FROM CfAttributcontent c WHERE c.attributref = :attributref AND c.classcontentref = :classcontentref")
+})
 public class CfAttributcontent implements Serializable {
 
     private static final long serialVersionUID = 1L;

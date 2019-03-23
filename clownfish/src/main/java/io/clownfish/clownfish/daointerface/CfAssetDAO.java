@@ -15,20 +15,18 @@
  */
 package io.clownfish.clownfish.daointerface;
 
+import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAttribut;
-import io.clownfish.clownfish.dbentities.CfAttributcontent;
-import io.clownfish.clownfish.dbentities.CfClasscontent;
 import java.util.List;
 
 /**
  *
  * @author sulzbachr
  */
-public interface CfAttributcontentDAO {
-    List<CfAttributcontent> findAll();
-    List<CfAttributcontent> findByClasscontentref(CfClasscontent classcontentref);
-    CfAttributcontent findByAttributrefAndClasscontentref(CfAttribut attributref, CfClasscontent classcontentref);
-    boolean create(CfAttributcontent entity);
-    boolean delete(CfAttributcontent entity);
-    boolean edit(CfAttributcontent entity);
+public interface CfAssetDAO {
+    List<CfAsset> findAll();
+    CfAsset findById(Long id);
+    boolean create(CfAsset entity);
+    boolean delete(CfAsset entity);
+    boolean edit(CfAsset entity);
 }

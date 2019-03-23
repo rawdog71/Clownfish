@@ -16,7 +16,9 @@
 package io.clownfish.clownfish.dbrepository;
 
 import io.clownfish.clownfish.daointerface.CfAttributcontentDAO;
+import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
+import io.clownfish.clownfish.dbentities.CfClasscontent;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -65,5 +67,23 @@ public class CfAttributcontentDAOImpl implements CfAttributcontentDAO {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
         return true;
+    }
+
+    @Override
+    public List<CfAttributcontent> findByClasscontentref(CfClasscontent classcontentref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findByClasscontentref");
+        List<CfAttributcontent> cfattributcontentlist = query.getResultList();
+        return cfattributcontentlist;
+    }
+
+    @Override
+    public CfAttributcontent findByAttributrefAndClasscontentref(CfAttribut attributref, CfClasscontent classcontentref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findByAttributrefAndClasscontentref");
+        query.setParameter("attributref", attributref);
+        query.setParameter("classcontentref", classcontentref);
+        CfAttributcontent cfattributcontent = (CfAttributcontent) query.getSingleResult();
+        return cfattributcontent;
     }
 }

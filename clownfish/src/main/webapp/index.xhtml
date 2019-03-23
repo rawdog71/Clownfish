@@ -417,6 +417,67 @@
                     <p:commandButton id="changeattribut" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" />
                 </p:tab>
                 
+                <p:tab title="Content" rendered="#{loginBean.login}">
+                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                        <p:dataTable id="classcontentlist" var="classcontent" value="#{classcontentlist.classcontentlist}" 
+                                     selectionMode="single" selection="#{classcontentlist.selectedContent}" rowKey="#{classcontent.id}"
+                                     emptyMessage="No content available" filteredValue="#{classcontentlist.filteredContent}" widgetVar="classcontentlist">
+                            <p:ajax event="rowSelect" listener="#{classcontentlist.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:newcontent" />
+                            <p:column headerText="Name" filterBy="#{classcontent.name}" filterMatchMode="contains">
+                                <h:outputText value="#{classcontent.name}" />
+                            </p:column>
+                            <p:column headerText="Klasse" filterBy="#{classcontent.classref}" filterMatchMode="exact">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('classcontentlist').filter()" styleClass="custom-filter">
+                                        <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{classcontentlist.classlist}" />
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{classcontent.classref}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:scrollPanel>
+                    
+                    <p:outputLabel for="contentname">Name</p:outputLabel>
+                    <p:inputText id="contentname" value="#{classcontentlist.contentName}" >
+                        <p:ajax event="keyup" listener="#{classcontentlist.onChangeName(changeEvent)}" update="newcontent" />
+                    </p:inputText>
+
+                    <p:outputLabel for="contentclass" value="Class:" />
+                    <p:selectOneMenu id="contentclass" value="#{classcontentlist.selectedClass}" required="true" converter="#{classConverterBean}">
+                        <f:selectItems value="#{classcontentlist.classlist}" />
+                    </p:selectOneMenu>
+                    
+                    <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentlist.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist" disabled="#{classcontentlist.newContentButtonDisabled}" />
+                    <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentlist.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist" />
+                    
+                    <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentlist.attributcontentlist}" selectionMode="single" selection="#{classcontentlist.selectedAttributContent}" rowKey="#{attributcontent.id}">
+                        <p:ajax event="rowSelect" listener="#{classcontentlist.onSelectAttribut}" update=":form:tabview:attributcontentlist" />
+                        <p:column headerText="Name">
+                            <h:outputText value="#{attributcontent.attributref.name}" />
+                        </p:column>
+                        <p:column headerText="Typ">
+                            <h:outputText value="#{attributcontent.attributref.attributetype}" />
+                        </p:column>
+                        <p:column headerText="Wert">
+                            <p:inputText id="attributvalueString" value="#{classcontentlist.editContent}" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isStringType}" />
+                            <p:password id="attributvalueHashString" value="#{classcontentlist.editContent}" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isHashStringType}" />
+                            <p:inputNumber id="attributvalueInt" value="#{classcontentlist.editContent}" decimalPlaces="0" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isIntegerType}" />
+                            <p:inputNumber id="attributvalueReal" value="#{classcontentlist.editContent}" decimalPlaces="2" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isRealType}" />
+                            <p:textEditor id="attributvalueHtmlText" widgetVar="editor1" value="#{classcontentlist.editContent}" height="300" style="margin-bottom:10px" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isHTMLTextType}" />
+                            <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentlist.editContent}" style="margin-bottom:10px" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isTextType}" />
+                            <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentlist.editContent}" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isBooleanType}" />
+                            <p:calendar id="attributvalueDatetime" value="#{classcontentlist.editContent}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isDatetimeType}" />
+                            <p:selectOneMenu id="media" value="#{classcontentlist.selectedMedia}" converter="#{mediaConverterBean}" rendered="#{classcontentlist.renderSelected(attributcontent) and classcontentlist.isMediaType}">
+                                <f:selectItems value="#{assetlist.assetlist}" />
+                            </p:selectOneMenu>
+                            
+                            <h:outputText value="#{attributcontent}" rendered="#{not classcontentlist.renderSelected(attributcontent)}" />
+                            <p:commandButton id="editattribut" process="form" value="Edit" actionListener="#{classcontentlist.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentlist.renderSelected(attributcontent)}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                
                 <p:tab title="Properties" rendered="#{loginBean.login}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="propertylist" var="propertycontent" value="#{propertylist.propertylist}" 

@@ -104,7 +104,7 @@ public class CfClass implements Serializable {
 
     @Override
     public String toString() {
-        return "io.clownfish.clownfish.dbentities.CfClass[ id=" + id + " ]";
+        return name;
     }
     
 }

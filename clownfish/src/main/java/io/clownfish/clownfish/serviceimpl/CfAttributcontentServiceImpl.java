@@ -16,7 +16,9 @@
 package io.clownfish.clownfish.serviceimpl;
 
 import io.clownfish.clownfish.daointerface.CfAttributcontentDAO;
+import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
+import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -53,6 +55,16 @@ public class CfAttributcontentServiceImpl implements CfAttributcontentService {
     @Override
     public boolean edit(CfAttributcontent entity) {
         return this.cfattributcontentDAO.edit(entity);
+    }
+
+    @Override
+    public List<CfAttributcontent> findByClasscontentref(CfClasscontent classcontentref) {
+        return this.cfattributcontentDAO.findByClasscontentref(classcontentref);
+    }
+
+    @Override
+    public CfAttributcontent findByAttributrefAndClasscontentref(CfAttribut attributref, CfClasscontent classcontentref) {
+        return this.cfattributcontentDAO.findByAttributrefAndClasscontentref(attributref, classcontentref);
     }
 
 }
