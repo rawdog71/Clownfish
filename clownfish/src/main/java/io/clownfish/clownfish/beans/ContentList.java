@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@Named("classcontentlist")
+@Named("classcontentList")
 @Transactional
 @ViewScoped
 @Component
