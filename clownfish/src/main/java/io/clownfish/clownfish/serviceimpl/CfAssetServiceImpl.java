@@ -17,7 +17,6 @@ package io.clownfish.clownfish.serviceimpl;
 
 import io.clownfish.clownfish.daointerface.CfAssetDAO;
 import io.clownfish.clownfish.dbentities.CfAsset;
-import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

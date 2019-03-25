@@ -4,28 +4,41 @@ import KNSAPTools.SAPConnection;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
+import io.clownfish.clownfish.beans.DatabaseBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
+import io.clownfish.clownfish.beans.PropertyList;
 import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfSite;
+import io.clownfish.clownfish.dbentities.CfSitecontent;
+import io.clownfish.clownfish.dbentities.CfSitedatasource;
+import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfTemplate;
-import io.clownfish.clownfish.dbentities.CfUser;
 import io.clownfish.clownfish.interceptor.GzipSwitch;
+import io.clownfish.clownfish.jdbc.DatatableDeleteProperties;
+import io.clownfish.clownfish.jdbc.DatatableNewProperties;
+import io.clownfish.clownfish.jdbc.DatatableProperties;
+import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
 import io.clownfish.clownfish.mail.EmailProperties;
 import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
+import io.clownfish.clownfish.sap.SAPUtility;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
+import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
+import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
-import io.clownfish.clownfish.serviceinterface.CfUserService;
 import io.clownfish.clownfish.utils.ClownfishUtil;
+import io.clownfish.clownfish.utils.DatabaseUtil;
 import io.clownfish.clownfish.utils.MailUtil;
+import io.clownfish.clownfish.utils.SiteUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
 import java.io.IOException;
 import java.io.StringReader;
@@ -40,15 +53,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -59,20 +73,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
 public class Clownfish {
-    //@Autowired CfUserService cfuserService;
     @Autowired CfSiteService cfsiteService;
+    @Autowired CfSitecontentService cfsitecontentService;
+    @Autowired CfSitedatasourceService cfsitedatasourceService;
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfTemplateversionService cftemplateversionService;
     @Autowired CfStylesheetService cfstylesheetService;
     @Autowired CfStylesheetversionService cfstylesheetversionService;
     @Autowired CfJavascriptService cfjavascriptService;
     @Autowired CfJavascriptversionService cfjavascriptversionService;
+    @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired TemplateUtil templateUtil;
+    @Autowired PropertyList propertylist;
+    @Autowired CfTemplateLoaderImpl freemarkerTemplateloader;
+    @Autowired SiteUtil siteutil;
     
-    
-    
+    /*
     @Context
     private UriInfo context;
+    */
     @Context
     protected HttpServletResponse response;
     @Context 
@@ -82,7 +101,7 @@ public class Clownfish {
     private freemarker.template.Configuration freemarkerCfg;
     private RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
     private RPY_TABLE_READ rpytableread = null;
-    private static final SAPConnection sapc = new SAPConnection(SAPCONNECTION, "Gemini1");
+    private static SAPConnection sapc = null;
     private boolean sapSupport = false;
     private Map<String, String> propertymap = null;
     private HttpSession userSession;
@@ -94,12 +113,29 @@ public class Clownfish {
 
     @RequestMapping("/")
     String home() {
-        //CfUser cfUser = cfuserService.findById(1L);
-        
-        return "Hello Clownfish ";
+        return "Welcome to Clownfish Content Management System";
     }
     
-    /*
+    @RequestMapping("/{name}")
+    String universal(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        userSession = request.getSession();
+        this.request = request;
+        this.response = response;
+        Map<String, String[]> querymap = request.getParameterMap();
+        
+        ArrayList queryParams = new ArrayList();
+        for (Object key : querymap.keySet()) {
+            JsonFormParameter jfp = new JsonFormParameter();
+            jfp.setName((String) key);
+            String[] values = querymap.get(key);
+            jfp.setValue(values[0]);
+            queryParams.add(jfp);
+        }
+
+        return makeResponse(name, queryParams);
+    }
+    
+    
     @PostConstruct
     public void init() {
         // Set default values
@@ -110,8 +146,8 @@ public class Clownfish {
         locale = new Locale("de");
 
         // read all System Properties of the property table
-        propertymap = new PropertyList().init(em);
-        geminiutil = new GeminiUtil();
+        propertymap = propertylist.fillPropertyMap();
+        clownfishutil = new ClownfishUtil();
         String sapSupportProp = propertymap.get("sap.support");
         if (sapSupportProp.compareToIgnoreCase("true") == 0) {
             sapSupport = true;
@@ -119,7 +155,7 @@ public class Clownfish {
         if (sapSupport) {
             //Class<?> clazz = Class.forName("KNSAPTools.SAPConnection");
             //Object sapcinstance = clazz.newInstance();
-            
+            sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
             rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapc);
             rpytableread = new RPY_TABLE_READ(sapc);
         }
@@ -138,7 +174,7 @@ public class Clownfish {
         }
         this.gzipswitch = new GzipSwitch();
     }
-    */
+    
     
     /**
      * Creates a new instance of GenericResource
@@ -217,7 +253,6 @@ public class Clownfish {
             }
             
             // Hole die Seite über den Namen
-            //CfSite knsite = (Knsite) em.createNamedQuery("Knsite.findByName").setParameter("name", name).getSingleResult();
             CfSite cfsite = cfsiteService.findByName(name);
             if ((cfsite.getContenttype() != null)) {
                 if (!cfsite.getContenttype().isEmpty()) response.setContentType(cfsite.getContenttype());
@@ -230,18 +265,15 @@ public class Clownfish {
             }
             
             try {
-                //CfTemplate kntemplate = (Kntemplate) em.createNamedQuery("Kntemplate.findById").setParameter("id", knsite.getTemplateref()).getSingleResult();
-                CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref());
+                CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
                 if (cftemplate.getScriptlanguage() == 0) {  // Freemarker Template
-                    CfTemplateLoaderImpl loader = new CfTemplateLoaderImpl();
                     fmRoot = new LinkedHashMap();
-                    
-                    loader.setModus(modus);
+                    freemarkerTemplateloader.setModus(modus);
                     
                     // Hole das zugehörige Template über den name
                     freemarkerCfg = new freemarker.template.Configuration();
                     freemarkerCfg.setDefaultEncoding("UTF-8");
-                    freemarkerCfg.setTemplateLoader(loader);
+                    freemarkerCfg.setTemplateLoader(freemarkerTemplateloader);
                     freemarkerCfg.setLocalizedLookup(false);
                     freemarkerCfg.setLocale(Locale.GERMANY);
                     
@@ -257,12 +289,10 @@ public class Clownfish {
                     } else {
                         long currentTemplateVersion;
                         try {
-                            //currentTemplateVersion = (long) em.createNamedQuery("Kntemplateversion.findMaxVersion").setParameter("templateref", kntemplate.getId()).getSingleResult();
                             currentTemplateVersion = cftemplateversionService.findMaxVersion(cftemplate.getId());
                         } catch (NullPointerException ex) {
                             currentTemplateVersion = 0;
                         }
-                        //TemplateUtil templateUtility = new TemplateUtil(em);
                         templateContent = templateUtil.getVersion(cftemplate.getId(), currentTemplateVersion);
                     }
                     templateContent = templateUtil.fetchIncludes(templateContent, modus);
@@ -282,49 +312,44 @@ public class Clownfish {
                 // Hole das Javascript, falls vorhanden
                 String cfjavascript = "";
                 if (cfsite.getJavascriptref()!= null) {
-                    //knjavascript = ((Knjavascript) em.createNamedQuery("Knjavascript.findById").setParameter("id", knsite.getJavascriptref()).getSingleResult()).getContent();
                     cfjavascript = ((CfJavascript) cfjavascriptService.findById(cfsite.getJavascriptref().longValue())).getContent();
                 }
                 
-                SiteUtil siteutil = new SiteUtil(em);
-                
                 // Hole sämtlichen Content, der zu dieser Seite referenziert ist
-                List<Knsitecontent> sitecontentlist = new ArrayList<>();
-                sitecontentlist.addAll(em.createNamedQuery("Knsitecontent.findBySiteref").setParameter("siteref", knsite.getId()).getResultList());
+                List<CfSitecontent> sitecontentlist = new ArrayList<>();
+                sitecontentlist.addAll(cfsitecontentService.findBySiteref(cfsite.getId()));
                 Map sitecontentmap = siteutil.getSitecontentmap(sitecontentlist);
                 
                 // Hole sämtliche Listen, die zu dieser Seite referenziert sind
-                siteutil.getSitelist_list(knsite, sitecontentmap);
+                siteutil.getSitelist_list(cfsite, sitecontentmap);
 
                 // Manage Parameters 
-                HashMap<String, DatatableProperties> datatableproperties = geminiutil.getDatatableproperties(postmap);
-                EmailProperties emailproperties = geminiutil.getEmailproperties(postmap);
-                HashMap<String, DatatableNewProperties> datatablenewproperties = geminiutil.getDatatablenewproperties(postmap);
-                HashMap<String, DatatableDeleteProperties> datatabledeleteproperties = geminiutil.getDatatabledeleteproperties(postmap);
-                HashMap<String, DatatableUpdateProperties> datatableupdateproperties = geminiutil.getDatatableupdateproperties(postmap);
+                HashMap<String, DatatableProperties> datatableproperties = clownfishutil.getDatatableproperties(postmap);
+                EmailProperties emailproperties = clownfishutil.getEmailproperties(postmap);
+                HashMap<String, DatatableNewProperties> datatablenewproperties = clownfishutil.getDatatablenewproperties(postmap);
+                HashMap<String, DatatableDeleteProperties> datatabledeleteproperties = clownfishutil.getDatatabledeleteproperties(postmap);
+                HashMap<String, DatatableUpdateProperties> datatableupdateproperties = clownfishutil.getDatatableupdateproperties(postmap);
                 manageSessionVariables(postmap);
                 writeSessionVariables(parametermap);
                 
                 // Hole die Datenquellen zu dieser Seite
-                List<Knsitedatasource> sitedatasourcelist = new ArrayList<>();
-                sitedatasourcelist.addAll(em.createNamedQuery("Knsitedatasource.findBySiteref").setParameter("siteref", knsite.getId()).getResultList());
+                List<CfSitedatasource> sitedatasourcelist = new ArrayList<>();
+                sitedatasourcelist.addAll(cfsitedatasourceService.findBySiteref(cfsite.getId()));
 
-                DatabaseUtil databaseUtil = new DatabaseUtil(em);
+                DatabaseUtil databaseUtil = new DatabaseUtil();
                 HashMap<String, HashMap> dbexport = databaseUtil.getDbexport(sitedatasourcelist, datatableproperties, datatablenewproperties, datatabledeleteproperties, datatableupdateproperties);
                 sitecontentmap.put("db", dbexport);
 
                 // Hole die SAP RFCs zu dieser Seite
                 if (sapSupport) {
-                    List<Knsitesaprfc> sitesaprfclist = new ArrayList<>();
-                    sitesaprfclist.addAll(em.createNamedQuery("Knsitesaprfc.findBySiteref").setParameter("siteref", knsite.getId()).getResultList());
-                    HashMap<String, List> saprfcfunctionparamMap = geminiutil.getSaprfcfunctionparamMap(sitesaprfclist, rfc_get_function_interface);
+                    List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
+                    sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                    HashMap<String, List> saprfcfunctionparamMap = clownfishutil.getSaprfcfunctionparamMap(sitesaprfclist, rfc_get_function_interface);
                     
                     //Class<?> clazz = Class.forName("KNSAPTools.SAPConnection");
                     //Object sapcinstance = clazz.newInstance();
                     
                     HashMap<String, HashMap> sapexport = new SAPUtility(sapc).getSapExport(sitesaprfclist, saprfcfunctionparamMap, postmap, rpytableread);
-                    
-                    //HashMap<String, HashMap> sapexport = getSapExport(sitesaprfclist, saprfcfunctionparamMap, postmap);
                     sitecontentmap.put("sap", sapexport);
                 }
                 
@@ -333,26 +358,26 @@ public class Clownfish {
                     try {
                         sendRespondMail(emailproperties.getSendto(), emailproperties.getSubject(), emailproperties.getBody());
                     } catch (Exception ex) {
-                        Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
 
                 Writer out = new StringWriter();
-                if (kntemplate.getScriptlanguage() == 0) {  // Freemarker Template
-                    DatabaseBean databasebean = new DatabaseBean(em, sitedatasourcelist, sitecontentmap);
+                if (cftemplate.getScriptlanguage() == 0) {  // Freemarker Template
+                    DatabaseBean databasebean = new DatabaseBean(sitedatasourcelist, sitecontentmap);
                     fmRoot.put("databaseBean", databasebean);
-                    fmRoot.put("css", knstylesheet);
-                    fmRoot.put("js", knjavascript);
+                    fmRoot.put("css", cfstylesheet);
+                    fmRoot.put("js", cfjavascript);
                     fmRoot.put("sitecontent", sitecontentmap); 
                     fmRoot.put("parameter", parametermap);
                     
                     freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
                     env.process();
                 } else {                                    // Velocity Template
-                    DatabaseBean databasebean = new DatabaseBean(em, sitedatasourcelist, sitecontentmap);
+                    DatabaseBean databasebean = new DatabaseBean(sitedatasourcelist, sitecontentmap);
                     velContext.put("databaseBean", databasebean);
-                    velContext.put("css", knstylesheet);
-                    velContext.put("js", knjavascript);
+                    velContext.put("css", cfstylesheet);
+                    velContext.put("js", cfjavascript);
                     velContext.put("sitecontent", sitecontentmap); 
                     velContext.put("parameter", parametermap);
                     
@@ -363,7 +388,7 @@ public class Clownfish {
                 if (gzip == null) {
                      gzip = "off";
                 }
-                switch (knsite.getGzip()) {
+                switch (cfsite.getGzip()) {
                     case 1:
                         gzip = "on";
                         break;
@@ -380,7 +405,7 @@ public class Clownfish {
                 if (htmlcompression == null) {
                      htmlcompression = "off";
                 }
-                switch (knsite.getHtmlcompression()) {
+                switch (cfsite.getHtmlcompression()) {
                     case 1:
                         htmlcompression = "on";
                         break;
@@ -430,5 +455,4 @@ public class Clownfish {
             }
         }
     }
-    
 }

@@ -72,7 +72,6 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter CfTemplate selectedTemplate = null;
     private @Getter @Setter CfStylesheet selectedStylesheet = null;
     private @Getter @Setter CfJavascript selectedJavascript = null;
-    //private @Getter @Setter List<CfJavascript> javascriptlist;
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter List<CfDatasource> datasources;
     private @Getter @Setter List<CfDatasource> selectedDatasources;
@@ -129,12 +128,8 @@ public class SiteTreeBean implements Serializable {
         }
         root = new DefaultTreeNode("Root", null);
         loadTree();
-        //javascriptlist = cfjavascriptService.findAll();
-        //datasources = em.createNamedQuery("Kndatasource.findAll").getResultList();
         datasources = cfdatasourceService.findAll();
-        //contentlist = em.createNamedQuery("Knlist.findAll").getResultList();
         contentlist = cflistService.findAll();
-        //classcontentlist = em.createNamedQuery("Knclasscontent.findAll").getResultList();
         classcontentlist = cfclasscontentService.findAll();
         
         selectedDatasources = new ArrayList<>();

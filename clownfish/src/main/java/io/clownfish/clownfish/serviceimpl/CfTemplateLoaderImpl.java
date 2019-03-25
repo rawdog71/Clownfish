@@ -11,16 +11,17 @@ import java.io.StringReader;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
+@Component
 public class CfTemplateLoaderImpl implements TemplateLoader {
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfTemplateversionService cftemplateversionService;
     @Autowired TemplateUtil templateUtil;
-    
     
     private @Getter @Setter int modus = 0;
 
@@ -31,8 +32,8 @@ public class CfTemplateLoaderImpl implements TemplateLoader {
     public Object findTemplateSource(String name) throws IOException {
         try {
             //CfTemplate kntemplate = (CfTemplate) em.createNamedQuery("Kntemplate.findByName").setParameter("name", name).getSingleResult();
-            CfTemplate kntemplate = cftemplateService.findByName(name);
-            return kntemplate;
+            CfTemplate cftemplate = cftemplateService.findByName(name);
+            return cftemplate;
         } catch (Exception ex) {
             return null;
         }

@@ -1,6 +1,5 @@
 package io.clownfish.clownfish;
 
-import io.clownfish.clownfish.beans.LoginBean;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import org.springframework.boot.SpringApplication;
@@ -12,9 +11,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import org.springframework.web.context.ServletContextAware;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  *
@@ -54,14 +51,6 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         servletRegistrationBean.setLoadOnStartup(1);
         return servletRegistrationBean;
     }
-    
-    /*
-    @Bean
-    @Scope(WebApplicationContext.SCOPE_SESSION)
-    public LoginBean loginbean() {
-        return new LoginBean();
-    }
-*/
     
     @Override
     public void setServletContext(ServletContext servletContext) {

@@ -22,11 +22,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author rawdog
  */
+@Component
 public class SiteUtil {
     @Autowired CfSitelistService cfsitelistService;
     @Autowired CfClasscontentService cfclasscontentService;
@@ -43,22 +45,16 @@ public class SiteUtil {
     
     public void getSitelist_list(CfSite cfsite, Map sitecontentmap) {
         List<CfSitelist> sitelist_list = new ArrayList<>();
-        //sitelist_list.addAll(em.createNamedQuery("Knsitelist.findBySiteref").setParameter("siteref", knsite.getId()).getResultList());
         sitelist_list.addAll(cfsitelistService.findBySiteref(cfsite.getId()));
         for (CfSitelist sitelist : sitelist_list) {
-            //CfList knlist = (Knlist) em.createNamedQuery("Knlist.findById").setParameter("id", sitelist.getKnsitelistPK().getListref()).getSingleResult();
             CfList cflist = cflistService.findById(sitelist.getCfSitelistPK().getListref());
             Map listcontentmap = new LinkedHashMap();
 
-            //List<CfListcontent> contentlist = em.createNamedQuery("Knlistcontent.findByListref").setParameter("listref", knlist.getId()).getResultList();
             List<CfListcontent> contentlist = cflistcontentService.findByListref(cflist.getId());
             for (CfListcontent listcontent : contentlist) {
-                //Knclasscontent classcontent = (Knclasscontent) em.createNamedQuery("Knclasscontent.findById").setParameter("id", listcontent.getKnlistcontentPK().getClasscontentref()).getSingleResult();
                 CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                //CfClass cfclass = (CfClass) em.createNamedQuery("Knclass.findById").setParameter("id", classcontent.getClassref().getId()).getSingleResult();
                 CfClass cfclass = cfclassService.findById(classcontent.getClassref().getId());
                 List<CfAttributcontent> attributcontentlist = new ArrayList<>();
-                //attributcontentlist.addAll(em.createNamedQuery("Knattributcontent.findByClasscontentref").setParameter("classcontentref", classcontent).getResultList());
                 attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
                 listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
             }
@@ -69,14 +65,10 @@ public class SiteUtil {
     public Map getSitecontentmap(List<CfSitecontent> sitecontentlist) {
         Map sitecontentmap = new LinkedHashMap();
         for (CfSitecontent sitecontent : sitecontentlist) {
-            //CfClasscontent classcontent = em.find(Knclasscontent.class, sitecontent.getKnsitecontentPK().getClasscontentref());
             CfClasscontent classcontent = cfclasscontentService.findById(sitecontent.getCfSitecontentPK().getClasscontentref());
             List<CfAttributcontent> attributcontentlist = new ArrayList<>();
-            //Knclasscontent knclasscontent = em.find(Knclasscontent.class, classcontent.getId());
-            //attributcontentlist.addAll(em.createNamedQuery("Knattributcontent.findByClasscontentref").setParameter("classcontentref", knclasscontent).getResultList());
             attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
             sitecontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
-            
         }
         return sitecontentmap;
     }
