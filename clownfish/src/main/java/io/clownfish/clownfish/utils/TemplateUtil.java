@@ -96,7 +96,7 @@ public class TemplateUtil {
                 } else {
                     long currentTemplateVersion = 0;
                     try {
-                        currentVersion = (long) cftemplateversionService.findMaxVersion(cftemplate.getId());
+                        currentTemplateVersion = (long) cftemplateversionService.findMaxVersion(cftemplate.getId());
                     } catch (NullPointerException ex) {
                         currentTemplateVersion = 0;
                     }
