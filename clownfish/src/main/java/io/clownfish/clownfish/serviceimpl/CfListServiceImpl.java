@@ -46,5 +46,25 @@ public class CfListServiceImpl implements CfListService {
     public CfList findById(Long id) {
         return this.cflistDAO.findById(id);
     }
+
+    @Override
+    public boolean create(CfList entity) {
+        return this.cflistDAO.create(entity);
+    }
+
+    @Override
+    public boolean delete(CfList entity) {
+        return this.cflistDAO.delete(entity);
+    }
+
+    @Override
+    public boolean edit(CfList entity) {
+        return this.cflistDAO.edit(entity);
+    }
+
+    @Override
+    public CfList findByName(String name) {
+        return this.cflistDAO.findByName(name);
+    }
     
 }

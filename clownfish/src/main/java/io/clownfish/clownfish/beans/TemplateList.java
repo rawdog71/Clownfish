@@ -15,8 +15,6 @@
  */
 package io.clownfish.clownfish.beans;
 
-import io.clownfish.clownfish.constants.ClownfishConst;
-import static io.clownfish.clownfish.constants.ClownfishConst.TemplateStyle.FREEMARKER;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.dbentities.CfTemplateversion;
 import io.clownfish.clownfish.dbentities.CfTemplateversionPK;
@@ -63,7 +61,7 @@ public class TemplateList {
     private @Getter @Setter CfTemplate selectedTemplate = null;
     private @Getter @Setter String templateName;
     private @Getter @Setter boolean newButtonDisabled = false;
-    private @Getter @Setter ClownfishConst.TemplateStyle templateScriptLanguage = FREEMARKER;
+    private @Getter @Setter int templateScriptLanguage = 0;
     private @Getter @Setter String selectedScriptlanguage = "";
     private @Getter @Setter CfTemplateversion version = null;
     private @Getter @Setter List<CfTemplateversion> versionlist;
@@ -106,7 +104,7 @@ public class TemplateList {
             templateName = selectedTemplate.getName();
             templateUtility.setTemplateContent(selectedTemplate.getContent());
             templateScriptLanguage = selectedTemplate.getScriptlanguage();
-            if (FREEMARKER == selectedTemplate.getScriptlanguage()) {
+            if (0 == selectedTemplate.getScriptlanguage()) {
                 selectedScriptlanguage = "freemarker";
             } else {
                 selectedScriptlanguage = "velocity";

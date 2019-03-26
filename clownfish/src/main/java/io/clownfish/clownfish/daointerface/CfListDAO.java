@@ -25,4 +25,8 @@ import java.util.List;
 public interface CfListDAO {
     List<CfList> findAll();
     CfList findById(Long id);
+    CfList findByName(String name);
+    boolean create(CfList entity);
+    boolean delete(CfList entity);
+    boolean edit(CfList entity);
 }

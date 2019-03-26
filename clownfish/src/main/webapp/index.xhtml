@@ -479,6 +479,48 @@
                     </p:dataTable>
                 </p:tab>
                 
+                <p:tab title="Datalist" rendered="#{loginBean.login}">
+                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                        <p:dataTable id="datalistcontent" var="datalist" value="#{datacontentList.datacontentlist}" selectionMode="single" selection="#{datacontentList.selectedList}" rowKey="#{datalist.id}" widgetVar="datalistcontent">
+                            <p:ajax event="rowSelect" listener="#{datacontentList.onSelect}" update=":form:msgs :form:tabview:datacontentname :form:tabview:datacontentclass :form:tabview:newcontentlist :form:tabview:datacontentlistbox" />
+                            <p:column headerText="Name" filterBy="#{datalist.name}" filterMatchMode="contains">
+                                <h:outputText value="#{datalist.name}" />
+                            </p:column>
+                            <p:column headerText="Klasse" filterBy="#{datalist.classref}" filterMatchMode="exact">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('datalistcontent').filter()" styleClass="custom-filter">
+                                        <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{datacontentList.classlist}" />
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{datalist.classref}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:scrollPanel>    
+                    
+                    <p:outputLabel for="datacontentname">Name</p:outputLabel>
+                    <p:inputText id="datacontentname" value="#{datacontentList.contentName}" >
+                        <p:ajax event="keyup" listener="#{datacontentList.onChangeName(changeEvent)}" update="newcontentlist" />
+                    </p:inputText>
+
+                    <p:outputLabel for="datacontentclass" value="Class:" />
+                    <p:selectOneMenu id="datacontentclass" value="#{datacontentList.selectedClass}" required="true" converter="#{classConverterBean}">
+                        <f:selectItems value="#{datacontentList.classlist}" />
+                    </p:selectOneMenu>
+                    
+                    <p:commandButton id="newcontentlist" process="form" value="New" actionListener="#{datacontentList.onCreateContent}" update=":form:msgs :form:tabview:sitelist :form:tabview:datalistcontent" disabled="#{datacontentlist.newContentButtonDisabled}">
+                        <f:actionListener binding="#{sitetree.initContentlist()}" />
+                    </p:commandButton>
+                    <p:commandButton id="deletecontentlist" process="form" value="Delete" actionListener="#{datacontentList.onDeleteContent}" update=":form:msgs :form:tabview:sitelist :form:tabview:datalistcontent">
+                        <f:actionListener binding="#{sitetree.initContentlist()}" />
+                    </p:commandButton>
+                    
+                    <p:selectManyCheckbox id="datacontentlistbox" value="#{datacontentList.selectedListcontent}" layout="responsive" columns="4" converter="#{classcontentConverterBean}">
+                        <f:selectItems value="#{datacontentList.filteredclasscontentlist}" var="content" itemLabel="#{content.name}" itemValue="#{content}" />
+                        <p:ajax listener="#{datacontentList.onChangeContent}" />
+                    </p:selectManyCheckbox>
+                </p:tab>
+                
                 <p:tab title="Properties" rendered="#{loginBean.login}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="propertylist" var="propertycontent" value="#{propertylist.propertylist}" 

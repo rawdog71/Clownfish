@@ -63,5 +63,24 @@ public class CfListcontentDAOImpl implements CfListcontentDAO {
         return cfcontentlist;
     }
 
-    
+    @Override
+    public boolean create(CfListcontent entity) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(entity);
+        return true;
+    }
+
+    @Override
+    public boolean delete(CfListcontent entity) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.delete(entity);
+        return true;
+    }
+
+    @Override
+    public boolean edit(CfListcontent entity) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.merge(entity);
+        return true;
+    }
 }

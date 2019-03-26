@@ -15,11 +15,8 @@
  */
 package io.clownfish.clownfish.serviceimpl;
 
-import io.clownfish.clownfish.daointerface.CfListDAO;
 import io.clownfish.clownfish.daointerface.CfListcontentDAO;
-import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
-import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +50,21 @@ public class CfListcontentServiceImpl implements CfListcontentService {
     @Override
     public List<CfListcontent> findByClasscontentref(long classcontentref) {
         return this.cflistcontentDAO.findByClasscontentref(classcontentref);
+    }
+
+    @Override
+    public boolean create(CfListcontent entity) {
+        return this.cflistcontentDAO.create(entity);
+    }
+
+    @Override
+    public boolean delete(CfListcontent entity) {
+        return this.cflistcontentDAO.delete(entity);
+    }
+
+    @Override
+    public boolean edit(CfListcontent entity) {
+        return this.cflistcontentDAO.edit(entity);
     }
 
 }

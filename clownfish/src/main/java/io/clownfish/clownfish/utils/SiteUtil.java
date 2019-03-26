@@ -36,11 +36,9 @@ public class SiteUtil {
     @Autowired CfListService cflistService;
     @Autowired CfListcontentService cflistcontentService;
     @Autowired CfAttributcontentService cfattributcontentService;
+    @Autowired ClassUtil classutil;
     
-    private final ClassUtil classutil;
-
     public SiteUtil() {
-        classutil = new ClassUtil();
     }
     
     public void getSitelist_list(CfSite cfsite, Map sitecontentmap) {

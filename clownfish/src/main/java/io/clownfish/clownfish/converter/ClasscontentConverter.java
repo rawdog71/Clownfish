@@ -1,7 +1,7 @@
 package io.clownfish.clownfish.converter;
 
-import io.clownfish.clownfish.dbentities.CfList;
-import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import java.io.Serializable;
 import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
@@ -17,18 +17,19 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @ViewScoped
-@Named("sitelistConverterBean")
-@FacesConverter(value = "sitelistConverter")
+@Named("classcontentConverterBean")
+@FacesConverter(value = "classcontentConverter")
 @Component
-public class ListConverter implements Converter, Serializable {
-    @Autowired CfListService cflistservice;
+public class ClasscontentConverter implements Converter, Serializable {
+    @Autowired CfClasscontentService cfclasscontentservice;
     
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            Object o = cflistservice.findByName(value);
+            //Object o = em.createNamedQuery("Knclasscontent.findById").setParameter("id", new Long(value)).getSingleResult();
+            Object o = cfclasscontentservice.findById(new Long(value));
             return o;
         }
     }
@@ -38,8 +39,8 @@ public class ListConverter implements Converter, Serializable {
         if (value == null) {
             return "-1";
         } else {
-            String returnname = ((CfList) value).getName();
-            return returnname; 
+            String returnname = ((CfClasscontent) value).getId().toString();
+            return  returnname;
         }
     }
 }

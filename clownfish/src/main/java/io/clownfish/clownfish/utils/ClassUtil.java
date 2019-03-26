@@ -14,12 +14,16 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.faces.bean.ViewScoped;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author rawdog
  */
+@ViewScoped
+@Component
 public class ClassUtil {
     @Autowired CfAttributService cfattributService;
     @Autowired CfAttributetypeService cfattributetypeService;

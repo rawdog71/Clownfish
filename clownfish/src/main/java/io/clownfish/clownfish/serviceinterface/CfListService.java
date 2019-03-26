@@ -25,4 +25,8 @@ import java.util.List;
 public interface CfListService {
     List<CfList> findAll();
     CfList findById(Long id);
+    CfList findByName(String name);
+    boolean create(CfList entity);
+    boolean delete(CfList entity);
+    boolean edit(CfList entity);
 }

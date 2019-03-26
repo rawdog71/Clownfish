@@ -9,7 +9,6 @@ import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
 import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
 import io.clownfish.clownfish.constants.ClownfishConst;
-import static io.clownfish.clownfish.constants.ClownfishConst.TemplateStyle.FREEMARKER;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
 import io.clownfish.clownfish.dbentities.CfJavascript;
@@ -270,7 +269,7 @@ public class Clownfish {
             
             try {
                 CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
-                if (FREEMARKER == cftemplate.getScriptlanguage()) {  // Freemarker Template
+                if (0 == cftemplate.getScriptlanguage()) {  // Freemarker Template
                     fmRoot = new LinkedHashMap();
                     freemarkerTemplateloader.setModus(modus);
                     
@@ -366,7 +365,7 @@ public class Clownfish {
                 }
 
                 Writer out = new StringWriter();
-                if (FREEMARKER == cftemplate.getScriptlanguage()) {  // Freemarker Template
+                if (0 == cftemplate.getScriptlanguage()) {  // Freemarker Template
                     DatabaseBean databasebean = new DatabaseBean(sitedatasourcelist, sitecontentmap);
                     fmRoot.put("databaseBean", databasebean);
                     fmRoot.put("css", cfstylesheet);

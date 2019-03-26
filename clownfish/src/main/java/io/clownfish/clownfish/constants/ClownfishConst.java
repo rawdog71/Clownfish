@@ -24,9 +24,4 @@ public class ClownfishConst {
         DEVELOPMENT,
         STAGING
     }
-    
-    public enum TemplateStyle {
-        FREEMARKER,
-        VELOCITY
-    }
 }

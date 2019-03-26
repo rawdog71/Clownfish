@@ -53,5 +53,34 @@ public class CfListDAOImpl implements CfListDAO {
         CfList cflist = (CfList) query.getSingleResult();
         return cflist;
     }
-    
+
+    @Override
+    public boolean create(CfList entity) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(entity);
+        return true;
+    }
+
+    @Override
+    public boolean delete(CfList entity) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.delete(entity);
+        return true;
+    }
+
+    @Override
+    public boolean edit(CfList entity) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.merge(entity);
+        return true;
+    }
+
+    @Override
+    public CfList findByName(String name) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfList.findByName");  
+        query.setParameter("name", name);
+        CfList cflist = (CfList) query.getSingleResult();
+        return cflist;
+    }
 }
