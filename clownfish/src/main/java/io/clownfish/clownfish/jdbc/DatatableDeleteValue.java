@@ -3,13 +3,16 @@
  */
 package io.clownfish.clownfish.jdbc;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  *
  * @author sulzbachr
  */
 public class DatatableDeleteValue {
-    private String field;
-    private String value;
+    private @Getter @Setter String field;
+    private @Getter @Setter String value;
 
     public DatatableDeleteValue() {
     }
@@ -18,22 +21,4 @@ public class DatatableDeleteValue {
         this.field = field;
         this.value = value;
     }
-
-    public String getField() {
-        return field;
-    }
-
-    public void setField(String field) {
-        this.field = field;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-    
-    
 }

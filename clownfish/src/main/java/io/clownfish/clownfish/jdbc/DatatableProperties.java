@@ -4,20 +4,22 @@
 package io.clownfish.clownfish.jdbc;
 
 import java.util.ArrayList;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author sulzbachr
  */
 public class DatatableProperties {
-    private String tablename;
-    private String orderby;
-    private String orderdir;
-    private int pagination;
-    private int page;
-    private ArrayList<DatatableCondition> conditionlist;
-    private ArrayList<String> groupbylist;
-    private String groupbycount;
+    private @Getter @Setter String tablename;
+    private @Getter @Setter String orderby;
+    private @Getter @Setter String orderdir;
+    private @Getter @Setter int pagination;
+    private @Getter @Setter int page;
+    private @Getter @Setter ArrayList<DatatableCondition> conditionlist;
+    private @Getter @Setter ArrayList<String> groupbylist;
+    private @Getter @Setter String groupbycount;
 
     public DatatableProperties() {
         conditionlist = new ArrayList<>();
@@ -33,70 +35,6 @@ public class DatatableProperties {
         this.page = page;
         conditionlist = new ArrayList<>();
         groupbylist = new ArrayList<>();
-        this.groupbycount = groupbycount;
-    }
-
-    public String getTablename() {
-        return tablename;
-    }
-
-    public void setTablename(String tablename) {
-        this.tablename = tablename;
-    }
-
-    public String getOrderby() {
-        return orderby;
-    }
-
-    public void setOrderby(String orderby) {
-        this.orderby = orderby;
-    }
-
-    public String getOrderdir() {
-        return orderdir;
-    }
-
-    public void setOrderdir(String orderdir) {
-        this.orderdir = orderdir;
-    }
-
-    public int getPagination() {
-        return pagination;
-    }
-
-    public void setPagination(int pagination) {
-        this.pagination = pagination;
-    }
-
-    public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        this.page = page;
-    }
-
-    public ArrayList<DatatableCondition> getConditionlist() {
-        return conditionlist;
-    }
-
-    public void setConditionlist(ArrayList<DatatableCondition> conditionlist) {
-        this.conditionlist = conditionlist;
-    }
-
-    public ArrayList<String> getGroupbylist() {
-        return groupbylist;
-    }
-
-    public void setGroupbylist(ArrayList<String> groupbylist) {
-        this.groupbylist = groupbylist;
-    }
-
-    public String getGroupbycount() {
-        return groupbycount;
-    }
-
-    public void setGroupbycount(String groupbycount) {
         this.groupbycount = groupbycount;
     }
 }

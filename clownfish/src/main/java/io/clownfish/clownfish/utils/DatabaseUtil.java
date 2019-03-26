@@ -41,7 +41,6 @@ public class DatabaseUtil {
     public HashMap<String, HashMap> getDbexport(List<CfSitedatasource> sitedatasourcelist, HashMap<String, DatatableProperties> datatableproperties, HashMap<String, DatatableNewProperties> datatablenewproperties, HashMap<String, DatatableDeleteProperties> datatabledeleteproperties, HashMap<String, DatatableUpdateProperties> datatableupdateproperties) {
         HashMap<String, HashMap> dbexport = new HashMap<>();
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
-            //CfDatasource kndatasource = (Kndatasource) em.createNamedQuery("Kndatasource.findById").setParameter("id", sitedatasource.getKnsitedatasourcePK().getDatasourceref()).getSingleResult();
             CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
 
             JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());

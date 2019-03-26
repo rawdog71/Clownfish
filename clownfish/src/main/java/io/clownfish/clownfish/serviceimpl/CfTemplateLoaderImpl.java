@@ -1,6 +1,8 @@
 package io.clownfish.clownfish.serviceimpl;
 
 import freemarker.cache.TemplateLoader;
+import io.clownfish.clownfish.constants.ClownfishConst;
+import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
@@ -23,7 +25,7 @@ public class CfTemplateLoaderImpl implements TemplateLoader {
     @Autowired CfTemplateversionService cftemplateversionService;
     @Autowired TemplateUtil templateUtil;
     
-    private @Getter @Setter int modus = 0;
+    private @Getter @Setter ClownfishConst.ViewModus modus = DEVELOPMENT;
 
     public CfTemplateLoaderImpl() {
     }
@@ -45,7 +47,7 @@ public class CfTemplateLoaderImpl implements TemplateLoader {
 
     @Override
     public Reader getReader(Object templateObject, String encoding) throws IOException {
-        if (0 == modus) {
+        if (DEVELOPMENT == modus) {
             String content = ((CfTemplate) templateObject).getContent();
             content = templateUtil.fetchIncludes(content, modus);
             return new StringReader(content);

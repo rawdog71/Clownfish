@@ -3,14 +3,17 @@
  */
 package io.clownfish.clownfish.jdbc;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  *
  * @author sulzbachr
  */
 public class DatatableCondition {
-    private String field;
-    private String operand;
-    private String value;
+    private @Getter @Setter String field;
+    private @Getter @Setter String operand;
+    private @Getter @Setter String value;
 
     public DatatableCondition() {
     }
@@ -18,30 +21,6 @@ public class DatatableCondition {
     public DatatableCondition(String field, String operand, String value) {
         this.field = field;
         this.operand = operand;
-        this.value = value;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public void setField(String field) {
-        this.field = field;
-    }
-
-    public String getOperand() {
-        return operand;
-    }
-
-    public void setOperand(String operand) {
-        this.operand = operand;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
         this.value = value;
     }
 }

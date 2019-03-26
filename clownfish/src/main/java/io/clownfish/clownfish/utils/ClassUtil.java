@@ -30,15 +30,12 @@ public class ClassUtil {
     
     public Map getattributmap (CfClasscontent classcontent) {
         List<CfAttributcontent> attributcontentlist = new ArrayList<>();
-        //attributcontentlist.addAll(em.createNamedQuery("Knattributcontent.findByClasscontentref").setParameter("classcontentref", classcontent).getResultList());
         attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
         
         Map attributcontentmap = new LinkedHashMap();
 
         for (CfAttributcontent attributcontent : attributcontentlist) {
-            //CfAttribut cfattribut = (CfAttribut) em.createNamedQuery("Knattribut.findById").setParameter("id", attributcontent.getAttributref().getId()).getSingleResult();
             CfAttribut cfattribut = cfattributService.findById(attributcontent.getAttributref().getId());
-            //Knattributetype knattributtype = (Knattributetype) em.createNamedQuery("Knattributetype.findById").setParameter("id", knattribut.getAttributetype().getId()).getSingleResult();
             CfAttributetype cfattributtype = cfattributetypeService.findById(cfattribut.getAttributetype().getId());
             switch (cfattributtype.getName()) {
                 case "boolean":

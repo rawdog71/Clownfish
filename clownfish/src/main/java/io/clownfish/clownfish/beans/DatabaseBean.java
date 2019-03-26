@@ -42,7 +42,6 @@ public class DatabaseBean {
     public Map dbread(String catalog, String tablename, String sqlstatement) {
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
             try {
-                //CfDatasource kndatasource = (CfDatasource) em.createNamedQuery("Kndatasource.findById").setParameter("id", sitedatasource.getKnsitedatasourcePK().getDatasourceref()).getSingleResult();
                 CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
                 
                 JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());

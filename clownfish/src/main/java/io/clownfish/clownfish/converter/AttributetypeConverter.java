@@ -31,7 +31,6 @@ public class AttributetypeConverter implements Converter, Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            //Object o = em.createNamedQuery("Knattributetype.findById").setParameter("id", new Long(value)).getSingleResult();
             Object o = cfattributetypeService.findByName(value);
             return o;
         }

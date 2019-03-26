@@ -6,6 +6,8 @@ package io.clownfish.clownfish.utils;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.Patch;
+import io.clownfish.clownfish.constants.ClownfishConst;
+import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.dbentities.CfTemplateversion;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
@@ -82,7 +84,7 @@ public class TemplateUtil {
         return diff;
     }
     
-    public String fetchIncludes(String content, int modus) {
+    public String fetchIncludes(String content, ClownfishConst.ViewModus modus) {
         Pattern pattern = Pattern.compile("(\\[\\[\\*).+(\\*\\]\\])");
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
@@ -91,7 +93,7 @@ public class TemplateUtil {
             try {
                 // Hole das Template über den Namen
                 CfTemplate cftemplate = cftemplateService.findByName(templatename);
-                if (0 == modus) {
+                if (DEVELOPMENT == modus) {
                     content = content.replace(lastmatch, cftemplate.getContent());
                 } else {
                     long currentTemplateVersion = 0;

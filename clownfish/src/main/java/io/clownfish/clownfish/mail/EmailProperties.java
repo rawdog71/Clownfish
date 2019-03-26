@@ -3,15 +3,18 @@
  */
 package io.clownfish.clownfish.mail;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  *
  * @author sulzbachr
  */
 public class EmailProperties {
-    private String sendto;
-    private String sendfrom;
-    private String subject;
-    private String body;
+    private @Getter @Setter String sendto;
+    private @Getter @Setter String sendfrom;
+    private @Getter @Setter String subject;
+    private @Getter @Setter String body;
 
     public EmailProperties() {
     }
@@ -20,38 +23,6 @@ public class EmailProperties {
         this.sendto = sendto;
         this.sendfrom = sendfrom;
         this.subject = subject;
-        this.body = body;
-    }
-
-    public String getSendto() {
-        return sendto;
-    }
-
-    public void setSendto(String sendto) {
-        this.sendto = sendto;
-    }
-
-    public String getSendfrom() {
-        return sendfrom;
-    }
-
-    public void setSendfrom(String sendfrom) {
-        this.sendfrom = sendfrom;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
         this.body = body;
     }
 }

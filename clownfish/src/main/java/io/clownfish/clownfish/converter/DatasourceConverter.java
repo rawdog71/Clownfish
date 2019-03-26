@@ -28,7 +28,6 @@ public class DatasourceConverter implements Converter, Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            //Object o = em.createNamedQuery("Kndatasource.findById").setParameter("id", new Long(value)).getSingleResult();
             Object o = cfdatasourceservice.findById(new Long(value));
             return o;
         }

@@ -3,17 +3,20 @@
  */
 package io.clownfish.clownfish.jdbc;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  *
  * @author sulzbachr
  */
 public class TableField {
-    private String name;
-    private String type;
-    private boolean primaryKey;
-    private int size;
-    private int decimaldigits;
-    private String nullable;
+    private @Getter @Setter String name;
+    private @Getter @Setter String type;
+    private @Getter @Setter boolean primaryKey;
+    private @Getter @Setter int size;
+    private @Getter @Setter int decimaldigits;
+    private @Getter @Setter String nullable;
 
     public TableField() {
     }
@@ -26,53 +29,4 @@ public class TableField {
         this.decimaldigits = decimaldigits;
         this.nullable = nullable;
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public boolean isPrimaryKey() {
-        return primaryKey;
-    }
-
-    public void setPrimaryKey(boolean primaryKey) {
-        this.primaryKey = primaryKey;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    public int getDecimaldigits() {
-        return decimaldigits;
-    }
-
-    public void setDecimaldigits(int decimaldigits) {
-        this.decimaldigits = decimaldigits;
-    }
-
-    public String getNullable() {
-        return nullable;
-    }
-
-    public void setNullable(String nullable) {
-        this.nullable = nullable;
-    }
-
 }

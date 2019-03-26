@@ -15,6 +15,8 @@
  */
 package io.clownfish.clownfish.dbentities;
 
+import io.clownfish.clownfish.constants.ClownfishConst.TemplateStyle;
+import static io.clownfish.clownfish.constants.ClownfishConst.TemplateStyle.FREEMARKER;
 import java.io.Serializable;
 import java.math.BigInteger;
 import javax.persistence.Basic;
@@ -68,7 +70,7 @@ public class CfTemplate implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "scriptlanguage")
-    private int scriptlanguage;
+    private TemplateStyle scriptlanguage;
     @Column(name = "checkedoutby")
     private BigInteger checkedoutby;
 
@@ -79,7 +81,7 @@ public class CfTemplate implements Serializable {
         this.id = id;
     }
 
-    public CfTemplate(Long id, String name, String content, int scriptlanguage) {
+    public CfTemplate(Long id, String name, String content, TemplateStyle scriptlanguage) {
         this.id = id;
         this.name = name;
         this.content = content;
@@ -110,11 +112,11 @@ public class CfTemplate implements Serializable {
         this.content = content;
     }
 
-    public int getScriptlanguage() {
+    public TemplateStyle getScriptlanguage() {
         return scriptlanguage;
     }
 
-    public void setScriptlanguage(int scriptlanguage) {
+    public void setScriptlanguage(TemplateStyle scriptlanguage) {
         this.scriptlanguage = scriptlanguage;
     }
 
@@ -152,7 +154,7 @@ public class CfTemplate implements Serializable {
     }
     
     public String getScriptLanguageTxt() {
-        if (getScriptlanguage() == 0) {
+        if (FREEMARKER == getScriptlanguage()) {
             return "freemarker";
         } else {
             return "velocity";

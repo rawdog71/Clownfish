@@ -83,16 +83,13 @@ public class ContentList implements Serializable {
     
     @PostConstruct
     public void init() {
-        //classcontentlist = em.createNamedQuery("Knclasscontent.findAll").getResultList();
         classcontentlist = cfclasscontentService.findAll();
-        //classlist = em.createNamedQuery("Knclass.findAll").getResultList();
         classlist = cfclassService.findAll();
         editContent = "";
     }
     
     public void onSelect(SelectEvent event) {
         selectedContent = (CfClasscontent) event.getObject();
-        //attributcontentlist = em.createNamedQuery("Knattributcontent.findByClasscontentref").setParameter("classcontentref", selectedContent).getResultList();
         attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
        
         contentName = selectedContent.getName();
@@ -142,14 +139,11 @@ public class ContentList implements Serializable {
             case "media":
                 isMediaType = true;
                 if (selectedAttribut.getContentInteger() != null) {
-                    //selectedMedia = (CfAsset) em.createNamedQuery("Knasset.findById").setParameter("id", selectedAttribut.getContentInteger().longValue()).getSingleResult();
                     selectedMedia = cfassetService.findById(selectedAttribut.getContentInteger().longValue());
                 }
                 break;    
         }
-        
         editContent = selectedAttribut.toString();
-        //System.out.println("Selected: " + selectedAttribut.getId());
     }
     
     public void onCreateContent(ActionEvent actionEvent) {
@@ -157,21 +151,16 @@ public class ContentList implements Serializable {
             CfClasscontent newclasscontent = new CfClasscontent();
             newclasscontent.setName(contentName);
             newclasscontent.setClassref(selectedClass);
-            
-            //knclasscontentFacadeREST.create(newclasscontent);
             cfclasscontentService.create(newclasscontent);
             
-            //List<Knattribut> attributlist = em.createNamedQuery("Knattribut.findByClassref").setParameter("classref", newclasscontent.getClassref()).getResultList();
             List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
             for (CfAttribut attribut : attributlist) {
                 
                 if (attribut.getAutoincrementor() == true) {
-                    //List<Knclasscontent> classcontentlist2 = em.createNamedQuery("Knclasscontent.findByClassref").setParameter("classref", newclasscontent.getClassref()).getResultList();
                     List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
                     long max = 0;
                     for (CfClasscontent classcontent : classcontentlist2) {
                         try {
-                            //Knattributcontent attributcontent = (Knattributcontent) em.createNamedQuery("Knattributcontent.findByAttributrefAndClasscontentref").setParameter("attributref", attribut).setParameter("classcontentref", classcontent).getSingleResult();
                             CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);
                             if (attributcontent.getContentInteger().longValue() > max) {
                                 max = attributcontent.getContentInteger().longValue();
@@ -184,18 +173,14 @@ public class ContentList implements Serializable {
                     newcontent.setAttributref(attribut);
                     newcontent.setClasscontentref(newclasscontent);
                     newcontent.setContentInteger(BigInteger.valueOf(max+1));
-                    //knattributcontentFacadeREST.create(newcontent);
                     cfattributcontentService.create(newcontent);
                 } else {
                     CfAttributcontent newcontent = new CfAttributcontent();
                     newcontent.setAttributref(attribut);
                     newcontent.setClasscontentref(newclasscontent);
-                    //knattributcontentFacadeREST.create(newcontent);
                     cfattributcontentService.create(newcontent);
                 }
             }
-            
-            //classcontentlist = em.createNamedQuery("Knclasscontent.findAll").getResultList();
             classcontentlist = cfclasscontentService.findAll();
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
@@ -204,16 +189,13 @@ public class ContentList implements Serializable {
     
     public void onDeleteContent(ActionEvent actionEvent) {
         if (selectedContent != null) {
-            //knclasscontentFacadeREST.remove(selectedContent);
             cfclasscontentService.delete(selectedContent);
-            //classcontentlist = em.createNamedQuery("Knclasscontent.findAll").getResultList();
             classcontentlist = cfclasscontentService.findAll();
         }
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            //Knclasscontent validateClasscontent = (Knclasscontent) em.createNamedQuery("Knclasscontent.findByName").setParameter("name", contentName).getSingleResult();
             CfClasscontent validateClasscontent = cfclasscontentService.findByName(contentName);
             newContentButtonDisabled = true;
         } catch (NoResultException ex) {
@@ -222,8 +204,6 @@ public class ContentList implements Serializable {
     }
     
     public void onEditAttribut(ActionEvent actionEvent) {
-        //System.out.println("Edit");
-        
         selectedAttribut.setSalt(null);
         switch (selectedAttribut.getAttributref().getAttributetype().getName()) {
             case "boolean":
@@ -231,19 +211,15 @@ public class ContentList implements Serializable {
                 break;
             case "string":
                 if (selectedAttribut.getAttributref().getIdentity() == true) {
-                    //List<Knclasscontent> classcontentlist2 = em.createNamedQuery("Knclasscontent.findByClassref").setParameter("classref", selectedAttribut.getClasscontentref().getClassref()).getResultList();
                     List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(selectedAttribut.getClasscontentref().getClassref());
                     boolean found = false;
                     for (CfClasscontent classcontent : classcontentlist2) {
                         try {
-                            //Knattributcontent attributcontent = (Knattributcontent) em.createNamedQuery("Knattributcontent.findByAttributrefAndClasscontentref").setParameter("attributref", selectedAttribut.getAttributref()).setParameter("classcontentref", classcontent).getSingleResult();
                             CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(selectedAttribut.getAttributref(), classcontent);
                             if (attributcontent.getContentString().compareToIgnoreCase(editContent) == 0) {
                                 found = true;
                             }
-                        } catch (javax.persistence.NoResultException ex) {
-                            
-                        } catch (NullPointerException ex) {
+                        } catch (javax.persistence.NoResultException | NullPointerException ex) {
                             
                         }
                     }
@@ -281,7 +257,6 @@ public class ContentList implements Serializable {
                 selectedAttribut.setContentInteger(BigInteger.valueOf(selectedMedia.getId()));
                 break;    
         }
-        //knattributcontentFacadeREST.edit(selectedAttribut);
         cfattributcontentService.edit(selectedAttribut);
     }
 }

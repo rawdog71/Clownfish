@@ -18,10 +18,10 @@ import lombok.Setter;
  */
 public class MailUtil {
     private @Getter @Setter String mailsmtphost;
-    private @Getter @Setter  String mailtransportprotocol;
-    private @Getter @Setter  String mailuser;
-    private @Getter @Setter  String mailpassword;
-    private @Getter @Setter  String sendfrom;
+    private @Getter @Setter String mailtransportprotocol;
+    private @Getter @Setter String mailuser;
+    private @Getter @Setter String mailpassword;
+    private @Getter @Setter String sendfrom;
     private final Properties props;
     private final String encodingOptions = "text/html; charset=UTF-8";
 

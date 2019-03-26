@@ -31,8 +31,6 @@ public class ClassConverter implements Converter, Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            //Object o = em.createNamedQuery("Knclass.findById").setParameter("id", new Long(value)).getSingleResult();
-            //Object o = cfclassservice.findByName(value);
             Object o = cfclassservice.findById(new Long(value));
             return o;
         }

@@ -8,6 +8,10 @@ import io.clownfish.clownfish.beans.DatabaseBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
 import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
+import io.clownfish.clownfish.constants.ClownfishConst;
+import static io.clownfish.clownfish.constants.ClownfishConst.TemplateStyle.FREEMARKER;
+import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
+import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
@@ -105,7 +109,7 @@ public class Clownfish {
     private boolean sapSupport = false;
     private Map<String, String> propertymap = null;
     private HttpSession userSession;
-    private int modus = 1;
+    private ClownfishConst.ViewModus modus = STAGING;
     private ClownfishUtil clownfishutil;
     private String characterEncoding;
     private String contentType;
@@ -139,7 +143,7 @@ public class Clownfish {
     @PostConstruct
     public void init() {
         // Set default values
-        modus = 1;  // 1 = Staging mode (fetch sourcecode from commited repository) <= default
+        modus = STAGING;  // 1 = Staging mode (fetch sourcecode from commited repository) <= default
                     // 0 = Development mode (fetch sourcecode from database)
         characterEncoding = "UTF-8";
         contentType = "text/html";
@@ -248,7 +252,7 @@ public class Clownfish {
             Map parametermap = clownfishutil.getParametermap(postmap);
             if (parametermap.containsKey("modus")) {    // check mode for display (stageing or dev)
                 if (parametermap.get("modus").toString().compareToIgnoreCase("dev") == 0) {
-                    modus = 0;
+                    modus = DEVELOPMENT;
                 }
             }
             
@@ -266,7 +270,7 @@ public class Clownfish {
             
             try {
                 CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
-                if (cftemplate.getScriptlanguage() == 0) {  // Freemarker Template
+                if (FREEMARKER == cftemplate.getScriptlanguage()) {  // Freemarker Template
                     fmRoot = new LinkedHashMap();
                     freemarkerTemplateloader.setModus(modus);
                     
@@ -284,7 +288,7 @@ public class Clownfish {
                     velTemplate = new org.apache.velocity.Template();
                     org.apache.velocity.runtime.RuntimeServices runtimeServices = org.apache.velocity.runtime.RuntimeSingleton.getRuntimeServices();
                     String templateContent;
-                    if (0 == modus) {
+                    if (DEVELOPMENT == modus) {
                         templateContent = cftemplate.getContent();
                     } else {
                         long currentTemplateVersion;
@@ -305,7 +309,6 @@ public class Clownfish {
                 // Hole das Stylesheet, falls vorhanden
                 String cfstylesheet = "";
                 if (cfsite.getStylesheetref() != null) {
-                    //knstylesheet = ((Knstylesheet) em.createNamedQuery("Knstylesheet.findById").setParameter("id", knsite.getStylesheetref()).getSingleResult()).getContent();
                     cfstylesheet = ((CfStylesheet) cfstylesheetService.findById(cfsite.getStylesheetref().longValue())).getContent();
                 }
 
@@ -363,7 +366,7 @@ public class Clownfish {
                 }
 
                 Writer out = new StringWriter();
-                if (cftemplate.getScriptlanguage() == 0) {  // Freemarker Template
+                if (FREEMARKER == cftemplate.getScriptlanguage()) {  // Freemarker Template
                     DatabaseBean databasebean = new DatabaseBean(sitedatasourcelist, sitecontentmap);
                     fmRoot.put("databaseBean", databasebean);
                     fmRoot.put("css", cfstylesheet);
