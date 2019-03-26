@@ -15,7 +15,7 @@
         
         <h:form id="form">
             <p:growl id="msgs" showDetail="true" />
-            
+            <p:graphicImage value="images/clownfish-48.png" />
             <p:outputLabel value="Clownfish CMS " />
             
             <p:commandButton id="userButton" value="User" type="button" icon="fa fa-home" rendered="#{loginBean.login}" />
@@ -519,6 +519,55 @@
                         <f:selectItems value="#{datacontentList.filteredclasscontentlist}" var="content" itemLabel="#{content.name}" itemValue="#{content}" />
                         <p:ajax listener="#{datacontentList.onChangeContent}" />
                     </p:selectManyCheckbox>
+                </p:tab>
+                
+                <p:tab title="Datasources" rendered="#{loginBean.login}">
+                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                        <p:dataTable id="datasourcelist" var="datasource" value="#{datasourceList.datasourcelist}" selectionMode="single" selection="#{datasourceList.selectedDatasource}" rowKey="#{datasource.id}">
+                            <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver" />
+                            <p:column headerText="Name">
+                                <h:outputText value="#{datasource.name}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:scrollPanel>    
+                    
+                    <p:panelGrid columns="2">
+                        <p:outputLabel for="datasourcename">Name</p:outputLabel>
+                        <p:inputText id="datasourcename" value="#{datasourceList.datasourceName}" >
+                            <p:ajax event="keyup" listener="#{datasourceList.onChangeName(changeEvent)}" update="newdatasource" />
+                        </p:inputText>
+
+                        <p:outputLabel for="datasourceserver">Server</p:outputLabel>
+                        <p:inputText id="datasourceserver" value="#{datasourceList.datasourceServer}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourceurl">URL</p:outputLabel>
+                        <p:inputText id="datasourceurl" value="#{datasourceList.datasourceURL}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourceport">Port</p:outputLabel>
+                        <p:inputText id="datasourceport" value="#{datasourceList.datasourcePort}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourcedbname">Database Name</p:outputLabel>
+                        <p:inputText id="datasourcedbname" value="#{datasourceList.datasourceDatabasename}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourceuser">User</p:outputLabel>
+                        <p:inputText id="datasourceuser" value="#{datasourceList.datasourceUser}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourcepassword">Password</p:outputLabel>
+                        <p:inputText id="datasourcepassword" value="#{datasourceList.datasourcePassword}" ></p:inputText>
+                        
+                        <p:outputLabel for="datasourcedriver">Driver Class</p:outputLabel>
+                        <p:inputText id="datasourcedriver" value="#{datasourceList.datasourceDriverclass}" ></p:inputText>
+                    </p:panelGrid>
+                    
+                    <p:panelGrid columns="3">
+                        <p:commandButton id="newdatasource" process="form" value="New" actionListener="#{datasourceList.onCreateContent}" update=":form:msgs :form:tabview:sitedatasource :form:tabview:datasourcelist" disabled="#{datasourceList.newContentButtonDisabled}">
+                            <f:actionListener binding="#{sitetree.initDatasources()}" />
+                        </p:commandButton>
+                        <p:commandButton id="editdatasource" process="form" value="Edit" actionListener="#{datasourceList.onEditContent}" update=":form:msgs :form:tabview:datalistcontent" />
+                        <p:commandButton id="deletedatasource" process="form" value="Delete" actionListener="#{datasourceList.onDeleteContent}" update=":form:msgs :form:tabview:sitedatasource :form:tabview:datasourcelist">
+                            <f:actionListener binding="#{sitetree.initDatasources()}" />
+                        </p:commandButton>
+                    </p:panelGrid>
                 </p:tab>
                 
                 <p:tab title="Properties" rendered="#{loginBean.login}">

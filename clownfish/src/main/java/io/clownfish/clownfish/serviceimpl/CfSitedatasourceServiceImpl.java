@@ -61,4 +61,9 @@ public class CfSitedatasourceServiceImpl implements CfSitedatasourceService {
     public boolean edit(CfSitedatasource entity) {
         return this.cfsitedatasourceDAO.edit(entity);
     }
+
+    @Override
+    public List<CfSitedatasource> findByDatasourceref(Long datasourceref) {
+        return this.cfsitedatasourceDAO.findByDatasourceref(datasourceref);
+    }
 }

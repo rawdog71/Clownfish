@@ -25,4 +25,8 @@ import java.util.List;
 public interface CfDatasourceDAO {
     List<CfDatasource> findAll();
     CfDatasource findById(Long id);
+    CfDatasource findByName(String name);
+    boolean create(CfDatasource entity);
+    boolean delete(CfDatasource entity);
+    boolean edit(CfDatasource entity);
 }

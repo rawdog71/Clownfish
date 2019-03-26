@@ -46,5 +46,25 @@ public class CfDatasourceServiceImpl implements CfDatasourceService {
     public CfDatasource findById(Long id) {
         return this.cfdatasourceDAO.findById(id);
     }
+
+    @Override
+    public boolean create(CfDatasource entity) {
+        return this.cfdatasourceDAO.create(entity);
+    }
+
+    @Override
+    public boolean delete(CfDatasource entity) {
+        return this.cfdatasourceDAO.delete(entity);
+    }
+
+    @Override
+    public boolean edit(CfDatasource entity) {
+        return this.cfdatasourceDAO.edit(entity);
+    }
+
+    @Override
+    public CfDatasource findByName(String name) {
+        return this.cfdatasourceDAO.findByName(name);
+    }
     
 }

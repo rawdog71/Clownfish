@@ -47,10 +47,10 @@ public class CfSitedatasourceDAOImpl implements CfSitedatasourceDAO {
     }
     
     @Override
-    public List<CfSitedatasource> findBySiteref(Long ref) {
+    public List<CfSitedatasource> findBySiteref(Long siteref) {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfSitedatasource.findBySiteref");  
-        query.setParameter("siteref", ref);
+        query.setParameter("siteref", siteref);
         List<CfSitedatasource> cfsitedatasourcelist = query.getResultList();
         return cfsitedatasourcelist;
     }
@@ -74,5 +74,14 @@ public class CfSitedatasourceDAOImpl implements CfSitedatasourceDAO {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
         return true;
+    }
+
+    @Override
+    public List<CfSitedatasource> findByDatasourceref(Long datasourceref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfSitedatasource.findByDatasourceref");
+        query.setParameter("datasourceref", datasourceref);
+        List<CfSitedatasource> cfsitedatasourcelist = query.getResultList();
+        return cfsitedatasourcelist;
     }
 }

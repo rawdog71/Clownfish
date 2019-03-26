@@ -53,5 +53,35 @@ public class CfDatasourceDAOImpl implements CfDatasourceDAO {
         CfDatasource cfdatasource = (CfDatasource) query.getSingleResult();
         return cfdatasource;
     }
+
+    @Override
+    public boolean create(CfDatasource entity) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.persist(entity);
+        return true;
+    }
+
+    @Override
+    public boolean delete(CfDatasource entity) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.delete(entity);
+        return true;
+    }
+
+    @Override
+    public boolean edit(CfDatasource entity) {
+        Session session = this.sessionFactory.getCurrentSession();
+        session.merge(entity);
+        return true;
+    }
+
+    @Override
+    public CfDatasource findByName(String name) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfDatasource.findByName");
+        query.setParameter("name", name);
+        CfDatasource cfdatasource = (CfDatasource) query.getSingleResult();
+        return cfdatasource;
+    }
     
 }

@@ -25,6 +25,7 @@ import java.util.List;
 public interface CfSitedatasourceService {
     List<CfSitedatasource> findAll();
     List<CfSitedatasource> findBySiteref(Long ref);
+    List<CfSitedatasource> findByDatasourceref(Long datasourceref);
     boolean create(CfSitedatasource entity);
     boolean delete(CfSitedatasource entity);
     boolean edit(CfSitedatasource entity);
