@@ -15,18 +15,18 @@
  */
 package io.clownfish.clownfish.daointerface;
 
-import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfKeyword;
 import java.util.List;
 
 /**
  *
  * @author sulzbachr
  */
-public interface CfAssetDAO {
-    List<CfAsset> findAll();
-    CfAsset findById(Long id);
-    CfAsset findByName(String name);
-    boolean create(CfAsset entity);
-    boolean delete(CfAsset entity);
-    boolean edit(CfAsset entity);
+public interface CfKeywordDAO {
+    List<CfKeyword> findAll();
+    CfKeyword findById(Long id);
+    CfKeyword findByName(String name);
+    boolean create(CfKeyword entity);
+    boolean delete(CfKeyword entity);
+    boolean edit(CfKeyword entity);
 }

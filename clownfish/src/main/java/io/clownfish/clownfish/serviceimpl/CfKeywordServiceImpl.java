@@ -15,9 +15,9 @@
  */
 package io.clownfish.clownfish.serviceimpl;
 
-import io.clownfish.clownfish.daointerface.CfAssetDAO;
-import io.clownfish.clownfish.dbentities.CfAsset;
-import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.daointerface.CfKeywordDAO;
+import io.clownfish.clownfish.dbentities.CfKeyword;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,41 +29,41 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class CfAssetServiceImpl implements CfAssetService {
-    private final CfAssetDAO cfassetDAO;
+public class CfKeywordServiceImpl implements CfKeywordService {
+    private final CfKeywordDAO cfkeywordDAO;
     
     @Autowired
-    public CfAssetServiceImpl(CfAssetDAO cfassetDAO) {
-        this.cfassetDAO = cfassetDAO;
+    public CfKeywordServiceImpl(CfKeywordDAO cfkeywordDAO) {
+        this.cfkeywordDAO = cfkeywordDAO;
     }
     
     @Override
-    public boolean create(CfAsset entity) {
-        return this.cfassetDAO.create(entity);
+    public boolean create(CfKeyword entity) {
+        return this.cfkeywordDAO.create(entity);
     }
 
     @Override
-    public boolean delete(CfAsset entity) {
-        return this.cfassetDAO.delete(entity);
+    public boolean delete(CfKeyword entity) {
+        return this.cfkeywordDAO.delete(entity);
     }
 
     @Override
-    public boolean edit(CfAsset entity) {
-        return this.cfassetDAO.edit(entity);
+    public boolean edit(CfKeyword entity) {
+        return this.cfkeywordDAO.edit(entity);
     }    
 
     @Override
-    public List<CfAsset> findAll() {
-        return this.cfassetDAO.findAll();
+    public List<CfKeyword> findAll() {
+        return this.cfkeywordDAO.findAll();
     }
 
     @Override
-    public CfAsset findById(Long id) {
-        return this.cfassetDAO.findById(id);
+    public CfKeyword findById(Long id) {
+        return this.cfkeywordDAO.findById(id);
     }
 
     @Override
-    public CfAsset findByName(String name) {
-        return this.cfassetDAO.findByName(name);
+    public CfKeyword findByName(String name) {
+        return this.cfkeywordDAO.findByName(name);
     }
 }

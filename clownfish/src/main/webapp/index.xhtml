@@ -570,6 +570,35 @@
                     </p:panelGrid>
                 </p:tab>
                 
+                <p:tab title="Assets" rendered="#{loginBean.login}">
+                    <h:form enctype="multipart/form-data">
+                        <p:fileUpload fileUploadListener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true"
+                                              update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx)$/" />
+                        <p:growl id="messages" showDetail="true" />
+                    </h:form>
+                    
+                    <p:dataGrid id="assetlist" var="media" value="#{assetList.assetlist}" columns="4" layout="grid"
+                        rows="12" paginator="true"
+                        paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                        rowsPerPageTemplate="6,12,16">
+
+                        <f:facet name="header">
+                            Medien
+                        </f:facet>
+
+                        <p:panel header="#{media.id}" style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                <p:graphicImage url="GetAsset?mediaid=#{media.id}&amp;width=200" /> 
+                                <h:outputText value="#{media.name}" />
+                                <h:selectBooleanCheckbox value="#{assetList.selectedAsset}" />
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+                    
+                    <p:pickList id="assetkeywordpicklist" value="#{assetList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" />
+                    <p:commandButton id="attachassetkeyword" process="form" value="Attach" actionListener="#{assetList.onAttach}" />
+                </p:tab>
+                
                 <p:tab title="Properties" rendered="#{loginBean.login}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="propertylist" var="propertycontent" value="#{propertylist.propertylist}" 

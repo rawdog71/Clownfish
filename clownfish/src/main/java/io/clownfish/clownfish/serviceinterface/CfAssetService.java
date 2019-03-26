@@ -25,6 +25,7 @@ import java.util.List;
 public interface CfAssetService {
     List<CfAsset> findAll();
     CfAsset findById(Long id);
+    CfAsset findByName(String name);
     boolean create(CfAsset entity);
     boolean delete(CfAsset entity);
     boolean edit(CfAsset entity);

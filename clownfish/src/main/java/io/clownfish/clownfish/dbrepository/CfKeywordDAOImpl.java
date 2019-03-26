@@ -15,8 +15,8 @@
  */
 package io.clownfish.clownfish.dbrepository;
 
-import io.clownfish.clownfish.daointerface.CfAssetDAO;
-import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.daointerface.CfKeywordDAO;
+import io.clownfish.clownfish.dbentities.CfKeyword;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -29,59 +29,59 @@ import org.springframework.stereotype.Repository;
  * @author sulzbachr
  */
 @Repository
-public class CfAssetDAOImpl implements CfAssetDAO {
+public class CfKeywordDAOImpl implements CfKeywordDAO {
 
     private final SessionFactory sessionFactory;
     
     @Autowired 
-    public CfAssetDAOImpl(SessionFactory sessionFactory) {
+    public CfKeywordDAOImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
     
     @Override
-    public CfAsset findById(Long id) {
+    public CfKeyword findById(Long id) {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findById");  
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfKeyword.findById");  
         query.setParameter("id", id);
-        CfAsset cfasset = (CfAsset) query.getSingleResult();
-        return cfasset;
+        CfKeyword cfkeyword = (CfKeyword) query.getSingleResult();
+        return cfkeyword;
     }
 
     @Override
-    public boolean create(CfAsset entity) {
+    public boolean create(CfKeyword entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
         return true;
     }
 
     @Override
-    public boolean delete(CfAsset entity) {
+    public boolean delete(CfKeyword entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.delete(entity);
         return true;
     }
 
     @Override
-    public boolean edit(CfAsset entity) {
+    public boolean edit(CfKeyword entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
         return true;
     }
 
     @Override
-    public List<CfAsset> findAll() {
+    public List<CfKeyword> findAll() {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findAll");
-        List<CfAsset> cfassetlist = query.getResultList();
-        return cfassetlist;
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfKeyword.findAll");
+        List<CfKeyword> cfkeywordlist = query.getResultList();
+        return cfkeywordlist;
     }
 
     @Override
-    public CfAsset findByName(String name) {
+    public CfKeyword findByName(String name) {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findByName");  
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfKeyword.findByName");  
         query.setParameter("name", name);
-        CfAsset cfasset = (CfAsset) query.getSingleResult();
-        return cfasset;
+        CfKeyword cfkeyword = (CfKeyword) query.getSingleResult();
+        return cfkeyword;
     }
 }
