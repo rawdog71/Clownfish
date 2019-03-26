@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.daointerface;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
-import io.clownfish.clownfish.dbentities.CfAttribut;
 import java.util.List;
 
 /**

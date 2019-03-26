@@ -18,7 +18,9 @@ package io.clownfish.clownfish.dbentities;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.Locale;
 import javax.persistence.Basic;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -35,6 +37,9 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
@@ -42,6 +47,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "cf_attributcontent", catalog = "clownfish", schema = "")
+@Cacheable(false)
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "CfAttributcontent.findAll", query = "SELECT c FROM CfAttributcontent c"),
@@ -206,7 +212,69 @@ public class CfAttributcontent implements Serializable {
 
     @Override
     public String toString() {
-        return "io.clownfish.clownfish.dbentities.CfAttributcontent[ id=" + id + " ]";
+        switch (attributref.getAttributetype().getId().intValue()) {
+            case 1: // boolean
+                if (null != getContentBoolean()) {
+                    return getContentBoolean().toString();
+                } else {
+                    return "";
+                }    
+            case 2: // string
+                if (null != getContentString()) {
+                    return getContentString();
+                } else {
+                    return "";
+                }
+            case 3: // integer
+                if (null != getContentInteger()) {
+                    return getContentInteger().toString();
+                } else {
+                    return "";
+                }
+            case 4: // real
+                if (null != getContentReal()) {
+                    return getContentReal().toString();
+                } else {
+                    return "";
+                }    
+            case 5: // htmltext (formatted)
+                if (null != getContentText()) {
+                    return getContentText();
+                } else {
+                    return "";
+                }
+            case 6: // datetime
+                if (null != getContentDate()) {
+                    DateTime dt = new DateTime(getContentDate());
+                    DateTimeFormatter dtf1 = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy").withLocale(Locale.GERMANY);
+                    
+                    String test = dt.toString(dtf1);
+                    DateTimeFormatter dtf = DateTimeFormat.forPattern("dd.MM.yyyy");
+                    
+                    return dt.toString(dtf);
+                } else {
+                    return "";
+                }
+            case 7: // hashstring (crypted with salt - for passwords)
+                if (null != getContentString()) {
+                    return getContentString();
+                } else {
+                    return "";
+                }
+            case 8: // media (id to asset)
+                if (null != getContentInteger()) {
+                    return getContentInteger().toString();
+                } else {
+                    return "";
+                }
+            case 9: // text (unformatted)
+                if (null != getContentText()) {
+                    return getContentText();
+                } else {
+                    return "";
+                }
+        }
+        return "?";
     }
     
 }

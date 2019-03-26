@@ -452,7 +452,7 @@
                     <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist" disabled="#{classcontentlist.newContentButtonDisabled}" />
                     <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist" />
                     
-                    <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentlist.selectedAttributContent}" rowKey="#{attributcontent.id}">
+                    <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentList.selectedAttributContent}" rowKey="#{attributcontent.id}">
                         <p:ajax event="rowSelect" listener="#{classcontentList.onSelectAttribut}" update=":form:tabview:attributcontentlist" />
                         <p:column headerText="Name">
                             <h:outputText value="#{attributcontent.attributref.name}" />
@@ -461,15 +461,15 @@
                             <h:outputText value="#{attributcontent.attributref.attributetype}" />
                         </p:column>
                         <p:column headerText="Wert">
-                            <p:inputText id="attributvalueString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.isStringType}" />
-                            <p:password id="attributvalueHashString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.isHashStringType}" />
-                            <p:inputNumber id="attributvalueInt" value="#{classcontentList.editContent}" decimalPlaces="0" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.isIntegerType}" />
-                            <p:inputNumber id="attributvalueReal" value="#{classcontentList.editContent}" decimalPlaces="2" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.isRealType}" />
-                            <p:textEditor id="attributvalueHtmlText" widgetVar="editor1" value="#{classcontentList.editContent}" height="300" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.isHTMLTextType}" />
-                            <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.isTextType}" />
-                            <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.isBooleanType}" />
-                            <p:calendar id="attributvalueDatetime" value="#{classcontentList.editContent}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.isDatetimeType}" />
-                            <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" converter="#{mediaConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.isMediaType}">
+                            <p:inputText id="attributvalueString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.stringType}" />
+                            <p:password id="attributvalueHashString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.hashStringType}" />
+                            <p:inputNumber id="attributvalueInt" value="#{classcontentList.editContent}" decimalPlaces="0" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.integerType}" />
+                            <p:inputNumber id="attributvalueReal" value="#{classcontentList.editContent}" decimalPlaces="2" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.realType}" />
+                            <p:textEditor id="attributvalueHtmlText" widgetVar="editor1" value="#{classcontentList.editContent}" height="300" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.HTMLTextType}" />
+                            <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.textType}" />
+                            <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.booleanType}" />
+                            <p:calendar id="attributvalueDatetime" value="#{classcontentList.editContent}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" />
+                            <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" converter="#{mediaConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}">
                                 <f:selectItems value="#{assetlist.assetlist}" />
                             </p:selectOneMenu>
                             

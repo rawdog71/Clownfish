@@ -22,7 +22,6 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
-import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,7 +37,6 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("classcontentList")
-@Transactional
 @ViewScoped
 @Component
 public class ContentList implements Serializable {
@@ -63,15 +61,15 @@ public class ContentList implements Serializable {
     private @Getter @Setter long selectedAttributId;
     private @Getter @Setter CfAsset selectedMedia;
     private @Getter @Setter String editContent;
-    private @Getter @Setter boolean isBooleanType = false;
-    private @Getter @Setter boolean isStringType = false;
-    private @Getter @Setter boolean isHashStringType = false;
-    private @Getter @Setter boolean isDatetimeType = false;
-    private @Getter @Setter boolean isIntegerType = false;
-    private @Getter @Setter boolean isRealType = false;
-    private @Getter @Setter boolean isHTMLTextType = false;
-    private @Getter @Setter boolean isTextType = false;
-    private @Getter @Setter boolean isMediaType = false;
+    private @Getter @Setter boolean isBooleanType;
+    private @Getter @Setter boolean isStringType;
+    private @Getter @Setter boolean isHashStringType;
+    private @Getter @Setter boolean isDatetimeType;
+    private @Getter @Setter boolean isIntegerType;
+    private @Getter @Setter boolean isRealType;
+    private @Getter @Setter boolean isHTMLTextType;
+    private @Getter @Setter boolean isTextType;
+    private @Getter @Setter boolean isMediaType;
     private @Getter @Setter boolean valueBooleanRendered = false;
     private @Getter @Setter boolean valueDatetimeRendered = false;
 
