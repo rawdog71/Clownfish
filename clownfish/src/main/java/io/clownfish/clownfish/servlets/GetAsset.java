@@ -1,7 +1,7 @@
 /*
  * Copyright Rainer Sulzbach
  */
-package io.clownfish.clownfish;
+package io.clownfish.clownfish.servlets;
 
 import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.dbentities.CfAsset;
