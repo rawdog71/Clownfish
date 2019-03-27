@@ -4,7 +4,7 @@ import KNSAPTools.SAPConnection;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
-import io.clownfish.clownfish.beans.DatabaseBean;
+import io.clownfish.clownfish.beans.DatabaseTemplateBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
 import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
@@ -28,6 +28,7 @@ import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.sap.SAPUtility;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
+import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
@@ -93,6 +94,8 @@ public class Clownfish {
     @Autowired CfTemplateLoaderImpl freemarkerTemplateloader;
     @Autowired SiteUtil siteutil;
     @Autowired DatabaseUtil databaseUtil;
+    @Autowired CfDatasourceService cfdatasourceService;
+    @Autowired DatabaseTemplateBean databasebean;
     
     /*
     @Context
@@ -390,7 +393,7 @@ public class Clownfish {
 
                 Writer out = new StringWriter();
                 if (0 == cftemplate.getScriptlanguage()) {  // Freemarker Template
-                    DatabaseBean databasebean = new DatabaseBean(sitedatasourcelist, sitecontentmap);
+                    databasebean.init(sitedatasourcelist, sitecontentmap);
                     fmRoot.put("databaseBean", databasebean);
                     fmRoot.put("css", cfstylesheet);
                     fmRoot.put("js", cfjavascript);
@@ -400,7 +403,7 @@ public class Clownfish {
                     freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
                     env.process();
                 } else {                                    // Velocity Template
-                    DatabaseBean databasebean = new DatabaseBean(sitedatasourcelist, sitecontentmap);
+                    databasebean.init(sitedatasourcelist, sitecontentmap);
                     velContext.put("databaseBean", databasebean);
                     velContext.put("css", cfstylesheet);
                     velContext.put("js", cfjavascript);

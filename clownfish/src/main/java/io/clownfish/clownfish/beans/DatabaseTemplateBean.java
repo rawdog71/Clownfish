@@ -21,22 +21,28 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
-public class DatabaseBean {
+@Component
+public class DatabaseTemplateBean {
     @Autowired CfDatasourceService cfdatasourceService;
     
-    private final List<CfSitedatasource> sitedatasourcelist;
-    private final Map sitecontentmap;
-    private final HashMap<String, ArrayList> dbtables;
+    private List<CfSitedatasource> sitedatasourcelist;
+    private Map sitecontentmap;
+    private HashMap<String, ArrayList> dbtables;
+
+    public DatabaseTemplateBean() {
+        dbtables = new HashMap<>();
+    }
     
-    public DatabaseBean(List<CfSitedatasource> sitedatasourcelist, Map sitecontentmap) {
+    public void init(List<CfSitedatasource> sitedatasourcelist, Map sitecontentmap) {
         this.sitedatasourcelist = sitedatasourcelist;
         this.sitecontentmap = sitecontentmap;
-        dbtables = new HashMap<>();
+        
     }
     
     public Map dbread(String catalog, String tablename, String sqlstatement) {
@@ -69,7 +75,7 @@ public class DatabaseBean {
                 }
                 ((HashMap)((HashMap) sitecontentmap.get("db")).get(cfdatasource.getDatabasename())).put("table", dbtables);
             } catch (SQLException ex) {
-                Logger.getLogger(DatabaseBean.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(DatabaseTemplateBean.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return sitecontentmap;
@@ -129,7 +135,7 @@ public class DatabaseBean {
             tfs.setTableFieldsList(tableFieldsList);
             return tfs;
         } catch (SQLException ex) {
-            Logger.getLogger(DatabaseBean.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DatabaseTemplateBean.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }

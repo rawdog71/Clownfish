@@ -64,6 +64,13 @@
                                     </p:row>
                                     <p:row>
                                         <p:column>
+                                            <p:outputLabel for="sitetitle">Titel</p:outputLabel>
+                                            <p:inputText id="sitetitle" value="#{sitetree.siteTitle}" >
+                                            </p:inputText>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column>
                                             <p:outputLabel for="sitedatasource" value="Datasource:" />
                                             <p:selectCheckboxMenu id="sitedatasource" value="#{sitetree.selectedDatasources}" required="false" label="Datasources" converter="#{datasourceConverterBean}" filter="true" filterMatchMode="startsWith">
                                                 <f:selectItems value="#{sitetree.datasources}" var="datasource" itemLabel="#{datasource.name}" itemValue="#{datasource}" />

@@ -93,6 +93,9 @@ public class CfSite implements Serializable {
     @NotNull
     @Column(name = "gzip")
     private int gzip;
+    @Size(max = 255)
+    @Column(name = "title")
+    private String title;
 
     public CfSite() {
     }
@@ -201,6 +204,14 @@ public class CfSite implements Serializable {
 
     public void setGzip(int gzip) {
         this.gzip = gzip;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     @Override

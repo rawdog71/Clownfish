@@ -87,6 +87,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfClasscontent> selectedclasscontentlist;
     private @Getter @Setter int sitehtmlcompression;
     private @Getter @Setter int sitegzip;
+    private @Getter @Setter String siteTitle;
     private @Getter @Setter String aliaspath;
     private @Getter @Setter String characterEncoding;
     private @Getter @Setter String contentType;
@@ -272,6 +273,7 @@ public class SiteTreeBean implements Serializable {
             selectedclasscontentlist.add(cc);
         }
         siteName = selectedSite.getName();
+        siteTitle = selectedSite.getTitle();
         aliaspath = selectedSite.getAliaspath();
         sitehtmlcompression = selectedSite.getHtmlcompression();
         characterEncoding = selectedSite.getCharacterencoding();
@@ -367,6 +369,7 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setContenttype(contentType);
             selectedSite.setLocale(locale);
             selectedSite.setAliaspath(aliaspath);
+            selectedSite.setTitle(siteTitle);
             cfsiteService.edit(selectedSite);
             loadTree();
             
@@ -425,6 +428,7 @@ public class SiteTreeBean implements Serializable {
             newsite.setCharacterencoding(characterEncoding);
             newsite.setLocale(locale);
             newsite.setAliaspath(siteName);
+            newsite.setTitle(siteTitle);
             cfsiteService.create(newsite);
             loadTree();
         } catch (ConstraintViolationException ex) {
