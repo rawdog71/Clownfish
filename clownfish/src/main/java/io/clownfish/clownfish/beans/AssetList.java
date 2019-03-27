@@ -3,21 +3,16 @@
  */
 package io.clownfish.clownfish.beans;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +27,18 @@ import javax.inject.Named;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DualListModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -71,7 +74,7 @@ public class AssetList {
         }
     }
     
-    public void handleFileUpload(FileUploadEvent event) {
+    public void handleFileUpload(FileUploadEvent event) throws TikaException, SAXException {
         Logger logger = Logger.getLogger(getClass().getName());
         logger.log(Level.INFO, "UPLOAD: {0}", event.getFile().getFileName());
         String mediapath = propertymap.get("media.folder");
@@ -94,17 +97,29 @@ public class AssetList {
             }
             inputStream.close();
             
-            Metadata metadata = ImageMetadataReader.readMetadata(result);
-            for (Directory directory : metadata.getDirectories()) {
-                Collection<Tag> tags = directory.getTags();
-                for (Tag tag : tags)
-                    metamap.put(tag.getTagName(), tag.getDescription());
+            //detecting the file type using detect method
+            String fileextension = FilenameUtils.getExtension(mediapath + File.separator + event.getFile().getFileName());
+            
+            Parser parser = new AutoDetectParser();
+            BodyContentHandler handler = new BodyContentHandler();
+            Metadata metadata = new Metadata();
+            FileInputStream inputstream = new FileInputStream(result);
+            ParseContext context = new ParseContext();
+
+            parser.parse(inputstream, handler, metadata, context);
+            //System.out.println(handler.toString());
+
+            //getting the list of all meta data elements 
+            String[] metadataNames = metadata.names();
+            for(String name : metadataNames) {		        
+                //System.out.println(name + ": " + metadata.get(name));
+                metamap.put(name, metadata.get(name));
             }
             
             CfAsset newasset = new CfAsset();
             newasset.setName(event.getFile().getFileName());
-            newasset.setFileextension(metamap.get("Expected File Name Extension"));
-            newasset.setMimetype(metamap.get("Detected MIME Type"));
+            newasset.setFileextension(fileextension.toLowerCase());
+            newasset.setMimetype(metamap.get("Content-Type"));
             newasset.setImagewidth(metamap.get("Image Width"));
             newasset.setImageheight(metamap.get("Image Height"));
             cfassetService.create(newasset);
@@ -113,7 +128,7 @@ public class AssetList {
             
             FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
             FacesContext.getCurrentInstance().addMessage(null, message);
-        } catch (IOException | ImageProcessingException e) {
+        } catch (IOException e) {
             Logger.getLogger(AssetList.class.getName()).log(Level.SEVERE, null, e);
             FacesMessage error = new FacesMessage("The files were not uploaded!");
             FacesContext.getCurrentInstance().addMessage(null, error);

@@ -88,7 +88,6 @@ public class DatasourceList implements Serializable {
     public void onEditContent(ActionEvent actionEvent) {
         try {
             if (selectedDatasource != null) {
-                /*
                 selectedDatasource.setName(datasourceName);
                 selectedDatasource.setDatabasename(datasourceDatabasename);
                 selectedDatasource.setDriverclass(datasourceDriverclass);
@@ -97,7 +96,6 @@ public class DatasourceList implements Serializable {
                 selectedDatasource.setServer(datasourceServer);
                 selectedDatasource.setUrl(datasourceURL);
                 selectedDatasource.setUser(datasourceUser);
-*/
                 cfdatasourceService.edit(selectedDatasource);
                 datasourcelist = cfdatasourceService.findAll();
             }

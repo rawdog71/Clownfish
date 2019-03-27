@@ -92,6 +92,7 @@ public class Clownfish {
     @Autowired PropertyList propertylist;
     @Autowired CfTemplateLoaderImpl freemarkerTemplateloader;
     @Autowired SiteUtil siteutil;
+    @Autowired DatabaseUtil databaseUtil;
     
     /*
     @Context
@@ -361,7 +362,7 @@ public class Clownfish {
                 List<CfSitedatasource> sitedatasourcelist = new ArrayList<>();
                 sitedatasourcelist.addAll(cfsitedatasourceService.findBySiteref(cfsite.getId()));
 
-                DatabaseUtil databaseUtil = new DatabaseUtil();
+                //DatabaseUtil databaseUtil = new DatabaseUtil();
                 HashMap<String, HashMap> dbexport = databaseUtil.getDbexport(sitedatasourcelist, datatableproperties, datatablenewproperties, datatabledeleteproperties, datatableupdateproperties);
                 sitecontentmap.put("db", dbexport);
 

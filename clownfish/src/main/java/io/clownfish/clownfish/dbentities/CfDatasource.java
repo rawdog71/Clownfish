@@ -17,6 +17,7 @@ package io.clownfish.clownfish.dbentities;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -35,6 +36,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "cf_datasource", catalog = "clownfish", schema = "")
+@Cacheable(false)
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "CfDatasource.findAll", query = "SELECT c FROM CfDatasource c"),

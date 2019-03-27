@@ -119,8 +119,8 @@ public class GetAsset extends HttpServlet {
                         if ((width > 0) || (height > 0)) {
                             BufferedImage result = AsyncScalr.resize(ImageIO.read(f), width).get();
                             ByteArrayOutputStream os = new ByteArrayOutputStream();
-                            ImageIO.write(result, "jpg", os);
-                            ImageIO.write(result, "jpg", new File(cachepath + File.separator + cacheKey));
+                            ImageIO.write(result, asset.getFileextension(), os);
+                            ImageIO.write(result, asset.getFileextension(), new File(cachepath + File.separator + cacheKey));
 
                             try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                                 in = new ByteArrayInputStream(os.toByteArray());
