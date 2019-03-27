@@ -25,7 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ViewScoped;
+import javax.faces.bean.RequestScoped;
+//import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
@@ -42,7 +43,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("assetList")
-@ViewScoped
+@RequestScoped
 @Component
 public class AssetList {
     @Autowired CfAssetService cfassetService;

@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.web.context.ServletContextAware;
  */
 @Configuration
 @ComponentScan("io.clownfish.*")
+@ServletComponentScan
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
 public class Main extends SpringBootServletInitializer implements ServletContextAware {
 

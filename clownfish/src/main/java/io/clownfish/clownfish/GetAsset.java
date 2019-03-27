@@ -31,6 +31,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.imgscalr.AsyncScalr;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -38,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author sulzbachr
  */
 @WebServlet(name = "GetAsset", urlPatterns = {"/GetAsset"}, asyncSupported = true)
+@Component
 public class GetAsset extends HttpServlet {
     @Autowired CfAssetService cfassetService;
     @Autowired PropertyList propertylist;
