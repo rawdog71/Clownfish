@@ -65,7 +65,9 @@ import javax.ws.rs.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -119,8 +121,8 @@ public class Clownfish {
         return "Welcome to Clownfish Content Management System";
     }
     
-    @RequestMapping("/{name}")
-    String universal(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+    @GetMapping("/{name}")
+    String universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         userSession = request.getSession();
         this.request = request;
         this.response = response;
@@ -136,6 +138,27 @@ public class Clownfish {
         }
 
         return makeResponse(name, queryParams);
+    }
+    
+    @PostMapping("/{name}")
+    String universalPost(@PathVariable("name") String name, String content, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        userSession = request.getSession();
+        this.request = request;
+        this.response = response;
+        Map<String, String[]> querymap = request.getParameterMap();
+        
+        ArrayList queryParams = new ArrayList();
+        for (Object key : querymap.keySet()) {
+            JsonFormParameter jfp = new JsonFormParameter();
+            jfp.setName((String) key);
+            String[] values = querymap.get(key);
+            jfp.setValue(values[0]);
+            queryParams.add(jfp);
+        }
+        
+        return makeResponse(name, queryParams);
+
+        //return makeResponse(name, queryParams);
     }
     
     

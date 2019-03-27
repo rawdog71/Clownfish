@@ -38,6 +38,8 @@ public class ClassList implements Serializable {
     @Autowired CfAttributetypeService cfattributetypeService;
     @Autowired CfClasscontentService cfclascontentService;
     @Autowired CfAttributcontentService cfattributcontentService;
+    @Autowired DataList datalist;
+    @Autowired ContentList contentlist;
     
     private @Getter @Setter List<CfClass> classListe;
     private @Getter @Setter CfClass selectedClass = null;
@@ -103,6 +105,8 @@ public class ClassList implements Serializable {
             cfclassService.create(newclass);
             classListe = cfclassService.findAll();
             className = "";
+            contentlist.init();
+            datalist.init();
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
         }
