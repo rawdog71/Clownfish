@@ -28,7 +28,6 @@ public class ClasscontentConverter implements Converter, Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            //Object o = em.createNamedQuery("Knclasscontent.findById").setParameter("id", new Long(value)).getSingleResult();
             Object o = cfclasscontentservice.findById(new Long(value));
             return o;
         }

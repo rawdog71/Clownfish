@@ -104,7 +104,7 @@ public class CfKeyword implements Serializable {
 
     @Override
     public String toString() {
-        return "io.clownfish.clownfish.dbentities.CfKeyword[ id=" + id + " ]";
+        return name;
     }
     
 }

@@ -84,13 +84,11 @@ public class GetAsset extends HttpServlet {
                     String cachepath = propertymap.get("cache.folder");
                     String imagefilename = acontext.getRequest().getParameter("file");
                     if (imagefilename != null) {
-                        //asset = (CfAsset) em.createNamedQuery("Knasset.findByName").setParameter("name", imagefilename).getSingleResult();
                         asset = cfassetService.findByName(imagefilename);
                         imagefilename = asset.getName();
                     }
                     String mediaid = acontext.getRequest().getParameter("mediaid");
                     if (mediaid != null) {
-                        //asset = (Knasset) em.createNamedQuery("Knasset.findById").setParameter("id", Long.parseLong(mediaid)).getSingleResult();
                         asset = cfassetService.findById(Long.parseLong(mediaid));
                         imagefilename = asset.getName();
                     }

@@ -54,9 +54,7 @@ public class DataList implements Serializable {
 
     @PostConstruct
     public void init() {
-        //datacontentlist = em.createNamedQuery("Knlist.findAll").getResultList();
         datacontentlist = cflistService.findAll();
-        //classlist = em.createNamedQuery("Knclass.findAll").getResultList();
         classlist = cfclassService.findAll();
         
         selectedListcontent = new ArrayList<>();
@@ -64,21 +62,16 @@ public class DataList implements Serializable {
     
     public void onSelect(SelectEvent event) {
         selectedList = (CfList) event.getObject();
-        
         contentName = selectedList.getName();
         selectedClass = selectedList.getClassref();
         newContentButtonDisabled = true;
         
-        //filteredclasscontentlist = em.createNamedQuery("Knclasscontent.findByClassref").setParameter("classref", selectedList.getClassref()).getResultList();
         filteredclasscontentlist = cfclasscontentService.findByClassref(selectedList.getClassref());
-        
-        //List<Knlistcontent> selectedcontent = em.createNamedQuery("Knlistcontent.findByListref").setParameter("listref", selectedList.getId()).getResultList();
         List<CfListcontent> selectedcontent = cflistcontentService.findByListref(selectedList.getId());
         
         selectedListcontent.clear();
         if (selectedcontent.size() > 0) {
             for (CfListcontent listcontent : selectedcontent) {
-                //Knclasscontent selectedContent = (Knclasscontent) em.createNamedQuery("Knclasscontent.findById").setParameter("id", listcontent.getKnlistcontentPK().getClasscontentref()).getSingleResult();
                 CfClasscontent selectedContent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
                 selectedListcontent.add(selectedContent);
             }
@@ -91,10 +84,7 @@ public class DataList implements Serializable {
             newlistcontent.setName(contentName);
             newlistcontent.setClassref(selectedClass);
             
-            //knlistFacadeREST.create(newlistcontent);
             cflistService.create(newlistcontent);
-            
-            //datacontentlist = em.createNamedQuery("Knlist.findAll").getResultList();
             datacontentlist = cflistService.findAll();
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
@@ -103,16 +93,13 @@ public class DataList implements Serializable {
     
     public void onDeleteContent(ActionEvent actionEvent) {
         if (selectedList != null) {
-            //knlistFacadeREST.remove(selectedList);
             cflistService.delete(selectedList);
-            //datacontentlist = em.createNamedQuery("Knlist.findAll").getResultList();
             datacontentlist = cflistService.findAll();
         }
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            //Knlist validateList = (Knlist) em.createNamedQuery("Knlist.findByName").setParameter("name", contentName).getSingleResult();
             CfList validateList = cflistService.findByName(contentName);
             newContentButtonDisabled = true;
         } catch (NoResultException ex) {
@@ -122,10 +109,8 @@ public class DataList implements Serializable {
     
     public void onChangeContent(AjaxBehaviorEvent event) {
         // Delete listcontent first
-        //List<Knlistcontent> contentList = em.createNamedQuery("Knlistcontent.findByListref").setParameter("listref", selectedList.getId()).getResultList();
         List<CfListcontent> contentList = cflistcontentService.findByListref(selectedList.getId());
         for (CfListcontent content : contentList) {
-            //knlistcontentFacadeREST.remove(content);
             cflistcontentService.delete(content);
         }
         // Add selected listcontent
@@ -136,7 +121,6 @@ public class DataList implements Serializable {
                 cflistcontentPK.setListref(selectedList.getId());
                 cflistcontentPK.setClasscontentref(selected.getId());
                 listcontent.setCfListcontentPK(cflistcontentPK);
-                //knlistcontentFacadeREST.create(listcontent);
                 cflistcontentService.create(listcontent);
             }
         }

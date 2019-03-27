@@ -47,7 +47,6 @@ public class DatasourceList implements Serializable {
 
     @PostConstruct
     public void init() {
-        //datasourcelist = em.createNamedQuery("Kndatasource.findAll").getResultList();
         datasourcelist = cfdatasourceService.findAll();
         newContentButtonDisabled = false;
     }
@@ -79,10 +78,7 @@ public class DatasourceList implements Serializable {
             newdatasourcecontent.setUrl(datasourceURL);
             newdatasourcecontent.setUser(datasourceUser);
             
-            //kndatasourceFacadeREST.create(newdatasourcecontent);
             cfdatasourceService.create(newdatasourcecontent);
-            
-            //datasourcelist = em.createNamedQuery("Kndatasource.findAll").getResultList();
             datasourcelist = cfdatasourceService.findAll();
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
@@ -102,9 +98,7 @@ public class DatasourceList implements Serializable {
                 selectedDatasource.setUrl(datasourceURL);
                 selectedDatasource.setUser(datasourceUser);
 */
-                //kndatasourceFacadeREST.edit(selectedDatasource);
                 cfdatasourceService.edit(selectedDatasource);
-                //datasourcelist = em.createNamedQuery("Kndatasource.findAll").getResultList();
                 datasourcelist = cfdatasourceService.findAll();
             }
         } catch (ConstraintViolationException ex) {
@@ -114,15 +108,11 @@ public class DatasourceList implements Serializable {
     
     public void onDeleteContent(ActionEvent actionEvent) {
         if (selectedDatasource != null) {
-            //List<CfSitedatasource> sitedatasourcelist = em.createNamedQuery("Knsitedatasource.findByDatasourceref").setParameter("datasourceref", selectedDatasource.getId()).getResultList();
             List<CfSitedatasource> sitedatasourcelist = cfsitedatasourceService.findByDatasourceref(selectedDatasource.getId());
             for (CfSitedatasource sitedatasource : sitedatasourcelist) {
-                //knsitedatasourceFacadeREST.remove(sitedatasource);
                 cfsitedatasourceService.delete(sitedatasource);
             }
-            //kndatasourceFacadeREST.remove(selectedDatasource);
             cfdatasourceService.delete(selectedDatasource);
-            //datasourcelist = em.createNamedQuery("Kndatasource.findAll").getResultList();
             datasourcelist = cfdatasourceService.findAll();
             
         }
@@ -130,7 +120,6 @@ public class DatasourceList implements Serializable {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            //Kndatasource validateList = (Kndatasource) em.createNamedQuery("Kndatasource.findByName").setParameter("name", datasourceName).getSingleResult();
             CfDatasource validateList = cfdatasourceService.findByName(datasourceName);
             newContentButtonDisabled = true;
         } catch (NoResultException ex) {
