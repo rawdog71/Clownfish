@@ -26,6 +26,7 @@ public interface CfSiteService {
     List<CfSite> findAll();
     CfSite findById(Long id);
     CfSite findByName(String name);
+    CfSite findByAliaspath(String alias);
     CfSite findByTemplateref(Long ref);
     List<CfSite> findByParentref(Long ref);
     boolean create(CfSite entity);

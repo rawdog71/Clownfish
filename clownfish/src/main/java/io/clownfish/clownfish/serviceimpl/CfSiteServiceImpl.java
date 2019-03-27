@@ -77,4 +77,9 @@ public class CfSiteServiceImpl implements CfSiteService {
         return this.cfsiteDAO.findByParentref(ref);
     }
 
+    @Override
+    public CfSite findByAliaspath(String alias) {
+        return this.cfsiteDAO.findByAliaspath(alias);
+    }
+
 }

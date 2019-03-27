@@ -103,4 +103,13 @@ public class CfSiteDAOImpl implements CfSiteDAO {
         List<CfSite> cfsitelist = query.getResultList();
         return cfsitelist;
     }
+
+    @Override
+    public CfSite findByAliaspath(String alias) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfSite.findByAliaspath");  
+        query.setParameter("aliaspath", alias);
+        CfSite cfsite = (CfSite) query.getSingleResult();
+        return cfsite;
+    }
 }

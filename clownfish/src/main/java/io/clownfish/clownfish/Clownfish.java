@@ -125,11 +125,12 @@ public class Clownfish {
         return "Welcome to Clownfish Content Management System";
     }
     
-    @GetMapping("/{name}")
-    String universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+    @GetMapping("/**")
+    String universalGet(@Context HttpServletRequest request, @Context HttpServletResponse response) {
         userSession = request.getSession();
         this.request = request;
         this.response = response;
+        String name = request.getRequestURI();
         Map<String, String[]> querymap = request.getParameterMap();
         
         ArrayList queryParams = new ArrayList();
@@ -140,15 +141,15 @@ public class Clownfish {
             jfp.setValue(values[0]);
             queryParams.add(jfp);
         }
-
         return makeResponse(name, queryParams);
     }
     
-    @PostMapping("/{name}")
-    String universalPost(@PathVariable("name") String name, String content, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+    @PostMapping("/**")
+    String universalPost(@Context HttpServletRequest request, @Context HttpServletResponse response) {
         userSession = request.getSession();
         this.request = request;
         this.response = response;
+        String name = request.getRequestURI();
         Map<String, String[]> querymap = request.getParameterMap();
         
         ArrayList queryParams = new ArrayList();
@@ -266,6 +267,7 @@ public class Clownfish {
     
     private String makeResponse(String name, List<JsonFormParameter> postmap) {
         try {
+            name = name.substring(1);
             // Freemarker Template
             freemarker.template.Template fmTemplate = null;
             Map fmRoot = null;
@@ -283,7 +285,12 @@ public class Clownfish {
             }
             
             // Hole die Seite über den Namen
-            CfSite cfsite = cfsiteService.findByName(name);
+            CfSite cfsite = null;
+            try {
+                cfsite = cfsiteService.findByName(name);
+            } catch (Exception ex) {
+                cfsite = cfsiteService.findByAliaspath(name);
+            }
             if ((cfsite.getContenttype() != null)) {
                 if (!cfsite.getContenttype().isEmpty()) response.setContentType(cfsite.getContenttype());
             }
