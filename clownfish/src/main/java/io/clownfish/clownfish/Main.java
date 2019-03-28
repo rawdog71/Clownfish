@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.ServletContextAware;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
  *
@@ -21,6 +22,7 @@ import org.springframework.web.context.ServletContextAware;
 @Configuration
 @ComponentScan("io.clownfish.*")
 @ServletComponentScan
+@EnableWebMvc
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
 public class Main extends SpringBootServletInitializer implements ServletContextAware {
 
@@ -47,7 +49,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     }
 
     @Bean
-    public ServletRegistrationBean facesServletRegistraiton() {
+    public ServletRegistrationBean facesServletRegistratiton() {
         ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new FacesServlet(), new String[]{"*.xhtml"});
         servletRegistrationBean.setName("XHTML Faces Servlet");
         servletRegistrationBean.setLoadOnStartup(1);

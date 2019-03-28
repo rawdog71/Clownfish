@@ -1,8 +1,6 @@
 package io.clownfish.clownfish;
 
 import KNSAPTools.SAPConnection;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import io.clownfish.clownfish.beans.DatabaseTemplateBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
@@ -97,10 +95,6 @@ public class Clownfish {
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired DatabaseTemplateBean databasebean;
     
-    /*
-    @Context
-    private UriInfo context;
-    */
     @Context
     protected HttpServletResponse response;
     @Context 
@@ -124,47 +118,6 @@ public class Clownfish {
     String home() {
         return "Welcome to Clownfish Content Management System";
     }
-    
-    @GetMapping("/{name}")
-    String universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        userSession = request.getSession();
-        this.request = request;
-        this.response = response;
-        Map<String, String[]> querymap = request.getParameterMap();
-        
-        ArrayList queryParams = new ArrayList();
-        for (Object key : querymap.keySet()) {
-            JsonFormParameter jfp = new JsonFormParameter();
-            jfp.setName((String) key);
-            String[] values = querymap.get(key);
-            jfp.setValue(values[0]);
-            queryParams.add(jfp);
-        }
-
-        return makeResponse(name, queryParams);
-    }
-    
-    @PostMapping("/{name}")
-    String universalPost(@PathVariable("name") String name, String content, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        userSession = request.getSession();
-        this.request = request;
-        this.response = response;
-        Map<String, String[]> querymap = request.getParameterMap();
-        
-        ArrayList queryParams = new ArrayList();
-        for (Object key : querymap.keySet()) {
-            JsonFormParameter jfp = new JsonFormParameter();
-            jfp.setName((String) key);
-            String[] values = querymap.get(key);
-            jfp.setValue(values[0]);
-            queryParams.add(jfp);
-        }
-        
-        return makeResponse(name, queryParams);
-
-        //return makeResponse(name, queryParams);
-    }
-    
     
     @PostConstruct
     public void init() {
@@ -205,64 +158,46 @@ public class Clownfish {
         this.gzipswitch = new GzipSwitch();
     }
     
-    
-    /**
-     * Creates a new instance of GenericResource
-     */
     public Clownfish() {
     }
 
-    /**
-     * Retrieves representation of an instance of de.koenigneurath.freemarkertest.GenericResource
-     * @param name
-     * @param request
-     * @return an instance of java.lang.String
-     */
-    /*
-    @GET
-    @Compress
-    @Path("{name}")
-    @Produces(MediaType.TEXT_HTML)
-    public String getHtml(@PathParam("name") String name, @Context HttpServletRequest request) {
+    @GetMapping("/{name}")
+    String universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         userSession = request.getSession();
-        MultivaluedMap querymap = context.getQueryParameters();
+        this.request = request;
+        this.response = response;
+        Map<String, String[]> querymap = request.getParameterMap();
+        
         ArrayList queryParams = new ArrayList();
         for (Object key : querymap.keySet()) {
             JsonFormParameter jfp = new JsonFormParameter();
             jfp.setName((String) key);
-            List values = (List) querymap.get(key);
-            jfp.setValue((String) values.get(0));
+            String[] values = querymap.get(key);
+            jfp.setValue(values[0]);
             queryParams.add(jfp);
         }
-        return makeHTML(name, queryParams);
+
+        return makeResponse(name, queryParams);
     }
-    */
-    /**
-     * PUT method for updating or creating an instance of GenericResource
-     * @param content representation for the resource
-     */
-    /*
-    @PUT
-    @Consumes(MediaType.TEXT_HTML)
-    public void putHtml(String content) {
-    }
-    */
     
-    /*
-    @POST
-    @Compress
-    @Path("{name}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_HTML)
-    public String postHtml(@PathParam("name") String name, String content, @Context HttpServletRequest request) {
+    @PostMapping("/{name}")
+    String universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         userSession = request.getSession();
-        Gson gson = new Gson(); 
-        List<JsonFormParameter> map;
-        map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
+        this.request = request;
+        this.response = response;
+        Map<String, String[]> querymap = request.getParameterMap();
         
-        return makeHTML(name, map);
+        ArrayList queryParams = new ArrayList();
+        for (Object key : querymap.keySet()) {
+            JsonFormParameter jfp = new JsonFormParameter();
+            jfp.setName((String) key);
+            String[] values = querymap.get(key);
+            jfp.setValue(values[0]);
+            queryParams.add(jfp);
+        }
+        
+        return makeResponse(name, queryParams);
     }
-    */
     
     private String makeResponse(String name, List<JsonFormParameter> postmap) {
         try {
