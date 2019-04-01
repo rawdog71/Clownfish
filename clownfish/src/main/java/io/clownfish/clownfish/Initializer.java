@@ -19,6 +19,7 @@ public class Initializer implements ServletContextInitializer {
         servletContext.setInitParameter("primefaces.CLIENT_SIDE_VALIDATION", "true");
         servletContext.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
         servletContext.setInitParameter("primefaces.UPLOADER", "commons");
+        servletContext.setInitParameter("primefaces.FONT_AWESOME", "true");
     }
     
     @Bean

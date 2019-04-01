@@ -47,7 +47,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     }
 
     @Bean
-    public ServletRegistrationBean facesServletRegistraiton() {
+    public ServletRegistrationBean facesServletRegistratiton() {
         ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new FacesServlet(), new String[]{"*.xhtml"});
         servletRegistrationBean.setName("XHTML Faces Servlet");
         servletRegistrationBean.setLoadOnStartup(1);
