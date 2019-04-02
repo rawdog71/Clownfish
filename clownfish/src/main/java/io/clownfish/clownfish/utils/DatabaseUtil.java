@@ -457,6 +457,10 @@ public class DatabaseUtil {
                         tf = new TableField(columnName, "INT", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;    
+                    case "7":       // real
+                        tf = new TableField(columnName, "REAL", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tableFieldsList.add(tf);
+                        break;            
                     case "8":       // float
                         tf = new TableField(columnName, "FLOAT", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);

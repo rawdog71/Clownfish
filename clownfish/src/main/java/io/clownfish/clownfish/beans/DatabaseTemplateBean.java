@@ -114,6 +114,9 @@ public class DatabaseTemplateBean {
                     case 5:       // smallint
                         tableFieldsList.add(new TableField(columnName, "INT", false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
+                    case 7:       // real
+                        tableFieldsList.add(new TableField(columnName, "REAL", false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        break;            
                     case 8:       // float
                         tableFieldsList.add(new TableField(columnName, "FLOAT", false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
