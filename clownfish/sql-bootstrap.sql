@@ -262,6 +262,7 @@ CREATE TABLE IF NOT EXISTS `cf_site` (
   `locale` varchar(16) DEFAULT NULL,
   `aliaspath` varchar(255) DEFAULT NULL,
   `gzip` int(1) NOT NULL,
+  `title` varchar(255) DEFAULT NULL,  
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `alias` (`aliaspath`)
