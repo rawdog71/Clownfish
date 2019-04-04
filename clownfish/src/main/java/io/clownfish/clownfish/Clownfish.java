@@ -1,6 +1,8 @@
 package io.clownfish.clownfish;
 
 import KNSAPTools.SAPConnection;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import io.clownfish.clownfish.beans.DatabaseTemplateBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
@@ -55,6 +57,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
@@ -182,21 +185,21 @@ public class Clownfish {
     
     @PostMapping("/{name}")
     String universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        userSession = request.getSession();
-        this.request = request;
-        this.response = response;
-        Map<String, String[]> querymap = request.getParameterMap();
-        
-        ArrayList queryParams = new ArrayList();
-        for (Object key : querymap.keySet()) {
-            JsonFormParameter jfp = new JsonFormParameter();
-            jfp.setName((String) key);
-            String[] values = querymap.get(key);
-            jfp.setValue(values[0]);
-            queryParams.add(jfp);
+        try {
+            userSession = request.getSession();
+            this.request = request;
+            this.response = response;
+            String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+            
+            Gson gson = new Gson(); 
+            List<JsonFormParameter> map;
+            map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
+            
+            return makeResponse(name, map);
+        } catch (IOException ex) {
+            Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
         }
-        
-        return makeResponse(name, queryParams);
     }
     
     private String makeResponse(String name, List<JsonFormParameter> postmap) {
