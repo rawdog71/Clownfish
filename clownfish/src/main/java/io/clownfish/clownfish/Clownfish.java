@@ -166,25 +166,21 @@ public class Clownfish {
 
     @GetMapping("/{name}")
     String universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        if (name.compareToIgnoreCase("favicon") != 0) {
-            userSession = request.getSession();
-            this.request = request;
-            this.response = response;
-            Map<String, String[]> querymap = request.getParameterMap();
+        userSession = request.getSession();
+        this.request = request;
+        this.response = response;
+        Map<String, String[]> querymap = request.getParameterMap();
 
-            ArrayList queryParams = new ArrayList();
-            for (Object key : querymap.keySet()) {
-                JsonFormParameter jfp = new JsonFormParameter();
-                jfp.setName((String) key);
-                String[] values = querymap.get(key);
-                jfp.setValue(values[0]);
-                queryParams.add(jfp);
-            }
-
-            return makeResponse(name, queryParams);
-        } else {
-            return "";
+        ArrayList queryParams = new ArrayList();
+        for (Object key : querymap.keySet()) {
+            JsonFormParameter jfp = new JsonFormParameter();
+            jfp.setName((String) key);
+            String[] values = querymap.get(key);
+            jfp.setValue(values[0]);
+            queryParams.add(jfp);
         }
+
+        return makeResponse(name, queryParams);
     }
     
     @PostMapping("/{name}")
@@ -208,7 +204,6 @@ public class Clownfish {
     
     private String makeResponse(String name, List<JsonFormParameter> postmap) {
         try {
-            //name = name.substring(1);
             // Freemarker Template
             freemarker.template.Template fmTemplate = null;
             Map fmRoot = null;
@@ -217,7 +212,7 @@ public class Clownfish {
             org.apache.velocity.VelocityContext velContext = null;
             org.apache.velocity.Template velTemplate = null;
 
-            // Hole die Parameter Liste
+            // fetch parameter list
             Map parametermap = clownfishutil.getParametermap(postmap);
             if (parametermap.containsKey("modus")) {    // check mode for display (stageing or dev)
                 if (parametermap.get("modus").toString().compareToIgnoreCase("dev") == 0) {
@@ -225,7 +220,7 @@ public class Clownfish {
                 }
             }
             
-            // Hole die Seite über den Namen
+            // fetch site by name or aliasname
             CfSite cfsite = null;
             try {
                 cfsite = cfsiteService.findByName(name);
@@ -244,11 +239,11 @@ public class Clownfish {
             
             try {
                 CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
+                // fetch the dependend template 
                 if (0 == cftemplate.getScriptlanguage()) {  // Freemarker Template
                     fmRoot = new LinkedHashMap();
                     freemarkerTemplateloader.setModus(modus);
                     
-                    // Hole das zugehörige Template über den name
                     freemarkerCfg = new freemarker.template.Configuration();
                     freemarkerCfg.setDefaultEncoding("UTF-8");
                     freemarkerCfg.setTemplateLoader(freemarkerTemplateloader);
@@ -280,27 +275,27 @@ public class Clownfish {
                     velTemplate.initDocument();
                 }
                 
-                // Hole das Stylesheet, falls vorhanden
+                // fetch the dependend styleshett, if available
                 String cfstylesheet = "";
                 if (cfsite.getStylesheetref() != null) {
                     cfstylesheet = ((CfStylesheet) cfstylesheetService.findById(cfsite.getStylesheetref().longValue())).getContent();
                 }
 
-                // Hole das Javascript, falls vorhanden
+                // fetch the dependend javascript, if available
                 String cfjavascript = "";
                 if (cfsite.getJavascriptref()!= null) {
                     cfjavascript = ((CfJavascript) cfjavascriptService.findById(cfsite.getJavascriptref().longValue())).getContent();
                 }
                 
-                // Hole sämtlichen Content, der zu dieser Seite referenziert ist
+                // fetch the dependend content
                 List<CfSitecontent> sitecontentlist = new ArrayList<>();
                 sitecontentlist.addAll(cfsitecontentService.findBySiteref(cfsite.getId()));
                 Map sitecontentmap = siteutil.getSitecontentmap(sitecontentlist);
                 
-                // Hole sämtliche Listen, die zu dieser Seite referenziert sind
+                // fetch the dependend datalists, if available
                 siteutil.getSitelist_list(cfsite, sitecontentmap);
 
-                // Manage Parameters 
+                // manage parameters 
                 HashMap<String, DatatableProperties> datatableproperties = clownfishutil.getDatatableproperties(postmap);
                 EmailProperties emailproperties = clownfishutil.getEmailproperties(postmap);
                 HashMap<String, DatatableNewProperties> datatablenewproperties = clownfishutil.getDatatablenewproperties(postmap);
@@ -309,15 +304,14 @@ public class Clownfish {
                 manageSessionVariables(postmap);
                 writeSessionVariables(parametermap);
                 
-                // Hole die Datenquellen zu dieser Seite
+                // fetch the dependend datasources
                 List<CfSitedatasource> sitedatasourcelist = new ArrayList<>();
                 sitedatasourcelist.addAll(cfsitedatasourceService.findBySiteref(cfsite.getId()));
 
-                //DatabaseUtil databaseUtil = new DatabaseUtil();
                 HashMap<String, HashMap> dbexport = databaseUtil.getDbexport(sitedatasourcelist, datatableproperties, datatablenewproperties, datatabledeleteproperties, datatableupdateproperties);
                 sitecontentmap.put("db", dbexport);
 
-                // Hole die SAP RFCs zu dieser Seite
+                // fetch the dependend SAP remote function calls
                 if (sapSupport) {
                     List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                     sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
@@ -330,7 +324,7 @@ public class Clownfish {
                     sitecontentmap.put("sap", sapexport);
                 }
                 
-                // Send Email
+                // send a mail, if email properties are set
                 if (emailproperties != null) {
                     try {
                         sendRespondMail(emailproperties.getSendto(), emailproperties.getSubject(), emailproperties.getBody());
@@ -339,8 +333,9 @@ public class Clownfish {
                     }
                 }
 
+                // write the output
                 Writer out = new StringWriter();
-                if (0 == cftemplate.getScriptlanguage()) {  // Freemarker Template
+                if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
                     databasebean.init(sitedatasourcelist, sitecontentmap);
                     fmRoot.put("databaseBean", databasebean);
                     fmRoot.put("css", cfstylesheet);
@@ -350,7 +345,7 @@ public class Clownfish {
                     
                     freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
                     env.process();
-                } else {                                    // Velocity Template
+                } else {                                    // Velocity template
                     databasebean.init(sitedatasourcelist, sitecontentmap);
                     velContext.put("databaseBean", databasebean);
                     velContext.put("css", cfstylesheet);
@@ -404,7 +399,6 @@ public class Clownfish {
                 return "No template";
             }     
         } catch (IOException | freemarker.template.TemplateException | org.apache.velocity.runtime.parser.ParseException ex) {
-            //Logger.getLogger(GenericResource.class.getName()).log(Level.SEVERE, null, ex);
             return ex.getMessage();
         } 
     }
