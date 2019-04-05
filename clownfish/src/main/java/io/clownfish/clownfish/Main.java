@@ -1,5 +1,6 @@
 package io.clownfish.clownfish;
 
+import java.util.concurrent.TimeUnit;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import org.springframework.boot.SpringApplication;
@@ -12,8 +13,11 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  *
@@ -24,7 +28,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @ServletComponentScan
 @EnableWebMvc
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
-public class Main extends SpringBootServletInitializer implements ServletContextAware {
+public class Main extends SpringBootServletInitializer implements ServletContextAware, WebMvcConfigurer {
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
@@ -59,5 +63,17 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     @Override
     public void setServletContext(ServletContext servletContext) {
         servletContext.setInitParameter("com.sun.faces.forceLoadConfiguration", Boolean.TRUE.toString());
+    }
+    
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
+       // Register resource handler for CSS and JS
+       registry.addResourceHandler("/resources/**").addResourceLocations("/WEB-INF/resources/")
+             .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic());
+
+       // Register resource handler for images
+       registry.addResourceHandler("/images/**").addResourceLocations("/WEB-INF/images/")
+             .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic());
     }
 }

@@ -125,8 +125,8 @@ public class Clownfish {
     @PostConstruct
     public void init() {
         // Set default values
-        modus = STAGING;  // 1 = Staging mode (fetch sourcecode from commited repository) <= default
-                    // 0 = Development mode (fetch sourcecode from database)
+        modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
+                            // 0 = Development mode (fetch sourcecode from database)
         characterEncoding = "UTF-8";
         contentType = "text/html";
         locale = new Locale("de");
@@ -166,21 +166,25 @@ public class Clownfish {
 
     @GetMapping("/{name}")
     String universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        userSession = request.getSession();
-        this.request = request;
-        this.response = response;
-        Map<String, String[]> querymap = request.getParameterMap();
-        
-        ArrayList queryParams = new ArrayList();
-        for (Object key : querymap.keySet()) {
-            JsonFormParameter jfp = new JsonFormParameter();
-            jfp.setName((String) key);
-            String[] values = querymap.get(key);
-            jfp.setValue(values[0]);
-            queryParams.add(jfp);
-        }
+        if (name.compareToIgnoreCase("favicon") != 0) {
+            userSession = request.getSession();
+            this.request = request;
+            this.response = response;
+            Map<String, String[]> querymap = request.getParameterMap();
 
-        return makeResponse(name, queryParams);
+            ArrayList queryParams = new ArrayList();
+            for (Object key : querymap.keySet()) {
+                JsonFormParameter jfp = new JsonFormParameter();
+                jfp.setName((String) key);
+                String[] values = querymap.get(key);
+                jfp.setValue(values[0]);
+                queryParams.add(jfp);
+            }
+
+            return makeResponse(name, queryParams);
+        } else {
+            return "";
+        }
     }
     
     @PostMapping("/{name}")
