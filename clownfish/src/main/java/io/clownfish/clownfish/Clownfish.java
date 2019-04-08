@@ -44,7 +44,6 @@ import io.clownfish.clownfish.utils.DatabaseUtil;
 import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.SiteUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -74,11 +73,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import javax.ws.rs.core.Response;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 
 /**
  *
@@ -199,7 +193,7 @@ public class Clownfish {
     }
     
     @PostMapping("/{name}")
-    String universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+    void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
             userSession = request.getSession();
             this.request = request;
@@ -210,10 +204,14 @@ public class Clownfish {
             List<JsonFormParameter> map;
             map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
             
-            return makeResponse(name, map);
+            String out = makeResponse(name, map);
+            response.setContentType(this.response.getContentType());
+            response.setCharacterEncoding(this.response.getCharacterEncoding());
+            PrintWriter outwriter = response.getWriter();
+            outwriter.println(out);
+            
         } catch (IOException ex) {
             Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
         }
     }
     
