@@ -44,7 +44,9 @@ import io.clownfish.clownfish.utils.DatabaseUtil;
 import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.SiteUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -72,6 +74,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import javax.ws.rs.core.Response;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 /**
  *
@@ -164,23 +171,31 @@ public class Clownfish {
     public Clownfish() {
     }
 
-    @GetMapping("/{name}")
-    String universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        userSession = request.getSession();
-        this.request = request;
-        this.response = response;
-        Map<String, String[]> querymap = request.getParameterMap();
-
-        ArrayList queryParams = new ArrayList();
-        for (Object key : querymap.keySet()) {
-            JsonFormParameter jfp = new JsonFormParameter();
-            jfp.setName((String) key);
-            String[] values = querymap.get(key);
-            jfp.setValue(values[0]);
-            queryParams.add(jfp);
+    @GetMapping(path = "/{name}")
+    void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        try {
+            userSession = request.getSession();
+            this.request = request;
+            this.response = response;
+            Map<String, String[]> querymap = request.getParameterMap();
+            
+            ArrayList queryParams = new ArrayList();
+            for (Object key : querymap.keySet()) {
+                JsonFormParameter jfp = new JsonFormParameter();
+                jfp.setName((String) key);
+                String[] values = querymap.get(key);
+                jfp.setValue(values[0]);
+                queryParams.add(jfp);
+            }
+            
+            String out = makeResponse(name, queryParams);
+            response.setContentType(this.response.getContentType());
+            response.setCharacterEncoding(this.response.getCharacterEncoding());
+            PrintWriter outwriter = response.getWriter();
+            outwriter.println(out);
+        } catch (IOException ex) {
+            Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        return makeResponse(name, queryParams);
     }
     
     @PostMapping("/{name}")
@@ -228,13 +243,13 @@ public class Clownfish {
                 cfsite = cfsiteService.findByAliaspath(name);
             }
             if ((cfsite.getContenttype() != null)) {
-                if (!cfsite.getContenttype().isEmpty()) response.setContentType(cfsite.getContenttype());
+                if (!cfsite.getContenttype().isEmpty()) this.response.setContentType(cfsite.getContenttype());
             }
             if ((cfsite.getCharacterencoding() != null)) {
-                if (!cfsite.getCharacterencoding().isEmpty()) response.setCharacterEncoding(cfsite.getCharacterencoding());
+                if (!cfsite.getCharacterencoding().isEmpty()) this.response.setCharacterEncoding(cfsite.getCharacterencoding());
             }
             if ((cfsite.getLocale() != null)) {
-                if (!cfsite.getLocale().isEmpty()) response.setLocale(new Locale(cfsite.getLocale()));
+                if (!cfsite.getLocale().isEmpty()) this.response.setLocale(new Locale(cfsite.getLocale()));
             }
             
             try {

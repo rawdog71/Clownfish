@@ -57,6 +57,7 @@ public class DatabaseUtil {
                 while(resultSetTables.next())
                 {
                     String tablename = resultSetTables.getString("TABLE_NAME");
+                    //System.out.println(tablename);
                     if (datatableproperties.get(tablename) != null) {
                         manageTableRead(con, dmd, tablename, datatableproperties, dbtables, dbvalues);
                     }
@@ -85,6 +86,17 @@ public class DatabaseUtil {
                         }
                     }
                 }
+                
+                resultSetTables = dmd.getTables(null, null, null, new String[]{"VIEW"});
+                while(resultSetTables.next())
+                {
+                    String tablename = resultSetTables.getString("TABLE_NAME");
+                    //System.out.println(tablename);
+                    if (datatableproperties.get(tablename) != null) {
+                        manageTableRead(con, dmd, tablename, datatableproperties, dbtables, dbvalues);
+                    }
+                }
+                
                 dbvalues.put("table", dbtables);
                 dbexport.put(cfdatasource.getDatabasename(), dbvalues);
             } catch (SQLException ex) {
