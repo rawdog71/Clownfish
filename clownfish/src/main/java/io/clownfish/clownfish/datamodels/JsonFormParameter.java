@@ -3,30 +3,17 @@
  */
 package io.clownfish.clownfish.datamodels;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  *
  * @author sulzbachr
  */
 public class JsonFormParameter {
-    private String name;
-    private String value;
+    private @Getter @Setter String name;
+    private @Getter @Setter String value;
 
     public JsonFormParameter() {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 }

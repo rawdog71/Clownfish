@@ -30,9 +30,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatabaseTemplateBean {
     @Autowired CfDatasourceService cfdatasourceService;
-    
-    private List<CfSitedatasource> sitedatasourcelist;
     private Map sitecontentmap;
+    private List<CfSitedatasource> sitedatasourcelist;
+    
     private HashMap<String, ArrayList> dbtables;
 
     public DatabaseTemplateBean() {
@@ -42,10 +42,9 @@ public class DatabaseTemplateBean {
     public void init(List<CfSitedatasource> sitedatasourcelist, Map sitecontentmap) {
         this.sitedatasourcelist = sitedatasourcelist;
         this.sitecontentmap = sitecontentmap;
-        
     }
     
-    public Map dbread(String catalog, String tablename, String sqlstatement) {
+    public Map dbread(String catalog, String tablename, String sqlstatement, String namespace) {
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
             try {
                 CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
@@ -73,7 +72,7 @@ public class DatabaseTemplateBean {
                     }
                     dbtables.put(tablename, tablevalues);
                 }
-                ((HashMap)((HashMap) sitecontentmap.get("db")).get(cfdatasource.getDatabasename())).put("table", dbtables);
+                ((HashMap)((HashMap) sitecontentmap.get("db")).get(cfdatasource.getDatabasename())).put(namespace, dbtables);
             } catch (SQLException ex) {
                 Logger.getLogger(DatabaseTemplateBean.class.getName()).log(Level.SEVERE, null, ex);
             }

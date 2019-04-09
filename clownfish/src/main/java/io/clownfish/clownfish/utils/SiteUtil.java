@@ -60,14 +60,14 @@ public class SiteUtil {
         }
     }
     
-    public Map getSitecontentmap(List<CfSitecontent> sitecontentlist) {
-        Map sitecontentmap = new LinkedHashMap();
+    public Map getSitecontentmapList(List<CfSitecontent> sitecontentlist) {
+        Map sitecontentmapdummy = new LinkedHashMap();
         for (CfSitecontent sitecontent : sitecontentlist) {
             CfClasscontent classcontent = cfclasscontentService.findById(sitecontent.getCfSitecontentPK().getClasscontentref());
             List<CfAttributcontent> attributcontentlist = new ArrayList<>();
             attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
-            sitecontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
+            sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
         }
-        return sitecontentmap;
+        return sitecontentmapdummy;
     }
 }

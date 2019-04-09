@@ -11,6 +11,7 @@ import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
+import io.clownfish.clownfish.datamodels.ClownfishResponse;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
@@ -65,9 +66,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,6 +84,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
+@Component
 public class Clownfish {
     @Autowired CfSiteService cfsiteService;
     @Autowired CfSitecontentService cfsitecontentService;
@@ -117,6 +122,8 @@ public class Clownfish {
     private String characterEncoding;
     private String contentType;
     private Locale locale;
+    private @Getter @Setter Map sitecontentmap;
+    private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
 
     @RequestMapping("/")
     String home() {
@@ -182,11 +189,19 @@ public class Clownfish {
                 queryParams.add(jfp);
             }
             
-            String out = makeResponse(name, queryParams);
-            response.setContentType(this.response.getContentType());
-            response.setCharacterEncoding(this.response.getCharacterEncoding());
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(out);
+            ClownfishResponse cfResponse = makeResponse(name, queryParams);
+            
+            if (cfResponse.getErrorcode() == 0) {
+                response.setContentType(this.response.getContentType());
+                response.setCharacterEncoding(this.response.getCharacterEncoding());
+                PrintWriter outwriter = response.getWriter();
+                outwriter.println(cfResponse.getOutput());
+            } else {
+                response.setContentType("text/html");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter outwriter = response.getWriter();
+                outwriter.println(cfResponse.getOutput());
+            }
         } catch (IOException ex) {
             Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -204,18 +219,25 @@ public class Clownfish {
             List<JsonFormParameter> map;
             map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
             
-            String out = makeResponse(name, map);
-            response.setContentType(this.response.getContentType());
-            response.setCharacterEncoding(this.response.getCharacterEncoding());
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(out);
-            
+            ClownfishResponse cfResponse = makeResponse(name, map);
+            if (cfResponse.getErrorcode() == 0) {
+                response.setContentType(this.response.getContentType());
+                response.setCharacterEncoding(this.response.getCharacterEncoding());
+                PrintWriter outwriter = response.getWriter();
+                outwriter.println(cfResponse.getOutput());
+            } else {
+                response.setContentType("text/html");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter outwriter = response.getWriter();
+                outwriter.println(cfResponse.getOutput());
+            }
         } catch (IOException ex) {
             Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    private String makeResponse(String name, List<JsonFormParameter> postmap) {
+    private ClownfishResponse makeResponse(String name, List<JsonFormParameter> postmap) {
+        ClownfishResponse cfresponse = new ClownfishResponse();
         try {
             // Freemarker Template
             freemarker.template.Template fmTemplate = null;
@@ -303,7 +325,7 @@ public class Clownfish {
                 // fetch the dependend content
                 List<CfSitecontent> sitecontentlist = new ArrayList<>();
                 sitecontentlist.addAll(cfsitecontentService.findBySiteref(cfsite.getId()));
-                Map sitecontentmap = siteutil.getSitecontentmap(sitecontentlist);
+                sitecontentmap = siteutil.getSitecontentmapList(sitecontentlist);
                 
                 // fetch the dependend datalists, if available
                 siteutil.getSitelist_list(cfsite, sitecontentmap);
@@ -318,7 +340,7 @@ public class Clownfish {
                 writeSessionVariables(parametermap);
                 
                 // fetch the dependend datasources
-                List<CfSitedatasource> sitedatasourcelist = new ArrayList<>();
+                sitedatasourcelist = new ArrayList<>();
                 sitedatasourcelist.addAll(cfsitedatasourceService.findBySiteref(cfsite.getId()));
 
                 HashMap<String, HashMap> dbexport = databaseUtil.getDbexport(sitedatasourcelist, datatableproperties, datatablenewproperties, datatabledeleteproperties, datatableupdateproperties);
@@ -404,15 +426,23 @@ public class Clownfish {
                     htmlcompressor.setPreserveLineBreaks(false);
                     htmlcompressor.setCompressCss(false);
 
-                    return htmlcompressor.compress(out.toString());
+                    cfresponse.setErrorcode(0);
+                    cfresponse.setOutput(htmlcompressor.compress(out.toString()));
+                    return cfresponse;
                 } else {
-                    return out.toString();
+                    cfresponse.setErrorcode(0);
+                    cfresponse.setOutput(out.toString());
+                    return cfresponse;
                 }
             } catch (NoResultException ex) {
-                return "No template";
+                cfresponse.setErrorcode(1);
+                cfresponse.setOutput("No template");
+                return cfresponse;
             }     
         } catch (IOException | freemarker.template.TemplateException | org.apache.velocity.runtime.parser.ParseException ex) {
-            return ex.getMessage();
+            cfresponse.setErrorcode(1);
+            cfresponse.setOutput(ex.getMessage());
+            return cfresponse;
         } 
     }
     
