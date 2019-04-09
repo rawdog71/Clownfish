@@ -385,6 +385,7 @@ public class Clownfish {
                     fmRoot.put("js", cfjavascript);
                     fmRoot.put("sitecontent", sitecontentmap); 
                     fmRoot.put("parameter", parametermap);
+                    fmRoot.put("property", propertymap);
                     
                     freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
                     env.process();
@@ -395,6 +396,7 @@ public class Clownfish {
                     velContext.put("js", cfjavascript);
                     velContext.put("sitecontent", sitecontentmap); 
                     velContext.put("parameter", parametermap);
+                    velContext.put("property", propertymap);
                     
                     velTemplate.merge(velContext, out);
                 }
