@@ -77,6 +77,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.HandlerMapping;
 
 /**
  *
@@ -172,9 +173,13 @@ public class Clownfish {
     public Clownfish() {
     }
 
-    @GetMapping(path = "/{name}")
-    void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+    @GetMapping(path = "/**")
+    void universalGet(@Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
+            String name = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+            if (name.startsWith("/")) {
+                name = name.substring(1);
+            }
             userSession = request.getSession();
             this.request = request;
             this.response = response;
@@ -190,7 +195,6 @@ public class Clownfish {
             }
             
             ClownfishResponse cfResponse = makeResponse(name, queryParams);
-            
             if (cfResponse.getErrorcode() == 0) {
                 response.setContentType(this.response.getContentType());
                 response.setCharacterEncoding(this.response.getCharacterEncoding());
@@ -207,9 +211,13 @@ public class Clownfish {
         }
     }
     
-    @PostMapping("/{name}")
-    void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+    @PostMapping("/**")
+    void universalPost(@Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
+            String name = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+            if (name.startsWith("/")) {
+                name = name.substring(1);
+            }
             userSession = request.getSession();
             this.request = request;
             this.response = response;
