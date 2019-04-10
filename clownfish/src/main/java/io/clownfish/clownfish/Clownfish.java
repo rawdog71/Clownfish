@@ -77,7 +77,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.HandlerMapping;
 
 /**
  *
@@ -120,9 +119,9 @@ public class Clownfish {
     private HttpSession userSession;
     private ClownfishConst.ViewModus modus = STAGING;
     private ClownfishUtil clownfishutil;
-    private String characterEncoding;
-    private String contentType;
-    private Locale locale;
+    private @Getter @Setter String characterEncoding;
+    private @Getter @Setter String contentType;
+    private @Getter @Setter Locale locale;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
 
@@ -173,13 +172,9 @@ public class Clownfish {
     public Clownfish() {
     }
 
-    @GetMapping(path = "/**")
-    void universalGet(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+    @GetMapping(path = "/{name}")
+    void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
-            String name = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-            if (name.startsWith("/")) {
-                name = name.substring(1);
-            }
             userSession = request.getSession();
             this.request = request;
             this.response = response;
@@ -211,13 +206,9 @@ public class Clownfish {
         }
     }
     
-    @PostMapping("/**")
-    void universalPost(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+    @PostMapping("/{name}")
+    void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
-            String name = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-            if (name.startsWith("/")) {
-                name = name.substring(1);
-            }
             userSession = request.getSession();
             this.request = request;
             this.response = response;
@@ -386,9 +377,12 @@ public class Clownfish {
                     fmRoot.put("sitecontent", sitecontentmap); 
                     fmRoot.put("parameter", parametermap);
                     fmRoot.put("property", propertymap);
-                    
-                    freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
-                    env.process();
+                    try {
+                        freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
+                        env.process();
+                    } catch (freemarker.template.TemplateException ex) {
+                        System.out.println(ex);
+                    }
                 } else {                                    // Velocity template
                     databasebean.init(sitedatasourcelist, sitecontentmap);
                     velContext.put("databaseBean", databasebean);
@@ -449,7 +443,7 @@ public class Clownfish {
                 cfresponse.setOutput("No template");
                 return cfresponse;
             }     
-        } catch (IOException | freemarker.template.TemplateException | org.apache.velocity.runtime.parser.ParseException ex) {
+        } catch (IOException | org.apache.velocity.runtime.parser.ParseException ex) {
             cfresponse.setErrorcode(1);
             cfresponse.setOutput(ex.getMessage());
             return cfresponse;

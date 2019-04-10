@@ -52,11 +52,10 @@ public class MailUtil {
         } else {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(mailto));
         }
-        //message.addRecipient(Message.RecipientType.BCC, new InternetAddress("rainer.sulzbach@koenig-neurath.de"));
         message.setSubject(subject);
         message.setContent(mailbody, encodingOptions);
 
-        if (mailto.compareToIgnoreCase("noreply@koenig-neurath.de") != 0) {
+        if (mailto.compareToIgnoreCase("noreply@clownfish.io") != 0) {
         // Send the message
             Transport.send( message );
         }

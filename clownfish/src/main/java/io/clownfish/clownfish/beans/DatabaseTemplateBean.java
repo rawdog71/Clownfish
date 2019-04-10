@@ -33,10 +33,7 @@ public class DatabaseTemplateBean {
     private Map sitecontentmap;
     private List<CfSitedatasource> sitedatasourcelist;
     
-    private HashMap<String, ArrayList> dbtables;
-
     public DatabaseTemplateBean() {
-        dbtables = new HashMap<>();
     }
     
     public void init(List<CfSitedatasource> sitedatasourcelist, Map sitecontentmap) {
@@ -45,6 +42,7 @@ public class DatabaseTemplateBean {
     }
     
     public Map dbread(String catalog, String tablename, String sqlstatement, String namespace) {
+        HashMap<String, ArrayList> dbtables = new HashMap<>();
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
             try {
                 CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
@@ -52,6 +50,7 @@ public class DatabaseTemplateBean {
                 JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
                 Connection con = jdbcutil.getConnection();
                 if (con.getCatalog().compareToIgnoreCase(catalog) == 0) {
+                    //System.out.println(sqlstatement);
                     Statement stmt = con.createStatement();
                     ResultSet result = stmt.executeQuery(sqlstatement);
                     ResultSetMetaData rmd = result.getMetaData();
@@ -79,7 +78,6 @@ public class DatabaseTemplateBean {
         }
         return sitecontentmap;
     }
-    
     
     private TableFieldStructure getTableFieldsList(ResultSetMetaData dmd) {
         try {
