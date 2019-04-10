@@ -123,7 +123,7 @@ public class SiteTreeBean implements Serializable {
                 sapSupport = true;
             }
             if (sapSupport) {
-                sapc = new SAPConnection(SAPCONNECTION, "Gemini4");
+                sapc = new SAPConnection(SAPCONNECTION, "Clownfish4");
                 rfcgrouplist = new RFC_GROUP_SEARCH(sapc).getRfcGroupList();
             }
         }
@@ -219,6 +219,10 @@ public class SiteTreeBean implements Serializable {
         }
     }
 
+    public void refresh() {
+        init();
+    }
+    
     public void onDragDrop(TreeDragDropEvent event) {
         TreeNode dragNode = event.getDragNode();
         TreeNode dropNode = event.getDropNode();

@@ -16,6 +16,7 @@
             <p:graphicImage value="images/clownfish-48.png" />
             <p:outputLabel value="Clownfish CMS " />
             
+            <p:commandButton id="refreshButton" actionListener="#{loginBean.refresh}" value="Refresh" type="button" icon="fa fa-sync" rendered="#{loginBean.login}" update=":form" />
             <p:commandButton id="userButton" value="User" type="button" icon="fa fa-home" rendered="#{loginBean.login}" />
             <p:menu overlay="true" trigger="userButton" my="left top" at="left bottom">
                 <p:menuitem value="Profil" update="msgs" icon="fa fa-user"/>

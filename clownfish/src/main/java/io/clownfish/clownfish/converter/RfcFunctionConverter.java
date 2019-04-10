@@ -35,7 +35,7 @@ public class RfcFunctionConverter implements Converter, Serializable {
     
     @PostConstruct
     public void init() {
-        //sapc = new SAPConnection(SAPCONNECTION, "Gemini2");
+        sapc = new SAPConnection(SAPCONNECTION, "Clownfish2");
     }
 
     public SiteTreeBean getSitetree() {

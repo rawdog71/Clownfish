@@ -30,7 +30,7 @@ public class RfcGroupConverter implements Converter, Serializable {
     
     @PostConstruct
     public void init() {
-        //sapc = new SAPConnection(SAPCONNECTION, "Gemini3");
+        sapc = new SAPConnection(SAPCONNECTION, "Clownfish3");
     }
     
     @Override
