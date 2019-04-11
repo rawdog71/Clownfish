@@ -1,5 +1,17 @@
 /*
- * Copyright Rainer Sulzbach
+ * Copyright 2019 sulzbachr.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.clownfish.clownfish.beans;
 
@@ -41,6 +53,10 @@ public class PropertyList {
     private @Getter @Setter String propertykey;
     private @Getter @Setter String propertyvalue;
 
+    public PropertyList() {
+        propertymap = new HashMap<>();
+    }
+    
     @PostConstruct
     public void init() {
         propertylist = cfpropertyService.findAll();
@@ -48,7 +64,7 @@ public class PropertyList {
     }
     
     public Map<String, String> fillPropertyMap() {
-        propertymap = new HashMap<>();
+        propertymap.clear();
         propertylist = cfpropertyService.findAll();
         for (CfProperty property : propertylist) {
             propertymap.put(property.getHashkey(), property.getValue());
@@ -70,7 +86,8 @@ public class PropertyList {
             newproperty.setValue(propertyvalue);
             cfpropertyService.create(newproperty);
 
-            propertylist = cfpropertyService.findAll();
+            //propertylist = cfpropertyService.findAll();
+            fillPropertyMap();
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
         }
@@ -82,7 +99,8 @@ public class PropertyList {
                 selectedProperty.setHashkey(propertykey);
                 selectedProperty.setValue(propertyvalue);
                 cfpropertyService.edit(selectedProperty);
-                propertylist = cfpropertyService.findAll();
+                //propertylist = cfpropertyService.findAll();
+                fillPropertyMap();
             }
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
@@ -92,7 +110,8 @@ public class PropertyList {
     public void onDeleteProperty(ActionEvent actionEvent) {
         if (null != selectedProperty) {
             cfpropertyService.delete(selectedProperty);
-            propertylist = cfpropertyService.findAll();
+            //propertylist = cfpropertyService.findAll();
+            fillPropertyMap();
         }
     }
     
