@@ -1,7 +1,7 @@
 /*
  * Copyright Rainer Sulzbach
  */
-package io.clownfish.clownfish.beans;
+package io.clownfish.clownfish.templatebeans;
 
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;

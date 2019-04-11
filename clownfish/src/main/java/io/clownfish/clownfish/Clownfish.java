@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import de.destrukt.sapconnection.SAPConnection;
-import io.clownfish.clownfish.beans.DatabaseTemplateBean;
+import io.clownfish.clownfish.templatebeans.DatabaseTemplateBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
 import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
@@ -40,6 +40,7 @@ import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
+import io.clownfish.clownfish.templatebeans.EmailTemplateBean;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.DatabaseUtil;
 import io.clownfish.clownfish.utils.MailUtil;
@@ -103,6 +104,7 @@ public class Clownfish {
     @Autowired DatabaseUtil databaseUtil;
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired DatabaseTemplateBean databasebean;
+    @Autowired EmailTemplateBean emailbean;
     
     @Context
     protected HttpServletResponse response;
@@ -115,7 +117,7 @@ public class Clownfish {
     private RPY_TABLE_READ rpytableread = null;
     private static SAPConnection sapc = null;
     private boolean sapSupport = false;
-    private Map<String, String> propertymap = null;
+    private @Getter @Setter Map<String, String> propertymap = null;
     private HttpSession userSession;
     private ClownfishConst.ViewModus modus = STAGING;
     private ClownfishUtil clownfishutil;
@@ -371,7 +373,9 @@ public class Clownfish {
                 Writer out = new StringWriter();
                 if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
                     databasebean.init(sitedatasourcelist, sitecontentmap);
+                    emailbean.init(propertymap);
                     fmRoot.put("databaseBean", databasebean);
+                    fmRoot.put("emailBean", emailbean);
                     fmRoot.put("css", cfstylesheet);
                     fmRoot.put("js", cfjavascript);
                     fmRoot.put("sitecontent", sitecontentmap); 
@@ -385,7 +389,9 @@ public class Clownfish {
                     }
                 } else {                                    // Velocity template
                     databasebean.init(sitedatasourcelist, sitecontentmap);
+                    emailbean.init(propertymap);
                     velContext.put("databaseBean", databasebean);
+                    velContext.put("emailBean", emailbean);
                     velContext.put("css", cfstylesheet);
                     velContext.put("js", cfjavascript);
                     velContext.put("sitecontent", sitecontentmap); 

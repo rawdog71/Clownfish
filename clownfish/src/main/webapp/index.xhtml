@@ -179,13 +179,13 @@
                                 </p:panelGrid>
                             </p:column>
                             <p:column colspan="12" style="vertical-align: top;" rendered="#{sitetree.sapSupport}">
-                                <p:dataTable id="saprfclist" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.knsitesaprfcPK}">
+                                <p:dataTable id="saprfclist" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.cfSitesaprfcPK}">
                                     <p:ajax event="rowSelect" listener="#{sitetree.onRfcSelect}" update=":form:tabview:siterfcgroup :form:tabview:siterfcfunction" />
                                     <p:column headerText="RFC GRUPPE">
-                                        <h:outputText value="#{rfclist.knsitesaprfcPK.rfcgroup}" />
+                                        <h:outputText value="#{rfclist.cfSitesaprfcPK.rfcgroup}" />
                                     </p:column>
                                     <p:column headerText="RFC FUNKTION">
-                                        <h:outputText value="#{rfclist.knsitesaprfcPK.rfcfunction}" />
+                                        <h:outputText value="#{rfclist.cfSitesaprfcPK.rfcfunction}" />
                                     </p:column>
                                 </p:dataTable>
                                 <p:selectOneMenu id="siterfcgroup" value="#{sitetree.selectedrfcgroup}" required="false" label="RFCGROUP" converter="#{rfcGroupConverterBean}">
