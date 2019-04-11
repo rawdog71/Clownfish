@@ -1,6 +1,6 @@
 package io.clownfish.clownfish.beans;
 
-import KNSAPTools.SAPConnection;
+import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfJavascript;
@@ -49,6 +49,7 @@ import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -219,7 +220,7 @@ public class SiteTreeBean implements Serializable {
         }
     }
 
-    public void refresh() {
+    public void onRefresh(ActionEvent actionEvent) {
         init();
     }
     
@@ -227,9 +228,38 @@ public class SiteTreeBean implements Serializable {
         TreeNode dragNode = event.getDragNode();
         TreeNode dropNode = event.getDropNode();
         int dropIndex = event.getDropIndex();
+        CfSite dragsite = (CfSite) dragNode.getData();
+        if (dropNode.getParent() != null) {
+            CfSite dropsite = (CfSite) dropNode.getData();
+            dragsite.setParentref(BigInteger.valueOf(dropsite.getId()));
+            cfsiteService.edit(dragsite);
+        } else {
+            dragsite.setParentref(BigInteger.ZERO);
+            cfsiteService.edit(dragsite);
+        }
         
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Dragged " + dragNode.getData(), "Dropped on " + dropNode.getData() + " at " + dropIndex);
         FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+    
+    public void onUnselect(NodeUnselectEvent event) {
+        selectedNode = event.getTreeNode();
+        selectedSite = null;
+        
+        selectedTemplate = null;
+        selectedStylesheet = null;
+        selectedJavascript = null;
+        siteName = "";
+        siteTitle = "";
+        aliaspath = "";
+        sitehtmlcompression = 0;
+        characterEncoding = "";
+        contentType = "";
+        locale = "";
+        selectedDatasources.clear();
+        selectedContentlist.clear();
+        selectedclasscontentlist.clear();
+        newButtonDisabled = false;
     }
     
     public void onSelect(NodeSelectEvent event) {

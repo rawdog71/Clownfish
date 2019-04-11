@@ -162,18 +162,6 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>SAPJCo</groupId>
-            <artifactId>SAPJCo</artifactId>
-            <version>3.8</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>KNSAPTools</groupId>
-            <artifactId>KNSAPTools</artifactId>
-            <version>1.0</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
         </dependency>
@@ -239,6 +227,11 @@
             <groupId>net.sourceforge.jtds</groupId>
             <artifactId>jtds</artifactId>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>de.destrukt</groupId>
+            <artifactId>SAPConnection</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>

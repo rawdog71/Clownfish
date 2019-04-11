@@ -3,9 +3,9 @@
  */
 package io.clownfish.clownfish.sap;
 
-import KNSAPTools.SAPConnection;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoTable;
+import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.sap.models.RfcGroup;
 import java.util.ArrayList;
 import java.util.List;

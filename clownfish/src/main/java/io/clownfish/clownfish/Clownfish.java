@@ -1,9 +1,9 @@
 package io.clownfish.clownfish;
 
-import KNSAPTools.SAPConnection;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
+import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.DatabaseTemplateBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;

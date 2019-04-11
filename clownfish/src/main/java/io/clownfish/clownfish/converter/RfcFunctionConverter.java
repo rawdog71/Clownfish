@@ -1,6 +1,6 @@
 package io.clownfish.clownfish.converter;
 
-import KNSAPTools.SAPConnection;
+import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.SiteTreeBean;
 import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
 import io.clownfish.clownfish.sap.models.RfcFunction;

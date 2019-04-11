@@ -16,7 +16,6 @@
             <p:graphicImage value="images/clownfish-48.png" />
             <p:outputLabel value="Clownfish CMS " />
             
-            <p:commandButton id="refreshButton" actionListener="#{loginBean.refresh}" value="Refresh" type="button" icon="fa fa-sync" rendered="#{loginBean.login}" update=":form" />
             <p:commandButton id="userButton" value="User" type="button" icon="fa fa-home" rendered="#{loginBean.login}" />
             <p:menu overlay="true" trigger="userButton" my="left top" at="left bottom">
                 <p:menuitem value="Profil" update="msgs" icon="fa fa-user"/>
@@ -46,6 +45,7 @@
                                     <p:tree id="sitetree" value="#{sitetree.root}" var="node" dynamic="true" selectionMode="single" draggable="true" droppable="true">
                                         <p:ajax event="dragdrop" listener="#{sitetree.onDragDrop}" update=":form:msgs" />
                                         <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:templateview :form:tabview:cssview :form:tabview:sitepanel :form:tabview:jsview :form:tabview:sitelist :form:tabview:classcontentdroplist :form:tabview:newsite :form:tabview:saprfclist" />
+                                        <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:templateview :form:tabview:cssview :form:tabview:sitepanel :form:tabview:jsview :form:tabview:sitelist :form:tabview:classcontentdroplist :form:tabview:newsite :form:tabview:saprfclist" />
                                         <p:treeNode>
                                             <h:outputText value="#{node}" />
                                         </p:treeNode>
