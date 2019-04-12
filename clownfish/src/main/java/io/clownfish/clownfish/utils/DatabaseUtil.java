@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author rawdog
+ * @author sulzbachr
  */
 @Component
 public class DatabaseUtil {

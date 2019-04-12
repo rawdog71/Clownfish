@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 rawdog.
+ * Copyright 2019 sulzbachr.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  *
- * @author rawdog
+ * @author sulzbachr
  */
 public interface CfPropertyDAO {
     CfProperty findByHashkey(String hashkey);

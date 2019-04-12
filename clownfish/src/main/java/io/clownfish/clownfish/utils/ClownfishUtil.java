@@ -34,7 +34,7 @@ import java.util.Map;
 
 /**
  *
- * @author rawdog
+ * @author sulzbachr
  */
 public class ClownfishUtil {
     

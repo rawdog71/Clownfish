@@ -36,7 +36,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  *
- * @author rawdog71
+ * @author sulzbachr
  */
 @Configuration
 @ComponentScan("io.clownfish.*")

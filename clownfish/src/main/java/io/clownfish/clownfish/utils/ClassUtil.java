@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author rawdog
+ * @author sulzbachr
  */
 @ViewScoped
 @Component

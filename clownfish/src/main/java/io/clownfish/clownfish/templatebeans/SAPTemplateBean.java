@@ -15,33 +15,148 @@
  */
 package io.clownfish.clownfish.templatebeans;
 
+import com.sap.conn.jco.JCoException;
+import com.sap.conn.jco.JCoFunction;
+import com.sap.conn.jco.JCoTable;
+import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
+import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
+import io.clownfish.clownfish.sap.SAPDATATYPE;
+import io.clownfish.clownfish.sap.SAPUtility;
+import io.clownfish.clownfish.sap.models.RfcFunctionParam;
+import io.clownfish.clownfish.sap.models.RpyTableRead;
+import io.clownfish.clownfish.utils.ClownfishUtil;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.springframework.stereotype.Component;
 
 /**
  *
- * @author rawdog
+ * @author sulzbachr
  */
+@Component
 public class SAPTemplateBean {
     private List<CfSitesaprfc> sitesaprfclist;
-    private HashMap<String, List> saprfcfunctionparamMap;
+    //private HashMap<String, List> saprfcfunctionparamMap;
     private List<JsonFormParameter> postmap;
     private RPY_TABLE_READ rpytableread;
     private Map sitecontentmap;
+    static SAPConnection sapc = null;
+    private ClownfishUtil clownfishUtil;
+    private RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
 
     public SAPTemplateBean() {
     }
     
-    public void init(Map sitecontentmap) {
+    public void init(ClownfishUtil clownfishUtil, Object sapc, List<CfSitesaprfc> sitesaprfclist, RPY_TABLE_READ rpytableread, List<JsonFormParameter> postmap, Map sitecontentmap) {
+        this.clownfishUtil = clownfishUtil;
+        this.sapc = (SAPConnection) sapc;
+        this.sitesaprfclist = sitesaprfclist;
+        //this.saprfcfunctionparamMap = saprfcfunctionparamMap;
+        this.rpytableread = rpytableread;
         this.sitecontentmap = sitecontentmap;
+        this.postmap = postmap;
+        rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapc);
     }
 
-    public Map execute(String catalog, String tablename, String sqlstatement, String namespace) {
+    public Map execute(String rfcFunction) {
+        JCoTable functions_table = null;
+        HashMap<String, HashMap> sapexport = new HashMap<>();
+        HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
+        List<RfcFunctionParam> rfcfunctionparamlist = new ArrayList<>();
+        rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction));
+        saprfcfunctionparamMap.put(rfcFunction, rfcfunctionparamlist);
+        
+        try {
+            HashMap<String, Object> sapvalues = new HashMap<>();
+            List<RfcFunctionParam> paramlist = saprfcfunctionparamMap.get(rfcFunction);
+
+            // Setze die Import Parameter des SAP RFC mit den Werten aus den POST Parametern
+            JCoFunction function = sapc.getDestination().getRepository().getFunction(rfcFunction);
+            for (RfcFunctionParam rfcfunctionparam : paramlist) {
+                if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
+                    if (null != postmap) {
+                        for (JsonFormParameter jfp : postmap) {
+                            if (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0) {
+                                function.getImportParameterList().setValue(rfcfunctionparam.getParameter(), jfp.getValue());
+                            }
+                        }
+                    }
+                }
+            }
+            // SAP RFC ausführen
+            function.execute(sapc.getDestination());
+
+            HashMap<String, ArrayList> saptables = new HashMap<>();
+            for (RfcFunctionParam rfcfunctionparam : paramlist) {    
+                String tablename = rfcfunctionparam.getTabname();
+                String paramname = rfcfunctionparam.getParameter();
+                if (rfcfunctionparam.getParamclass().compareToIgnoreCase("E") == 0) {
+                    sapvalues.put(rfcfunctionparam.getParameter(), function.getExportParameterList().getString(rfcfunctionparam.getParameter()));
+                }
+                if (rfcfunctionparam.getParamclass().compareToIgnoreCase("T") == 0) {
+                    ArrayList<HashMap> tablevalues = new ArrayList<>();
+                    functions_table = function.getTableParameterList().getTable(paramname);
+                    List<RpyTableRead> rpytablereadlist = rpytableread.getRpyTableReadList(tablename);
+                    for (int i = 0; i < functions_table.getNumRows(); i++) {
+                        HashMap<String, String> sapexportvalues = new HashMap<>();
+                        functions_table.setRow(i);
+                        for (RpyTableRead rpytablereadentry : rpytablereadlist) {
+                            if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CHAR) == 0) || 
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.NUMC) == 0) ||
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.UNIT) == 0)) {
+                                String value = functions_table.getString(rpytablereadentry.getFieldname());
+                                sapexportvalues.put(rpytablereadentry.getFieldname(), value);
+                                continue;
+                            }
+                            if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) || 
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.TIMS) == 0)) {
+                                Date value = functions_table.getDate(rpytablereadentry.getFieldname());
+                                String datum = "";
+                                if (null != value) {
+                                    if (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) {
+                                        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+                                        datum = sdf.format(value);
+                                    } else {
+                                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                                        datum = sdf.format(value);
+                                    }
+                                }
+                                sapexportvalues.put(rpytablereadentry.getFieldname(), datum);
+                                continue;
+                            }
+                            if (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.QUAN) == 0) {
+                                double value = functions_table.getDouble(rpytablereadentry.getFieldname());
+                                sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
+                                continue;
+                            }
+                            if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT1) == 0) || 
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT2) == 0) || 
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT4) == 0) || 
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT8) == 0)) {
+                                int value = functions_table.getInt(rpytablereadentry.getFieldname());
+                                sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
+                            }
+                        }
+                        tablevalues.add(sapexportvalues);
+                    }
+                    saptables.put(paramname, tablevalues);
+                }
+            }
+            sapvalues.put("table", saptables);
+            sapexport.put(rfcFunction, sapvalues);
+        } catch(JCoException ex) {
+            Logger.getLogger(SAPUtility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        sitecontentmap.put("sap", sapexport);
         return sitecontentmap;
     }
-    
 }

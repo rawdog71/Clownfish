@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 rawdog.
+ * Copyright 2019 sulzbachr.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author rawdog
+ * @author sulzbachr
  */
 @Repository
 public class CfJavascriptversionDAOImpl implements CfJavascriptversionDAO {

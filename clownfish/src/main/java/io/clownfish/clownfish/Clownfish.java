@@ -56,6 +56,7 @@ import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.templatebeans.EmailTemplateBean;
+import io.clownfish.clownfish.templatebeans.SAPTemplateBean;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.DatabaseUtil;
 import io.clownfish.clownfish.utils.MailUtil;
@@ -96,7 +97,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
- * @author rawdog71
+ * @author sulzbachr
  */
 @RestController
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
@@ -120,6 +121,7 @@ public class Clownfish {
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired DatabaseTemplateBean databasebean;
     @Autowired EmailTemplateBean emailbean;
+    @Autowired SAPTemplateBean sapbean;
     
     @Context
     protected HttpServletResponse response;
@@ -128,7 +130,7 @@ public class Clownfish {
     
     private GzipSwitch gzipswitch;
     private freemarker.template.Configuration freemarkerCfg;
-    private RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
+    //private RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
     private RPY_TABLE_READ rpytableread = null;
     private static SAPConnection sapc = null;
     private boolean sapSupport = false;
@@ -167,7 +169,7 @@ public class Clownfish {
             //Class<?> clazz = Class.forName("KNSAPTools.SAPConnection");
             //Object sapcinstance = clazz.newInstance();
             sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
-            rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapc);
+            //rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapc);
             rpytableread = new RPY_TABLE_READ(sapc);
         }
         // Override default values with system properties
@@ -366,13 +368,17 @@ public class Clownfish {
                 if (sapSupport) {
                     List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                     sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
-                    HashMap<String, List> saprfcfunctionparamMap = clownfishutil.getSaprfcfunctionparamMap(sitesaprfclist, rfc_get_function_interface);
+                    //HashMap<String, List> saprfcfunctionparamMap = clownfishutil.getSaprfcfunctionparamMap(sitesaprfclist, rfc_get_function_interface);
                     
                     //Class<?> clazz = Class.forName("KNSAPTools.SAPConnection");
                     //Object sapcinstance = clazz.newInstance();
                     
+                    /*
                     HashMap<String, HashMap> sapexport = new SAPUtility(sapc).getSapExport(sitesaprfclist, saprfcfunctionparamMap, postmap, rpytableread);
                     sitecontentmap.put("sap", sapexport);
+                    */
+                    
+                    sapbean.init(clownfishutil, sapc, sitesaprfclist, rpytableread, postmap, sitecontentmap);
                 }
                 
                 // send a mail, if email properties are set
@@ -389,6 +395,7 @@ public class Clownfish {
                 if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
                     databasebean.init(sitedatasourcelist, sitecontentmap);
                     emailbean.init(propertymap);
+                    fmRoot.put("sapBean", sapbean);
                     fmRoot.put("databaseBean", databasebean);
                     fmRoot.put("emailBean", emailbean);
                     fmRoot.put("css", cfstylesheet);

@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  *
- * @author rawdog71
+ * @author sulzbachr
  */
 @Configuration
 public class Initializer implements ServletContextInitializer {

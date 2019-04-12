@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  *
- * @author rawdog
+ * @author sulzbachr
  */
 @Controller
 public class FaviconController {
