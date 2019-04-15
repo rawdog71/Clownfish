@@ -40,9 +40,7 @@ import io.clownfish.clownfish.jdbc.DatatableNewProperties;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
 import io.clownfish.clownfish.mail.EmailProperties;
-import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
-import io.clownfish.clownfish.sap.SAPUtility;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
@@ -143,7 +141,7 @@ public class Clownfish {
     private @Getter @Setter Locale locale;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
-
+    
     @RequestMapping("/")
     String home() {
         return "Welcome to Clownfish Content Management System";
