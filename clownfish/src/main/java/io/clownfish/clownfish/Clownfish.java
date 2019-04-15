@@ -364,23 +364,6 @@ public class Clownfish {
                 HashMap<String, HashMap> dbexport = databaseUtil.getDbexport(sitedatasourcelist, datatableproperties, datatablenewproperties, datatabledeleteproperties, datatableupdateproperties);
                 sitecontentmap.put("db", dbexport);
 
-                // fetch the dependend SAP remote function calls
-                if (sapSupport) {
-                    List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
-                    sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
-                    //HashMap<String, List> saprfcfunctionparamMap = clownfishutil.getSaprfcfunctionparamMap(sitesaprfclist, rfc_get_function_interface);
-                    
-                    //Class<?> clazz = Class.forName("KNSAPTools.SAPConnection");
-                    //Object sapcinstance = clazz.newInstance();
-                    
-                    /*
-                    HashMap<String, HashMap> sapexport = new SAPUtility(sapc).getSapExport(sitesaprfclist, saprfcfunctionparamMap, postmap, rpytableread);
-                    sitecontentmap.put("sap", sapexport);
-                    */
-                    
-                    sapbean.init(clownfishutil, sapc, sitesaprfclist, rpytableread, postmap, sitecontentmap);
-                }
-                
                 // send a mail, if email properties are set
                 if (emailproperties != null) {
                     try {
@@ -393,14 +376,20 @@ public class Clownfish {
                 // write the output
                 Writer out = new StringWriter();
                 if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
-                    databasebean.init(sitedatasourcelist, sitecontentmap);
                     emailbean.init(propertymap);
-                    fmRoot.put("sapBean", sapbean);
-                    fmRoot.put("databaseBean", databasebean);
                     fmRoot.put("emailBean", emailbean);
                     fmRoot.put("css", cfstylesheet);
                     fmRoot.put("js", cfjavascript);
-                    fmRoot.put("sitecontent", sitecontentmap); 
+                    fmRoot.put("sitecontent", sitecontentmap);
+                    if (sapSupport) {
+                        List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
+                        sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                        sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
+                    }
+                    fmRoot.put("sapBean", sapbean);
+                    databasebean.init(sitedatasourcelist);
+                    fmRoot.put("databaseBean", databasebean);
+                    
                     fmRoot.put("parameter", parametermap);
                     fmRoot.put("property", propertymap);
                     try {
@@ -410,13 +399,20 @@ public class Clownfish {
                         System.out.println(ex);
                     }
                 } else {                                    // Velocity template
-                    databasebean.init(sitedatasourcelist, sitecontentmap);
                     emailbean.init(propertymap);
-                    velContext.put("databaseBean", databasebean);
                     velContext.put("emailBean", emailbean);
                     velContext.put("css", cfstylesheet);
                     velContext.put("js", cfjavascript);
                     velContext.put("sitecontent", sitecontentmap); 
+                    if (sapSupport) {
+                        List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
+                        sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                        sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
+                    }
+                    velContext.put("sapBean", sapbean);
+                    databasebean.init(sitedatasourcelist);
+                    velContext.put("databaseBean", databasebean);
+                    
                     velContext.put("parameter", parametermap);
                     velContext.put("property", propertymap);
                     

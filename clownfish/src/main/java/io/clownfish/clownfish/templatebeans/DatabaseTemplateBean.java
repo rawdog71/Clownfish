@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,18 +44,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatabaseTemplateBean {
     @Autowired CfDatasourceService cfdatasourceService;
-    private Map sitecontentmap;
+    private @Getter @Setter Map contentmap;
     private List<CfSitedatasource> sitedatasourcelist;
     
     public DatabaseTemplateBean() {
+        contentmap = new HashMap<>();
     }
     
-    public void init(List<CfSitedatasource> sitedatasourcelist, Map sitecontentmap) {
+    public void init(List<CfSitedatasource> sitedatasourcelist) {
         this.sitedatasourcelist = sitedatasourcelist;
-        this.sitecontentmap = sitecontentmap;
     }
     
-    public Map dbread(String catalog, String tablename, String sqlstatement, String namespace) {
+    public Map dbread(String catalog, String tablename, String sqlstatement) {
         HashMap<String, ArrayList> dbtables = new HashMap<>();
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
             try {
@@ -83,12 +85,13 @@ public class DatabaseTemplateBean {
                     }
                     dbtables.put(tablename, tablevalues);
                 }
-                ((HashMap)((HashMap) sitecontentmap.get("db")).get(cfdatasource.getDatabasename())).put(namespace, dbtables);
+                //((HashMap)((HashMap) sitecontentmap.get("db")).get(cfdatasource.getDatabasename())).put(namespace, dbtables);
+                contentmap.put("db", dbtables);
             } catch (SQLException ex) {
                 Logger.getLogger(DatabaseTemplateBean.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return sitecontentmap;
+        return contentmap;
     }
     
     private TableFieldStructure getTableFieldsList(ResultSetMetaData dmd) {

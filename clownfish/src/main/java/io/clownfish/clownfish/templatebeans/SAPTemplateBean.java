@@ -27,7 +27,6 @@ import io.clownfish.clownfish.sap.SAPDATATYPE;
 import io.clownfish.clownfish.sap.SAPUtility;
 import io.clownfish.clownfish.sap.models.RfcFunctionParam;
 import io.clownfish.clownfish.sap.models.RpyTableRead;
-import io.clownfish.clownfish.utils.ClownfishUtil;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,27 +45,22 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SAPTemplateBean {
-    private List<CfSitesaprfc> sitesaprfclist;
-    //private HashMap<String, List> saprfcfunctionparamMap;
     private List<JsonFormParameter> postmap;
     private RPY_TABLE_READ rpytableread;
-    private Map sitecontentmap;
+    private @Getter @Setter Map contentmap;
     static SAPConnection sapc = null;
-    private ClownfishUtil clownfishUtil;
     private RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
 
     public SAPTemplateBean() {
+        contentmap = new HashMap<>();
     }
     
-    public void init(ClownfishUtil clownfishUtil, Object sapc, List<CfSitesaprfc> sitesaprfclist, RPY_TABLE_READ rpytableread, List<JsonFormParameter> postmap, Map sitecontentmap) {
-        this.clownfishUtil = clownfishUtil;
+    public void init(Object sapc, List<CfSitesaprfc> sitesaprfclist, RPY_TABLE_READ rpytableread, List<JsonFormParameter> postmap) {
         this.sapc = (SAPConnection) sapc;
-        this.sitesaprfclist = sitesaprfclist;
-        //this.saprfcfunctionparamMap = saprfcfunctionparamMap;
         this.rpytableread = rpytableread;
-        this.sitecontentmap = sitecontentmap;
         this.postmap = postmap;
         rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapc);
+        contentmap.clear();
     }
 
     public Map execute(String rfcFunction) {
@@ -156,7 +152,7 @@ public class SAPTemplateBean {
         } catch(JCoException ex) {
             Logger.getLogger(SAPUtility.class.getName()).log(Level.SEVERE, null, ex);
         }
-        sitecontentmap.put("sap", sapexport);
-        return sitecontentmap;
+        contentmap.put("sap", sapexport);
+        return contentmap;
     }
 }
