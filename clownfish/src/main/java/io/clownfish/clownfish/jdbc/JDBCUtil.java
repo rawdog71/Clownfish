@@ -43,7 +43,7 @@ public class JDBCUtil {
         try {
             Class.forName(className);
         } catch (ClassNotFoundException ex) {
-            System.out.println("Unable to load the class. Terminating the program");
+            System.out.println("Unable to load the class: " + className);
             return null;
         }
         //get the connection

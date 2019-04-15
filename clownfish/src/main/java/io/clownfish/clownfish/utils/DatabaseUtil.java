@@ -59,62 +59,65 @@ public class DatabaseUtil {
 
             JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
             Connection con = jdbcutil.getConnection();
-            try {
-                DatabaseMetaData dmd = con.getMetaData();
+            if (null != con) {
+                try {
+                    DatabaseMetaData dmd = con.getMetaData();
 
-                ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
+                    ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
 
-                HashMap<String, ArrayList> dbtables = new HashMap<>();
-                HashMap<String, Object> dbvalues = new HashMap<>();
-                while(resultSetTables.next())
-                {
-                    String tablename = resultSetTables.getString("TABLE_NAME");
-                    //System.out.println(tablename);
-                    if (datatableproperties.get(tablename) != null) {
-                        manageTableRead(con, dmd, tablename, datatableproperties, dbtables, dbvalues);
-                    }
-                    if (datatablenewproperties.get(tablename) != null) {
-                        boolean ok = manageTableInsert(con, dmd, tablename, datatablenewproperties, dbtables, dbvalues);
-                        if (ok) {
-                            dbvalues.put("INSERT", "true");
-                        } else {
-                            dbvalues.put("INSERT", "false");
+                    HashMap<String, ArrayList> dbtables = new HashMap<>();
+                    HashMap<String, Object> dbvalues = new HashMap<>();
+                    while(resultSetTables.next())
+                    {
+                        String tablename = resultSetTables.getString("TABLE_NAME");
+                        //System.out.println(tablename);
+                        if (datatableproperties.get(tablename) != null) {
+                            manageTableRead(con, dmd, tablename, datatableproperties, dbtables, dbvalues);
+                        }
+                        if (datatablenewproperties.get(tablename) != null) {
+                            boolean ok = manageTableInsert(con, dmd, tablename, datatablenewproperties, dbtables, dbvalues);
+                            if (ok) {
+                                dbvalues.put("INSERT", "true");
+                            } else {
+                                dbvalues.put("INSERT", "false");
+                            }
+                        }
+                        if (datatabledeleteproperties.get(tablename) != null) {
+                            boolean ok = manageTableDelete(con, dmd, tablename, datatabledeleteproperties, dbtables, dbvalues);
+                            if (ok) {
+                                dbvalues.put("DELETE", "true");
+                            } else {
+                                dbvalues.put("DELETE", "false");
+                            }
+                        }
+                        if (datatableupdateproperties.get(tablename) != null) {
+                            boolean ok = manageTableUpdate(con, dmd, tablename, datatableupdateproperties, dbtables, dbvalues);
+                            if (ok) {
+                                dbvalues.put("UPDATE", "true");
+                            } else {
+                                dbvalues.put("UPDATE", "false");
+                            }
                         }
                     }
-                    if (datatabledeleteproperties.get(tablename) != null) {
-                        boolean ok = manageTableDelete(con, dmd, tablename, datatabledeleteproperties, dbtables, dbvalues);
-                        if (ok) {
-                            dbvalues.put("DELETE", "true");
-                        } else {
-                            dbvalues.put("DELETE", "false");
+
+                    resultSetTables = dmd.getTables(null, null, null, new String[]{"VIEW"});
+                    while(resultSetTables.next())
+                    {
+                        String tablename = resultSetTables.getString("TABLE_NAME");
+                        //System.out.println(tablename);
+                        if (datatableproperties.get(tablename) != null) {
+                            manageTableRead(con, dmd, tablename, datatableproperties, dbtables, dbvalues);
                         }
                     }
-                    if (datatableupdateproperties.get(tablename) != null) {
-                        boolean ok = manageTableUpdate(con, dmd, tablename, datatableupdateproperties, dbtables, dbvalues);
-                        if (ok) {
-                            dbvalues.put("UPDATE", "true");
-                        } else {
-                            dbvalues.put("UPDATE", "false");
-                        }
-                    }
+
+                    dbvalues.put("table", dbtables);
+                    dbexport.put(cfdatasource.getDatabasename(), dbvalues);
+                } catch (SQLException ex) {
+                    Logger.getLogger(DatabaseUtil.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-                resultSetTables = dmd.getTables(null, null, null, new String[]{"VIEW"});
-                while(resultSetTables.next())
-                {
-                    String tablename = resultSetTables.getString("TABLE_NAME");
-                    //System.out.println(tablename);
-                    if (datatableproperties.get(tablename) != null) {
-                        manageTableRead(con, dmd, tablename, datatableproperties, dbtables, dbvalues);
-                    }
-                }
-                
-                dbvalues.put("table", dbtables);
-                dbexport.put(cfdatasource.getDatabasename(), dbvalues);
-            } catch (SQLException ex) {
-                Logger.getLogger(DatabaseUtil.class.getName()).log(Level.SEVERE, null, ex);
+            } else {
+                return null;
             }
-            
         }
         return dbexport;
     }
