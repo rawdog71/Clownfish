@@ -56,6 +56,9 @@ public class DatabaseTemplateBean {
     }
     
     public Map dbread(String catalog, String tablename, String sqlstatement) {
+        System.out.println("DBREAD->catalog: " + catalog);
+        System.out.println("DBREAD->tablename: " + tablename);
+        System.out.println("DBREAD->sqlstatement: " + sqlstatement);
         HashMap<String, ArrayList> dbtables = new HashMap<>();
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
             try {
@@ -91,6 +94,7 @@ public class DatabaseTemplateBean {
                 Logger.getLogger(DatabaseTemplateBean.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        System.out.println(contentmap);
         return contentmap;
     }
     
