@@ -56,9 +56,9 @@ public class DatabaseTemplateBean {
     }
     
     public Map dbread(String catalog, String tablename, String sqlstatement) {
-        System.out.println("DBREAD->catalog: " + catalog);
-        System.out.println("DBREAD->tablename: " + tablename);
-        System.out.println("DBREAD->sqlstatement: " + sqlstatement);
+        //System.out.println("DBREAD->catalog: " + catalog);
+        //System.out.println("DBREAD->tablename: " + tablename);
+        //System.out.println("DBREAD->sqlstatement: " + sqlstatement);
         HashMap<String, ArrayList> dbtables = new HashMap<>();
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
             try {
@@ -66,35 +66,36 @@ public class DatabaseTemplateBean {
                 
                 JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
                 Connection con = jdbcutil.getConnection();
-                if (con.getCatalog().compareToIgnoreCase(catalog) == 0) {
-                    //System.out.println(sqlstatement);
-                    Statement stmt = con.createStatement();
-                    ResultSet result = stmt.executeQuery(sqlstatement);
-                    ResultSetMetaData rmd = result.getMetaData();
-                    TableFieldStructure tfs = getTableFieldsList(rmd);
-                    
-                    ArrayList<HashMap> tablevalues = new ArrayList<>();
-                    while (result.next()) {
-                        HashMap<String, String> dbexportvalues = new HashMap<>();
-                        for (TableField tf : tfs.getTableFieldsList()) {
-                            try {
-                                String value = result.getString(tf.getName());
-                                dbexportvalues.put(tf.getName(), value);
-                            } catch (java.sql.SQLException ex) {
+                if (null != con) {
+                    if (con.getCatalog().compareToIgnoreCase(catalog) == 0) {
+                        Statement stmt = con.createStatement();
+                        ResultSet result = stmt.executeQuery(sqlstatement);
+                        ResultSetMetaData rmd = result.getMetaData();
+                        TableFieldStructure tfs = getTableFieldsList(rmd);
 
+                        ArrayList<HashMap> tablevalues = new ArrayList<>();
+                        while (result.next()) {
+                            HashMap<String, String> dbexportvalues = new HashMap<>();
+                            for (TableField tf : tfs.getTableFieldsList()) {
+                                try {
+                                    String value = result.getString(tf.getName());
+                                    dbexportvalues.put(tf.getName(), value);
+                                } catch (java.sql.SQLException ex) {
+
+                                }
                             }
+                            tablevalues.add(dbexportvalues);
                         }
-                        tablevalues.add(dbexportvalues);
+                        dbtables.put(tablename, tablevalues);
                     }
-                    dbtables.put(tablename, tablevalues);
+                    contentmap.put("db", dbtables);
+                } else {
+                    Logger.getLogger(DatabaseTemplateBean.class.getName()).log(Level.SEVERE, null, "Connection to database not established");
                 }
-                //((HashMap)((HashMap) sitecontentmap.get("db")).get(cfdatasource.getDatabasename())).put(namespace, dbtables);
-                contentmap.put("db", dbtables);
             } catch (SQLException ex) {
                 Logger.getLogger(DatabaseTemplateBean.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        System.out.println(contentmap);
         return contentmap;
     }
     
