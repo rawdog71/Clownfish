@@ -1,0 +1,115 @@
+
+**** Error file opened at 20190417 194829 Central European Summer Time Rel 3.0.8 (2011-11-28) [720.114]
+Error:  >Wed Apr 17 19:48:29,237<    RfcException: [null]
+    message: Connect to SAP gateway failed
+Connection parameters: TYPE=A DEST=Clownfish4 ASHOST=xkncidb SYSNR=00 PCS=1
+
+LOCATION    CPIC (TCP/IP) on local host with Unicode
+ERROR       hostname 'xkncidb' unknown
+TIME        Wed Apr 17 19:48:29 2019
+RELEASE     720
+COMPONENT   NI (network interface)
+VERSION     40
+RC          -2
+MODULE      ninti.c
+LINE        895
+DETAIL      NiPGetHostByName: 'xkncidb' not found
+SYSTEM CALL getaddrinfo
+COUNTER     2
+
+    Return code: RFC_FAILURE(1)
+    error group: 102
+    key: RFC_ERROR_COMMUNICATION
+
+
+**** Error file opened at 20190417 234106 Central European Summer Time Rel 3.0.8 (2011-11-28) [720.114]
+Error:  >Wed Apr 17 23:41:06,429<    RfcException: [null]
+    message: Connect to SAP gateway failed
+Connection parameters: TYPE=A DEST=Clownfish4 ASHOST=xkncidb SYSNR=00 PCS=1
+
+LOCATION    CPIC (TCP/IP) on local host with Unicode
+ERROR       hostname 'xkncidb' unknown
+TIME        Wed Apr 17 23:41:06 2019
+RELEASE     720
+COMPONENT   NI (network interface)
+VERSION     40
+RC          -2
+MODULE      ninti.c
+LINE        895
+DETAIL      NiPGetHostByName: 'xkncidb' not found
+SYSTEM CALL getaddrinfo
+COUNTER     2
+
+    Return code: RFC_FAILURE(1)
+    error group: 102
+    key: RFC_ERROR_COMMUNICATION
+
+
+**** Error file opened at 20190417 234314 Central European Summer Time Rel 3.0.8 (2011-11-28) [720.114]
+Error:  >Wed Apr 17 23:43:14,449<    RfcException: [null]
+    message: Connect to SAP gateway failed
+Connection parameters: TYPE=A DEST=Clownfish4 ASHOST=xkncidb SYSNR=00 PCS=1
+
+LOCATION    CPIC (TCP/IP) on local host with Unicode
+ERROR       hostname 'xkncidb' unknown
+TIME        Wed Apr 17 23:43:14 2019
+RELEASE     720
+COMPONENT   NI (network interface)
+VERSION     40
+RC          -2
+MODULE      ninti.c
+LINE        895
+DETAIL      NiPGetHostByName: 'xkncidb' not found
+SYSTEM CALL getaddrinfo
+COUNTER     2
+
+    Return code: RFC_FAILURE(1)
+    error group: 102
+    key: RFC_ERROR_COMMUNICATION
+
+
+**** Error file opened at 20190418 175050 Central European Summer Time Rel 3.0.8 (2011-11-28) [720.114]
+Error:  >Thu Apr 18 17:50:50,218<    RfcException: [null]
+    message: Connect to SAP gateway failed
+Connection parameters: TYPE=A DEST=Clownfish4 ASHOST=xkncidb SYSNR=00 PCS=1
+
+LOCATION    CPIC (TCP/IP) on local host with Unicode
+ERROR       hostname 'xkncidb' unknown
+TIME        Thu Apr 18 17:50:50 2019
+RELEASE     720
+COMPONENT   NI (network interface)
+VERSION     40
+RC          -2
+MODULE      ninti.c
+LINE        895
+DETAIL      NiPGetHostByName: 'xkncidb' not found
+SYSTEM CALL getaddrinfo
+COUNTER     2
+
+    Return code: RFC_FAILURE(1)
+    error group: 102
+    key: RFC_ERROR_COMMUNICATION
+
+
+**** Error file opened at 20190418 175923 Central European Summer Time Rel 3.0.8 (2011-11-28) [720.114]
+Error:  >Thu Apr 18 17:59:23,931<    RfcException: [null]
+    message: Connect to SAP gateway failed
+Connection parameters: TYPE=A DEST=Clownfish4 ASHOST=xkncidb SYSNR=00 PCS=1
+
+LOCATION    CPIC (TCP/IP) on local host with Unicode
+ERROR       hostname 'xkncidb' unknown
+TIME        Thu Apr 18 17:59:23 2019
+RELEASE     720
+COMPONENT   NI (network interface)
+VERSION     40
+RC          -2
+MODULE      ninti.c
+LINE        895
+DETAIL      NiPGetHostByName: 'xkncidb' not found
+SYSTEM CALL getaddrinfo
+COUNTER     2
+
+    Return code: RFC_FAILURE(1)
+    error group: 102
+    key: RFC_ERROR_COMMUNICATION
+
