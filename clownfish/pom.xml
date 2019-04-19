@@ -97,11 +97,13 @@
             <version>6.1.1</version>
             <type>jar</type>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>all-themes</artifactId>
             <version>1.0.8</version>
         </dependency>
+        -->
         
         <!-- COMMONS -->
         <dependency>
