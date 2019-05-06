@@ -60,7 +60,7 @@ public class DatabaseTemplateBean {
         //System.out.println("DBREAD->tablename: " + tablename);
         //System.out.println("DBREAD->sqlstatement: " + sqlstatement);
         HashMap<String, ArrayList> dbtables = new HashMap<>();
-        for (CfSitedatasource sitedatasource : sitedatasourcelist) {
+        sitedatasourcelist.stream().forEach((sitedatasource) -> {
             try {
                 CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
                 
@@ -76,14 +76,14 @@ public class DatabaseTemplateBean {
                         ArrayList<HashMap> tablevalues = new ArrayList<>();
                         while (result.next()) {
                             HashMap<String, String> dbexportvalues = new HashMap<>();
-                            for (TableField tf : tfs.getTableFieldsList()) {
+                            tfs.getTableFieldsList().stream().forEach((tf) -> {
                                 try {
                                     String value = result.getString(tf.getName());
                                     dbexportvalues.put(tf.getName(), value);
                                 } catch (java.sql.SQLException ex) {
 
                                 }
-                            }
+                            });
                             tablevalues.add(dbexportvalues);
                         }
                         dbtables.put(tablename, tablevalues);
@@ -95,7 +95,7 @@ public class DatabaseTemplateBean {
             } catch (SQLException ex) {
                 Logger.getLogger(DatabaseTemplateBean.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        });
         return contentmap;
     }
     

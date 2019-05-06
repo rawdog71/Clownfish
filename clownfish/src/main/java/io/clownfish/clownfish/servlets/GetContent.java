@@ -1,5 +1,17 @@
 /*
- * Copyright Rainer Sulzbach
+ * Copyright 2019 sulzbachr.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.clownfish.clownfish.servlets;
 
@@ -86,20 +98,15 @@ public class GetContent extends HttpServlet {
             throws ServletException, IOException {
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
-        for (String paramname : parameters.keySet()) {
-            if (paramname.compareToIgnoreCase("class") == 0) {
-                String[] values = parameters.get(paramname);
-                klasse = values[0];
-            }
-        }
+        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("class") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+            klasse = values[0];
+        });
         searchmap = new HashMap<>();
-        for (String paramname : parameters.keySet()) {
-            if (paramname.startsWith("search$")) {
-                String[] keys = paramname.split("\\$");
-                String[] values = parameters.get(paramname);
-                searchmap.put(keys[1], values[0]);
-            }
-        }
+        parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("search$"))).forEach((paramname) -> {
+            String[] keys = paramname.split("\\$");
+            String[] values = parameters.get(paramname);
+            searchmap.put(keys[1], values[0]);
+        });
         
         //CfClass knclass = (Knclass) em.createNamedQuery("Knclass.findByName").setParameter("name", klasse).getSingleResult();
         CfClass cfclass = cfclassService.findByName(klasse);
@@ -219,14 +226,13 @@ public class GetContent extends HttpServlet {
     }
     
     private void contentooutput(HashMap<String, String> outputmap, List<CfAttributcontent> attributcontentList) {
-        for (CfAttributcontent attributcontent : attributcontentList) {
-            //CfAttribut knattribut = (Knattribut) em.createNamedQuery("Knattribut.findById").setParameter("id", attributcontent.getAttributref().getId()).getSingleResult();
+        attributcontentList.stream().forEach((attributcontent) -> {
             CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
             long attributtypeid = knattribut.getAttributetype().getId();
             AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
             if (attributdef.getType().compareToIgnoreCase("hashstring") != 0) {
                 outputmap.put(knattribut.getName(), attributdef.getValue());
             }
-        }
+        });
     }
 }

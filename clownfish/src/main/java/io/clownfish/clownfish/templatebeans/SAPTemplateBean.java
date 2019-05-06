@@ -80,11 +80,9 @@ public class SAPTemplateBean {
             for (RfcFunctionParam rfcfunctionparam : paramlist) {
                 if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
                     if (null != postmap) {
-                        for (JsonFormParameter jfp : postmap) {
-                            if (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0) {
-                                function.getImportParameterList().setValue(rfcfunctionparam.getParameter(), jfp.getValue());
-                            }
-                        }
+                        postmap.stream().filter((jfp) -> (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0)).forEach((jfp) -> {
+                            function.getImportParameterList().setValue(rfcfunctionparam.getParameter(), jfp.getValue());
+                        });
                     }
                 }
             }
