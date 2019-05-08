@@ -25,6 +25,7 @@ import lombok.Setter;
 public class TableField {
     private @Getter @Setter String name;
     private @Getter @Setter String type;
+    private @Getter @Setter String typename;
     private @Getter @Setter boolean primaryKey;
     private @Getter @Setter int size;
     private @Getter @Setter int decimaldigits;
@@ -33,9 +34,10 @@ public class TableField {
     public TableField() {
     }
 
-    public TableField(String name, String type, boolean primaryKey, int size, int decimaldigits, String nullable) {
+    public TableField(String name, String type, String typename, boolean primaryKey, int size, int decimaldigits, String nullable) {
         this.name = name;
         this.type = type;
+        this.typename = typename;
         this.primaryKey = primaryKey;
         this.size = size;
         this.decimaldigits = decimaldigits;

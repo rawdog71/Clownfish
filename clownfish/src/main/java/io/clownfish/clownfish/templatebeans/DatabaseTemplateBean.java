@@ -107,6 +107,7 @@ public class DatabaseTemplateBean {
             for (int i = 1; i <= columncount; i++) {
                 String columnName = dmd.getColumnName(i);
                 int colomuntype = dmd.getColumnType(i);
+                String colomuntypename = dmd.getColumnTypeName(i);
                 int columnsize = dmd.getColumnDisplaySize(i);
                 int decimaldigits = dmd.getPrecision(i);
                 /*
@@ -120,34 +121,37 @@ public class DatabaseTemplateBean {
 
                 switch (colomuntype) {
                     case 1:      // varchar -> String
-                        tableFieldsList.add(new TableField(columnName, "STRING", false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "STRING", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case 2:       // int
-                        tableFieldsList.add(new TableField(columnName, "INT", false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "INT", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case 4:       // int
-                        tableFieldsList.add(new TableField(columnName, "INT", false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "INT", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case 5:       // smallint
-                        tableFieldsList.add(new TableField(columnName, "INT", false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "INT", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case 7:       // real
-                        tableFieldsList.add(new TableField(columnName, "REAL", false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "REAL", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;            
                     case 8:       // float
-                        tableFieldsList.add(new TableField(columnName, "FLOAT", false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "FLOAT", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case 12:      // varchar -> String
-                        tableFieldsList.add(new TableField(columnName, "STRING", false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "STRING", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case -5:      // long
-                        tableFieldsList.add(new TableField(columnName, "LONG", false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "LONG", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
+                    case -7:      // bit
+                        tableFieldsList.add(new TableField(columnName, "BOOLEAN", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        break;    
                     case 2005:    // text -> String
-                        tableFieldsList.add(new TableField(columnName, "STRING", false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "STRING", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case 93:      // Date
-                        tableFieldsList.add(new TableField(columnName, "DATE", false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "DATE", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                 }
             }

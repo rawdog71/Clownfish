@@ -454,6 +454,7 @@ public class DatabaseUtil {
             {
                 String columnName = columns.getString("COLUMN_NAME");
                 String datatype = columns.getString("DATA_TYPE");
+                String colomuntypename = columns.getString("TYPE_NAME");
                 String columnsize = columns.getString("COLUMN_SIZE");
                 String decimaldigits = columns.getString("DECIMAL_DIGITS");
                 if (decimaldigits == null) {
@@ -469,43 +470,47 @@ public class DatabaseUtil {
                 TableField tf = null;
                 switch (datatype) {
                     case "1":      // varchar -> String
-                        tf = new TableField(columnName, "STRING", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tf = new TableField(columnName, "STRING", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;
                     case "2":       // int
-                        tf = new TableField(columnName, "INT", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tf = new TableField(columnName, "INT", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;
                     case "4":       // int
-                        tf = new TableField(columnName, "INT", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tf = new TableField(columnName, "INT", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;
                     case "5":       // smallint
-                        tf = new TableField(columnName, "INT", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tf = new TableField(columnName, "INT", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;    
                     case "7":       // real
-                        tf = new TableField(columnName, "REAL", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tf = new TableField(columnName, "REAL", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;            
                     case "8":       // float
-                        tf = new TableField(columnName, "FLOAT", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tf = new TableField(columnName, "FLOAT", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;    
                     case "12":      // varchar -> String
-                        tf = new TableField(columnName, "STRING", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tf = new TableField(columnName, "STRING", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;
                     case "-5":      // long
-                        tf = new TableField(columnName, "LONG", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tf = new TableField(columnName, "LONG", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;
+                    case "-7":      // bit
+                        tf = new TableField(columnName, "BOOLEAN", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tableFieldsList.add(tf);
+                        break;    
                     case "2005":    // text -> String
-                        tf = new TableField(columnName, "STRING", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tf = new TableField(columnName, "STRING", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;
                     case "93":      // Date
-                        tf = new TableField(columnName, "DATE", pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                        tf = new TableField(columnName, "DATE", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;
                 }
