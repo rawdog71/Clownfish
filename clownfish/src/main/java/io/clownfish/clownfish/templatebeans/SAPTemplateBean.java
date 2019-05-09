@@ -22,6 +22,7 @@ import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
+import io.clownfish.clownfish.sap.RFC_READ_TABLE;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.sap.SAPDATATYPE;
 import io.clownfish.clownfish.sap.SAPUtility;
@@ -100,6 +101,55 @@ public class SAPTemplateBean {
                     ArrayList<HashMap> tablevalues = new ArrayList<>();
                     functions_table = function.getTableParameterList().getTable(paramname);
                     List<RpyTableRead> rpytablereadlist = rpytableread.getRpyTableReadList(tablename);
+                    for (int i = 0; i < functions_table.getNumRows(); i++) {
+                        HashMap<String, String> sapexportvalues = new HashMap<>();
+                        functions_table.setRow(i);
+                        for (RpyTableRead rpytablereadentry : rpytablereadlist) {
+                            if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CHAR) == 0) || 
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.NUMC) == 0) ||
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.UNIT) == 0)) {
+                                String value = functions_table.getString(rpytablereadentry.getFieldname());
+                                sapexportvalues.put(rpytablereadentry.getFieldname(), value);
+                                continue;
+                            }
+                            if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) || 
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.TIMS) == 0)) {
+                                Date value = functions_table.getDate(rpytablereadentry.getFieldname());
+                                String datum = "";
+                                if (null != value) {
+                                    if (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) {
+                                        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+                                        datum = sdf.format(value);
+                                    } else {
+                                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                                        datum = sdf.format(value);
+                                    }
+                                }
+                                sapexportvalues.put(rpytablereadentry.getFieldname(), datum);
+                                continue;
+                            }
+                            if (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.QUAN) == 0) {
+                                double value = functions_table.getDouble(rpytablereadentry.getFieldname());
+                                sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
+                                continue;
+                            }
+                            if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT1) == 0) || 
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT2) == 0) || 
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT4) == 0) || 
+                                (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT8) == 0)) {
+                                int value = functions_table.getInt(rpytablereadentry.getFieldname());
+                                sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
+                            }
+                        }
+                        tablevalues.add(sapexportvalues);
+                    }
+                    saptables.put(paramname, tablevalues);
+                }
+                if (rfcfunctionparam.getParamclass().compareToIgnoreCase("C") == 0) {
+                    ArrayList<HashMap> tablevalues = new ArrayList<>();
+                    String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
+                    functions_table = function.getChangingParameterList().getTable(paramname);
+                    List<RpyTableRead> rpytablereadlist = rpytableread.getRpyTableReadList(param);
                     for (int i = 0; i < functions_table.getNumRows(); i++) {
                         HashMap<String, String> sapexportvalues = new HashMap<>();
                         functions_table.setRow(i);
