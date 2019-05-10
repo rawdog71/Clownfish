@@ -22,8 +22,8 @@ import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.sap.models.RfcFunctionParam;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -32,6 +32,8 @@ import java.util.logging.Logger;
 public class RFC_GET_FUNCTION_INTERFACE {
     static SAPConnection sapc = null;
     JCoTable functions_table = null;
+    
+    final Logger logger = LoggerFactory.getLogger(RFC_GET_FUNCTION_INTERFACE.class);
 
     public RFC_GET_FUNCTION_INTERFACE(Object sapc) {
         RFC_GET_FUNCTION_INTERFACE.sapc = (SAPConnection) sapc;
@@ -68,7 +70,7 @@ public class RFC_GET_FUNCTION_INTERFACE {
             }
             return functionsList;
         } catch(JCoException ex) {
-            Logger.getLogger(RFC_GET_FUNCTION_INTERFACE.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             return null;
         }
     }

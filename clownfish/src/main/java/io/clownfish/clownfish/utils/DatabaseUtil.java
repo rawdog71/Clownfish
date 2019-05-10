@@ -36,8 +36,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,6 +48,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatabaseUtil {
     @Autowired CfDatasourceService cfdatasourceService;
+    
+    final Logger logger = LoggerFactory.getLogger(DatabaseUtil.class);
 
     public DatabaseUtil() {
     }
@@ -113,7 +115,7 @@ public class DatabaseUtil {
                     dbvalues.put("table", dbtables);
                     dbexport.put(cfdatasource.getDatabasename(), dbvalues);
                 } catch (SQLException ex) {
-                    Logger.getLogger(DatabaseUtil.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error(ex.getMessage());
                 }
             } else {
                 return null;
@@ -296,7 +298,7 @@ public class DatabaseUtil {
             }
             dbvalues.put(tablename, dbexportvalues);
         } catch (SQLException ex) {
-            Logger.getLogger(DatabaseUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         }
     }
     
@@ -340,7 +342,7 @@ public class DatabaseUtil {
             }
             return ok;
         } catch (SQLException ex) {
-            Logger.getLogger(DatabaseUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             return false;
         }
     }
@@ -383,7 +385,7 @@ public class DatabaseUtil {
             }
             return ok;
         } catch (SQLException ex) {
-            Logger.getLogger(DatabaseUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             return false;
         }
     }
@@ -428,7 +430,7 @@ public class DatabaseUtil {
             }
             return ok;
         } catch (SQLException ex) {
-            Logger.getLogger(DatabaseUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             return false;
         }
     }
@@ -519,7 +521,7 @@ public class DatabaseUtil {
             tfs.setTableFieldsList(tableFieldsList);
             return tfs;
         } catch (SQLException ex) {
-            Logger.getLogger(DatabaseUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             return null;
         }
     }

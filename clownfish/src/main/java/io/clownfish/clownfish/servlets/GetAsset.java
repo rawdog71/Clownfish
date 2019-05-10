@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -60,6 +60,8 @@ public class GetAsset extends HttpServlet {
     private int height = 0;
     
     private static Map<String, String> propertymap = null;
+    
+    final Logger logger = LoggerFactory.getLogger(GetAsset.class);
     
     public GetAsset() {
     }
@@ -120,7 +122,7 @@ public class GetAsset extends HttpServlet {
                             in = new FileInputStream(f);
                             IOUtils.copy(in, out);
                         } catch (IOException ex) {
-                            Logger.getLogger(GetAsset.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.error(ex.getMessage());
                             acontext.complete();
                         }
                     } else {
@@ -138,7 +140,7 @@ public class GetAsset extends HttpServlet {
                                 in = new ByteArrayInputStream(os.toByteArray());
                                 IOUtils.copy(in, out);
                             } catch (IOException ex) {
-                                Logger.getLogger(GetAsset.class.getName()).log(Level.SEVERE, null, ex);
+                                logger.error(ex.getMessage());
                                 acontext.complete();
                             }
                         } else {
@@ -146,7 +148,7 @@ public class GetAsset extends HttpServlet {
                                 in = new FileInputStream(f);
                                 IOUtils.copy(in, out);
                             } catch (IOException ex) {
-                                Logger.getLogger(GetAsset.class.getName()).log(Level.SEVERE, null, ex);
+                                logger.error(ex.getMessage());
                                 acontext.complete();
                             }
                         }
@@ -159,11 +161,11 @@ public class GetAsset extends HttpServlet {
                         out.print("No image");
                         acontext.complete();
                     } catch (IOException ex1) {
-                        Logger.getLogger(GetAsset.class.getName()).log(Level.SEVERE, null, ex1);
+                        logger.error(ex1.getMessage());
                         acontext.complete();
                     }
                 } catch (IOException | InterruptedException | ExecutionException ex) {
-                    Logger.getLogger(GetAsset.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error(ex.getMessage());
                 }
            }
         });

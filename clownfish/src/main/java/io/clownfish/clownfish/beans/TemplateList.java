@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ViewScoped;
@@ -41,6 +39,8 @@ import javax.persistence.NoResultException;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -70,6 +70,8 @@ public class TemplateList {
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
+    
+    final Logger logger = LoggerFactory.getLogger(TemplateList.class);
 
     public TemplateList() {
     }
@@ -173,7 +175,7 @@ public class TemplateList {
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(TemplateList.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error(ex.getMessage());
                 }
             } else {
                 difference = templateUtility.hasDifference(selectedTemplate);

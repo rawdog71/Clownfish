@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ViewScoped;
@@ -51,6 +49,8 @@ import org.primefaces.model.DualListModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -69,6 +69,8 @@ public class AssetList {
     private @Getter @Setter Boolean selectedAsset;
     private @Getter @Setter String assetName;
     private @Getter @Setter DualListModel<CfKeyword> keywords;
+    
+    final Logger logger = LoggerFactory.getLogger(AssetList.class);
 
     @PostConstruct
     public void init() {
@@ -87,8 +89,7 @@ public class AssetList {
     }
     
     public void handleFileUpload(FileUploadEvent event) throws TikaException, SAXException {
-        Logger logger = Logger.getLogger(getClass().getName());
-        logger.log(Level.INFO, "UPLOAD: {0}", event.getFile().getFileName());
+        logger.info("UPLOAD: {0}", event.getFile().getFileName());
         String mediapath = propertymap.get("media.folder");
         HashMap<String, String> metamap = new HashMap<>();
         try {
@@ -141,7 +142,7 @@ public class AssetList {
             FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
             FacesContext.getCurrentInstance().addMessage(null, message);
         } catch (IOException e) {
-            Logger.getLogger(AssetList.class.getName()).log(Level.SEVERE, null, e);
+            logger.error(e.getMessage());
             FacesMessage error = new FacesMessage("The files were not uploaded!");
             FacesContext.getCurrentInstance().addMessage(null, error);
         } 

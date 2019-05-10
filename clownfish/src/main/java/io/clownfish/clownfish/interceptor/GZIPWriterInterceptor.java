@@ -17,13 +17,13 @@ package io.clownfish.clownfish.interceptor;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -33,6 +33,8 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 @Compress
 public class GZIPWriterInterceptor implements WriterInterceptor {
     private GzipSwitch gzipswitch;
+    
+    final Logger logger = LoggerFactory.getLogger(GZIPWriterInterceptor.class);
     
     @Override
     public void aroundWriteTo(WriterInterceptorContext responseContext) {
@@ -44,7 +46,7 @@ public class GZIPWriterInterceptor implements WriterInterceptor {
             responseContext.setOutputStream(new GZIPOutputStream(outputStream));
             responseContext.proceed();
         } catch (IOException ex) {
-            Logger.getLogger(GZIPWriterInterceptor.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         }
     }
     

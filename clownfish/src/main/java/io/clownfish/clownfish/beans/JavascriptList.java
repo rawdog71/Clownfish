@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ViewScoped;
@@ -43,6 +41,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -68,6 +68,8 @@ public class JavascriptList {
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
+    
+    final Logger logger = LoggerFactory.getLogger(JavascriptList.class);
 
     public JavascriptList() {
     }
@@ -165,7 +167,7 @@ public class JavascriptList {
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(TemplateList.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error(ex.getMessage());
                 }
             } else {
                 difference = javascriptUtility.hasDifference(selectedJavascript);

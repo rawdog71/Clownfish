@@ -19,8 +19,8 @@ import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoTable;
 import de.destrukt.sapconnection.SAPConnection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -30,6 +30,8 @@ public class RFC_READ_TABLE {
     static SAPConnection sapc = null;
     JCoTable functions_table = null;
     JCoTable options_table = null;
+    
+    final Logger logger = LoggerFactory.getLogger(RFC_READ_TABLE.class);
 
     public RFC_READ_TABLE(Object sapc) {
         RFC_READ_TABLE.sapc = (SAPConnection) sapc;
@@ -59,7 +61,7 @@ public class RFC_READ_TABLE {
             }
             return value;
         } catch(JCoException ex) {
-            Logger.getLogger(RFC_GET_FUNCTION_INTERFACE.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             return null;
         }
     }

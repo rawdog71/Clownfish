@@ -28,8 +28,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
@@ -55,6 +55,8 @@ public class TemplateUtil {
     private @Getter @Setter  Patch<String> patch = null;
     private @Getter @Setter  List<String> source = null;
     private @Getter @Setter  List<String> target = null;
+    
+    final Logger logger = LoggerFactory.getLogger(TemplateUtil.class);
 
     public TemplateUtil() {
     }
@@ -65,7 +67,7 @@ public class TemplateUtil {
             byte[] decompress = CompressionUtils.decompress(template.getContent());
             return new String(decompress, StandardCharsets.UTF_8);
         } catch (IOException | DataFormatException ex) {
-            Logger.getLogger(TemplateUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             return null;
         }
     }
@@ -91,7 +93,7 @@ public class TemplateUtil {
                 diff = true;
             }
         } catch (DiffException ex) {
-            Logger.getLogger(TemplateUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         }
         return diff;
     }

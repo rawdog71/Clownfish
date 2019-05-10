@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -37,6 +37,8 @@ import java.util.logging.Logger;
  */
 public class SAPUtility {
     static SAPConnection sapc = null;
+    
+    final static Logger logger = LoggerFactory.getLogger(SAPUtility.class);
     
     public SAPUtility(Object sapc) {
         SAPUtility.sapc = (SAPConnection) sapc;
@@ -130,7 +132,7 @@ public class SAPUtility {
                 sapvalues.put("table", saptables);
                 sapexport.put(cfsitesaprfc.getCfSitesaprfcPK().getRfcfunction(), sapvalues);
             } catch(JCoException ex) {
-                Logger.getLogger(SAPUtility.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage());
             }
         }
         return sapexport;

@@ -25,7 +25,6 @@ import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RFC_READ_TABLE;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.sap.SAPDATATYPE;
-import io.clownfish.clownfish.sap.SAPUtility;
 import io.clownfish.clownfish.sap.models.RfcFunctionParam;
 import io.clownfish.clownfish.sap.models.RpyTableRead;
 import java.text.SimpleDateFormat;

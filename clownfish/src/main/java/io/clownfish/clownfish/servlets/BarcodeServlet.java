@@ -20,8 +20,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -52,6 +52,9 @@ import org.springframework.stereotype.Component;
 @WebServlet(name = "BarcodeServlet", urlPatterns = {"/Barcode"}, asyncSupported = true)
 @Component
 public class BarcodeServlet extends HttpServlet {
+    
+    final Logger logger = LoggerFactory.getLogger(BarcodeServlet.class);
+    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -121,17 +124,17 @@ public class BarcodeServlet extends HttpServlet {
                     ImageIO.write(barcodeImage, "png", outputStream);
                     outputStream.close();
                 } catch (FileNotFoundException ex) {
-                    Logger.getLogger(BarcodeServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error(ex.getMessage());
                     acontext.complete();
                 } catch (IOException ex) {
-                    Logger.getLogger(BarcodeServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error(ex.getMessage());
                     acontext.complete();
                 } finally {
                     try {
                         out.close();
                         acontext.complete();
                     } catch (IOException ex) {
-                        Logger.getLogger(BarcodeServlet.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.error(ex.getMessage());
                         acontext.complete();
                     }
                 }

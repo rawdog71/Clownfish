@@ -21,8 +21,8 @@ import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.sap.models.RfcGroup;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,6 +31,8 @@ import java.util.logging.Logger;
 public class RFC_GROUP_SEARCH {
     static SAPConnection sapc = null;
     JCoTable groups_table = null;
+    
+    final Logger logger = LoggerFactory.getLogger(RFC_GROUP_SEARCH.class);
     
     public RFC_GROUP_SEARCH(SAPConnection sapc) {
         RFC_GROUP_SEARCH.sapc = sapc;
@@ -55,7 +57,7 @@ public class RFC_GROUP_SEARCH {
             }
             return groupsList;
         } catch(Exception ex) {
-            Logger.getLogger(RFC_GROUP_SEARCH.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             return null;
         }
     }

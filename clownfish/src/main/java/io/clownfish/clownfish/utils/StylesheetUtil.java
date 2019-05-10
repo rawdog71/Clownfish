@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.zip.DataFormatException;
 import javax.faces.bean.ViewScoped;
 import lombok.Getter;
@@ -50,6 +50,8 @@ public class StylesheetUtil {
     private @Getter @Setter  Patch<String> patch = null;
     private @Getter @Setter  List<String> source = null;
     private @Getter @Setter  List<String> target = null;
+    
+    final Logger logger = LoggerFactory.getLogger(StylesheetUtil.class);
 
     public StylesheetUtil() {
     }
@@ -60,7 +62,7 @@ public class StylesheetUtil {
             byte[] decompress = CompressionUtils.decompress(stylesheet.getContent());
             return new String(decompress, StandardCharsets.UTF_8);
         } catch (IOException | DataFormatException ex) {
-            Logger.getLogger(StylesheetUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             return null;
         }
     }
@@ -86,7 +88,7 @@ public class StylesheetUtil {
                 diff = true;
             }
         } catch (DiffException ex) {
-            Logger.getLogger(StylesheetUtil.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         }
         return diff;
     }

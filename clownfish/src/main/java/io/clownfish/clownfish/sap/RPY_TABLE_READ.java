@@ -22,8 +22,8 @@ import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.sap.models.RpyTableRead;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -33,6 +33,8 @@ public class RPY_TABLE_READ {
     static SAPConnection sapc = null;
     JCoTable functions_table = null;
 
+    final Logger logger = LoggerFactory.getLogger(RPY_TABLE_READ.class);
+    
     public RPY_TABLE_READ(Object sapc) {
         RPY_TABLE_READ.sapc = (SAPConnection) sapc;
     }
@@ -92,7 +94,7 @@ public class RPY_TABLE_READ {
             }
             return tablefieldList;
         } catch(JCoException ex) {
-            Logger.getLogger(RFC_GET_FUNCTION_INTERFACE.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             return null;
         }
     }
