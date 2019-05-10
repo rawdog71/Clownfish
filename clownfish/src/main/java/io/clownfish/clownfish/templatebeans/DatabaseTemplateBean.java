@@ -30,10 +30,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +47,8 @@ public class DatabaseTemplateBean {
     private @Getter @Setter Map contentmap;
     private List<CfSitedatasource> sitedatasourcelist;
     
+    final Logger logger = LoggerFactory.getLogger(DatabaseTemplateBean.class);
+    
     public DatabaseTemplateBean() {
         contentmap = new HashMap<>();
     }
@@ -59,6 +61,7 @@ public class DatabaseTemplateBean {
         //System.out.println("DBREAD->catalog: " + catalog);
         //System.out.println("DBREAD->tablename: " + tablename);
         //System.out.println("DBREAD->sqlstatement: " + sqlstatement);
+        logger.info("START dbread");
         HashMap<String, ArrayList> dbtables = new HashMap<>();
         sitedatasourcelist.stream().forEach((sitedatasource) -> {
             try {
@@ -90,12 +93,13 @@ public class DatabaseTemplateBean {
                     }
                     contentmap.put("db", dbtables);
                 } else {
-                    Logger.getLogger(DatabaseTemplateBean.class.getName()).log(Level.SEVERE, null, "Connection to database not established");
+                    logger.warn("Connection to database not established");
                 }
             } catch (SQLException ex) {
-                Logger.getLogger(DatabaseTemplateBean.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage());
             }
         });
+        logger.info("END dbread");
         return contentmap;
     }
     
@@ -159,7 +163,7 @@ public class DatabaseTemplateBean {
             tfs.setTableFieldsList(tableFieldsList);
             return tfs;
         } catch (SQLException ex) {
-            Logger.getLogger(DatabaseTemplateBean.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             return null;
         }
     }

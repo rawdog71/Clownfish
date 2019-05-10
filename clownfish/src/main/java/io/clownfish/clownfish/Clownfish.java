@@ -72,8 +72,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.persistence.NoResultException;
@@ -86,12 +86,16 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -142,6 +146,8 @@ public class Clownfish {
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     
+    final Logger logger = LoggerFactory.getLogger(Clownfish.class);
+    
     @RequestMapping("/")
     String home() {
         return "Welcome to Clownfish Content Management System";
@@ -149,6 +155,7 @@ public class Clownfish {
     
     @PostConstruct
     public void init() {
+        logger.info("INIT");
         // Set default values
         modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
                             // 0 = Development mode (fetch sourcecode from database)
@@ -190,7 +197,8 @@ public class Clownfish {
     }
 
     @GetMapping(path = "/{name}")
-    void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+    public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        logger.info("START universal GET: " + name);
         try {
             userSession = request.getSession();
             this.request = request;
@@ -206,25 +214,27 @@ public class Clownfish {
                 queryParams.add(jfp);
             }
             
-            ClownfishResponse cfResponse = makeResponse(name, queryParams);
-            if (cfResponse.getErrorcode() == 0) {
+            Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams);
+            if (cfResponse.get().getErrorcode() == 0) {
                 response.setContentType(this.response.getContentType());
                 response.setCharacterEncoding(this.response.getCharacterEncoding());
                 PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfResponse.getOutput());
+                outwriter.println(cfResponse.get().getOutput());
             } else {
                 response.setContentType("text/html");
                 response.setCharacterEncoding("UTF-8");
                 PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfResponse.getOutput());
+                outwriter.println(cfResponse.get().getOutput());
             }
-        } catch (IOException ex) {
-            Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | InterruptedException | ExecutionException ex) {
+            logger.error(ex.getMessage());
         }
+        logger.info("END universal GET: " + name);
     }
     
     @PostMapping("/{name}")
-    void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+    public void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        logger.info("START universal POST:" + name);
         try {
             userSession = request.getSession();
             this.request = request;
@@ -235,24 +245,27 @@ public class Clownfish {
             List<JsonFormParameter> map;
             map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
             
-            ClownfishResponse cfResponse = makeResponse(name, map);
-            if (cfResponse.getErrorcode() == 0) {
+            Future<ClownfishResponse> cfResponse = makeResponse(name, map);
+            if (cfResponse.get().getErrorcode() == 0) {
                 response.setContentType(this.response.getContentType());
                 response.setCharacterEncoding(this.response.getCharacterEncoding());
                 PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfResponse.getOutput());
+                outwriter.println(cfResponse.get().getOutput());
             } else {
                 response.setContentType("text/html");
                 response.setCharacterEncoding("UTF-8");
                 PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfResponse.getOutput());
+                outwriter.println(cfResponse.get().getOutput());
             }
-        } catch (IOException ex) {
-            Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | InterruptedException | ExecutionException ex) {
+            logger.error(ex.getMessage());
         }
+        logger.info("END universal POST:" + name);
     }
     
-    private ClownfishResponse makeResponse(String name, List<JsonFormParameter> postmap) {
+    @Async
+    public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap) {
+        logger.info("START makeResponse: " + name);
         ClownfishResponse cfresponse = new ClownfishResponse();
         try {
             // Freemarker Template
@@ -367,7 +380,7 @@ public class Clownfish {
                     try {
                         sendRespondMail(emailproperties.getSendto(), emailproperties.getSubject(), emailproperties.getBody());
                     } catch (Exception ex) {
-                        Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.error(ex.getMessage());
                     }
                 }
 
@@ -394,7 +407,7 @@ public class Clownfish {
                         freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
                         env.process();
                     } catch (freemarker.template.TemplateException ex) {
-                        System.out.println(ex);
+                        logger.error(ex.getMessage());
                     }
                 } else {                                    // Velocity template
                     emailbean.init(propertymap);
@@ -454,21 +467,25 @@ public class Clownfish {
 
                     cfresponse.setErrorcode(0);
                     cfresponse.setOutput(htmlcompressor.compress(out.toString()));
-                    return cfresponse;
+                    logger.info("END makeResponse: " + name);
+                    return new AsyncResult<ClownfishResponse>(cfresponse);
                 } else {
                     cfresponse.setErrorcode(0);
                     cfresponse.setOutput(out.toString());
-                    return cfresponse;
+                    logger.info("END makeResponse: " + name);
+                    return new AsyncResult<ClownfishResponse>(cfresponse);
                 }
             } catch (NoResultException ex) {
                 cfresponse.setErrorcode(1);
                 cfresponse.setOutput("No template");
-                return cfresponse;
+                logger.info("END makeResponse: " + name);
+                return new AsyncResult<ClownfishResponse>(cfresponse);
             }     
         } catch (IOException | org.apache.velocity.runtime.parser.ParseException ex) {
             cfresponse.setErrorcode(1);
             cfresponse.setOutput(ex.getMessage());
-            return cfresponse;
+            logger.info("END makeResponse: " + name);
+            return new AsyncResult<ClownfishResponse>(cfresponse);
         } 
     }
     
