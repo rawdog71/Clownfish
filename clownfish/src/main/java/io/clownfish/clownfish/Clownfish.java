@@ -198,7 +198,7 @@ public class Clownfish {
 
     @GetMapping(path = "/{name}")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        logger.info("START universal GET: " + name);
+        //logger.info("START universal GET: " + name);
         try {
             userSession = request.getSession();
             this.request = request;
@@ -229,12 +229,12 @@ public class Clownfish {
         } catch (IOException | InterruptedException | ExecutionException ex) {
             logger.error(ex.getMessage());
         }
-        logger.info("END universal GET: " + name);
+        //logger.info("END universal GET: " + name);
     }
     
     @PostMapping("/{name}")
     public void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        logger.info("START universal POST:" + name);
+        //logger.info("START universal POST:" + name);
         try {
             userSession = request.getSession();
             this.request = request;
@@ -260,12 +260,17 @@ public class Clownfish {
         } catch (IOException | InterruptedException | ExecutionException ex) {
             logger.error(ex.getMessage());
         }
-        logger.info("END universal POST:" + name);
+        //logger.info("END universal POST:" + name);
     }
     
     @Async
     public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap) {
+        /*
         logger.info("START makeResponse: " + name);
+        for (JsonFormParameter param : postmap) {
+            logger.info("PARAM: " + param.getName() + " VALUE:" + param.getValue());
+        }
+        */
         ClownfishResponse cfresponse = new ClownfishResponse();
         try {
             // Freemarker Template
@@ -467,24 +472,24 @@ public class Clownfish {
 
                     cfresponse.setErrorcode(0);
                     cfresponse.setOutput(htmlcompressor.compress(out.toString()));
-                    logger.info("END makeResponse: " + name);
+                    //logger.info("END makeResponse: " + name);
                     return new AsyncResult<ClownfishResponse>(cfresponse);
                 } else {
                     cfresponse.setErrorcode(0);
                     cfresponse.setOutput(out.toString());
-                    logger.info("END makeResponse: " + name);
+                    //logger.info("END makeResponse: " + name);
                     return new AsyncResult<ClownfishResponse>(cfresponse);
                 }
             } catch (NoResultException ex) {
                 cfresponse.setErrorcode(1);
                 cfresponse.setOutput("No template");
-                logger.info("END makeResponse: " + name);
+                //logger.info("END makeResponse: " + name);
                 return new AsyncResult<ClownfishResponse>(cfresponse);
             }     
         } catch (IOException | org.apache.velocity.runtime.parser.ParseException ex) {
             cfresponse.setErrorcode(1);
             cfresponse.setOutput(ex.getMessage());
-            logger.info("END makeResponse: " + name);
+            //logger.info("END makeResponse: " + name);
             return new AsyncResult<ClownfishResponse>(cfresponse);
         } 
     }

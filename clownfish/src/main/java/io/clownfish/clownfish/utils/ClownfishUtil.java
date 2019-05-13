@@ -52,6 +52,19 @@ public class ClownfishUtil {
         return parametermap;
     }
     
+    public static List<JsonFormParameter> getJsonFormParameterList(Map parameterlist) {
+        List<JsonFormParameter> jsonlist = new ArrayList<>();
+        if (null != parameterlist) {
+            for (Object param : parameterlist.keySet()) {
+                JsonFormParameter jsfp = new JsonFormParameter();
+                jsfp.setName((String) param);
+                jsfp.setValue((String) parameterlist.get(param));
+                jsonlist.add(jsfp);
+            }
+        }
+        return jsonlist;
+    }
+    
     /*
         getSaprfcfunctionparamMap
     */
