@@ -74,6 +74,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.persistence.NoResultException;
@@ -149,8 +150,19 @@ public class Clownfish {
     final Logger logger = LoggerFactory.getLogger(Clownfish.class);
     
     @RequestMapping("/")
-    String home() {
-        return "Welcome to Clownfish Content Management System";
+    public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+        PrintWriter outwriter = null;
+        try {
+            addHeader(response);
+            response.setContentType("text/html");
+            response.setCharacterEncoding("UTF-8");
+            outwriter = response.getWriter();
+            outwriter.println("<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Clownfish Server</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"></head><body><img src='images/clownfish-48.png'> Welcome to Clownfish Content Management System</body></html>");
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            outwriter.close();
+        }
     }
     
     @PostConstruct
@@ -171,10 +183,7 @@ public class Clownfish {
             sapSupport = true;
         }
         if (sapSupport) {
-            //Class<?> clazz = Class.forName("KNSAPTools.SAPConnection");
-            //Object sapcinstance = clazz.newInstance();
             sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
-            //rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapc);
             rpytableread = new RPY_TABLE_READ(sapc);
         }
         // Override default values with system properties
@@ -213,19 +222,17 @@ public class Clownfish {
                 jfp.setValue(values[0]);
                 queryParams.add(jfp);
             }
-            
+            addHeader(response);
             Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams);
             if (cfResponse.get().getErrorcode() == 0) {
                 response.setContentType(this.response.getContentType());
                 response.setCharacterEncoding(this.response.getCharacterEncoding());
-                PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfResponse.get().getOutput());
             } else {
                 response.setContentType("text/html");
                 response.setCharacterEncoding("UTF-8");
-                PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfResponse.get().getOutput());
             }
+            PrintWriter outwriter = response.getWriter();
+                outwriter.println(cfResponse.get().getOutput());
         } catch (IOException | InterruptedException | ExecutionException ex) {
             logger.error(ex.getMessage());
         }
@@ -244,7 +251,7 @@ public class Clownfish {
             Gson gson = new Gson(); 
             List<JsonFormParameter> map;
             map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
-            
+            addHeader(response);
             Future<ClownfishResponse> cfResponse = makeResponse(name, map);
             if (cfResponse.get().getErrorcode() == 0) {
                 response.setContentType(this.response.getContentType());
@@ -516,5 +523,10 @@ public class Clownfish {
                 parametermap.put(key, attributevalue);
             }
         }
+    }
+    
+    private void addHeader(HttpServletResponse response) {
+        response.addHeader("Server", "Clownfish Server Open Source Version 1.0");
+        response.addHeader("X-Powered-By", "Clownfish Server Open Source Version 1.0 by Rainer Sulzbach");
     }
 }
