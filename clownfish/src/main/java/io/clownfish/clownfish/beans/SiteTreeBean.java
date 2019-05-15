@@ -143,7 +143,7 @@ public class SiteTreeBean implements Serializable {
                 rfcgrouplist = new RFC_GROUP_SEARCH(sapc).getRfcGroupList();
             }
         }
-        root = new DefaultTreeNode("Root", null);
+        //root = new DefaultTreeNode("Root", null);
         loadTree();
         datasources = cfdatasourceService.findAll();
         contentlist = cflistService.findAll();
@@ -176,6 +176,7 @@ public class SiteTreeBean implements Serializable {
     }
     
     private void loadTree() {
+        root = new DefaultTreeNode("Root", null);
         List<CfSite> sitelist = cfsiteService.findByParentref(0L);
         for (CfSite site : sitelist) {
             TreeNode tn = new DefaultTreeNode(site);
