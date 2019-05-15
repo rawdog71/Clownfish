@@ -74,7 +74,7 @@ public class SAPTemplateBean {
         rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction));
         saprfcfunctionparamMap.put(rfcFunction, rfcfunctionparamlist);
         
-        List<JsonFormParameter> postmap = ClownfishUtil.getJsonFormParameterList(parametermap);
+        List<JsonFormParameter> postmap_async = ClownfishUtil.getJsonFormParameterList(parametermap);
         
         try {
             HashMap<String, Object> sapvalues = new HashMap<>();
@@ -84,8 +84,8 @@ public class SAPTemplateBean {
             JCoFunction function = sapc.getDestination().getRepository().getFunction(rfcFunction);
             for (RfcFunctionParam rfcfunctionparam : paramlist) {
                 if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
-                    if (null != postmap) {
-                        postmap.stream().filter((jfp) -> (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0)).forEach((jfp) -> {
+                    if (null != postmap_async) {
+                        postmap_async.stream().filter((jfp) -> (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0)).forEach((jfp) -> {
                             function.getImportParameterList().setValue(rfcfunctionparam.getParameter(), jfp.getValue());
                         });
                     }
