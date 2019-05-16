@@ -47,6 +47,9 @@ import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import io.clownfish.clownfish.utils.JavascriptUtil;
+import io.clownfish.clownfish.utils.StylesheetUtil;
+import io.clownfish.clownfish.utils.TemplateUtil;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -127,6 +130,9 @@ public class SiteTreeBean implements Serializable {
     @Autowired TemplateList templatelist;
     @Autowired StylesheetList stylesheetlist;
     @Autowired JavascriptList javascriptlist;
+    @Autowired private @Getter @Setter TemplateUtil templateUtility;
+    @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
+    @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
     
     @PostConstruct
     public void init() {
@@ -188,7 +194,8 @@ public class SiteTreeBean implements Serializable {
     public String getTemplate() {
         if (null != selectedSite) {
             if (null != selectedTemplate) {
-                return selectedTemplate.getContent();
+                templateUtility.setTemplateContent(selectedTemplate.getContent());
+                return templateUtility.getTemplateContent();
             } else {
                 try {
                     CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().longValue());
@@ -205,7 +212,8 @@ public class SiteTreeBean implements Serializable {
     public String getStylesheet() {
         if (null != selectedSite) {
             if (null != selectedStylesheet) {
-                return selectedStylesheet.getContent();
+                stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
+                return stylesheetUtility.getStyelsheetContent();
             } else {
                 try {
                     CfStylesheet stylesheet = cfstylesheetService.findById(selectedSite.getStylesheetref().longValue());
@@ -222,7 +230,8 @@ public class SiteTreeBean implements Serializable {
     public String getJavascript() {
         if (null != selectedSite) {
             if (null != selectedJavascript) {
-                return selectedJavascript.getContent();
+                javascriptUtility.setJavascriptContent(selectedJavascript.getContent());
+                return javascriptUtility.getJavascriptContent();
             } else {
                 try {
                     CfJavascript javascript = cfjavascriptService.findById(selectedSite.getJavascriptref().longValue());
