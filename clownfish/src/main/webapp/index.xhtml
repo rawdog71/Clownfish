@@ -455,8 +455,8 @@
                         <f:selectItems value="#{classcontentList.classlist}" />
                     </p:selectOneMenu>
                     
-                    <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist" disabled="#{classcontentlist.newContentButtonDisabled}" />
-                    <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist" />
+                    <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}" />
+                    <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:classcontentdroplist" />
                     
                     <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentList.selectedAttributContent}" rowKey="#{attributcontent.id}">
                         <p:ajax event="rowSelect" listener="#{classcontentList.onSelectAttribut}" update=":form:tabview:attributcontentlist" />
