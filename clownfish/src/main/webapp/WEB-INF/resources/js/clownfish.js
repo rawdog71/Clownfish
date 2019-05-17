@@ -71,5 +71,33 @@ function getCurrentDate() {
     var currentDate = dd + '.' + mm + '.' + yyyy + ' ' + hour + ":" + minute + ":" + second;
     
     return currentDate;
+}
+
+function getCurrentTime() {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+
+    var yyyy = today.getFullYear();
+    if (dd < 10) {
+      dd = '0' + dd;
+    } 
+    if (mm < 10) {
+      mm = '0' + mm;
+    }
+    var hour = today.getHours();
+    if (hour < 10) {
+      hour = '0' + hour;
+    }
+    var minute = today.getMinutes();
+    if (minute < 10) {
+      minute = '0' + minute;
+    }
+    var second = today.getSeconds();
+    if (second < 10) {
+      second = '0' + second;
+    }
+    var currentTime = hour + ":" + minute + ":" + second;
     
+    return currentTime;
 }
