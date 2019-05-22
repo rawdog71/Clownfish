@@ -28,7 +28,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
@@ -39,6 +38,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("datacontentList")
-@ViewScoped
+@Scope("request")
 @Component
 public class DataList implements Serializable {
     @Autowired CfListService cflistService;

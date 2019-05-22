@@ -20,7 +20,6 @@ import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
@@ -28,6 +27,7 @@ import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("keywordList")
-@ViewScoped
+@Scope("request")
 @Component
 public class KeywordList {
     @Autowired CfKeywordService cfkeywordService;

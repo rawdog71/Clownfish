@@ -21,7 +21,6 @@ import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
@@ -29,7 +28,7 @@ import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Scope;
 
 /**
  *
@@ -37,12 +36,11 @@ import org.springframework.stereotype.Component;
  */
 
 @Named("loginBean")
-@Component
-@SessionScoped
+@Scope("session")
 public class LoginBean implements Serializable {
     @Autowired CfUserService cfuserService;
     
-    private @Getter @Setter boolean login;
+    private boolean login;
     private @Getter @Setter String vorname;
     private @Getter @Setter String nachname;
     private @Getter @Setter String email;
@@ -56,6 +54,14 @@ public class LoginBean implements Serializable {
     @PostConstruct
     public void init() {
         login = false;
+    }
+
+    public boolean isLogin() {
+        return login;
+    }
+
+    public void setLogin(boolean login) {
+        this.login = login;
     }
     
     public void onLogin(ActionEvent actionEvent) {

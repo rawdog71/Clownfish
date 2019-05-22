@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
@@ -32,6 +31,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
  */
 @Transactional
 @Named("propertylist")
-@ViewScoped
+@Scope("singleton")
 @Component
 public class PropertyList {
     @Autowired CfPropertyService cfpropertyService;

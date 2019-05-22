@@ -18,20 +18,20 @@ package io.clownfish.clownfish.converter;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import java.io.Serializable;
-import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
-@ViewScoped
+@Scope("request")
 @Named("datasourceConverterBean")
 @FacesConverter(value = "datasourceConverter")
 @Component

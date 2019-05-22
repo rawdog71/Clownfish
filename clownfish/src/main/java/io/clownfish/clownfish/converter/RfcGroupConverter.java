@@ -21,19 +21,19 @@ import io.clownfish.clownfish.sap.models.RfcGroup;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
-@ViewScoped
+@Scope("request")
 @Named("rfcGroupConverterBean")
 @FacesConverter(value = "rfcGroupConverter")
 @Component

@@ -18,15 +18,13 @@ package io.clownfish.clownfish.converter;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import java.io.Serializable;
-import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,7 +32,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 
-@ViewScoped
+@Scope("request")
 @Named("attributetypeConverterBean")
 @FacesConverter(value = "attributetypeConverter")
 @Component

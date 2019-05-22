@@ -103,6 +103,37 @@ public class DatabaseTemplateBean {
         return contentmap;
     }
     
+    public boolean dbexecute(String catalog, String tablename, String sqlstatement) {
+        //System.out.println("DBREAD->catalog: " + catalog);
+        //System.out.println("DBREAD->tablename: " + tablename);
+        //System.out.println("DBREAD->sqlstatement: " + sqlstatement);
+        boolean ok = false;
+        logger.info("START dbexecute");
+        for (CfSitedatasource sitedatasource : sitedatasourcelist) {
+            try {
+                CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
+                
+                JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
+                Connection con = jdbcutil.getConnection();
+                if (null != con) {
+                    if (con.getCatalog().compareToIgnoreCase(catalog) == 0) {
+                        Statement stmt = con.createStatement();
+                        int count = stmt.executeUpdate(sqlstatement);
+                        if (count > 0 ) {
+                            ok = true;
+                        }
+                    }
+                } else {
+                    logger.warn("Connection to database not established");
+                }
+            } catch (SQLException ex) {
+                logger.error(ex.getMessage());
+            }
+        };
+        logger.info("END dbexecute");
+        return ok;
+    }
+    
     private TableFieldStructure getTableFieldsList(ResultSetMetaData dmd) {
         try {
             TableFieldStructure tfs = new TableFieldStructure();

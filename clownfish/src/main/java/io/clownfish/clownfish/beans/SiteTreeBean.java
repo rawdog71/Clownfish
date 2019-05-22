@@ -73,12 +73,13 @@ import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 
 /**
  *
  * @author sulzbachr
  */
-@ViewScoped
+@Scope("request")
 @Named("sitetree")
 public class SiteTreeBean implements Serializable {
     public static final String SAPCONNECTION = "sapconnection.props";

@@ -30,7 +30,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
-import javax.faces.bean.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import javax.validation.ConstraintViolationException;
@@ -38,6 +37,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("classList")
-@ViewScoped
+@Scope("request")
 @Component
 public class ClassList implements Serializable {
     @Autowired CfClassService cfclassService;
