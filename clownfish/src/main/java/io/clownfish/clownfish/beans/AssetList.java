@@ -57,7 +57,7 @@ import org.springframework.context.annotation.Scope;
  * @author sulzbachr
  */
 @Named("assetList")
-@Scope("request")
+@Scope("session")
 @Component
 public class AssetList {
     @Autowired CfAssetService cfassetService;

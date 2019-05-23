@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 
-@Scope("request")
+@Scope("session")
 @Named("attributetypeConverterBean")
 @FacesConverter(value = "attributetypeConverter")
 @Component

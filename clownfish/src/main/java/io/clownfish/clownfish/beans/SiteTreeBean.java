@@ -79,7 +79,7 @@ import org.springframework.context.annotation.Scope;
  *
  * @author sulzbachr
  */
-@Scope("request")
+@Scope("session")
 @Named("sitetree")
 public class SiteTreeBean implements Serializable {
     public static final String SAPCONNECTION = "sapconnection.props";

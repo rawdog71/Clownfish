@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@Scope("request")
+@Scope("session")
 @Named("classConverterBean")
 @FacesConverter(value = "classConverter")
 @Component

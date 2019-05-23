@@ -49,7 +49,7 @@ import org.springframework.context.annotation.Scope;
  * @author sulzbachr
  */
 @Named("javascriptList")
-@Scope("request")
+@Scope("session")
 @Component
 public class JavascriptList {
     @Inject

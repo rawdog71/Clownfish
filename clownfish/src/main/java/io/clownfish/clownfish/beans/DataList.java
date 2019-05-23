@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("datacontentList")
-@Scope("request")
+@Scope("session")
 @Component
 public class DataList implements Serializable {
     @Autowired CfListService cflistService;

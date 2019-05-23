@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("classList")
-@Scope("request")
+@Scope("session")
 @Component
 public class ClassList implements Serializable {
     @Autowired CfClassService cfclassService;

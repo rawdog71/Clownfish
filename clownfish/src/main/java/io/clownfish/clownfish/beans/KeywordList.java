@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("keywordList")
-@Scope("request")
+@Scope("session")
 @Component
 public class KeywordList {
     @Autowired CfKeywordService cfkeywordService;

@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  */
 @Transactional
 @Named("userlist")
-@Scope("request")
+@Scope("session")
 @Component
 public class UserList {
     @Autowired CfUserService cfuserService;

@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("datasourceList")
-@Scope("request")
+@Scope("session")
 @Component
 public class DatasourceList implements Serializable {
     @Autowired CfDatasourceService cfdatasourceService;

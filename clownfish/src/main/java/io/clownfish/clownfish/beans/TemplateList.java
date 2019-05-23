@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("templateList")
-@Scope("request")
+@Scope("session")
 @Component
 public class TemplateList {
     @Inject
