@@ -25,6 +25,7 @@ import io.clownfish.clownfish.dbentities.CfTemplateversion;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -46,7 +47,7 @@ import org.springframework.stereotype.Component;
  */
 @ViewScoped
 @Component
-public class TemplateUtil {
+public class TemplateUtil implements Serializable {
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfTemplateversionService cftemplateversionService;
     

@@ -23,6 +23,7 @@ import io.clownfish.clownfish.dbentities.CfStylesheetversion;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +42,7 @@ import org.springframework.stereotype.Component;
  */
 @ViewScoped
 @Component
-public class StylesheetUtil {
+public class StylesheetUtil implements Serializable {
     @Autowired CfStylesheetService cfstylesheetService;
     @Autowired CfStylesheetversionService cfstylesheetversionService;
     

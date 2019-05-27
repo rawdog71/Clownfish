@@ -87,6 +87,7 @@ public class DatabaseTemplateBean {
                         dbtables.put(tablename, tablevalues);
                     }
                     contentmap.put("db", dbtables);
+                    con.close();
                 } else {
                     logger.warn("Connection to database not established");
                 }
@@ -114,6 +115,7 @@ public class DatabaseTemplateBean {
                             ok = true;
                         }
                     }
+                    con.close();
                 } else {
                     logger.warn("Connection to database not established");
                 }

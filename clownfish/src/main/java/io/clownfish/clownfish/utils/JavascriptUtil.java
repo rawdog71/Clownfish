@@ -23,6 +23,7 @@ import io.clownfish.clownfish.dbentities.CfJavascriptversion;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +42,7 @@ import org.springframework.stereotype.Component;
  */
 @ViewScoped
 @Component
-public class JavascriptUtil {
+public class JavascriptUtil implements Serializable {
     @Autowired CfJavascriptService cfjavascriptService;
     @Autowired CfJavascriptversionService cfjavascriptversionService;
     
