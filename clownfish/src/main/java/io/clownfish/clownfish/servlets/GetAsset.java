@@ -56,8 +56,8 @@ public class GetAsset extends HttpServlet {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient PropertyList propertylist;
     
-    private int width = 0;
-    private int height = 0;
+    private static int width = 0;
+    private static int height = 0;
     
     private static Map<String, String> propertymap = null;
     

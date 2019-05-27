@@ -63,7 +63,7 @@ public class SiteUtil {
             List<CfListcontent> contentlist = cflistcontentService.findByListref(cflist.getId());
             for (CfListcontent listcontent : contentlist) {
                 CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                CfClass cfclass = cfclassService.findById(classcontent.getClassref().getId());
+                cfclassService.findById(classcontent.getClassref().getId());
                 List<CfAttributcontent> attributcontentlist = new ArrayList<>();
                 attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
                 listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));

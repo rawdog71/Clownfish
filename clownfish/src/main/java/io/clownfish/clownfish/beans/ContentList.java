@@ -56,20 +56,20 @@ import org.springframework.stereotype.Component;
 @Scope("session")
 @Component
 public class ContentList implements Serializable {
-    @Autowired CfClassService cfclassService;
-    @Autowired CfClasscontentService cfclasscontentService;
-    @Autowired CfAttributcontentService cfattributcontentService;
-    @Autowired CfAssetService cfassetService;
-    @Autowired CfAttributService cfattributService;
+    @Autowired transient CfClassService cfclassService;
+    @Autowired transient CfClasscontentService cfclasscontentService;
+    @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired transient CfAssetService cfassetService;
+    @Autowired transient CfAttributService cfattributService;
     
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter CfClasscontent selectedContent = null;
-    private @Getter @Setter List<CfAttributcontent> attributcontentlist = null;
+    private transient @Getter @Setter List<CfAttributcontent> attributcontentlist = null;
     private @Getter @Setter CfAttributcontent selectedAttributContent = null;
     private @Getter @Setter List<CfClasscontent> filteredContent;
     private @Getter @Setter String contentName;
     private @Getter @Setter CfClass selectedClass;
-    private @Getter @Setter List<CfClass> classlist = null;
+    private transient @Getter @Setter List<CfClass> classlist = null;
     private @Getter @Setter boolean newContentButtonDisabled = false;
     private @Getter @Setter boolean contentValueBoolean = false;
     private @Getter @Setter Date contentValueDatetime;
@@ -212,7 +212,7 @@ public class ContentList implements Serializable {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            CfClasscontent validateClasscontent = cfclasscontentService.findByName(contentName);
+            cfclasscontentService.findByName(contentName);
             newContentButtonDisabled = true;
         } catch (NoResultException ex) {
             newContentButtonDisabled = contentName.isEmpty();
