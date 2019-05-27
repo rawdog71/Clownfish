@@ -214,7 +214,7 @@ public class StylesheetList {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            CfStylesheet validateStylesheet = cfstylesheetService.findByName(stylesheetName);
+            cfstylesheetService.findByName(stylesheetName);
             newButtonDisabled = true;
         } catch (NoResultException ex) {
             newButtonDisabled = stylesheetName.isEmpty();
@@ -257,7 +257,7 @@ public class StylesheetList {
     
     public void onVersionSelect(ActionEvent actionEvent) {
         if (null != selectedStylesheet) {
-            String versioncontent = stylesheetUtility.getVersion(version.getCfStylesheetversionPK().getStylesheetref(), version.getCfStylesheetversionPK().getVersion());
+            stylesheetUtility.getVersion(version.getCfStylesheetversionPK().getStylesheetref(), version.getCfStylesheetversionPK().getVersion());
         }
     }
 }

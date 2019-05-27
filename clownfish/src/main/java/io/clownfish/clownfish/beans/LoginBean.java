@@ -38,7 +38,7 @@ import org.springframework.context.annotation.Scope;
 @Named("loginBean")
 @Scope("session")
 public class LoginBean implements Serializable {
-    @Autowired CfUserService cfuserService;
+    @Autowired transient CfUserService cfuserService;
     
     private boolean login;
     private @Getter @Setter String vorname;

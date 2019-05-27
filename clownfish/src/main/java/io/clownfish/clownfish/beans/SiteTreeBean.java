@@ -97,7 +97,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfDatasource> selectedDatasources;
     private @Getter @Setter List<CfList> contentlist;
     private @Getter @Setter List<CfList> selectedContentlist;
-    private @Getter @Setter List<CfSitesaprfc> saprfclist = null;
+    private transient @Getter @Setter List<CfSitesaprfc> saprfclist = null;
     private @Getter @Setter CfSitesaprfc selectedrfc = null;
     private @Getter @Setter List<RfcGroup> rfcgrouplist;
     private @Getter @Setter RfcGroup selectedrfcgroup = null;
@@ -115,19 +115,19 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter Map<String, String> propertymap = null;
     private @Getter @Setter boolean sapSupport = false;
     
-    @Autowired CfTemplateService cftemplateService;
-    @Autowired CfStylesheetService cfstylesheetService;
-    @Autowired CfJavascriptService cfjavascriptService;
-    @Autowired CfSiteService cfsiteService;
-    @Autowired CfDatasourceService cfdatasourceService;
-    @Autowired CfSitedatasourceService cfsitedatasourceService;
-    @Autowired CfSitecontentService cfsitecontentService;
-    @Autowired CfListService cflistService;
-    @Autowired CfSitelistService cfsitelistService;
-    @Autowired CfClasscontentService cfclasscontentService;
-    @Autowired CfSitesaprfcService cfsitesaprfcService;
-    @Autowired CfPropertyService cfpropertyService;
-    @Autowired PropertyList propertylist;
+    @Autowired transient  CfTemplateService cftemplateService;
+    @Autowired transient  CfStylesheetService cfstylesheetService;
+    @Autowired transient  CfJavascriptService cfjavascriptService;
+    @Autowired transient  CfSiteService cfsiteService;
+    @Autowired transient  CfDatasourceService cfdatasourceService;
+    @Autowired transient  CfSitedatasourceService cfsitedatasourceService;
+    @Autowired transient  CfSitecontentService cfsitecontentService;
+    @Autowired transient  CfListService cflistService;
+    @Autowired transient  CfSitelistService cfsitelistService;
+    @Autowired transient  CfClasscontentService cfclasscontentService;
+    @Autowired transient  CfSitesaprfcService cfsitesaprfcService;
+    @Autowired transient  CfPropertyService cfpropertyService;
+    @Autowired transient  PropertyList propertylist;
     @Autowired transient TemplateList templatelist;
     @Autowired transient StylesheetList stylesheetlist;
     @Autowired transient JavascriptList javascriptlist;
@@ -458,7 +458,7 @@ public class SiteTreeBean implements Serializable {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            CfSite validateSite = cfsiteService.findByName(siteName);
+            cfsiteService.findByName(siteName);
             newButtonDisabled = true;
         } catch (NoResultException ex) {
             newButtonDisabled = siteName.isEmpty();

@@ -99,7 +99,6 @@ public class PropertyList {
                 selectedProperty.setHashkey(propertykey);
                 selectedProperty.setValue(propertyvalue);
                 cfpropertyService.edit(selectedProperty);
-                //propertylist = cfpropertyService.findAll();
                 fillPropertyMap();
             }
         } catch (ConstraintViolationException ex) {
@@ -110,14 +109,13 @@ public class PropertyList {
     public void onDeleteProperty(ActionEvent actionEvent) {
         if (null != selectedProperty) {
             cfpropertyService.delete(selectedProperty);
-            //propertylist = cfpropertyService.findAll();
             fillPropertyMap();
         }
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            CfProperty validateProperty = cfpropertyService.findByHashkey(propertykey);
+            cfpropertyService.findByHashkey(propertykey);
             newPropertyButtonDisabled = true;
         } catch (NoResultException ex) {
             newPropertyButtonDisabled = selectedProperty.getHashkey().isEmpty();

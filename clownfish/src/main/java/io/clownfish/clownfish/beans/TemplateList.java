@@ -220,7 +220,7 @@ public class TemplateList {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            CfTemplate validateTemplate = cftemplateService.findByName(templateName);
+            cftemplateService.findByName(templateName);
             newButtonDisabled = true;
         } catch (NoResultException ex) {
             newButtonDisabled = templateName.isEmpty();
@@ -266,7 +266,7 @@ public class TemplateList {
     
     public void onVersionSelect(ActionEvent actionEvent) {
         if (null != selectedTemplate) {
-            String versioncontent = templateUtility.getVersion(version.getCfTemplateversionPK().getTemplateref(), version.getCfTemplateversionPK().getVersion());
+            templateUtility.getVersion(version.getCfTemplateversionPK().getTemplateref(), version.getCfTemplateversionPK().getVersion());
         }
     }
 }

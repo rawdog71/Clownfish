@@ -117,12 +117,11 @@ public class AssetList {
             Parser parser = new AutoDetectParser();
             BodyContentHandler handler = new BodyContentHandler();
             Metadata metadata = new Metadata();
-            FileInputStream inputstream = new FileInputStream(result);
-            ParseContext context = new ParseContext();
-
-            parser.parse(inputstream, handler, metadata, context);
-            inputstream.close();
-            //System.out.println(handler.toString());
+            try (FileInputStream inputstream = new FileInputStream(result)) {
+                ParseContext context = new ParseContext();
+                parser.parse(inputstream, handler, metadata, context);
+                //System.out.println(handler.toString());
+            }
 
             //getting the list of all meta data elements 
             String[] metadataNames = metadata.names();
