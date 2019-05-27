@@ -85,8 +85,8 @@ public class SiteTreeBean implements Serializable {
     public static final String SAPCONNECTION = "sapconnection.props";
     private static SAPConnection sapc = null;
     
-    private @Getter @Setter TreeNode root;
-    private @Getter @Setter TreeNode selectedNode = null;
+    private transient @Getter @Setter TreeNode root;
+    private transient @Getter @Setter TreeNode selectedNode = null;
     private @Getter @Setter String siteName;
     private @Getter @Setter CfSite selectedSite = null;
     private @Getter @Setter CfTemplate selectedTemplate = null;
@@ -112,7 +112,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter String characterEncoding;
     private @Getter @Setter String contentType;
     private @Getter @Setter String locale;
-    private @Getter @Setter Map<String, String> propertymap = null;
+    private transient @Getter @Setter Map<String, String> propertymap = null;
     private @Getter @Setter boolean sapSupport = false;
     
     @Autowired transient  CfTemplateService cftemplateService;
