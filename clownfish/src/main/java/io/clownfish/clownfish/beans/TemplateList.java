@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfTemplateversion;
 import io.clownfish.clownfish.dbentities.CfTemplateversionPK;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
+import io.clownfish.clownfish.utils.CheckoutUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.TemplateUtil;
 import java.io.IOException;
@@ -114,23 +115,10 @@ public class TemplateList {
             versionlist = cftemplateversionService.findByTemplateref(selectedTemplate.getId());
             difference = templateUtility.hasDifference(selectedTemplate);
             BigInteger co = selectedTemplate.getCheckedoutby();
-            if (null != co) {
-                if (co.longValue() > 0) {
-                    if (co.longValue() == loginbean.getCfuser().getId()) {
-                        checkedout = true;
-                        access = true;
-                    } else {
-                        checkedout = false;
-                        access = false;
-                    }
-                } else {
-                    checkedout = false;
-                    access = true;
-                }
-            } else {
-                checkedout = false;
-                access = true;
-            }
+            CheckoutUtil checkoutUtil = new CheckoutUtil();
+            checkoutUtil.getCheckoutAccess(co, loginbean);
+            checkedout = checkoutUtil.isCheckedout();
+            access = checkoutUtil.isAccess();
         } else {
             checkedout = false;
             access = false;

@@ -58,15 +58,11 @@ public class DatabaseTemplateBean {
     }
     
     public Map dbread(String catalog, String tablename, String sqlstatement) {
-        //System.out.println("DBREAD->catalog: " + catalog);
-        //System.out.println("DBREAD->tablename: " + tablename);
-        //System.out.println("DBREAD->sqlstatement: " + sqlstatement);
         logger.info("START dbread");
         HashMap<String, ArrayList> dbtables = new HashMap<>();
         sitedatasourcelist.stream().forEach((sitedatasource) -> {
             try {
                 CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
-                
                 JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
                 Connection con = jdbcutil.getConnection();
                 if (null != con) {
@@ -75,7 +71,6 @@ public class DatabaseTemplateBean {
                         ResultSet result = stmt.executeQuery(sqlstatement);
                         ResultSetMetaData rmd = result.getMetaData();
                         TableFieldStructure tfs = getTableFieldsList(rmd);
-
                         ArrayList<HashMap> tablevalues = new ArrayList<>();
                         while (result.next()) {
                             HashMap<String, String> dbexportvalues = new HashMap<>();
@@ -84,7 +79,7 @@ public class DatabaseTemplateBean {
                                     String value = result.getString(tf.getName());
                                     dbexportvalues.put(tf.getName(), value);
                                 } catch (java.sql.SQLException ex) {
-
+                                    logger.warn(ex.getMessage());
                                 }
                             });
                             tablevalues.add(dbexportvalues);
@@ -103,16 +98,12 @@ public class DatabaseTemplateBean {
         return contentmap;
     }
     
-    public boolean dbexecute(String catalog, String tablename, String sqlstatement) {
-        //System.out.println("DBREAD->catalog: " + catalog);
-        //System.out.println("DBREAD->tablename: " + tablename);
-        //System.out.println("DBREAD->sqlstatement: " + sqlstatement);
+    public boolean dbexecute(String catalog, String sqlstatement) {
         boolean ok = false;
         logger.info("START dbexecute");
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
             try {
                 CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
-                
                 JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
                 Connection con = jdbcutil.getConnection();
                 if (null != con) {

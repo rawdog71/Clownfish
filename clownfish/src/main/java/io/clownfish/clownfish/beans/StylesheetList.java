@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfStylesheetversion;
 import io.clownfish.clownfish.dbentities.CfStylesheetversionPK;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
+import io.clownfish.clownfish.utils.CheckoutUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.StylesheetUtil;
 import java.io.IOException;
@@ -106,23 +107,10 @@ public class StylesheetList {
             versionlist = cfstylesheetversionService.findByStylesheetref(selectedStylesheet.getId());
             difference = stylesheetUtility.hasDifference(selectedStylesheet);
             BigInteger co = selectedStylesheet.getCheckedoutby();
-            if (null != co) {
-                if (co.longValue() > 0) {
-                    if (co.longValue() == loginbean.getCfuser().getId()) {
-                        checkedout = true;
-                        access = true;
-                    } else {
-                        checkedout = false;
-                        access = false;
-                    }
-                } else {
-                    checkedout = false;
-                    access = true;
-                }
-            } else {
-                checkedout = false;
-                access = true;
-            }
+            CheckoutUtil checkoutUtil = new CheckoutUtil();
+            checkoutUtil.getCheckoutAccess(co, loginbean);
+            checkedout = checkoutUtil.isCheckedout();
+            access = checkoutUtil.isAccess();
         } else {
             checkedout = false;
             access = false;
