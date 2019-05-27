@@ -49,15 +49,15 @@ import org.springframework.stereotype.Component;
 @WebServlet(name = "GetContent", urlPatterns = {"/GetContent"})
 @Component
 public class GetContent extends HttpServlet {
-    @Autowired transient CfClassService cfclassService;
-    @Autowired transient CfClasscontentService cfclasscontentService;
-    @Autowired transient CfAttributService cfattributService;
-    @Autowired transient CfAttributcontentService cfattributcontentService;
-    @Autowired transient CfAttributetypeService cfattributetypeService;
+    @Autowired static transient CfClassService cfclassService;
+    @Autowired static transient CfClasscontentService cfclasscontentService;
+    @Autowired static transient CfAttributService cfattributService;
+    @Autowired static transient CfAttributcontentService cfattributcontentService;
+    @Autowired static transient CfAttributetypeService cfattributetypeService;
     
-    private transient @Getter @Setter String klasse;
-    private transient @Getter @Setter HashMap<String, String> searchmap;
-    private transient @Getter @Setter HashMap<String, String> outputmap;
+    private static transient @Getter @Setter String klasse;
+    private static transient @Getter @Setter HashMap<String, String> searchmap;
+    private static transient @Getter @Setter HashMap<String, String> outputmap;
 
     class AttributDef {
         String value;
@@ -141,7 +141,7 @@ public class GetContent extends HttpServlet {
             }
             if (found) {
                 outputmap.put("contentfound", "true");
-                contentooutput(outputmap, attributcontentList);
+                contentOutput(outputmap, attributcontentList);
                 break;
             }
         }
@@ -223,7 +223,7 @@ public class GetContent extends HttpServlet {
         }
     }
     
-    private void contentooutput(HashMap<String, String> outputmap, List<CfAttributcontent> attributcontentList) {
+    private void contentOutput(HashMap<String, String> outputmap, List<CfAttributcontent> attributcontentList) {
         attributcontentList.stream().forEach((attributcontent) -> {
             CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
             long attributtypeid = knattribut.getAttributetype().getId();
