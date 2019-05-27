@@ -18,6 +18,7 @@ package io.clownfish.clownfish.serviceimpl;
 import io.clownfish.clownfish.daointerface.CfJavascriptDAO;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
+import java.io.Serializable;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class CfJavascriptServiceImpl implements CfJavascriptService {
+public class CfJavascriptServiceImpl implements CfJavascriptService, Serializable {
     private final CfJavascriptDAO cfjavascriptDAO;
     
     @Autowired

@@ -18,6 +18,7 @@ package io.clownfish.clownfish.serviceimpl;
 import io.clownfish.clownfish.daointerface.CfJavascriptversionDAO;
 import io.clownfish.clownfish.dbentities.CfJavascriptversion;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
+import java.io.Serializable;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class CfJavascriptversionServiceImpl implements CfJavascriptversionService {
+public class CfJavascriptversionServiceImpl implements CfJavascriptversionService, Serializable {
     private final CfJavascriptversionDAO cfjavascriptversionDAO;
     
     @Autowired

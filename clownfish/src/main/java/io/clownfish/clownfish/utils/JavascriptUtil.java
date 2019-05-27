@@ -48,11 +48,11 @@ public class JavascriptUtil implements Serializable {
     
     private @Getter @Setter long currentVersion;
     private @Getter @Setter String javascriptContent = "";
-    private @Getter @Setter Patch<String> patch = null;
-    private @Getter @Setter List<String> source = null;
-    private @Getter @Setter List<String> target = null;
+    private transient @Getter @Setter Patch<String> patch = null;
+    private transient @Getter @Setter List<String> source = null;
+    private transient @Getter @Setter List<String> target = null;
     
-    final Logger logger = LoggerFactory.getLogger(JavascriptUtil.class);
+    final transient Logger logger = LoggerFactory.getLogger(JavascriptUtil.class);
 
     public JavascriptUtil() {
     }
