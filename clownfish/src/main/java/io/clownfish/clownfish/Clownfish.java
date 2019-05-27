@@ -74,7 +74,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.persistence.NoResultException;
@@ -161,7 +160,9 @@ public class Clownfish {
         } catch (IOException ex) {
             logger.error(ex.getMessage());
         } finally {
-            outwriter.close();
+            if (null != outwriter) {
+                outwriter.close();
+            }
         }
     }
     
@@ -207,7 +208,6 @@ public class Clownfish {
 
     @GetMapping(path = "/{name}")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        //logger.info("START universal GET: " + name);
         try {
             userSession = request.getSession();
             this.request = request;
@@ -215,13 +215,15 @@ public class Clownfish {
             Map<String, String[]> querymap = request.getParameterMap();
             
             ArrayList queryParams = new ArrayList();
-            for (Object key : querymap.keySet()) {
+            querymap.keySet().stream().map((key) -> {
                 JsonFormParameter jfp = new JsonFormParameter();
                 jfp.setName((String) key);
-                String[] values = querymap.get(key);
+                String[] values = querymap.get((String) key);
                 jfp.setValue(values[0]);
+                return jfp;
+            }).forEach((jfp) -> {
                 queryParams.add(jfp);
-            }
+            });
             addHeader(response);
             Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams);
             if (cfResponse.get().getErrorcode() == 0) {
@@ -236,12 +238,10 @@ public class Clownfish {
         } catch (IOException | InterruptedException | ExecutionException ex) {
             logger.error(ex.getMessage());
         }
-        //logger.info("END universal GET: " + name);
     }
     
     @PostMapping("/{name}")
     public void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        //logger.info("START universal POST:" + name);
         try {
             userSession = request.getSession();
             this.request = request;
@@ -267,17 +267,10 @@ public class Clownfish {
         } catch (IOException | InterruptedException | ExecutionException ex) {
             logger.error(ex.getMessage());
         }
-        //logger.info("END universal POST:" + name);
     }
     
     @Async
     public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap) {
-        /*
-        logger.info("START makeResponse: " + name);
-        for (JsonFormParameter param : postmap) {
-            logger.info("PARAM: " + param.getName() + " VALUE:" + param.getValue());
-        }
-        */
         ClownfishResponse cfresponse = new ClownfishResponse();
         try {
             // Freemarker Template
@@ -297,7 +290,7 @@ public class Clownfish {
             }
             
             // fetch site by name or aliasname
-            CfSite cfsite = null;
+            CfSite cfsite;
             try {
                 cfsite = cfsiteService.findByName(name);
             } catch (Exception ex) {
@@ -400,46 +393,55 @@ public class Clownfish {
                 Writer out = new StringWriter();
                 if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
                     emailbean.init(propertymap);
-                    fmRoot.put("emailBean", emailbean);
-                    fmRoot.put("css", cfstylesheet);
-                    fmRoot.put("js", cfjavascript);
-                    fmRoot.put("sitecontent", sitecontentmap);
-                    if (sapSupport) {
-                        List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
-                        sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
-                        sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
-                    }
-                    fmRoot.put("sapBean", sapbean);
-                    databasebean.init(sitedatasourcelist);
-                    fmRoot.put("databaseBean", databasebean);
+                    if (null != fmRoot) {
+                        fmRoot.put("emailBean", emailbean);
+                        fmRoot.put("css", cfstylesheet);
+                        fmRoot.put("js", cfjavascript);
+                        fmRoot.put("sitecontent", sitecontentmap);
                     
-                    fmRoot.put("parameter", parametermap);
-                    fmRoot.put("property", propertymap);
-                    try {
-                        freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
-                        env.process();
-                    } catch (freemarker.template.TemplateException ex) {
-                        logger.error(ex.getMessage());
+                        if (sapSupport) {
+                            List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
+                            sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                            sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
+                        }
+                        fmRoot.put("sapBean", sapbean);
+                        databasebean.init(sitedatasourcelist);
+                        fmRoot.put("databaseBean", databasebean);
+
+                        fmRoot.put("parameter", parametermap);
+                        fmRoot.put("property", propertymap);
+                        try {
+                            if (null != fmTemplate) {
+                                freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
+                                env.process();
+                            }
+                        } catch (freemarker.template.TemplateException ex) {
+                            logger.error(ex.getMessage());
+                        }
                     }
                 } else {                                    // Velocity template
                     emailbean.init(propertymap);
-                    velContext.put("emailBean", emailbean);
-                    velContext.put("css", cfstylesheet);
-                    velContext.put("js", cfjavascript);
-                    velContext.put("sitecontent", sitecontentmap); 
-                    if (sapSupport) {
-                        List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
-                        sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
-                        sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
+                    if (null != velContext) {
+                        velContext.put("emailBean", emailbean);
+                        velContext.put("css", cfstylesheet);
+                        velContext.put("js", cfjavascript);
+                        velContext.put("sitecontent", sitecontentmap); 
+                        if (sapSupport) {
+                            List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
+                            sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                            sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
+                        }
+                        velContext.put("sapBean", sapbean);
+                        databasebean.init(sitedatasourcelist);
+                        velContext.put("databaseBean", databasebean);
+
+                        velContext.put("parameter", parametermap);
+                        velContext.put("property", propertymap);
+
+                        if (null != velTemplate) {
+                            velTemplate.merge(velContext, out);
+                        }
                     }
-                    velContext.put("sapBean", sapbean);
-                    databasebean.init(sitedatasourcelist);
-                    velContext.put("databaseBean", databasebean);
-                    
-                    velContext.put("parameter", parametermap);
-                    velContext.put("property", propertymap);
-                    
-                    velTemplate.merge(velContext, out);
                 }
                 String gzip;
                 gzip = propertymap.get("html.gzip");
@@ -480,24 +482,24 @@ public class Clownfish {
                     cfresponse.setErrorcode(0);
                     cfresponse.setOutput(htmlcompressor.compress(out.toString()));
                     //logger.info("END makeResponse: " + name);
-                    return new AsyncResult<ClownfishResponse>(cfresponse);
+                    return new AsyncResult<>(cfresponse);
                 } else {
                     cfresponse.setErrorcode(0);
                     cfresponse.setOutput(out.toString());
                     //logger.info("END makeResponse: " + name);
-                    return new AsyncResult<ClownfishResponse>(cfresponse);
+                    return new AsyncResult<>(cfresponse);
                 }
             } catch (NoResultException ex) {
                 cfresponse.setErrorcode(1);
                 cfresponse.setOutput("No template");
                 //logger.info("END makeResponse: " + name);
-                return new AsyncResult<ClownfishResponse>(cfresponse);
+                return new AsyncResult<>(cfresponse);
             }     
         } catch (IOException | org.apache.velocity.runtime.parser.ParseException ex) {
             cfresponse.setErrorcode(1);
             cfresponse.setOutput(ex.getMessage());
             //logger.info("END makeResponse: " + name);
-            return new AsyncResult<ClownfishResponse>(cfresponse);
+            return new AsyncResult<>(cfresponse);
         } 
     }
     
@@ -508,21 +510,17 @@ public class Clownfish {
 
     private void manageSessionVariables(List<JsonFormParameter> postmap) {
         if (postmap != null) {
-            for (JsonFormParameter jfp : postmap) {
-                if (jfp.getName().startsWith("session")) {
-                    userSession.setAttribute(jfp.getName(), jfp.getValue());
-                }
-            }
+            postmap.stream().filter((jfp) -> (jfp.getName().startsWith("session"))).forEach((jfp) -> {
+                userSession.setAttribute(jfp.getName(), jfp.getValue());
+            });
         }
     }
     
     private void writeSessionVariables(Map parametermap) {
-        for (String key : Collections.list(userSession.getAttributeNames())) {
-            if (key.startsWith("session")) {
-                String attributevalue = (String) userSession.getAttribute(key);
-                parametermap.put(key, attributevalue);
-            }
-        }
+        Collections.list(userSession.getAttributeNames()).stream().filter((key) -> (key.startsWith("session"))).forEach((key) -> {
+            String attributevalue = (String) userSession.getAttribute(key);
+            parametermap.put(key, attributevalue);
+        });
     }
     
     private void addHeader(HttpServletResponse response) {

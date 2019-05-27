@@ -109,10 +109,11 @@ public class DatabaseTemplateBean {
                 Connection con = jdbcutil.getConnection();
                 if (null != con) {
                     if (con.getCatalog().compareToIgnoreCase(catalog) == 0) {
-                        Statement stmt = con.createStatement();
-                        int count = stmt.executeUpdate(sqlstatement);
-                        if (count > 0 ) {
-                            ok = true;
+                        try (Statement stmt = con.createStatement()) {
+                            int count = stmt.executeUpdate(sqlstatement);
+                            if (count > 0 ) {
+                                ok = true;
+                            }
                         }
                     }
                     con.close();
