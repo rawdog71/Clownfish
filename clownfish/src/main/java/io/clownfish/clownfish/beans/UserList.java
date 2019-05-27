@@ -113,7 +113,7 @@ public class UserList {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            CfUser validateList = cfuserService.findByEmail(email);
+            cfuserService.findByEmail(email);
             newUserButtonDisabled = true;
         } catch (NoResultException ex) {
             newUserButtonDisabled = email.isEmpty();

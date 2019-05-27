@@ -48,20 +48,20 @@ import org.springframework.stereotype.Component;
 @Scope("session")
 @Component
 public class ClassList implements Serializable {
-    @Autowired CfClassService cfclassService;
-    @Autowired CfAttributService cfattributService;
-    @Autowired CfAttributetypeService cfattributetypeService;
-    @Autowired CfClasscontentService cfclascontentService;
-    @Autowired CfAttributcontentService cfattributcontentService;
+    @Autowired transient CfClassService cfclassService;
+    @Autowired transient CfAttributService cfattributService;
+    @Autowired transient CfAttributetypeService cfattributetypeService;
+    @Autowired transient CfClasscontentService cfclascontentService;
+    @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired DataList datalist;
     @Autowired ContentList contentlist;
     
     private @Getter @Setter List<CfClass> classListe;
     private @Getter @Setter CfClass selectedClass = null;
-    private @Getter @Setter List<CfAttribut> selectedAttributList = null;
+    private transient @Getter @Setter List<CfAttribut> selectedAttributList = null;
     private @Getter @Setter CfAttribut selectedAttribut = null;
     private @Getter @Setter CfAttributetype selectedAttributeType = null;
-    private @Getter @Setter List<CfAttributetype> attributetypelist = null;
+    private transient @Getter @Setter List<CfAttributetype> attributetypelist = null;
     private @Getter @Setter String className;
     private @Getter @Setter String attributName;
     private @Getter @Setter boolean identity;
@@ -69,7 +69,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean newButtonDisabled;
     private @Getter @Setter boolean newAttributButtonDisabled;
     
-    @Autowired private @Getter @Setter AttributList attributlist;
+    @Autowired transient private @Getter @Setter AttributList attributlist;
 
     @PostConstruct
     public void init() {
@@ -97,7 +97,7 @@ public class ClassList implements Serializable {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            CfClass validateClass = cfclassService.findByName(className);
+            cfclassService.findByName(className);
             newButtonDisabled = true;
         } catch (NoResultException ex) {
             newButtonDisabled = className.isEmpty();
@@ -106,7 +106,7 @@ public class ClassList implements Serializable {
     
     public void onChangeAttributName(ValueChangeEvent changeEvent) {
         try {
-            CfAttribut validateClass = cfattributService.findByNameAndClassref(attributName, selectedClass);
+            cfattributService.findByNameAndClassref(attributName, selectedClass);
             newAttributButtonDisabled = true;
         } catch (NoResultException ex) {
             newAttributButtonDisabled = attributName.isEmpty();

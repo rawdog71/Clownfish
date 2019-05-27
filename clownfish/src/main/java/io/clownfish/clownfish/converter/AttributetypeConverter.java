@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 @FacesConverter(value = "attributetypeConverter")
 @Component
 public class AttributetypeConverter implements Converter, Serializable {
-    @Autowired CfAttributetypeService cfattributetypeService;
+    @Autowired transient CfAttributetypeService cfattributetypeService;
     
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {

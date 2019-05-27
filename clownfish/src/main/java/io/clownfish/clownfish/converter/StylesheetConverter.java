@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @FacesConverter(value = "stylesheetConverter")
 @Component
 public class StylesheetConverter implements Converter, Serializable {
-    @Autowired CfStylesheetService cfstylesheetservice;
+    @Autowired transient CfStylesheetService cfstylesheetservice;
 
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {

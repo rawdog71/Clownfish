@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @FacesConverter(value = "templateConverter")
 @Component
 public class TemplateConverter implements Converter, Serializable {
-    @Autowired CfTemplateService cftemplateservice;
+    @Autowired transient CfTemplateService cftemplateservice;
     
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {

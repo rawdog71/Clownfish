@@ -213,7 +213,7 @@ public class JavascriptList {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            CfJavascript validateJavascript = cfjavascriptService.findByName(javascriptName);
+            cfjavascriptService.findByName(javascriptName);
             newButtonDisabled = true;
         } catch (NoResultException ex) {
             newButtonDisabled = javascriptName.isEmpty();
@@ -258,7 +258,7 @@ public class JavascriptList {
     
     public void onVersionSelect(ActionEvent actionEvent) {
         if (null != selectedJavascript) {
-            String versioncontent = javascriptUtility.getVersion(version.getCfJavascriptversionPK().getJavascriptref(), version.getCfJavascriptversionPK().getVersion());
+            javascriptUtility.getVersion(version.getCfJavascriptversionPK().getJavascriptref(), version.getCfJavascriptversionPK().getVersion());
         }
     }
 }

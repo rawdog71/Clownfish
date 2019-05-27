@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @FacesConverter(value = "javascriptConverter")
 @Component
 public class JavascriptConverter implements Converter, Serializable {
-    @Autowired CfJavascriptService cfjavascriptservice;
+    @Autowired transient CfJavascriptService cfjavascriptservice;
     
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {

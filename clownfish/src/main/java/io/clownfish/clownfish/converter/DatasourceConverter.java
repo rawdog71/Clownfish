@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @FacesConverter(value = "datasourceConverter")
 @Component
 public class DatasourceConverter implements Converter, Serializable {
-    @Autowired CfDatasourceService cfdatasourceservice;
+    @Autowired transient CfDatasourceService cfdatasourceservice;
     
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {

@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @FacesConverter(value = "sitelistConverter")
 @Component
 public class ListConverter implements Converter, Serializable {
-    @Autowired CfListService cflistservice;
+    @Autowired transient CfListService cflistservice;
     
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
