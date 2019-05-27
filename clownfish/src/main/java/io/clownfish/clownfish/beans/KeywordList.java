@@ -61,15 +61,15 @@ public class KeywordList {
 
     public void onCreate(ActionEvent actionEvent) {
         try {
-            for (String keyword : items) {
+            items.stream().forEach((keyword) -> {
                 try {
-                    CfKeyword testkeyword = cfkeywordService.findByName(keyword);
+                    cfkeywordService.findByName(keyword);
                 } catch (NoResultException ex) {
                     CfKeyword newkeyword = new CfKeyword();
                     newkeyword.setName(keyword);
                     cfkeywordService.create(newkeyword);
                 }
-            }
+            });
             keywordlist = cfkeywordService.findAll();
             assetlist.init();
         } catch (ConstraintViolationException ex) {

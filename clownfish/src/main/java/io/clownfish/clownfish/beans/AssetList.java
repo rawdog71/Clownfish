@@ -107,6 +107,7 @@ public class AssetList {
                     fileOutputStream.write(buffer, 0, bulk);
                     fileOutputStream.flush();
                 }
+                fileOutputStream.close();
             }
             inputStream.close();
             

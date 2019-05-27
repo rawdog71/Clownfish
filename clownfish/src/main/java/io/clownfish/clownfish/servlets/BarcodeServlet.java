@@ -53,7 +53,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BarcodeServlet extends HttpServlet {
     
-    final Logger logger = LoggerFactory.getLogger(BarcodeServlet.class);
+    final transient Logger logger = LoggerFactory.getLogger(BarcodeServlet.class);
     
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -68,7 +68,7 @@ public class BarcodeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         final AsyncContext acontext = request.startAsync();
-        
+
         acontext.start(new Runnable() {
             public void run() {
                 OutputStream out = null;
@@ -83,38 +83,54 @@ public class BarcodeServlet extends HttpServlet {
                     String message = acontext.getRequest().getParameter("message");
                     if (height != null) {
                         barcodeHeight = Integer.parseInt(height);
-                    }   if (dpi != null) {
+                    }
+                    if (dpi != null) {
                         barcodeDpi = Integer.parseInt(dpi);
-                    }   if (type == null) {
+                    }
+                    if (type == null) {
                         type = "Code128";
-                    }   if (message == null) {
+                    }
+                    if (message == null) {
                         message = "yes";
-                    }   if (type.compareToIgnoreCase("code128") == 0) {
+                    }
+                    if (type.compareToIgnoreCase("code128") == 0) {
                         bean = new Code128Bean();
-                    }   if (type.compareToIgnoreCase("code39") == 0) {
+                    }
+                    if (type.compareToIgnoreCase("code39") == 0) {
                         bean = new Code39Bean();
-                    }   if (type.compareToIgnoreCase("codabar") == 0) {
+                    }
+                    if (type.compareToIgnoreCase("codabar") == 0) {
                         bean = new CodabarBean();
-                    }   if (type.compareToIgnoreCase("int2of5") == 0) {
+                    }
+                    if (type.compareToIgnoreCase("int2of5") == 0) {
                         bean = new Interleaved2Of5Bean();
-                    }   if (type.compareToIgnoreCase("postnet") == 0) {
+                    }
+                    if (type.compareToIgnoreCase("postnet") == 0) {
                         bean = new POSTNETBean();
-                    }   if (type.compareToIgnoreCase("upcean13") == 0) {
+                    }
+                    if (type.compareToIgnoreCase("upcean13") == 0) {
                         bean = new EAN13Bean();
-                    }   if (type.compareToIgnoreCase("upcean8") == 0) {
+                    }
+                    if (type.compareToIgnoreCase("upcean8") == 0) {
                         bean = new EAN8Bean();
-                    }   if (type.compareToIgnoreCase("upca") == 0) {
+                    }
+                    if (type.compareToIgnoreCase("upca") == 0) {
                         bean = new UPCABean();
-                    }   if (type.compareToIgnoreCase("upce") == 0) {
+                    }
+                    if (type.compareToIgnoreCase("upce") == 0) {
                         bean = new UPCEBean();
-                    }   if (type.compareToIgnoreCase("pdf417") == 0) {
+                    }
+                    if (type.compareToIgnoreCase("pdf417") == 0) {
                         bean = new PDF417Bean();
-                    }   if (type.compareToIgnoreCase("datamatrix") == 0) {
+                    }
+                    if (type.compareToIgnoreCase("datamatrix") == 0) {
                         bean = new DataMatrixBean();
-                    }   ((AbstractBarcodeBean) bean).setBarHeight(barcodeHeight);
+                    }
+                    ((AbstractBarcodeBean) bean).setBarHeight(barcodeHeight);
                     if (message.compareToIgnoreCase("no") == 0) {
                         ((AbstractBarcodeBean) bean).setMsgPosition(HumanReadablePlacement.HRP_NONE);
-                    }   out = new java.io.FileOutputStream(new File("output.png"));
+                    }
+                    out = new java.io.FileOutputStream(new File("output.png"));
                     BitmapCanvasProvider provider = new BitmapCanvasProvider(out, "image/x-png", barcodeDpi, BufferedImage.TYPE_BYTE_GRAY, true, 0);
                     ((AbstractBarcodeBean) bean).generateBarcode(provider, barcode);
                     provider.finish();
@@ -131,7 +147,9 @@ public class BarcodeServlet extends HttpServlet {
                     acontext.complete();
                 } finally {
                     try {
-                        out.close();
+                        if (null != out) {
+                            out.close();
+                        }
                         acontext.complete();
                     } catch (IOException ex) {
                         logger.error(ex.getMessage());

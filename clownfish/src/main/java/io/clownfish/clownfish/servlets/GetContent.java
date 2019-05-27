@@ -49,15 +49,15 @@ import org.springframework.stereotype.Component;
 @WebServlet(name = "GetContent", urlPatterns = {"/GetContent"})
 @Component
 public class GetContent extends HttpServlet {
-    @Autowired CfClassService cfclassService;
-    @Autowired CfClasscontentService cfclasscontentService;
-    @Autowired CfAttributService cfattributService;
-    @Autowired CfAttributcontentService cfattributcontentService;
-    @Autowired CfAttributetypeService cfattributetypeService;
+    @Autowired transient CfClassService cfclassService;
+    @Autowired transient CfClasscontentService cfclasscontentService;
+    @Autowired transient CfAttributService cfattributService;
+    @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired transient CfAttributetypeService cfattributetypeService;
     
-    private @Getter @Setter String klasse;
-    private @Getter @Setter HashMap<String, String> searchmap;
-    private @Getter @Setter HashMap<String, String> outputmap;
+    private transient @Getter @Setter String klasse;
+    private transient @Getter @Setter HashMap<String, String> searchmap;
+    private transient @Getter @Setter HashMap<String, String> outputmap;
 
     class AttributDef {
         String value;
@@ -108,34 +108,32 @@ public class GetContent extends HttpServlet {
             searchmap.put(keys[1], values[0]);
         });
         
-        //CfClass knclass = (Knclass) em.createNamedQuery("Knclass.findByName").setParameter("name", klasse).getSingleResult();
         CfClass cfclass = cfclassService.findByName(klasse);
-        //List<CfClasscontent> classcontentList = em.createNamedQuery("Knclasscontent.findByClassref").setParameter("classref", knclass).getResultList();
         List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
         boolean found = true;
         for (CfClasscontent classcontent : classcontentList) {
-            //List<CfAttributcontent> attributcontentList = em.createNamedQuery("Knattributcontent.findByClasscontentref").setParameter("classcontentref", classcontent).getResultList();
             List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
             found = true;
             for (CfAttributcontent attributcontent : attributcontentList) {
-                //Knattribut knattribut = (Knattribut) em.createNamedQuery("Knattribut.findById").setParameter("id", attributcontent.getAttributref().getId()).getSingleResult();
                 CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
                 for (String searchcontent : searchmap.keySet()) {
                     String searchvalue = searchmap.get(searchcontent);
                     if (knattribut.getName().compareToIgnoreCase(searchcontent) == 0) {
                         long attributtypeid = knattribut.getAttributetype().getId();
                         AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
-                        if (attributdef.getType().compareToIgnoreCase("hashstring") == 0) {
-                            String salt = attributcontent.getSalt();
-                            if (salt != null) {
-                                searchvalue = PasswordUtil.generateSecurePassword(searchvalue, salt);
+                        if (null != attributdef) {
+                            if (attributdef.getType().compareToIgnoreCase("hashstring") == 0) {
+                                String salt = attributcontent.getSalt();
+                                if (salt != null) {
+                                    searchvalue = PasswordUtil.generateSecurePassword(searchvalue, salt);
+                                }
                             }
-                        }
-                        if (attributdef.getValue() == null) {
-                            found = false;
-                        } else {
-                            if (searchvalue.compareToIgnoreCase(attributdef.getValue()) != 0) {
+                            if (attributdef.getValue() == null) {
                                 found = false;
+                            } else {
+                                if (searchvalue.compareToIgnoreCase(attributdef.getValue()) != 0) {
+                                    found = false;
+                                }
                             }
                         }
                     }

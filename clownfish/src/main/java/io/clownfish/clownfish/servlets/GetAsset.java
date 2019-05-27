@@ -61,7 +61,7 @@ public class GetAsset extends HttpServlet {
     
     private static Map<String, String> propertymap = null;
     
-    final Logger logger = LoggerFactory.getLogger(GetAsset.class);
+    final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
     
     public GetAsset() {
     }
