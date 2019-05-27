@@ -18,6 +18,7 @@ package io.clownfish.clownfish.serviceimpl;
 import io.clownfish.clownfish.daointerface.CfStylesheetDAO;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
+import java.io.Serializable;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class CfStylesheetServiceImpl implements CfStylesheetService {
-    private final CfStylesheetDAO cfstylesheetDAO;
+public class CfStylesheetServiceImpl implements CfStylesheetService, Serializable {
+    private final transient CfStylesheetDAO cfstylesheetDAO;
     
     @Autowired
     public CfStylesheetServiceImpl(CfStylesheetDAO cfpropertyDAO) {

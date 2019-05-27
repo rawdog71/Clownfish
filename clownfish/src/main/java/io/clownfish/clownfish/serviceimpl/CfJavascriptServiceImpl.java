@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class CfJavascriptServiceImpl implements CfJavascriptService, Serializable {
-    private final CfJavascriptDAO cfjavascriptDAO;
+    private transient final CfJavascriptDAO cfjavascriptDAO;
     
     @Autowired
     public CfJavascriptServiceImpl(CfJavascriptDAO cfpropertyDAO) {

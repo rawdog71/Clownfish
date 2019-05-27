@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class CfJavascriptversionServiceImpl implements CfJavascriptversionService, Serializable {
-    private final CfJavascriptversionDAO cfjavascriptversionDAO;
+    private transient final CfJavascriptversionDAO cfjavascriptversionDAO;
     
     @Autowired
     public CfJavascriptversionServiceImpl(CfJavascriptversionDAO cfjavascriptversionDAO) {

@@ -18,6 +18,7 @@ package io.clownfish.clownfish.serviceimpl;
 import io.clownfish.clownfish.daointerface.CfTemplateDAO;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import java.io.Serializable;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class CfTemplateServiceImpl implements CfTemplateService {
-    private final CfTemplateDAO cftemplateDAO;
+public class CfTemplateServiceImpl implements CfTemplateService, Serializable {
+    private transient final CfTemplateDAO cftemplateDAO;
     
     @Autowired
     public CfTemplateServiceImpl(CfTemplateDAO cftemplateDAO) {

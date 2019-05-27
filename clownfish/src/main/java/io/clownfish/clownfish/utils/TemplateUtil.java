@@ -48,16 +48,16 @@ import org.springframework.stereotype.Component;
 @ViewScoped
 @Component
 public class TemplateUtil implements Serializable {
-    @Autowired CfTemplateService cftemplateService;
-    @Autowired CfTemplateversionService cftemplateversionService;
+    @Autowired transient CfTemplateService cftemplateService;
+    @Autowired transient CfTemplateversionService cftemplateversionService;
     
     private @Getter @Setter long currentVersion;
-    private @Getter @Setter  String templateContent = "";
-    private @Getter @Setter  Patch<String> patch = null;
-    private @Getter @Setter  List<String> source = null;
-    private @Getter @Setter  List<String> target = null;
+    private @Getter @Setter String templateContent = "";
+    private transient @Getter @Setter Patch<String> patch = null;
+    private transient @Getter @Setter List<String> source = null;
+    private transient @Getter @Setter List<String> target = null;
     
-    final Logger logger = LoggerFactory.getLogger(TemplateUtil.class);
+    final transient Logger logger = LoggerFactory.getLogger(TemplateUtil.class);
 
     public TemplateUtil() {
     }

@@ -43,16 +43,16 @@ import org.springframework.stereotype.Component;
 @ViewScoped
 @Component
 public class StylesheetUtil implements Serializable {
-    @Autowired CfStylesheetService cfstylesheetService;
-    @Autowired CfStylesheetversionService cfstylesheetversionService;
+    @Autowired transient CfStylesheetService cfstylesheetService;
+    @Autowired transient CfStylesheetversionService cfstylesheetversionService;
     
-    private @Getter @Setter  long currentVersion;
-    private @Getter @Setter  String styelsheetContent = "";
-    private @Getter @Setter  Patch<String> patch = null;
-    private @Getter @Setter  List<String> source = null;
-    private @Getter @Setter  List<String> target = null;
+    private @Getter @Setter long currentVersion;
+    private @Getter @Setter String styelsheetContent = "";
+    private transient @Getter @Setter Patch<String> patch = null;
+    private transient @Getter @Setter List<String> source = null;
+    private transient @Getter @Setter List<String> target = null;
     
-    final Logger logger = LoggerFactory.getLogger(StylesheetUtil.class);
+    final transient Logger logger = LoggerFactory.getLogger(StylesheetUtil.class);
 
     public StylesheetUtil() {
     }

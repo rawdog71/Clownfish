@@ -18,6 +18,7 @@ package io.clownfish.clownfish.serviceimpl;
 import io.clownfish.clownfish.daointerface.CfStylesheetversionDAO;
 import io.clownfish.clownfish.dbentities.CfStylesheetversion;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
+import java.io.Serializable;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class CfStylesheetversionServiceImpl implements CfStylesheetversionService {
-    private final CfStylesheetversionDAO cfstylesheetversionDAO;
+public class CfStylesheetversionServiceImpl implements CfStylesheetversionService, Serializable {
+    private transient final CfStylesheetversionDAO cfstylesheetversionDAO;
     
     @Autowired
     public CfStylesheetversionServiceImpl(CfStylesheetversionDAO cfstylesheetversionDAO) {

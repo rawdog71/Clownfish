@@ -43,8 +43,8 @@ import org.springframework.stereotype.Component;
 @ViewScoped
 @Component
 public class JavascriptUtil implements Serializable {
-    @Autowired CfJavascriptService cfjavascriptService;
-    @Autowired CfJavascriptversionService cfjavascriptversionService;
+    @Autowired transient CfJavascriptService cfjavascriptService;
+    @Autowired transient CfJavascriptversionService cfjavascriptversionService;
     
     private @Getter @Setter long currentVersion;
     private @Getter @Setter String javascriptContent = "";
