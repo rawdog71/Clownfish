@@ -49,20 +49,20 @@ import org.springframework.stereotype.Component;
 @Scope("session")
 @Component
 public class DataList implements Serializable {
-    @Autowired CfListService cflistService;
-    @Autowired CfListcontentService cflistcontentService;
-    @Autowired CfClassService cfclassService;
-    @Autowired CfClasscontentService cfclasscontentService;
+    @Autowired transient CfListService cflistService;
+    @Autowired transient CfListcontentService cflistcontentService;
+    @Autowired transient CfClassService cfclassService;
+    @Autowired transient CfClasscontentService cfclasscontentService;
     
     
-    private @Getter @Setter List<CfList> datacontentlist = null;
+    private transient @Getter @Setter List<CfList> datacontentlist = null;
     private @Getter @Setter CfList selectedList = null;
     private @Getter @Setter String contentName;
     private @Getter @Setter CfClass selectedClass;
-    private @Getter @Setter List<CfClass> classlist = null;
+    private transient @Getter @Setter List<CfClass> classlist = null;
     private @Getter @Setter boolean newContentButtonDisabled = false;
-    private @Getter @Setter List<CfClasscontent> selectedListcontent = null;
-    private @Getter @Setter List<CfClasscontent> filteredclasscontentlist = null;
+    private transient @Getter @Setter List<CfClasscontent> selectedListcontent = null;
+    private transient @Getter @Setter List<CfClasscontent> filteredclasscontentlist = null;
 
     @PostConstruct
     public void init() {
@@ -112,7 +112,7 @@ public class DataList implements Serializable {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            CfList validateList = cflistService.findByName(contentName);
+            cflistService.findByName(contentName);
             newContentButtonDisabled = true;
         } catch (NoResultException ex) {
             newContentButtonDisabled = contentName.isEmpty();

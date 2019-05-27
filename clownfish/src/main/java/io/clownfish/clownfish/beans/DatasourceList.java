@@ -42,10 +42,10 @@ import org.springframework.stereotype.Component;
 @Scope("session")
 @Component
 public class DatasourceList implements Serializable {
-    @Autowired CfDatasourceService cfdatasourceService;
-    @Autowired CfSitedatasourceService cfsitedatasourceService;
+    @Autowired transient CfDatasourceService cfdatasourceService;
+    @Autowired transient CfSitedatasourceService cfsitedatasourceService;
     
-    private @Getter @Setter List<CfDatasource> datasourcelist = null;
+    private transient @Getter @Setter List<CfDatasource> datasourcelist = null;
     private @Getter @Setter CfDatasource selectedDatasource = null;
     private @Getter @Setter String datasourceName;
     private @Getter @Setter String datasourceServer;
@@ -119,9 +119,9 @@ public class DatasourceList implements Serializable {
     public void onDeleteContent(ActionEvent actionEvent) {
         if (selectedDatasource != null) {
             List<CfSitedatasource> sitedatasourcelist = cfsitedatasourceService.findByDatasourceref(selectedDatasource.getId());
-            for (CfSitedatasource sitedatasource : sitedatasourcelist) {
+            sitedatasourcelist.stream().forEach((sitedatasource) -> {
                 cfsitedatasourceService.delete(sitedatasource);
-            }
+            });
             cfdatasourceService.delete(selectedDatasource);
             datasourcelist = cfdatasourceService.findAll();
             
@@ -130,7 +130,7 @@ public class DatasourceList implements Serializable {
     
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
-            CfDatasource validateList = cfdatasourceService.findByName(datasourceName);
+            cfdatasourceService.findByName(datasourceName);
             newContentButtonDisabled = true;
         } catch (NoResultException ex) {
             newContentButtonDisabled = datasourceName.isEmpty();

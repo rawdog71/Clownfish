@@ -121,6 +121,7 @@ public class AssetList {
             ParseContext context = new ParseContext();
 
             parser.parse(inputstream, handler, metadata, context);
+            inputStream.close();
             //System.out.println(handler.toString());
 
             //getting the list of all meta data elements 

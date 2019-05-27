@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @FacesConverter(value = "classcontentConverter")
 @Component
 public class ClasscontentConverter implements Converter, Serializable {
-    @Autowired CfClasscontentService cfclasscontentservice;
+    @Autowired transient CfClasscontentService cfclasscontentservice;
     
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {

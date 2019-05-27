@@ -248,7 +248,7 @@ public class CfAttributcontent implements Serializable {
                     DateTime dt = new DateTime(getContentDate());
                     DateTimeFormatter dtf1 = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy").withLocale(Locale.GERMANY);
                     
-                    String test = dt.toString(dtf1);
+                    dt.toString(dtf1);
                     DateTimeFormatter dtf = DateTimeFormat.forPattern("dd.MM.yyyy");
                     
                     return dt.toString(dtf);
