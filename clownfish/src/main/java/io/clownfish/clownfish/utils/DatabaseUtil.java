@@ -147,9 +147,9 @@ public class DatabaseUtil {
                 if (dtp.getOrderdir() != null) {
                     default_direction = datatableproperties.get(tablename).getOrderdir();
                 }
-                low_limit = 1 + ((dtp.getPage()-1) * dtp.getPagination());
+                low_limit = 1L + (long)((dtp.getPage()-1) * dtp.getPagination());
                 if (con.getMetaData().getDriverName().contains("MS SQL")) {
-                    high_limit = dtp.getPage() * dtp.getPagination();
+                    high_limit = (long) dtp.getPage() * (long) dtp.getPagination();
                 }
                 if (con.getMetaData().getDriverName().contains("MySQL")) {
                     high_limit = dtp.getPagination();
