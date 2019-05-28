@@ -293,6 +293,11 @@ public class DatabaseUtil {
                 tablevalues.add(dbexportvalues);
             }
             dbtables.put(tablename, tablevalues);
+            try {
+                result.close();
+            } catch (SQLException ex) {
+                logger.error(ex.getMessage());
+            }
             result = stmt.executeQuery(sql_count.toString());
             HashMap<String, String> dbexportvalues = new HashMap<>();
             while (result.next()) {
@@ -599,80 +604,81 @@ public class DatabaseUtil {
                 sql_condition.append("(");
                 sql_condition.append(dtc.getField());
                 String fieldType = getFieldType(tableFieldsList, dtc.getField());
-                switch (dtc.getOperand()) {
-                    case "eq" : 
-                        sql_condition.append(" = ");
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        sql_condition.append(dtc.getValue());
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        break;
-                    case "lk" : 
-                        sql_condition.append(" LIKE ");
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0) || (fieldType.compareToIgnoreCase("int") == 0) || (fieldType.compareToIgnoreCase("float") == 0)) {
-                            sql_condition.append("'%");
-                        }
-                        sql_condition.append(dtc.getValue());
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0) || (fieldType.compareToIgnoreCase("int") == 0) || (fieldType.compareToIgnoreCase("float") == 0)) {
-                            sql_condition.append("%'");
-                        }
-                        break;
-                    case "gt" : 
-                        sql_condition.append(" > ");
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        sql_condition.append(dtc.getValue());
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        break;
-                    case "ge" : 
-                        sql_condition.append(" >= ");
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        sql_condition.append(dtc.getValue());
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        break;    
-                    case "lt" : 
-                        sql_condition.append(" < ");
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        sql_condition.append(dtc.getValue());
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        break;
-                    case "le" : 
-                        sql_condition.append(" <= ");
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        sql_condition.append(dtc.getValue());
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        break;    
-                    case "neq" : 
-                        sql_condition.append(" <> ");
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        sql_condition.append(dtc.getValue());
-                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                            sql_condition.append("'");
-                        }
-                        break;
+                if (null != fieldType) {
+                    switch (dtc.getOperand()) {
+                        case "eq" : 
+                            sql_condition.append(" = ");
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            sql_condition.append(dtc.getValue());
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            break;
+                        case "lk" : 
+                            sql_condition.append(" LIKE ");
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0) || (fieldType.compareToIgnoreCase("int") == 0) || (fieldType.compareToIgnoreCase("float") == 0)) {
+                                sql_condition.append("'%");
+                            }
+                            sql_condition.append(dtc.getValue());
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0) || (fieldType.compareToIgnoreCase("int") == 0) || (fieldType.compareToIgnoreCase("float") == 0)) {
+                                sql_condition.append("%'");
+                            }
+                            break;
+                        case "gt" : 
+                            sql_condition.append(" > ");
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            sql_condition.append(dtc.getValue());
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            break;
+                        case "ge" : 
+                            sql_condition.append(" >= ");
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            sql_condition.append(dtc.getValue());
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            break;    
+                        case "lt" : 
+                            sql_condition.append(" < ");
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            sql_condition.append(dtc.getValue());
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            break;
+                        case "le" : 
+                            sql_condition.append(" <= ");
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            sql_condition.append(dtc.getValue());
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            break;    
+                        case "neq" : 
+                            sql_condition.append(" <> ");
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            sql_condition.append(dtc.getValue());
+                            if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                                sql_condition.append("'");
+                            }
+                            break;
+                    }
+                    sql_condition.append(") AND ");
                 }
-
-                sql_condition.append(") AND ");
             }
             sql_condition.delete(sql_condition.length()-4, sql_condition.length());
         }
