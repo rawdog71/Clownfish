@@ -39,6 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +60,8 @@ public class GetContent extends HttpServlet {
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter HashMap<String, String> searchmap;
     private static transient @Getter @Setter HashMap<String, String> outputmap;
+    
+    final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
 
     class AttributDef {
         String value;
@@ -91,11 +95,8 @@ public class GetContent extends HttpServlet {
      *
      * @param request servlet request
      * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("class") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
@@ -153,6 +154,8 @@ public class GetContent extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             out.print(json);
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
         }
     }
 
@@ -197,7 +200,6 @@ public class GetContent extends HttpServlet {
 
     
     private AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent) {
-        //Knattributetype knattributtype = (Knattributetype) em.createNamedQuery("Knattributetype.findById").setParameter("id", attributtypeid).getSingleResult();
         CfAttributetype knattributtype = cfattributetypeService.findById(attributtypeid);
         switch (knattributtype.getName()) {
             case "boolean":
