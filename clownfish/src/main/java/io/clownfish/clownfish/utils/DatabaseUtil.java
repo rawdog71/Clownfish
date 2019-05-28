@@ -290,6 +290,7 @@ public class DatabaseUtil {
                 tablevalues.add(dbexportvalues);
             }
             dbtables.put(tablename, tablevalues);
+            result.close();
             result = stmt.executeQuery(sql_count.toString());
             HashMap<String, String> dbexportvalues = new HashMap<>();
             while (result.next()) {
@@ -297,6 +298,8 @@ public class DatabaseUtil {
                 dbexportvalues.put("count", value);
             }
             dbvalues.put(tablename, dbexportvalues);
+            stmt.close();
+            result.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         }
@@ -313,14 +316,16 @@ public class DatabaseUtil {
                 sql_insert_fields.append(dtnv.getField());
                 sql_insert_fields.append(", ");
                 String fieldType = getFieldType(tfs.getTableFieldsList(), dtnv.getField());
-                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                    sql_insert_values.append("'");
+                if (null != fieldType) {
+                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                        sql_insert_values.append("'");
+                    }
+                    sql_insert_values.append(dtnv.getValue());
+                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                        sql_insert_values.append("'");
+                    }
+                    sql_insert_values.append(", ");
                 }
-                sql_insert_values.append(dtnv.getValue());
-                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                    sql_insert_values.append("'");
-                }
-                sql_insert_values.append(", ");
             }
             sql_insert_fields.delete(sql_insert_fields.length()-2, sql_insert_fields.length());
             sql_insert_values.delete(sql_insert_values.length()-2, sql_insert_values.length());
@@ -340,6 +345,7 @@ public class DatabaseUtil {
             if (count > 0 ) {
                 ok = true;
             }
+            stmt.close();
             return ok;
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
@@ -360,14 +366,16 @@ public class DatabaseUtil {
                     sql_condition.append(dtdv.getField());
                     String fieldType = getFieldType(tfs.getTableFieldsList(), dtdv.getField());
                     sql_condition.append(" = ");
-                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                        sql_condition.append("'");
+                    if (null != fieldType) {
+                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                            sql_condition.append("'");
+                        }
+                        sql_condition.append(dtdv.getValue());
+                        if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                            sql_condition.append("'");
+                        }
+                        sql_condition.append(") AND ");
                     }
-                    sql_condition.append(dtdv.getValue());
-                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                        sql_condition.append("'");
-                    }
-                    sql_condition.append(") AND ");
                 }
                 sql_condition.delete(sql_condition.length()-4, sql_condition.length());
             }
@@ -383,6 +391,7 @@ public class DatabaseUtil {
             if (count > 0 ) {
                 ok = true;
             }
+            stmt.close();
             return ok;
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
@@ -400,14 +409,16 @@ public class DatabaseUtil {
                 sql_update_values.append(dtuv.getField());
                 sql_update_values.append(" = ");
                 String fieldType = getFieldType(tfs.getTableFieldsList(), dtuv.getField());
-                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                    sql_update_values.append("'");
+                if (null != fieldType) {
+                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                        sql_update_values.append("'");
+                    }
+                    sql_update_values.append(dtuv.getValue());
+                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                        sql_update_values.append("'");
+                    }
+                    sql_update_values.append(", ");
                 }
-                sql_update_values.append(dtuv.getValue());
-                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                    sql_update_values.append("'");
-                }
-                sql_update_values.append(", ");
             }
             sql_update_values.delete(sql_update_values.length()-2, sql_update_values.length());
             
@@ -428,6 +439,7 @@ public class DatabaseUtil {
             if (count > 0 ) {
                 ok = true;
             }
+            stmt.close();
             return ok;
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
