@@ -36,6 +36,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,6 +126,8 @@ public class DatabaseUtil {
     }
     
     private void manageTableRead(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, DatatableProperties> datatableproperties, HashMap<String, ArrayList> dbtables, HashMap<String, Object> dbvalues) {
+        Statement stmt = null;
+        ResultSet result = null;
         try {
             long low_limit = 1;
             long high_limit = 50;
@@ -274,8 +277,8 @@ public class DatabaseUtil {
                 }
             }
             
-            Statement stmt = con.createStatement();
-            ResultSet result = stmt.executeQuery(sql_outer.toString());
+            stmt = con.createStatement();
+            result = stmt.executeQuery(sql_outer.toString());
             ArrayList<HashMap> tablevalues = new ArrayList<>();
             while (result.next()) {
                 HashMap<String, String> dbexportvalues = new HashMap<>();
@@ -290,7 +293,6 @@ public class DatabaseUtil {
                 tablevalues.add(dbexportvalues);
             }
             dbtables.put(tablename, tablevalues);
-            result.close();
             result = stmt.executeQuery(sql_count.toString());
             HashMap<String, String> dbexportvalues = new HashMap<>();
             while (result.next()) {
@@ -298,14 +300,28 @@ public class DatabaseUtil {
                 dbexportvalues.put("count", value);
             }
             dbvalues.put(tablename, dbexportvalues);
-            stmt.close();
-            result.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
+        } finally {
+            if (null != stmt) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {
+                    logger.error(ex.getMessage());
+                }
+            }
+            if (null != result) {
+                try {
+                    result.close();
+                } catch (SQLException ex) {
+                    logger.error(ex.getMessage());
+                }
+            }
         }
     }
     
     private boolean manageTableInsert(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, DatatableNewProperties> datatablenewproperties, HashMap<String, ArrayList> dbtables, HashMap<String, Object> dbvalues) {
+        Statement stmt = null;
         try {
             TableFieldStructure tfs = getTableFieldsList(dmd, tablename, "");
             DatatableNewProperties dtnp = datatablenewproperties.get(tablename);
@@ -339,21 +355,29 @@ public class DatabaseUtil {
             sql_insert.append(sql_insert_values);
             sql_insert.append(")");
             
-            Statement stmt = con.createStatement();
+            stmt = con.createStatement();
             int count = stmt.executeUpdate(sql_insert.toString());
             boolean ok = false;
             if (count > 0 ) {
                 ok = true;
             }
-            stmt.close();
             return ok;
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
             return false;
+        } finally {
+            if (null != stmt) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {
+                    logger.error(ex.getMessage());
+                }
+            }
         }
     }
     
     private boolean manageTableDelete(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, DatatableDeleteProperties> datatabledeleteproperties, HashMap<String, ArrayList> dbtables, HashMap<String, Object> dbvalues) {
+        Statement stmt = null;
         try {
             TableFieldStructure tfs = getTableFieldsList(dmd, tablename, "");
             DatatableDeleteProperties dtdp = datatabledeleteproperties.get(tablename);
@@ -385,21 +409,30 @@ public class DatabaseUtil {
             sql_delete.append(tablename);
             sql_delete.append(sql_condition);
             
-            Statement stmt = con.createStatement();
+            stmt = con.createStatement();
             int count = stmt.executeUpdate(sql_delete.toString());
             boolean ok = false;
             if (count > 0 ) {
                 ok = true;
             }
-            stmt.close();
+            
             return ok;
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
             return false;
+        } finally {
+            if (null != stmt) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {
+                    logger.error(ex.getMessage());
+                }
+            }
         }
     }
     
     private boolean manageTableUpdate(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, DatatableUpdateProperties> datatableproperties, HashMap<String, ArrayList> dbtables, HashMap<String, Object> dbvalues) {
+        Statement stmt = null;
         try {
             TableFieldStructure tfs = getTableFieldsList(dmd, tablename, "");
             DatatableUpdateProperties dtup = datatableproperties.get(tablename);
@@ -433,17 +466,24 @@ public class DatabaseUtil {
             }
             sql_update.append(sql_condition);
             
-            Statement stmt = con.createStatement();
+            stmt = con.createStatement();
             int count = stmt.executeUpdate(sql_update.toString());
             boolean ok = false;
             if (count > 0 ) {
                 ok = true;
             }
-            stmt.close();
             return ok;
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
             return false;
+        } finally {
+            if (null != stmt) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {
+                    logger.error(ex.getMessage());
+                }
+            }
         }
     }
     
