@@ -60,7 +60,7 @@ public class StylesheetList {
     
     private @Getter @Setter List<CfStylesheet> stylesheetListe;
     private @Getter @Setter CfStylesheet selectedStylesheet = null;
-    private @Getter @Setter String stylesheetName;
+    private @Getter @Setter String stylesheetName = "";
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter CfStylesheetversion version = null;
     private @Getter @Setter List<CfStylesheetversion> versionlist;

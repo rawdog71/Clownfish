@@ -60,7 +60,7 @@ public class JavascriptList {
     
     private @Getter @Setter List<CfJavascript> javascriptListe;
     private @Getter @Setter CfJavascript selectedJavascript = null;
-    private @Getter @Setter String javascriptName;
+    private @Getter @Setter String javascriptName = "";
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter CfJavascriptversion version = null;
     private @Getter @Setter List<CfJavascriptversion> versionlist;

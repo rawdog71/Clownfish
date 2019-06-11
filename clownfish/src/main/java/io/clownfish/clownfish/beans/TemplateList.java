@@ -60,7 +60,7 @@ public class TemplateList {
     
     private @Getter @Setter List<CfTemplate> templateListe;
     private @Getter @Setter CfTemplate selectedTemplate = null;
-    private @Getter @Setter String templateName;
+    private @Getter @Setter String templateName = "";
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter int templateScriptLanguage = 0;
     private @Getter @Setter String selectedScriptlanguage = "";
