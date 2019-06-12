@@ -16,16 +16,19 @@
 package io.clownfish.clownfish.converter;
 
 import de.destrukt.sapconnection.SAPConnection;
+import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
 import io.clownfish.clownfish.sap.models.RfcGroup;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -40,12 +43,22 @@ import org.springframework.stereotype.Component;
 public class RfcGroupConverter implements Converter, Serializable {
     private List<RfcGroup> rfcgrouplist;
     private static SAPConnection sapc = null;
+    private Map<String, String> propertymap = null;
+    private boolean sapSupport = false;
+    @Autowired transient PropertyList propertylist;
     
     public static final String SAPCONNECTION = "sapconnection.props";
     
     @PostConstruct
     public void init() {
-        sapc = new SAPConnection(SAPCONNECTION, "Clownfish3");
+        propertymap = propertylist.fillPropertyMap();
+        String sapSupportProp = propertymap.get("sap.support");
+        if (sapSupportProp.compareToIgnoreCase("true") == 0) {
+            sapSupport = true;
+        }
+        if (sapSupport) {
+            sapc = new SAPConnection(SAPCONNECTION, "Clownfish3");
+        }
     }
     
     @Override
@@ -53,13 +66,17 @@ public class RfcGroupConverter implements Converter, Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            rfcgrouplist = new RFC_GROUP_SEARCH(sapc).getRfcGroupList();
-            for (RfcGroup rfcgroup : rfcgrouplist) {
-                if (rfcgroup.getName().compareToIgnoreCase(value) == 0 ) {
-                    return (Object) rfcgroup;
+            if (sapSupport) {
+                rfcgrouplist = new RFC_GROUP_SEARCH(sapc).getRfcGroupList();
+                for (RfcGroup rfcgroup : rfcgrouplist) {
+                    if (rfcgroup.getName().compareToIgnoreCase(value) == 0 ) {
+                        return (Object) rfcgroup;
+                    }
                 }
+                return null;
+            } else {
+                return null;
             }
-            return null;
         }
     }
 

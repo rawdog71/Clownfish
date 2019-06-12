@@ -16,11 +16,13 @@
 package io.clownfish.clownfish.converter;
 
 import de.destrukt.sapconnection.SAPConnection;
+import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.beans.SiteTreeBean;
 import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
 import io.clownfish.clownfish.sap.models.RfcFunction;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.component.UIComponent;
@@ -44,13 +46,23 @@ public class RfcFunctionConverter implements Converter, Serializable {
     private List<RfcFunction> rfcfunctionlist;
     @ManagedProperty(value="#{sitetree}")
     @Autowired SiteTreeBean sitetree;
+    private Map<String, String> propertymap = null;
+    private boolean sapSupport = false;
+    @Autowired transient PropertyList propertylist;
     
     public static final String SAPCONNECTION = "sapconnection.props";
     private static SAPConnection sapc = null;
     
     @PostConstruct
     public void init() {
-        sapc = new SAPConnection(SAPCONNECTION, "Clownfish2");
+        propertymap = propertylist.fillPropertyMap();
+        String sapSupportProp = propertymap.get("sap.support");
+        if (sapSupportProp.compareToIgnoreCase("true") == 0) {
+            sapSupport = true;
+        }
+        if (sapSupport) {
+            sapc = new SAPConnection(SAPCONNECTION, "Clownfish2");
+        }
     }
 
     public SiteTreeBean getSitetree() {
@@ -66,13 +78,17 @@ public class RfcFunctionConverter implements Converter, Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            rfcfunctionlist = new RFC_FUNCTION_SEARCH(sapc).getRfcFunctionsList(sitetree.getSelectedrfcgroup().getName());
-            for (RfcFunction rfcfunction : rfcfunctionlist) {
-                if (rfcfunction.getName().compareToIgnoreCase(value) == 0 ) {
-                    return (Object) rfcfunction;
+            if (sapSupport) {
+                rfcfunctionlist = new RFC_FUNCTION_SEARCH(sapc).getRfcFunctionsList(sitetree.getSelectedrfcgroup().getName());
+                for (RfcFunction rfcfunction : rfcfunctionlist) {
+                    if (rfcfunction.getName().compareToIgnoreCase(value) == 0 ) {
+                        return (Object) rfcfunction;
+                    }
                 }
+                return null;
+            } else {
+                return null;
             }
-            return null;
         }
     }
 
