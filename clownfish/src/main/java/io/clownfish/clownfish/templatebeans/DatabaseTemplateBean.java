@@ -58,7 +58,7 @@ public class DatabaseTemplateBean {
     }
     
     public Map dbread(String catalog, String tablename, String sqlstatement) {
-        logger.info("START dbread");
+        //logger.info("START dbread");
         HashMap<String, ArrayList> dbtables = new HashMap<>();
         sitedatasourcelist.stream().forEach((sitedatasource) -> {
             try {
@@ -95,7 +95,7 @@ public class DatabaseTemplateBean {
                 logger.error(ex.getMessage());
             }
         });
-        logger.info("END dbread");
+        //logger.info("END dbread");
         return contentmap;
     }
     

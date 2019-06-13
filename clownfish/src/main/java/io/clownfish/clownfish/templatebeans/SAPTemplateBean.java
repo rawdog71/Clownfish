@@ -51,6 +51,7 @@ public class SAPTemplateBean {
     private @Getter @Setter Map contentmap;
     static SAPConnection sapc = null;
     private RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
+    private static HashMap<String, JCoFunction> jcofunctiontable = null;
     
     final Logger logger = LoggerFactory.getLogger(SAPTemplateBean.class);
 
@@ -63,10 +64,12 @@ public class SAPTemplateBean {
         this.rpytableread = rpytableread;
         this.postmap = postmap;
         rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapc);
+        jcofunctiontable = new HashMap();
         contentmap.clear();
     }
     
     public Map executeAsync(String rfcFunction, Map parametermap) {
+        //logger.info("START SAP execute");
         JCoTable functions_table = null;
         HashMap<String, HashMap> sapexport = new HashMap<>();
         HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
@@ -81,7 +84,13 @@ public class SAPTemplateBean {
             List<RfcFunctionParam> paramlist = saprfcfunctionparamMap.get(rfcFunction);
 
             // Setze die Import Parameter des SAP RFC mit den Werten aus den POST Parametern
-            JCoFunction function = sapc.getDestination().getRepository().getFunction(rfcFunction);
+            JCoFunction function;
+            if (jcofunctiontable.containsKey(rfcFunction)) {
+                function = jcofunctiontable.get(rfcFunction);
+            } else {
+                function = sapc.getDestination().getRepository().getFunction(rfcFunction);
+                jcofunctiontable.put(rfcFunction, function);
+            }
             for (RfcFunctionParam rfcfunctionparam : paramlist) {
                 if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
                     if (null != postmap_async) {
@@ -92,12 +101,18 @@ public class SAPTemplateBean {
                 }
             }
             // SAP RFC ausführen
+            //logger.info("START SAP RFC execute");
             function.execute(sapc.getDestination());
+            //logger.info("STOP SAP RFC execute");
             HashMap<String, ArrayList> saptables = new HashMap<>();
             for (RfcFunctionParam rfcfunctionparam : paramlist) {    
+                String paramclass = rfcfunctionparam.getParamclass().toLowerCase();
+                if (paramclass.compareToIgnoreCase("i") == 0) {
+                    continue;
+                }
                 String tablename = rfcfunctionparam.getTabname();
                 String paramname = rfcfunctionparam.getParameter();
-                String paramclass = rfcfunctionparam.getParamclass().toLowerCase();
+                
                 
                 ArrayList<HashMap> tablevalues = new ArrayList<>();
                 List<RpyTableRead> rpytablereadlist = null;
@@ -126,6 +141,7 @@ public class SAPTemplateBean {
             logger.error(ex.getMessage());
         }
         contentmap.put("sap", sapexport);
+        //logger.info("STOP SAP execute");
         return contentmap;
     }
 
@@ -142,7 +158,13 @@ public class SAPTemplateBean {
             List<RfcFunctionParam> paramlist = saprfcfunctionparamMap.get(rfcFunction);
 
             // Setze die Import Parameter des SAP RFC mit den Werten aus den POST Parametern
-            JCoFunction function = sapc.getDestination().getRepository().getFunction(rfcFunction);
+            JCoFunction function;
+            if (jcofunctiontable.containsKey(rfcFunction)) {
+                function = jcofunctiontable.get(rfcFunction);
+            } else {
+                function = sapc.getDestination().getRepository().getFunction(rfcFunction);
+                jcofunctiontable.put(rfcFunction, function);
+            }
             for (RfcFunctionParam rfcfunctionparam : paramlist) {
                 if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
                     if (null != postmap) {
@@ -156,9 +178,12 @@ public class SAPTemplateBean {
             function.execute(sapc.getDestination());
             HashMap<String, ArrayList> saptables = new HashMap<>();
             for (RfcFunctionParam rfcfunctionparam : paramlist) {    
+                String paramclass = rfcfunctionparam.getParamclass().toLowerCase();
+                if (paramclass.compareToIgnoreCase("i") == 0) {
+                    continue;
+                }
                 String tablename = rfcfunctionparam.getTabname();
                 String paramname = rfcfunctionparam.getParameter();
-                String paramclass = rfcfunctionparam.getParamclass().toLowerCase();
                 
                 ArrayList<HashMap> tablevalues = new ArrayList<>();
                 List<RpyTableRead> rpytablereadlist = null;
