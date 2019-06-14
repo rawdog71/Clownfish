@@ -21,6 +21,7 @@ import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.TableField;
 import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -35,14 +36,17 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
+@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
-public class DatabaseTemplateBean {
+public class DatabaseTemplateBean implements Serializable {
     @Autowired CfDatasourceService cfdatasourceService;
     private @Getter @Setter Map contentmap;
     private List<CfSitedatasource> sitedatasourcelist;

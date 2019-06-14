@@ -28,6 +28,7 @@ import io.clownfish.clownfish.sap.SAPDATATYPE;
 import io.clownfish.clownfish.sap.models.RfcFunctionParam;
 import io.clownfish.clownfish.sap.models.RpyTableRead;
 import io.clownfish.clownfish.utils.ClownfishUtil;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,14 +39,17 @@ import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
+@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
-public class SAPTemplateBean {
+public class SAPTemplateBean implements Serializable {
     private static List<JsonFormParameter> postmap;
     private RPY_TABLE_READ rpytableread;
     private @Getter @Setter Map contentmap;

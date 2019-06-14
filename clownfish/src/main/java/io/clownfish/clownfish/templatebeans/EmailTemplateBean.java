@@ -16,17 +16,21 @@
 package io.clownfish.clownfish.templatebeans;
 
 import io.clownfish.clownfish.utils.MailUtil;
+import java.io.Serializable;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
+@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
-public class EmailTemplateBean {
+public class EmailTemplateBean implements Serializable {
     private @Getter @Setter Map<String, String> propertymap = null;
 
     public EmailTemplateBean() {
