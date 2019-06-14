@@ -93,6 +93,12 @@ public class SAPTemplateBean {
                 function = sapc.getDestination().getRepository().getFunction(rfcFunction);
                 jcofunctiontable.put(rfcFunction, function);
             }
+            try {
+                function.getTableParameterList().clear();
+                function.getChangingParameterList().clear();
+            } catch (Exception ex) {
+                
+            }
             for (RfcFunctionParam rfcfunctionparam : paramlist) {
                 if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
                     if (null != postmap_async) {
@@ -116,6 +122,7 @@ public class SAPTemplateBean {
                 String paramname = rfcfunctionparam.getParameter();
                 
                 ArrayList<HashMap> tablevalues = new ArrayList<>();
+                tablevalues.clear();
                 List<RpyTableRead> rpytablereadlist = null;
                 switch (paramclass) {
                     case "e":
@@ -170,6 +177,12 @@ public class SAPTemplateBean {
             } else {
                 function = sapc.getDestination().getRepository().getFunction(rfcFunction);
                 jcofunctiontable.put(rfcFunction, function);
+            }
+            try {
+                function.getTableParameterList().clear();
+                function.getChangingParameterList().clear();
+            } catch (Exception ex) {
+                
             }
             for (RfcFunctionParam rfcfunctionparam : paramlist) {
                 if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
