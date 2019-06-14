@@ -52,6 +52,7 @@ public class SAPTemplateBean {
     static SAPConnection sapc = null;
     private RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
     private static HashMap<String, JCoFunction> jcofunctiontable = null;
+    private static HashMap<String, List<RpyTableRead>> rpyMap = null;
     
     final Logger logger = LoggerFactory.getLogger(SAPTemplateBean.class);
 
@@ -65,6 +66,7 @@ public class SAPTemplateBean {
         this.postmap = postmap;
         rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapc);
         jcofunctiontable = new HashMap();
+        rpyMap = new HashMap();
         contentmap.clear();
     }
     
@@ -113,7 +115,6 @@ public class SAPTemplateBean {
                 String tablename = rfcfunctionparam.getTabname();
                 String paramname = rfcfunctionparam.getParameter();
                 
-                
                 ArrayList<HashMap> tablevalues = new ArrayList<>();
                 List<RpyTableRead> rpytablereadlist = null;
                 switch (paramclass) {
@@ -122,16 +123,21 @@ public class SAPTemplateBean {
                         break;
                     case "t":
                         functions_table = function.getTableParameterList().getTable(paramname);
-                        rpytablereadlist = rpytableread.getRpyTableReadList(tablename);
-                        setTableValues(functions_table, rpytablereadlist, tablevalues);
-                        saptables.put(paramname, tablevalues);
+                        if (!functions_table.isEmpty()) {
+                            rpytablereadlist = getRpytablereadlist(tablename);
+                            setTableValues(functions_table, rpytablereadlist, tablevalues);
+                            saptables.put(paramname, tablevalues);
+                        }
                         break;
                     case "c":
                         String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
                         functions_table = function.getChangingParameterList().getTable(paramname);
-                        rpytablereadlist = rpytableread.getRpyTableReadList(param);
-                        setTableValues(functions_table, rpytablereadlist, tablevalues);
-                        saptables.put(paramname, tablevalues);
+                        if (!functions_table.isEmpty()) {
+                            rpytablereadlist = getRpytablereadlist(param);
+                            //rpytablereadlist = rpytableread.getRpyTableReadList(param);
+                            setTableValues(functions_table, rpytablereadlist, tablevalues);
+                            saptables.put(paramname, tablevalues);
+                        }
                     break;
                 }
             }
@@ -193,14 +199,23 @@ public class SAPTemplateBean {
                         break;
                     case "t":
                         functions_table = function.getTableParameterList().getTable(paramname);
-                        rpytablereadlist = rpytableread.getRpyTableReadList(tablename);
+                        if (!functions_table.isEmpty()) {
+                            rpytablereadlist = getRpytablereadlist(tablename);
+                            setTableValues(functions_table, rpytablereadlist, tablevalues);
+                            saptables.put(paramname, tablevalues);
+                        }
                         setTableValues(functions_table, rpytablereadlist, tablevalues);
                         saptables.put(paramname, tablevalues);
                         break;
                     case "c":
                         String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
                         functions_table = function.getChangingParameterList().getTable(paramname);
-                        rpytablereadlist = rpytableread.getRpyTableReadList(param);
+                        //rpytablereadlist = rpytableread.getRpyTableReadList(param);
+                        if (!functions_table.isEmpty()) {
+                            rpytablereadlist = getRpytablereadlist(param);
+                            setTableValues(functions_table, rpytablereadlist, tablevalues);
+                            saptables.put(paramname, tablevalues);
+                        }
                         setTableValues(functions_table, rpytablereadlist, tablevalues);
                         saptables.put(paramname, tablevalues);
                     break;
@@ -258,5 +273,16 @@ public class SAPTemplateBean {
             }
             tablevalues.add(sapexportvalues);
         }
+    }
+    
+    private List<RpyTableRead> getRpytablereadlist(String tablename) {
+        List<RpyTableRead> rpytablereadlist = null;
+        if (rpyMap.containsKey(tablename)) {
+            rpytablereadlist = rpyMap.get(tablename);
+        } else {
+            rpytablereadlist = rpytableread.getRpyTableReadList(tablename);
+            rpyMap.put(tablename, rpytablereadlist);
+        }
+        return rpytablereadlist;
     }
 }
