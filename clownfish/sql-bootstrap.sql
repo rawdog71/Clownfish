@@ -401,6 +401,20 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 --
+-- Tabellenstruktur für Tabelle `cf_quartz`
+--
+
+
+CREATE TABLE IF NOT EXISTS `cf_quartz` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `schedule` varchar(50) DEFAULT NULL,
+  `site_ref` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+--
 -- Datenbank: `clownfish`
 --
 
