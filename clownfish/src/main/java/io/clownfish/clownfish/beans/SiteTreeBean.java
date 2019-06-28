@@ -538,10 +538,12 @@ public class SiteTreeBean implements Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            rfcgrouplist = new RFC_GROUP_SEARCH(sapc).getRfcGroupList();
-            for (RfcGroup rfcgroup : rfcgrouplist) {
-                if (rfcgroup.getName().compareToIgnoreCase(value) == 0 ) {
-                    return rfcgroup;
+            if (sapSupport) {
+                rfcgrouplist = new RFC_GROUP_SEARCH(sapc).getRfcGroupList();
+                for (RfcGroup rfcgroup : rfcgrouplist) {
+                    if (rfcgroup.getName().compareToIgnoreCase(value) == 0 ) {
+                        return rfcgroup;
+                    }
                 }
             }
             return null;
