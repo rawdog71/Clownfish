@@ -15,10 +15,32 @@
  */
 package io.clownfish.clownfish.templatebeans;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.InetAddress;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Component;
+
 /**
  *
  * @author sulzbachr
  */
-public class NetworkTemplateBean {
+@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Component
+public class NetworkTemplateBean implements Serializable {
+
+    public NetworkTemplateBean() {
+    }
     
+    public boolean getNetworkStatus(String ipaddress) {
+        try{
+            InetAddress address = InetAddress.getByName(ipaddress);
+            boolean reachable = address.isReachable(1000);
+            return reachable;
+        } catch (IOException e){
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

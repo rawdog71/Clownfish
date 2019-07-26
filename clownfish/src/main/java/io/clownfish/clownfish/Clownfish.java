@@ -56,6 +56,7 @@ import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.templatebeans.EmailTemplateBean;
+import io.clownfish.clownfish.templatebeans.NetworkTemplateBean;
 import io.clownfish.clownfish.templatebeans.SAPTemplateBean;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.DatabaseUtil;
@@ -138,6 +139,7 @@ public class Clownfish {
     @Autowired DatabaseTemplateBean databasebean;
     @Autowired EmailTemplateBean emailbean;
     @Autowired SAPTemplateBean sapbean;
+    @Autowired NetworkTemplateBean networkbean;
     
     @Context
     protected HttpServletResponse response;
@@ -473,6 +475,7 @@ public class Clownfish {
                         fmRoot.put("sapBean", sapbean);
                         databasebean.init(sitedatasourcelist);
                         fmRoot.put("databaseBean", databasebean);
+                        fmRoot.put("networkBean", networkbean);
 
                         fmRoot.put("parameter", parametermap);
                         fmRoot.put("property", propertymap);
@@ -500,6 +503,7 @@ public class Clownfish {
                         velContext.put("sapBean", sapbean);
                         databasebean.init(sitedatasourcelist);
                         velContext.put("databaseBean", databasebean);
+                        velContext.put("networkBean", networkbean);
 
                         velContext.put("parameter", parametermap);
                         velContext.put("property", propertymap);
