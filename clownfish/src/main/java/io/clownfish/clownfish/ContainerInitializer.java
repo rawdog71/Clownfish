@@ -15,6 +15,8 @@
  */
 package io.clownfish.clownfish;
 
+import java.util.Properties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.stereotype.Component;
@@ -26,11 +28,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ContainerInitializer implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
+    
+    @Value("${server.port:9000}")
+    int serverPort;
 
     @Override
     public void customize(TomcatServletWebServerFactory factory) {
+        Properties props = System.getProperties();
         factory.setContextPath("");
-        factory.setPort(9000);
+        factory.setPort(serverPort);
     }
     
 }

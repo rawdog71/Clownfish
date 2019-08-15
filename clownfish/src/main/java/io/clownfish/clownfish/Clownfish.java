@@ -264,6 +264,7 @@ public class Clownfish {
                 .build();
 
             sched.scheduleJob(job, trigger);
+            sched.start();
         } catch (SchedulerException ex) {
             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
