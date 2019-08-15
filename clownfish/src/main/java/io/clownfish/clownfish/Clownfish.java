@@ -88,6 +88,9 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 import lombok.Getter;
 import lombok.Setter;
+import static org.fusesource.jansi.Ansi.Color.*;
+import static org.fusesource.jansi.Ansi.ansi;
+import org.fusesource.jansi.AnsiConsole;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import org.quartz.CronTrigger;
 import static org.quartz.JobBuilder.newJob;
@@ -185,7 +188,10 @@ public class Clownfish {
     @PostConstruct
     public void init() {
         try {
+            AnsiConsole.systemInstall();
+            System.out.println(ansi().fg(GREEN));
             System.out.println("INIT CLOWNFISH CMS Version 1.0");
+            System.out.println(ansi().fg(RED));
             System.out.println("                               ...                                             ");
             System.out.println("                            &@@@@@@@                                           ");
             System.out.println("                          .&&%%%@%@@@@                                         ");
@@ -214,6 +220,8 @@ public class Clownfish {
             System.out.println("              %#%&&@&*    *((((///(@@&     .##/*                                ");
             System.out.println("                  ,,***,   *((/(#@@@@@,                                         ");
             System.out.println("                            *@@@@@@@@%                                          ");
+            System.out.println(ansi().reset());
+            AnsiConsole.systemUninstall();
             
             // Set default values
             modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
