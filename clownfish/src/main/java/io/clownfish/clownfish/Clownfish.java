@@ -187,7 +187,7 @@ public class Clownfish {
     
     @PostConstruct
     public void init() {
-        try {
+        //try {
             AnsiConsole.systemInstall();
             System.out.println(ansi().fg(GREEN));
             System.out.println("INIT CLOWNFISH CMS Version 1.0");
@@ -256,6 +256,7 @@ public class Clownfish {
             }
             this.gzipswitch = new GzipSwitch();
             
+            /*
             SchedulerFactory sf = new StdSchedulerFactory();
             Scheduler sched = sf.getScheduler();
             
@@ -273,9 +274,11 @@ public class Clownfish {
 
             sched.scheduleJob(job, trigger);
             sched.start();
+
         } catch (SchedulerException ex) {
             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
+        */
     }
     
     public Clownfish() {
