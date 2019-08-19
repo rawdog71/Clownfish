@@ -62,6 +62,12 @@ public class DatabaseTemplateBean implements Serializable {
         contentmap.clear();
     }
     
+    public void initjob(List<CfSitedatasource> sitedatasourcelist, CfDatasourceService cfdatasourceService) {
+        this.sitedatasourcelist = sitedatasourcelist;
+        this.cfdatasourceService = cfdatasourceService;
+        contentmap.clear();
+    }
+    
     public Map dbread(String catalog, String tablename, String sqlstatement) {
         //logger.info("START dbread");
         HashMap<String, ArrayList> dbtables = new HashMap<>();
