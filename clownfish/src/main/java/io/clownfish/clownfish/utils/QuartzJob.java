@@ -219,14 +219,20 @@ public class QuartzJob implements Job {
                 velContext.put("sapBean", sapbean);
                 DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
                 databasebean.initjob(sitedatasourcelist, cfdatasourceService);
-                velContext.put("databaseBean", databasebean);
+                fmRoot.put("databaseBean", databasebean);
                 NetworkTemplateBean networkbean = new NetworkTemplateBean();
-                velContext.put("networkBean", networkbean);
+                fmRoot.put("networkBean", networkbean);
 
-                velContext.put("property", propertymap);
-
-                if (null != velTemplate) {
-                    velTemplate.merge(velContext, out);
+                fmRoot.put("property", propertymap);
+                try {
+                    if (null != fmTemplate) {
+                        freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
+                        env.process();
+                    }
+                } catch (freemarker.template.TemplateException ex) {
+                    logger.error(ex.getMessage());
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
