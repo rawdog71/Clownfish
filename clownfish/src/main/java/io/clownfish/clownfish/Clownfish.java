@@ -19,6 +19,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import de.destrukt.sapconnection.SAPConnection;
+import freemarker.core.ParseException;
+import freemarker.template.MalformedTemplateNameException;
 import io.clownfish.clownfish.templatebeans.DatabaseTemplateBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
@@ -93,13 +95,12 @@ import static org.fusesource.jansi.Ansi.ansi;
 import org.fusesource.jansi.AnsiConsole;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import org.quartz.CronTrigger;
-import static org.quartz.JobBuilder.newJob;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
-import static org.quartz.TriggerBuilder.newTrigger;
-import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -143,12 +144,13 @@ public class Clownfish {
     @Autowired EmailTemplateBean emailbean;
     @Autowired SAPTemplateBean sapbean;
     @Autowired NetworkTemplateBean networkbean;
-    
+    @Autowired private Scheduler scheduler;
+
     @Context
     protected HttpServletResponse response;
-    @Context 
+    @Context
     protected HttpServletRequest request;
-    
+
     private GzipSwitch gzipswitch;
     private freemarker.template.Configuration freemarkerCfg;
     //private RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
@@ -164,9 +166,9 @@ public class Clownfish {
     private @Getter @Setter Locale locale;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
-    
+
     final Logger logger = LoggerFactory.getLogger(Clownfish.class);
-    
+
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
         PrintWriter outwriter = null;
@@ -184,103 +186,89 @@ public class Clownfish {
             }
         }
     }
-    
+
     @PostConstruct
     public void init() {
-        //try {
-            AnsiConsole.systemInstall();
-            System.out.println(ansi().fg(GREEN));
-            System.out.println("INIT CLOWNFISH CMS Version 1.0");
-            System.out.println(ansi().fg(RED));
-            System.out.println("                               ...                                             ");
-            System.out.println("                            &@@@@@@@                                           ");
-            System.out.println("                          .&&%%%@%@@@@                                         ");
-            System.out.println("                          %%%%%%%%&%%@                                         ");
-            System.out.println("                         .%%%%%%%%#%%&                                         ");
-            System.out.println("                         /%%%%%%%%%##%         &&@@.                           ");
-            System.out.println("                    .,*//#############%        %#%#%@@                          ");
-            System.out.println("                     #((###############       ###%#%%&@                         ");
-            System.out.println("           //          #((((/(/(((((((/       (###(###&%                        ");
-            System.out.println("        *((//((#/       #((((#(((((((#         (((##%##@                        ");
-            System.out.println("      /(((((#(////#     .((((((((((((*         *((((###%                        ");
-            System.out.println("     /(((((#((######     #(((((##((@@@@&        ((((((##                        ");
-            System.out.println("    (((((((####@@&#(%     #((((####((((&@/      #(((((((*            (&@@&#     ");
-            System.out.println("   /(((((((#######(((&    *((((##(((((((#@/     #(((((((/          &&%%%%&@@@,  ");
-            System.out.println("  /((((((((((((((#((((&    (#((#(##((##((@@     #(#####(*       *########%%&@@@.");
-            System.out.println("  /%#(((((((((((((/((((.   ###########(((#@*    ((#####(.      /#########%%%@@@@");
-            System.out.println("   ,(((((((((((((((((((/   ###########((((@,   ((#######       ###########%%%@@@");
-            System.out.println("    .(((((((((((((/((((*   (#########((((#@    ((######%      .##########%%%&@@@");
-            System.out.println("       ,/(((((((((((((&   #(#########((((@/  .#((###((((       #########%%%%&@@@");
-            System.out.println("           /((((((##(&   %(((((######(((&/  .#(((((((((.       *########%%%&&@@@");
-            System.out.println("              ,//(#@   /(#(####(((##(((&.  (((((((((/           /######%%%&&@@@@");
-            System.out.println("                ./* .#(########((#((*/.  *#(((((((###.           /%##%%%%@@@@@@ ");
-            System.out.println("                /######((#######(    ./#######(###(#@              .&@@@@@@@%   ");
-            System.out.println("               /#######%%#(((#((((@.  /@%#####(##((@#                           ");
-            System.out.println("              /####%%#@& *#(((//(/(%@   *@@@@%#%&@@                             ");
-            System.out.println("              %#%&&@&*    *((((///(@@&     .##/*                                ");
-            System.out.println("                  ,,***,   *((/(#@@@@@,                                         ");
-            System.out.println("                            *@@@@@@@@%                                          ");
-            System.out.println(ansi().reset());
-            AnsiConsole.systemUninstall();
-            
-            // Set default values
-            modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
-            // 0 = Development mode (fetch sourcecode from database)
-            characterEncoding = "UTF-8";
-            contentType = "text/html";
-            locale = new Locale("de");
-            
-            // read all System Properties of the property table
-            propertymap = propertylist.fillPropertyMap();
-            clownfishutil = new ClownfishUtil();
-            String sapSupportProp = propertymap.get("sap.support");
-            if (sapSupportProp.compareToIgnoreCase("true") == 0) {
-                sapSupport = true;
-            }
-            if (sapSupport) {
-                sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
-                rpytableread = new RPY_TABLE_READ(sapc);
-            }
-            // Override default values with system properties
-            String systemContentType = propertymap.get("response.contenttype");
-            String systemCharacterEncoding = propertymap.get("response.characterencoding");
-            String systemLocale = propertymap.get("response.locale");
-            if (!systemCharacterEncoding.isEmpty()) {
-                characterEncoding = systemCharacterEncoding;
-            }
-            if (!systemContentType.isEmpty()) {
-                contentType = systemContentType;
-            }
-            if (!systemLocale.isEmpty()) {
-                locale = new Locale(systemLocale);
-            }
-            this.gzipswitch = new GzipSwitch();
-            
-            /*
-            SchedulerFactory sf = new StdSchedulerFactory();
-            Scheduler sched = sf.getScheduler();
-            
-            // Fetch the Quartz jobs
-            List<CfQuartz> joblist = quartzlist.getQuartzlist();
-            
-            JobDetail job = newJob(QuartzJob.class)
-                .withIdentity("job1", "group1")
-                .build();
+        AnsiConsole.systemInstall();
+        System.out.println(ansi().fg(GREEN));
+        System.out.println("INIT CLOWNFISH CMS Version 1.0");
+        System.out.println(ansi().fg(RED));
+        System.out.println("                               ...                                             ");
+        System.out.println("                            &@@@@@@@                                           ");
+        System.out.println("                          .&&%%%@%@@@@                                         ");
+        System.out.println("                          %%%%%%%%&%%@                                         ");
+        System.out.println("                         .%%%%%%%%#%%&                                         ");
+        System.out.println("                         /%%%%%%%%%##%         &&@@.                           ");
+        System.out.println("                    .,*//#############%        %#%#%@@                          ");
+        System.out.println("                     #((###############       ###%#%%&@                         ");
+        System.out.println("           //          #((((/(/(((((((/       (###(###&%                        ");
+        System.out.println("        *((//((#/       #((((#(((((((#         (((##%##@                        ");
+        System.out.println("      /(((((#(////#     .((((((((((((*         *((((###%                        ");
+        System.out.println("     /(((((#((######     #(((((##((@@@@&        ((((((##                        ");
+        System.out.println("    (((((((####@@&#(%     #((((####((((&@/      #(((((((*            (&@@&#     ");
+        System.out.println("   /(((((((#######(((&    *((((##(((((((#@/     #(((((((/          &&%%%%&@@@,  ");
+        System.out.println("  /((((((((((((((#((((&    (#((#(##((##((@@     #(#####(*       *########%%&@@@.");
+        System.out.println("  /%#(((((((((((((/((((.   ###########(((#@*    ((#####(.      /#########%%%@@@@");
+        System.out.println("   ,(((((((((((((((((((/   ###########((((@,   ((#######       ###########%%%@@@");
+        System.out.println("    .(((((((((((((/((((*   (#########((((#@    ((######%      .##########%%%&@@@");
+        System.out.println("       ,/(((((((((((((&   #(#########((((@/  .#((###((((       #########%%%%&@@@");
+        System.out.println("           /((((((##(&   %(((((######(((&/  .#(((((((((.       *########%%%&&@@@");
+        System.out.println("              ,//(#@   /(#(####(((##(((&.  (((((((((/           /######%%%&&@@@@");
+        System.out.println("                ./* .#(########((#((*/.  *#(((((((###.           /%##%%%%@@@@@@ ");
+        System.out.println("                /######((#######(    ./#######(###(#@              .&@@@@@@@%   ");
+        System.out.println("               /#######%%#(((#((((@.  /@%#####(##((@#                           ");
+        System.out.println("              /####%%#@& *#(((//(/(%@   *@@@@%#%&@@                             ");
+        System.out.println("              %#%&&@&*    *((((///(@@&     .##/*                                ");
+        System.out.println("                  ,,***,   *((/(#@@@@@,                                         ");
+        System.out.println("                            *@@@@@@@@%                                          ");
+        System.out.println(ansi().reset());
+        AnsiConsole.systemUninstall();
 
-            CronTrigger trigger = newTrigger()
-                .withIdentity("trigger1", "group1")
-                .withSchedule(cronSchedule("0/10 0 0 ? * * *"))
-                .build();
+        // Set default values
+        modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
+        // 0 = Development mode (fetch sourcecode from database)
+        characterEncoding = "UTF-8";
+        contentType = "text/html";
+        locale = new Locale("de");
 
-            sched.scheduleJob(job, trigger);
-            sched.start();
-
-        } catch (SchedulerException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        // read all System Properties of the property table
+        propertymap = propertylist.fillPropertyMap();
+        clownfishutil = new ClownfishUtil();
+        String sapSupportProp = propertymap.get("sap.support");
+        if (sapSupportProp.compareToIgnoreCase("true") == 0) {
+            sapSupport = true;
         }
-        */
+        if (sapSupport) {
+            sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
+            rpytableread = new RPY_TABLE_READ(sapc);
+        }
+        // Override default values with system properties
+        String systemContentType = propertymap.get("response.contenttype");
+        String systemCharacterEncoding = propertymap.get("response.characterencoding");
+        String systemLocale = propertymap.get("response.locale");
+        if (!systemCharacterEncoding.isEmpty()) {
+            characterEncoding = systemCharacterEncoding;
+        }
+        if (!systemContentType.isEmpty()) {
+            contentType = systemContentType;
+        }
+        if (!systemLocale.isEmpty()) {
+            locale = new Locale(systemLocale);
+        }
+        this.gzipswitch = new GzipSwitch();
+
+        // Fetch the Quartz jobs
+        List<CfQuartz> joblist = quartzlist.getQuartzlist();
+        for (CfQuartz quartz : joblist) {
+            try {
+                JobDetail job = newJob(quartz.getName());
+                scheduler.scheduleJob(job, trigger(job, quartz.getSchedule()));
+            } catch (SchedulerException ex) {
+                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
-    
+
     public Clownfish() {
     }
 
@@ -291,7 +279,7 @@ public class Clownfish {
             this.request = request;
             this.response = response;
             Map<String, String[]> querymap = request.getParameterMap();
-            
+
             ArrayList queryParams = new ArrayList();
             querymap.keySet().stream().map((key) -> {
                 JsonFormParameter jfp = new JsonFormParameter();
@@ -312,12 +300,12 @@ public class Clownfish {
                 response.setCharacterEncoding("UTF-8");
             }
             PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfResponse.get().getOutput());
+            outwriter.println(cfResponse.get().getOutput());
         } catch (IOException | InterruptedException | ExecutionException ex) {
             logger.error(ex.getMessage());
         }
     }
-    
+
     @PostMapping("/{name}")
     public void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
@@ -325,10 +313,11 @@ public class Clownfish {
             this.request = request;
             this.response = response;
             String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-            
-            Gson gson = new Gson(); 
+
+            Gson gson = new Gson();
             List<JsonFormParameter> map;
-            map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
+            map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {
+            }.getType());
             addHeader(response);
             Future<ClownfishResponse> cfResponse = makeResponse(name, map);
             if (cfResponse.get().getErrorcode() == 0) {
@@ -346,7 +335,7 @@ public class Clownfish {
             logger.error(ex.getMessage());
         }
     }
-    
+
     @Async
     public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap) {
         ClownfishResponse cfresponse = new ClownfishResponse();
@@ -354,7 +343,7 @@ public class Clownfish {
             // Freemarker Template
             freemarker.template.Template fmTemplate = null;
             Map fmRoot = null;
-            
+
             // Velocity Template
             org.apache.velocity.VelocityContext velContext = null;
             org.apache.velocity.Template velTemplate = null;
@@ -366,7 +355,7 @@ public class Clownfish {
                     modus = DEVELOPMENT;
                 }
             }
-            
+
             // fetch site by name or aliasname
             CfSite cfsite;
             try {
@@ -375,32 +364,38 @@ public class Clownfish {
                 cfsite = cfsiteService.findByAliaspath(name);
             }
             if ((cfsite.getContenttype() != null)) {
-                if (!cfsite.getContenttype().isEmpty()) this.response.setContentType(cfsite.getContenttype());
+                if (!cfsite.getContenttype().isEmpty()) {
+                    this.response.setContentType(cfsite.getContenttype());
+                }
             }
             if ((cfsite.getCharacterencoding() != null)) {
-                if (!cfsite.getCharacterencoding().isEmpty()) this.response.setCharacterEncoding(cfsite.getCharacterencoding());
+                if (!cfsite.getCharacterencoding().isEmpty()) {
+                    this.response.setCharacterEncoding(cfsite.getCharacterencoding());
+                }
             }
             if ((cfsite.getLocale() != null)) {
-                if (!cfsite.getLocale().isEmpty()) this.response.setLocale(new Locale(cfsite.getLocale()));
+                if (!cfsite.getLocale().isEmpty()) {
+                    this.response.setLocale(new Locale(cfsite.getLocale()));
+                }
             }
-            
+
             try {
                 CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
                 // fetch the dependend template 
                 if (0 == cftemplate.getScriptlanguage()) {  // Freemarker Template
                     fmRoot = new LinkedHashMap();
                     freemarkerTemplateloader.setModus(modus);
-                    
+
                     freemarkerCfg = new freemarker.template.Configuration();
                     freemarkerCfg.setDefaultEncoding("UTF-8");
                     freemarkerCfg.setTemplateLoader(freemarkerTemplateloader);
                     freemarkerCfg.setLocalizedLookup(false);
                     freemarkerCfg.setLocale(Locale.GERMANY);
-                    
+
                     fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
                 } else {                                    // Velocity Template
                     velContext = new org.apache.velocity.VelocityContext();
-                    
+
                     velTemplate = new org.apache.velocity.Template();
                     org.apache.velocity.runtime.RuntimeServices runtimeServices = org.apache.velocity.runtime.RuntimeSingleton.getRuntimeServices();
                     String templateContent;
@@ -421,7 +416,7 @@ public class Clownfish {
                     velTemplate.setData(runtimeServices.parse(reader, cftemplate.getName()));
                     velTemplate.initDocument();
                 }
-                
+
                 // fetch the dependend styleshett, if available
                 String cfstylesheet = "";
                 if (cfsite.getStylesheetref() != null) {
@@ -430,15 +425,15 @@ public class Clownfish {
 
                 // fetch the dependend javascript, if available
                 String cfjavascript = "";
-                if (cfsite.getJavascriptref()!= null) {
+                if (cfsite.getJavascriptref() != null) {
                     cfjavascript = ((CfJavascript) cfjavascriptService.findById(cfsite.getJavascriptref().longValue())).getContent();
                 }
-                
+
                 // fetch the dependend content
                 List<CfSitecontent> sitecontentlist = new ArrayList<>();
                 sitecontentlist.addAll(cfsitecontentService.findBySiteref(cfsite.getId()));
                 sitecontentmap = siteutil.getSitecontentmapList(sitecontentlist);
-                
+
                 // fetch the dependend datalists, if available
                 siteutil.getSitelist_list(cfsite, sitecontentmap);
 
@@ -450,7 +445,7 @@ public class Clownfish {
                 HashMap<String, DatatableUpdateProperties> datatableupdateproperties = clownfishutil.getDatatableupdateproperties(postmap);
                 manageSessionVariables(postmap);
                 writeSessionVariables(parametermap);
-                
+
                 // fetch the dependend datasources
                 sitedatasourcelist = new ArrayList<>();
                 sitedatasourcelist.addAll(cfsitedatasourceService.findBySiteref(cfsite.getId()));
@@ -478,7 +473,7 @@ public class Clownfish {
                         fmRoot.put("css", cfstylesheet);
                         fmRoot.put("js", cfjavascript);
                         fmRoot.put("sitecontent", sitecontentmap);
-                    
+
                         if (sapSupport) {
                             List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                             sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
@@ -506,7 +501,7 @@ public class Clownfish {
                         velContext.put("emailBean", emailbean);
                         velContext.put("css", cfstylesheet);
                         velContext.put("js", cfjavascript);
-                        velContext.put("sitecontent", sitecontentmap); 
+                        velContext.put("sitecontent", sitecontentmap);
                         if (sapSupport) {
                             List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                             sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
@@ -528,7 +523,7 @@ public class Clownfish {
                 String gzip;
                 gzip = propertymap.get("html.gzip");
                 if (gzip == null) {
-                     gzip = "off";
+                    gzip = "off";
                 }
                 switch (cfsite.getGzip()) {
                     case 1:
@@ -536,16 +531,16 @@ public class Clownfish {
                         break;
                     case 2:
                         gzip = "off";
-                        break;    
+                        break;
                 }
                 if (gzip.compareToIgnoreCase("on") == 0) {
                     gzipswitch.setGzipon(true);
                 }
-                
+
                 String htmlcompression;
                 htmlcompression = propertymap.get("html.compression");
                 if (htmlcompression == null) {
-                     htmlcompression = "off";
+                    htmlcompression = "off";
                 }
                 switch (cfsite.getHtmlcompression()) {
                     case 1:
@@ -553,7 +548,7 @@ public class Clownfish {
                         break;
                     case 2:
                         htmlcompression = "off";
-                        break;    
+                        break;
                 }
                 if (htmlcompression.compareToIgnoreCase("on") == 0) {
                     HtmlCompressor htmlcompressor = new HtmlCompressor();
@@ -576,13 +571,13 @@ public class Clownfish {
                 cfresponse.setOutput("No template");
                 //logger.info("END makeResponse: " + name);
                 return new AsyncResult<>(cfresponse);
-            }     
+            }
         } catch (IOException | org.apache.velocity.runtime.parser.ParseException ex) {
             cfresponse.setErrorcode(1);
             cfresponse.setOutput(ex.getMessage());
             //logger.info("END makeResponse: " + name);
             return new AsyncResult<>(cfresponse);
-        } 
+        }
     }
     
     private void sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
@@ -597,16 +592,29 @@ public class Clownfish {
             });
         }
     }
-    
+
     private void writeSessionVariables(Map parametermap) {
         Collections.list(userSession.getAttributeNames()).stream().filter((key) -> (key.startsWith("session"))).forEach((key) -> {
             String attributevalue = (String) userSession.getAttribute(key);
             parametermap.put(key, attributevalue);
         });
     }
-    
+
     private void addHeader(HttpServletResponse response) {
         response.addHeader("Server", "Clownfish Server Open Source Version 1.0");
         response.addHeader("X-Powered-By", "Clownfish Server Open Source Version 1.0 by Rainer Sulzbach");
+    }
+
+    private JobDetail newJob(String identity) {
+        return JobBuilder.newJob().ofType(QuartzJob.class).storeDurably()
+            .withIdentity(JobKey.jobKey(identity))
+            .build();
+    }
+
+    private CronTrigger trigger(JobDetail jobDetail, String schedule) {
+        return TriggerBuilder.newTrigger().forJob(jobDetail)
+            .withIdentity(jobDetail.getKey().getName(), jobDetail.getKey().getGroup())
+            .withSchedule(cronSchedule(schedule))
+            .build();
     }
 }
