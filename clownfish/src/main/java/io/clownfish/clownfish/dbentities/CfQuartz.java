@@ -61,6 +61,8 @@ public class CfQuartz implements Serializable {
     private String schedule;
     @Column(name = "site_ref")
     private BigInteger siteRef;
+    @Column(name = "active")
+    private boolean active;
 
     public CfQuartz() {
     }
@@ -104,6 +106,14 @@ public class CfQuartz implements Serializable {
 
     public void setSiteRef(BigInteger siteRef) {
         this.siteRef = siteRef;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     @Override

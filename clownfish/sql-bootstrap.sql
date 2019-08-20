@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS `cf_javascript` (
 --
 
 CREATE TABLE IF NOT EXISTS `cf_javascriptversion` (
-  `javascriptref` bigint(20) NOT NULL,
+  `javascriptref` bigint(20) unsigned NOT NULL,
   `version` bigint(20) NOT NULL,
   `content` varbinary(64000) DEFAULT NULL,
   `tstamp` datetime NOT NULL,
@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS `cf_property` (
 --
 
 CREATE TABLE IF NOT EXISTS `cf_relation` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `typ` int(11) NOT NULL,
   `ref1` bigint(20) NOT NULL,
   `ref2` bigint(20) NOT NULL,
@@ -287,8 +287,8 @@ CREATE TABLE IF NOT EXISTS `cf_sitecontent` (
 --
 
 CREATE TABLE IF NOT EXISTS `cf_sitedatasource` (
-  `siteref` bigint(20) NOT NULL,
-  `datasourceref` bigint(20) NOT NULL,
+  `siteref` bigint(20) unsigned NOT NULL,
+  `datasourceref` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`siteref`,`datasourceref`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -339,7 +339,7 @@ CREATE TABLE IF NOT EXISTS `cf_stylesheet` (
 --
 
 CREATE TABLE IF NOT EXISTS `cf_stylesheetversion` (
-  `stylesheetref` bigint(20) NOT NULL,
+  `stylesheetref` bigint(20) unsigned NOT NULL,
   `version` bigint(20) NOT NULL,
   `content` varbinary(64000) DEFAULT NULL,
   `tstamp` datetime NOT NULL,
@@ -370,7 +370,7 @@ CREATE TABLE IF NOT EXISTS `cf_template` (
 --
 
 CREATE TABLE IF NOT EXISTS `cf_templateversion` (
-  `templateref` bigint(20) NOT NULL,
+  `templateref` bigint(20) unsigned NOT NULL,
   `version` bigint(20) NOT NULL,
   `content` varbinary(64000) DEFAULT NULL,
   `tstamp` datetime NOT NULL,
@@ -385,7 +385,7 @@ CREATE TABLE IF NOT EXISTS `cf_templateversion` (
 --
 
 CREATE TABLE IF NOT EXISTS `cf_user` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `vorname` varchar(50) NOT NULL,
   `nachname` varchar(50) NOT NULL,
   `email` varchar(50) NOT NULL,
@@ -406,13 +406,14 @@ SET time_zone = "+00:00";
 
 
 CREATE TABLE IF NOT EXISTS `cf_quartz` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `schedule` varchar(50) DEFAULT NULL,
   `site_ref` bigint(20) DEFAULT NULL,
+  `active` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Datenbank: `clownfish`

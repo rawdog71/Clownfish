@@ -188,90 +188,104 @@ public class Clownfish {
     }
 
     @PostConstruct
+    @GetMapping(path = "/init") 
     public void init() {
-        AnsiConsole.systemInstall();
-        System.out.println(ansi().fg(GREEN));
-        System.out.println("INIT CLOWNFISH CMS Version 1.0");
-        System.out.println(ansi().fg(RED));
-        System.out.println("                               ...                                             ");
-        System.out.println("                            &@@@@@@@                                           ");
-        System.out.println("                          .&&%%%@%@@@@                                         ");
-        System.out.println("                          %%%%%%%%&%%@                                         ");
-        System.out.println("                         .%%%%%%%%#%%&                                         ");
-        System.out.println("                         /%%%%%%%%%##%         &&@@.                           ");
-        System.out.println("                    .,*//#############%        %#%#%@@                          ");
-        System.out.println("                     #((###############       ###%#%%&@                         ");
-        System.out.println("           //          #((((/(/(((((((/       (###(###&%                        ");
-        System.out.println("        *((//((#/       #((((#(((((((#         (((##%##@                        ");
-        System.out.println("      /(((((#(////#     .((((((((((((*         *((((###%                        ");
-        System.out.println("     /(((((#((######     #(((((##((@@@@&        ((((((##                        ");
-        System.out.println("    (((((((####@@&#(%     #((((####((((&@/      #(((((((*            (&@@&#     ");
-        System.out.println("   /(((((((#######(((&    *((((##(((((((#@/     #(((((((/          &&%%%%&@@@,  ");
-        System.out.println("  /((((((((((((((#((((&    (#((#(##((##((@@     #(#####(*       *########%%&@@@.");
-        System.out.println("  /%#(((((((((((((/((((.   ###########(((#@*    ((#####(.      /#########%%%@@@@");
-        System.out.println("   ,(((((((((((((((((((/   ###########((((@,   ((#######       ###########%%%@@@");
-        System.out.println("    .(((((((((((((/((((*   (#########((((#@    ((######%      .##########%%%&@@@");
-        System.out.println("       ,/(((((((((((((&   #(#########((((@/  .#((###((((       #########%%%%&@@@");
-        System.out.println("           /((((((##(&   %(((((######(((&/  .#(((((((((.       *########%%%&&@@@");
-        System.out.println("              ,//(#@   /(#(####(((##(((&.  (((((((((/           /######%%%&&@@@@");
-        System.out.println("                ./* .#(########((#((*/.  *#(((((((###.           /%##%%%%@@@@@@ ");
-        System.out.println("                /######((#######(    ./#######(###(#@              .&@@@@@@@%   ");
-        System.out.println("               /#######%%#(((#((((@.  /@%#####(##((@#                           ");
-        System.out.println("              /####%%#@& *#(((//(/(%@   *@@@@%#%&@@                             ");
-        System.out.println("              %#%&&@&*    *((((///(@@&     .##/*                                ");
-        System.out.println("                  ,,***,   *((/(#@@@@@,                                         ");
-        System.out.println("                            *@@@@@@@@%                                          ");
-        System.out.println(ansi().reset());
-        AnsiConsole.systemUninstall();
-
-        // Set default values
-        modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
-        // 0 = Development mode (fetch sourcecode from database)
-        characterEncoding = "UTF-8";
-        contentType = "text/html";
-        locale = new Locale("de");
-
-        // read all System Properties of the property table
-        propertymap = propertylist.fillPropertyMap();
-        clownfishutil = new ClownfishUtil();
-        String sapSupportProp = propertymap.get("sap.support");
-        if (sapSupportProp.compareToIgnoreCase("true") == 0) {
-            sapSupport = true;
-        }
-        if (sapSupport) {
-            sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
-            rpytableread = new RPY_TABLE_READ(sapc);
-        }
-        // Override default values with system properties
-        String systemContentType = propertymap.get("response.contenttype");
-        String systemCharacterEncoding = propertymap.get("response.characterencoding");
-        String systemLocale = propertymap.get("response.locale");
-        if (!systemCharacterEncoding.isEmpty()) {
-            characterEncoding = systemCharacterEncoding;
-        }
-        if (!systemContentType.isEmpty()) {
-            contentType = systemContentType;
-        }
-        if (!systemLocale.isEmpty()) {
-            locale = new Locale(systemLocale);
-        }
-        this.gzipswitch = new GzipSwitch();
-
-        // Fetch the Quartz jobs
-        List<CfQuartz> joblist = quartzlist.getQuartzlist();
-        for (CfQuartz quartz : joblist) {
-            try {
-                JobDetail job = newJob(quartz.getName());
-                scheduler.scheduleJob(job, trigger(job, quartz.getSchedule()));
-            } catch (SchedulerException ex) {
-                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            AnsiConsole.systemInstall();
+            System.out.println(ansi().fg(GREEN));
+            System.out.println("INIT CLOWNFISH CMS Version 1.0");
+            System.out.println(ansi().fg(RED));
+            System.out.println("                               ...                                             ");
+            System.out.println("                            &@@@@@@@                                           ");
+            System.out.println("                          .&&%%%@%@@@@                                         ");
+            System.out.println("                          %%%%%%%%&%%@                                         ");
+            System.out.println("                         .%%%%%%%%#%%&                                         ");
+            System.out.println("                         /%%%%%%%%%##%         &&@@.                           ");
+            System.out.println("                    .,*//#############%        %#%#%@@                          ");
+            System.out.println("                     #((###############       ###%#%%&@                         ");
+            System.out.println("           //          #((((/(/(((((((/       (###(###&%                        ");
+            System.out.println("        *((//((#/       #((((#(((((((#         (((##%##@                        ");
+            System.out.println("      /(((((#(////#     .((((((((((((*         *((((###%                        ");
+            System.out.println("     /(((((#((######     #(((((##((@@@@&        ((((((##                        ");
+            System.out.println("    (((((((####@@&#(%     #((((####((((&@/      #(((((((*            (&@@&#     ");
+            System.out.println("   /(((((((#######(((&    *((((##(((((((#@/     #(((((((/          &&%%%%&@@@,  ");
+            System.out.println("  /((((((((((((((#((((&    (#((#(##((##((@@     #(#####(*       *########%%&@@@.");
+            System.out.println("  /%#(((((((((((((/((((.   ###########(((#@*    ((#####(.      /#########%%%@@@@");
+            System.out.println("   ,(((((((((((((((((((/   ###########((((@,   ((#######       ###########%%%@@@");
+            System.out.println("    .(((((((((((((/((((*   (#########((((#@    ((######%      .##########%%%&@@@");
+            System.out.println("       ,/(((((((((((((&   #(#########((((@/  .#((###((((       #########%%%%&@@@");
+            System.out.println("           /((((((##(&   %(((((######(((&/  .#(((((((((.       *########%%%&&@@@");
+            System.out.println("              ,//(#@   /(#(####(((##(((&.  (((((((((/           /######%%%&&@@@@");
+            System.out.println("                ./* .#(########((#((*/.  *#(((((((###.           /%##%%%%@@@@@@ ");
+            System.out.println("                /######((#######(    ./#######(###(#@              .&@@@@@@@%   ");
+            System.out.println("               /#######%%#(((#((((@.  /@%#####(##((@#                           ");
+            System.out.println("              /####%%#@& *#(((//(/(%@   *@@@@%#%&@@                             ");
+            System.out.println("              %#%&&@&*    *((((///(@@&     .##/*                                ");
+            System.out.println("                  ,,***,   *((/(#@@@@@,                                         ");
+            System.out.println("                            *@@@@@@@@%                                          ");
+            System.out.println(ansi().reset());
+            
+            // Set default values
+            modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
+            // 0 = Development mode (fetch sourcecode from database)
+            characterEncoding = "UTF-8";
+            contentType = "text/html";
+            locale = new Locale("de");
+            
+            // read all System Properties of the property table
+            propertymap = propertylist.fillPropertyMap();
+            clownfishutil = new ClownfishUtil();
+            String sapSupportProp = propertymap.get("sap.support");
+            if (sapSupportProp.compareToIgnoreCase("true") == 0) {
+                sapSupport = true;
             }
+            if (sapSupport) {
+                sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
+                rpytableread = new RPY_TABLE_READ(sapc);
+            }
+            // Override default values with system properties
+            String systemContentType = propertymap.get("response.contenttype");
+            String systemCharacterEncoding = propertymap.get("response.characterencoding");
+            String systemLocale = propertymap.get("response.locale");
+            if (!systemCharacterEncoding.isEmpty()) {
+                characterEncoding = systemCharacterEncoding;
+            }
+            if (!systemContentType.isEmpty()) {
+                contentType = systemContentType;
+            }
+            if (!systemLocale.isEmpty()) {
+                locale = new Locale(systemLocale);
+            }
+            this.gzipswitch = new GzipSwitch();
+            
+            
+            scheduler.clear();
+            // Fetch the Quartz jobs
+            quartzlist.init();
+            List<CfQuartz> joblist = quartzlist.getQuartzlist();
+            for (CfQuartz quartz : joblist) {
+                try {
+                    if (quartz.isActive()) {
+                        JobDetail job = newJob(quartz.getName());
+                        scheduler.scheduleJob(job, trigger(job, quartz.getSchedule()));
+                        System.out.println(ansi().fg(GREEN));
+                        System.out.println("JOB SCHEDULE: " + quartz.getName());
+                        System.out.println(ansi().reset());
+                        
+                    }
+                } catch (SchedulerException ex) {
+                    java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            AnsiConsole.systemUninstall();
+        } catch (SchedulerException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public Clownfish() {
     }
-
+    
     @GetMapping(path = "/{name}")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {

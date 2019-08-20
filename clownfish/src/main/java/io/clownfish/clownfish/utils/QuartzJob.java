@@ -101,7 +101,7 @@ public class QuartzJob implements Job {
         }
     }
     
-    public void callJob(long siteref) {
+    private void callJob(long siteref) {
         modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
         // read all System Properties of the property table
         propertymap = propertylist.fillPropertyMap();
@@ -236,6 +236,7 @@ public class QuartzJob implements Job {
                 }
             }
         }
+        System.out.println(out);
     }
     
 }
