@@ -167,7 +167,7 @@ public class Clownfish {
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
 
     final Logger logger = LoggerFactory.getLogger(Clownfish.class);
-    final String version = "0.1.1";
+    private String version;
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -190,6 +190,10 @@ public class Clownfish {
     @PostConstruct
     @GetMapping(path = "/init") 
     public void init() {
+        version = getClass().getPackage().getImplementationVersion();
+        if (null == version) {
+            version = "DEBUG";
+        }
         try {
             AnsiConsole.systemInstall();
             System.out.println(ansi().fg(GREEN));

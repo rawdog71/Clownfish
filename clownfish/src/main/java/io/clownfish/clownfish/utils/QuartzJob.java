@@ -129,17 +129,18 @@ public class QuartzJob implements Job {
 
         CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
         // fetch the dependend template 
-        if (0 == cftemplate.getScriptlanguage()) {  try {
-            // Freemarker Template
-            fmRoot = new LinkedHashMap();
+        if (0 == cftemplate.getScriptlanguage()) {  
+            try {
+                // Freemarker Template
+                fmRoot = new LinkedHashMap();
 
-            freemarkerCfg = new freemarker.template.Configuration();
-            freemarkerCfg.setDefaultEncoding("UTF-8");
-            freemarkerCfg.setTemplateLoader(freemarkerTemplateloader);
-            freemarkerCfg.setLocalizedLookup(false);
-            freemarkerCfg.setLocale(Locale.GERMANY);
+                freemarkerCfg = new freemarker.template.Configuration();
+                freemarkerCfg.setDefaultEncoding("UTF-8");
+                freemarkerCfg.setTemplateLoader(freemarkerTemplateloader);
+                freemarkerCfg.setLocalizedLookup(false);
+                freemarkerCfg.setLocale(Locale.GERMANY);
 
-            fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
+                fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
             } catch (MalformedTemplateNameException ex) {
                 java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ParseException ex) {
@@ -149,24 +150,24 @@ public class QuartzJob implements Job {
             }
         } else {                                    
             try {
-            // Velocity Template
-            velContext = new org.apache.velocity.VelocityContext();
+                // Velocity Template
+                velContext = new org.apache.velocity.VelocityContext();
 
-            velTemplate = new org.apache.velocity.Template();
-            org.apache.velocity.runtime.RuntimeServices runtimeServices = org.apache.velocity.runtime.RuntimeSingleton.getRuntimeServices();
-            String templateContent;
-            long currentTemplateVersion;
-            try {
-                currentTemplateVersion = cftemplateversionService.findMaxVersion(cftemplate.getId());
-            } catch (NullPointerException ex) {
-                currentTemplateVersion = 0;
-            }
-            templateContent = templateUtil.getVersion(cftemplate.getId(), currentTemplateVersion);
-            templateContent = templateUtil.fetchIncludes(templateContent, modus);
-            StringReader reader = new StringReader(templateContent);
-            velTemplate.setRuntimeServices(runtimeServices);
-            velTemplate.setData(runtimeServices.parse(reader, cftemplate.getName()));
-            velTemplate.initDocument();
+                velTemplate = new org.apache.velocity.Template();
+                org.apache.velocity.runtime.RuntimeServices runtimeServices = org.apache.velocity.runtime.RuntimeSingleton.getRuntimeServices();
+                String templateContent;
+                long currentTemplateVersion;
+                try {
+                    currentTemplateVersion = cftemplateversionService.findMaxVersion(cftemplate.getId());
+                } catch (NullPointerException ex) {
+                    currentTemplateVersion = 0;
+                }
+                templateContent = templateUtil.getVersion(cftemplate.getId(), currentTemplateVersion);
+                templateContent = templateUtil.fetchIncludes(templateContent, modus);
+                StringReader reader = new StringReader(templateContent);
+                velTemplate.setRuntimeServices(runtimeServices);
+                velTemplate.setData(runtimeServices.parse(reader, cftemplate.getName()));
+                velTemplate.initDocument();
             } catch (org.apache.velocity.runtime.parser.ParseException ex) {
                 java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
             }
