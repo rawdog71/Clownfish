@@ -19,8 +19,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import de.destrukt.sapconnection.SAPConnection;
-import freemarker.core.ParseException;
-import freemarker.template.MalformedTemplateNameException;
 import io.clownfish.clownfish.templatebeans.DatabaseTemplateBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
@@ -66,6 +64,7 @@ import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.QuartzJob;
 import io.clownfish.clownfish.utils.SiteUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -168,12 +167,13 @@ public class Clownfish {
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
 
     final Logger logger = LoggerFactory.getLogger(Clownfish.class);
+    final String version = "0.1.1";
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
         PrintWriter outwriter = null;
         try {
-            addHeader(response);
+            addHeader(response, version);
             response.setContentType("text/html");
             response.setCharacterEncoding("UTF-8");
             outwriter = response.getWriter();
@@ -193,7 +193,7 @@ public class Clownfish {
         try {
             AnsiConsole.systemInstall();
             System.out.println(ansi().fg(GREEN));
-            System.out.println("INIT CLOWNFISH CMS Version 1.0");
+            System.out.println("INIT CLOWNFISH CMS Version " + version);
             System.out.println(ansi().fg(RED));
             System.out.println("                               ...                                             ");
             System.out.println("                            &@@@@@@@                                           ");
@@ -304,7 +304,7 @@ public class Clownfish {
             }).forEach((jfp) -> {
                 queryParams.add(jfp);
             });
-            addHeader(response);
+            addHeader(response, version);
             Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams);
             if (cfResponse.get().getErrorcode() == 0) {
                 response.setContentType(this.response.getContentType());
@@ -332,7 +332,7 @@ public class Clownfish {
             List<JsonFormParameter> map;
             map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {
             }.getType());
-            addHeader(response);
+            addHeader(response, version);
             Future<ClownfishResponse> cfResponse = makeResponse(name, map);
             if (cfResponse.get().getErrorcode() == 0) {
                 response.setContentType(this.response.getContentType());
@@ -614,9 +614,9 @@ public class Clownfish {
         });
     }
 
-    private void addHeader(HttpServletResponse response) {
-        response.addHeader("Server", "Clownfish Server Open Source Version 1.0");
-        response.addHeader("X-Powered-By", "Clownfish Server Open Source Version 1.0 by Rainer Sulzbach");
+    private void addHeader(HttpServletResponse response, String version) {
+        response.addHeader("Server", "Clownfish Server Open Source Version " + version);
+        response.addHeader("X-Powered-By", "Clownfish Server Open Source Version " + version + " by Rainer Sulzbach");
     }
 
     private JobDetail newJob(String identity) {
