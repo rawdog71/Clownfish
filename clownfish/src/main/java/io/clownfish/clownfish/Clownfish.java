@@ -164,6 +164,7 @@ public class Clownfish {
     private @Getter @Setter String contentType;
     private @Getter @Setter Locale locale;
     private @Getter @Setter Map sitecontentmap;
+    private @Getter @Setter Map metainfomap;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
 
     final Logger logger = LoggerFactory.getLogger(Clownfish.class);
@@ -357,6 +358,7 @@ public class Clownfish {
     @Async
     public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap) {
         ClownfishResponse cfresponse = new ClownfishResponse();
+        metainfomap = new HashMap<>();
         try {
             // Freemarker Template
             freemarker.template.Template fmTemplate = null;
@@ -471,7 +473,12 @@ public class Clownfish {
                 HashMap<String, HashMap> dbexport = databaseUtil.getDbexport(sitedatasourcelist, datatableproperties, datatablenewproperties, datatabledeleteproperties, datatableupdateproperties);
                 sitecontentmap.put("db", dbexport);
                 // Put meta info to sitecontentmap
-                sitecontentmap.put("title", cfsite.getTitle());
+                metainfomap.put("title", cfsite.getTitle());
+                metainfomap.put("name", cfsite.getName());
+                metainfomap.put("encoding", cfsite.getCharacterencoding());
+                metainfomap.put("contenttype", cfsite.getContenttype());
+                metainfomap.put("locale", cfsite.getLocale());
+                metainfomap.put("alias", cfsite.getAliaspath());
 
                 // send a mail, if email properties are set
                 if (emailproperties != null) {
@@ -491,6 +498,7 @@ public class Clownfish {
                         fmRoot.put("css", cfstylesheet);
                         fmRoot.put("js", cfjavascript);
                         fmRoot.put("sitecontent", sitecontentmap);
+                        fmRoot.put("metainfo", metainfomap);
 
                         if (sapSupport) {
                             List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
@@ -520,6 +528,7 @@ public class Clownfish {
                         velContext.put("css", cfstylesheet);
                         velContext.put("js", cfjavascript);
                         velContext.put("sitecontent", sitecontentmap);
+                        velContext.put("metainfo", metainfomap);
                         if (sapSupport) {
                             List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                             sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
