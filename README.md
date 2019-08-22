@@ -7,7 +7,8 @@ Features:
 - Embedded Tomcat
 - Spring Boot
 - Templating (Freemarker/Velocity)
-- external datasources
+- External datasources
 - SAP remote function calls
 - Asset management
 - Keywords
+- Cronjob scheduler
