@@ -90,7 +90,7 @@
                                     <p:row>
                                         <p:column>
                                             <p:outputLabel for="classcontentdroplist" value="Contentlist:" />
-                                            <p:selectCheckboxMenu id="classcontentdroplist" value="#{sitetree.selectedclasscontentlist}" required="false" label="Contentlist" converter="#{classcontentConverterBean}" filter="true" filterMatchMode="startsWith">
+                                            <p:selectCheckboxMenu id="classcontentdroplist" value="#{sitetree.selectedClasscontentlist}" required="false" label="Contentlist" converter="#{classcontentConverterBean}" filter="true" filterMatchMode="startsWith">
                                                 <f:selectItems value="#{sitetree.classcontentlist}" var="classcontent" itemLabel="#{classcontent.name}" itemValue="#{classcontent}" />
                                             </p:selectCheckboxMenu>
                                         </p:column>
@@ -455,8 +455,12 @@
                         <f:selectItems value="#{classcontentList.classlist}" />
                     </p:selectOneMenu>
                     
-                    <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}" />
-                    <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:classcontentdroplist" />
+                    <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}">
+                        <f:actionListener binding="#{sitetree.initClassContentlist()}" />
+                    </p:commandButton>
+                    <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:classcontentdroplist">
+                        <f:actionListener binding="#{sitetree.initClassContentlist()}" />
+                    </p:commandButton>
                     
                     <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentList.selectedAttributContent}" rowKey="#{attributcontent.id}">
                         <p:ajax event="rowSelect" listener="#{classcontentList.onSelectAttribut}" update=":form:tabview:attributcontentlist" />

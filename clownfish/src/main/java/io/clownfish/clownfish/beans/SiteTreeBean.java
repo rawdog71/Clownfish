@@ -103,7 +103,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<RfcFunction> rfcfunctionlist;
     private @Getter @Setter RfcFunction selectedrfcfunction = null;
     private @Getter @Setter List<CfClasscontent> classcontentlist;
-    private @Getter @Setter List<CfClasscontent> selectedclasscontentlist;
+    private @Getter @Setter List<CfClasscontent> selectedClasscontentlist;
     private @Getter @Setter int sitehtmlcompression;
     private @Getter @Setter int sitegzip;
     private @Getter @Setter String siteTitle;
@@ -157,7 +157,7 @@ public class SiteTreeBean implements Serializable {
         
         selectedDatasources = new ArrayList<>();
         selectedContentlist = new ArrayList<>();
-        selectedclasscontentlist = new ArrayList<>();
+        selectedClasscontentlist = new ArrayList<>();
         locale = propertymap.get("response.locale");
         contentType = propertymap.get("response.contenttype");
         characterEncoding = propertymap.get("response.characterencoding");
@@ -169,6 +169,10 @@ public class SiteTreeBean implements Serializable {
     
     public void initContentlist() {
         contentlist = cflistService.findAll();
+    }
+    
+    public void initClassContentlist() {
+        classcontentlist = cfclasscontentService.findAll();
     }
 
     private void fillChildren(long parentid, TreeNode node) {
@@ -283,7 +287,7 @@ public class SiteTreeBean implements Serializable {
         locale = "";
         selectedDatasources.clear();
         selectedContentlist.clear();
-        selectedclasscontentlist.clear();
+        selectedClasscontentlist.clear();
         newButtonDisabled = false;
     }
     
@@ -325,11 +329,11 @@ public class SiteTreeBean implements Serializable {
             selectedContentlist.add(cl);
         }
         
-        selectedclasscontentlist.clear();
-        List<CfSitecontent> selectedClasscontentlist = cfsitecontentService.findBySiteref(selectedSite.getId());
-        for (CfSitecontent sitecontent : selectedClasscontentlist) {
+        selectedClasscontentlist.clear();
+        List<CfSitecontent> selectedClasscontentliste = cfsitecontentService.findBySiteref(selectedSite.getId());
+        for (CfSitecontent sitecontent : selectedClasscontentliste) {
             CfClasscontent cc = cfclasscontentService.findById(sitecontent.getCfSitecontentPK().getClasscontentref());
-            selectedclasscontentlist.add(cc);
+            selectedClasscontentlist.add(cc);
         }
         siteName = selectedSite.getName();
         siteTitle = selectedSite.getTitle();
@@ -413,8 +417,8 @@ public class SiteTreeBean implements Serializable {
                 cfsitecontentService.delete(content);
             }
             // Add selected sitecontent
-            if (selectedclasscontentlist.size() > 0) {
-                for (CfClasscontent content : selectedclasscontentlist) {
+            if (selectedClasscontentlist.size() > 0) {
+                for (CfClasscontent content : selectedClasscontentlist) {
                     CfSitecontent sitecontent = new CfSitecontent();
                     CfSitecontentPK knsitecontentPK = new CfSitecontentPK();
                     knsitecontentPK.setSiteref(selectedSite.getId());
