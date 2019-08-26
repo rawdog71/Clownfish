@@ -64,12 +64,18 @@ import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.QuartzJob;
 import io.clownfish.clownfish.utils.SiteUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -168,7 +174,8 @@ public class Clownfish {
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
 
     final Logger logger = LoggerFactory.getLogger(Clownfish.class);
-    private String version;
+    private @Getter @Setter String version;
+    private @Getter @Setter String static_folder;
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -240,6 +247,7 @@ public class Clownfish {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
             clownfishutil = new ClownfishUtil();
+            static_folder = propertymap.get("static_folder");
             String sapSupportProp = propertymap.get("sap_support");
             if (sapSupportProp.compareToIgnoreCase("true") == 0) {
                 sapSupport = true;
@@ -309,17 +317,39 @@ public class Clownfish {
             }).forEach((jfp) -> {
                 queryParams.add(jfp);
             });
-            addHeader(response, version);
-            Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams);
-            if (cfResponse.get().getErrorcode() == 0) {
-                response.setContentType(this.response.getContentType());
-                response.setCharacterEncoding(this.response.getCharacterEncoding());
+            
+            if ((querymap.containsKey("modus")) && (querymap.get("modus")[0].compareToIgnoreCase("static") == 0)) {
+                List<String> lines = Files.readAllLines(Paths.get(static_folder + File.separator + name), StandardCharsets.UTF_8); 
+                StringBuilder sb = new StringBuilder(1024); 
+                for (String line : lines) { 
+                    sb.append(line); 
+                }
+                PrintWriter outwriter = response.getWriter();
+                outwriter.println(sb);
             } else {
-                response.setContentType("text/html");
-                response.setCharacterEncoding("UTF-8");
+                addHeader(response, version);
+                Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams);
+                if (cfResponse.get().getErrorcode() == 0) {
+                    response.setContentType(this.response.getContentType());
+                    response.setCharacterEncoding(this.response.getCharacterEncoding());
+                } else {
+                    response.setContentType("text/html");
+                    response.setCharacterEncoding("UTF-8");
+                }
+                PrintWriter outwriter = response.getWriter();
+                String content = cfResponse.get().getOutput();
+                outwriter.println(content);
+                
+                if ((querymap.containsKey("modus")) && (querymap.get("modus")[0].compareToIgnoreCase("makestatic") == 0)) {
+                    FileWriter fw = new FileWriter(static_folder + File.separator + name);
+                    try {
+                        fw.write(content);
+                        fw.close();    
+                    } catch (Exception e) {
+                        throw new RuntimeException("Unable to create the destination file", e);
+                    }
+                }
             }
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(cfResponse.get().getOutput());
         } catch (IOException | InterruptedException | ExecutionException ex) {
             logger.error(ex.getMessage());
         }
