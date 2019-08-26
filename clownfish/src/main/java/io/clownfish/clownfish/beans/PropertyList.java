@@ -38,7 +38,6 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@Transactional
 @Named("propertylist")
 @Scope("singleton")
 @Component
@@ -52,6 +51,7 @@ public class PropertyList {
     private @Getter @Setter boolean newPropertyButtonDisabled;
     private @Getter @Setter String propertykey;
     private @Getter @Setter String propertyvalue;
+    private @Getter @Setter boolean deletePropertyButtonDisabled;
 
     public PropertyList() {
         propertymap = new HashMap<>();
@@ -61,6 +61,7 @@ public class PropertyList {
     public void init() {
         propertylist = cfpropertyService.findAll();
         newPropertyButtonDisabled = false;
+        deletePropertyButtonDisabled = true;
     }
     
     public Map<String, String> fillPropertyMap() {
@@ -77,13 +78,21 @@ public class PropertyList {
         propertykey = selectedProperty.getHashkey();
         propertyvalue = selectedProperty.getValue();
         newPropertyButtonDisabled = true;
+        if (selectedProperty.isNodelete()) {
+            deletePropertyButtonDisabled = true;
+        } else {
+            deletePropertyButtonDisabled = false;
+        }
+            
     }
     
     public void onCreateProperty(ActionEvent actionEvent) {
         try {
             CfProperty newproperty = new CfProperty();
+            propertykey = propertykey.replace(".", "_");
             newproperty.setHashkey(propertykey);
             newproperty.setValue(propertyvalue);
+            newproperty.setNodelete(false);
             cfpropertyService.create(newproperty);
 
             //propertylist = cfpropertyService.findAll();
@@ -96,6 +105,7 @@ public class PropertyList {
     public void onEditProperty(ActionEvent actionEvent) {
         try {
             if (null != selectedProperty) {
+                propertykey = propertykey.replace(".", "_");
                 selectedProperty.setHashkey(propertykey);
                 selectedProperty.setValue(propertyvalue);
                 cfpropertyService.edit(selectedProperty);

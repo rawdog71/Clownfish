@@ -56,7 +56,7 @@ public class RfcFunctionConverter implements Converter, Serializable {
     @PostConstruct
     public void init() {
         propertymap = propertylist.fillPropertyMap();
-        String sapSupportProp = propertymap.get("sap.support");
+        String sapSupportProp = propertymap.get("sap_support");
         if (sapSupportProp.compareToIgnoreCase("true") == 0) {
             sapSupport = true;
         }

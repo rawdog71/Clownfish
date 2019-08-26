@@ -226,6 +226,7 @@ CREATE TABLE IF NOT EXISTS `cf_listcontent` (
 CREATE TABLE IF NOT EXISTS `cf_property` (
   `hashkey` varchar(255) NOT NULL,
   `value` varchar(255) NOT NULL,
+  `nodelete` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`hashkey`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -263,6 +264,7 @@ CREATE TABLE IF NOT EXISTS `cf_site` (
   `aliaspath` varchar(255) DEFAULT NULL,
   `gzip` int(1) NOT NULL,
   `title` varchar(255) DEFAULT NULL,  
+  `job` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `alias` (`aliaspath`)
@@ -434,20 +436,24 @@ INSERT INTO `cf_attributetype` (`id`, `name`) VALUES
 (8, 'media'),
 (9, 'text');
 
-INSERT INTO `cf_property` (`hashkey`, `value`) VALUES
-('cache.folder', ''),
-('html.compression', 'on'),
-('html.gzip', 'on'),
-('mail.password', ''),
-('mail.sendfrom', 'info@clownfish.io'),
-('mail.smtp.host', 'mail.clownfish.io'),
-('mail.transport.protocol', 'smtp'),
-('mail.user', 'Info'),
-('media.folder', ''),
-('response.characterencoding', 'UTF-8'),
-('response.contenttype', 'text/html'),
-('response.locale', 'de'),
-('sap.support', 'false');
+--
+-- Daten für Tabelle `cf_property`
+--
+
+INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
+('cache_folder', '', 1),
+('html.compression', 'on', 1),
+('html.gzip', 'on', 1),
+('mail.password', '', 1),
+('mail.sendfrom', '', 1),
+('mail.smtp.host', '', 1),
+('mail.transport.protocol', 'smtp', 1),
+('mail.user', '', 1),
+('media.folder', '', 1),
+('response.characterencoding', 'UTF-8', 1),
+('response.contenttype', 'text/html', 1),
+('response.locale', 'de', 1),
+('sap.support', 'false', 1);
 
 INSERT INTO `cf_user` (`id`, `vorname`, `nachname`, `email`, `passwort`, `salt`) VALUES
 (1, 'Admin', 'Istrator', 'admin', 'Ll66CGHeusR7eoQPejg8t3CKkpVdpm2IlN/dZif4aGE=', 'zm85UW0YCIyBCxOXTagQQYcezjLzIQ');

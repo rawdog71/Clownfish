@@ -90,7 +90,7 @@ public class AssetList {
     
     public void handleFileUpload(FileUploadEvent event) throws TikaException, SAXException {
         logger.info("UPLOAD: {0}", event.getFile().getFileName());
-        String mediapath = propertymap.get("media.folder");
+        String mediapath = propertymap.get("media_folder");
         HashMap<String, String> metamap = new HashMap<>();
         try {
             File result = new File(mediapath + File.separator + event.getFile().getFileName());

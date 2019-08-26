@@ -136,6 +136,13 @@
                                     
                                     <p:row>
                                         <p:column>    
+                                            <p:outputLabel for="selectjob" value="Job;" />
+                                            <p:selectBooleanCheckbox id="selectjob" value="#{sitetree.sitejob}"/>  
+                                        </p:column>
+                                    </p:row>
+                                    
+                                    <p:row>
+                                        <p:column>    
                                             <p:outputLabel for="selectgzip" value="GZIP:" />
                                             <p:triStateCheckbox id="selectgzip" value="#{sitetree.sitegzip}"/>  
                                         </p:column>
@@ -656,7 +663,7 @@
                     <p:panelGrid id="propertybtnpanel" columns="3">
                         <p:commandButton id="newproperty" process="form" value="New" actionListener="#{propertylist.onCreateProperty}" update=":form:msgs :form:tabview:propertylist" disabled="#{propertylist.newPropertyButtonDisabled}" />
                         <p:commandButton id="editproperty" process="form" value="Edit" actionListener="#{propertylist.onEditProperty}" update=":form:msgs :form:tabview:propertylist" />
-                        <p:commandButton id="deleteproperty" process="form" value="Delete" actionListener="#{propertylist.onDeleteProperty}" update=":form:msgs :form:tabview:propertylist" />
+                        <p:commandButton id="deleteproperty" process="form" value="Delete" actionListener="#{propertylist.onDeleteProperty}" disabled="#{propertylist.deletePropertyButtonDisabled}" update=":form:msgs :form:tabview:propertylist" />
                     </p:panelGrid>
                 </p:tab>
                 

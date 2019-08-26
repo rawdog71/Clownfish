@@ -106,7 +106,7 @@ public class QuartzJob implements Job {
         // read all System Properties of the property table
         propertymap = propertylist.fillPropertyMap();
         //clownfishutil = new ClownfishUtil();
-        String sapSupportProp = propertymap.get("sap.support");
+        String sapSupportProp = propertymap.get("sap_support");
         if (sapSupportProp.compareToIgnoreCase("true") == 0) {
             sapSupport = true;
         }

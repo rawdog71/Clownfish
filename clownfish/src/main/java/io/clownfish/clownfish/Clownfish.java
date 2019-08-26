@@ -240,7 +240,7 @@ public class Clownfish {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
             clownfishutil = new ClownfishUtil();
-            String sapSupportProp = propertymap.get("sap.support");
+            String sapSupportProp = propertymap.get("sap_support");
             if (sapSupportProp.compareToIgnoreCase("true") == 0) {
                 sapSupport = true;
             }
@@ -249,9 +249,9 @@ public class Clownfish {
                 rpytableread = new RPY_TABLE_READ(sapc);
             }
             // Override default values with system properties
-            String systemContentType = propertymap.get("response.contenttype");
-            String systemCharacterEncoding = propertymap.get("response.characterencoding");
-            String systemLocale = propertymap.get("response.locale");
+            String systemContentType = propertymap.get("response_contenttype");
+            String systemCharacterEncoding = propertymap.get("response_characterencoding");
+            String systemLocale = propertymap.get("response_locale");
             if (!systemCharacterEncoding.isEmpty()) {
                 characterEncoding = systemCharacterEncoding;
             }
@@ -383,220 +383,226 @@ public class Clownfish {
             } catch (Exception ex) {
                 cfsite = cfsiteService.findByAliaspath(name);
             }
-            if ((cfsite.getContenttype() != null)) {
-                if (!cfsite.getContenttype().isEmpty()) {
-                    this.response.setContentType(cfsite.getContenttype());
-                }
-            }
-            if ((cfsite.getCharacterencoding() != null)) {
-                if (!cfsite.getCharacterencoding().isEmpty()) {
-                    this.response.setCharacterEncoding(cfsite.getCharacterencoding());
-                }
-            }
-            if ((cfsite.getLocale() != null)) {
-                if (!cfsite.getLocale().isEmpty()) {
-                    this.response.setLocale(new Locale(cfsite.getLocale()));
-                }
-            }
-
-            try {
-                CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
-                // fetch the dependend template 
-                if (0 == cftemplate.getScriptlanguage()) {  // Freemarker Template
-                    fmRoot = new LinkedHashMap();
-                    freemarkerTemplateloader.setModus(modus);
-
-                    freemarkerCfg = new freemarker.template.Configuration();
-                    freemarkerCfg.setDefaultEncoding("UTF-8");
-                    freemarkerCfg.setTemplateLoader(freemarkerTemplateloader);
-                    freemarkerCfg.setLocalizedLookup(false);
-                    freemarkerCfg.setLocale(Locale.GERMANY);
-
-                    fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
-                } else {                                    // Velocity Template
-                    velContext = new org.apache.velocity.VelocityContext();
-
-                    velTemplate = new org.apache.velocity.Template();
-                    org.apache.velocity.runtime.RuntimeServices runtimeServices = org.apache.velocity.runtime.RuntimeSingleton.getRuntimeServices();
-                    String templateContent;
-                    if (DEVELOPMENT == modus) {
-                        templateContent = cftemplate.getContent();
-                    } else {
-                        long currentTemplateVersion;
-                        try {
-                            currentTemplateVersion = cftemplateversionService.findMaxVersion(cftemplate.getId());
-                        } catch (NullPointerException ex) {
-                            currentTemplateVersion = 0;
-                        }
-                        templateContent = templateUtil.getVersion(cftemplate.getId(), currentTemplateVersion);
+            if (!cfsite.isJob()) {
+                if ((cfsite.getContenttype() != null)) {
+                    if (!cfsite.getContenttype().isEmpty()) {
+                        this.response.setContentType(cfsite.getContenttype());
                     }
-                    templateContent = templateUtil.fetchIncludes(templateContent, modus);
-                    StringReader reader = new StringReader(templateContent);
-                    velTemplate.setRuntimeServices(runtimeServices);
-                    velTemplate.setData(runtimeServices.parse(reader, cftemplate.getName()));
-                    velTemplate.initDocument();
                 }
-
-                // fetch the dependend styleshett, if available
-                String cfstylesheet = "";
-                if (cfsite.getStylesheetref() != null) {
-                    cfstylesheet = ((CfStylesheet) cfstylesheetService.findById(cfsite.getStylesheetref().longValue())).getContent();
+                if ((cfsite.getCharacterencoding() != null)) {
+                    if (!cfsite.getCharacterencoding().isEmpty()) {
+                        this.response.setCharacterEncoding(cfsite.getCharacterencoding());
+                    }
                 }
-
-                // fetch the dependend javascript, if available
-                String cfjavascript = "";
-                if (cfsite.getJavascriptref() != null) {
-                    cfjavascript = ((CfJavascript) cfjavascriptService.findById(cfsite.getJavascriptref().longValue())).getContent();
-                }
-
-                // fetch the dependend content
-                List<CfSitecontent> sitecontentlist = new ArrayList<>();
-                sitecontentlist.addAll(cfsitecontentService.findBySiteref(cfsite.getId()));
-                sitecontentmap = siteutil.getSitecontentmapList(sitecontentlist);
-
-                // fetch the dependend datalists, if available
-                siteutil.getSitelist_list(cfsite, sitecontentmap);
-
-                // manage parameters 
-                HashMap<String, DatatableProperties> datatableproperties = clownfishutil.getDatatableproperties(postmap);
-                EmailProperties emailproperties = clownfishutil.getEmailproperties(postmap);
-                HashMap<String, DatatableNewProperties> datatablenewproperties = clownfishutil.getDatatablenewproperties(postmap);
-                HashMap<String, DatatableDeleteProperties> datatabledeleteproperties = clownfishutil.getDatatabledeleteproperties(postmap);
-                HashMap<String, DatatableUpdateProperties> datatableupdateproperties = clownfishutil.getDatatableupdateproperties(postmap);
-                manageSessionVariables(postmap);
-                writeSessionVariables(parametermap);
-
-                // fetch the dependend datasources
-                sitedatasourcelist = new ArrayList<>();
-                sitedatasourcelist.addAll(cfsitedatasourceService.findBySiteref(cfsite.getId()));
-
-                HashMap<String, HashMap> dbexport = databaseUtil.getDbexport(sitedatasourcelist, datatableproperties, datatablenewproperties, datatabledeleteproperties, datatableupdateproperties);
-                sitecontentmap.put("db", dbexport);
-                // Put meta info to sitecontentmap
-                metainfomap.put("title", cfsite.getTitle());
-                metainfomap.put("name", cfsite.getName());
-                metainfomap.put("encoding", cfsite.getCharacterencoding());
-                metainfomap.put("contenttype", cfsite.getContenttype());
-                metainfomap.put("locale", cfsite.getLocale());
-                metainfomap.put("alias", cfsite.getAliaspath());
-
-                // send a mail, if email properties are set
-                if (emailproperties != null) {
-                    try {
-                        sendRespondMail(emailproperties.getSendto(), emailproperties.getSubject(), emailproperties.getBody());
-                    } catch (Exception ex) {
-                        logger.error(ex.getMessage());
+                if ((cfsite.getLocale() != null)) {
+                    if (!cfsite.getLocale().isEmpty()) {
+                        this.response.setLocale(new Locale(cfsite.getLocale()));
                     }
                 }
 
-                // write the output
-                Writer out = new StringWriter();
-                if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
-                    emailbean.init(propertymap);
-                    if (null != fmRoot) {
-                        fmRoot.put("emailBean", emailbean);
-                        fmRoot.put("css", cfstylesheet);
-                        fmRoot.put("js", cfjavascript);
-                        fmRoot.put("sitecontent", sitecontentmap);
-                        fmRoot.put("metainfo", metainfomap);
+                try {
+                    CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
+                    // fetch the dependend template 
+                    if (0 == cftemplate.getScriptlanguage()) {  // Freemarker Template
+                        fmRoot = new LinkedHashMap();
+                        freemarkerTemplateloader.setModus(modus);
 
-                        if (sapSupport) {
-                            List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
-                            sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
-                            sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
-                        }
-                        fmRoot.put("sapBean", sapbean);
-                        databasebean.init(sitedatasourcelist);
-                        fmRoot.put("databaseBean", databasebean);
-                        fmRoot.put("networkBean", networkbean);
+                        freemarkerCfg = new freemarker.template.Configuration();
+                        freemarkerCfg.setDefaultEncoding("UTF-8");
+                        freemarkerCfg.setTemplateLoader(freemarkerTemplateloader);
+                        freemarkerCfg.setLocalizedLookup(false);
+                        freemarkerCfg.setLocale(Locale.GERMANY);
 
-                        fmRoot.put("parameter", parametermap);
-                        fmRoot.put("property", propertymap);
-                        try {
-                            if (null != fmTemplate) {
-                                freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
-                                env.process();
+                        fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
+                    } else {                                    // Velocity Template
+                        velContext = new org.apache.velocity.VelocityContext();
+
+                        velTemplate = new org.apache.velocity.Template();
+                        org.apache.velocity.runtime.RuntimeServices runtimeServices = org.apache.velocity.runtime.RuntimeSingleton.getRuntimeServices();
+                        String templateContent;
+                        if (DEVELOPMENT == modus) {
+                            templateContent = cftemplate.getContent();
+                        } else {
+                            long currentTemplateVersion;
+                            try {
+                                currentTemplateVersion = cftemplateversionService.findMaxVersion(cftemplate.getId());
+                            } catch (NullPointerException ex) {
+                                currentTemplateVersion = 0;
                             }
-                        } catch (freemarker.template.TemplateException ex) {
+                            templateContent = templateUtil.getVersion(cftemplate.getId(), currentTemplateVersion);
+                        }
+                        templateContent = templateUtil.fetchIncludes(templateContent, modus);
+                        StringReader reader = new StringReader(templateContent);
+                        velTemplate.setRuntimeServices(runtimeServices);
+                        velTemplate.setData(runtimeServices.parse(reader, cftemplate.getName()));
+                        velTemplate.initDocument();
+                    }
+
+                    // fetch the dependend styleshett, if available
+                    String cfstylesheet = "";
+                    if (cfsite.getStylesheetref() != null) {
+                        cfstylesheet = ((CfStylesheet) cfstylesheetService.findById(cfsite.getStylesheetref().longValue())).getContent();
+                    }
+
+                    // fetch the dependend javascript, if available
+                    String cfjavascript = "";
+                    if (cfsite.getJavascriptref() != null) {
+                        cfjavascript = ((CfJavascript) cfjavascriptService.findById(cfsite.getJavascriptref().longValue())).getContent();
+                    }
+
+                    // fetch the dependend content
+                    List<CfSitecontent> sitecontentlist = new ArrayList<>();
+                    sitecontentlist.addAll(cfsitecontentService.findBySiteref(cfsite.getId()));
+                    sitecontentmap = siteutil.getSitecontentmapList(sitecontentlist);
+
+                    // fetch the dependend datalists, if available
+                    siteutil.getSitelist_list(cfsite, sitecontentmap);
+
+                    // manage parameters 
+                    HashMap<String, DatatableProperties> datatableproperties = clownfishutil.getDatatableproperties(postmap);
+                    EmailProperties emailproperties = clownfishutil.getEmailproperties(postmap);
+                    HashMap<String, DatatableNewProperties> datatablenewproperties = clownfishutil.getDatatablenewproperties(postmap);
+                    HashMap<String, DatatableDeleteProperties> datatabledeleteproperties = clownfishutil.getDatatabledeleteproperties(postmap);
+                    HashMap<String, DatatableUpdateProperties> datatableupdateproperties = clownfishutil.getDatatableupdateproperties(postmap);
+                    manageSessionVariables(postmap);
+                    writeSessionVariables(parametermap);
+
+                    // fetch the dependend datasources
+                    sitedatasourcelist = new ArrayList<>();
+                    sitedatasourcelist.addAll(cfsitedatasourceService.findBySiteref(cfsite.getId()));
+
+                    HashMap<String, HashMap> dbexport = databaseUtil.getDbexport(sitedatasourcelist, datatableproperties, datatablenewproperties, datatabledeleteproperties, datatableupdateproperties);
+                    sitecontentmap.put("db", dbexport);
+                    // Put meta info to sitecontentmap
+                    metainfomap.put("title", cfsite.getTitle());
+                    metainfomap.put("name", cfsite.getName());
+                    metainfomap.put("encoding", cfsite.getCharacterencoding());
+                    metainfomap.put("contenttype", cfsite.getContenttype());
+                    metainfomap.put("locale", cfsite.getLocale());
+                    metainfomap.put("alias", cfsite.getAliaspath());
+
+                    // send a mail, if email properties are set
+                    if (emailproperties != null) {
+                        try {
+                            sendRespondMail(emailproperties.getSendto(), emailproperties.getSubject(), emailproperties.getBody());
+                        } catch (Exception ex) {
                             logger.error(ex.getMessage());
                         }
                     }
-                } else {                                    // Velocity template
-                    emailbean.init(propertymap);
-                    if (null != velContext) {
-                        velContext.put("emailBean", emailbean);
-                        velContext.put("css", cfstylesheet);
-                        velContext.put("js", cfjavascript);
-                        velContext.put("sitecontent", sitecontentmap);
-                        velContext.put("metainfo", metainfomap);
-                        if (sapSupport) {
-                            List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
-                            sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
-                            sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
+
+                    // write the output
+                    Writer out = new StringWriter();
+                    if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
+                        emailbean.init(propertymap);
+                        if (null != fmRoot) {
+                            fmRoot.put("emailBean", emailbean);
+                            fmRoot.put("css", cfstylesheet);
+                            fmRoot.put("js", cfjavascript);
+                            fmRoot.put("sitecontent", sitecontentmap);
+                            fmRoot.put("metainfo", metainfomap);
+
+                            if (sapSupport) {
+                                List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
+                                sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                                sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
+                            }
+                            fmRoot.put("sapBean", sapbean);
+                            databasebean.init(sitedatasourcelist);
+                            fmRoot.put("databaseBean", databasebean);
+                            fmRoot.put("networkBean", networkbean);
+
+                            fmRoot.put("parameter", parametermap);
+                            fmRoot.put("property", propertymap);
+                            try {
+                                if (null != fmTemplate) {
+                                    freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
+                                    env.process();
+                                }
+                            } catch (freemarker.template.TemplateException ex) {
+                                logger.error(ex.getMessage());
+                            }
                         }
-                        velContext.put("sapBean", sapbean);
-                        databasebean.init(sitedatasourcelist);
-                        velContext.put("databaseBean", databasebean);
-                        velContext.put("networkBean", networkbean);
+                    } else {                                    // Velocity template
+                        emailbean.init(propertymap);
+                        if (null != velContext) {
+                            velContext.put("emailBean", emailbean);
+                            velContext.put("css", cfstylesheet);
+                            velContext.put("js", cfjavascript);
+                            velContext.put("sitecontent", sitecontentmap);
+                            velContext.put("metainfo", metainfomap);
+                            if (sapSupport) {
+                                List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
+                                sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                                sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
+                            }
+                            velContext.put("sapBean", sapbean);
+                            databasebean.init(sitedatasourcelist);
+                            velContext.put("databaseBean", databasebean);
+                            velContext.put("networkBean", networkbean);
 
-                        velContext.put("parameter", parametermap);
-                        velContext.put("property", propertymap);
+                            velContext.put("parameter", parametermap);
+                            velContext.put("property", propertymap);
 
-                        if (null != velTemplate) {
-                            velTemplate.merge(velContext, out);
+                            if (null != velTemplate) {
+                                velTemplate.merge(velContext, out);
+                            }
                         }
                     }
-                }
-                String gzip;
-                gzip = propertymap.get("html.gzip");
-                if (gzip == null) {
-                    gzip = "off";
-                }
-                switch (cfsite.getGzip()) {
-                    case 1:
-                        gzip = "on";
-                        break;
-                    case 2:
+                    String gzip;
+                    gzip = propertymap.get("html_gzip");
+                    if (gzip == null) {
                         gzip = "off";
-                        break;
-                }
-                if (gzip.compareToIgnoreCase("on") == 0) {
-                    gzipswitch.setGzipon(true);
-                }
+                    }
+                    switch (cfsite.getGzip()) {
+                        case 1:
+                            gzip = "on";
+                            break;
+                        case 2:
+                            gzip = "off";
+                            break;
+                    }
+                    if (gzip.compareToIgnoreCase("on") == 0) {
+                        gzipswitch.setGzipon(true);
+                    }
 
-                String htmlcompression;
-                htmlcompression = propertymap.get("html.compression");
-                if (htmlcompression == null) {
-                    htmlcompression = "off";
-                }
-                switch (cfsite.getHtmlcompression()) {
-                    case 1:
-                        htmlcompression = "on";
-                        break;
-                    case 2:
+                    String htmlcompression;
+                    htmlcompression = propertymap.get("html_compression");
+                    if (htmlcompression == null) {
                         htmlcompression = "off";
-                        break;
-                }
-                if (htmlcompression.compareToIgnoreCase("on") == 0) {
-                    HtmlCompressor htmlcompressor = new HtmlCompressor();
-                    htmlcompressor.setRemoveSurroundingSpaces(HtmlCompressor.ALL_TAGS);
-                    htmlcompressor.setPreserveLineBreaks(false);
-                    htmlcompressor.setCompressCss(false);
+                    }
+                    switch (cfsite.getHtmlcompression()) {
+                        case 1:
+                            htmlcompression = "on";
+                            break;
+                        case 2:
+                            htmlcompression = "off";
+                            break;
+                    }
+                    if (htmlcompression.compareToIgnoreCase("on") == 0) {
+                        HtmlCompressor htmlcompressor = new HtmlCompressor();
+                        htmlcompressor.setRemoveSurroundingSpaces(HtmlCompressor.ALL_TAGS);
+                        htmlcompressor.setPreserveLineBreaks(false);
+                        htmlcompressor.setCompressCss(false);
 
-                    cfresponse.setErrorcode(0);
-                    cfresponse.setOutput(htmlcompressor.compress(out.toString()));
-                    //logger.info("END makeResponse: " + name);
-                    return new AsyncResult<>(cfresponse);
-                } else {
-                    cfresponse.setErrorcode(0);
-                    cfresponse.setOutput(out.toString());
+                        cfresponse.setErrorcode(0);
+                        cfresponse.setOutput(htmlcompressor.compress(out.toString()));
+                        //logger.info("END makeResponse: " + name);
+                        return new AsyncResult<>(cfresponse);
+                    } else {
+                        cfresponse.setErrorcode(0);
+                        cfresponse.setOutput(out.toString());
+                        //logger.info("END makeResponse: " + name);
+                        return new AsyncResult<>(cfresponse);
+                    }
+                } catch (NoResultException ex) {
+                    cfresponse.setErrorcode(1);
+                    cfresponse.setOutput("No template");
                     //logger.info("END makeResponse: " + name);
                     return new AsyncResult<>(cfresponse);
                 }
-            } catch (NoResultException ex) {
-                cfresponse.setErrorcode(1);
-                cfresponse.setOutput("No template");
-                //logger.info("END makeResponse: " + name);
+            } else {
+                cfresponse.setErrorcode(2);
+                cfresponse.setOutput("Only for Job calling");
                 return new AsyncResult<>(cfresponse);
             }
         } catch (IOException | org.apache.velocity.runtime.parser.ParseException ex) {
@@ -608,7 +614,7 @@ public class Clownfish {
     }
     
     private void sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
-        MailUtil mailutil = new MailUtil(propertymap.get("mail.smtp.host"), propertymap.get("mail.transport.protocol"), propertymap.get("mail.user"), propertymap.get("mail.password"), propertymap.get("mail.sendfrom"));
+        MailUtil mailutil = new MailUtil(propertymap.get("mail_smtp_host"), propertymap.get("mail_transport_protocol"), propertymap.get("mail_user"), propertymap.get("mail_password"), propertymap.get("mail_sendfrom"));
         mailutil.sendRespondMail(mailto, subject, mailbody);
     }
 

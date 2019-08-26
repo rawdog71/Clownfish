@@ -52,6 +52,8 @@ public class CfProperty implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "value")
     private String value;
+    @Column(name = "nodelete")
+    private boolean nodelete;
 
     public CfProperty() {
     }
@@ -79,6 +81,14 @@ public class CfProperty implements Serializable {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public boolean isNodelete() {
+        return nodelete;
+    }
+
+    public void setNodelete(boolean nodelete) {
+        this.nodelete = nodelete;
     }
 
     @Override

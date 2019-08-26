@@ -90,8 +90,8 @@ public class GetAsset extends HttpServlet {
                 width = 0;
                 height = 0;
                 CfAsset asset = null;
-                String mediapath = propertymap.get("media.folder");
-                String cachepath = propertymap.get("cache.folder");
+                String mediapath = propertymap.get("media_folder");
+                String cachepath = propertymap.get("cache_folder");
                 String imagefilename = acontext.getRequest().getParameter("file");
                 if (imagefilename != null) {
                     asset = cfassetService.findByName(imagefilename);

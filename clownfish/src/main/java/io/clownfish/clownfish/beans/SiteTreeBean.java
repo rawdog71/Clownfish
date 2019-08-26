@@ -106,6 +106,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfClasscontent> selectedClasscontentlist;
     private @Getter @Setter int sitehtmlcompression;
     private @Getter @Setter int sitegzip;
+    private @Getter @Setter boolean sitejob;
     private @Getter @Setter String siteTitle;
     private @Getter @Setter String aliaspath;
     private @Getter @Setter String characterEncoding;
@@ -137,7 +138,7 @@ public class SiteTreeBean implements Serializable {
     @PostConstruct
     public void init() {
         propertymap = propertylist.fillPropertyMap();
-        String sapSupportProp = propertymap.get("sap.support");
+        String sapSupportProp = propertymap.get("sap_support");
         if (sapSupportProp == null) {
             sapSupport = false;
         } else {
@@ -158,9 +159,9 @@ public class SiteTreeBean implements Serializable {
         selectedDatasources = new ArrayList<>();
         selectedContentlist = new ArrayList<>();
         selectedClasscontentlist = new ArrayList<>();
-        locale = propertymap.get("response.locale");
-        contentType = propertymap.get("response.contenttype");
-        characterEncoding = propertymap.get("response.characterencoding");
+        locale = propertymap.get("response_locale");
+        contentType = propertymap.get("response_contenttype");
+        characterEncoding = propertymap.get("response_characterencoding");
     }
     
     public void initDatasources() {
@@ -337,6 +338,7 @@ public class SiteTreeBean implements Serializable {
         }
         siteName = selectedSite.getName();
         siteTitle = selectedSite.getTitle();
+        sitejob = selectedSite.isJob();
         aliaspath = selectedSite.getAliaspath();
         sitehtmlcompression = selectedSite.getHtmlcompression();
         characterEncoding = selectedSite.getCharacterencoding();
@@ -433,6 +435,7 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setLocale(locale);
             selectedSite.setAliaspath(aliaspath);
             selectedSite.setTitle(siteTitle);
+            selectedSite.setJob(sitejob);
             cfsiteService.edit(selectedSite);
             loadTree();
             
@@ -492,6 +495,7 @@ public class SiteTreeBean implements Serializable {
             newsite.setLocale(locale);
             newsite.setAliaspath(siteName);
             newsite.setTitle(siteTitle);
+            selectedSite.setJob(sitejob);
             cfsiteService.create(newsite);
             loadTree();
         } catch (ConstraintViolationException ex) {

@@ -96,6 +96,8 @@ public class CfSite implements Serializable {
     @Size(max = 255)
     @Column(name = "title")
     private String title;
+    @Column(name = "job")
+    private boolean job;
 
     public CfSite() {
     }
@@ -212,6 +214,14 @@ public class CfSite implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public boolean isJob() {
+        return job;
+    }
+
+    public void setJob(boolean job) {
+        this.job = job;
     }
 
     @Override
