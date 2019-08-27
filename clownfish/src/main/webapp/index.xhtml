@@ -44,8 +44,8 @@
                                 <p:scrollPanel style="height: 400px; border: none;" mode="native">
                                     <p:tree id="sitetree" value="#{sitetree.root}" var="node" dynamic="true" selectionMode="single" draggable="true" droppable="true">
                                         <p:ajax event="dragdrop" listener="#{sitetree.onDragDrop}" update=":form:msgs" />
-                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:templateview :form:tabview:cssview :form:tabview:sitepanel :form:tabview:jsview :form:tabview:sitelist :form:tabview:classcontentdroplist :form:tabview:newsite :form:tabview:saprfclist" />
-                                        <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:templateview :form:tabview:cssview :form:tabview:sitepanel :form:tabview:jsview :form:tabview:sitelist :form:tabview:classcontentdroplist :form:tabview:newsite :form:tabview:saprfclist" />
+                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:src_tabview:cssview :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:src_tabview:jsview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:saprfclist" />
+                                        <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:src_tabview:cssview :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:src_tabview:jsview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:saprfclist" />
                                         <p:treeNode>
                                             <h:outputText value="#{node}" />
                                         </p:treeNode>
@@ -53,129 +53,141 @@
                                 </p:scrollPanel>
                             </p:column>
                             <p:column colspan="12" style="vertical-align: top;">
-                                <p:panelGrid id="sitepanel">
-                                    <p:row>
-                                        <p:column>
-                                            <p:outputLabel for="sitename">Name</p:outputLabel>
-                                            <p:inputText id="sitename" value="#{sitetree.siteName}" >
-                                                <p:ajax event="keyup" listener="#{sitetree.onChangeName(changeEvent)}" update=":form:tabview:newsite" />
-                                            </p:inputText>
-                                        </p:column>
-                                    </p:row>
-                                    <p:row>
-                                        <p:column>
-                                            <p:outputLabel for="sitetitle">Titel</p:outputLabel>
-                                            <p:inputText id="sitetitle" value="#{sitetree.siteTitle}" >
-                                            </p:inputText>
-                                        </p:column>
-                                    </p:row>
-                                    <p:row>
-                                        <p:column>
-                                            <p:outputLabel for="sitedatasource" value="Datasource:" />
-                                            <p:selectCheckboxMenu id="sitedatasource" value="#{sitetree.selectedDatasources}" required="false" label="Datasources" converter="#{datasourceConverterBean}" filter="true" filterMatchMode="startsWith">
-                                                <f:selectItems value="#{sitetree.datasources}" var="datasource" itemLabel="#{datasource.name}" itemValue="#{datasource}" />
-                                            </p:selectCheckboxMenu>
-                                        </p:column>
-                                    </p:row>
+                                <p:tabView id="tabsiteview">
+                                    <p:tab title="Main" id="site_main">
+                                        <p:panelGrid id="sitepanel_main">
+                                            <p:row>
+                                                <p:column>
+                                                    <p:outputLabel for="sitename">Name</p:outputLabel>
+                                                    <p:inputText id="sitename" value="#{sitetree.siteName}" >
+                                                        <p:ajax event="keyup" listener="#{sitetree.onChangeName(changeEvent)}" update=":form:tabview:newsite" />
+                                                    </p:inputText>
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="selecttemplate" value="Template:" />
+                                                    <p:selectOneMenu id="selecttemplate" value="#{sitetree.selectedTemplate}" required="false" converter="#{templateConverterBean}">
+                                                        <p:ajax listener="#{sitetree.onChangeTemplate}" update=":form:tabview:src_tabview:templateview" />
+                                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                                        <f:selectItems value="#{templateList.templateListe}" />
+                                                    </p:selectOneMenu>
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="selectstylesheet" value="Stylesheet:" />
+                                                    <p:selectOneMenu id="selectstylesheet" value="#{sitetree.selectedStylesheet}" required="false" converter="#{stylesheetConverterBean}">
+                                                        <p:ajax listener="#{sitetree.onChangeStylesheet}" update=":form:tabview:src_tabview:cssview" />
+                                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                                        <f:selectItems value="#{stylesheetList.stylesheetListe}" />
+                                                    </p:selectOneMenu>
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="selectjavascript" value="Javascript:" />
+                                                    <p:selectOneMenu id="selectjavascript" value="#{sitetree.selectedJavascript}" required="false" converter="#{javascriptConverterBean}">
+                                                        <p:ajax listener="#{sitetree.onChangeJavascript}" update=":form:tabview:src_tabview:jsview" />
+                                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                                        <f:selectItems value="#{javascriptList.javascriptListe}" />
+                                                    </p:selectOneMenu>
+                                                </p:column>
+                                            </p:row>
+                                        </p:panelGrid>
+                                    </p:tab>
+                                    <p:tab title="Content" id="site_content">
+                                        <p:panelGrid id="sitepanel_content">
+                                            <p:row>
+                                                <p:column>
+                                                    <p:outputLabel for="sitedatasource" value="Datasource:" />
+                                                    <p:selectCheckboxMenu id="sitedatasource" value="#{sitetree.selectedDatasources}" required="false" label="Datasources" converter="#{datasourceConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                        <f:selectItems value="#{sitetree.datasources}" var="datasource" itemLabel="#{datasource.name}" itemValue="#{datasource}" />
+                                                    </p:selectCheckboxMenu>
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>
+                                                    <p:outputLabel for="sitelist" value="Datalist:" />
+                                                    <p:selectCheckboxMenu id="sitelist" value="#{sitetree.selectedContentlist}" required="false" label="Datalist" converter="#{sitelistConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                        <f:selectItems value="#{sitetree.contentlist}" var="contentlist" itemLabel="#{contentlist.name}" itemValue="#{contentlist}" />
+                                                    </p:selectCheckboxMenu>
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>
+                                                    <p:outputLabel for="classcontentdroplist" value="Contentlist:" />
+                                                    <p:selectCheckboxMenu id="classcontentdroplist" value="#{sitetree.selectedClasscontentlist}" required="false" label="Contentlist" converter="#{classcontentConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                        <f:selectItems value="#{sitetree.classcontentlist}" var="classcontent" itemLabel="#{classcontent.name}" itemValue="#{classcontent}" />
+                                                    </p:selectCheckboxMenu>
+                                                </p:column>
+                                            </p:row>
+                                        </p:panelGrid>
+                                    </p:tab>
+                                    <p:tab title="SEO" id="site_seo">
+                                        <p:panelGrid id="sitepanel_seo">
+                                            <p:row>
+                                                <p:column>
+                                                    <p:outputLabel for="sitetitle">Titel</p:outputLabel>
+                                                    <p:inputText id="sitetitle" value="#{sitetree.siteTitle}" >
+                                                    </p:inputText>
+                                                </p:column>
+                                            </p:row>
+                                        </p:panelGrid>
+                                    </p:tab>
+                                    <p:tab title="Misc" id="site_misc">
+                                        <p:panelGrid id="sitepanel_misc">
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="selecthtmlcompression" value="HTML Compression:" />
+                                                    <p:triStateCheckbox id="selecthtmlcompression" value="#{sitetree.sitehtmlcompression}"/>  
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="selectjob" value="Job;" />
+                                                    <p:selectBooleanCheckbox id="selectjob" value="#{sitetree.sitejob}"/>  
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="selectgzip" value="GZIP:" />
+                                                    <p:triStateCheckbox id="selectgzip" value="#{sitetree.sitegzip}"/>  
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="contenttype" value="ContentType:" />
+                                                    <p:inputText id="contenttype" value="#{sitetree.contentType}" maxlength="16" />
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="encoding" value="Encoding:" />
+                                                    <p:inputText id="encoding" value="#{sitetree.characterEncoding}" maxlength="16" />
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="locale" value="Locale:" />
+                                                    <p:inputText id="locale" value="#{sitetree.locale}" maxlength="16" />
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="aliaspath" value="Path:" />
+                                                    <p:inputText id="aliaspath" value="#{sitetree.aliaspath}" maxlength="255" />
+                                                </p:column>
+                                            </p:row>
+                                        </p:panelGrid>
+                                    </p:tab>
+                                    <p:tab title="SAP" id="site_sap">
+                                        <p:panelGrid id="sitepanel_sap">
+                                        </p:panelGrid>
+                                    </p:tab>
+                                </p:tabView>
                                     
-                                    <p:row>
-                                        <p:column>
-                                            <p:outputLabel for="sitelist" value="Datalist:" />
-                                            <p:selectCheckboxMenu id="sitelist" value="#{sitetree.selectedContentlist}" required="false" label="Datalist" converter="#{sitelistConverterBean}" filter="true" filterMatchMode="startsWith">
-                                                <f:selectItems value="#{sitetree.contentlist}" var="contentlist" itemLabel="#{contentlist.name}" itemValue="#{contentlist}" />
-                                            </p:selectCheckboxMenu>
-                                        </p:column>
-                                    </p:row>
-                                    
-                                    <p:row>
-                                        <p:column>
-                                            <p:outputLabel for="classcontentdroplist" value="Contentlist:" />
-                                            <p:selectCheckboxMenu id="classcontentdroplist" value="#{sitetree.selectedClasscontentlist}" required="false" label="Contentlist" converter="#{classcontentConverterBean}" filter="true" filterMatchMode="startsWith">
-                                                <f:selectItems value="#{sitetree.classcontentlist}" var="classcontent" itemLabel="#{classcontent.name}" itemValue="#{classcontent}" />
-                                            </p:selectCheckboxMenu>
-                                        </p:column>
-                                    </p:row>
-                                    
-                                    <p:row>
-                                        <p:column>    
-                                            <p:outputLabel for="selecttemplate" value="Template:" />
-                                            <p:selectOneMenu id="selecttemplate" value="#{sitetree.selectedTemplate}" required="false" converter="#{templateConverterBean}">
-                                                <p:ajax listener="#{sitetree.onChangeTemplate}" update=":form:tabview:templateview" />
-                                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                                <f:selectItems value="#{templateList.templateListe}" />
-                                            </p:selectOneMenu>
-                                        </p:column>
-                                    </p:row>
-                                    <p:row>
-                                        <p:column>    
-                                            <p:outputLabel for="selectstylesheet" value="Stylesheet:" />
-                                            <p:selectOneMenu id="selectstylesheet" value="#{sitetree.selectedStylesheet}" required="false" converter="#{stylesheetConverterBean}">
-                                                <p:ajax listener="#{sitetree.onChangeStylesheet}" update=":form:tabview:cssview" />
-                                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                                <f:selectItems value="#{stylesheetList.stylesheetListe}" />
-                                            </p:selectOneMenu>
-                                        </p:column>
-                                    </p:row>
-                                    <p:row>
-                                        <p:column>    
-                                            <p:outputLabel for="selectjavascript" value="Javascript:" />
-                                            <p:selectOneMenu id="selectjavascript" value="#{sitetree.selectedJavascript}" required="false" converter="#{javascriptConverterBean}">
-                                                <p:ajax listener="#{sitetree.onChangeJavascript}" update=":form:tabview:jsview" />
-                                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                                <f:selectItems value="#{javascriptList.javascriptListe}" />
-                                            </p:selectOneMenu>
-                                        </p:column>
-                                    </p:row>
-                                    
-                                    <p:row>
-                                        <p:column>    
-                                            <p:outputLabel for="selecthtmlcompression" value="HTML Compression:" />
-                                            <p:triStateCheckbox id="selecthtmlcompression" value="#{sitetree.sitehtmlcompression}"/>  
-                                        </p:column>
-                                    </p:row>
-                                    
-                                    <p:row>
-                                        <p:column>    
-                                            <p:outputLabel for="selectjob" value="Job;" />
-                                            <p:selectBooleanCheckbox id="selectjob" value="#{sitetree.sitejob}"/>  
-                                        </p:column>
-                                    </p:row>
-                                    
-                                    <p:row>
-                                        <p:column>    
-                                            <p:outputLabel for="selectgzip" value="GZIP:" />
-                                            <p:triStateCheckbox id="selectgzip" value="#{sitetree.sitegzip}"/>  
-                                        </p:column>
-                                    </p:row>
-                                    
-                                    <p:row>
-                                        <p:column>    
-                                            <p:outputLabel for="contenttype" value="ContentType:" />
-                                            <p:inputText id="contenttype" value="#{sitetree.contentType}" maxlength="16" />
-                                        </p:column>
-                                    </p:row>
-                                    
-                                    <p:row>
-                                        <p:column>    
-                                            <p:outputLabel for="encoding" value="Encoding:" />
-                                            <p:inputText id="encoding" value="#{sitetree.characterEncoding}" maxlength="16" />
-                                        </p:column>
-                                    </p:row>
-                                    
-                                    <p:row>
-                                        <p:column>    
-                                            <p:outputLabel for="locale" value="Locale:" />
-                                            <p:inputText id="locale" value="#{sitetree.locale}" maxlength="16" />
-                                        </p:column>
-                                    </p:row>
-                                    
-                                    <p:row>
-                                        <p:column>    
-                                            <p:outputLabel for="aliaspath" value="Path:" />
-                                            <p:inputText id="aliaspath" value="#{sitetree.aliaspath}" maxlength="255" />
-                                        </p:column>
-                                    </p:row>
-                                    
+                                <p:panelGrid>    
                                     <p:row>
                                         <p:column>
                                             <p:commandButton id="changeSiteButton" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs" />
@@ -213,17 +225,18 @@
                     
                     <p:panelGrid>
                         <p:row>
-                            <p:column colspan="12">
-                            Template:
-                            <pe:codeMirror id="templateview" mode="#{sitetree.selectedTemplate.scriptLanguageTxt}" theme="ambiance" value="#{sitetree.template}" lineNumbers="true" matchBrackets="true" readonly="true" />
-                            </p:column>
-                            <p:column colspan="12">
-                            Stylesheet:
-                            <pe:codeMirror id="cssview" mode="css" theme="ambiance" value="#{sitetree.stylesheet}" lineNumbers="true" matchBrackets="true" readonly="true" />
-                            </p:column>
-                            <p:column colspan="12">
-                            Javascript:
-                            <pe:codeMirror id="jsview" mode="javascript" theme="ambiance" value="#{sitetree.javascript}" lineNumbers="true" matchBrackets="true" readonly="true" />
+                            <p:column colspan="12" style="vertical-align: top;">
+                                <p:tabView id="src_tabview">
+                                    <p:tab title="Template" id="src_template">
+                                        <pe:codeMirror id="templateview" mode="#{sitetree.selectedTemplate.scriptLanguageTxt}" theme="ambiance" value="#{sitetree.template}" lineNumbers="true" matchBrackets="true" readonly="true" />
+                                    </p:tab>
+                                    <p:tab title="Stylesheet" id="src_stylesheet">
+                                        <pe:codeMirror id="cssview" mode="css" theme="ambiance" value="#{sitetree.stylesheet}" lineNumbers="true" matchBrackets="true" readonly="true" />
+                                    </p:tab>
+                                    <p:tab title="Javascript" id="src_javascript">
+                                        <pe:codeMirror id="jsview" mode="javascript" theme="ambiance" value="#{sitetree.javascript}" lineNumbers="true" matchBrackets="true" readonly="true" />
+                                    </p:tab>
+                                </p:tabView>
                             </p:column>
                         </p:row>
                     </p:panelGrid>
@@ -236,7 +249,7 @@
                         <f:selectItems value="#{templateList.templateListe}" />
                     </p:selectOneMenu>
                     
-                    <p:commandButton id="deletetemplateButton" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:selecttemplate" />
+                    <p:commandButton id="deletetemplateButton" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:tabsiteview:selecttemplate" />
 
                     <p:outputLabel for="templatename">Name</p:outputLabel>
                     <p:inputText id="templatename" value="#{templateList.templateName}" >
@@ -246,7 +259,7 @@
                         <f:selectItem itemValue="0" itemLabel="Freemarker" />
                         <f:selectItem itemValue="1" itemLabel="Velocity" />
                     </p:selectOneMenu>
-                    <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
+                    <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
 
                     <pe:codeMirror id="edittemplate" mode="#{templateList.selectedScriptlanguage}" readonly="#{!templateList.checkedout}" theme="ambiance" value="#{templateList.templateContent}" lineNumbers="true" matchBrackets="true" />
                     <h:panelGroup id="difftemplateBtnGroup">
@@ -288,13 +301,13 @@
                         <f:selectItems value="#{stylesheetList.stylesheetListe}" />
                     </p:selectOneMenu>
                     
-                    <p:commandButton id="deletestylesheetButton" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:selectstylesheet" />
+                    <p:commandButton id="deletestylesheetButton" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:tabsiteview:selectstylesheet" />
 
                     <p:outputLabel for="stylesheetname">Name</p:outputLabel>
                     <p:inputText id="stylesheetname" value="#{stylesheetList.stylesheetName}" >
                         <p:ajax event="keyup" listener="#{stylesheetList.onChangeName(changeEvent)}" update=":form:tabview:newstylesheet" />
                     </p:inputText>
-                    <p:commandButton id="newstylesheet" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
+                    <p:commandButton id="newstylesheet" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
 
                     <pe:codeMirror id="editstylesheet" mode="css" theme="ambiance" readonly="#{!stylesheetList.checkedout}" value="#{stylesheetList.stylesheetContent}" lineNumbers="true" matchBrackets="true" />
                         <h:panelGroup id="diffstylesheetBtnGroup">
@@ -337,13 +350,13 @@
                         <f:selectItems value="#{javascriptList.javascriptListe}" />
                     </p:selectOneMenu>
                     
-                    <p:commandButton id="deletejavascriptButton" value="Delete" actionListener="#{javascriptList.onDelete}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:selectjavascript" />
+                    <p:commandButton id="deletejavascriptButton" value="Delete" actionListener="#{javascriptList.onDelete}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:tabsiteview:selectjavascript" />
 
                     <p:outputLabel for="javascriptname">Name</p:outputLabel>
                     <p:inputText id="javascriptname" value="#{javascriptList.javascriptName}" >
                         <p:ajax event="keyup" listener="#{javascriptList.onChangeName(changeEvent)}" update=":form:tabview:newjavascript" />
                     </p:inputText>
-                    <p:commandButton id="newjavascript" process="form" value="New" actionListener="#{javascriptList.onCreate}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
+                    <p:commandButton id="newjavascript" process="form" value="New" actionListener="#{javascriptList.onCreate}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
                     
                     <pe:codeMirror id="editjavascript" mode="javascript" theme="ambiance" readonly="#{!javascriptList.checkedout}" value="#{javascriptList.javascriptContent}" lineNumbers="true" matchBrackets="true" />
                     <h:panelGroup id="diffjavascriptBtnGroup">
@@ -462,10 +475,10 @@
                         <f:selectItems value="#{classcontentList.classlist}" />
                     </p:selectOneMenu>
                     
-                    <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}">
+                    <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}">
                         <f:actionListener binding="#{sitetree.initClassContentlist()}" />
                     </p:commandButton>
-                    <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:classcontentdroplist">
+                    <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
                         <f:actionListener binding="#{sitetree.initClassContentlist()}" />
                     </p:commandButton>
                     
@@ -525,10 +538,10 @@
                         <f:selectItems value="#{datacontentList.classlist}" />
                     </p:selectOneMenu>
                     
-                    <p:commandButton id="newcontentlist" process="form" value="New" actionListener="#{datacontentList.onCreateContent}" update=":form:msgs :form:tabview:sitelist :form:tabview:datalistcontent" disabled="#{datacontentlist.newContentButtonDisabled}">
+                    <p:commandButton id="newcontentlist" process="form" value="New" actionListener="#{datacontentList.onCreateContent}" update=":form:msgs :form:tabview:tabsiteview:sitelist :form:tabview:datalistcontent" disabled="#{datacontentlist.newContentButtonDisabled}">
                         <f:actionListener binding="#{sitetree.initContentlist()}" />
                     </p:commandButton>
-                    <p:commandButton id="deletecontentlist" process="form" value="Delete" actionListener="#{datacontentList.onDeleteContent}" update=":form:msgs :form:tabview:sitelist :form:tabview:datalistcontent">
+                    <p:commandButton id="deletecontentlist" process="form" value="Delete" actionListener="#{datacontentList.onDeleteContent}" update=":form:msgs :form:tabview:tabsiteview:sitelist :form:tabview:datalistcontent">
                         <f:actionListener binding="#{sitetree.initContentlist()}" />
                     </p:commandButton>
                     
@@ -577,11 +590,11 @@
                     </p:panelGrid>
                     
                     <p:panelGrid columns="3">
-                        <p:commandButton id="newdatasource" process="form" value="New" actionListener="#{datasourceList.onCreateContent}" update=":form:msgs :form:tabview:sitedatasource :form:tabview:datasourcelist" disabled="#{datasourceList.newContentButtonDisabled}">
+                        <p:commandButton id="newdatasource" process="form" value="New" actionListener="#{datasourceList.onCreateContent}" update=":form:msgs :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist" disabled="#{datasourceList.newContentButtonDisabled}">
                             <f:actionListener binding="#{sitetree.initDatasources()}" />
                         </p:commandButton>
                         <p:commandButton id="editdatasource" process="form" value="Edit" actionListener="#{datasourceList.onEditContent}" update=":form:msgs :form:tabview:datalistcontent" />
-                        <p:commandButton id="deletedatasource" process="form" value="Delete" actionListener="#{datasourceList.onDeleteContent}" update=":form:msgs :form:tabview:sitedatasource :form:tabview:datasourcelist">
+                        <p:commandButton id="deletedatasource" process="form" value="Delete" actionListener="#{datasourceList.onDeleteContent}" update=":form:msgs :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist">
                             <f:actionListener binding="#{sitetree.initDatasources()}" />
                         </p:commandButton>
                     </p:panelGrid>
