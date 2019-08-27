@@ -98,6 +98,8 @@ public class CfSite implements Serializable {
     private String title;
     @Column(name = "job")
     private boolean job;
+    @Column(name = "description")
+    private String description;
 
     public CfSite() {
     }
@@ -222,6 +224,14 @@ public class CfSite implements Serializable {
 
     public void setJob(boolean job) {
         this.job = job;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

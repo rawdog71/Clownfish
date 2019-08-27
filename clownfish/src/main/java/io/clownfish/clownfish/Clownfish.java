@@ -494,6 +494,7 @@ public class Clownfish {
                     sitecontentmap.put("db", dbexport);
                     // Put meta info to sitecontentmap
                     metainfomap.put("title", cfsite.getTitle());
+                    metainfomap.put("description", cfsite.getDescription());
                     metainfomap.put("name", cfsite.getName());
                     metainfomap.put("encoding", cfsite.getCharacterencoding());
                     metainfomap.put("contenttype", cfsite.getContenttype());

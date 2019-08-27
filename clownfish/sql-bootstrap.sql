@@ -265,6 +265,7 @@ CREATE TABLE IF NOT EXISTS `cf_site` (
   `gzip` int(1) NOT NULL,
   `title` varchar(255) DEFAULT NULL,  
   `job` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `description` text DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `alias` (`aliaspath`)

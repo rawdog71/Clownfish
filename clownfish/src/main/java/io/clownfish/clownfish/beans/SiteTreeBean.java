@@ -108,6 +108,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter int sitegzip;
     private @Getter @Setter boolean sitejob;
     private @Getter @Setter String siteTitle;
+    private @Getter @Setter String siteDescription;
     private @Getter @Setter String aliaspath;
     private @Getter @Setter String characterEncoding;
     private @Getter @Setter String contentType;
@@ -281,6 +282,7 @@ public class SiteTreeBean implements Serializable {
         selectedJavascript = null;
         siteName = "";
         siteTitle = "";
+        siteDescription = "";
         aliaspath = "";
         sitehtmlcompression = 0;
         characterEncoding = "";
@@ -338,6 +340,7 @@ public class SiteTreeBean implements Serializable {
         }
         siteName = selectedSite.getName();
         siteTitle = selectedSite.getTitle();
+        siteDescription = selectedSite.getDescription();
         sitejob = selectedSite.isJob();
         aliaspath = selectedSite.getAliaspath();
         sitehtmlcompression = selectedSite.getHtmlcompression();
@@ -435,6 +438,7 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setLocale(locale);
             selectedSite.setAliaspath(aliaspath);
             selectedSite.setTitle(siteTitle);
+            selectedSite.setDescription(siteDescription);
             selectedSite.setJob(sitejob);
             cfsiteService.edit(selectedSite);
             loadTree();
@@ -495,6 +499,7 @@ public class SiteTreeBean implements Serializable {
             newsite.setLocale(locale);
             newsite.setAliaspath(siteName);
             newsite.setTitle(siteTitle);
+            newsite.setDescription(siteDescription);
             selectedSite.setJob(sitejob);
             cfsiteService.create(newsite);
             loadTree();
