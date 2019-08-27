@@ -64,18 +64,19 @@ import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.QuartzJob;
 import io.clownfish.clownfish.utils.SiteUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -319,13 +320,7 @@ public class Clownfish {
             });
             
             if ((querymap.containsKey("modus")) && (querymap.get("modus")[0].compareToIgnoreCase("static") == 0)) {
-                List<String> lines = Files.readAllLines(Paths.get(static_folder + File.separator + name), StandardCharsets.UTF_8); 
-                StringBuilder sb = new StringBuilder(1024); 
-                for (String line : lines) { 
-                    sb.append(line); 
-                }
-                PrintWriter outwriter = response.getWriter();
-                outwriter.println(sb);
+                printStaticSite(name);
             } else {
                 addHeader(response, version);
                 Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams);
@@ -341,13 +336,7 @@ public class Clownfish {
                 outwriter.println(content);
                 
                 if ((querymap.containsKey("modus")) && (querymap.get("modus")[0].compareToIgnoreCase("makestatic") == 0)) {
-                    FileWriter fw = new FileWriter(static_folder + File.separator + name);
-                    try {
-                        fw.write(content);
-                        fw.close();    
-                    } catch (Exception e) {
-                        throw new RuntimeException("Unable to create the destination file", e);
-                    }
+                    generateStaticSite(name, content);
                 }
             }
         } catch (IOException | InterruptedException | ExecutionException ex) {
@@ -679,5 +668,45 @@ public class Clownfish {
             .withIdentity(jobDetail.getKey().getName(), jobDetail.getKey().getGroup())
             .withSchedule(cronSchedule(schedule))
             .build();
+    }
+    
+    private void printStaticSite(String sitename) {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(static_folder + File.separator + sitename), "UTF-8"));
+            StringBuilder sb = new StringBuilder(1024);
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+            response.setContentType(contentType);
+            response.setCharacterEncoding(characterEncoding);
+            PrintWriter outwriter = response.getWriter();
+            outwriter.println(sb);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void generateStaticSite(String sitename, String content) {
+        FileOutputStream fileStream = null;
+        try {
+            OutputStreamWriter writer = null;
+            fileStream = new FileOutputStream(new File(static_folder + File.separator + sitename));
+            writer = new OutputStreamWriter(fileStream, "UTF-8");
+            try {
+                writer.write(content);
+                writer.close();
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to create the destination file", e);
+            }
+        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fileStream.close();
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }
