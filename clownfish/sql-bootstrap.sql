@@ -435,7 +435,8 @@ INSERT INTO `cf_attributetype` (`id`, `name`) VALUES
 (6, 'datetime'),
 (7, 'hashstring'),
 (8, 'media'),
-(9, 'text');
+(9, 'text'),
+(10, 'markdown');
 
 --
 -- Daten für Tabelle `cf_property`

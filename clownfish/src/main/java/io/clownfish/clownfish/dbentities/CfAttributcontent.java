@@ -273,6 +273,12 @@ public class CfAttributcontent implements Serializable {
                 } else {
                     return "";
                 }
+            case 10: // text (markdown formatted)
+                if (null != getContentText()) {
+                    return getContentText();
+                } else {
+                    return "";
+                }    
         }
         return "?";
     }

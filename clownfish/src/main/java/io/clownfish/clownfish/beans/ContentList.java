@@ -85,6 +85,7 @@ public class ContentList implements Serializable {
     private @Getter @Setter boolean isRealType;
     private @Getter @Setter boolean isHTMLTextType;
     private @Getter @Setter boolean isTextType;
+    private @Getter @Setter boolean isMarkdownType;
     private @Getter @Setter boolean isMediaType;
     private @Getter @Setter boolean valueBooleanRendered = false;
     private @Getter @Setter boolean valueDatetimeRendered = false;
@@ -124,6 +125,7 @@ public class ContentList implements Serializable {
         isRealType = false;
         isHTMLTextType = false;
         isTextType = false;
+        isMarkdownType = false;
         isDatetimeType = false;
         isMediaType = false;
         
@@ -149,6 +151,9 @@ public class ContentList implements Serializable {
             case "text":
                 isTextType = true;
                 break;
+            case "markdown":
+                isMarkdownType = true;
+                break;    
             case "datetime":
                 isDatetimeType = true;
                 break;
@@ -263,6 +268,9 @@ public class ContentList implements Serializable {
             case "text":
                 selectedAttribut.setContentText(editContent);
                 break;
+            case "markdown":
+                selectedAttribut.setContentText(editContent);
+                break;    
             case "datetime":
                 DateTimeFormatter dtf = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss ZZZ yyyy").withLocale(Locale.US);
                 DateTime dt = DateTime.parse(editContent, dtf);
