@@ -15,8 +15,6 @@
  */
 package io.clownfish.clownfish.utils;
 
-import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
-import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
@@ -29,7 +27,6 @@ import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +48,7 @@ public class ClassUtil {
     public ClassUtil() {
     }
     
-    public Map getattributmap (CfClasscontent classcontent) {
+    public Map getattributmap (CfClasscontent classcontent, MutableDataSet markdownOptions) {
         List<CfAttributcontent> attributcontentlist = new ArrayList<>();
         attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
         
@@ -89,24 +86,19 @@ public class ClassUtil {
                     attributcontentmap.put(cfattribut.getName(), attributcontent.getContentText());
                     break;    
                 case "markdown":
-                    attributcontentmap.put(cfattribut.getName(), parseMarkdown(attributcontent.getContentText()));
+                    attributcontentmap.put(cfattribut.getName(), parseMarkdown(attributcontent.getContentText(), markdownOptions));
                     break;        
             }
         }
         return attributcontentmap;
     }
     
-    private String parseMarkdown(String content) {
-        MutableDataSet options = new MutableDataSet();
-
-        // uncomment to set optional extensions
-        options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), StrikethroughExtension.create()));
-
+    private String parseMarkdown(String content, MutableDataSet markdownOptions) {
         // uncomment to convert soft-breaks to hard breaks
         //options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
 
-        Parser parser = Parser.builder(options).build();
-        HtmlRenderer renderer = HtmlRenderer.builder(options).build();
+        Parser parser = Parser.builder(markdownOptions).build();
+        HtmlRenderer renderer = HtmlRenderer.builder(markdownOptions).build();
 
         // You can re-use parser and renderer instances
         Node document = parser.parse(content);

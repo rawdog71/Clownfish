@@ -15,8 +15,8 @@
  */
 package io.clownfish.clownfish.utils;
 
+import com.vladsch.flexmark.util.data.MutableDataSet;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
-import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
@@ -53,7 +53,7 @@ public class SiteUtil {
     public SiteUtil() {
     }
     
-    public void getSitelist_list(CfSite cfsite, Map sitecontentmap) {
+    public void getSitelist_list(CfSite cfsite, Map sitecontentmap, MutableDataSet markdownOptions) {
         List<CfSitelist> sitelist_list = new ArrayList<>();
         sitelist_list.addAll(cfsitelistService.findBySiteref(cfsite.getId()));
         for (CfSitelist sitelist : sitelist_list) {
@@ -66,19 +66,19 @@ public class SiteUtil {
                 cfclassService.findById(classcontent.getClassref().getId());
                 List<CfAttributcontent> attributcontentlist = new ArrayList<>();
                 attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
-                listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
+                listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent, markdownOptions));
             }
             sitecontentmap.put(cflist.getName(), listcontentmap);
         }
     }
     
-    public Map getSitecontentmapList(List<CfSitecontent> sitecontentlist) {
+    public Map getSitecontentmapList(List<CfSitecontent> sitecontentlist, MutableDataSet markdownOptions) {
         Map sitecontentmapdummy = new LinkedHashMap();
         for (CfSitecontent sitecontent : sitecontentlist) {
             CfClasscontent classcontent = cfclasscontentService.findById(sitecontent.getCfSitecontentPK().getClasscontentref());
             List<CfAttributcontent> attributcontentlist = new ArrayList<>();
             attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
-            sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
+            sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent, markdownOptions));
         }
         return sitecontentmapdummy;
     }

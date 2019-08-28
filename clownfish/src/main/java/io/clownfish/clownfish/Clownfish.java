@@ -18,9 +18,7 @@ package io.clownfish.clownfish;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
-import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.templatebeans.DatabaseTemplateBean;
@@ -81,7 +79,10 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -178,6 +179,7 @@ public class Clownfish {
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map metainfomap;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
+    private @Getter @Setter MutableDataSet markdownOptions = null;
 
     final Logger logger = LoggerFactory.getLogger(Clownfish.class);
     private @Getter @Setter String version;
@@ -253,6 +255,7 @@ public class Clownfish {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
             clownfishutil = new ClownfishUtil();
+            markdownOptions = new MutableDataSet();
             static_folder = propertymap.get("static_folder");
             String sapSupportProp = propertymap.get("sap_support");
             if (sapSupportProp.compareToIgnoreCase("true") == 0) {
@@ -300,8 +303,37 @@ public class Clownfish {
         } catch (SchedulerException ex) {
             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        propertymap.entrySet().stream().filter( 
+            pm -> pm.getKey().startsWith("markdown_")
+        ).filter( 
+            pm -> pm.getValue().compareToIgnoreCase("on") == 0
+        ).forEach( 
+            pm -> putToMarkdownOptions(pm.getKey())
+        );
     }
 
+    private void putToMarkdownOptions(String option) {
+        try {
+            System.out.println(option);
+            ClassLoader classLoader = Clownfish.class.getClassLoader();
+            switch (option) {
+                case "markdown_StrikethroughExtension":
+                    Class StrikethroughExtensionClass = classLoader.loadClass("com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension");
+                    Object strikethroughExtensionObject = StrikethroughExtensionClass.newInstance();
+                    markdownOptions.set(Parser.EXTENSIONS, Arrays.asList(strikethroughExtensionObject));
+                    break;
+                case "markdown_TablesExtension":
+                    Class TablesExtensionClass = classLoader.loadClass("com.vladsch.flexmark.ext.tables.TablesExtension");
+                    Object tablesExtensionClassObject = TablesExtensionClass.newInstance();
+                    markdownOptions.set(Parser.EXTENSIONS, Arrays.asList(tablesExtensionClassObject));
+                    break;
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException  ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public Clownfish() {
     }
     
@@ -479,10 +511,10 @@ public class Clownfish {
                     // fetch the dependend content
                     List<CfSitecontent> sitecontentlist = new ArrayList<>();
                     sitecontentlist.addAll(cfsitecontentService.findBySiteref(cfsite.getId()));
-                    sitecontentmap = siteutil.getSitecontentmapList(sitecontentlist);
+                    sitecontentmap = siteutil.getSitecontentmapList(sitecontentlist, markdownOptions);
 
                     // fetch the dependend datalists, if available
-                    siteutil.getSitelist_list(cfsite, sitecontentmap);
+                    siteutil.getSitelist_list(cfsite, sitecontentmap, markdownOptions);
 
                     // manage parameters 
                     HashMap<String, DatatableProperties> datatableproperties = clownfishutil.getDatatableproperties(postmap);
