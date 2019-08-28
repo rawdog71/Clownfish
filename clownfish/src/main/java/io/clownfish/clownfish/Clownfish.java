@@ -319,6 +319,7 @@ public class Clownfish {
                 queryParams.add(jfp);
             });
             
+            // if modus = static then try to render the static generated site from the static folder
             if ((querymap.containsKey("modus")) && (querymap.get("modus")[0].compareToIgnoreCase("static") == 0)) {
                 printStaticSite(name);
             } else {
@@ -335,6 +336,7 @@ public class Clownfish {
                 String content = cfResponse.get().getOutput();
                 outwriter.println(content);
                 
+                // if modus = makestatic then generate a static site to the static folder
                 if ((querymap.containsKey("modus")) && (querymap.get("modus")[0].compareToIgnoreCase("makestatic") == 0)) {
                     generateStaticSite(name, content);
                 }
