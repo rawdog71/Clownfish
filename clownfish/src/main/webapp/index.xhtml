@@ -44,8 +44,8 @@
                                 <p:scrollPanel style="height: 400px; border: none;" mode="native">
                                     <p:tree id="sitetree" value="#{sitetree.root}" var="node" dynamic="true" selectionMode="single" draggable="true" droppable="true">
                                         <p:ajax event="dragdrop" listener="#{sitetree.onDragDrop}" update=":form:msgs" />
-                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:src_tabview:cssview :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:src_tabview:jsview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:saprfclist" />
-                                        <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:src_tabview:cssview :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:src_tabview:jsview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:saprfclist" />
+                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:src_tabview:cssview :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:src_tabview:jsview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist" />
+                                        <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:src_tabview:cssview :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:src_tabview:jsview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist" />
                                         <p:treeNode>
                                             <h:outputText value="#{node}" />
                                         </p:treeNode>
@@ -188,8 +188,31 @@
                                             </p:row>
                                         </p:panelGrid>
                                     </p:tab>
-                                    <p:tab title="SAP" id="site_sap">
+                                    <p:tab title="SAP" id="site_sap" rendered="#{sitetree.sapSupport}">
                                         <p:panelGrid id="sitepanel_sap">
+                                            <p:column colspan="12" style="vertical-align: top;">
+                                                <p:dataTable id="saprfclist" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.cfSitesaprfcPK}">
+                                                    <p:ajax event="rowSelect" listener="#{sitetree.onRfcSelect}" update=":form:tabview:tabsiteview:siterfcgroup :form:tabview:tabsiteview:siterfcfunction" />
+                                                    <p:column headerText="RFC GRUPPE">
+                                                        <h:outputText value="#{rfclist.cfSitesaprfcPK.rfcgroup}" />
+                                                    </p:column>
+                                                    <p:column headerText="RFC FUNKTION">
+                                                        <h:outputText value="#{rfclist.cfSitesaprfcPK.rfcfunction}" />
+                                                    </p:column>
+                                                </p:dataTable>
+                                                <p:selectOneMenu id="siterfcgroup" value="#{sitetree.selectedrfcgroup}" required="false" label="RFCGROUP" converter="#{rfcGroupConverterBean}">
+                                                    <p:ajax listener="#{sitetree.onChangeRfcGroup}" update=":form:tabview:tabsiteview:siterfcfunction" />
+                                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                                    <f:selectItems value="#{sitetree.rfcgrouplist}" var="rfcgroup" itemLabel="#{rfcgroup.name}" itemValue="#{rfcgroup}" />
+                                                </p:selectOneMenu>
+                                                <p:selectOneMenu id="siterfcfunction" value="#{sitetree.selectedrfcfunction}" required="false" label="RFCFUNCTION" converter="#{rfcFunctionConverterBean}">
+                                                    <p:ajax listener="#{sitetree.onChangeRfcFunction}" />
+                                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                                    <f:selectItems value="#{sitetree.rfcfunctionlist}" var="rfcfunction" itemLabel="#{rfcfunction.name}" itemValue="#{rfcfunction}" />
+                                                </p:selectOneMenu>
+                                                <p:commandButton id="newRfc" process="form" value="New" actionListener="#{sitetree.onNewRfc}" update=":form:tabview:tabsiteview:saprfclist" />
+                                                <p:commandButton id="deleteRfc" process="form" value="Delete" actionListener="#{sitetree.onDeleteRfc}" update=":form:tabview:tabsiteview:saprfclist" />
+                                            </p:column>
                                         </p:panelGrid>
                                     </p:tab>
                                 </p:tabView>
@@ -204,29 +227,7 @@
                                     </p:row>
                                 </p:panelGrid>
                             </p:column>
-                            <p:column colspan="12" style="vertical-align: top;" rendered="#{sitetree.sapSupport}">
-                                <p:dataTable id="saprfclist" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.cfSitesaprfcPK}">
-                                    <p:ajax event="rowSelect" listener="#{sitetree.onRfcSelect}" update=":form:tabview:siterfcgroup :form:tabview:siterfcfunction" />
-                                    <p:column headerText="RFC GRUPPE">
-                                        <h:outputText value="#{rfclist.cfSitesaprfcPK.rfcgroup}" />
-                                    </p:column>
-                                    <p:column headerText="RFC FUNKTION">
-                                        <h:outputText value="#{rfclist.cfSitesaprfcPK.rfcfunction}" />
-                                    </p:column>
-                                </p:dataTable>
-                                <p:selectOneMenu id="siterfcgroup" value="#{sitetree.selectedrfcgroup}" required="false" label="RFCGROUP" converter="#{rfcGroupConverterBean}">
-                                    <p:ajax listener="#{sitetree.onChangeRfcGroup}" update=":form:tabview:siterfcfunction" />
-                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                    <f:selectItems value="#{sitetree.rfcgrouplist}" var="rfcgroup" itemLabel="#{rfcgroup.name}" itemValue="#{rfcgroup}" />
-                                </p:selectOneMenu>
-                                <p:selectOneMenu id="siterfcfunction" value="#{sitetree.selectedrfcfunction}" required="false" label="RFCFUNCTION" converter="#{rfcFunctionConverterBean}">
-                                    <p:ajax listener="#{sitetree.onChangeRfcFunction}" />
-                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                    <f:selectItems value="#{sitetree.rfcfunctionlist}" var="rfcfunction" itemLabel="#{rfcfunction.name}" itemValue="#{rfcfunction}" />
-                                </p:selectOneMenu>
-                                <p:commandButton id="newRfc" process="form" value="New" actionListener="#{sitetree.onNewRfc}" update=":form:tabview:saprfclist" />
-                                <p:commandButton id="deleteRfc" process="form" value="Delete" actionListener="#{sitetree.onDeleteRfc}" update=":form:tabview:saprfclist" />
-                            </p:column>
+                            
                         </p:row>
                     </p:panelGrid>
                     
