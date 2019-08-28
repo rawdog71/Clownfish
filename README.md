@@ -16,3 +16,4 @@ Work in progress
 - Asset management
 - Keywords
 - Cronjob scheduler
+- Markdown content
