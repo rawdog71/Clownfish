@@ -15,14 +15,21 @@
  */
 package io.clownfish.clownfish.utils;
 
+import com.vladsch.flexmark.ext.abbreviation.AbbreviationExtension;
+import com.vladsch.flexmark.ext.admonition.AdmonitionExtension;
+import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension;
+import com.vladsch.flexmark.ext.jekyll.tag.JekyllTagExtension;
+import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.builder.Extension;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.dbentities.CfProperty;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -42,11 +49,13 @@ public class MarkdownUtil {
     private @Getter @Setter List<CfProperty> propertylist;
     private @Getter @Setter Map<String, String> propertymap;
     @Autowired private PropertyList proplist;
+    private List<Extension> extensionList;
 
     public MarkdownUtil() {
     }
     
     public void initOptions() {
+        extensionList = new ArrayList<>();
         markdownOptions = new MutableDataSet();
         propertymap = proplist.fillPropertyMap();
         
@@ -57,25 +66,35 @@ public class MarkdownUtil {
         ).forEach( 
             pm -> putToMarkdownOptions(pm.getKey())
         );
+        if (!extensionList.isEmpty()) {
+            markdownOptions.set(Parser.EXTENSIONS, extensionList);
+        }
+        markdownOptions.set(HtmlRenderer.GENERATE_HEADER_ID, true);
     }
     
     private void putToMarkdownOptions(String option) {
         try {
-            //System.out.println(option);
-            ClassLoader classLoader = Clownfish.class.getClassLoader();
             switch (option) {
+                case "markdown_AbbreviationExtension":
+                    extensionList.add(AbbreviationExtension.create());
+                    break;
+                case "markdown_AdmonitionExtension":
+                    extensionList.add(AdmonitionExtension.create());
+                    break;
+                case "markdown_AnchorLinkExtension":
+                    extensionList.add(AnchorLinkExtension.create());
+                    break;
                 case "markdown_StrikethroughExtension":
-                    Class StrikethroughExtensionClass = classLoader.loadClass("com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension");
-                    Object strikethroughExtensionObject = StrikethroughExtensionClass.newInstance();
-                    markdownOptions.set(Parser.EXTENSIONS, Arrays.asList(strikethroughExtensionObject));
+                    extensionList.add(StrikethroughExtension.create());
                     break;
                 case "markdown_TablesExtension":
-                    Class TablesExtensionClass = classLoader.loadClass("com.vladsch.flexmark.ext.tables.TablesExtension");
-                    Object tablesExtensionClassObject = TablesExtensionClass.newInstance();
-                    markdownOptions.set(Parser.EXTENSIONS, Arrays.asList(tablesExtensionClassObject));
+                    extensionList.add(TablesExtension.create());
+                    break;
+                case "markdown_JekyllTagExtension":    
+                    extensionList.add(JekyllTagExtension.create());
                     break;
             }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException  ex) {
+        } catch (SecurityException  ex) {
             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
