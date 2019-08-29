@@ -15,10 +15,6 @@
  */
 package io.clownfish.clownfish.utils;
 
-import com.vladsch.flexmark.html.HtmlRenderer;
-import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.util.data.MutableDataSet;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
@@ -44,11 +40,12 @@ public class ClassUtil {
     @Autowired CfAttributService cfattributService;
     @Autowired CfAttributetypeService cfattributetypeService;
     @Autowired CfAttributcontentService cfattributcontentService;
+    @Autowired MarkdownUtil markdownUtil;
     
     public ClassUtil() {
     }
     
-    public Map getattributmap (CfClasscontent classcontent, MutableDataSet markdownOptions) {
+    public Map getattributmap (CfClasscontent classcontent) {
         List<CfAttributcontent> attributcontentlist = new ArrayList<>();
         attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
         
@@ -86,22 +83,11 @@ public class ClassUtil {
                     attributcontentmap.put(cfattribut.getName(), attributcontent.getContentText());
                     break;    
                 case "markdown":
-                    attributcontentmap.put(cfattribut.getName(), parseMarkdown(attributcontent.getContentText(), markdownOptions));
+                    markdownUtil.initOptions();
+                    attributcontentmap.put(cfattribut.getName(), markdownUtil.parseMarkdown(attributcontent.getContentText(), markdownUtil.getMarkdownOptions()));
                     break;        
             }
         }
         return attributcontentmap;
-    }
-    
-    private String parseMarkdown(String content, MutableDataSet markdownOptions) {
-        // uncomment to convert soft-breaks to hard breaks
-        //options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
-
-        Parser parser = Parser.builder(markdownOptions).build();
-        HtmlRenderer renderer = HtmlRenderer.builder(markdownOptions).build();
-
-        // You can re-use parser and renderer instances
-        Node document = parser.parse(content);
-        return renderer.render(document);  // "<p>This is <em>Sparta</em></p>\n"
     }
 }
