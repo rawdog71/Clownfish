@@ -18,6 +18,8 @@ package io.clownfish.clownfish.utils;
 import com.vladsch.flexmark.ext.abbreviation.AbbreviationExtension;
 import com.vladsch.flexmark.ext.admonition.AdmonitionExtension;
 import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension;
+import com.vladsch.flexmark.ext.aside.AsideExtension;
+import com.vladsch.flexmark.ext.attributes.AttributesExtension;
 import com.vladsch.flexmark.ext.jekyll.tag.JekyllTagExtension;
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
@@ -84,6 +86,12 @@ public class MarkdownUtil {
                 case "markdown_AnchorLinkExtension":
                     extensionList.add(AnchorLinkExtension.create());
                     break;
+                case "markdown_AsideExtension":
+                    extensionList.add(AsideExtension.create());
+                    break;
+                case "markdown_AttributesExtension":
+                    extensionList.add(AttributesExtension.create());
+                    break;    
                 case "markdown_StrikethroughExtension":
                     extensionList.add(StrikethroughExtension.create());
                     break;
