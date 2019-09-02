@@ -522,7 +522,9 @@ public class Clownfish {
                         if (null != fmRoot) {
                             fmRoot.put("emailBean", emailbean);
                             fmRoot.put("css", cfstylesheet);
+                            
                             fmRoot.put("js", cfjavascript);
+                            
                             fmRoot.put("sitecontent", sitecontentmap);
                             fmRoot.put("metainfo", metainfomap);
 

@@ -291,6 +291,7 @@ public class SiteTreeBean implements Serializable {
         selectedDatasources.clear();
         selectedContentlist.clear();
         selectedClasscontentlist.clear();
+        sitejob = false;
         newButtonDisabled = false;
     }
     
@@ -500,7 +501,7 @@ public class SiteTreeBean implements Serializable {
             newsite.setAliaspath(siteName);
             newsite.setTitle(siteTitle);
             newsite.setDescription(siteDescription);
-            selectedSite.setJob(sitejob);
+            newsite.setJob(sitejob);
             cfsiteService.create(newsite);
             loadTree();
         } catch (ConstraintViolationException ex) {
