@@ -400,7 +400,7 @@
                     </p:confirmDialog> 
                 </p:tab>
                 
-                <p:tab title="Klassen" id="classpanel" rendered="#{loginBean.login}">
+                <p:tab title="Classes" id="classpanel" rendered="#{loginBean.login}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="classlist" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
                             <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:newclass" />
@@ -519,7 +519,7 @@
                     </p:dataTable>
                 </p:tab>
                 
-                <p:tab title="Datalist" id="datalistpanel" rendered="#{loginBean.login}">
+                <p:tab title="Datalists" id="datalistpanel" rendered="#{loginBean.login}">
                     <p:scrollPanel id="datapanel" style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="datalistcontent" var="datalist" value="#{datacontentList.datacontentlist}" selectionMode="single" selection="#{datacontentList.selectedList}" rowKey="#{datalist.id}" widgetVar="datalistcontent">
                             <p:ajax event="rowSelect" listener="#{datacontentList.onSelect}" update=":form:msgs :form:tabview:datacontentname :form:tabview:datacontentclass :form:tabview:newcontentlist :form:tabview:datacontentlistbox" />
