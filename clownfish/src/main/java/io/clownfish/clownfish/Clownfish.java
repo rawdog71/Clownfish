@@ -462,16 +462,32 @@ public class Clownfish {
                         velTemplate.initDocument();
                     }
 
+                    String gzip = getPropertySwitch("html_gzip", cfsite.getGzip());
+                    if (gzip.compareToIgnoreCase("on") == 0) {
+                        gzipswitch.setGzipon(true);
+                    }
+                    String htmlcompression = getPropertySwitch("html_compression", cfsite.getHtmlcompression());
+                    HtmlCompressor htmlcompressor = new HtmlCompressor();
+                    htmlcompressor.setRemoveSurroundingSpaces(HtmlCompressor.ALL_TAGS);
+                    htmlcompressor.setPreserveLineBreaks(false);
                     // fetch the dependend styleshett, if available
                     String cfstylesheet = "";
                     if (cfsite.getStylesheetref() != null) {
                         cfstylesheet = ((CfStylesheet) cfstylesheetService.findById(cfsite.getStylesheetref().longValue())).getContent();
+                        if (htmlcompression.compareToIgnoreCase("on") == 0) {
+                            htmlcompressor.setCompressCss(true);
+                            cfstylesheet = htmlcompressor.compress(cfstylesheet);
+                        }
                     }
 
                     // fetch the dependend javascript, if available
                     String cfjavascript = "";
                     if (cfsite.getJavascriptref() != null) {
                         cfjavascript = ((CfJavascript) cfjavascriptService.findById(cfsite.getJavascriptref().longValue())).getContent();
+                        if (htmlcompression.compareToIgnoreCase("on") == 0) {
+                            htmlcompressor.setCompressJavaScript(true);
+                            cfjavascript = htmlcompressor.compress(cfjavascript);
+                        }
                     }
 
                     // fetch the dependend content
@@ -522,9 +538,7 @@ public class Clownfish {
                         if (null != fmRoot) {
                             fmRoot.put("emailBean", emailbean);
                             fmRoot.put("css", cfstylesheet);
-                            
                             fmRoot.put("js", cfjavascript);
-                            
                             fmRoot.put("sitecontent", sitecontentmap);
                             fmRoot.put("metainfo", metainfomap);
 
@@ -575,41 +589,9 @@ public class Clownfish {
                             }
                         }
                     }
-                    String gzip;
-                    gzip = propertymap.get("html_gzip");
-                    if (gzip == null) {
-                        gzip = "off";
-                    }
-                    switch (cfsite.getGzip()) {
-                        case 1:
-                            gzip = "on";
-                            break;
-                        case 2:
-                            gzip = "off";
-                            break;
-                    }
-                    if (gzip.compareToIgnoreCase("on") == 0) {
-                        gzipswitch.setGzipon(true);
-                    }
-
-                    String htmlcompression;
-                    htmlcompression = propertymap.get("html_compression");
-                    if (htmlcompression == null) {
-                        htmlcompression = "off";
-                    }
-                    switch (cfsite.getHtmlcompression()) {
-                        case 1:
-                            htmlcompression = "on";
-                            break;
-                        case 2:
-                            htmlcompression = "off";
-                            break;
-                    }
                     if (htmlcompression.compareToIgnoreCase("on") == 0) {
-                        HtmlCompressor htmlcompressor = new HtmlCompressor();
-                        htmlcompressor.setRemoveSurroundingSpaces(HtmlCompressor.ALL_TAGS);
-                        htmlcompressor.setPreserveLineBreaks(false);
                         htmlcompressor.setCompressCss(false);
+                        htmlcompressor.setCompressJavaScript(false);
 
                         cfresponse.setErrorcode(0);
                         cfresponse.setOutput(htmlcompressor.compress(out.toString()));
@@ -716,5 +698,21 @@ public class Clownfish {
                 java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+    
+    private String getPropertySwitch(String property, int propertyfield) {
+        String propertySwitch = propertymap.get(property);
+        if (propertySwitch == null) {
+            propertySwitch = "off";
+        }
+        switch (propertyfield) {
+            case 1:
+                propertySwitch = "on";
+                break;
+            case 2:
+                propertySwitch = "off";
+                break;
+        }
+        return propertySwitch;
     }
 }
