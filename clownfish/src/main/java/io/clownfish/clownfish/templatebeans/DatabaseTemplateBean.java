@@ -112,7 +112,7 @@ public class DatabaseTemplateBean implements Serializable {
     
     public boolean dbexecute(String catalog, String sqlstatement) {
         boolean ok = false;
-        logger.info("START dbexecute");
+        logger.info("START dbexecute: " + sqlstatement);
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
             try {
                 CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
@@ -124,6 +124,9 @@ public class DatabaseTemplateBean implements Serializable {
                             int count = stmt.executeUpdate(sqlstatement);
                             if (count > 0 ) {
                                 ok = true;
+                                logger.info("START dbexecute TRUE");
+                            } else {
+                                logger.info("START dbexecute FALSE");
                             }
                         }
                     }

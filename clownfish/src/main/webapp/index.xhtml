@@ -270,7 +270,7 @@
                     </p:selectOneMenu>
                     <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
 
-                    <pe:codeMirror id="edittemplate" mode="#{templateList.selectedScriptlanguage}" readonly="#{!templateList.checkedout}" theme="ambiance" value="#{templateList.templateContent}" lineNumbers="true" matchBrackets="true" />
+                    <pe:codeMirror id="edittemplate" mode="#{templateList.selectedScriptlanguage}" readonly="#{!templateList.checkedout}" theme="ambiance" value="#{templateList.templateContent}" lineNumbers="true" matchBrackets="true" class="template" />
                     <h:panelGroup id="difftemplateBtnGroup">
                         <p:commandButton id="savetemplate" process="form" value="Save" rendered="#{templateList.checkedout}" actionListener="#{templateList.onSave}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
                         <p:commandButton id="checkintemplate" process="form" value="CheckIn" rendered="#{templateList.checkedout}" actionListener="#{templateList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
