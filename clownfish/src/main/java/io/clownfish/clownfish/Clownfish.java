@@ -121,6 +121,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.HandlerMapping;
 
 
 /**
@@ -190,6 +191,24 @@ public class Clownfish {
             response.setCharacterEncoding("UTF-8");
             outwriter = response.getWriter();
             outwriter.println("<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Clownfish Server</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"></head><body><img src='images/clownfish-48.png'> Welcome to Clownfish Content Management System</body></html>");
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            if (null != outwriter) {
+                outwriter.close();
+            }
+        }
+    }
+    
+    @RequestMapping("/error")
+    public void error(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+        PrintWriter outwriter = null;
+        try {
+            addHeader(response, version);
+            response.setContentType("text/html");
+            response.setCharacterEncoding("UTF-8");
+            outwriter = response.getWriter();
+            outwriter.println("<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Clownfish Server</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"></head><body><img src='/images/clownfish-48.png'> Something went wrong</body></html>");
         } catch (IOException ex) {
             logger.error(ex.getMessage());
         } finally {
@@ -303,9 +322,14 @@ public class Clownfish {
     public Clownfish() {
     }
     
-    @GetMapping(path = "/{name}")
+    @GetMapping(path = "/{name}/**")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
+            String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+            if (name.compareToIgnoreCase(path) != 0) {
+                name = path.substring(1);
+            }
+            
             userSession = request.getSession();
             this.request = request;
             this.response = response;
@@ -349,9 +373,14 @@ public class Clownfish {
         }
     }
 
-    @PostMapping("/{name}")
+    @PostMapping("/{name}/**")
     public void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
+            String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+            if (name.compareToIgnoreCase(path) != 0) {
+                name = path.substring(1);
+            }
+            
             userSession = request.getSession();
             this.request = request;
             this.response = response;
