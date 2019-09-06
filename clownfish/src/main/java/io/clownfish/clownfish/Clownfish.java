@@ -190,7 +190,7 @@ public class Clownfish {
             response.setContentType("text/html");
             response.setCharacterEncoding("UTF-8");
             outwriter = response.getWriter();
-            outwriter.println("<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Clownfish Server</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"></head><body><img src='images/clownfish-48.png'> Welcome to Clownfish Content Management System</body></html>");
+            outwriter.println("<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Clownfish Server</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"></head><body><img src='images/clownfish-48.png'> Welcome to Clownfish Content Management System (Version " + version + ")</body></html>");
         } catch (IOException ex) {
             logger.error(ex.getMessage());
         } finally {
