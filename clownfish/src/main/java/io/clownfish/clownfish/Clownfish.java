@@ -328,6 +328,9 @@ public class Clownfish {
             String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
             if (name.compareToIgnoreCase(path) != 0) {
                 name = path.substring(1);
+                if (name.lastIndexOf("/")+1 == name.length()) {
+                    name = name.substring(0, name.length()-1);
+                }
             }
             
             userSession = request.getSession();
@@ -379,6 +382,9 @@ public class Clownfish {
             String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
             if (name.compareToIgnoreCase(path) != 0) {
                 name = path.substring(1);
+                if (name.lastIndexOf("/")+1 == name.length()) {
+                    name = name.substring(0, name.length()-1);
+                }
             }
             
             userSession = request.getSession();

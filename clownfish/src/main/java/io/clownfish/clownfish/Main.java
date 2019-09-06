@@ -21,7 +21,6 @@ import javax.servlet.ServletContext;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -37,6 +36,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.PathResourceResolver;
 
 /**
  *
@@ -91,12 +91,17 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
        // Register resource handler for CSS and JS
-       registry.addResourceHandler("/resources/**").addResourceLocations("/WEB-INF/resources/")
-             .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic());
+       registry.addResourceHandler("resources/**").addResourceLocations("/WEB-INF/resources/")
+            .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+            .resourceChain(true)
+            .addResolver(new PathResourceResolver());
 
        // Register resource handler for images
-       registry.addResourceHandler("/images/**").addResourceLocations("/WEB-INF/images/")
-             .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic());
+       registry.addResourceHandler("images/**").addResourceLocations("/WEB-INF/images/")
+            .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+            .resourceChain(true)
+            .addResolver(new PathResourceResolver());
+       registry.setOrder(-1);
     }
     
     @Override
