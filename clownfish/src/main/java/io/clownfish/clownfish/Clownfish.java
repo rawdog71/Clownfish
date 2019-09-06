@@ -202,20 +202,11 @@ public class Clownfish {
     
     @RequestMapping("/error")
     public void error(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        PrintWriter outwriter = null;
-        try {
-            addHeader(response, version);
-            response.setContentType("text/html");
-            response.setCharacterEncoding("UTF-8");
-            outwriter = response.getWriter();
-            outwriter.println("<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Clownfish Server</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"></head><body><img src='/images/clownfish-48.png'> Something went wrong</body></html>");
-        } catch (IOException ex) {
-            logger.error(ex.getMessage());
-        } finally {
-            if (null != outwriter) {
-                outwriter.close();
-            }
+        String error_site = propertymap.get("error_site");
+        if (null == error_site) {
+            error_site = "error";
         }
+        universalGet(error_site, request, response);
     }
 
     @PostConstruct
@@ -295,6 +286,8 @@ public class Clownfish {
             this.gzipswitch = new GzipSwitch();
             
             markdownUtil = new MarkdownUtil();
+            
+            metainfomap = new HashMap<>();
             scheduler.clear();
             // Fetch the Quartz jobs
             quartzlist.init();
@@ -417,7 +410,7 @@ public class Clownfish {
     @Async
     public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap) {
         ClownfishResponse cfresponse = new ClownfishResponse();
-        metainfomap = new HashMap<>();
+        
         try {
             // Freemarker Template
             freemarker.template.Template fmTemplate = null;
