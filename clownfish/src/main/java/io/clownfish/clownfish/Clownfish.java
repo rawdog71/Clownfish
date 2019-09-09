@@ -184,20 +184,12 @@ public class Clownfish {
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        PrintWriter outwriter = null;
-        try {
-            addHeader(response, version);
-            response.setContentType("text/html");
-            response.setCharacterEncoding("UTF-8");
-            outwriter = response.getWriter();
-            outwriter.println("<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Clownfish Server</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"></head><body><img src='images/clownfish-48.png'> Welcome to Clownfish Content Management System</body></html>");
-        } catch (IOException ex) {
-            logger.error(ex.getMessage());
-        } finally {
-            if (null != outwriter) {
-                outwriter.close();
-            }
+        String root_site = propertymap.get("root_site");
+        if (null == root_site) {
+            root_site = "root";
         }
+        request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, root_site);
+        universalGet(root_site, request, response);
     }
     
     @RequestMapping("/error")
@@ -206,6 +198,7 @@ public class Clownfish {
         if (null == error_site) {
             error_site = "error";
         }
+        request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, error_site);
         universalGet(error_site, request, response);
     }
 
@@ -288,6 +281,7 @@ public class Clownfish {
             markdownUtil = new MarkdownUtil();
             
             metainfomap = new HashMap<>();
+            metainfomap.put("version", version);
             scheduler.clear();
             // Fetch the Quartz jobs
             quartzlist.init();

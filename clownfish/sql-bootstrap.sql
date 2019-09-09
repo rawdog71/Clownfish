@@ -444,18 +444,28 @@ INSERT INTO `cf_attributetype` (`id`, `name`) VALUES
 
 INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
 ('cache_folder', '', 1),
-('html.compression', 'on', 1),
-('html.gzip', 'on', 1),
-('mail.password', '', 1),
-('mail.sendfrom', '', 1),
-('mail.smtp.host', '', 1),
-('mail.transport.protocol', 'smtp', 1),
-('mail.user', '', 1),
-('media.folder', '', 1),
-('response.characterencoding', 'UTF-8', 1),
-('response.contenttype', 'text/html', 1),
-('response.locale', 'de', 1),
-('sap.support', 'false', 1);
+('html_compression', 'on', 1),
+('html_gzip', 'on', 1),
+('mail_password', '', 1),
+('mail_sendfrom', '', 1),
+('mail_smtp_host', '', 1),
+('mail_transport_protocol', 'smtp', 1),
+('mail_user', '', 1),
+('media_folder', '', 1),
+('response_characterencoding', 'UTF-8', 1),
+('response_contenttype', 'text/html', 1),
+('response_locale', 'de', 1),
+('sap_support', 'false', 1),
+('error_site', 'error', 1),
+('root_site', 'root', 1);
 
 INSERT INTO `cf_user` (`id`, `vorname`, `nachname`, `email`, `passwort`, `salt`) VALUES
 (1, 'Admin', 'Istrator', 'admin', 'Ll66CGHeusR7eoQPejg8t3CKkpVdpm2IlN/dZif4aGE=', 'zm85UW0YCIyBCxOXTagQQYcezjLzIQ');
+
+INSERT INTO `cf_site` (`id`, `name`, `templateref`, `parentref`, `stylesheetref`, `javascriptref`, `htmlcompression`, `characterencoding`, `contenttype`, `locale`, `aliaspath`, `gzip`, `title`, `job`, `description`) VALUES
+(1, 'error', 1, 0, NULL, NULL, 0, 'UTF-8', 'text/html', 'de', 'root', 0, '', 0, ''),
+(2, 'root', 2, 0, NULL, NULL, 0, 'UTF-8', 'text/html', 'de', 'error', 0, '', 0, '');
+
+INSERT INTO `cf_template` (`id`, `name`, `content`, `scriptlanguage`, `checkedoutby`) VALUES
+(1, 'root', '<!DOCTYPE html>\r\n<html xmlns="http://www.w3.org/1999/xhtml\\">\r\n  <head>\r\n    <title>Clownfish Server</title>\r\n    <meta charset="utf-8">\r\n    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">\r\n  </head>\r\n  <body>\r\n    <img src=''/images/clownfish-48.png''> Welcome to Clownfish Content Management System (Version ${metainfo.version})\r\n  </body>\r\n</html>', 0, 0),
+(2, 'error', '<!DOCTYPE html>\r\n<html xmlns="http://www.w3.org/1999/xhtml">\r\n  <head>\r\n    <title>Clownfish Server</title>\r\n    <meta charset="utf-8">\r\n    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">\r\n  </head>\r\n  <body>\r\n    <img src=''/images/clownfish-48.png''> ERROR! Something went wrong!\r\n  </body>\r\n</html>', 0, 0);
