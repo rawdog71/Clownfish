@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EntityScan("io.clownfish.clownfish.dbentities")
 @EnableTransactionManagement
 @PropertySources({
-    @PropertySource("classpath:application.properties")
+    @PropertySource("file:application.properties")
 })
 public class MySQLAppConfig {
     @Value("${app.datasource.url}") String url;
