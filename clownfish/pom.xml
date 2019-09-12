@@ -267,6 +267,12 @@
             <artifactId>flexmark-all</artifactId>
             <version>0.50.26</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>8.2.0</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import de.destrukt.sapconnection.SAPConnection;
+import io.clownfish.clownfish.beans.AttributContentList;
 import io.clownfish.clownfish.templatebeans.DatabaseTemplateBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
@@ -41,6 +42,7 @@ import io.clownfish.clownfish.jdbc.DatatableDeleteProperties;
 import io.clownfish.clownfish.jdbc.DatatableNewProperties;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
+import io.clownfish.clownfish.lucene.Indexer;
 import io.clownfish.clownfish.mail.EmailProperties;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
@@ -144,6 +146,7 @@ public class Clownfish {
     @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired TemplateUtil templateUtil;
     @Autowired PropertyList propertylist;
+    @Autowired AttributContentList attributContentList;
     @Autowired QuartzList quartzlist;
     @Autowired CfTemplateLoaderImpl freemarkerTemplateloader;
     @Autowired SiteUtil siteutil;
@@ -177,10 +180,12 @@ public class Clownfish {
     private @Getter @Setter Map metainfomap;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     private @Getter @Setter MarkdownUtil markdownUtil;
+    private @Getter @Setter Indexer contentIndexer;
 
     final Logger logger = LoggerFactory.getLogger(Clownfish.class);
     private @Getter @Setter String version;
     private @Getter @Setter String static_folder;
+    private @Getter @Setter String index_folder;
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -255,6 +260,7 @@ public class Clownfish {
             propertymap = propertylist.fillPropertyMap();
             clownfishutil = new ClownfishUtil();
             static_folder = propertymap.get("static_folder");
+            index_folder = "E:\\Data\\clownfish\\index\\";
             String sapSupportProp = propertymap.get("sap_support");
             if (sapSupportProp.compareToIgnoreCase("true") == 0) {
                 sapSupport = true;
@@ -279,7 +285,9 @@ public class Clownfish {
             this.gzipswitch = new GzipSwitch();
             
             markdownUtil = new MarkdownUtil();
-            
+            contentIndexer = new Indexer(index_folder, attributContentList);
+            contentIndexer.createIndex();
+           
             metainfomap = new HashMap<>();
             metainfomap.put("version", version);
             scheduler.clear();
@@ -301,7 +309,11 @@ public class Clownfish {
                 }
             }
             AnsiConsole.systemUninstall();
+            
+            
         } catch (SchedulerException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

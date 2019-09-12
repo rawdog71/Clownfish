@@ -53,6 +53,10 @@ public class CfAttributetype implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "searchrelevant")
+    private int searchrelevant;
 
     public CfAttributetype() {
     }
@@ -80,6 +84,14 @@ public class CfAttributetype implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getSearchrelevant() {
+        return searchrelevant;
+    }
+
+    public void setSearchrelevant(int searchrelevant) {
+        this.searchrelevant = searchrelevant;
     }
 
     @Override

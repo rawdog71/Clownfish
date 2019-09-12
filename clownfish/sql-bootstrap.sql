@@ -97,11 +97,12 @@ CREATE TABLE IF NOT EXISTS `cf_attributcontent` (
 --
 
 CREATE TABLE IF NOT EXISTS `cf_attributetype` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
+  `searchrelevant` tinyint(3) UNSIGNED NOT NULL
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  UNIQUE KEY `name` (`name`)  
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -433,17 +434,17 @@ CREATE TABLE IF NOT EXISTS `cf_quartz` (
 -- Daten für Tabelle `cf_attributetype`
 --
 
-INSERT INTO `cf_attributetype` (`id`, `name`) VALUES
-(1, 'boolean'),
-(2, 'string'),
-(3, 'integer'),
-(4, 'real'),
-(5, 'htmltext'),
-(6, 'datetime'),
-(7, 'hashstring'),
-(8, 'media'),
-(9, 'text'),
-(10, 'markdown');
+INSERT INTO `cf_attributetype` (`id`, `name`, `searchrelevant`) VALUES
+(1, 'boolean', 0),
+(2, 'string', 1),
+(3, 'integer', 0),
+(4, 'real', 0),
+(5, 'htmltext', 1),
+(6, 'datetime', 0),
+(7, 'hashstring', 0),
+(8, 'media', 0),
+(9, 'text', 1),
+(10, 'markdown', 1);
 
 --
 -- Daten für Tabelle `cf_property`
@@ -460,6 +461,7 @@ INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
 ('mail_user', '', 1),
 ('media_folder', '', 1),
 ('static_folder', '', 1),
+('index_folder', '', 1),
 ('response_characterencoding', 'UTF-8', 1),
 ('response_contenttype', 'text/html', 1),
 ('response_locale', 'de', 1),
