@@ -75,4 +75,13 @@ public class CfSitecontentDAOImpl implements CfSitecontentDAO {
         session.merge(entity);
         return true;
     }
+
+    @Override
+    public List<CfSitecontent> findByClasscontentref(Long ref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfSitecontent.findByClasscontentref");  
+        query.setParameter("classcontentref", ref);
+        List<CfSitecontent> cfsitecontentlist = query.getResultList();
+        return cfsitecontentlist;
+    }
 }

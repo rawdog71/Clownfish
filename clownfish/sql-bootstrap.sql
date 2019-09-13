@@ -468,7 +468,8 @@ INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
 ('response_locale', 'de', 1),
 ('sap_support', 'false', 1),
 ('error_site', 'error', 1),
-('root_site', 'root', 1);
+('root_site', 'root', 1),
+('search_site', 'searchresult', 1);
 
 INSERT INTO `cf_user` (`id`, `vorname`, `nachname`, `email`, `passwort`, `salt`) VALUES
 (1, 'Admin', 'Istrator', 'admin', 'Ll66CGHeusR7eoQPejg8t3CKkpVdpm2IlN/dZif4aGE=', 'zm85UW0YCIyBCxOXTagQQYcezjLzIQ');

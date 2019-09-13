@@ -62,4 +62,9 @@ public class CfSitecontentServiceImpl implements CfSitecontentService {
     public boolean edit(CfSitecontent entity) {
         return this.cfsitecontentDAO.edit(entity);
     }
+
+    @Override
+    public List<CfSitecontent> findByClasscontentref(Long ref) {
+        return this.cfsitecontentDAO.findByClasscontentref(ref);
+    }
 }

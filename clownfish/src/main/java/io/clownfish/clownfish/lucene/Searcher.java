@@ -15,8 +15,14 @@
  */
 package io.clownfish.clownfish.lucene;
 
+import io.clownfish.clownfish.dbentities.CfSite;
+import io.clownfish.clownfish.dbentities.CfSitecontent;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
+import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
@@ -36,21 +42,39 @@ import org.apache.lucene.search.TopDocs;
  * @author sulzbachr
  */
 public class Searcher {
-
     IndexSearcher indexSearcher;
     QueryParser queryParser;
     Query query;
+    ArrayList<CfSite> foundSites;
+    CfSitecontentService sitecontentservice;
+    CfSiteService siteservice;
 
-    public Searcher(String indexDirectoryPath) throws IOException {
+    public Searcher(String indexDirectoryPath, CfSitecontentService sitecontentservice, CfSiteService siteservice) throws IOException {
+        this.sitecontentservice = sitecontentservice;
+        this.siteservice = siteservice;
         Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
         IndexReader reader = DirectoryReader.open(indexDirectory);
         indexSearcher = new IndexSearcher(reader);
         queryParser = new QueryParser(LuceneConstants.CONTENT_TEXT, new StandardAnalyzer());
+        foundSites = new ArrayList<>();
     }
     
-    public TopDocs search(String searchQuery) throws IOException, ParseException {
+    public List<CfSite> search(String searchQuery) throws IOException, ParseException {
+        foundSites.clear();
         query = queryParser.parse(searchQuery);
-        return indexSearcher.search(query, LuceneConstants.MAX_SEARCH);
+        TopDocs hits = indexSearcher.search(query, LuceneConstants.MAX_SEARCH);
+        for(ScoreDoc scoreDoc : hits.scoreDocs) {
+            Document doc = getDocument(scoreDoc);
+            long classcontentref = Long.parseLong(doc.get(LuceneConstants.CLASSCONTENT_REF));
+            List<CfSitecontent> sitelist = sitecontentservice.findByClasscontentref(classcontentref);
+            for (CfSitecontent sitecontent : sitelist) {
+                CfSite foundsite = siteservice.findById(sitecontent.getCfSitecontentPK().getSiteref());
+                if (!foundSites.contains(foundsite)) {
+                    foundSites.add(foundsite);
+                }
+            }
+        }
+        return foundSites;
     }
     
     public Document getDocument(ScoreDoc scoreDoc) throws CorruptIndexException, IOException {

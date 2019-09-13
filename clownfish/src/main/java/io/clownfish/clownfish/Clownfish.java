@@ -101,10 +101,7 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 import org.fusesource.jansi.AnsiConsole;
@@ -184,6 +181,7 @@ public class Clownfish {
     private @Getter @Setter Locale locale;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map metainfomap;
+    private @Getter @Setter Map searchmap;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     private @Getter @Setter MarkdownUtil markdownUtil;
     private @Getter @Setter Indexer contentIndexer;
@@ -299,6 +297,8 @@ public class Clownfish {
            
             metainfomap = new HashMap<>();
             metainfomap.put("version", version);
+            
+            searchmap = new HashMap<>();
             scheduler.clear();
             // Fetch the Quartz jobs
             quartzlist.init();
@@ -331,26 +331,26 @@ public class Clownfish {
     }
     
     @GetMapping(path = "/search/{query}")
-    public void search(@PathVariable("query") String query) {
+    public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
-            Searcher searcher = new Searcher(index_folder);
+            Searcher searcher = new Searcher(index_folder, cfsitecontentService, cfsiteService);
             long startTime = System.currentTimeMillis();
-            TopDocs hits = searcher.search(query);
+            List<CfSite> sitehits = searcher.search(query);
             long endTime = System.currentTimeMillis();
             
-            System.out.println(hits.totalHits + " documents found. Time :" + (endTime - startTime));
-            for(ScoreDoc scoreDoc : hits.scoreDocs) {
-                Document doc = searcher.getDocument(scoreDoc);
-                System.out.println("ID: " + doc.get(LuceneConstants.ID));
-                System.out.println("CONTENT REF: " + doc.get(LuceneConstants.CLASSCONTENT_REF));
-                if (null != doc.get(LuceneConstants.CONTENT_STRING)) {
-                    System.out.println("CONTENT STRING: " + doc.get(LuceneConstants.CONTENT_STRING));
-                }
-                if (null != doc.get(LuceneConstants.CONTENT_TEXT)) {
-                    System.out.println("CONTENT TEXT: " + doc.get(LuceneConstants.CONTENT_TEXT));
-                }
-                
+            System.out.println("Search Time :" + (endTime - startTime));
+            searchmap.clear();
+            for (CfSite site : sitehits) {
+                searchmap.put(site.getName(), site);
+                System.out.println(site.getName());
             }
+            //sitecontentmap.put("search", searchmap);
+            String search_site = propertymap.get("search_site");
+            if (null == search_site) {
+                search_site = "searchresult";
+            }
+            request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, search_site);
+            universalGet(search_site, request, response);
         } catch (IOException | ParseException ex) {
             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -359,11 +359,13 @@ public class Clownfish {
     @GetMapping(path = "/{name}/**")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
-            String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-            if (name.compareToIgnoreCase(path) != 0) {
-                name = path.substring(1);
-                if (name.lastIndexOf("/")+1 == name.length()) {
-                    name = name.substring(0, name.length()-1);
+            if (0 != name.compareToIgnoreCase("searchresult")) {
+                String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+                if (name.compareToIgnoreCase(path) != 0) {
+                    name = path.substring(1);
+                    if (name.lastIndexOf("/")+1 == name.length()) {
+                        name = name.substring(0, name.length()-1);
+                    }
                 }
             }
             
@@ -623,6 +625,9 @@ public class Clownfish {
 
                             fmRoot.put("parameter", parametermap);
                             fmRoot.put("property", propertymap);
+                            if (!searchmap.isEmpty()) {
+                                fmRoot.put("searchlist", searchmap);
+                            }
                             try {
                                 if (null != fmTemplate) {
                                     freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
@@ -652,7 +657,9 @@ public class Clownfish {
 
                             velContext.put("parameter", parametermap);
                             velContext.put("property", propertymap);
-
+                            if (!searchmap.isEmpty()) {
+                                velContext.put("searchlist", searchmap);
+                            }
                             if (null != velTemplate) {
                                 velTemplate.merge(velContext, out);
                             }
