@@ -17,3 +17,4 @@ Work in progress
 - Keywords
 - Cronjob scheduler
 - Markdown content
+- Lucene search engine
