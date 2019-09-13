@@ -53,6 +53,10 @@ public class CfClass implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "searchrelevant")
+    private boolean searchrelevant;
 
     public CfClass() {
     }
@@ -80,6 +84,14 @@ public class CfClass implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isSearchrelevant() {
+        return searchrelevant;
+    }
+
+    public void setSearchrelevant(boolean searchrelevant) {
+        this.searchrelevant = searchrelevant;
     }
 
     @Override

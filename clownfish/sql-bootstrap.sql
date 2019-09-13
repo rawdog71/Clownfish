@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `cf_attributcontent` (
 CREATE TABLE IF NOT EXISTS `cf_attributetype` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
-  `searchrelevant` tinyint(3) UNSIGNED NOT NULL
+  `searchrelevant` tinyint(3) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -113,6 +113,7 @@ CREATE TABLE IF NOT EXISTS `cf_attributetype` (
 CREATE TABLE IF NOT EXISTS `cf_class` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
+  `searchrelevant` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

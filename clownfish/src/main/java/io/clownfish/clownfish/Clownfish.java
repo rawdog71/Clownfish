@@ -43,6 +43,8 @@ import io.clownfish.clownfish.jdbc.DatatableNewProperties;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
 import io.clownfish.clownfish.lucene.Indexer;
+import io.clownfish.clownfish.lucene.LuceneConstants;
+import io.clownfish.clownfish.lucene.Searcher;
 import io.clownfish.clownfish.mail.EmailProperties;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
@@ -99,6 +101,10 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 import org.fusesource.jansi.AnsiConsole;
@@ -260,7 +266,7 @@ public class Clownfish {
             propertymap = propertylist.fillPropertyMap();
             clownfishutil = new ClownfishUtil();
             static_folder = propertymap.get("static_folder");
-            index_folder = "E:\\Data\\clownfish\\index\\";
+            index_folder = propertymap.get("index_folder");
             String sapSupportProp = propertymap.get("sap_support");
             if (sapSupportProp.compareToIgnoreCase("true") == 0) {
                 sapSupport = true;
@@ -285,8 +291,11 @@ public class Clownfish {
             this.gzipswitch = new GzipSwitch();
             
             markdownUtil = new MarkdownUtil();
-            contentIndexer = new Indexer(index_folder, attributContentList);
-            contentIndexer.createIndex();
+            if ((null != index_folder) && (!index_folder.isEmpty())) {
+                contentIndexer = new Indexer(index_folder, attributContentList);
+                long idx = contentIndexer.createIndex();
+                System.out.println("Indexing content: " + idx);
+            }
            
             metainfomap = new HashMap<>();
             metainfomap.put("version", version);
@@ -319,6 +328,32 @@ public class Clownfish {
     }
 
     public Clownfish() {
+    }
+    
+    @GetMapping(path = "/search/{query}")
+    public void search(@PathVariable("query") String query) {
+        try {
+            Searcher searcher = new Searcher(index_folder);
+            long startTime = System.currentTimeMillis();
+            TopDocs hits = searcher.search(query);
+            long endTime = System.currentTimeMillis();
+            
+            System.out.println(hits.totalHits + " documents found. Time :" + (endTime - startTime));
+            for(ScoreDoc scoreDoc : hits.scoreDocs) {
+                Document doc = searcher.getDocument(scoreDoc);
+                System.out.println("ID: " + doc.get(LuceneConstants.ID));
+                System.out.println("CONTENT REF: " + doc.get(LuceneConstants.CLASSCONTENT_REF));
+                if (null != doc.get(LuceneConstants.CONTENT_STRING)) {
+                    System.out.println("CONTENT STRING: " + doc.get(LuceneConstants.CONTENT_STRING));
+                }
+                if (null != doc.get(LuceneConstants.CONTENT_TEXT)) {
+                    System.out.println("CONTENT TEXT: " + doc.get(LuceneConstants.CONTENT_TEXT));
+                }
+                
+            }
+        } catch (IOException | ParseException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     @GetMapping(path = "/{name}/**")

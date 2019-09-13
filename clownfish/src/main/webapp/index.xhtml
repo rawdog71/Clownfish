@@ -403,18 +403,21 @@
                 <p:tab title="Classes" id="classpanel" rendered="#{loginBean.login}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="classlist" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
-                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:newclass" />
+                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:newclass" />
                             <p:column headerText="Name">
                                 <h:outputText value="#{clazz.name}" />
                             </p:column>
                         </p:dataTable>
                     </p:scrollPanel>
 
-                    <p:outputLabel for="classname">Name</p:outputLabel>
+                    <p:outputLabel for="classname">Name: </p:outputLabel>
                     <p:inputText id="classname" value="#{classList.className}" >
                         <p:ajax event="keyup" listener="#{classList.onChangeName(changeEvent)}" update=":form:tabview:newclass" />
                     </p:inputText>
+                    <p:outputLabel for="classsearchrelevant">Search engine relevant: </p:outputLabel>
+                    <p:selectBooleanCheckbox id="classsearchrelevant" value="#{classList.classSearchrelevant}" />
                     <p:commandButton id="newclass" process="form" value="New" actionListener="#{classList.onCreate}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" disabled="#{classlist.newButtonDisabled}" />
+                    <p:commandButton id="updateclass" process="form" value="Edit" actionListener="#{classList.onEdit}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" />
 
                     <p:dataTable id="attributlist" var="attribut" value="#{classList.selectedAttributList}" selectionMode="single" selection="#{classList.selectedAttribut}" rowKey="#{attribut.id}">
                         <p:ajax event="rowSelect" listener="#{classList.onSelectAttribute}" update=":form:msgs :form:tabview:attributname :form:tabview:attributtype :form:tabview:attributidentity :form:tabview:attributautoinc :form:tabview:newattribut" />

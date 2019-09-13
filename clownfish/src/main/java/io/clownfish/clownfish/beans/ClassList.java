@@ -63,6 +63,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter CfAttributetype selectedAttributeType = null;
     private transient @Getter @Setter List<CfAttributetype> attributetypelist = null;
     private @Getter @Setter String className;
+    private @Getter @Setter boolean classSearchrelevant;
     private @Getter @Setter String attributName;
     private @Getter @Setter boolean identity;
     private @Getter @Setter boolean autoinc;
@@ -81,6 +82,7 @@ public class ClassList implements Serializable {
         selectedClass = (CfClass) event.getObject();
         selectedAttributList = attributlist.init(selectedClass);
         className = selectedClass.getName();
+        classSearchrelevant = selectedClass.isSearchrelevant();
         attributName = "";
         selectedAttributeType = null;
         newButtonDisabled = true;
@@ -117,9 +119,24 @@ public class ClassList implements Serializable {
         try {
             CfClass newclass = new CfClass();
             newclass.setName(className);
+            newclass.setSearchrelevant(classSearchrelevant);
             cfclassService.create(newclass);
             classListe = cfclassService.findAll();
             className = "";
+            classSearchrelevant = false;
+            contentlist.init();
+            datalist.init();
+        } catch (ConstraintViolationException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+    
+    public void onEdit(ActionEvent actionEvent) {
+        try {
+            selectedClass.setName(className);
+            selectedClass.setSearchrelevant(classSearchrelevant);
+            cfclassService.edit(selectedClass);
+            classListe = cfclassService.findAll();
             contentlist.init();
             datalist.init();
         } catch (ConstraintViolationException ex) {

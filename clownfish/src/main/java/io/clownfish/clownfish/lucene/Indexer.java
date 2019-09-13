@@ -22,12 +22,12 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import java.nio.file.Paths;
-import javax.transaction.Transactional;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.document.NumericDocValuesField;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriterConfig;
 
@@ -46,6 +46,8 @@ public class Indexer {
         StandardAnalyzer analyzer = new StandardAnalyzer();
         IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
         writer = new IndexWriter(indexDirectory, iwc);
+        writer.deleteAll();
+        writer.commit();
     }
 
     public void close() throws CorruptIndexException, IOException {
@@ -53,46 +55,53 @@ public class Indexer {
     }
 
     private Document getDocument(CfAttributcontent attributcontent) throws IOException {
-        Document document = new Document();
-        
-        document.add(new NumericDocValuesField(LuceneConstants.ID, attributcontent.getId()));
-        switch (attributcontent.getAttributref().getAttributetype().getName()) {
-            case "string":
-                if (null != attributcontent.getContentString()) {
-                    document.add(new TextField(LuceneConstants.CONTENT_STRING, attributcontent.getContentString(), Field.Store.YES));
-                }
-                break;
-            case "text":
-                if (null != attributcontent.getContentText()) {
-                    document.add(new TextField(LuceneConstants.CONTENT_TEXT, attributcontent.getContentText(), Field.Store.YES));
-                }
-                break;
-            case "htmltext":
-                if (null != attributcontent.getContentText()) {
-                    document.add(new TextField(LuceneConstants.CONTENT_TEXT, attributcontent.getContentText(), Field.Store.YES));
-                }
-                break;
-            case "markdown":
-                if (null != attributcontent.getContentText()) {
-                    document.add(new TextField(LuceneConstants.CONTENT_TEXT, attributcontent.getContentText(), Field.Store.YES));
-                }
-                break;
+        if (attributcontent.getClasscontentref().getClassref().isSearchrelevant()) {
+            Document document = new Document();
+            document.add(new StoredField(LuceneConstants.ID, attributcontent.getId()));
+            document.add(new StoredField(LuceneConstants.CLASSCONTENT_REF, attributcontent.getClasscontentref().getId()));
+            switch (attributcontent.getAttributref().getAttributetype().getName()) {
+                case "string":
+                    if (null != attributcontent.getContentString()) {
+                        document.add(new TextField(LuceneConstants.CONTENT_STRING, attributcontent.getContentString(), Field.Store.YES));
+                    }
+                    break;
+                case "text":
+                    if (null != attributcontent.getContentText()) {
+                        document.add(new TextField(LuceneConstants.CONTENT_TEXT, attributcontent.getContentText(), Field.Store.YES));
+                    }
+                    break;
+                case "htmltext":
+                    if (null != attributcontent.getContentText()) {
+                        document.add(new TextField(LuceneConstants.CONTENT_TEXT, attributcontent.getContentText(), Field.Store.YES));
+                    }
+                    break;
+                case "markdown":
+                    if (null != attributcontent.getContentText()) {
+                        document.add(new TextField(LuceneConstants.CONTENT_TEXT, attributcontent.getContentText(), Field.Store.YES));
+                    }
+                    break;
+            }
+            return document;
+        } else {
+            return null;
         }
-        return document;
     }
 
     private void indexAttributContent(CfAttributcontent attributcontent) throws IOException {
-        if (attributcontent.getAttributref().getAttributetype().getSearchrelevant() == 1) {
-            System.out.println("Indexing " + attributcontent.getId());
+        if (attributcontent.getAttributref().getAttributetype().isSearchrelevant()) {
             Document document = getDocument(attributcontent);
-            writer.addDocument(document);
+            if (null != document) {
+                //System.out.println("Indexing " + attributcontent.getId());
+                writer.addDocument(document);
+            }
         }
     }
 
-    public int createIndex() throws IOException {
+    public long createIndex() throws IOException {
         for (CfAttributcontent attributcontent : attributContentList.getAttributcontentlist()) {
             indexAttributContent(attributcontent);
         }
+        writer.commit();
         return writer.numRamDocs();
     }
 }
