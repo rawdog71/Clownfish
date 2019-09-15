@@ -45,7 +45,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,7 +52,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("classcontentList")
-@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope("session")
 @Component
 public class ContentList implements Serializable {
     @Autowired transient CfClassService cfclassService;

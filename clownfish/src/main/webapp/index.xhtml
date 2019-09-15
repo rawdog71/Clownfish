@@ -199,6 +199,11 @@
                                                     <p:selectBooleanCheckbox id="selectsitestatic" value="#{sitetree.sitestatic}"/>
                                                 </p:column>
                                             </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:commandButton id="deletestaticsite" process="form" value="Delete static site" actionListener="#{sitetree.onDeleteStaticSite}" />
+                                                </p:column>
+                                            </p:row>
                                         </p:panelGrid>
                                     </p:tab>
                                     <p:tab title="SAP" id="site_sap" rendered="#{sitetree.sapSupport}">

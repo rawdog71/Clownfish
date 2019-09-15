@@ -43,7 +43,6 @@ import io.clownfish.clownfish.jdbc.DatatableNewProperties;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
 import io.clownfish.clownfish.lucene.ContentIndexer;
-import io.clownfish.clownfish.lucene.LuceneConstants;
 import io.clownfish.clownfish.lucene.Searcher;
 import io.clownfish.clownfish.mail.EmailProperties;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
@@ -468,6 +467,8 @@ public class Clownfish {
                 if ((cfsite.isStaticsite()) && (!makestatic)) {
                     cfresponse = getStaticSite(name);
                     if (0 == cfresponse.getErrorcode()) {
+                        response.setContentType(contentType);
+                        response.setCharacterEncoding(characterEncoding);
                         return new AsyncResult<>(cfresponse);
                     } else {
                         Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, true);
@@ -763,24 +764,6 @@ public class Clownfish {
             cfResponse.setOutput("Static site not found");
             cfResponse.setErrorcode(1);
             return cfResponse;
-        }
-    }
-    
-    
-    private void printStaticSite(String sitename) {
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(static_folder + File.separator + sitename), "UTF-8"));
-            StringBuilder sb = new StringBuilder(1024);
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-            response.setContentType(contentType);
-            response.setCharacterEncoding(characterEncoding);
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(sb);
-        } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

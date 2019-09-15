@@ -31,7 +31,6 @@ import lombok.Setter;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,7 +39,7 @@ import org.springframework.stereotype.Component;
  */
 @Transactional
 @Named("userlist")
-@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope("session")
 @Component
 public class UserList {
     @Autowired CfUserService cfuserService;

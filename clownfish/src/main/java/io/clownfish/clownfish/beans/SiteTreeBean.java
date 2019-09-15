@@ -50,11 +50,16 @@ import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.utils.JavascriptUtil;
 import io.clownfish.clownfish.utils.StylesheetUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.inject.Named;
@@ -516,6 +521,20 @@ public class SiteTreeBean implements Serializable {
             loadTree();
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
+        }
+    }
+    
+    public void onDeleteStaticSite(ActionEvent actionEvent) {
+        String static_folder = propertymap.get("static_folder");
+        if (null != static_folder) {
+            File file = new File(static_folder + File.separator +  selectedSite.getName());
+            try {
+                Files.deleteIfExists(file.toPath());
+                FacesMessage message = new FacesMessage("Deleted static site for " + selectedSite.getName());
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            } catch (IOException ex) {
+                Logger.getLogger(SiteTreeBean.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     

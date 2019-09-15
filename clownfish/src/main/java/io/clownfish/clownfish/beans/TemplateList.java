@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,7 +50,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("templateList")
-@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope("session")
 @Component
 public class TemplateList {
     @Inject
