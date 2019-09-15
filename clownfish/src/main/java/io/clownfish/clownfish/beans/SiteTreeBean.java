@@ -107,6 +107,8 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter int sitehtmlcompression;
     private @Getter @Setter int sitegzip;
     private @Getter @Setter boolean sitejob;
+    private @Getter @Setter boolean sitestatic;
+    private @Getter @Setter boolean sitesearchrelevant;
     private @Getter @Setter String siteTitle;
     private @Getter @Setter String siteDescription;
     private @Getter @Setter String aliaspath;
@@ -292,6 +294,8 @@ public class SiteTreeBean implements Serializable {
         selectedContentlist.clear();
         selectedClasscontentlist.clear();
         sitejob = false;
+        sitesearchrelevant = false;
+        sitestatic = false;
         newButtonDisabled = false;
     }
     
@@ -343,6 +347,8 @@ public class SiteTreeBean implements Serializable {
         siteTitle = selectedSite.getTitle();
         siteDescription = selectedSite.getDescription();
         sitejob = selectedSite.isJob();
+        sitesearchrelevant = selectedSite.isSearchrelevant();
+        sitestatic = selectedSite.isStaticsite();
         aliaspath = selectedSite.getAliaspath();
         sitehtmlcompression = selectedSite.getHtmlcompression();
         characterEncoding = selectedSite.getCharacterencoding();
@@ -441,6 +447,8 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setTitle(siteTitle);
             selectedSite.setDescription(siteDescription);
             selectedSite.setJob(sitejob);
+            selectedSite.setSearchrelevant(sitesearchrelevant);
+            selectedSite.setStaticsite(sitestatic);
             cfsiteService.edit(selectedSite);
             loadTree();
             
@@ -502,6 +510,8 @@ public class SiteTreeBean implements Serializable {
             newsite.setTitle(siteTitle);
             newsite.setDescription(siteDescription);
             newsite.setJob(sitejob);
+            newsite.setSearchrelevant(sitesearchrelevant);
+            newsite.setStaticsite(sitestatic);
             cfsiteService.create(newsite);
             loadTree();
         } catch (ConstraintViolationException ex) {

@@ -28,12 +28,12 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
@@ -43,7 +43,7 @@ import org.apache.lucene.search.TopDocs;
  */
 public class Searcher {
     IndexSearcher indexSearcher;
-    QueryParser queryParser;
+    MultiFieldQueryParser queryParser;
     Query query;
     ArrayList<CfSite> foundSites;
     CfSitecontentService sitecontentservice;
@@ -55,7 +55,8 @@ public class Searcher {
         Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
         IndexReader reader = DirectoryReader.open(indexDirectory);
         indexSearcher = new IndexSearcher(reader);
-        queryParser = new QueryParser(LuceneConstants.CONTENT_TEXT, new StandardAnalyzer());
+        //queryParser = new QueryParser(LuceneConstants.CONTENT_TEXT, new StandardAnalyzer());
+        queryParser = new MultiFieldQueryParser(new String[] {LuceneConstants.CONTENT_TEXT, LuceneConstants.CONTENT_STRING}, new StandardAnalyzer());
         foundSites = new ArrayList<>();
     }
     
@@ -69,7 +70,7 @@ public class Searcher {
             List<CfSitecontent> sitelist = sitecontentservice.findByClasscontentref(classcontentref);
             for (CfSitecontent sitecontent : sitelist) {
                 CfSite foundsite = siteservice.findById(sitecontent.getCfSitecontentPK().getSiteref());
-                if (!foundSites.contains(foundsite)) {
+                if ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant())) {
                     foundSites.add(foundsite);
                 }
             }

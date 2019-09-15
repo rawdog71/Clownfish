@@ -51,13 +51,14 @@ import org.xml.sax.SAXException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 
 /**
  *
  * @author sulzbachr
  */
 @Named("assetList")
-@Scope("session")
+@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class AssetList {
     @Autowired CfAssetService cfassetService;

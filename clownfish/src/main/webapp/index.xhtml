@@ -187,6 +187,18 @@
                                                     <p:inputText id="aliaspath" value="#{sitetree.aliaspath}" maxlength="255" />
                                                 </p:column>
                                             </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="selectsearchrelevant" value="Search relevant:" />
+                                                    <p:selectBooleanCheckbox id="selectsearchrelevant" value="#{sitetree.sitesearchrelevant}"/>  
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>    
+                                                    <p:outputLabel for="selectsitestatic" value="Static site:" />
+                                                    <p:selectBooleanCheckbox id="selectsitestatic" value="#{sitetree.sitestatic}"/>
+                                                </p:column>
+                                            </p:row>
                                         </p:panelGrid>
                                     </p:tab>
                                     <p:tab title="SAP" id="site_sap" rendered="#{sitetree.sapSupport}">

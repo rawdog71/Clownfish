@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class EmailTemplateBean implements Serializable {
     private @Getter @Setter Map<String, String> propertymap = null;

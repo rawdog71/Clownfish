@@ -32,7 +32,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
@@ -46,6 +45,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,7 +53,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("classcontentList")
-@Scope("session")
+@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class ContentList implements Serializable {
     @Autowired transient CfClassService cfclassService;

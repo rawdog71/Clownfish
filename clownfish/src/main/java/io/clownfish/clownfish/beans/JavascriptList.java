@@ -44,13 +44,14 @@ import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 
 /**
  *
  * @author sulzbachr
  */
 @Named("javascriptList")
-@Scope("session")
+@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class JavascriptList {
     @Inject

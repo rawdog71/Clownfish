@@ -100,6 +100,10 @@ public class CfSite implements Serializable {
     private boolean job;
     @Column(name = "description")
     private String description;
+    @Column(name = "staticsite")
+    private boolean staticsite;
+    @Column(name = "searchrelevant")
+    private boolean searchrelevant;
 
     public CfSite() {
     }
@@ -232,6 +236,22 @@ public class CfSite implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isStaticsite() {
+        return staticsite;
+    }
+
+    public void setStaticsite(boolean staticsite) {
+        this.staticsite = staticsite;
+    }
+
+    public boolean isSearchrelevant() {
+        return searchrelevant;
+    }
+
+    public void setSearchrelevant(boolean searchrelevant) {
+        this.searchrelevant = searchrelevant;
     }
 
     @Override

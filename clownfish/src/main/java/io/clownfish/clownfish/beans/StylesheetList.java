@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,7 +51,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("stylesheetList")
-@Scope("session")
+@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class StylesheetList {
     @Inject

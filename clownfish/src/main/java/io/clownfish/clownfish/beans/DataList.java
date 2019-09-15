@@ -39,6 +39,7 @@ import lombok.Setter;
 import org.primefaces.event.SelectEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,7 +47,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("datacontentList")
-@Scope("session")
+@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class DataList implements Serializable {
     @Autowired transient CfListService cflistService;
