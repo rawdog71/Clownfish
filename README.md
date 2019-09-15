@@ -18,3 +18,4 @@ Work in progress
 - Cronjob scheduler
 - Markdown content
 - Lucene search engine
+- Static site generation
