@@ -762,8 +762,9 @@ public class Clownfish {
     
     private ClownfishResponse getStaticSite(String sitename) {
         ClownfishResponse cfResponse = new ClownfishResponse();
+        BufferedReader br = null;
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(static_folder + File.separator + sitename), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(static_folder + File.separator + sitename), "UTF-8"));
             StringBuilder sb = new StringBuilder(1024);
             String line;
             while ((line = br.readLine()) != null) {
@@ -771,19 +772,23 @@ public class Clownfish {
             }
             cfResponse.setOutput(sb.toString());
             cfResponse.setErrorcode(0);
+            br.close();
             return cfResponse;
-            /*
-            response.setContentType(contentType);
-            response.setCharacterEncoding(characterEncoding);
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(sb);
-            */
             
         } catch (IOException ex) {
             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
             cfResponse.setOutput("Static site not found");
             cfResponse.setErrorcode(1);
+            
             return cfResponse;
+        } finally {
+            try {
+                if (null != br) {
+                    br.close();
+                }
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     
@@ -803,7 +808,9 @@ public class Clownfish {
             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                fileStream.close();
+                if (null != fileStream) {
+                    fileStream.close();
+                }
             } catch (IOException ex) {
                 java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
             }
