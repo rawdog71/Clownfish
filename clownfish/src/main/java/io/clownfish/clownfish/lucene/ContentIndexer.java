@@ -22,6 +22,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -34,19 +36,18 @@ import org.apache.lucene.index.IndexWriterConfig;
  *
  * @author rawdog
  */
-public class ContentIndexer {
+public class ContentIndexer implements Runnable {
     private final AttributContentList attributContentList;
-    private final IndexWriter writer;
+    private IndexWriter writer;
+    private final Directory indexDirectory;
+    private final IndexWriterConfig iwc;
 
     public ContentIndexer(String indexDirectoryPath, AttributContentList attributContentList) throws IOException {
         this.attributContentList = attributContentList;
-        Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
+        indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
 
         StandardAnalyzer analyzer = new StandardAnalyzer();
-        IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-        writer = new IndexWriter(indexDirectory, iwc);
-        writer.deleteAll();
-        writer.commit();
+        iwc = new IndexWriterConfig(analyzer);
     }
 
     public void close() throws CorruptIndexException, IOException {
@@ -102,5 +103,20 @@ public class ContentIndexer {
         }
         writer.commit();
         return writer.numRamDocs();
+    }
+
+    @Override
+    public void run() {
+        try {
+            long startTime = System.currentTimeMillis();
+            writer = new IndexWriter(indexDirectory, iwc);
+            writer.deleteAll();
+            createIndex();
+            writer.commit();
+            long endTime = System.currentTimeMillis();
+            System.out.println("Index Time: " + (endTime - startTime) + "ms");
+        } catch (IOException ex) {
+            Logger.getLogger(ContentIndexer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

@@ -187,6 +187,7 @@ public class Clownfish {
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map metainfomap;
     private @Getter @Setter Map searchmap;
+    private @Getter @Setter Map searchmetadata;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     private @Getter @Setter MarkdownUtil markdownUtil;
     private @Getter @Setter ContentIndexer contentIndexer;
@@ -295,15 +296,19 @@ public class Clownfish {
             
             markdownUtil = new MarkdownUtil();
             if ((null != index_folder) && (!index_folder.isEmpty())) {
+                // Call a parallel thread to index the content in Lucene
                 contentIndexer = new ContentIndexer(index_folder, attributContentList);
-                long idx = contentIndexer.createIndex();
-                System.out.println("Indexing content: " + idx);
+                contentIndexer.run();
             }
            
+            // Init Site Metadata Map
             metainfomap = new HashMap<>();
             metainfomap.put("version", version);
             
+            // Init Lucene Search Map
             searchmap = new HashMap<>();
+            searchmetadata = new HashMap<>();
+            
             scheduler.clear();
             // Fetch the Quartz jobs
             quartzlist.init();
@@ -340,6 +345,9 @@ public class Clownfish {
             long endTime = System.currentTimeMillis();
             
             System.out.println("Search Time :" + (endTime - startTime));
+            searchmetadata.clear();
+            searchmetadata.put("cfSearchQuery", query);
+            searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
             searchmap.clear();
             for (CfSite site : sitehits) {
                 searchmap.put(site.getName(), site);
@@ -634,6 +642,9 @@ public class Clownfish {
 
                                 fmRoot.put("parameter", parametermap);
                                 fmRoot.put("property", propertymap);
+                                if (!searchmetadata.isEmpty()) {
+                                    fmRoot.put("searchmetadata", searchmetadata);
+                                }
                                 if (!searchmap.isEmpty()) {
                                     fmRoot.put("searchlist", searchmap);
                                 }
@@ -666,6 +677,9 @@ public class Clownfish {
 
                                 velContext.put("parameter", parametermap);
                                 velContext.put("property", propertymap);
+                                if (!searchmetadata.isEmpty()) {
+                                    velContext.put("searchmetadata", searchmetadata);
+                                }
                                 if (!searchmap.isEmpty()) {
                                     velContext.put("searchlist", searchmap);
                                 }

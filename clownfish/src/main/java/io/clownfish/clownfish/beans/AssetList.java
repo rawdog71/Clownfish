@@ -120,7 +120,7 @@ public class AssetList {
             try (FileInputStream inputstream = new FileInputStream(result)) {
                 ParseContext context = new ParseContext();
                 parser.parse(inputstream, handler, metadata, context);
-                //System.out.println(handler.toString());
+                System.out.println(handler.toString());
             }
 
             //getting the list of all meta data elements 
@@ -128,6 +128,12 @@ public class AssetList {
             for(String name : metadataNames) {		        
                 //System.out.println(name + ": " + metadata.get(name));
                 metamap.put(name, metadata.get(name));
+            }
+            
+            switch (metamap.get("Content-Type")) {
+                case "application/pdf":
+                    System.out.println("PDF");
+                    break;
             }
             
             CfAsset newasset = new CfAsset();
