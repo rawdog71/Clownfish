@@ -50,9 +50,12 @@ import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
@@ -138,6 +141,9 @@ import org.springframework.web.servlet.HandlerMapping;
 public class Clownfish {
     @Autowired CfSiteService cfsiteService;
     @Autowired CfSitecontentService cfsitecontentService;
+    @Autowired CfListcontentService cflistcontentService;
+    @Autowired CfListService cflistService;
+    @Autowired CfSitelistService cfsitelistService;
     @Autowired CfSitedatasourceService cfsitedatasourceService;
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfTemplateversionService cftemplateversionService;
@@ -328,7 +334,7 @@ public class Clownfish {
     @GetMapping(path = "/search/{query}")
     public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
-            Searcher searcher = new Searcher(index_folder, cfsitecontentService, cfsiteService);
+            Searcher searcher = new Searcher(index_folder, cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService);
             long startTime = System.currentTimeMillis();
             List<CfSite> sitehits = searcher.search(query);
             long endTime = System.currentTimeMillis();

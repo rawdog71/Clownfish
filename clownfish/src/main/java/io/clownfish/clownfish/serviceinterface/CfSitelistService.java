@@ -25,6 +25,7 @@ import java.util.List;
 public interface CfSitelistService {
     List<CfSitelist> findAll();
     List<CfSitelist> findBySiteref(Long ref);
+    List<CfSitelist> findByListref(Long ref);
     boolean create(CfSitelist entity);
     boolean delete(CfSitelist entity);
     boolean edit(CfSitelist entity);

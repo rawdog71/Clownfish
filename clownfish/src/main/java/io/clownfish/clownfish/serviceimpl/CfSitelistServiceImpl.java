@@ -61,4 +61,9 @@ public class CfSitelistServiceImpl implements CfSitelistService {
     public boolean edit(CfSitelist entity) {
         return this.cfsitelistDAO.edit(entity);
     }
+
+    @Override
+    public List<CfSitelist> findByListref(Long ref) {
+        return this.cfsitelistDAO.findByListref(ref);
+    }
 }
