@@ -71,6 +71,9 @@ public class CfAsset implements Serializable {
     @Size(max = 255)
     @Column(name = "imageheight")
     private String imageheight;
+    @Size(max = 255)
+    @Column(name = "description")
+    private String description;
 
     public CfAsset() {
     }
@@ -130,6 +133,14 @@ public class CfAsset implements Serializable {
 
     public void setImageheight(String imageheight) {
         this.imageheight = imageheight;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
