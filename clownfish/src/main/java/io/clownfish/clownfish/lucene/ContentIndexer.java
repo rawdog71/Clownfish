@@ -19,18 +19,13 @@ import io.clownfish.clownfish.beans.AttributContentList;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import java.io.IOException;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexWriterConfig;
 
 /**
  *
@@ -38,16 +33,11 @@ import org.apache.lucene.index.IndexWriterConfig;
  */
 public class ContentIndexer implements Runnable {
     private final AttributContentList attributContentList;
-    private IndexWriter writer;
-    private final Directory indexDirectory;
-    private final IndexWriterConfig iwc;
+    private final IndexWriter writer;
 
-    public ContentIndexer(String indexDirectoryPath, AttributContentList attributContentList) throws IOException {
+    public ContentIndexer(IndexWriter writer, AttributContentList attributContentList) throws IOException {
+        this.writer = writer;
         this.attributContentList = attributContentList;
-        indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
-
-        StandardAnalyzer analyzer = new StandardAnalyzer();
-        iwc = new IndexWriterConfig(analyzer);
     }
 
     public void close() throws CorruptIndexException, IOException {
@@ -109,8 +99,6 @@ public class ContentIndexer implements Runnable {
     public void run() {
         try {
             long startTime = System.currentTimeMillis();
-            writer = new IndexWriter(indexDirectory, iwc);
-            writer.deleteAll();
             createIndex();
             writer.commit();
             long endTime = System.currentTimeMillis();

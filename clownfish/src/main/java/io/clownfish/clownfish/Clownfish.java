@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import de.destrukt.sapconnection.SAPConnection;
+import io.clownfish.clownfish.beans.AssetList;
 import io.clownfish.clownfish.beans.AttributContentList;
 import io.clownfish.clownfish.templatebeans.DatabaseTemplateBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
@@ -42,6 +43,7 @@ import io.clownfish.clownfish.jdbc.DatatableDeleteProperties;
 import io.clownfish.clownfish.jdbc.DatatableNewProperties;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
+import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.Searcher;
 import io.clownfish.clownfish.mail.EmailProperties;
@@ -84,6 +86,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -103,7 +106,12 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 import org.fusesource.jansi.AnsiConsole;
@@ -155,6 +163,7 @@ public class Clownfish {
     @Autowired TemplateUtil templateUtil;
     @Autowired PropertyList propertylist;
     @Autowired AttributContentList attributContentList;
+    @Autowired AssetList assetList;
     @Autowired QuartzList quartzlist;
     @Autowired CfTemplateLoaderImpl freemarkerTemplateloader;
     @Autowired SiteUtil siteutil;
@@ -191,11 +200,16 @@ public class Clownfish {
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     private @Getter @Setter MarkdownUtil markdownUtil;
     private @Getter @Setter ContentIndexer contentIndexer;
+    private @Getter @Setter AssetIndexer assetIndexer;
 
     final Logger logger = LoggerFactory.getLogger(Clownfish.class);
     private @Getter @Setter String version;
     private @Getter @Setter String static_folder;
     private @Getter @Setter String index_folder;
+    private @Getter @Setter String media_folder;
+    private @Getter @Setter IndexWriter writer;
+    private @Getter @Setter Directory indexDirectory;
+    private @Getter @Setter IndexWriterConfig iwc;
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -271,6 +285,7 @@ public class Clownfish {
             clownfishutil = new ClownfishUtil();
             static_folder = propertymap.get("static_folder");
             index_folder = propertymap.get("index_folder");
+            media_folder = propertymap.get("media_folder");
             String sapSupportProp = propertymap.get("sap_support");
             if (sapSupportProp.compareToIgnoreCase("true") == 0) {
                 sapSupport = true;
@@ -297,8 +312,16 @@ public class Clownfish {
             markdownUtil = new MarkdownUtil();
             if ((null != index_folder) && (!index_folder.isEmpty())) {
                 // Call a parallel thread to index the content in Lucene
-                contentIndexer = new ContentIndexer(index_folder, attributContentList);
+                indexDirectory = FSDirectory.open(Paths.get(index_folder));
+
+                StandardAnalyzer analyzer = new StandardAnalyzer();
+                iwc = new IndexWriterConfig(analyzer);
+                writer = new IndexWriter(indexDirectory, iwc);
+                writer.deleteAll();
+                contentIndexer = new ContentIndexer(writer, attributContentList);
                 contentIndexer.run();
+                assetIndexer = new AssetIndexer(writer, assetList, media_folder);
+                assetIndexer.run();
             }
            
             // Init Site Metadata Map
