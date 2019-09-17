@@ -55,7 +55,6 @@ public class AssetIndexer implements Runnable {
         this.media_folder = media_folder;
         
         parser = new AutoDetectParser();
-        handler = new BodyContentHandler();
         metamap = new HashMap<>();
     }
 
@@ -67,14 +66,14 @@ public class AssetIndexer implements Runnable {
         Document document = new Document();
         document.add(new StoredField(LuceneConstants.ID, assetcontent.getId()));
         document.add(new StoredField(LuceneConstants.ASSET_NAME, assetcontent.getName()));
-        
+        handler = new BodyContentHandler();
         Metadata metadata = new Metadata();
         metamap.clear();
          
         try (FileInputStream inputstream = new FileInputStream(media_folder + File.separator + assetcontent.getName())) {
             ParseContext context = new ParseContext();
             parser.parse(inputstream, handler, metadata, context);
-            System.out.println(handler.toString());
+            //System.out.println(handler.toString());
         } catch (SAXException | TikaException ex) {
             Logger.getLogger(AssetIndexer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -86,10 +85,15 @@ public class AssetIndexer implements Runnable {
             metamap.put(name, metadata.get(name));
         }
 
+        document.add(new StoredField(LuceneConstants.CONTENT_TYPE, metamap.get("Content-Type")));
         switch (metamap.get("Content-Type")) {
             case "application/pdf":
                 document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
                 System.out.println("PDF");
+                break;
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
+                System.out.println("DOCX");
                 break;
         }
     
@@ -116,7 +120,7 @@ public class AssetIndexer implements Runnable {
         try {
             long startTime = System.currentTimeMillis();
             createIndex();
-            writer.commit();
+            //writer.commit();
             long endTime = System.currentTimeMillis();
             System.out.println("Index Time: " + (endTime - startTime) + "ms");
         } catch (IOException ex) {

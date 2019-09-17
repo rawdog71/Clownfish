@@ -30,6 +30,7 @@ import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
 import io.clownfish.clownfish.datamodels.ClownfishResponse;
+import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfQuartz;
 import io.clownfish.clownfish.dbentities.CfSite;
@@ -45,10 +46,12 @@ import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
 import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.ContentIndexer;
+import io.clownfish.clownfish.lucene.SearchResult;
 import io.clownfish.clownfish.lucene.Searcher;
 import io.clownfish.clownfish.mail.EmailProperties;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
@@ -152,6 +155,7 @@ public class Clownfish {
     @Autowired CfListcontentService cflistcontentService;
     @Autowired CfListService cflistService;
     @Autowired CfSitelistService cfsitelistService;
+    @Autowired CfAssetService cfassetService;
     @Autowired CfSitedatasourceService cfsitedatasourceService;
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfTemplateversionService cftemplateversionService;
@@ -195,7 +199,8 @@ public class Clownfish {
     private @Getter @Setter Locale locale;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map metainfomap;
-    private @Getter @Setter Map searchmap;
+    private @Getter @Setter Map searchcontentmap;
+    private @Getter @Setter Map searchassetmap;
     private @Getter @Setter Map searchmetadata;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     private @Getter @Setter MarkdownUtil markdownUtil;
@@ -322,6 +327,7 @@ public class Clownfish {
                 contentIndexer.run();
                 assetIndexer = new AssetIndexer(writer, assetList, media_folder);
                 assetIndexer.run();
+                writer.commit();
             }
            
             // Init Site Metadata Map
@@ -329,7 +335,8 @@ public class Clownfish {
             metainfomap.put("version", version);
             
             // Init Lucene Search Map
-            searchmap = new HashMap<>();
+            searchcontentmap = new HashMap<>();
+            searchassetmap = new HashMap<>();
             searchmetadata = new HashMap<>();
             
             scheduler.clear();
@@ -362,20 +369,27 @@ public class Clownfish {
     @GetMapping(path = "/search/{query}")
     public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
-            Searcher searcher = new Searcher(index_folder, cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService);
+            Searcher searcher = new Searcher(index_folder, cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService, cfassetService);
             long startTime = System.currentTimeMillis();
-            List<CfSite> sitehits = searcher.search(query);
+            SearchResult searchresult =searcher.search(query);
+            //List<CfSite> sitehits = searcher.search(query);
             long endTime = System.currentTimeMillis();
             
             System.out.println("Search Time :" + (endTime - startTime));
             searchmetadata.clear();
             searchmetadata.put("cfSearchQuery", query);
             searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
-            searchmap.clear();
-            for (CfSite site : sitehits) {
-                searchmap.put(site.getName(), site);
-                System.out.println(site.getName());
+            searchcontentmap.clear();
+            for (CfSite site : searchresult.getFoundSites()) {
+                searchcontentmap.put(site.getName(), site);
+                //System.out.println(site.getName());
             }
+            searchassetmap.clear();
+            for (CfAsset asset : searchresult.getFoundAssets()) {
+                searchassetmap.put(asset.getName(), asset);
+                //System.out.println(asset.getName());
+            }
+            
             //sitecontentmap.put("search", searchmap);
             String search_site = propertymap.get("search_site");
             if (null == search_site) {
@@ -668,8 +682,11 @@ public class Clownfish {
                                 if (!searchmetadata.isEmpty()) {
                                     fmRoot.put("searchmetadata", searchmetadata);
                                 }
-                                if (!searchmap.isEmpty()) {
-                                    fmRoot.put("searchlist", searchmap);
+                                if (!searchcontentmap.isEmpty()) {
+                                    fmRoot.put("searchcontentlist", searchcontentmap);
+                                }
+                                if (!searchassetmap.isEmpty()) {
+                                    fmRoot.put("searchassetlist", searchassetmap);
                                 }
                                 try {
                                     if (null != fmTemplate) {
@@ -703,8 +720,11 @@ public class Clownfish {
                                 if (!searchmetadata.isEmpty()) {
                                     velContext.put("searchmetadata", searchmetadata);
                                 }
-                                if (!searchmap.isEmpty()) {
-                                    velContext.put("searchlist", searchmap);
+                                if (!searchcontentmap.isEmpty()) {
+                                    velContext.put("searchcontentlist", searchcontentmap);
+                                }
+                                if (!searchassetmap.isEmpty()) {
+                                    velContext.put("searchassetlist", searchassetmap);
                                 }
                                 if (null != velTemplate) {
                                     velTemplate.merge(velContext, out);

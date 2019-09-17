@@ -15,11 +15,13 @@
  */
 package io.clownfish.clownfish.lucene;
 
+import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.dbentities.CfSitelist;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
@@ -52,54 +54,72 @@ public class Searcher {
     MultiFieldQueryParser queryParser;
     Query query;
     ArrayList<CfSite> foundSites;
+    ArrayList<CfAsset> foundAssets;
     CfSitecontentService sitecontentservice;
     CfSiteService siteservice;
     CfListcontentService sitelistservice;
     CfListService cflistservice;
     CfSitelistService cfsitelistservice;
+    CfAssetService cfassetservice;
 
-    public Searcher(String indexDirectoryPath, CfSitecontentService sitecontentservice, CfSiteService siteservice, CfListcontentService sitelistservice, CfListService cflistservice, CfSitelistService cfsitelistservice) throws IOException {
+    public Searcher(String indexDirectoryPath, CfSitecontentService sitecontentservice, CfSiteService siteservice, CfListcontentService sitelistservice, CfListService cflistservice, CfSitelistService cfsitelistservice, CfAssetService cfassetservice) throws IOException {
         this.sitecontentservice = sitecontentservice;
         this.siteservice = siteservice;
         this.sitelistservice = sitelistservice;
         this.cflistservice = cflistservice;
         this.cfsitelistservice = cfsitelistservice;
+        this.cfassetservice = cfassetservice;
         Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
         IndexReader reader = DirectoryReader.open(indexDirectory);
         indexSearcher = new IndexSearcher(reader);
-        queryParser = new MultiFieldQueryParser(new String[] {LuceneConstants.CONTENT_TEXT, LuceneConstants.CONTENT_STRING}, new StandardAnalyzer());
+        queryParser = new MultiFieldQueryParser(new String[] {LuceneConstants.CONTENT_TEXT, LuceneConstants.CONTENT_STRING, LuceneConstants.ASSET_NAME, LuceneConstants.ASSET_TEXT}, new StandardAnalyzer());
         foundSites = new ArrayList<>();
+        foundAssets = new ArrayList<>();
     }
     
-    public List<CfSite> search(String searchQuery) throws IOException, ParseException {
+    public SearchResult search(String searchQuery) throws IOException, ParseException {
+        SearchResult searchresult = new SearchResult();
         foundSites.clear();
+        foundAssets.clear();
         query = queryParser.parse(searchQuery);
         TopDocs hits = indexSearcher.search(query, LuceneConstants.MAX_SEARCH);
-        for(ScoreDoc scoreDoc : hits.scoreDocs) {
+        for (ScoreDoc scoreDoc : hits.scoreDocs) {
             Document doc = getDocument(scoreDoc);
-            long classcontentref = Long.parseLong(doc.get(LuceneConstants.CLASSCONTENT_REF));
-            // Search directly in site
-            List<CfSitecontent> sitelist = sitecontentservice.findByClasscontentref(classcontentref);
-            for (CfSitecontent sitecontent : sitelist) {
-                CfSite foundsite = siteservice.findById(sitecontent.getCfSitecontentPK().getSiteref());
-                if ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant())) {
-                    foundSites.add(foundsite);
-                }
-            }
-            // Search in sitelists
-            List<CfListcontent> listcontent = sitelistservice.findByClasscontentref(classcontentref);
-            for (CfListcontent listcontententry : listcontent) {
-                CfList foundlist = cflistservice.findById(listcontententry.getCfListcontentPK().getListref());
-                List<CfSitelist> foundsitelist = cfsitelistservice.findByListref(foundlist.getId());
-                for (CfSitelist sitelistentry : foundsitelist) {
-                    CfSite foundsite = siteservice.findById(sitelistentry.getCfSitelistPK().getSiteref());
+            String contenttype = doc.get(LuceneConstants.CONTENT_TYPE);
+            if (0 == contenttype.compareToIgnoreCase("Clownfish/Content")) {
+                long classcontentref = Long.parseLong(doc.get(LuceneConstants.CLASSCONTENT_REF));
+                // Search directly in site
+                List<CfSitecontent> sitelist = sitecontentservice.findByClasscontentref(classcontentref);
+                for (CfSitecontent sitecontent : sitelist) {
+                    CfSite foundsite = siteservice.findById(sitecontent.getCfSitecontentPK().getSiteref());
                     if ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant())) {
                         foundSites.add(foundsite);
                     }
                 }
+                // Search in sitelists
+                List<CfListcontent> listcontent = sitelistservice.findByClasscontentref(classcontentref);
+                for (CfListcontent listcontententry : listcontent) {
+                    CfList foundlist = cflistservice.findById(listcontententry.getCfListcontentPK().getListref());
+                    List<CfSitelist> foundsitelist = cfsitelistservice.findByListref(foundlist.getId());
+                    for (CfSitelist sitelistentry : foundsitelist) {
+                        CfSite foundsite = siteservice.findById(sitelistentry.getCfSitelistPK().getSiteref());
+                        if ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant())) {
+                            foundSites.add(foundsite);
+                        }
+                    }
+                }
+            } else {
+                String assetid = doc.getField(LuceneConstants.ID).stringValue();
+                //System.out.println("ASSET-ID: " + assetid);
+                CfAsset asset = cfassetservice.findById(Long.parseLong(assetid));
+                if (!foundAssets.contains(assetid)) {
+                    foundAssets.add(asset);
+                }
             }
         }
-        return foundSites;
+        searchresult.foundSites = foundSites;
+        searchresult.foundAssets = foundAssets;
+        return searchresult;
     }
     
     public Document getDocument(ScoreDoc scoreDoc) throws CorruptIndexException, IOException {

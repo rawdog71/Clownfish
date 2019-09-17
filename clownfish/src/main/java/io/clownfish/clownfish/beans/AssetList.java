@@ -130,12 +130,6 @@ public class AssetList {
                 metamap.put(name, metadata.get(name));
             }
             
-            switch (metamap.get("Content-Type")) {
-                case "application/pdf":
-                    System.out.println("PDF");
-                    break;
-            }
-            
             CfAsset newasset = new CfAsset();
             newasset.setName(event.getFile().getFileName());
             newasset.setFileextension(fileextension.toLowerCase());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 rawdog.
+ * Copyright 2019 sulzbachr.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,20 @@
  */
 package io.clownfish.clownfish.lucene;
 
+import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfSite;
+import java.util.ArrayList;
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  *
- * @author rawdog
+ * @author sulzbachr
  */
-public class LuceneConstants {
-    public static final String CONTENT_TYPE = "contenttype";
-    public static final String ID = "id";
-    public static final String CLASSCONTENT_REF = "classcontentref";
-    public static final String CONTENT_STRING = "content_string";
-    public static final String CONTENT_TEXT = "content_text";
-    public static final String ASSET_NAME = "asset_name";
-    public static final String ASSET_TEXT = "asset_text";
-    public static final int MAX_SEARCH = 10;
+public class SearchResult {
+    @Getter @Setter ArrayList<CfSite> foundSites;
+    @Getter @Setter ArrayList<CfAsset> foundAssets;
+
+    public SearchResult() {
+    }
 }

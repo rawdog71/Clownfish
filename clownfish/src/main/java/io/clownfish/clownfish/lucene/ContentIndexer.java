@@ -47,6 +47,7 @@ public class ContentIndexer implements Runnable {
     private Document getDocument(CfAttributcontent attributcontent) throws IOException {
         if (attributcontent.getClasscontentref().getClassref().isSearchrelevant()) {
             Document document = new Document();
+            document.add(new StoredField(LuceneConstants.CONTENT_TYPE, "Clownfish/Content"));
             document.add(new StoredField(LuceneConstants.ID, attributcontent.getId()));
             document.add(new StoredField(LuceneConstants.CLASSCONTENT_REF, attributcontent.getClasscontentref().getId()));
             switch (attributcontent.getAttributref().getAttributetype().getName()) {
@@ -91,7 +92,7 @@ public class ContentIndexer implements Runnable {
         for (CfAttributcontent attributcontent : attributContentList.getAttributcontentlist()) {
             indexAttributContent(attributcontent);
         }
-        writer.commit();
+        //writer.commit();
         return writer.numRamDocs();
     }
 
@@ -100,7 +101,7 @@ public class ContentIndexer implements Runnable {
         try {
             long startTime = System.currentTimeMillis();
             createIndex();
-            writer.commit();
+            //writer.commit();
             long endTime = System.currentTimeMillis();
             System.out.println("Index Time: " + (endTime - startTime) + "ms");
         } catch (IOException ex) {
