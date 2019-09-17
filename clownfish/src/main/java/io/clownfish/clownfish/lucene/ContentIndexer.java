@@ -44,6 +44,13 @@ public class ContentIndexer implements Runnable {
         writer.close();
     }
 
+    /*
+        getDocument makes the IndexDocument for a content element with following fields:
+        id
+        classcontent_ref
+        content-type (always Clownfish/Content)
+        content
+    */
     private Document getDocument(CfAttributcontent attributcontent) throws IOException {
         if (attributcontent.getClasscontentref().getClassref().isSearchrelevant()) {
             Document document = new Document();

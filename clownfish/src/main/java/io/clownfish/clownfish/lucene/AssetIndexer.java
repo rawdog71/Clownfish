@@ -62,10 +62,22 @@ public class AssetIndexer implements Runnable {
         writer.close();
     }
 
+    
+    /*
+        getDocument makes the IndexDocument for an asset with following fields:
+        id
+        name
+        description (if available)
+        content-type
+        content (if asset type has content)
+    */
     private Document getDocument(CfAsset assetcontent) throws IOException {
         Document document = new Document();
         document.add(new StoredField(LuceneConstants.ID, assetcontent.getId()));
         document.add(new StoredField(LuceneConstants.ASSET_NAME, assetcontent.getName()));
+        if (null != assetcontent.getDescription()) {
+            document.add(new StoredField(LuceneConstants.ASSET_DESCRIPTION, assetcontent.getDescription()));
+        }
         handler = new BodyContentHandler();
         Metadata metadata = new Metadata();
         metamap.clear();
@@ -91,6 +103,10 @@ public class AssetIndexer implements Runnable {
                 document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
                 System.out.println("PDF");
                 break;
+            case "application/msword":
+                document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
+                System.out.println("DOC");
+                break;    
             case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                 document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
                 System.out.println("DOCX");

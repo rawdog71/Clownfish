@@ -27,5 +27,6 @@ public class LuceneConstants {
     public static final String CONTENT_TEXT = "content_text";
     public static final String ASSET_NAME = "asset_name";
     public static final String ASSET_TEXT = "asset_text";
+    public static final String ASSET_DESCRIPTION = "asset_description";
     public static final int MAX_SEARCH = 10;
 }

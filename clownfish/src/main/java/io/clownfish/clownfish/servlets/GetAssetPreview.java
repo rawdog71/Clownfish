@@ -49,9 +49,9 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@WebServlet(name = "GetAsset", urlPatterns = {"/GetAsset"}, asyncSupported = true)
+@WebServlet(name = "GetAssetPreview", urlPatterns = {"/GetAssetPreview"}, asyncSupported = true)
 @Component
-public class GetAsset extends HttpServlet {
+public class GetAssetPreview extends HttpServlet {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient PropertyList propertylist;
     
@@ -60,9 +60,9 @@ public class GetAsset extends HttpServlet {
     
     private static Map<String, String> propertymap = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
+    final transient Logger logger = LoggerFactory.getLogger(GetAssetPreview.class);
     
-    public GetAsset() {
+    public GetAssetPreview() {
     }
 
     @PostConstruct
@@ -166,9 +166,9 @@ public class GetAsset extends HttpServlet {
                         }
                     }
                 } else {
-                    acontext.getResponse().setContentType(asset.getMimetype());
+                    acontext.getResponse().setContentType("image/svg+xml");
                     InputStream in;
-                    File f = new File(mediapath + File.separator + imagefilename);
+                    File f = new File(mediapath + File.separator + "document.svg");
                     try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                         in = new FileInputStream(f);
                         IOUtils.copy(in, out);
