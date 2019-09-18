@@ -38,7 +38,6 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@Transactional
 @Named("propertylist")
 @Scope("singleton")
 @Component

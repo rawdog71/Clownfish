@@ -36,9 +36,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.zip.GZIPOutputStream;
 import javax.annotation.PostConstruct;
+import javax.servlet.ServletContext;
 import org.apache.commons.io.IOUtils;
 import org.imgscalr.AsyncScalr;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +59,8 @@ public class GetAssetPreview extends HttpServlet {
     
     private static int width = 0;
     private static int height = 0;
+    
+    private String resourcepath;
     
     private static Map<String, String> propertymap = null;
     
@@ -168,7 +172,27 @@ public class GetAssetPreview extends HttpServlet {
                 } else {
                     acontext.getResponse().setContentType("image/svg+xml");
                     InputStream in;
-                    File f = new File(mediapath + File.separator + "document.svg");
+                    File f;
+                    String iconfilename;
+                    
+                    String mimetype = asset.getMimetype();
+                    switch (mimetype) {
+                        case "application/pdf":
+                            iconfilename = "pdf.svg";
+                            break;
+                        default:
+                            iconfilename = "document.svg";
+                            break;
+                    }
+                    
+                    String iconpath = propertymap.get("icon_folder");
+                    if (null != iconpath) {
+                        f = new File(iconpath + File.separator + iconfilename);
+                    } else {
+                        ServletContext servletContext = getServletContext();
+                        String path = servletContext.getRealPath("/WEB-INF/images/" + iconfilename);
+                        f = new File(path);
+                    }
                     try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                         in = new FileInputStream(f);
                         IOUtils.copy(in, out);

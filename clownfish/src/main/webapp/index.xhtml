@@ -648,7 +648,7 @@
 
                         <p:panel header="#{media.id}" style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
-                                <p:graphicImage url="GetAssetPreview?mediaid=#{media.id}&amp;width=200" /> 
+                                <p:graphicImage url="GetAssetPreview?mediaid=#{media.id}&amp;width=200" width="200" /> 
                                 <h:outputText value="#{media.name}" />
                                 <h:selectBooleanCheckbox value="#{assetList.selectedAsset}" />
                             </h:panelGrid>
