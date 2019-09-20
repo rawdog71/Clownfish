@@ -84,4 +84,14 @@ public class CfAssetDAOImpl implements CfAssetDAO {
         CfAsset cfasset = (CfAsset) query.getSingleResult();
         return cfasset;
     }
+
+    @Override
+    public List<CfAsset> findByIndexed(boolean indexed) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findByIndexed");
+        query.setParameter("indexed", indexed);
+        List<CfAsset> cfassetlist = query.getResultList();
+        return cfassetlist;
+    }
+
 }

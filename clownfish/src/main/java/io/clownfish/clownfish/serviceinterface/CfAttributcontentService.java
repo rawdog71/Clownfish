@@ -28,6 +28,7 @@ public interface CfAttributcontentService {
     List<CfAttributcontent> findAll();
     List<CfAttributcontent> findByClasscontentref(CfClasscontent classcontentref);
     CfAttributcontent findByAttributrefAndClasscontentref(CfAttribut attributref, CfClasscontent classcontentref);
+    List<CfAttributcontent> findByIndexed(boolean indexed);
     boolean create(CfAttributcontent entity);
     boolean delete(CfAttributcontent entity);
     boolean edit(CfAttributcontent entity);

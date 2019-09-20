@@ -46,12 +46,14 @@ import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
 import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.ContentIndexer;
+import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.lucene.SearchResult;
 import io.clownfish.clownfish.lucene.Searcher;
 import io.clownfish.clownfish.mail.EmailProperties;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
@@ -155,7 +157,8 @@ public class Clownfish {
     @Autowired CfListcontentService cflistcontentService;
     @Autowired CfListService cflistService;
     @Autowired CfSitelistService cfsitelistService;
-    @Autowired CfAssetService cfassetService;
+    @Autowired @Getter @Setter CfAssetService cfassetService;
+    @Autowired @Getter @Setter CfAttributcontentService cfattributcontentService;
     @Autowired CfSitedatasourceService cfsitedatasourceService;
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfTemplateversionService cftemplateversionService;
@@ -211,10 +214,8 @@ public class Clownfish {
     private @Getter @Setter String version;
     private @Getter @Setter String static_folder;
     private @Getter @Setter String index_folder;
-    private @Getter @Setter String media_folder;
-    private @Getter @Setter IndexWriter writer;
-    private @Getter @Setter Directory indexDirectory;
-    private @Getter @Setter IndexWriterConfig iwc;
+    public @Getter @Setter String media_folder;
+    @Autowired public @Getter @Setter IndexService indexService;
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -316,18 +317,16 @@ public class Clownfish {
             
             markdownUtil = new MarkdownUtil();
             if ((null != index_folder) && (!index_folder.isEmpty())) {
+                //indexService = new IndexService();
+                //indexService.init();
                 // Call a parallel thread to index the content in Lucene
-                indexDirectory = FSDirectory.open(Paths.get(index_folder));
 
-                StandardAnalyzer analyzer = new StandardAnalyzer();
-                iwc = new IndexWriterConfig(analyzer);
-                writer = new IndexWriter(indexDirectory, iwc);
-                writer.deleteAll();
-                contentIndexer = new ContentIndexer(writer, attributContentList);
+                indexService.getWriter().deleteAll();
+                contentIndexer = new ContentIndexer(cfattributcontentService, indexService);
                 contentIndexer.run();
-                assetIndexer = new AssetIndexer(writer, assetList, media_folder);
+                assetIndexer = new AssetIndexer(cfassetService, indexService, media_folder);
                 assetIndexer.run();
-                writer.commit();
+                indexService.getWriter().commit();
             }
            
             // Init Site Metadata Map

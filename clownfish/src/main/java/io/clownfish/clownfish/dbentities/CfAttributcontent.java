@@ -59,7 +59,8 @@ import org.joda.time.format.DateTimeFormatter;
     @NamedQuery(name = "CfAttributcontent.findByContentString", query = "SELECT c FROM CfAttributcontent c WHERE c.contentString = :contentString"),
     @NamedQuery(name = "CfAttributcontent.findByContentDate", query = "SELECT c FROM CfAttributcontent c WHERE c.contentDate = :contentDate"),
     @NamedQuery(name = "CfAttributcontent.findBySalt", query = "SELECT c FROM CfAttributcontent c WHERE c.salt = :salt"),
-    @NamedQuery(name = "CfAttributcontent.findByAttributrefAndClasscontentref", query = "SELECT c FROM CfAttributcontent c WHERE c.attributref = :attributref AND c.classcontentref = :classcontentref")
+    @NamedQuery(name = "CfAttributcontent.findByAttributrefAndClasscontentref", query = "SELECT c FROM CfAttributcontent c WHERE c.attributref = :attributref AND c.classcontentref = :classcontentref"),
+    @NamedQuery(name = "CfAttributcontent.findByIndexed", query = "SELECT c FROM CfAttributcontent c WHERE c.indexed = :indexed")
 })
 public class CfAttributcontent implements Serializable {
 
@@ -95,6 +96,8 @@ public class CfAttributcontent implements Serializable {
     @Size(max = 30)
     @Column(name = "salt")
     private String salt;
+    @Column(name = "indexed")
+    private boolean indexed;
 
     public CfAttributcontent() {
     }
@@ -187,6 +190,14 @@ public class CfAttributcontent implements Serializable {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public boolean isIndexed() {
+        return indexed;
+    }
+
+    public void setIndexed(boolean indexed) {
+        this.indexed = indexed;
     }
 
     @Override

@@ -15,9 +15,10 @@
  */
 package io.clownfish.clownfish.lucene;
 
-import io.clownfish.clownfish.beans.AttributContentList;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import java.io.IOException;
+import java.util.List;
 import org.apache.lucene.index.IndexWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,12 +33,12 @@ import org.apache.lucene.index.CorruptIndexException;
  * @author rawdog
  */
 public class ContentIndexer implements Runnable {
-    private final AttributContentList attributContentList;
+    List<CfAttributcontent> attributcontentlist;
     private final IndexWriter writer;
 
-    public ContentIndexer(IndexWriter writer, AttributContentList attributContentList) throws IOException {
-        this.writer = writer;
-        this.attributContentList = attributContentList;
+    public ContentIndexer(CfAttributcontentService cfattributcontentService, IndexService indexService) throws IOException {
+        writer = indexService.getWriter();
+        attributcontentlist = cfattributcontentService.findByIndexed(false);
     }
 
     public void close() throws CorruptIndexException, IOException {
@@ -96,10 +97,9 @@ public class ContentIndexer implements Runnable {
     }
 
     public long createIndex() throws IOException {
-        for (CfAttributcontent attributcontent : attributContentList.getAttributcontentlist()) {
+        for (CfAttributcontent attributcontent : attributcontentlist) {
             indexAttributContent(attributcontent);
         }
-        //writer.commit();
         return writer.numRamDocs();
     }
 
@@ -108,7 +108,6 @@ public class ContentIndexer implements Runnable {
         try {
             long startTime = System.currentTimeMillis();
             createIndex();
-            //writer.commit();
             long endTime = System.currentTimeMillis();
             System.out.println("Index Time: " + (endTime - startTime) + "ms");
         } catch (IOException ex) {

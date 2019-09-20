@@ -15,12 +15,13 @@
  */
 package io.clownfish.clownfish.lucene;
 
-import io.clownfish.clownfish.beans.AssetList;
 import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import org.apache.lucene.index.IndexWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,17 +43,17 @@ import org.xml.sax.SAXException;
  * @author rawdog
  */
 public class AssetIndexer implements Runnable {
-    private final AssetList assetList;
+    List<CfAsset> assetList;
     private final IndexWriter writer;
     private final String media_folder;
     private final Parser parser;
     BodyContentHandler handler;
     HashMap<String, String> metamap;
 
-    public AssetIndexer(IndexWriter writer, AssetList assetList, String media_folder) throws IOException {
-        this.assetList = assetList;
-        this.writer = writer;
-        this.media_folder = media_folder;
+    public AssetIndexer(CfAssetService cfassetService, IndexService indexService, String mediaFolder) throws IOException {
+        assetList = cfassetService.findByIndexed(false);
+        this.writer = indexService.getWriter();
+        this.media_folder = mediaFolder;
         
         parser = new AutoDetectParser();
         metamap = new HashMap<>();
@@ -116,7 +117,7 @@ public class AssetIndexer implements Runnable {
         return document;
     }
 
-    private void indexAssetContent(CfAsset assetcontent) throws IOException {
+    public void indexAssetContent(CfAsset assetcontent) throws IOException {
         Document document = getDocument(assetcontent);
         if (null != document) {
             //System.out.println("Indexing " + attributcontent.getId());
@@ -125,7 +126,7 @@ public class AssetIndexer implements Runnable {
     }
 
     public long createIndex() throws IOException {
-        for (CfAsset asset : assetList.getAssetlist()) {
+        for (CfAsset asset : assetList) {
             indexAssetContent(asset);
         }
         return writer.numRamDocs();
@@ -136,7 +137,6 @@ public class AssetIndexer implements Runnable {
         try {
             long startTime = System.currentTimeMillis();
             createIndex();
-            //writer.commit();
             long endTime = System.currentTimeMillis();
             System.out.println("Index Time: " + (endTime - startTime) + "ms");
         } catch (IOException ex) {

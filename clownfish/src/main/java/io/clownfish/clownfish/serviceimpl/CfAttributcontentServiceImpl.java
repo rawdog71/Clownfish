@@ -67,4 +67,9 @@ public class CfAttributcontentServiceImpl implements CfAttributcontentService {
         return this.cfattributcontentDAO.findByAttributrefAndClasscontentref(attributref, classcontentref);
     }
 
+    @Override
+    public List<CfAttributcontent> findByIndexed(boolean indexed) {
+        return this.cfattributcontentDAO.findByIndexed(indexed);
+    }
+
 }

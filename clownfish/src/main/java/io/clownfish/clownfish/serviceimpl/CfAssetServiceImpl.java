@@ -66,4 +66,9 @@ public class CfAssetServiceImpl implements CfAssetService {
     public CfAsset findByName(String name) {
         return this.cfassetDAO.findByName(name);
     }
+
+    @Override
+    public List<CfAsset> findByIndexed(boolean indexed) {
+        return this.cfassetDAO.findByIndexed(indexed);
+    }
 }

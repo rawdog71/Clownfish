@@ -17,6 +17,8 @@ package io.clownfish.clownfish.beans;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfKeyword;
+import io.clownfish.clownfish.lucene.AssetIndexer;
+import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import java.io.File;
@@ -37,6 +39,7 @@ import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -63,6 +66,7 @@ public class AssetList {
     @Autowired CfAssetService cfassetService;
     @Autowired CfKeywordService cfkeywordService;
     @Autowired PropertyList propertylist;
+    @Autowired IndexService indexService;
     
     private static Map<String, String> propertymap = null;
     private @Getter @Setter List<CfAsset> assetlist;
@@ -91,6 +95,7 @@ public class AssetList {
     public void handleFileUpload(FileUploadEvent event) throws TikaException, SAXException {
         logger.info("UPLOAD: {0}", event.getFile().getFileName());
         String mediapath = propertymap.get("media_folder");
+        String indexpath = propertymap.get("index_folder");
         HashMap<String, String> metamap = new HashMap<>();
         try {
             File result = new File(mediapath + File.separator + event.getFile().getFileName());
@@ -138,6 +143,15 @@ public class AssetList {
             newasset.setImageheight(metamap.get("Image Height"));
             cfassetService.create(newasset);
             assetlist = cfassetService.findAll();
+            
+            if ((null != indexpath) && (!indexpath.isEmpty())) {
+                //IndexService indexService = new IndexService();
+                //indexService.init(indexpath);
+                AssetIndexer assetIndexer = new AssetIndexer(cfassetService, indexService, mediapath);
+                assetIndexer.indexAssetContent(newasset);
+                indexService.getWriter().commit();
+            }
+            
             assetName = "";
             
             FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");

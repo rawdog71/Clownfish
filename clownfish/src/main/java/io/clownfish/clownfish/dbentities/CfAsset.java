@@ -45,7 +45,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfAsset.findByFileextension", query = "SELECT c FROM CfAsset c WHERE c.fileextension = :fileextension"),
     @NamedQuery(name = "CfAsset.findByMimetype", query = "SELECT c FROM CfAsset c WHERE c.mimetype = :mimetype"),
     @NamedQuery(name = "CfAsset.findByImagewidth", query = "SELECT c FROM CfAsset c WHERE c.imagewidth = :imagewidth"),
-    @NamedQuery(name = "CfAsset.findByImageheight", query = "SELECT c FROM CfAsset c WHERE c.imageheight = :imageheight")})
+    @NamedQuery(name = "CfAsset.findByImageheight", query = "SELECT c FROM CfAsset c WHERE c.imageheight = :imageheight"),
+    @NamedQuery(name = "CfAsset.findByIndexed", query = "SELECT c FROM CfAsset c WHERE c.indexed = :indexed")
+})
 public class CfAsset implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -74,6 +76,8 @@ public class CfAsset implements Serializable {
     @Size(max = 255)
     @Column(name = "description")
     private String description;
+    @Column(name = "indexed")
+    private boolean indexed;
 
     public CfAsset() {
     }
@@ -141,6 +145,14 @@ public class CfAsset implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isIndexed() {
+        return indexed;
+    }
+
+    public void setIndexed(boolean indexed) {
+        this.indexed = indexed;
     }
 
     @Override

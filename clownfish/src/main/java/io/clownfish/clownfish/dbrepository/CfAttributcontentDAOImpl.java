@@ -87,4 +87,13 @@ public class CfAttributcontentDAOImpl implements CfAttributcontentDAO {
         CfAttributcontent cfattributcontent = (CfAttributcontent) query.getSingleResult();
         return cfattributcontent;
     }
+
+    @Override
+    public List<CfAttributcontent> findByIndexed(boolean indexed) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findByIndexed");
+        query.setParameter("indexed", indexed);
+        List<CfAttributcontent> cfattributcontentlist = query.getResultList();
+        return cfattributcontentlist;
+    }
 }
