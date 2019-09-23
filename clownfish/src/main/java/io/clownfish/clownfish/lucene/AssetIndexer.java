@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.lucene;
 
+import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import java.io.File;
@@ -22,9 +23,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.lucene.index.IndexWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Named;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.TextField;
@@ -36,24 +39,31 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
 /**
  *
  * @author rawdog
  */
+@Named("assetindexerservice")
+@Scope("singleton")
+@Component
 public class AssetIndexer implements Runnable {
     List<CfAsset> assetList;
     private final IndexWriter writer;
-    private final String media_folder;
     private final Parser parser;
     BodyContentHandler handler;
     HashMap<String, String> metamap;
+    private final CfAssetService cfassetService;
+    private static Map<String, String> propertymap = null;
+    private final PropertyList propertylist;
 
-    public AssetIndexer(CfAssetService cfassetService, IndexService indexService, String mediaFolder) throws IOException {
-        assetList = cfassetService.findByIndexed(false);
+    public AssetIndexer(CfAssetService cfassetService, IndexService indexService, PropertyList propertylist) throws IOException {
+        this.cfassetService = cfassetService;
         this.writer = indexService.getWriter();
-        this.media_folder = mediaFolder;
+        this.propertylist = propertylist;
         
         parser = new AutoDetectParser();
         metamap = new HashMap<>();
@@ -73,13 +83,18 @@ public class AssetIndexer implements Runnable {
         content (if asset type has content)
     */
     private Document getDocument(CfAsset assetcontent) throws IOException {
+        if (propertymap == null) {
+            // read all System Properties of the property table
+            propertymap = propertylist.fillPropertyMap();
+        }
+        String media_folder = propertymap.get("media_folder");
         Document document = new Document();
         document.add(new StoredField(LuceneConstants.ID, assetcontent.getId()));
         document.add(new StoredField(LuceneConstants.ASSET_NAME, assetcontent.getName()));
         if (null != assetcontent.getDescription()) {
             document.add(new StoredField(LuceneConstants.ASSET_DESCRIPTION, assetcontent.getDescription()));
         }
-        handler = new BodyContentHandler();
+        handler = new BodyContentHandler(-1);
         Metadata metadata = new Metadata();
         metamap.clear();
          
@@ -118,9 +133,10 @@ public class AssetIndexer implements Runnable {
     }
 
     public void indexAssetContent(CfAsset assetcontent) throws IOException {
+        assetcontent.setIndexed(true);
+        cfassetService.edit(assetcontent);
         Document document = getDocument(assetcontent);
         if (null != document) {
-            //System.out.println("Indexing " + attributcontent.getId());
             writer.addDocument(document);
         }
     }
@@ -135,6 +151,7 @@ public class AssetIndexer implements Runnable {
     @Override
     public void run() {
         try {
+            assetList = cfassetService.findByIndexed(false);
             long startTime = System.currentTimeMillis();
             createIndex();
             long endTime = System.currentTimeMillis();

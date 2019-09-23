@@ -63,6 +63,7 @@ public class IndexService {
             iwc = new IndexWriterConfig(analyzer);
             iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
             writer = new IndexWriter(indexDirectory, iwc);
+            writer.forceMerge(10);
         } catch (IOException ex) {
             Logger.getLogger(IndexService.class.getName()).log(Level.SEVERE, null, ex);
         }

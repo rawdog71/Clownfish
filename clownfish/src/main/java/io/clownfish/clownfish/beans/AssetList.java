@@ -39,7 +39,6 @@ import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -67,6 +66,7 @@ public class AssetList {
     @Autowired CfKeywordService cfkeywordService;
     @Autowired PropertyList propertylist;
     @Autowired IndexService indexService;
+    @Autowired AssetIndexer assetIndexer;
     
     private static Map<String, String> propertymap = null;
     private @Getter @Setter List<CfAsset> assetlist;
@@ -120,12 +120,12 @@ public class AssetList {
             String fileextension = FilenameUtils.getExtension(mediapath + File.separator + event.getFile().getFileName());
             
             Parser parser = new AutoDetectParser();
-            BodyContentHandler handler = new BodyContentHandler();
+            BodyContentHandler handler = new BodyContentHandler(-1);
             Metadata metadata = new Metadata();
             try (FileInputStream inputstream = new FileInputStream(result)) {
                 ParseContext context = new ParseContext();
                 parser.parse(inputstream, handler, metadata, context);
-                System.out.println(handler.toString());
+                //System.out.println(handler.toString());
             }
 
             //getting the list of all meta data elements 
@@ -144,12 +144,11 @@ public class AssetList {
             cfassetService.create(newasset);
             assetlist = cfassetService.findAll();
             
+            // Index the uploaded assets and merge the Index files
             if ((null != indexpath) && (!indexpath.isEmpty())) {
-                //IndexService indexService = new IndexService();
-                //indexService.init(indexpath);
-                AssetIndexer assetIndexer = new AssetIndexer(cfassetService, indexService, mediapath);
-                assetIndexer.indexAssetContent(newasset);
+                assetIndexer.run();
                 indexService.getWriter().commit();
+                indexService.getWriter().forceMerge(10);
             }
             
             assetName = "";

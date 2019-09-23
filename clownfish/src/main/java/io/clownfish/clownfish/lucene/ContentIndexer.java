@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.lucene;
 
+import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import java.io.IOException;
@@ -22,23 +23,30 @@ import java.util.List;
 import org.apache.lucene.index.IndexWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Named;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.CorruptIndexException;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author rawdog
  */
+@Named("contentindexerservice")
+@Scope("singleton")
+@Component
 public class ContentIndexer implements Runnable {
     List<CfAttributcontent> attributcontentlist;
     private final IndexWriter writer;
-
+    private final CfAttributcontentService cfattributcontentService;
+    
     public ContentIndexer(CfAttributcontentService cfattributcontentService, IndexService indexService) throws IOException {
+        this.cfattributcontentService = cfattributcontentService;
         writer = indexService.getWriter();
-        attributcontentlist = cfattributcontentService.findByIndexed(false);
     }
 
     public void close() throws CorruptIndexException, IOException {
@@ -88,9 +96,10 @@ public class ContentIndexer implements Runnable {
 
     private void indexAttributContent(CfAttributcontent attributcontent) throws IOException {
         if (attributcontent.getAttributref().getAttributetype().isSearchrelevant()) {
+            attributcontent.setIndexed(true);
+            cfattributcontentService.edit(attributcontent);
             Document document = getDocument(attributcontent);
             if (null != document) {
-                //System.out.println("Indexing " + attributcontent.getId());
                 writer.addDocument(document);
             }
         }
@@ -106,6 +115,7 @@ public class ContentIndexer implements Runnable {
     @Override
     public void run() {
         try {
+            attributcontentlist = cfattributcontentService.findByIndexed(false);
             long startTime = System.currentTimeMillis();
             createIndex();
             long endTime = System.currentTimeMillis();

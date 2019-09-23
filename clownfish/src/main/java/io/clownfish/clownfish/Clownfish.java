@@ -317,14 +317,10 @@ public class Clownfish {
             
             markdownUtil = new MarkdownUtil();
             if ((null != index_folder) && (!index_folder.isEmpty())) {
-                //indexService = new IndexService();
-                //indexService.init();
                 // Call a parallel thread to index the content in Lucene
-
-                indexService.getWriter().deleteAll();
                 contentIndexer = new ContentIndexer(cfattributcontentService, indexService);
                 contentIndexer.run();
-                assetIndexer = new AssetIndexer(cfassetService, indexService, media_folder);
+                assetIndexer = new AssetIndexer(cfassetService, indexService, propertylist);
                 assetIndexer.run();
                 indexService.getWriter().commit();
             }
