@@ -93,12 +93,12 @@ public class QuartzJob implements Job {
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         List<CfQuartz> joblist = quartzlist.getQuartzlist();
-        for (CfQuartz quartz : joblist) {
-            if (quartz.getName().compareToIgnoreCase(jec.getJobDetail().getKey().getName()) == 0) {
-                System.out.println("JOB CLOWNFISH CMS Version 1.0: " + quartz.getName() + " - " + quartz.getSiteRef());
-                callJob(quartz.getSiteRef().longValue());
-            }
-        }
+        joblist.stream().filter((quartz) -> (quartz.getName().compareToIgnoreCase(jec.getJobDetail().getKey().getName()) == 0)).map((quartz) -> {
+            logger.info("JOB CLOWNFISH CMS Version 1.0: " + quartz.getName() + " - " + quartz.getSiteRef());
+            return quartz;
+        }).forEach((quartz) -> {
+            callJob(quartz.getSiteRef().longValue());
+        });
     }
     
     private void callJob(long siteref) {
@@ -142,11 +142,11 @@ public class QuartzJob implements Job {
 
                 fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
             } catch (MalformedTemplateNameException ex) {
-                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage());
             } catch (ParseException ex) {
-                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage());
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage());
             }
         } else {                                    
             try {
@@ -169,7 +169,7 @@ public class QuartzJob implements Job {
                 velTemplate.setData(runtimeServices.parse(reader, cftemplate.getName()));
                 velTemplate.initDocument();
             } catch (org.apache.velocity.runtime.parser.ParseException ex) {
-                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage());
             }
         }
 
@@ -205,7 +205,7 @@ public class QuartzJob implements Job {
                 } catch (freemarker.template.TemplateException ex) {
                     logger.error(ex.getMessage());
                 } catch (IOException ex) {
-                    java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error(ex.getMessage());
                 }
             }
         } else {                                    // Velocity template
@@ -220,20 +220,13 @@ public class QuartzJob implements Job {
                 velContext.put("sapBean", sapbean);
                 DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
                 databasebean.initjob(sitedatasourcelist, cfdatasourceService);
-                fmRoot.put("databaseBean", databasebean);
+                velContext.put("databaseBean", databasebean);
                 NetworkTemplateBean networkbean = new NetworkTemplateBean();
-                fmRoot.put("networkBean", networkbean);
+                velContext.put("networkBean", networkbean);
 
-                fmRoot.put("property", propertymap);
-                try {
-                    if (null != fmTemplate) {
-                        freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
-                        env.process();
-                    }
-                } catch (freemarker.template.TemplateException ex) {
-                    logger.error(ex.getMessage());
-                } catch (IOException ex) {
-                    java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                velContext.put("property", propertymap);
+                if (null != velTemplate) {
+                    velTemplate.merge(velContext, out);
                 }
             }
         }

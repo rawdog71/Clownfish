@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class EmailTemplateBean implements Serializable {
-    private @Getter @Setter Map<String, String> propertymap = null;
+    private transient @Getter @Setter Map<String, String> propertymap = null;
 
     public EmailTemplateBean() {
     }

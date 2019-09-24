@@ -46,7 +46,7 @@ public class RfcFunctionConverter implements Converter, Serializable {
     private List<RfcFunction> rfcfunctionlist;
     @ManagedProperty(value="#{sitetree}")
     @Autowired SiteTreeBean sitetree;
-    private Map<String, String> propertymap = null;
+    private transient Map<String, String> propertymap = null;
     private boolean sapSupport = false;
     @Autowired transient PropertyList propertylist;
     

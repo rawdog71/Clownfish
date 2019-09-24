@@ -69,6 +69,7 @@ public class CfQuartz implements Serializable {
 
     public CfQuartz(Long id) {
         this.id = id;
+        this.name = "";
     }
 
     public CfQuartz(Long id, String name) {

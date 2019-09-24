@@ -63,11 +63,13 @@ public class CfAttributetype implements Serializable {
 
     public CfAttributetype(Long id) {
         this.id = id;
+        this.searchrelevant = false;
     }
 
     public CfAttributetype(Long id, String name) {
         this.id = id;
         this.name = name;
+        this.searchrelevant = false;
     }
 
     public Long getId() {

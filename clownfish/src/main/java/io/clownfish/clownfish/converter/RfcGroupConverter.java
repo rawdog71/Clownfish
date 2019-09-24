@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 public class RfcGroupConverter implements Converter, Serializable {
     private List<RfcGroup> rfcgrouplist;
     private static SAPConnection sapc = null;
-    private Map<String, String> propertymap = null;
+    private transient Map<String, String> propertymap = null;
     private boolean sapSupport = false;
     @Autowired transient PropertyList propertylist;
     

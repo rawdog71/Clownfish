@@ -51,10 +51,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SAPTemplateBean implements Serializable {
     private static List<JsonFormParameter> postmap;
-    private RPY_TABLE_READ rpytableread;
-    private @Getter @Setter Map contentmap;
+    private transient RPY_TABLE_READ rpytableread;
+    private transient @Getter @Setter Map contentmap;
     static SAPConnection sapc = null;
-    private RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
+    private transient RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
     private static HashMap<String, JCoFunction> jcofunctiontable = null;
     private static HashMap<String, List<RpyTableRead>> rpyMap = null;
     
@@ -76,7 +76,7 @@ public class SAPTemplateBean implements Serializable {
     
     public Map executeAsync(String rfcFunction, Map parametermap) {
         //logger.info("START SAP execute");
-        JCoTable functions_table = null;
+        JCoTable functions_table;
         HashMap<String, HashMap> sapexport = new HashMap<>();
         HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
         List<RfcFunctionParam> rfcfunctionparamlist = new ArrayList<>();
@@ -127,7 +127,7 @@ public class SAPTemplateBean implements Serializable {
                 
                 ArrayList<HashMap> tablevalues = new ArrayList<>();
                 tablevalues.clear();
-                List<RpyTableRead> rpytablereadlist = null;
+                List<RpyTableRead> rpytablereadlist;
                 switch (paramclass) {
                     case "e":
                         sapvalues.put(rfcfunctionparam.getParameter(), function.getExportParameterList().getString(rfcfunctionparam.getParameter()));
@@ -163,7 +163,7 @@ public class SAPTemplateBean implements Serializable {
     }
 
     public Map execute(String rfcFunction) {
-        JCoTable functions_table = null;
+        JCoTable functions_table;
         HashMap<String, HashMap> sapexport = new HashMap<>();
         HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
         List<RfcFunctionParam> rfcfunctionparamlist = new ArrayList<>();
@@ -293,7 +293,7 @@ public class SAPTemplateBean implements Serializable {
     }
     
     private List<RpyTableRead> getRpytablereadlist(String tablename) {
-        List<RpyTableRead> rpytablereadlist = null;
+        List<RpyTableRead> rpytablereadlist;
         if (rpyMap.containsKey(tablename)) {
             rpytablereadlist = rpyMap.get(tablename);
         } else {

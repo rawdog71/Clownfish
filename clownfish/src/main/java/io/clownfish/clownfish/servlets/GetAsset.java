@@ -102,31 +102,12 @@ public class GetAsset extends HttpServlet {
                     asset = cfassetService.findById(Long.parseLong(mediaid));
                     imagefilename = asset.getName();
                 }
-                if (asset.getMimetype().contains("image")) {
-                    if (asset.getMimetype().contains("svg")) {
-                        acontext.getResponse().setContentType(asset.getMimetype());
-                        InputStream in;
-                        File f = new File(mediapath + File.separator + imagefilename);
-                        try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
-                            in = new FileInputStream(f);
-                            IOUtils.copy(in, out);
-                        } catch (IOException ex) {
-                            logger.error(ex.getMessage());
-                            acontext.complete();
-                        }
-                    } else {
-                        String paramwidth = acontext.getRequest().getParameter("width");
-                        if (paramwidth != null) {
-                            width = Integer.parseInt(paramwidth);
-                        }
-                        String paramheight = acontext.getRequest().getParameter("height");
-                        if (paramheight != null) {
-                            height = Integer.parseInt(paramheight);
-                        }
-                        String cacheKey = "cache" + imagefilename + "W" + String.valueOf(width) + "H" + String.valueOf(height);
-                        if (new File(cachepath + File.separator + cacheKey).exists()) {
-                            File f = new File(cachepath + File.separator + cacheKey);
+                if (null != asset) {
+                    if (asset.getMimetype().contains("image")) {
+                        if (asset.getMimetype().contains("svg")) {
+                            acontext.getResponse().setContentType(asset.getMimetype());
                             InputStream in;
+                            File f = new File(mediapath + File.separator + imagefilename);
                             try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                                 in = new FileInputStream(f);
                                 IOUtils.copy(in, out);
@@ -135,7 +116,26 @@ public class GetAsset extends HttpServlet {
                                 acontext.complete();
                             }
                         } else {
-                            if (null != asset) {
+                            String paramwidth = acontext.getRequest().getParameter("width");
+                            if (paramwidth != null) {
+                                width = Integer.parseInt(paramwidth);
+                            }
+                            String paramheight = acontext.getRequest().getParameter("height");
+                            if (paramheight != null) {
+                                height = Integer.parseInt(paramheight);
+                            }
+                            String cacheKey = "cache" + imagefilename + "W" + String.valueOf(width) + "H" + String.valueOf(height);
+                            if (new File(cachepath + File.separator + cacheKey).exists()) {
+                                File f = new File(cachepath + File.separator + cacheKey);
+                                InputStream in;
+                                try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                    in = new FileInputStream(f);
+                                    IOUtils.copy(in, out);
+                                } catch (IOException ex) {
+                                    logger.error(ex.getMessage());
+                                    acontext.complete();
+                                }
+                            } else {
                                 acontext.getResponse().setContentType(asset.getMimetype());
                                 InputStream in;
                                 File f = new File(mediapath + File.separator + imagefilename);
@@ -164,20 +164,20 @@ public class GetAsset extends HttpServlet {
                                 }
                             }
                         }
+                    } else {
+                        acontext.getResponse().setContentType(asset.getMimetype());
+                        InputStream in;
+                        File f = new File(mediapath + File.separator + imagefilename);
+                        try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                            in = new FileInputStream(f);
+                            IOUtils.copy(in, out);
+                        } catch (IOException ex) {
+                            logger.error(ex.getMessage());
+                            acontext.complete();
+                        }
                     }
-                } else {
-                    acontext.getResponse().setContentType(asset.getMimetype());
-                    InputStream in;
-                    File f = new File(mediapath + File.separator + imagefilename);
-                    try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
-                        in = new FileInputStream(f);
-                        IOUtils.copy(in, out);
-                    } catch (IOException ex) {
-                        logger.error(ex.getMessage());
-                        acontext.complete();
-                    }
+                    acontext.complete();
                 }
-                acontext.complete();
                 
             } catch (javax.persistence.NoResultException | java.lang.IllegalArgumentException ex) {
                 acontext.getResponse().setContentType("text/html;charset=UTF-8");

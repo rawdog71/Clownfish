@@ -63,11 +63,13 @@ public class CfClass implements Serializable {
 
     public CfClass(Long id) {
         this.id = id;
+        this.searchrelevant = false;
     }
 
     public CfClass(Long id, String name) {
         this.id = id;
         this.name = name;
+        this.searchrelevant = false;
     }
 
     public Long getId() {

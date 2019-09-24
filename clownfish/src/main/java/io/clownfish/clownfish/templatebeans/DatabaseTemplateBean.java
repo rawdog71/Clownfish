@@ -47,8 +47,8 @@ import org.springframework.stereotype.Component;
 @Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class DatabaseTemplateBean implements Serializable {
-    @Autowired CfDatasourceService cfdatasourceService;
-    private @Getter @Setter Map contentmap;
+    @Autowired transient CfDatasourceService cfdatasourceService;
+    private transient @Getter @Setter Map contentmap;
     private List<CfSitedatasource> sitedatasourcelist;
     
     final Logger logger = LoggerFactory.getLogger(DatabaseTemplateBean.class);
