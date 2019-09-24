@@ -15,20 +15,19 @@
  */
 package io.clownfish.clownfish.lucene;
 
-import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import java.io.IOException;
 import java.util.List;
 import org.apache.lucene.index.IndexWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Named;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.CorruptIndexException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +42,8 @@ public class ContentIndexer implements Runnable {
     List<CfAttributcontent> attributcontentlist;
     private final IndexWriter writer;
     private final CfAttributcontentService cfattributcontentService;
+    
+    final transient Logger logger = LoggerFactory.getLogger(ContentIndexer.class);
     
     public ContentIndexer(CfAttributcontentService cfattributcontentService, IndexService indexService) throws IOException {
         this.cfattributcontentService = cfattributcontentService;
@@ -116,12 +117,9 @@ public class ContentIndexer implements Runnable {
     public void run() {
         try {
             attributcontentlist = cfattributcontentService.findByIndexed(false);
-            long startTime = System.currentTimeMillis();
             createIndex();
-            long endTime = System.currentTimeMillis();
-            System.out.println("Index Time: " + (endTime - startTime) + "ms");
         } catch (IOException ex) {
-            Logger.getLogger(ContentIndexer.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         }
     }
 }

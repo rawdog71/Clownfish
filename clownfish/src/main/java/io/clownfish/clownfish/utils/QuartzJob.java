@@ -74,10 +74,7 @@ public class QuartzJob implements Job {
     @Autowired CfTemplateversionService cftemplateversionService;
     @Autowired TemplateUtil templateUtil;
     @Autowired CfSitedatasourceService cfsitedatasourceService;
-    //@Autowired DatabaseTemplateBean databasebean;
-    //@Autowired EmailTemplateBean emailbean;
     @Autowired SAPTemplateBean sapbean;
-    //@Autowired NetworkTemplateBean networkbean;
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired PropertyList propertylist;
     @Autowired CfSitesaprfcService cfsitesaprfcService;

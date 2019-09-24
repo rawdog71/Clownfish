@@ -230,7 +230,7 @@ public class JavascriptList {
             
             javascriptName = "";
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     

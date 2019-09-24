@@ -230,7 +230,7 @@ public class StylesheetList {
             stylesheetListe = cfstylesheetService.findAll();
             stylesheetName = "";
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     

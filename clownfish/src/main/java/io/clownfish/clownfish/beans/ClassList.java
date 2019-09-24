@@ -36,6 +36,8 @@ import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -71,6 +73,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean newAttributButtonDisabled;
     
     @Autowired transient private @Getter @Setter AttributList attributlist;
+    final transient Logger logger = LoggerFactory.getLogger(ClassList.class);
 
     @PostConstruct
     public void init() {
@@ -127,7 +130,7 @@ public class ClassList implements Serializable {
             contentlist.init();
             datalist.init();
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     
@@ -140,7 +143,7 @@ public class ClassList implements Serializable {
             contentlist.init();
             datalist.init();
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     
@@ -167,7 +170,7 @@ public class ClassList implements Serializable {
             }
             
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     

@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.lucene.index.IndexWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Named;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StoredField;
@@ -39,6 +37,8 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -59,6 +59,8 @@ public class AssetIndexer implements Runnable {
     private final CfAssetService cfassetService;
     private static Map<String, String> propertymap = null;
     private final PropertyList propertylist;
+    
+    final transient Logger logger = LoggerFactory.getLogger(AssetIndexer.class);
 
     public AssetIndexer(CfAssetService cfassetService, IndexService indexService, PropertyList propertylist) throws IOException {
         this.cfassetService = cfassetService;
@@ -103,7 +105,7 @@ public class AssetIndexer implements Runnable {
             parser.parse(inputstream, handler, metadata, context);
             //System.out.println(handler.toString());
         } catch (SAXException | TikaException ex) {
-            Logger.getLogger(AssetIndexer.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         }
 
         //getting the list of all meta data elements 
@@ -117,15 +119,12 @@ public class AssetIndexer implements Runnable {
         switch (metamap.get("Content-Type")) {
             case "application/pdf":
                 document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
-                System.out.println("PDF");
                 break;
             case "application/msword":
                 document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
-                System.out.println("DOC");
                 break;    
             case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                 document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
-                System.out.println("DOCX");
                 break;
         }
     
@@ -152,12 +151,9 @@ public class AssetIndexer implements Runnable {
     public void run() {
         try {
             assetList = cfassetService.findByIndexed(false);
-            long startTime = System.currentTimeMillis();
             createIndex();
-            long endTime = System.currentTimeMillis();
-            System.out.println("Index Time: " + (endTime - startTime) + "ms");
         } catch (IOException ex) {
-            Logger.getLogger(AssetIndexer.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         }
     }
 }

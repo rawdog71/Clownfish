@@ -237,7 +237,7 @@ public class TemplateList {
             templateListe = cftemplateService.findAll();
             templateName = "";
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     

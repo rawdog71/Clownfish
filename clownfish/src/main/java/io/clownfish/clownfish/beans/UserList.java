@@ -29,6 +29,8 @@ import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -52,6 +54,8 @@ public class UserList {
     private @Getter @Setter String passwort;
     private @Getter @Setter String passwort_validate;
     private @Getter @Setter boolean newUserButtonDisabled;
+    
+    final transient Logger logger = LoggerFactory.getLogger(SiteTreeBean.class);
 
     @PostConstruct
     public void init() {
@@ -85,7 +89,7 @@ public class UserList {
 
             userlist = cfuserService.findAll();
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     
@@ -100,7 +104,7 @@ public class UserList {
                 userlist = cfuserService.findAll();
             }
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     

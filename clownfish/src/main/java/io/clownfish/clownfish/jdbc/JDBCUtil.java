@@ -18,6 +18,8 @@ package io.clownfish.clownfish.jdbc;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -29,6 +31,8 @@ public class JDBCUtil {
     private final String user;
     private final String password;
     private Connection connection;
+    
+    final transient Logger logger = LoggerFactory.getLogger(JDBCUtil.class);
     
     public JDBCUtil(String className, String url, String user, String password) {
         this.className = className;
@@ -43,17 +47,17 @@ public class JDBCUtil {
         try {
             Class.forName(className);
         } catch (ClassNotFoundException ex) {
-            System.out.println("Unable to load the class: " + className);
+            logger.error(ex.getMessage());
             return null;
         }
         //get the connection
         try {
             connection = DriverManager.getConnection(url, user, password);
         } catch (SQLException ex) {
-            System.out.println("Error getting connection: " + ex.getMessage());
+            logger.error(ex.getMessage());
             return null;
         } catch (Exception ex) {
-            System.out.println("Error: " + ex.getMessage());
+            logger.error(ex.getMessage());
             return null;
         }
         return connection;

@@ -58,8 +58,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.inject.Named;
@@ -76,6 +74,8 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -142,6 +142,8 @@ public class SiteTreeBean implements Serializable {
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
+    
+    final transient Logger logger = LoggerFactory.getLogger(SiteTreeBean.class);
     
     @PostConstruct
     public void init() {
@@ -520,7 +522,7 @@ public class SiteTreeBean implements Serializable {
             cfsiteService.create(newsite);
             loadTree();
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     
@@ -533,7 +535,7 @@ public class SiteTreeBean implements Serializable {
                 FacesMessage message = new FacesMessage("Deleted static site for " + selectedSite.getName());
                 FacesContext.getCurrentInstance().addMessage(null, message);
             } catch (IOException ex) {
-                Logger.getLogger(SiteTreeBean.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage());
             }
         }
     }

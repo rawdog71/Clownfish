@@ -37,6 +37,8 @@ import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -54,7 +56,6 @@ public class DataList implements Serializable {
     @Autowired transient CfClassService cfclassService;
     @Autowired transient CfClasscontentService cfclasscontentService;
     
-    
     private transient @Getter @Setter List<CfList> datacontentlist = null;
     private @Getter @Setter CfList selectedList = null;
     private @Getter @Setter String contentName;
@@ -63,6 +64,8 @@ public class DataList implements Serializable {
     private @Getter @Setter boolean newContentButtonDisabled = false;
     private transient @Getter @Setter List<CfClasscontent> selectedListcontent = null;
     private transient @Getter @Setter List<CfClasscontent> filteredclasscontentlist = null;
+    
+    final transient Logger logger = LoggerFactory.getLogger(DataList.class);
 
     @PostConstruct
     public void init() {
@@ -99,7 +102,7 @@ public class DataList implements Serializable {
             cflistService.create(newlistcontent);
             datacontentlist = cflistService.findAll();
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     

@@ -30,6 +30,8 @@ import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -56,6 +58,8 @@ public class DatasourceList implements Serializable {
     private @Getter @Setter String datasourcePassword;
     private @Getter @Setter String datasourceDriverclass;
     private @Getter @Setter boolean newContentButtonDisabled = false;
+    
+    final transient Logger logger = LoggerFactory.getLogger(DatasourceList.class);
 
     @PostConstruct
     public void init() {
@@ -93,7 +97,7 @@ public class DatasourceList implements Serializable {
             cfdatasourceService.create(newdatasourcecontent);
             datasourcelist = cfdatasourceService.findAll();
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     
@@ -112,7 +116,7 @@ public class DatasourceList implements Serializable {
                 datasourcelist = cfdatasourceService.findAll();
             }
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     

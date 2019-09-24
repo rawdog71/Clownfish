@@ -29,6 +29,8 @@ import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -51,6 +53,8 @@ public class PropertyList {
     private @Getter @Setter String propertykey;
     private @Getter @Setter String propertyvalue;
     private @Getter @Setter boolean deletePropertyButtonDisabled;
+    
+    final transient Logger logger = LoggerFactory.getLogger(KeywordList.class);
 
     public PropertyList() {
         propertymap = new HashMap<>();
@@ -97,7 +101,7 @@ public class PropertyList {
             //propertylist = cfpropertyService.findAll();
             fillPropertyMap();
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     
@@ -111,7 +115,7 @@ public class PropertyList {
                 fillPropertyMap();
             }
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     
