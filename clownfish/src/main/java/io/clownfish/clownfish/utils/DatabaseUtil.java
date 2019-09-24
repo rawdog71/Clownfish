@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
 public class DatabaseUtil {
     @Autowired CfDatasourceService cfdatasourceService;
     
-    final Logger logger = LoggerFactory.getLogger(DatabaseUtil.class);
+    final transient Logger logger = LoggerFactory.getLogger(DatabaseUtil.class);
 
     public DatabaseUtil() {
     }
@@ -166,21 +166,27 @@ public class DatabaseUtil {
                 
                 if ((dtp != null) && (dtp.getGroupbylist().size() > 0)) {
                     sql_outer.append("count(*) AS groupbycount, ");
-                    for (TableField tf : tfs.getTableFieldsList()) {
-                        if (dtp.getGroupbylist().contains(tf.getName())) {
-                            sql_outer.append(tf.getName());
-                            sql_outer.append(", ");
-                            sql_inner.append(tf.getName());
-                            sql_inner.append(", ");
-                        }
-                    }
-                } else {
-                    for (TableField tf : tfs.getTableFieldsList()) {
+                    tfs.getTableFieldsList().stream().filter((tf) -> (dtp.getGroupbylist().contains(tf.getName()))).map((tf) -> {
                         sql_outer.append(tf.getName());
+                        return tf;
+                    }).map((tf) -> {
                         sql_outer.append(", ");
                         sql_inner.append(tf.getName());
+                        return tf;
+                    }).forEach((_item) -> {
                         sql_inner.append(", ");
-                    }
+                    });
+                } else {
+                    tfs.getTableFieldsList().stream().map((tf) -> {
+                        sql_outer.append(tf.getName());
+                        return tf;
+                    }).map((tf) -> {
+                        sql_outer.append(", ");
+                        sql_inner.append(tf.getName());
+                        return tf;
+                    }).forEach((_item) -> {
+                        sql_inner.append(", ");
+                    });
                 }
                 sql_count.append(tablename);
                 sql_outer.delete(sql_outer.length()-2, sql_outer.length());
@@ -223,17 +229,19 @@ public class DatabaseUtil {
                 
                 if ((dtp != null) && (dtp.getGroupbylist().size() > 0)) {
                     sql_outer.append("count(*) AS groupbycount, ");
-                    for (TableField tf : tfs.getTableFieldsList()) {
-                        if (dtp.getGroupbylist().contains(tf.getName())) {
-                            sql_outer.append(tf.getName());
-                            sql_outer.append(", ");
-                        }
-                    }
-                } else {
-                    for (TableField tf : tfs.getTableFieldsList()) {
+                    tfs.getTableFieldsList().stream().filter((tf) -> (dtp.getGroupbylist().contains(tf.getName()))).map((tf) -> {
                         sql_outer.append(tf.getName());
+                        return tf;
+                    }).forEach((_item) -> {
                         sql_outer.append(", ");
-                    }
+                    });
+                } else {
+                    tfs.getTableFieldsList().stream().map((tf) -> {
+                        sql_outer.append(tf.getName());
+                        return tf;
+                    }).forEach((_item) -> {
+                        sql_outer.append(", ");
+                    });
                 }
                 
                 sql_count.append(tablename);
@@ -332,8 +340,10 @@ public class DatabaseUtil {
             
             StringBuilder sql_insert_fields = new StringBuilder();
             StringBuilder sql_insert_values = new StringBuilder();
-            for (DatatableNewValue dtnv : dtnp.getValuelist()) {
+            dtnp.getValuelist().stream().map((dtnv) -> {
                 sql_insert_fields.append(dtnv.getField());
+                return dtnv;
+            }).forEach((dtnv) -> {
                 sql_insert_fields.append(", ");
                 String fieldType = getFieldType(tfs.getTableFieldsList(), dtnv.getField());
                 if (null != fieldType) {
@@ -346,7 +356,7 @@ public class DatabaseUtil {
                     }
                     sql_insert_values.append(", ");
                 }
-            }
+            });
             sql_insert_fields.delete(sql_insert_fields.length()-2, sql_insert_fields.length());
             sql_insert_values.delete(sql_insert_values.length()-2, sql_insert_values.length());
             
@@ -389,9 +399,11 @@ public class DatabaseUtil {
             StringBuilder sql_condition = new StringBuilder();
             if (dtdp != null) {
                 sql_condition.append(" WHERE ");
-                for (DatatableDeleteValue dtdv : dtdp.getValuelist()) {
+                dtdp.getValuelist().stream().map((dtdv) -> {
                     sql_condition.append("(");
                     sql_condition.append(dtdv.getField());
+                    return dtdv;
+                }).forEach((dtdv) -> {
                     String fieldType = getFieldType(tfs.getTableFieldsList(), dtdv.getField());
                     sql_condition.append(" = ");
                     if (null != fieldType) {
@@ -404,7 +416,7 @@ public class DatabaseUtil {
                         }
                         sql_condition.append(") AND ");
                     }
-                }
+                });
                 sql_condition.delete(sql_condition.length()-4, sql_condition.length());
             }
             
@@ -442,8 +454,10 @@ public class DatabaseUtil {
             DatatableUpdateProperties dtup = datatableproperties.get(tablename);
             
             StringBuilder sql_update_values = new StringBuilder();
-            for (DatatableNewValue dtuv : dtup.getValuelist()) {
+            dtup.getValuelist().stream().map((dtuv) -> {
                 sql_update_values.append(dtuv.getField());
+                return dtuv;
+            }).forEach((dtuv) -> {
                 sql_update_values.append(" = ");
                 String fieldType = getFieldType(tfs.getTableFieldsList(), dtuv.getField());
                 if (null != fieldType) {
@@ -456,7 +470,7 @@ public class DatabaseUtil {
                     }
                     sql_update_values.append(", ");
                 }
-            }
+            });
             sql_update_values.delete(sql_update_values.length()-2, sql_update_values.length());
             
             StringBuilder sql_update = new StringBuilder();
@@ -465,7 +479,7 @@ public class DatabaseUtil {
             sql_update.append(" SET ");
             sql_update.append(sql_update_values);
             StringBuilder sql_condition = new StringBuilder();
-            if (dtup != null) {
+            if (null != dtup) {
                 sql_condition = buildCondition(dtup.getConditionlist(), tfs.getTableFieldsList());
             }
             sql_update.append(sql_condition);
@@ -525,7 +539,7 @@ public class DatabaseUtil {
                 if ((default_order.isEmpty()) && (counter == 0)) {
                     default_order = columnName;
                 }
-                TableField tf = null;
+                TableField tf;
                 switch (datatype) {
                     case "1":      // varchar -> String
                         tf = new TableField(columnName, "STRING", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
@@ -586,10 +600,12 @@ public class DatabaseUtil {
         StringBuilder sql_groupby = new StringBuilder();
         if (!groupbylist.isEmpty()) {
             sql_groupby.append(" GROUP BY ");
-            for (String groupby : groupbylist) {
+            groupbylist.stream().map((groupby) -> {
                 sql_groupby.append(groupby);
+                return groupby;
+            }).forEach((_item) -> {
                 sql_groupby.append(", ");
-            }
+            });
             sql_groupby.delete(sql_groupby.length()-2, sql_groupby.length());
         }
         return sql_groupby;

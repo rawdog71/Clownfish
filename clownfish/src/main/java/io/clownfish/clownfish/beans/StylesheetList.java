@@ -70,7 +70,7 @@ public class StylesheetList {
     private @Getter @Setter boolean access;
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     
-    final Logger logger = LoggerFactory.getLogger(StylesheetList.class);
+    final transient Logger logger = LoggerFactory.getLogger(StylesheetList.class);
 
     public StylesheetList() {
     }

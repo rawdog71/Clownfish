@@ -33,7 +33,7 @@ public class RPY_TABLE_READ {
     static SAPConnection sapc = null;
     JCoTable functions_table = null;
 
-    final Logger logger = LoggerFactory.getLogger(RPY_TABLE_READ.class);
+    final transient Logger logger = LoggerFactory.getLogger(RPY_TABLE_READ.class);
     
     public RPY_TABLE_READ(Object sapc) {
         RPY_TABLE_READ.sapc = (SAPConnection) sapc;

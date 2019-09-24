@@ -32,7 +32,7 @@ public class RFC_GROUP_SEARCH {
     static SAPConnection sapc = null;
     JCoTable groups_table = null;
     
-    final Logger logger = LoggerFactory.getLogger(RFC_GROUP_SEARCH.class);
+    final transient Logger logger = LoggerFactory.getLogger(RFC_GROUP_SEARCH.class);
     
     public RFC_GROUP_SEARCH(SAPConnection sapc) {
         RFC_GROUP_SEARCH.sapc = sapc;

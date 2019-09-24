@@ -45,9 +45,9 @@ public class ClownfishUtil {
     public Map getParametermap(List<JsonFormParameter> postmap) {
         Map parametermap = new HashMap<>();
         if (postmap != null) {
-            for (JsonFormParameter jfp : postmap) {
+            postmap.stream().forEach((jfp) -> {
                 parametermap.put(jfp.getName(), jfp.getValue());
-            }
+            });
         }
         return parametermap;
     }
@@ -70,11 +70,11 @@ public class ClownfishUtil {
     */
     public HashMap<String, List> getSaprfcfunctionparamMap(List<CfSitesaprfc> sitesaprfclist, RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface) {
         HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
-        for (CfSitesaprfc knsitesaprfc : sitesaprfclist) {
+        sitesaprfclist.stream().forEach((knsitesaprfc) -> {
             List<RfcFunctionParam> rfcfunctionparamlist = new ArrayList<>();
             rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(knsitesaprfc.getCfSitesaprfcPK().getRfcfunction()));
             saprfcfunctionparamMap.put(knsitesaprfc.getCfSitesaprfcPK().getRfcfunction(), rfcfunctionparamlist);
-        }
+        });
         return saprfcfunctionparamMap;
     }
     
@@ -170,22 +170,22 @@ public class ClownfishUtil {
     public HashMap<String, DatatableNewProperties> getDatatablenewproperties(List<JsonFormParameter> postmap) {  
         HashMap<String, DatatableNewProperties> datatablenewproperties = new HashMap<>();
         if (postmap != null) {
-            for (JsonFormParameter jfp : postmap) {
+            postmap.stream().map((jfp) -> {
                 // Datenbank INSERT Parameter
                 if (jfp.getName().compareToIgnoreCase("db$tablenew") == 0) {
                     DatatableNewProperties dtnp = new DatatableNewProperties();
                     dtnp.setTablename(jfp.getValue());
                     datatablenewproperties.put(jfp.getValue(), dtnp);
                 }
-                if (jfp.getName().startsWith("db$tablenew$")) {
-                    String rest = jfp.getName().substring(12);
-                    String[] values = rest.split("\\$");
-                    DatatableNewValue dtnv = new DatatableNewValue();
-                    dtnv.setField(values[1]);
-                    dtnv.setValue(jfp.getValue());
-                    datatablenewproperties.get(values[0]).getValuelist().add(dtnv);
-                }
-            }
+                return jfp;
+            }).filter((jfp) -> (jfp.getName().startsWith("db$tablenew$"))).forEach((jfp) -> {
+                String rest = jfp.getName().substring(12);
+                String[] values = rest.split("\\$");
+                DatatableNewValue dtnv = new DatatableNewValue();
+                dtnv.setField(values[1]);
+                dtnv.setValue(jfp.getValue());
+                datatablenewproperties.get(values[0]).getValuelist().add(dtnv);
+            });
         }
         return datatablenewproperties;
     }
@@ -197,22 +197,22 @@ public class ClownfishUtil {
     public HashMap<String, DatatableDeleteProperties> getDatatabledeleteproperties(List<JsonFormParameter> postmap) {  
         HashMap<String, DatatableDeleteProperties> datatabledeleteproperties = new HashMap<>();
         if (postmap != null) {
-            for (JsonFormParameter jfp : postmap) {
+            postmap.stream().map((jfp) -> {
                 // Datenbank DELETE Parameter
                 if (jfp.getName().compareToIgnoreCase("db$tabledelete") == 0) {
                     DatatableDeleteProperties dtdp = new DatatableDeleteProperties();
                     dtdp.setTablename(jfp.getValue());
                     datatabledeleteproperties.put(jfp.getValue(), dtdp);
                 }
-                if (jfp.getName().startsWith("db$tabledelete$")) {
-                    String rest = jfp.getName().substring(15);
-                    String[] values = rest.split("\\$");
-                    DatatableDeleteValue dtdv = new DatatableDeleteValue();
-                    dtdv.setField(values[1]);
-                    dtdv.setValue(jfp.getValue());
-                    datatabledeleteproperties.get(values[0]).getValuelist().add(dtdv);
-                }
-            }
+                return jfp;
+            }).filter((jfp) -> (jfp.getName().startsWith("db$tabledelete$"))).forEach((jfp) -> {
+                String rest = jfp.getName().substring(15);
+                String[] values = rest.split("\\$");
+                DatatableDeleteValue dtdv = new DatatableDeleteValue();
+                dtdv.setField(values[1]);
+                dtdv.setValue(jfp.getValue());
+                datatabledeleteproperties.get(values[0]).getValuelist().add(dtdv);
+            });
         }
         return datatabledeleteproperties;
     }
@@ -224,30 +224,30 @@ public class ClownfishUtil {
     public HashMap<String, DatatableUpdateProperties> getDatatableupdateproperties(List<JsonFormParameter> postmap) {  
         HashMap<String, DatatableUpdateProperties> datatableupdateproperties = new HashMap<>();
         if (postmap != null) {
-            for (JsonFormParameter jfp : postmap) {
+            postmap.stream().map((jfp) -> {
                 // Datenbank UPDATE Parameter
                 if (jfp.getName().compareToIgnoreCase("db$tableupdate") == 0) {
                     DatatableUpdateProperties dtup = new DatatableUpdateProperties();
                     dtup.setTablename(jfp.getValue());
                     datatableupdateproperties.put(jfp.getValue(), dtup);
                 }
-                if (jfp.getName().startsWith("db$tableupdate$")) {
-                    String rest = jfp.getName().substring(15);
-                    String[] values = rest.split("\\$");
-                    if (values[1].compareToIgnoreCase("condition") == 0) {
-                        DatatableCondition dtc = new DatatableCondition();
-                        dtc.setField(values[2]);
-                        dtc.setOperand(values[3]);
-                        dtc.setValue(jfp.getValue());
-                        datatableupdateproperties.get(values[0]).getConditionlist().add(dtc);
-                    } else {
-                        DatatableNewValue dtnv = new DatatableNewValue();
-                        dtnv.setField(values[1]);
-                        dtnv.setValue(jfp.getValue());
-                        datatableupdateproperties.get(values[0]).getValuelist().add(dtnv);
-                    }
+                return jfp;
+            }).filter((jfp) -> (jfp.getName().startsWith("db$tableupdate$"))).forEach((jfp) -> {
+                String rest = jfp.getName().substring(15);
+                String[] values = rest.split("\\$");
+                if (values[1].compareToIgnoreCase("condition") == 0) {
+                    DatatableCondition dtc = new DatatableCondition();
+                    dtc.setField(values[2]);
+                    dtc.setOperand(values[3]);
+                    dtc.setValue(jfp.getValue());
+                    datatableupdateproperties.get(values[0]).getConditionlist().add(dtc);
+                } else {
+                    DatatableNewValue dtnv = new DatatableNewValue();
+                    dtnv.setField(values[1]);
+                    dtnv.setValue(jfp.getValue());
+                    datatableupdateproperties.get(values[0]).getValuelist().add(dtnv);
                 }
-            }
+            });
         }
         return datatableupdateproperties;
     }

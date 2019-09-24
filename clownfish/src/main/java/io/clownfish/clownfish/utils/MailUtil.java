@@ -46,10 +46,10 @@ public class MailUtil {
         this.mailpassword = mailpassword;
         this.sendfrom = sendfrom;
         
-        props.put("mail.smtp.host", mailsmtphost);
-        props.put("mail.transport.protocol", mailtransportprotocol);
-        props.put("mail.user", mailuser);
-        props.put("mail.password", mailpassword);
+        props.put("mail_smtp_host", mailsmtphost);
+        props.put("mail_transport_protocol", mailtransportprotocol);
+        props.put("mail_user", mailuser);
+        props.put("mail_password", mailpassword);
     }
 
     public void sendRespondMail(String mailto, String subject, String mailbody) throws Exception {

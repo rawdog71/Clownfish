@@ -58,7 +58,7 @@ public class SAPTemplateBean implements Serializable {
     private static HashMap<String, JCoFunction> jcofunctiontable = null;
     private static HashMap<String, List<RpyTableRead>> rpyMap = null;
     
-    final Logger logger = LoggerFactory.getLogger(SAPTemplateBean.class);
+    final transient Logger logger = LoggerFactory.getLogger(SAPTemplateBean.class);
 
     public SAPTemplateBean() {
         contentmap = new HashMap<>();

@@ -74,7 +74,7 @@ public class AssetList {
     private @Getter @Setter String assetName;
     private @Getter @Setter DualListModel<CfKeyword> keywords;
     
-    final Logger logger = LoggerFactory.getLogger(AssetList.class);
+    final transient Logger logger = LoggerFactory.getLogger(AssetList.class);
 
     @PostConstruct
     public void init() {

@@ -72,7 +72,7 @@ public class TemplateList {
     private @Getter @Setter boolean access;
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
     
-    final Logger logger = LoggerFactory.getLogger(TemplateList.class);
+    final transient Logger logger = LoggerFactory.getLogger(TemplateList.class);
 
     public TemplateList() {
     }

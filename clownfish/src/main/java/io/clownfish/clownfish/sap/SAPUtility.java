@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class SAPUtility {
     static SAPConnection sapc = null;
     
-    final static Logger logger = LoggerFactory.getLogger(SAPUtility.class);
+    final transient static Logger logger = LoggerFactory.getLogger(SAPUtility.class);
     
     public SAPUtility(Object sapc) {
         SAPUtility.sapc = (SAPConnection) sapc;

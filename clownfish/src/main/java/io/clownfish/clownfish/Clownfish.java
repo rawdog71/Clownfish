@@ -204,7 +204,7 @@ public class Clownfish {
     private @Getter @Setter ContentIndexer contentIndexer;
     private @Getter @Setter AssetIndexer assetIndexer;
 
-    final Logger logger = LoggerFactory.getLogger(Clownfish.class);
+    final transient Logger logger = LoggerFactory.getLogger(Clownfish.class);
     private @Getter @Setter String version;
     private @Getter @Setter String static_folder;
     private @Getter @Setter String index_folder;

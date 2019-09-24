@@ -88,7 +88,7 @@ public class QuartzJob implements Job {
     private static SAPConnection sapc = null;
     private RPY_TABLE_READ rpytableread = null;
     private ClownfishConst.ViewModus modus = STAGING;
-    final Logger logger = LoggerFactory.getLogger(QuartzJob.class);
+    final transient Logger logger = LoggerFactory.getLogger(QuartzJob.class);
 
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {

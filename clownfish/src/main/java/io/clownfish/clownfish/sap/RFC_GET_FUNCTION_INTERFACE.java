@@ -33,7 +33,7 @@ public class RFC_GET_FUNCTION_INTERFACE {
     static SAPConnection sapc = null;
     JCoTable functions_table = null;
     
-    final Logger logger = LoggerFactory.getLogger(RFC_GET_FUNCTION_INTERFACE.class);
+    final transient Logger logger = LoggerFactory.getLogger(RFC_GET_FUNCTION_INTERFACE.class);
 
     public RFC_GET_FUNCTION_INTERFACE(Object sapc) {
         RFC_GET_FUNCTION_INTERFACE.sapc = (SAPConnection) sapc;

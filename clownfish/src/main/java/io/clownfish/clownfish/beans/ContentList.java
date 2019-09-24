@@ -43,6 +43,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.primefaces.event.SelectEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -88,6 +90,8 @@ public class ContentList implements Serializable {
     private @Getter @Setter boolean isMediaType;
     private @Getter @Setter boolean valueBooleanRendered = false;
     private @Getter @Setter boolean valueDatetimeRendered = false;
+    
+    final transient Logger logger = LoggerFactory.getLogger(ContentList.class);
 
     public boolean renderSelected(CfAttributcontent attribut) {
         if (selectedAttribut != null) {
@@ -174,8 +178,7 @@ public class ContentList implements Serializable {
             cfclasscontentService.create(newclasscontent);
             
             List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
-            for (CfAttribut attribut : attributlist) {
-                
+            attributlist.stream().forEach((attribut) -> {
                 if (attribut.getAutoincrementor() == true) {
                     List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
                     long max = 0;
@@ -186,7 +189,7 @@ public class ContentList implements Serializable {
                                 max = attributcontent.getContentInteger().longValue();
                             }
                         } catch (javax.persistence.NoResultException ex) {
-                            
+                            logger.error(ex.getMessage());
                         }    
                     }
                     CfAttributcontent newcontent = new CfAttributcontent();
@@ -200,10 +203,10 @@ public class ContentList implements Serializable {
                     newcontent.setClasscontentref(newclasscontent);
                     cfattributcontentService.create(newcontent);
                 }
-            }
+            });
             classcontentlist = cfclasscontentService.findAll();
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
     

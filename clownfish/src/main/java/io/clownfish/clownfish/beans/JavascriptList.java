@@ -70,7 +70,7 @@ public class JavascriptList {
     private @Getter @Setter boolean access;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
     
-    final Logger logger = LoggerFactory.getLogger(JavascriptList.class);
+    final transient Logger logger = LoggerFactory.getLogger(JavascriptList.class);
 
     public JavascriptList() {
     }

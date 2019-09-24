@@ -51,7 +51,7 @@ public class DatabaseTemplateBean implements Serializable {
     private transient @Getter @Setter Map contentmap;
     private List<CfSitedatasource> sitedatasourcelist;
     
-    final Logger logger = LoggerFactory.getLogger(DatabaseTemplateBean.class);
+    final transient Logger logger = LoggerFactory.getLogger(DatabaseTemplateBean.class);
     
     public DatabaseTemplateBean() {
         contentmap = new HashMap<>();

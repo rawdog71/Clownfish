@@ -28,15 +28,15 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.builder.Extension;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.dbentities.CfProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +53,8 @@ public class MarkdownUtil {
     @Autowired private PropertyList proplist;
     private List<Extension> extensionList;
 
+    final transient Logger logger = LoggerFactory.getLogger(MarkdownUtil.class);
+    
     public MarkdownUtil() {
     }
     
@@ -103,7 +105,7 @@ public class MarkdownUtil {
                     break;
             }
         } catch (SecurityException  ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         }
     }
     
