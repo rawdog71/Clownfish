@@ -21,6 +21,7 @@ import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
+import io.clownfish.clownfish.utils.FolderUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,7 +30,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -64,11 +64,10 @@ import org.springframework.context.annotation.Scope;
 public class AssetList {
     @Autowired CfAssetService cfassetService;
     @Autowired CfKeywordService cfkeywordService;
-    @Autowired PropertyList propertylist;
     @Autowired IndexService indexService;
     @Autowired AssetIndexer assetIndexer;
+    @Autowired FolderUtil folderUtil;
     
-    private static Map<String, String> propertymap = null;
     private @Getter @Setter List<CfAsset> assetlist;
     private @Getter @Setter Boolean selectedAsset;
     private @Getter @Setter String assetName;
@@ -85,20 +84,13 @@ public class AssetList {
         List<CfKeyword> keywordTarget = new ArrayList<>();
         
         keywords = new DualListModel<>(keywordSource, keywordTarget);
-        
-        if (propertymap == null) {
-            // read all System Properties of the property table
-            propertymap = propertylist.fillPropertyMap();
-        }
     }
     
     public void handleFileUpload(FileUploadEvent event) throws TikaException, SAXException {
         logger.info("UPLOAD: {0}", event.getFile().getFileName());
-        String mediapath = propertymap.get("folder_media");
-        String indexpath = propertymap.get("folder_index");
         HashMap<String, String> metamap = new HashMap<>();
         try {
-            File result = new File(mediapath + File.separator + event.getFile().getFileName());
+            File result = new File(folderUtil.getMedia_folder() + File.separator + event.getFile().getFileName());
             InputStream inputStream;
             try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
                 byte[] buffer = new byte[64535];
@@ -117,7 +109,7 @@ public class AssetList {
             inputStream.close();
             
             //detecting the file type using detect method
-            String fileextension = FilenameUtils.getExtension(mediapath + File.separator + event.getFile().getFileName());
+            String fileextension = FilenameUtils.getExtension(folderUtil.getMedia_folder() + File.separator + event.getFile().getFileName());
             
             Parser parser = new AutoDetectParser();
             BodyContentHandler handler = new BodyContentHandler(-1);
@@ -145,7 +137,7 @@ public class AssetList {
             assetlist = cfassetService.findAll();
             
             // Index the uploaded assets and merge the Index files
-            if ((null != indexpath) && (!indexpath.isEmpty())) {
+            if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
                 assetIndexer.run();
                 indexService.getWriter().commit();
                 indexService.getWriter().forceMerge(10);

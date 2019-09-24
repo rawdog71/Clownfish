@@ -15,9 +15,9 @@
  */
 package io.clownfish.clownfish.servlets;
 
-import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.utils.PropertyUtil;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
@@ -38,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
 import java.util.zip.GZIPOutputStream;
-import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.imgscalr.AsyncScalr;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,26 +51,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class GetAsset extends HttpServlet {
     @Autowired transient CfAssetService cfassetService;
-    @Autowired transient PropertyList propertylist;
+    @Autowired private PropertyUtil propertyUtil;
     
     private static int width = 0;
     private static int height = 0;
-    
-    private static Map<String, String> propertymap = null;
     
     final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
     
     public GetAsset() {
     }
 
-    @PostConstruct
-    @Override
-    public void init() {
-        if (propertymap == null) {
-            // read all System Properties of the property table
-            propertymap = propertylist.fillPropertyMap();
-        }
-    }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -90,8 +78,6 @@ public class GetAsset extends HttpServlet {
                 width = 0;
                 height = 0;
                 CfAsset asset = null;
-                String mediapath = propertymap.get("folder_media");
-                String cachepath = propertymap.get("folder_cache");
                 String imagefilename = acontext.getRequest().getParameter("file");
                 if (imagefilename != null) {
                     asset = cfassetService.findByName(imagefilename);
@@ -107,7 +93,7 @@ public class GetAsset extends HttpServlet {
                         if (asset.getMimetype().contains("svg")) {
                             acontext.getResponse().setContentType(asset.getMimetype());
                             InputStream in;
-                            File f = new File(mediapath + File.separator + imagefilename);
+                            File f = new File(propertyUtil.getPropertymap().get("folder_media") + File.separator + imagefilename);
                             try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                                 in = new FileInputStream(f);
                                 IOUtils.copy(in, out);
@@ -125,8 +111,8 @@ public class GetAsset extends HttpServlet {
                                 height = Integer.parseInt(paramheight);
                             }
                             String cacheKey = "cache" + imagefilename + "W" + String.valueOf(width) + "H" + String.valueOf(height);
-                            if (new File(cachepath + File.separator + cacheKey).exists()) {
-                                File f = new File(cachepath + File.separator + cacheKey);
+                            if (new File(propertyUtil.getPropertymap().get("folder_cache") + File.separator + cacheKey).exists()) {
+                                File f = new File(propertyUtil.getPropertymap().get("folder_cache") + File.separator + cacheKey);
                                 InputStream in;
                                 try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                                     in = new FileInputStream(f);
@@ -138,13 +124,13 @@ public class GetAsset extends HttpServlet {
                             } else {
                                 acontext.getResponse().setContentType(asset.getMimetype());
                                 InputStream in;
-                                File f = new File(mediapath + File.separator + imagefilename);
+                                File f = new File(propertyUtil.getPropertymap().get("folder_media") + File.separator + imagefilename);
 
                                 if ((width > 0) || (height > 0)) {
                                     BufferedImage result = AsyncScalr.resize(ImageIO.read(f), width).get();
                                     ByteArrayOutputStream os = new ByteArrayOutputStream();
                                     ImageIO.write(result, asset.getFileextension(), os);
-                                    ImageIO.write(result, asset.getFileextension(), new File(cachepath + File.separator + cacheKey));
+                                    ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertymap().get("folder_cache") + File.separator + cacheKey));
 
                                     try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                                         in = new ByteArrayInputStream(os.toByteArray());
@@ -167,7 +153,7 @@ public class GetAsset extends HttpServlet {
                     } else {
                         acontext.getResponse().setContentType(asset.getMimetype());
                         InputStream in;
-                        File f = new File(mediapath + File.separator + imagefilename);
+                        File f = new File(propertyUtil.getPropertymap().get("folder_media") + File.separator + imagefilename);
                         try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                             in = new FileInputStream(f);
                             IOUtils.copy(in, out);

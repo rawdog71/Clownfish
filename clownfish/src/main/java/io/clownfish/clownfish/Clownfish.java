@@ -73,8 +73,10 @@ import io.clownfish.clownfish.templatebeans.NetworkTemplateBean;
 import io.clownfish.clownfish.templatebeans.SAPTemplateBean;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.DatabaseUtil;
+import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.MarkdownUtil;
+import io.clownfish.clownfish.utils.PropertyUtil;
 import io.clownfish.clownfish.utils.QuartzJob;
 import io.clownfish.clownfish.utils.SiteUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
@@ -100,7 +102,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.persistence.NoResultException;
@@ -187,10 +188,10 @@ public class Clownfish {
     private RPY_TABLE_READ rpytableread = null;
     private static SAPConnection sapc = null;
     private boolean sapSupport = false;
-    private @Getter @Setter Map<String, String> propertymap = null;
     private HttpSession userSession;
     private ClownfishConst.ViewModus modus = STAGING;
     private ClownfishUtil clownfishutil;
+    private PropertyUtil propertyUtil;
     private @Getter @Setter String characterEncoding;
     private @Getter @Setter String contentType;
     private @Getter @Setter Locale locale;
@@ -206,16 +207,14 @@ public class Clownfish {
 
     final transient Logger logger = LoggerFactory.getLogger(Clownfish.class);
     private @Getter @Setter String version;
-    private @Getter @Setter String static_folder;
-    private @Getter @Setter String index_folder;
-    private @Getter @Setter String media_folder;
+    @Autowired private FolderUtil folderUtil;
     @Autowired public @Getter @Setter IndexService indexService;
     private int searchlimit;
     
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        String root_site = propertymap.get("site_root");
+        String root_site = propertyUtil.getPropertymap().get("site_root");
         if (null == root_site) {
             root_site = "root";
         }
@@ -225,7 +224,7 @@ public class Clownfish {
     
     @RequestMapping("/error")
     public void error(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        String error_site = propertymap.get("site_error");
+        String error_site = propertyUtil.getPropertymap().get("site_error");
         if (null == error_site) {
             error_site = "error";
         }
@@ -275,6 +274,9 @@ public class Clownfish {
             System.out.println("                            *@@@@@@@@%                                          ");
             System.out.println(ansi().reset());
             
+            // read all System Properties of the property table
+            propertyUtil = new PropertyUtil(propertylist);
+            
             // Set default values
             modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
             // 0 = Development mode (fetch sourcecode from database)
@@ -282,13 +284,9 @@ public class Clownfish {
             contentType = "text/html";
             locale = new Locale("de");
             
-            // read all System Properties of the property table
-            propertymap = propertylist.fillPropertyMap();
             clownfishutil = new ClownfishUtil();
-            static_folder = propertymap.get("folder_static");
-            index_folder = propertymap.get("folder_index");
-            media_folder = propertymap.get("folder_media");
-            String sapSupportProp = propertymap.get("sap_support");
+            
+            String sapSupportProp = propertyUtil.getPropertymap().get("sap_support");
             if (sapSupportProp.compareToIgnoreCase("true") == 0) {
                 sapSupport = true;
             }
@@ -297,9 +295,9 @@ public class Clownfish {
                 rpytableread = new RPY_TABLE_READ(sapc);
             }
             // Override default values with system properties
-            String systemContentType = propertymap.get("response_contenttype");
-            String systemCharacterEncoding = propertymap.get("response_characterencoding");
-            String systemLocale = propertymap.get("response_locale");
+            String systemContentType = propertyUtil.getPropertymap().get("response_contenttype");
+            String systemCharacterEncoding = propertyUtil.getPropertymap().get("response_characterencoding");
+            String systemLocale = propertyUtil.getPropertymap().get("response_locale");
             if (!systemCharacterEncoding.isEmpty()) {
                 characterEncoding = systemCharacterEncoding;
             }
@@ -312,7 +310,7 @@ public class Clownfish {
             this.gzipswitch = new GzipSwitch();
             
             markdownUtil = new MarkdownUtil();
-            if ((null != index_folder) && (!index_folder.isEmpty())) {
+            if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getIndex_folder().isEmpty())) {
                 // Call a parallel thread to index the content in Lucene
                 contentIndexer = new ContentIndexer(cfattributcontentService, indexService);
                 contentIndexer.run();
@@ -361,7 +359,7 @@ public class Clownfish {
     @GetMapping(path = "/search/{query}")
     public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
-            Searcher searcher = new Searcher(index_folder, cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService, cfassetService);
+            Searcher searcher = new Searcher(folderUtil.getIndex_folder(), cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService, cfassetService);
             long startTime = System.currentTimeMillis();
             SearchResult searchresult = searcher.search(query, searchlimit);
             long endTime = System.currentTimeMillis();
@@ -379,7 +377,7 @@ public class Clownfish {
                 searchassetmap.put(asset.getName(), asset);
             });
             
-            String search_site = propertymap.get("site_search");
+            String search_site = propertyUtil.getPropertymap().get("site_search");
             if (null == search_site) {
                 search_site = "searchresult";
             }
@@ -648,7 +646,7 @@ public class Clownfish {
                         // write the output
                         Writer out = new StringWriter();
                         if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
-                            emailbean.init(propertymap);
+                            emailbean.init(propertyUtil.getPropertymap());
                             if (null != fmRoot) {
                                 fmRoot.put("emailBean", emailbean);
                                 fmRoot.put("css", cfstylesheet);
@@ -667,7 +665,7 @@ public class Clownfish {
                                 fmRoot.put("networkBean", networkbean);
 
                                 fmRoot.put("parameter", parametermap);
-                                fmRoot.put("property", propertymap);
+                                fmRoot.put("property", propertyUtil.getPropertymap());
                                 if (!searchmetadata.isEmpty()) {
                                     fmRoot.put("searchmetadata", searchmetadata);
                                 }
@@ -687,7 +685,7 @@ public class Clownfish {
                                 }
                             }
                         } else {                                    // Velocity template
-                            emailbean.init(propertymap);
+                            emailbean.init(propertyUtil.getPropertymap());
                             if (null != velContext) {
                                 velContext.put("emailBean", emailbean);
                                 velContext.put("css", cfstylesheet);
@@ -705,7 +703,7 @@ public class Clownfish {
                                 velContext.put("networkBean", networkbean);
 
                                 velContext.put("parameter", parametermap);
-                                velContext.put("property", propertymap);
+                                velContext.put("property", propertyUtil.getPropertymap());
                                 if (!searchmetadata.isEmpty()) {
                                     velContext.put("searchmetadata", searchmetadata);
                                 }
@@ -755,7 +753,7 @@ public class Clownfish {
     }
     
     private void sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
-        MailUtil mailutil = new MailUtil(propertymap.get("mail_smtp_host"), propertymap.get("mail_transport_protocol"), propertymap.get("mail_user"), propertymap.get("mail_password"), propertymap.get("mail_sendfrom"));
+        MailUtil mailutil = new MailUtil(propertyUtil.getPropertymap().get("mail_smtp_host"), propertyUtil.getPropertymap().get("mail_transport_protocol"), propertyUtil.getPropertymap().get("mail_user"), propertyUtil.getPropertymap().get("mail_password"), propertyUtil.getPropertymap().get("mail_sendfrom"));
         mailutil.sendRespondMail(mailto, subject, mailbody);
     }
 
@@ -796,7 +794,7 @@ public class Clownfish {
         ClownfishResponse cfResponse = new ClownfishResponse();
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(static_folder + File.separator + sitename), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getStatic_folder() + File.separator + sitename), "UTF-8"));
             StringBuilder sb = new StringBuilder(1024);
             String line;
             while ((line = br.readLine()) != null) {
@@ -827,7 +825,7 @@ public class Clownfish {
     private void generateStaticSite(String sitename, String content) {
         FileOutputStream fileStream = null;
         try {
-            fileStream = new FileOutputStream(new File(static_folder + File.separator + sitename));
+            fileStream = new FileOutputStream(new File(folderUtil.getStatic_folder()+ File.separator + sitename));
             OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
             try {
                 writer.write(content);
@@ -849,7 +847,7 @@ public class Clownfish {
     }
     
     private String getPropertySwitch(String property, int propertyfield) {
-        String propertySwitch = propertymap.get(property);
+        String propertySwitch = propertyUtil.getPropertymap().get(property);
         if (propertySwitch == null) {
             propertySwitch = "off";
         }
@@ -866,7 +864,7 @@ public class Clownfish {
     
     private int getPropertyInt(String propertyfield, int defaultvalue) {
         int value;
-        String intvalue = propertymap.get(propertyfield);
+        String intvalue = propertyUtil.getPropertymap().get(propertyfield);
         if (null != intvalue) {
             try {
                 value = Integer.parseInt(intvalue);
