@@ -87,7 +87,7 @@ public class AssetIndexer implements Runnable {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
         }
-        String media_folder = propertymap.get("media_folder");
+        String media_folder = propertymap.get("folder_media");
         Document document = new Document();
         document.add(new StoredField(LuceneConstants.ID, assetcontent.getId()));
         document.add(new StoredField(LuceneConstants.ASSET_NAME, assetcontent.getName()));

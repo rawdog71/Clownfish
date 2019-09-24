@@ -525,7 +525,7 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onDeleteStaticSite(ActionEvent actionEvent) {
-        String static_folder = propertymap.get("static_folder");
+        String static_folder = propertymap.get("folder_static");
         if (null != static_folder) {
             File file = new File(static_folder + File.separator +  selectedSite.getName());
             try {

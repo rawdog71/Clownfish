@@ -215,7 +215,7 @@ public class Clownfish {
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        String root_site = propertymap.get("root_site");
+        String root_site = propertymap.get("site_root");
         if (null == root_site) {
             root_site = "root";
         }
@@ -225,7 +225,7 @@ public class Clownfish {
     
     @RequestMapping("/error")
     public void error(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        String error_site = propertymap.get("error_site");
+        String error_site = propertymap.get("site_error");
         if (null == error_site) {
             error_site = "error";
         }
@@ -285,9 +285,9 @@ public class Clownfish {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
             clownfishutil = new ClownfishUtil();
-            static_folder = propertymap.get("static_folder");
-            index_folder = propertymap.get("index_folder");
-            media_folder = propertymap.get("media_folder");
+            static_folder = propertymap.get("folder_static");
+            index_folder = propertymap.get("folder_index");
+            media_folder = propertymap.get("folder_media");
             String sapSupportProp = propertymap.get("sap_support");
             if (sapSupportProp.compareToIgnoreCase("true") == 0) {
                 sapSupport = true;
@@ -379,7 +379,7 @@ public class Clownfish {
                 searchassetmap.put(asset.getName(), asset);
             });
             
-            String search_site = propertymap.get("search_site");
+            String search_site = propertymap.get("site_search");
             if (null == search_site) {
                 search_site = "searchresult";
             }

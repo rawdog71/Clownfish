@@ -455,7 +455,7 @@ INSERT INTO `cf_attributetype` (`id`, `name`, `searchrelevant`) VALUES
 --
 
 INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
-('cache_folder', '', 1),
+('folder_static', '', 1),
 ('html_compression', 'on', 1),
 ('html_gzip', 'on', 1),
 ('mail_password', '', 1),
@@ -463,16 +463,16 @@ INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
 ('mail_smtp_host', '', 1),
 ('mail_transport_protocol', 'smtp', 1),
 ('mail_user', '', 1),
-('media_folder', '', 1),
-('static_folder', '', 1),
-('index_folder', '', 1),
+('folder_media', '', 1),
+('folder_static', '', 1),
+('folder_index', '', 1),
 ('response_characterencoding', 'UTF-8', 1),
 ('response_contenttype', 'text/html', 1),
 ('response_locale', 'de', 1),
 ('sap_support', 'false', 1),
-('error_site', 'error', 1),
-('root_site', 'root', 1),
-('search_site', 'searchresult', 1);
+('site_error', 'error', 1),
+('site_root', 'root', 1),
+('site_search', 'searchresult', 1);
 
 INSERT INTO `cf_user` (`id`, `vorname`, `nachname`, `email`, `passwort`, `salt`) VALUES
 (1, 'Admin', 'Istrator', 'admin', 'Ll66CGHeusR7eoQPejg8t3CKkpVdpm2IlN/dZif4aGE=', 'zm85UW0YCIyBCxOXTagQQYcezjLzIQ');

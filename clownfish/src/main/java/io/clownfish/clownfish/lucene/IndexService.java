@@ -55,7 +55,7 @@ public class IndexService {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
         }
-        String indexpath = propertymap.get("index_folder");
+        String indexpath = propertymap.get("folder_index");
         try {
             indexDirectory = FSDirectory.open(Paths.get(indexpath));
             
