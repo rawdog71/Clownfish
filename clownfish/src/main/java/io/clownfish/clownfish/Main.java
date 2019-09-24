@@ -67,14 +67,6 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     }
 
     @Bean
-    public ServletRegistrationBean servletRegistrationBean() {
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new FacesServlet(), "*.jsf");
-        servletRegistrationBean.setName("JSF Faces Servlet");
-        servletRegistrationBean.setLoadOnStartup(1);
-        return servletRegistrationBean;
-    }
-
-    @Bean
     public ServletRegistrationBean facesServletRegistratiton() {
         ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new FacesServlet(), new String[]{"*.xhtml"});
         servletRegistrationBean.setName("XHTML Faces Servlet");

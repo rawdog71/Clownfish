@@ -30,7 +30,6 @@ import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
 import io.clownfish.clownfish.datamodels.ClownfishResponse;
-import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfQuartz;
 import io.clownfish.clownfish.dbentities.CfSite;
@@ -47,6 +46,7 @@ import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
 import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
+import io.clownfish.clownfish.lucene.LuceneConstants;
 import io.clownfish.clownfish.lucene.SearchResult;
 import io.clownfish.clownfish.lucene.Searcher;
 import io.clownfish.clownfish.mail.EmailProperties;
@@ -91,7 +91,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -111,12 +110,7 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 import org.fusesource.jansi.AnsiConsole;
@@ -214,8 +208,10 @@ public class Clownfish {
     private @Getter @Setter String version;
     private @Getter @Setter String static_folder;
     private @Getter @Setter String index_folder;
-    public @Getter @Setter String media_folder;
+    private @Getter @Setter String media_folder;
     @Autowired public @Getter @Setter IndexService indexService;
+    private int searchlimit;
+    
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -333,12 +329,13 @@ public class Clownfish {
             searchcontentmap = new HashMap<>();
             searchassetmap = new HashMap<>();
             searchmetadata = new HashMap<>();
+            searchlimit = getPropertyInt("lucene_searchlimit", LuceneConstants.MAX_SEARCH);
             
             scheduler.clear();
             // Fetch the Quartz jobs
             quartzlist.init();
             List<CfQuartz> joblist = quartzlist.getQuartzlist();
-            for (CfQuartz quartz : joblist) {
+            joblist.stream().forEach((quartz) -> {
                 try {
                     if (quartz.isActive()) {
                         JobDetail job = newJob(quartz.getName());
@@ -349,12 +346,12 @@ public class Clownfish {
                         
                     }
                 } catch (SchedulerException ex) {
-                    java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error(ex.getMessage());
                 }
-            }
+            });
             AnsiConsole.systemUninstall();
         } catch (SchedulerException | IOException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         }
     }
 
@@ -366,26 +363,22 @@ public class Clownfish {
         try {
             Searcher searcher = new Searcher(index_folder, cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService, cfassetService);
             long startTime = System.currentTimeMillis();
-            SearchResult searchresult =searcher.search(query);
-            //List<CfSite> sitehits = searcher.search(query);
+            SearchResult searchresult = searcher.search(query, searchlimit);
             long endTime = System.currentTimeMillis();
             
-            System.out.println("Search Time :" + (endTime - startTime));
+            logger.info("Search Time :" + (endTime - startTime));
             searchmetadata.clear();
             searchmetadata.put("cfSearchQuery", query);
             searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
             searchcontentmap.clear();
-            for (CfSite site : searchresult.getFoundSites()) {
+            searchresult.getFoundSites().stream().forEach((site) -> {
                 searchcontentmap.put(site.getName(), site);
-                //System.out.println(site.getName());
-            }
+            });
             searchassetmap.clear();
-            for (CfAsset asset : searchresult.getFoundAssets()) {
+            searchresult.getFoundAssets().stream().forEach((asset) -> {
                 searchassetmap.put(asset.getName(), asset);
-                //System.out.println(asset.getName());
-            }
+            });
             
-            //sitecontentmap.put("search", searchmap);
             String search_site = propertymap.get("search_site");
             if (null == search_site) {
                 search_site = "searchresult";
@@ -393,7 +386,7 @@ public class Clownfish {
             request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, search_site);
             universalGet(search_site, request, response);
         } catch (IOException | ParseException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         }
     }
     
@@ -509,7 +502,9 @@ public class Clownfish {
             } catch (Exception ex) {
                 cfsite = cfsiteService.findByAliaspath(name);
             }
+            // Site has not job flag
             if (!cfsite.isJob()) {
+                // Site has static flag
                 if ((cfsite.isStaticsite()) && (!makestatic)) {
                     cfresponse = getStaticSite(name);
                     if (0 == cfresponse.getErrorcode()) {
@@ -522,12 +517,11 @@ public class Clownfish {
                             generateStaticSite(name, cfStaticResponse.get().getOutput());
                             return makeResponse(name, postmap, false);
                         } catch (InterruptedException | ExecutionException ex) {
-                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.error(ex.getMessage());
                             return makeResponse(name, postmap, false);
                         }
                     }
                 } else {
-                
                     if ((cfsite.getContenttype() != null)) {
                         if (!cfsite.getContenttype().isEmpty()) {
                             this.response.setContentType(cfsite.getContenttype());
@@ -814,7 +808,7 @@ public class Clownfish {
             return cfResponse;
             
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
             cfResponse.setOutput("Static site not found");
             cfResponse.setErrorcode(1);
             
@@ -825,7 +819,7 @@ public class Clownfish {
                     br.close();
                 }
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage());
             }
         }
     }
@@ -833,9 +827,8 @@ public class Clownfish {
     private void generateStaticSite(String sitename, String content) {
         FileOutputStream fileStream = null;
         try {
-            OutputStreamWriter writer = null;
             fileStream = new FileOutputStream(new File(static_folder + File.separator + sitename));
-            writer = new OutputStreamWriter(fileStream, "UTF-8");
+            OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
             try {
                 writer.write(content);
                 writer.close();
@@ -843,14 +836,14 @@ public class Clownfish {
                 throw new RuntimeException("Unable to create the destination file", e);
             }
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         } finally {
             try {
                 if (null != fileStream) {
                     fileStream.close();
                 }
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage());
             }
         }
     }
@@ -869,5 +862,21 @@ public class Clownfish {
                 break;
         }
         return propertySwitch;
+    }
+    
+    private int getPropertyInt(String propertyfield, int defaultvalue) {
+        int value;
+        String intvalue = propertymap.get(propertyfield);
+        if (null != intvalue) {
+            try {
+                value = Integer.parseInt(intvalue);
+            } catch (NumberFormatException nex) {
+                value = defaultvalue;
+                logger.warn(nex.getMessage());
+            }
+        } else {
+            value = defaultvalue;
+        }
+        return value;
     }
 }

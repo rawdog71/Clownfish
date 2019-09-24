@@ -16,11 +16,9 @@
 package io.clownfish.clownfish.lucene;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
-import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
-import io.clownfish.clownfish.dbentities.CfSitelist;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
@@ -77,12 +75,12 @@ public class Searcher {
         foundAssets = new ArrayList<>();
     }
     
-    public SearchResult search(String searchQuery) throws IOException, ParseException {
+    public SearchResult search(String searchQuery, int searchlimit) throws IOException, ParseException {
         SearchResult searchresult = new SearchResult();
         foundSites.clear();
         foundAssets.clear();
         query = queryParser.parse(searchQuery);
-        TopDocs hits = indexSearcher.search(query, LuceneConstants.MAX_SEARCH);
+        TopDocs hits = indexSearcher.search(query, searchlimit);
         for (ScoreDoc scoreDoc : hits.scoreDocs) {
             Document doc = getDocument(scoreDoc);
             String contenttype = doc.get(LuceneConstants.CONTENT_TYPE);
@@ -90,29 +88,20 @@ public class Searcher {
                 long classcontentref = Long.parseLong(doc.get(LuceneConstants.CLASSCONTENT_REF));
                 // Search directly in site
                 List<CfSitecontent> sitelist = sitecontentservice.findByClasscontentref(classcontentref);
-                for (CfSitecontent sitecontent : sitelist) {
-                    CfSite foundsite = siteservice.findById(sitecontent.getCfSitecontentPK().getSiteref());
-                    if ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant())) {
-                        foundSites.add(foundsite);
-                    }
-                }
+                sitelist.stream().map((sitecontent) -> siteservice.findById(sitecontent.getCfSitecontentPK().getSiteref())).filter((foundsite) -> ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant()))).forEach((foundsite) -> {
+                    foundSites.add(foundsite);
+                });
                 // Search in sitelists
                 List<CfListcontent> listcontent = sitelistservice.findByClasscontentref(classcontentref);
-                for (CfListcontent listcontententry : listcontent) {
-                    CfList foundlist = cflistservice.findById(listcontententry.getCfListcontentPK().getListref());
-                    List<CfSitelist> foundsitelist = cfsitelistservice.findByListref(foundlist.getId());
-                    for (CfSitelist sitelistentry : foundsitelist) {
-                        CfSite foundsite = siteservice.findById(sitelistentry.getCfSitelistPK().getSiteref());
-                        if ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant())) {
-                            foundSites.add(foundsite);
-                        }
-                    }
-                }
+                listcontent.stream().map((listcontententry) -> cflistservice.findById(listcontententry.getCfListcontentPK().getListref())).map((foundlist) -> cfsitelistservice.findByListref(foundlist.getId())).forEach((foundsitelist) -> {
+                    foundsitelist.stream().map((sitelistentry) -> siteservice.findById(sitelistentry.getCfSitelistPK().getSiteref())).filter((foundsite) -> ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant()))).forEach((foundsite) -> {
+                        foundSites.add(foundsite);
+                    });
+                });
             } else {
                 String assetid = doc.getField(LuceneConstants.ID).stringValue();
-                //System.out.println("ASSET-ID: " + assetid);
                 CfAsset asset = cfassetservice.findById(Long.parseLong(assetid));
-                if (!foundAssets.contains(assetid)) {
+                if (!foundAssets.contains(asset)) {
                     foundAssets.add(asset);
                 }
             }
