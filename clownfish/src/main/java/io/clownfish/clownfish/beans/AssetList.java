@@ -88,10 +88,11 @@ public class AssetList {
     }
     
     public void handleFileUpload(FileUploadEvent event) throws TikaException, SAXException {
-        logger.info("UPLOAD: {0}", event.getFile().getFileName());
+        String filename = event.getFile().getFileName().toLowerCase();
+        logger.info("UPLOAD: {}", filename);
         HashMap<String, String> metamap = new HashMap<>();
         try {
-            File result = new File(folderUtil.getMedia_folder() + File.separator + event.getFile().getFileName());
+            File result = new File(folderUtil.getMedia_folder() + File.separator + filename);
             InputStream inputStream;
             try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
                 byte[] buffer = new byte[64535];
@@ -110,7 +111,7 @@ public class AssetList {
             inputStream.close();
             
             //detecting the file type using detect method
-            String fileextension = FilenameUtils.getExtension(folderUtil.getMedia_folder() + File.separator + event.getFile().getFileName());
+            String fileextension = FilenameUtils.getExtension(folderUtil.getMedia_folder() + File.separator + filename);
             
             Parser parser = new AutoDetectParser();
             BodyContentHandler handler = new BodyContentHandler(-1);
@@ -129,7 +130,7 @@ public class AssetList {
             }
             
             CfAsset newasset = new CfAsset();
-            newasset.setName(event.getFile().getFileName());
+            newasset.setName(filename);
             newasset.setFileextension(fileextension.toLowerCase());
             newasset.setMimetype(metamap.get("Content-Type"));
             newasset.setImagewidth(metamap.get("Image Width"));
@@ -146,7 +147,7 @@ public class AssetList {
             
             assetName = "";
             
-            FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
+            FacesMessage message = new FacesMessage("Succesful", filename + " is uploaded.");
             FacesContext.getCurrentInstance().addMessage(null, message);
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -155,11 +156,21 @@ public class AssetList {
         } 
     }
     
-    public void onDelete(ActionEvent actionEvent) {
-        logger.info("KLICK DELETE");
+    public void onDelete() {
+        try {
+            assetIndexer.removeDocument(selectedAsset);
+            indexService.getWriter().commit();
+            indexService.getWriter().forceMerge(10);
+            cfassetService.delete(selectedAsset);
+            File file = new File(folderUtil.getMedia_folder() + File.separator + selectedAsset.getName());
+            file.delete();
+            assetlist = cfassetService.findAll();
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
+        }
     }
     
-    public void onDetail(ActionEvent actionEvent) {
+    public void onDetail() {
         logger.info("KLICK DETAIL");
     }
  

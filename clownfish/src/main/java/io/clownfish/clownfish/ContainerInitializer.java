@@ -20,7 +20,6 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.stereotype.Component;
 
-
 /**
  *
  * @author sulzbachr
@@ -34,6 +33,12 @@ public class ContainerInitializer implements WebServerFactoryCustomizer<TomcatSe
     public void customize(TomcatServletWebServerFactory factory) {
         factory.setContextPath("");
         factory.setPort(serverPort);
+        /*
+        factory.addConnectorCustomizers(
+                (connector) -> {
+                    connector.setMaxPostSize(20000000); // 10 MB
+                }
+            );
+        */
     }
-    
 }

@@ -15,9 +15,11 @@
  */
 package io.clownfish.clownfish;
 
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +45,17 @@ public class Initializer implements ServletContextInitializer {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(new org.primefaces.webapp.filter.FileUploadFilter());
         registration.setName("PrimeFaces FileUpload Filter");
+        registration.setAsyncSupported(true);
         return registration;
     }
+    
+    /*
+    @Bean
+    public MultipartConfigElement multipartConfigElement() {
+        MultipartConfigFactory factory = new MultipartConfigFactory();
+        factory.setMaxFileSize("100MB");
+        factory.setMaxRequestSize("100MB");
+        return factory.createMultipartConfig();
+    }
+    */
 }

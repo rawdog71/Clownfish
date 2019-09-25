@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.apache.lucene.index.IndexWriter;
 import javax.inject.Named;
 import org.apache.lucene.document.Document;
@@ -31,6 +32,7 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.Term;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -145,6 +147,16 @@ public class AssetIndexer implements Runnable {
             indexAssetContent(asset);
         }
         return writer.numRamDocs();
+    }
+    
+    public void removeDocument(CfAsset asset) {
+        try {
+            Term term = new Term(LuceneConstants.ID, String.valueOf(asset.getId()));
+            writer.deleteDocuments(term);
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
+        }
+        
     }
 
     @Override

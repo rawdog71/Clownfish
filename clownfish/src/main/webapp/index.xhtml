@@ -633,7 +633,7 @@
                 <p:tab title="Assets" id="assetpanel" rendered="#{loginBean.login}">
                     <h:form enctype="multipart/form-data">
                         <p:fileUpload fileUploadListener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true"
-                                              update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|svg)$/" />
+                                              update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|svg)$/i" />
                         <p:growl id="messages" showDetail="true" />
                     </h:form>
                     
@@ -652,10 +652,10 @@
                                 <h:outputText value="#{media.shortName}" />
                                 <p:panelGrid columns="3" layout="grid" styleClass="ui-noborder" id="media-#{media.id}">
                                     <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
-                                    <p:commandButton process="form" icon="fa fa-trash" actionListener="#{assetList.onDelete}">
+                                    <p:commandButton icon="fa fa-trash" action="#{assetList.onDelete}" update=":form:tabview:assetlist">
                                         <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                     </p:commandButton>
-                                    <p:commandButton process="form" icon="fa fa-info" actionListener="#{assetList.onDetail}">
+                                    <p:commandButton icon="fa fa-info" action="#{assetList.onDetail}">
                                         <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                     </p:commandButton>
                                 </p:panelGrid>

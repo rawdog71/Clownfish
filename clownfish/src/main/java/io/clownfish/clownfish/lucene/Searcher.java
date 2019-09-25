@@ -42,6 +42,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -59,6 +61,8 @@ public class Searcher {
     CfListService cflistservice;
     CfSitelistService cfsitelistservice;
     CfAssetService cfassetservice;
+    
+    final transient Logger logger = LoggerFactory.getLogger(Searcher.class);
 
     public Searcher(String indexDirectoryPath, CfSitecontentService sitecontentservice, CfSiteService siteservice, CfListcontentService sitelistservice, CfListService cflistservice, CfSitelistService cfsitelistservice, CfAssetService cfassetservice) throws IOException {
         this.sitecontentservice = sitecontentservice;
@@ -99,10 +103,14 @@ public class Searcher {
                     });
                 });
             } else {
-                String assetid = doc.getField(LuceneConstants.ID).stringValue();
-                CfAsset asset = cfassetservice.findById(Long.parseLong(assetid));
-                if (!foundAssets.contains(asset)) {
-                    foundAssets.add(asset);
+                try {
+                    String assetid = doc.getField(LuceneConstants.ID).stringValue();
+                    CfAsset asset = cfassetservice.findById(Long.parseLong(assetid));
+                    if (!foundAssets.contains(asset)) {
+                        foundAssets.add(asset);
+                    }
+                } catch (Exception ex) {
+                    logger.warn(ex.getMessage());
                 }
             }
         }

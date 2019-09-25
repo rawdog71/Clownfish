@@ -81,7 +81,6 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
        // Register resource handler for CSS and JS
        registry.addResourceHandler("resources/**").addResourceLocations("/WEB-INF/resources/")
             .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
