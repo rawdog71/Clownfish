@@ -124,13 +124,24 @@ public class SAPTemplateBean implements Serializable {
                 }
                 String tablename = rfcfunctionparam.getTabname();
                 String paramname = rfcfunctionparam.getParameter();
+                String exid = rfcfunctionparam.getExid();
                 
                 ArrayList<HashMap> tablevalues = new ArrayList<>();
                 tablevalues.clear();
                 List<RpyTableRead> rpytablereadlist;
                 switch (paramclass) {
                     case "e":
-                        sapvalues.put(rfcfunctionparam.getParameter(), function.getExportParameterList().getString(rfcfunctionparam.getParameter()));
+                        if (exid.compareToIgnoreCase("h") == 0) {
+                            String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
+                            functions_table = function.getExportParameterList().getTable(paramname.trim());
+                            if (!functions_table.isEmpty()) {
+                                rpytablereadlist = getRpytablereadlist(param.trim());
+                                setTableValues(functions_table, rpytablereadlist, tablevalues);
+                                saptables.put(paramname, tablevalues);
+                            }
+                        } else {
+                            sapvalues.put(rfcfunctionparam.getParameter(), function.getExportParameterList().getString(rfcfunctionparam.getParameter()));
+                        }
                         break;
                     case "t":
                         functions_table = function.getTableParameterList().getTable(paramname);
@@ -207,12 +218,23 @@ public class SAPTemplateBean implements Serializable {
                 }
                 String tablename = rfcfunctionparam.getTabname();
                 String paramname = rfcfunctionparam.getParameter();
+                String exid = rfcfunctionparam.getExid();
                 
                 ArrayList<HashMap> tablevalues = new ArrayList<>();
                 List<RpyTableRead> rpytablereadlist = null;
                 switch (paramclass) {
                     case "e":
-                        sapvalues.put(rfcfunctionparam.getParameter(), function.getExportParameterList().getString(rfcfunctionparam.getParameter()));
+                        if (exid.compareToIgnoreCase("h") == 0) {
+                            String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
+                            functions_table = function.getExportParameterList().getTable(paramname.trim());
+                            if (!functions_table.isEmpty()) {
+                                rpytablereadlist = getRpytablereadlist(param.trim());
+                                setTableValues(functions_table, rpytablereadlist, tablevalues);
+                                saptables.put(paramname, tablevalues);
+                            }
+                        } else {
+                            sapvalues.put(rfcfunctionparam.getParameter(), function.getExportParameterList().getString(rfcfunctionparam.getParameter()));
+                        }
                         break;
                     case "t":
                         functions_table = function.getTableParameterList().getTable(paramname);

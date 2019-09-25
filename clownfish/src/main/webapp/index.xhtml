@@ -637,10 +637,10 @@
                         <p:growl id="messages" showDetail="true" />
                     </h:form>
                     
-                    <p:dataGrid id="assetlist" var="media" value="#{assetList.assetlist}" columns="4" layout="grid"
-                        rows="12" paginator="true"
+                    <p:dataGrid id="assetlist" var="media" value="#{assetList.assetlist}" columns="6" layout="grid"
+                        rows="24" paginator="true"
                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                        rowsPerPageTemplate="6,12,16">
+                        rowsPerPageTemplate="24,48,96,120">
 
                         <f:facet name="header">
                             Medien
@@ -648,9 +648,17 @@
 
                         <p:panel header="#{media.id}" style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
-                                <p:graphicImage url="GetAssetPreview?mediaid=#{media.id}&amp;width=200" width="200" /> 
-                                <h:outputText value="#{media.name}" />
-                                <h:selectBooleanCheckbox value="#{assetList.selectedAsset}" />
+                                <p:graphicImage url="GetAssetPreview?mediaid=#{media.id}&amp;width=200" width="200" alt="#{media.name}" title="#{media.name}" /> 
+                                <h:outputText value="#{media.shortName}" />
+                                <p:panelGrid columns="3" layout="grid" styleClass="ui-noborder" id="media-#{media.id}">
+                                    <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
+                                    <p:commandButton process="form" icon="fa fa-trash" actionListener="#{assetList.onDelete}">
+                                        <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
+                                    </p:commandButton>
+                                    <p:commandButton process="form" icon="fa fa-info" actionListener="#{assetList.onDetail}">
+                                        <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
+                                    </p:commandButton>
+                                </p:panelGrid>
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>

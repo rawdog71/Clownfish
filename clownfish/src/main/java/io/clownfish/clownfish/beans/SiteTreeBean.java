@@ -47,6 +47,7 @@ import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.JavascriptUtil;
 import io.clownfish.clownfish.utils.StylesheetUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
@@ -142,6 +143,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
+    @Autowired private FolderUtil folderUtil;
     
     final transient Logger logger = LoggerFactory.getLogger(SiteTreeBean.class);
     
@@ -527,9 +529,8 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onDeleteStaticSite(ActionEvent actionEvent) {
-        String static_folder = propertymap.get("folder_static");
-        if (null != static_folder) {
-            File file = new File(static_folder + File.separator +  selectedSite.getName());
+        if (null != folderUtil.getStatic_folder()) {
+            File file = new File(folderUtil.getStatic_folder() + File.separator +  selectedSite.getName());
             try {
                 Files.deleteIfExists(file.toPath());
                 FacesMessage message = new FacesMessage("Deleted static site for " + selectedSite.getName());

@@ -69,7 +69,8 @@ public class AssetList {
     @Autowired FolderUtil folderUtil;
     
     private @Getter @Setter List<CfAsset> assetlist;
-    private @Getter @Setter Boolean selectedAsset;
+    private @Getter @Setter CfAsset selectedAsset;
+    private @Getter @Setter Boolean checkedAsset;
     private @Getter @Setter String assetName;
     private @Getter @Setter DualListModel<CfKeyword> keywords;
     
@@ -152,6 +153,14 @@ public class AssetList {
             FacesMessage error = new FacesMessage("The files were not uploaded!");
             FacesContext.getCurrentInstance().addMessage(null, error);
         } 
+    }
+    
+    public void onDelete(ActionEvent actionEvent) {
+        logger.info("KLICK DELETE");
+    }
+    
+    public void onDetail(ActionEvent actionEvent) {
+        logger.info("KLICK DETAIL");
     }
  
     public void onAttach(ActionEvent actionEvent) {

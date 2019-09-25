@@ -31,13 +31,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author sulzbachr
  */
 public class ClownfishUtil {
-    
+    private @Getter @Setter String version;
     /*
         getParametermap
         Übergibt die POST Parameter in eine Hashmap um

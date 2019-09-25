@@ -73,6 +73,7 @@ import io.clownfish.clownfish.templatebeans.NetworkTemplateBean;
 import io.clownfish.clownfish.templatebeans.SAPTemplateBean;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.DatabaseUtil;
+import io.clownfish.clownfish.utils.DefaultUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.MarkdownUtil;
@@ -192,9 +193,7 @@ public class Clownfish {
     private ClownfishConst.ViewModus modus = STAGING;
     private ClownfishUtil clownfishutil;
     private PropertyUtil propertyUtil;
-    private @Getter @Setter String characterEncoding;
-    private @Getter @Setter String contentType;
-    private @Getter @Setter Locale locale;
+    private DefaultUtil defaultUtil;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map metainfomap;
     private @Getter @Setter Map searchcontentmap;
@@ -206,7 +205,7 @@ public class Clownfish {
     private @Getter @Setter AssetIndexer assetIndexer;
 
     final transient Logger logger = LoggerFactory.getLogger(Clownfish.class);
-    private @Getter @Setter String version;
+    
     @Autowired private FolderUtil folderUtil;
     @Autowired public @Getter @Setter IndexService indexService;
     private int searchlimit;
@@ -235,14 +234,15 @@ public class Clownfish {
     @PostConstruct
     @GetMapping(path = "/init") 
     public void init() {
-        version = getClass().getPackage().getImplementationVersion();
-        if (null == version) {
-            version = "DEBUG";
+        clownfishutil = new ClownfishUtil();
+        clownfishutil.setVersion(getClass().getPackage().getImplementationVersion());
+        if (null == clownfishutil.getVersion()) {
+            clownfishutil.setVersion("DEBUG");
         }
         try {
             AnsiConsole.systemInstall();
             System.out.println(ansi().fg(GREEN));
-            System.out.println("INIT CLOWNFISH CMS Version " + version);
+            System.out.println("INIT CLOWNFISH CMS Version " + clownfishutil.getVersion());
             System.out.println(ansi().fg(RED));
             System.out.println("                               ...                                             ");
             System.out.println("                            &@@@@@@@                                           ");
@@ -276,15 +276,14 @@ public class Clownfish {
             
             // read all System Properties of the property table
             propertyUtil = new PropertyUtil(propertylist);
+            defaultUtil = new DefaultUtil();
             
             // Set default values
             modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
             // 0 = Development mode (fetch sourcecode from database)
-            characterEncoding = "UTF-8";
-            contentType = "text/html";
-            locale = new Locale("de");
-            
-            clownfishutil = new ClownfishUtil();
+            defaultUtil.setCharacterEncoding("UTF-8");
+            defaultUtil.setContentType("text/html");
+            defaultUtil.setLocale(new Locale("de"));
             
             String sapSupportProp = propertyUtil.getPropertymap().get("sap_support");
             if (sapSupportProp.compareToIgnoreCase("true") == 0) {
@@ -299,13 +298,13 @@ public class Clownfish {
             String systemCharacterEncoding = propertyUtil.getPropertymap().get("response_characterencoding");
             String systemLocale = propertyUtil.getPropertymap().get("response_locale");
             if (!systemCharacterEncoding.isEmpty()) {
-                characterEncoding = systemCharacterEncoding;
+                defaultUtil.setCharacterEncoding(systemCharacterEncoding);
             }
             if (!systemContentType.isEmpty()) {
-                contentType = systemContentType;
+                defaultUtil.setContentType(systemContentType);
             }
             if (!systemLocale.isEmpty()) {
-                locale = new Locale(systemLocale);
+                defaultUtil.setLocale(new Locale(systemLocale));
             }
             this.gzipswitch = new GzipSwitch();
             
@@ -321,7 +320,7 @@ public class Clownfish {
            
             // Init Site Metadata Map
             metainfomap = new HashMap<>();
-            metainfomap.put("version", version);
+            metainfomap.put("version", clownfishutil.getVersion());
             
             // Init Lucene Search Map
             searchcontentmap = new HashMap<>();
@@ -417,7 +416,7 @@ public class Clownfish {
                 queryParams.add(jfp);
             });
             
-            addHeader(response, version);
+            addHeader(response, clownfishutil.getVersion());
             Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams, false);
             if (cfResponse.get().getErrorcode() == 0) {
                 response.setContentType(this.response.getContentType());
@@ -454,7 +453,7 @@ public class Clownfish {
             List<JsonFormParameter> map;
             map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {
             }.getType());
-            addHeader(response, version);
+            addHeader(response, clownfishutil.getVersion());
             Future<ClownfishResponse> cfResponse = makeResponse(name, map, false);
             if (cfResponse.get().getErrorcode() == 0) {
                 response.setContentType(this.response.getContentType());
@@ -506,8 +505,8 @@ public class Clownfish {
                 if ((cfsite.isStaticsite()) && (!makestatic)) {
                     cfresponse = getStaticSite(name);
                     if (0 == cfresponse.getErrorcode()) {
-                        response.setContentType(contentType);
-                        response.setCharacterEncoding(characterEncoding);
+                        response.setContentType(defaultUtil.getContentType());
+                        response.setCharacterEncoding(defaultUtil.getCharacterEncoding());
                         return new AsyncResult<>(cfresponse);
                     } else {
                         Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, true);

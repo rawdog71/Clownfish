@@ -106,6 +106,15 @@ public class CfAsset implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+    
+    public String getShortName() {
+        String newname = name.substring(0, name.length()-fileextension.length()-1);
+        if (newname.length() > 15) {
+            return newname.substring(0, 15) + "..." + fileextension;
+        } else {
+            return newname + "." + fileextension;
+        }
+    }
 
     public String getFileextension() {
         return fileextension;
