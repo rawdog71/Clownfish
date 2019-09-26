@@ -286,10 +286,7 @@ public class Clownfish {
             defaultUtil.setContentType("text/html");
             defaultUtil.setLocale(new Locale("de"));
             
-            String sapSupportProp = propertyUtil.getPropertymap().get("sap_support");
-            if (sapSupportProp.compareToIgnoreCase("true") == 0) {
-                sapSupport = true;
-            }
+            sapSupport = propertyUtil.getPropertyBoolean("sap_support", sapSupport);
             if (sapSupport) {
                 sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
                 rpytableread = new RPY_TABLE_READ(sapc);
