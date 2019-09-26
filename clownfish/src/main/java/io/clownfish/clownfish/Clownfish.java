@@ -189,6 +189,7 @@ public class Clownfish {
     private RPY_TABLE_READ rpytableread = null;
     private static SAPConnection sapc = null;
     private boolean sapSupport = false;
+    private boolean jobSupport = false;
     private HttpSession userSession;
     private ClownfishConst.ViewModus modus = STAGING;
     private ClownfishUtil clownfishutil;
@@ -326,26 +327,29 @@ public class Clownfish {
             searchcontentmap = new HashMap<>();
             searchassetmap = new HashMap<>();
             searchmetadata = new HashMap<>();
-            searchlimit = getPropertyInt("lucene_searchlimit", LuceneConstants.MAX_SEARCH);
+            searchlimit = propertyUtil.getPropertyInt("lucene_searchlimit", LuceneConstants.MAX_SEARCH);
             
-            scheduler.clear();
-            // Fetch the Quartz jobs
-            quartzlist.init();
-            List<CfQuartz> joblist = quartzlist.getQuartzlist();
-            joblist.stream().forEach((quartz) -> {
-                try {
-                    if (quartz.isActive()) {
-                        JobDetail job = newJob(quartz.getName());
-                        scheduler.scheduleJob(job, trigger(job, quartz.getSchedule()));
-                        System.out.println(ansi().fg(GREEN));
-                        System.out.println("JOB SCHEDULE: " + quartz.getName());
-                        System.out.println(ansi().reset());
-                        
+            jobSupport = propertyUtil.getPropertyBoolean("job_support", jobSupport);
+            if (jobSupport) {
+                scheduler.clear();
+                // Fetch the Quartz jobs
+                quartzlist.init();
+                List<CfQuartz> joblist = quartzlist.getQuartzlist();
+                joblist.stream().forEach((quartz) -> {
+                    try {
+                        if (quartz.isActive()) {
+                            JobDetail job = newJob(quartz.getName());
+                            scheduler.scheduleJob(job, trigger(job, quartz.getSchedule()));
+                            System.out.println(ansi().fg(GREEN));
+                            System.out.println("JOB SCHEDULE: " + quartz.getName());
+                            System.out.println(ansi().reset());
+
+                        }
+                    } catch (SchedulerException ex) {
+                        logger.error(ex.getMessage());
                     }
-                } catch (SchedulerException ex) {
-                    logger.error(ex.getMessage());
-                }
-            });
+                });
+            }
             AnsiConsole.systemUninstall();
         } catch (SchedulerException | IOException ex) {
             logger.error(ex.getMessage());
@@ -573,11 +577,11 @@ public class Clownfish {
                             velTemplate.initDocument();
                         }
 
-                        String gzip = getPropertySwitch("html_gzip", cfsite.getGzip());
+                        String gzip = propertyUtil.getPropertySwitch("html_gzip", cfsite.getGzip());
                         if (gzip.compareToIgnoreCase("on") == 0) {
                             gzipswitch.setGzipon(true);
                         }
-                        String htmlcompression = getPropertySwitch("html_compression", cfsite.getHtmlcompression());
+                        String htmlcompression = propertyUtil.getPropertySwitch("html_compression", cfsite.getHtmlcompression());
                         HtmlCompressor htmlcompressor = new HtmlCompressor();
                         htmlcompressor.setRemoveSurroundingSpaces(HtmlCompressor.ALL_TAGS);
                         htmlcompressor.setPreserveLineBreaks(false);
@@ -843,37 +847,5 @@ public class Clownfish {
                 logger.error(ex.getMessage());
             }
         }
-    }
-    
-    private String getPropertySwitch(String property, int propertyfield) {
-        String propertySwitch = propertyUtil.getPropertymap().get(property);
-        if (propertySwitch == null) {
-            propertySwitch = "off";
-        }
-        switch (propertyfield) {
-            case 1:
-                propertySwitch = "on";
-                break;
-            case 2:
-                propertySwitch = "off";
-                break;
-        }
-        return propertySwitch;
-    }
-    
-    private int getPropertyInt(String propertyfield, int defaultvalue) {
-        int value;
-        String intvalue = propertyUtil.getPropertymap().get(propertyfield);
-        if (null != intvalue) {
-            try {
-                value = Integer.parseInt(intvalue);
-            } catch (NumberFormatException nex) {
-                value = defaultvalue;
-                logger.warn(nex.getMessage());
-            }
-        } else {
-            value = defaultvalue;
-        }
-        return value;
     }
 }
