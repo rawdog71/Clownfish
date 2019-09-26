@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.dbentities.CfProperty;
 import io.clownfish.clownfish.serviceinterface.CfPropertyService;
 import java.util.HashMap;
@@ -53,6 +54,7 @@ public class PropertyList {
     private @Getter @Setter String propertykey;
     private @Getter @Setter String propertyvalue;
     private @Getter @Setter boolean deletePropertyButtonDisabled;
+    private Clownfish clownfish;
     
     final transient Logger logger = LoggerFactory.getLogger(KeywordList.class);
 
@@ -65,6 +67,10 @@ public class PropertyList {
         propertylist = cfpropertyService.findAll();
         newPropertyButtonDisabled = false;
         deletePropertyButtonDisabled = true;
+    }
+    
+    public void setClownfish(Clownfish clownfish) {
+        this.clownfish = clownfish;
     }
     
     public Map<String, String> fillPropertyMap() {
@@ -97,9 +103,8 @@ public class PropertyList {
             newproperty.setValue(propertyvalue);
             newproperty.setNodelete(false);
             cfpropertyService.create(newproperty);
-
-            //propertylist = cfpropertyService.findAll();
             fillPropertyMap();
+            clownfish.init();
         } catch (ConstraintViolationException ex) {
             logger.error(ex.getMessage());
         }
@@ -113,6 +118,7 @@ public class PropertyList {
                 selectedProperty.setValue(propertyvalue);
                 cfpropertyService.edit(selectedProperty);
                 fillPropertyMap();
+                clownfish.init();
             }
         } catch (ConstraintViolationException ex) {
             logger.error(ex.getMessage());
@@ -123,6 +129,7 @@ public class PropertyList {
         if (null != selectedProperty) {
             cfpropertyService.delete(selectedProperty);
             fillPropertyMap();
+            clownfish.init();
         }
     }
     

@@ -235,7 +235,9 @@ public class Clownfish {
     @PostConstruct
     @GetMapping(path = "/init") 
     public void init() {
-        clownfishutil = new ClownfishUtil();
+        if (null == clownfishutil) {
+            clownfishutil = new ClownfishUtil();
+        }
         clownfishutil.setVersion(getClass().getPackage().getImplementationVersion());
         if (null == clownfishutil.getVersion()) {
             clownfishutil.setVersion("DEBUG");
@@ -276,8 +278,13 @@ public class Clownfish {
             System.out.println(ansi().reset());
             
             // read all System Properties of the property table
-            propertyUtil = new PropertyUtil(propertylist);
-            defaultUtil = new DefaultUtil();
+            if (null == propertyUtil) {
+                propertyUtil = new PropertyUtil(propertylist);
+            }
+            propertylist.setClownfish(this);
+            if (null == defaultUtil) {
+                defaultUtil = new DefaultUtil();
+            }
             
             // Set default values
             modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
@@ -288,8 +295,10 @@ public class Clownfish {
             
             sapSupport = propertyUtil.getPropertyBoolean("sap_support", sapSupport);
             if (sapSupport) {
-                sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
-                rpytableread = new RPY_TABLE_READ(sapc);
+                if (null == sapc) {
+                    sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
+                    rpytableread = new RPY_TABLE_READ(sapc);
+                }
             }
             // Override default values with system properties
             String systemContentType = propertyUtil.getPropertymap().get("response_contenttype");
@@ -304,26 +313,42 @@ public class Clownfish {
             if (!systemLocale.isEmpty()) {
                 defaultUtil.setLocale(new Locale(systemLocale));
             }
-            this.gzipswitch = new GzipSwitch();
+            if (null == gzipswitch) {
+                gzipswitch = new GzipSwitch();
+            }
             
-            markdownUtil = new MarkdownUtil();
+            if (null == markdownUtil) {
+                markdownUtil = new MarkdownUtil();
+            }
             if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getIndex_folder().isEmpty())) {
                 // Call a parallel thread to index the content in Lucene
-                contentIndexer = new ContentIndexer(cfattributcontentService, indexService);
+                if (null == contentIndexer) {
+                    contentIndexer = new ContentIndexer(cfattributcontentService, indexService);
+                }
                 contentIndexer.run();
-                assetIndexer = new AssetIndexer(cfassetService, indexService, propertylist);
+                if (null == assetIndexer) {
+                    assetIndexer = new AssetIndexer(cfassetService, indexService, propertylist);
+                }
                 assetIndexer.run();
                 indexService.getWriter().commit();
             }
            
             // Init Site Metadata Map
-            metainfomap = new HashMap<>();
+            if (null == metainfomap) {
+                metainfomap = new HashMap<>();
+            }
             metainfomap.put("version", clownfishutil.getVersion());
             
             // Init Lucene Search Map
-            searchcontentmap = new HashMap<>();
-            searchassetmap = new HashMap<>();
-            searchmetadata = new HashMap<>();
+            if (null == searchcontentmap) {
+                searchcontentmap = new HashMap<>();
+            }
+            if (null == searchassetmap) {
+                searchassetmap = new HashMap<>();
+            }
+            if (null == searchmetadata) {
+                searchmetadata = new HashMap<>();
+            }
             searchlimit = propertyUtil.getPropertyInt("lucene_searchlimit", LuceneConstants.MAX_SEARCH);
             
             jobSupport = propertyUtil.getPropertyBoolean("job_support", jobSupport);
