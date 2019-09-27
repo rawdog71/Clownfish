@@ -214,7 +214,7 @@ public class Clownfish {
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        String root_site = propertyUtil.getPropertymap().get("site_root");
+        String root_site = propertyUtil.getPropertyValue("site_root");
         if (null == root_site) {
             root_site = "root";
         }
@@ -224,7 +224,7 @@ public class Clownfish {
     
     @RequestMapping("/error")
     public void error(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        String error_site = propertyUtil.getPropertymap().get("site_error");
+        String error_site = propertyUtil.getPropertyValue("site_error");
         if (null == error_site) {
             error_site = "error";
         }
@@ -301,9 +301,9 @@ public class Clownfish {
                 }
             }
             // Override default values with system properties
-            String systemContentType = propertyUtil.getPropertymap().get("response_contenttype");
-            String systemCharacterEncoding = propertyUtil.getPropertymap().get("response_characterencoding");
-            String systemLocale = propertyUtil.getPropertymap().get("response_locale");
+            String systemContentType = propertyUtil.getPropertyValue("response_contenttype");
+            String systemCharacterEncoding = propertyUtil.getPropertyValue("response_characterencoding");
+            String systemLocale = propertyUtil.getPropertyValue("response_locale");
             if (!systemCharacterEncoding.isEmpty()) {
                 defaultUtil.setCharacterEncoding(systemCharacterEncoding);
             }
@@ -402,7 +402,7 @@ public class Clownfish {
                 searchassetmap.put(asset.getName(), asset);
             });
             
-            String search_site = propertyUtil.getPropertymap().get("site_search");
+            String search_site = propertyUtil.getPropertyValue("site_search");
             if (null == search_site) {
                 search_site = "searchresult";
             }
@@ -778,7 +778,7 @@ public class Clownfish {
     }
     
     private void sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
-        MailUtil mailutil = new MailUtil(propertyUtil.getPropertymap().get("mail_smtp_host"), propertyUtil.getPropertymap().get("mail_transport_protocol"), propertyUtil.getPropertymap().get("mail_user"), propertyUtil.getPropertymap().get("mail_password"), propertyUtil.getPropertymap().get("mail_sendfrom"));
+        MailUtil mailutil = new MailUtil(propertyUtil.getPropertyValue("mail_smtp_host"), propertyUtil.getPropertyValue("mail_transport_protocol"), propertyUtil.getPropertyValue("mail_user"), propertyUtil.getPropertyValue("mail_password"), propertyUtil.getPropertyValue("mail_sendfrom"));
         mailutil.sendRespondMail(mailto, subject, mailbody);
     }
 

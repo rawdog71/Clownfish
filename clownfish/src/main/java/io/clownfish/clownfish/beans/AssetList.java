@@ -163,8 +163,11 @@ public class AssetList {
             indexService.getWriter().forceMerge(10);
             cfassetService.delete(selectedAsset);
             File file = new File(folderUtil.getMedia_folder() + File.separator + selectedAsset.getName());
-            file.delete();
             assetlist = cfassetService.findAll();
+            if (file.delete()) {
+                FacesMessage message = new FacesMessage("Succesful", selectedAsset.getName() + " has been deleted.");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
         } catch (IOException ex) {
             logger.error(ex.getMessage());
         }

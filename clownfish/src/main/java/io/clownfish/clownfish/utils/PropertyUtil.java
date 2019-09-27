@@ -34,6 +34,10 @@ public class PropertyUtil {
     private @Getter @Setter Map<String, String> propertymap = null;
     
     final transient Logger logger = LoggerFactory.getLogger(PropertyUtil.class);
+    
+    public String getPropertyValue(String key) {
+        return propertymap.get(key);
+    }
    
     public PropertyUtil(PropertyList propertylist) {
         if (propertymap == null) {

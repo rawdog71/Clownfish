@@ -93,7 +93,7 @@ public class GetAsset extends HttpServlet {
                         if (asset.getMimetype().contains("svg")) {
                             acontext.getResponse().setContentType(asset.getMimetype());
                             InputStream in;
-                            File f = new File(propertyUtil.getPropertymap().get("folder_media") + File.separator + imagefilename);
+                            File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
                             try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                                 in = new FileInputStream(f);
                                 IOUtils.copy(in, out);
@@ -111,8 +111,8 @@ public class GetAsset extends HttpServlet {
                                 height = Integer.parseInt(paramheight);
                             }
                             String cacheKey = "cache" + imagefilename + "W" + String.valueOf(width) + "H" + String.valueOf(height);
-                            if (new File(propertyUtil.getPropertymap().get("folder_cache") + File.separator + cacheKey).exists()) {
-                                File f = new File(propertyUtil.getPropertymap().get("folder_cache") + File.separator + cacheKey);
+                            if (new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey).exists()) {
+                                File f = new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey);
                                 InputStream in;
                                 try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                                     in = new FileInputStream(f);
@@ -124,13 +124,13 @@ public class GetAsset extends HttpServlet {
                             } else {
                                 acontext.getResponse().setContentType(asset.getMimetype());
                                 InputStream in;
-                                File f = new File(propertyUtil.getPropertymap().get("folder_media") + File.separator + imagefilename);
+                                File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
 
                                 if ((width > 0) || (height > 0)) {
                                     BufferedImage result = AsyncScalr.resize(ImageIO.read(f), width).get();
                                     ByteArrayOutputStream os = new ByteArrayOutputStream();
                                     ImageIO.write(result, asset.getFileextension(), os);
-                                    ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertymap().get("folder_cache") + File.separator + cacheKey));
+                                    ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey));
 
                                     try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                                         in = new ByteArrayInputStream(os.toByteArray());
@@ -153,7 +153,7 @@ public class GetAsset extends HttpServlet {
                     } else {
                         acontext.getResponse().setContentType(asset.getMimetype());
                         InputStream in;
-                        File f = new File(propertyUtil.getPropertymap().get("folder_media") + File.separator + imagefilename);
+                        File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
                         try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                             in = new FileInputStream(f);
                             IOUtils.copy(in, out);

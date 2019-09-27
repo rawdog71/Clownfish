@@ -535,6 +535,12 @@
                             
                             <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
                             <p:commandButton id="editattribut" process="form" value="Edit" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" />
+                            <p:focus for="attributvalueString" />
+                            <p:focus for="attributvalueInt" />
+                            <p:focus for="attributvalueReal" />
+                            <p:focus for="attributvalueHtmlText" />
+                            <p:focus for="attributvalueText" />
+                            <p:focus for="attributvalueMarkdown" />
                         </p:column>
                     </p:dataTable>
                 </p:tab>

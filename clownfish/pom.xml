@@ -278,7 +278,7 @@
             <artifactId>lucene-queryparser</artifactId>
             <version>7.4.0</version>
             <type>jar</type>
-        </dependency>        
+        </dependency>
     </dependencies>
     <build>
         <plugins>

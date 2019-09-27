@@ -38,10 +38,10 @@ public class FolderUtil {
 
     @PostConstruct
     public void init() {
-        setCache_folder(propertyUtil.getPropertymap().get("folder_cache"));
-        setStatic_folder(propertyUtil.getPropertymap().get("folder_static"));
-        setIndex_folder(propertyUtil.getPropertymap().get("folder_index"));
-        setMedia_folder(propertyUtil.getPropertymap().get("folder_media"));
+        setCache_folder(propertyUtil.getPropertyValue("folder_cache"));
+        setStatic_folder(propertyUtil.getPropertyValue("folder_static"));
+        setIndex_folder(propertyUtil.getPropertyValue("folder_index"));
+        setMedia_folder(propertyUtil.getPropertyValue("folder_media"));
     }
     
     public FolderUtil() {
