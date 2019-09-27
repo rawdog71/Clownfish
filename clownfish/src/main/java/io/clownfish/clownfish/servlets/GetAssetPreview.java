@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
 import java.util.zip.GZIPOutputStream;
-import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 import org.apache.commons.io.IOUtils;
 import org.imgscalr.AsyncScalr;
@@ -55,7 +54,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GetAssetPreview extends HttpServlet {
     @Autowired transient CfAssetService cfassetService;
-    @Autowired private PropertyUtil propertyUtil;
+    @Autowired transient PropertyUtil propertyUtil;
     
     private static int width = 0;
     private static int height = 0;

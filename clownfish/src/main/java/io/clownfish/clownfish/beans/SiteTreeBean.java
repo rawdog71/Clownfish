@@ -143,7 +143,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
-    @Autowired private FolderUtil folderUtil;
+    @Autowired transient FolderUtil folderUtil;
     
     final transient Logger logger = LoggerFactory.getLogger(SiteTreeBean.class);
     

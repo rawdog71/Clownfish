@@ -51,7 +51,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GetAsset extends HttpServlet {
     @Autowired transient CfAssetService cfassetService;
-    @Autowired private PropertyUtil propertyUtil;
+    @Autowired transient PropertyUtil propertyUtil;
     
     private static int width = 0;
     private static int height = 0;
