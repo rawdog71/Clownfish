@@ -285,9 +285,9 @@ public class Clownfish {
             // Set default values
             modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
             // 0 = Development mode (fetch sourcecode from database)
-            defaultUtil.setCharacterEncoding("UTF-8");
-            defaultUtil.setContentType("text/html");
-            defaultUtil.setLocale(new Locale("de"));
+            defaultUtil.setCharacterEncoding("UTF-8")
+                       .setContentType("text/html")
+                       .setLocale(new Locale("de"));
             
             sapSupport = propertyUtil.getPropertyBoolean("sap_support", sapSupport);
             if (sapSupport) {
@@ -448,8 +448,7 @@ public class Clownfish {
                 response.setCharacterEncoding("UTF-8");
             }
             PrintWriter outwriter = response.getWriter();
-            String content = cfResponse.get().getOutput();
-            outwriter.println(content);
+            outwriter.println(cfResponse.get().getOutput());
         } catch (IOException | InterruptedException | ExecutionException ex) {
             logger.error(ex.getMessage());
         }
@@ -473,8 +472,7 @@ public class Clownfish {
 
             Gson gson = new Gson();
             List<JsonFormParameter> map;
-            map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {
-            }.getType());
+            map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
             addHeader(response, clownfishutil.getVersion());
             Future<ClownfishResponse> cfResponse = makeResponse(name, map, false);
             if (cfResponse.get().getErrorcode() == 0) {

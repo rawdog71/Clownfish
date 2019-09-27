@@ -18,11 +18,13 @@ package io.clownfish.clownfish.utils;
 import java.util.Locale;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  *
  * @author sulzbachr
  */
+@Accessors(chain = true)
 public class DefaultUtil {
     private @Getter @Setter String characterEncoding;
     private @Getter @Setter String contentType;
