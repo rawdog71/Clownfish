@@ -111,7 +111,7 @@ public class TemplateUtil implements Serializable {
                 if (DEVELOPMENT == modus) {
                     content = content.replace(lastmatch, cftemplate.getContent());
                 } else {
-                    long currentTemplateVersion = 0;
+                    long currentTemplateVersion;
                     try {
                         currentTemplateVersion = (long) cftemplateversionService.findMaxVersion(cftemplate.getId());
                     } catch (NullPointerException ex) {

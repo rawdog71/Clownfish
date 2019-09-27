@@ -176,12 +176,12 @@ public class Clownfish {
     @Autowired EmailTemplateBean emailbean;
     @Autowired SAPTemplateBean sapbean;
     @Autowired NetworkTemplateBean networkbean;
+    @Autowired @Getter @Setter IndexService indexService;
     @Autowired private Scheduler scheduler;
+    @Autowired private FolderUtil folderUtil;
 
-    @Context
-    protected HttpServletResponse response;
-    @Context
-    protected HttpServletRequest request;
+    @Context protected HttpServletResponse response;
+    @Context protected HttpServletRequest request;
 
     private GzipSwitch gzipswitch;
     private freemarker.template.Configuration freemarkerCfg;
@@ -204,13 +204,9 @@ public class Clownfish {
     private @Getter @Setter MarkdownUtil markdownUtil;
     private @Getter @Setter ContentIndexer contentIndexer;
     private @Getter @Setter AssetIndexer assetIndexer;
+    private @Getter @Setter int searchlimit;
 
     final transient Logger logger = LoggerFactory.getLogger(Clownfish.class);
-    
-    @Autowired private FolderUtil folderUtil;
-    @Autowired public @Getter @Setter IndexService indexService;
-    private int searchlimit;
-    
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -829,7 +825,6 @@ public class Clownfish {
             cfResponse.setErrorcode(0);
             br.close();
             return cfResponse;
-            
         } catch (IOException ex) {
             logger.error(ex.getMessage());
             cfResponse.setOutput("Static site not found");

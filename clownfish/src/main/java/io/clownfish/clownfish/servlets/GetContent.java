@@ -214,6 +214,8 @@ public class GetContent extends HttpServlet {
                 return new AttributDef(attributcontent.getContentReal().toString(), "real");
             case "htmltext":
                 return new AttributDef(attributcontent.getContentText(), "htmltext");
+            case "markdown":
+                return new AttributDef(attributcontent.getContentText(), "markdown");    
             case "datetime":
                 return new AttributDef(attributcontent.getContentDate().toString(), "datetime");
             case "media":

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 rawdog.
+ * Copyright 2019 sulzbachr.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import org.apache.lucene.index.IndexWriter;
 import javax.inject.Named;
 import org.apache.lucene.document.Document;
@@ -47,7 +46,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author rawdog
+ * @author sulzbachr
  */
 @Named("assetindexerservice")
 @Scope("singleton")

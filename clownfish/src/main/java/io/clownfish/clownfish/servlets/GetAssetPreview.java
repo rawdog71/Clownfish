@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.servlets;
 
-import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.utils.PropertyUtil;
@@ -27,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;

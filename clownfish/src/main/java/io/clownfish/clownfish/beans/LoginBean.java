@@ -71,16 +71,16 @@ public class LoginBean implements Serializable {
             String secure = PasswordUtil.generateSecurePassword(passwort, salt);
             if (secure.compareTo(cfuser.getPasswort()) == 0) {
                 login = true;
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Login", "Willkommen " + cfuser.getVorname());
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Login", "Welcome " + cfuser.getVorname());
                 FacesContext.getCurrentInstance().addMessage(null, message);
             } else {
                 login = false;
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fehler", "Falsches Passwort oder falsche E-Mail");
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Wrong passworw or wrong e-mail");
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }
         } catch (NoResultException ex) {
             login = false;
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fehler", "Falsches Passwort oder falsche E-Mail");
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Wrong passworw or wrong e-mail");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }          
     }
