@@ -33,13 +33,16 @@ import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  *
  * @author sulzbachr
  */
+@Accessors(chain = true)
 public class ClownfishUtil {
     private @Getter @Setter String version;
+    private @Getter @Setter String versionMojarra;
     /*
         getParametermap
         Übergibt die POST Parameter in eine Hashmap um

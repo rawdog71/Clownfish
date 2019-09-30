@@ -72,7 +72,6 @@
             <artifactId>javax.el</artifactId>
         </dependency>
 
-
         <!-- JSF + PRIMEFACES -->
         <dependency>
             <groupId>com.sun.faces</groupId>

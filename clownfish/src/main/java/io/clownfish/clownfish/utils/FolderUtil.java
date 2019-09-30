@@ -18,6 +18,7 @@ package io.clownfish.clownfish.utils;
 import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
  */
 @Scope("singleton")
 @Component
+@Accessors(chain = true)
 public class FolderUtil {
     private @Getter @Setter String cache_folder;
     private @Getter @Setter String static_folder;

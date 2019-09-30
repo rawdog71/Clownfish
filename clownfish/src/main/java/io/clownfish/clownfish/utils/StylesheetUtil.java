@@ -33,6 +33,7 @@ import java.util.zip.DataFormatException;
 import javax.faces.bean.ViewScoped;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Component;
  */
 @ViewScoped
 @Component
+@Accessors(chain = true)
 public class StylesheetUtil implements Serializable {
     @Autowired transient CfStylesheetService cfstylesheetService;
     @Autowired transient CfStylesheetversionService cfstylesheetversionService;

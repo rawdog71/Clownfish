@@ -51,11 +51,11 @@ import org.springframework.stereotype.Component;
 @WebServlet(name = "GetContent", urlPatterns = {"/GetContent"})
 @Component
 public class GetContent extends HttpServlet {
-    @Autowired static transient CfClassService cfclassService;
-    @Autowired static transient CfClasscontentService cfclasscontentService;
-    @Autowired static transient CfAttributService cfattributService;
-    @Autowired static transient CfAttributcontentService cfattributcontentService;
-    @Autowired static transient CfAttributetypeService cfattributetypeService;
+    @Autowired transient CfClassService cfclassService;
+    @Autowired transient CfClasscontentService cfclasscontentService;
+    @Autowired transient CfAttributService cfattributService;
+    @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired transient CfAttributetypeService cfattributetypeService;
     
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter HashMap<String, String> searchmap;

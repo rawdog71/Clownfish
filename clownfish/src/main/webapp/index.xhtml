@@ -660,17 +660,21 @@
                                     <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
                                     <p:commandButton icon="fa fa-trash" action="#{assetList.onDelete}" update=":form:tabview:assetlist">
                                         <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
+                                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
-                                    <p:commandButton icon="fa fa-info" action="#{assetList.onDetail}">
+                                    
+                                    <p:commandButton icon="fa fa-info" action="#{assetList.onDetail}" onclick="PF('assetInfo').show();">
                                         <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                     </p:commandButton>
                                 </p:panelGrid>
                             </h:panelGrid>
                         </p:panel>
+                        
+                        <p:confirmDialog global="true">
+                            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-times" />
+                        </p:confirmDialog>
                     </p:dataGrid>
-                    
-                    <p:pickList id="assetkeywordpicklist" value="#{assetList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" />
-                    <p:commandButton id="attachassetkeyword" process="form" value="Attach" actionListener="#{assetList.onAttach}" />
                 </p:tab>
                 
                 <p:tab title="Keywords" id="keywordpanel" rendered="#{loginBean.login}">
@@ -688,7 +692,7 @@
                         <p:outputLabel for="keywords" value="Keywords: " />
                         <p:chips id="keywords" value="#{keywordList.items}" />
                         
-                        <p:commandButton id="newkeyword" process="form" value="New" actionListener="#{keywordList.onCreate}" update=":form:tabview:keywordlist :form:tabview:assetkeywordpicklist" />
+                        <p:commandButton id="newkeyword" process="form" value="New" actionListener="#{keywordList.onCreate}" update=":form:tabview:keywordlist :form:assetkeywordpicklist" />
                     </h:panelGrid>
                 </p:tab>
                 
@@ -766,6 +770,12 @@
                     </p:panelGrid>
                 </p:tab>
             </p:tabView>
+            
+            <p:dialog header="Asset info" id="assetInfoDlg" widgetVar="assetInfo" modal="true" minHeight="40">
+                
+                <p:pickList id="assetkeywordpicklist" value="#{assetList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" />
+                <p:commandButton id="attachassetkeyword" value="Attach" actionListener="#{assetList.onAttach}" />
+            </p:dialog>
         </h:form>
     </h:body>
 </html>

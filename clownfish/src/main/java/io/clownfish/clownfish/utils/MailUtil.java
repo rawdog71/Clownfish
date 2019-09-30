@@ -23,11 +23,13 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  *
  * @author sulzbachr
  */
+@Accessors(chain = true)
 public class MailUtil {
     private @Getter @Setter String mailsmtphost;
     private @Getter @Setter String mailtransportprotocol;

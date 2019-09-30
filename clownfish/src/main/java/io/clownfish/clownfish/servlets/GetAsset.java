@@ -104,11 +104,19 @@ public class GetAsset extends HttpServlet {
                         } else {
                             String paramwidth = acontext.getRequest().getParameter("width");
                             if (paramwidth != null) {
-                                width = Integer.parseInt(paramwidth);
+                                try {
+                                    width = Integer.parseInt(paramwidth);
+                                } catch (NumberFormatException nfe) {
+                                    width = 100;
+                                }
                             }
                             String paramheight = acontext.getRequest().getParameter("height");
                             if (paramheight != null) {
-                                height = Integer.parseInt(paramheight);
+                                try {
+                                    height = Integer.parseInt(paramheight);
+                                } catch (NumberFormatException nfe) {
+                                    height = 100;
+                                }
                             }
                             String cacheKey = "cache" + imagefilename + "W" + String.valueOf(width) + "H" + String.valueOf(height);
                             if (new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey).exists()) {

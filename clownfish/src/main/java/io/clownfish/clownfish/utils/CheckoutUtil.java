@@ -19,6 +19,7 @@ import io.clownfish.clownfish.beans.LoginBean;
 import java.math.BigInteger;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Component
+@Accessors(chain = true)
 public class CheckoutUtil {
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;

@@ -18,6 +18,8 @@ package io.clownfish.clownfish.templatebeans;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Component;
 @Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class NetworkTemplateBean implements Serializable {
+    final transient Logger logger = LoggerFactory.getLogger(SAPTemplateBean.class);
 
     public NetworkTemplateBean() {
     }
@@ -39,7 +42,7 @@ public class NetworkTemplateBean implements Serializable {
             boolean reachable = address.isReachable(1000);
             return reachable;
         } catch (IOException e){
-            e.printStackTrace();
+            logger.warn(e.getMessage());
             return false;
         }
     }

@@ -38,6 +38,7 @@ import javax.faces.bean.ViewScoped;
 import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +48,7 @@ import org.springframework.stereotype.Component;
  */
 @ViewScoped
 @Component
+@Accessors(chain = true)
 public class TemplateUtil implements Serializable {
     @Autowired transient CfTemplateService cftemplateService;
     @Autowired transient CfTemplateversionService cftemplateversionService;

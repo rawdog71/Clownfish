@@ -105,6 +105,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
+import javax.faces.context.FacesContext;
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -231,17 +232,19 @@ public class Clownfish {
     @PostConstruct
     @GetMapping(path = "/init") 
     public void init() {
+        Package p = FacesContext.class.getPackage();
+        
         if (null == clownfishutil) {
             clownfishutil = new ClownfishUtil();
         }
-        clownfishutil.setVersion(getClass().getPackage().getImplementationVersion());
+        clownfishutil.setVersion(getClass().getPackage().getImplementationVersion()).setVersionMojarra(p.getImplementationVersion());
         if (null == clownfishutil.getVersion()) {
             clownfishutil.setVersion("DEBUG");
         }
         try {
             AnsiConsole.systemInstall();
             System.out.println(ansi().fg(GREEN));
-            System.out.println("INIT CLOWNFISH CMS Version " + clownfishutil.getVersion());
+            System.out.println("INIT CLOWNFISH CMS Version " + clownfishutil.getVersion() + " on Mojarra " + clownfishutil.getVersionMojarra());
             System.out.println(ansi().fg(RED));
             System.out.println("                               ...                                             ");
             System.out.println("                            &@@@@@@@                                           ");
@@ -334,6 +337,7 @@ public class Clownfish {
                 metainfomap = new HashMap<>();
             }
             metainfomap.put("version", clownfishutil.getVersion());
+            metainfomap.put("versionMojarra", clownfishutil.getVersionMojarra());
             
             // Init Lucene Search Map
             if (null == searchcontentmap) {
