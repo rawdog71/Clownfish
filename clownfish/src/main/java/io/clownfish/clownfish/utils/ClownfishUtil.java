@@ -43,6 +43,7 @@ import lombok.experimental.Accessors;
 public class ClownfishUtil {
     private @Getter @Setter String version;
     private @Getter @Setter String versionMojarra;
+    private @Getter @Setter String versionTomcat;
     /*
         getParametermap
         Übergibt die POST Parameter in eine Hashmap um

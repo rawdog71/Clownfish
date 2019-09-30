@@ -113,6 +113,7 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.catalina.util.ServerInfo;
 import org.apache.lucene.queryparser.classic.ParseException;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -237,14 +238,14 @@ public class Clownfish {
         if (null == clownfishutil) {
             clownfishutil = new ClownfishUtil();
         }
-        clownfishutil.setVersion(getClass().getPackage().getImplementationVersion()).setVersionMojarra(p.getImplementationVersion());
+        clownfishutil.setVersion(getClass().getPackage().getImplementationVersion()).setVersionMojarra(p.getImplementationVersion()).setVersionTomcat(ServerInfo.getServerNumber());
         if (null == clownfishutil.getVersion()) {
             clownfishutil.setVersion("DEBUG");
         }
         try {
             AnsiConsole.systemInstall();
             System.out.println(ansi().fg(GREEN));
-            System.out.println("INIT CLOWNFISH CMS Version " + clownfishutil.getVersion() + " on Mojarra " + clownfishutil.getVersionMojarra());
+            System.out.println("INIT CLOWNFISH CMS Version " + clownfishutil.getVersion() + " on Tomcat " + clownfishutil.getVersionTomcat()+ " with Mojarra " + clownfishutil.getVersionMojarra());
             System.out.println(ansi().fg(RED));
             System.out.println("                               ...                                             ");
             System.out.println("                            &@@@@@@@                                           ");
@@ -338,6 +339,7 @@ public class Clownfish {
             }
             metainfomap.put("version", clownfishutil.getVersion());
             metainfomap.put("versionMojarra", clownfishutil.getVersionMojarra());
+            metainfomap.put("versionTomcat", clownfishutil.getVersionTomcat());
             
             // Init Lucene Search Map
             if (null == searchcontentmap) {
