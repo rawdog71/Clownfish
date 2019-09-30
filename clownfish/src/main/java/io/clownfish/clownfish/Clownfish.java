@@ -18,6 +18,8 @@ package io.clownfish.clownfish;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
+import com.hazelcast.config.*;
+import com.hazelcast.core.*;
 import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.AssetList;
 import io.clownfish.clownfish.beans.AttributContentList;
@@ -207,6 +209,9 @@ public class Clownfish {
     private @Getter @Setter ContentIndexer contentIndexer;
     private @Getter @Setter AssetIndexer assetIndexer;
     private @Getter @Setter int searchlimit;
+    
+    private Config hazelConfig;
+    HazelcastInstance hcInstance;
 
     final transient Logger logger = LoggerFactory.getLogger(Clownfish.class);
 
@@ -233,8 +238,15 @@ public class Clownfish {
     @PostConstruct
     @GetMapping(path = "/init") 
     public void init() {
-        Package p = FacesContext.class.getPackage();
+        /* Hazelcast test */
+        if (null == hazelConfig) {
+            hazelConfig = new Config();
+        }
+        if (null == hcInstance) {
+            hcInstance = Hazelcast.newHazelcastInstance(hazelConfig);
+        }
         
+        Package p = FacesContext.class.getPackage();
         if (null == clownfishutil) {
             clownfishutil = new ClownfishUtil();
         }
@@ -333,6 +345,12 @@ public class Clownfish {
                 indexService.getWriter().commit();
             }
            
+            /* Hazelcast test */
+            Map<String, String> hzMetainfomap = hcInstance.getMap("metainfos");
+            hzMetainfomap.put("version", clownfishutil.getVersion());
+            hzMetainfomap.put("versionMojarra", clownfishutil.getVersionMojarra());
+            hzMetainfomap.put("versionTomcat", clownfishutil.getVersionTomcat());
+            
             // Init Site Metadata Map
             if (null == metainfomap) {
                 metainfomap = new HashMap<>();

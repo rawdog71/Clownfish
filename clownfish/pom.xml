@@ -278,6 +278,11 @@
             <version>7.4.0</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+            <version>3.12.2</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
