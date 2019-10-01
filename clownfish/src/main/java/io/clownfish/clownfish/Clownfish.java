@@ -200,7 +200,6 @@ public class Clownfish {
     private PropertyUtil propertyUtil;
     private DefaultUtil defaultUtil;
     private @Getter @Setter Map sitecontentmap;
-    private @Getter @Setter Map metainfomap;
     private @Getter @Setter Map searchcontentmap;
     private @Getter @Setter Map searchassetmap;
     private @Getter @Setter Map searchmetadata;
@@ -211,7 +210,8 @@ public class Clownfish {
     private @Getter @Setter int searchlimit;
     
     private Config hazelConfig;
-    HazelcastInstance hcInstance;
+    private HazelcastInstance hcInstance;
+    private @Getter @Setter Map<String, String> hzMetainfomap;
 
     final transient Logger logger = LoggerFactory.getLogger(Clownfish.class);
 
@@ -345,19 +345,13 @@ public class Clownfish {
                 indexService.getWriter().commit();
             }
            
-            /* Hazelcast test */
-            Map<String, String> hzMetainfomap = hcInstance.getMap("metainfos");
+            // Init Site Metadata Map
+            if (null == hzMetainfomap) {
+                hzMetainfomap = hcInstance.getMap("metainfos");
+            }
             hzMetainfomap.put("version", clownfishutil.getVersion());
             hzMetainfomap.put("versionMojarra", clownfishutil.getVersionMojarra());
             hzMetainfomap.put("versionTomcat", clownfishutil.getVersionTomcat());
-            
-            // Init Site Metadata Map
-            if (null == metainfomap) {
-                metainfomap = new HashMap<>();
-            }
-            metainfomap.put("version", clownfishutil.getVersion());
-            metainfomap.put("versionMojarra", clownfishutil.getVersionMojarra());
-            metainfomap.put("versionTomcat", clownfishutil.getVersionTomcat());
             
             // Init Lucene Search Map
             if (null == searchcontentmap) {
@@ -669,13 +663,13 @@ public class Clownfish {
                         HashMap<String, HashMap> dbexport = databaseUtil.getDbexport(sitedatasourcelist, datatableproperties, datatablenewproperties, datatabledeleteproperties, datatableupdateproperties);
                         sitecontentmap.put("db", dbexport);
                         // Put meta info to sitecontentmap
-                        metainfomap.put("title", cfsite.getTitle());
-                        metainfomap.put("description", cfsite.getDescription());
-                        metainfomap.put("name", cfsite.getName());
-                        metainfomap.put("encoding", cfsite.getCharacterencoding());
-                        metainfomap.put("contenttype", cfsite.getContenttype());
-                        metainfomap.put("locale", cfsite.getLocale());
-                        metainfomap.put("alias", cfsite.getAliaspath());
+                        hzMetainfomap.put("title", cfsite.getTitle());
+                        hzMetainfomap.put("description", cfsite.getDescription());
+                        hzMetainfomap.put("name", cfsite.getName());
+                        hzMetainfomap.put("encoding", cfsite.getCharacterencoding());
+                        hzMetainfomap.put("contenttype", cfsite.getContenttype());
+                        hzMetainfomap.put("locale", cfsite.getLocale());
+                        hzMetainfomap.put("alias", cfsite.getAliaspath());
 
                         // send a mail, if email properties are set
                         if (emailproperties != null) {
@@ -695,7 +689,7 @@ public class Clownfish {
                                 fmRoot.put("css", cfstylesheet);
                                 fmRoot.put("js", cfjavascript);
                                 fmRoot.put("sitecontent", sitecontentmap);
-                                fmRoot.put("metainfo", metainfomap);
+                                fmRoot.put("metainfo", hzMetainfomap);
 
                                 if (sapSupport) {
                                     List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
@@ -734,7 +728,7 @@ public class Clownfish {
                                 velContext.put("css", cfstylesheet);
                                 velContext.put("js", cfjavascript);
                                 velContext.put("sitecontent", sitecontentmap);
-                                velContext.put("metainfo", metainfomap);
+                                velContext.put("metainfo", hzMetainfomap);
                                 if (sapSupport) {
                                     List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                                     sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));

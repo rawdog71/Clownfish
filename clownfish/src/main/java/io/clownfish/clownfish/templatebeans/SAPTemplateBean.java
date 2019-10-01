@@ -98,10 +98,14 @@ public class SAPTemplateBean implements Serializable {
                 jcofunctiontable.put(rfcFunction, function);
             }
             try {
-                function.getTableParameterList().clear();
-                function.getChangingParameterList().clear();
+                if (null != function.getTableParameterList()) {
+                    function.getTableParameterList().clear();
+                }
+                if (null != function.getChangingParameterList()) {
+                    function.getChangingParameterList().clear();
+                }
             } catch (Exception ex) {
-                
+                logger.error(ex.getMessage());
             }
             for (RfcFunctionParam rfcfunctionparam : paramlist) {
                 if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
@@ -194,10 +198,14 @@ public class SAPTemplateBean implements Serializable {
                 jcofunctiontable.put(rfcFunction, function);
             }
             try {
-                function.getTableParameterList().clear();
-                function.getChangingParameterList().clear();
+                if (null != function.getTableParameterList()) {
+                    function.getTableParameterList().clear();
+                }
+                if (null != function.getChangingParameterList()) {
+                    function.getChangingParameterList().clear();
+                }
             } catch (Exception ex) {
-                
+                logger.error(ex.getMessage());
             }
             for (RfcFunctionParam rfcfunctionparam : paramlist) {
                 if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {

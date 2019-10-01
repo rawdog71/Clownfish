@@ -127,7 +127,11 @@ public class CfSite implements Serializable {
     }
 
     public String getName() {
-        return name;
+        if (null != name) {
+            return name;
+        } else {
+            return "";
+        }
     }
 
     public void setName(String name) {
@@ -175,7 +179,11 @@ public class CfSite implements Serializable {
     }
 
     public String getCharacterencoding() {
-        return characterencoding;
+        if (null != characterencoding) {
+            return characterencoding;
+        } else {
+            return "";
+        }
     }
 
     public void setCharacterencoding(String characterencoding) {
@@ -183,7 +191,11 @@ public class CfSite implements Serializable {
     }
 
     public String getContenttype() {
-        return contenttype;
+        if (null != contenttype) {
+            return contenttype;
+        } else {
+            return "";
+        }
     }
 
     public void setContenttype(String contenttype) {
@@ -191,7 +203,11 @@ public class CfSite implements Serializable {
     }
 
     public String getLocale() {
-        return locale;
+        if (null != locale) {
+            return locale;
+        } else {
+            return "";
+        }
     }
 
     public void setLocale(String locale) {
@@ -199,7 +215,11 @@ public class CfSite implements Serializable {
     }
 
     public String getAliaspath() {
-        return aliaspath;
+        if (null != aliaspath) {
+            return aliaspath;
+        } else {
+            return "";
+        }
     }
 
     public void setAliaspath(String aliaspath) {
@@ -215,7 +235,11 @@ public class CfSite implements Serializable {
     }
 
     public String getTitle() {
-        return title;
+        if (null != title) {
+            return title;
+        } else {
+            return "";
+        }
     }
 
     public void setTitle(String title) {
@@ -231,7 +255,11 @@ public class CfSite implements Serializable {
     }
 
     public String getDescription() {
-        return description;
+        if (null != description) {
+            return description;
+        } else {
+            return "";
+        }
     }
 
     public void setDescription(String description) {

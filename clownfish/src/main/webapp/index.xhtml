@@ -776,6 +776,21 @@
             </p:confirmDialog>
             
             <p:dialog header="Asset info" id="assetInfoDlg" widgetVar="assetInfo" modal="true" minHeight="40">
+                <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
+                    <p:graphicImage url="GetAssetPreview?mediaid=#{assetList.selectedAsset.id}&amp;width=200" width="200" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" /> 
+                    <p:outputPanel>
+                        <h:panelGrid columns="2" cellpadding="5">
+                            <h:outputText value="Id:" />
+                            <h:outputText value="#{assetList.selectedAsset.id}" style="font-weight: bold"/>
+
+                            <h:outputText value="Name:" />
+                            <h:outputText value="#{assetList.selectedAsset.name}" style="font-weight: bold"/>
+
+                            <h:outputText value="Description:" />
+                            <h:outputText value="#{assetList.selectedAsset.description}" style="font-weight: bold"/>
+                        </h:panelGrid>
+                    </p:outputPanel>
+                </h:panelGrid>
                 <p:pickList id="assetkeywordpicklist" value="#{assetList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" />
                 <p:commandButton id="attachassetkeyword" value="Attach" actionListener="#{assetList.onAttach}" />
             </p:dialog>
