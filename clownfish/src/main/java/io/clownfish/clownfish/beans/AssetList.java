@@ -16,9 +16,11 @@
 package io.clownfish.clownfish.beans;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfAssetkeyword;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
+import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.utils.FolderUtil;
@@ -64,6 +66,7 @@ import org.springframework.context.annotation.Scope;
 public class AssetList {
     @Autowired CfAssetService cfassetService;
     @Autowired CfKeywordService cfkeywordService;
+    @Autowired CfAssetKeywordService cfassetkeywordService;
     @Autowired IndexService indexService;
     @Autowired AssetIndexer assetIndexer;
     @Autowired FolderUtil folderUtil;
@@ -73,6 +76,9 @@ public class AssetList {
     private @Getter @Setter Boolean checkedAsset;
     private @Getter @Setter String assetName;
     private @Getter @Setter DualListModel<CfKeyword> keywords;
+    private @Getter @Setter boolean isImage;
+    
+    private List<CfAssetkeyword> assetkeywordlist;
     
     final transient Logger logger = LoggerFactory.getLogger(AssetList.class);
 
@@ -174,6 +180,18 @@ public class AssetList {
     }
     
     public void onDetail() {
+        keywords.setSource(cfkeywordService.findAll());
+        //keywords.setTarget(keywordTarget);
+        assetkeywordlist = cfassetkeywordService.findByAssetRef(selectedAsset.getId());
+        for (CfAssetkeyword assetkeyword : assetkeywordlist) {
+            int idx = keywords.getSource().indexOf(assetkeyword);
+            keywords.getSource().remove(keywords.getSource().get(idx));
+        }
+        if (selectedAsset.getMimetype().contains("jpeg")) {
+            isImage = true;
+        } else {
+            isImage = false;
+        }
         logger.info("KLICK DETAIL");
     }
  

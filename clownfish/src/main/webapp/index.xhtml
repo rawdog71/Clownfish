@@ -663,7 +663,7 @@
                                         <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
                                     
-                                    <p:commandButton icon="fa fa-info" action="#{assetList.onDetail}" onclick="PF('assetInfo').show();">
+                                    <p:commandButton update=":form:assetInfoDlg" icon="fa fa-info" action="#{assetList.onDetail}" oncomplete="PF('assetInfo').show();">
                                         <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                     </p:commandButton>
                                 </p:panelGrid>
@@ -776,23 +776,36 @@
             </p:confirmDialog>
             
             <p:dialog header="Asset info" id="assetInfoDlg" widgetVar="assetInfo" modal="true" minHeight="40">
-                <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
-                    <p:graphicImage url="GetAssetPreview?mediaid=#{assetList.selectedAsset.id}&amp;width=200" width="200" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" /> 
-                    <p:outputPanel>
-                        <h:panelGrid columns="2" cellpadding="5">
-                            <h:outputText value="Id:" />
-                            <h:outputText value="#{assetList.selectedAsset.id}" style="font-weight: bold"/>
+                <p:outputPanel id="assetDetail">
+                    <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
+                        <p:graphicImage url="GetAssetPreview?mediaid=#{assetList.selectedAsset.id}&amp;width=200" width="200" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" /> 
+                        <p:outputPanel>
+                            <h:panelGrid columns="2" cellpadding="5">
+                                <h:outputText value="Id:" />
+                                <h:outputText value="#{assetList.selectedAsset.id}" style="font-weight: bold"/>
 
-                            <h:outputText value="Name:" />
-                            <h:outputText value="#{assetList.selectedAsset.name}" style="font-weight: bold"/>
+                                <h:outputText value="Name:" />
+                                <h:outputText value="#{assetList.selectedAsset.name}" style="font-weight: bold"/>
 
-                            <h:outputText value="Description:" />
-                            <h:outputText value="#{assetList.selectedAsset.description}" style="font-weight: bold"/>
-                        </h:panelGrid>
-                    </p:outputPanel>
-                </h:panelGrid>
-                <p:pickList id="assetkeywordpicklist" value="#{assetList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" />
-                <p:commandButton id="attachassetkeyword" value="Attach" actionListener="#{assetList.onAttach}" />
+                                <h:outputText value="Description:" />
+                                <h:outputText value="#{assetList.selectedAsset.description}" style="font-weight: bold"/>
+                                
+                                <h:outputText value="Mimetype:" />
+                                <h:outputText value="#{assetList.selectedAsset.mimetype}" style="font-weight: bold"/>
+                                
+                                <h:outputText value="Width:" rendered="#{assetList.image}" />
+                                <h:outputText value="#{assetList.selectedAsset.imagewidth}" rendered="#{assetList.image}" style="font-weight: bold"/>
+                                
+                                <h:outputText value="Height:" rendered="#{assetList.image}" />
+                                <h:outputText value="#{assetList.selectedAsset.imageheight}" rendered="#{assetList.image}" style="font-weight: bold"/>
+                            </h:panelGrid>
+                        </p:outputPanel>
+                    </h:panelGrid>
+                    <p:pickList id="assetkeywordpicklist" value="#{assetList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" />
+                    <p:commandButton id="attachassetkeyword" value="Attach" actionListener="#{assetList.onAttach}" update=":form:assetInfoDlg">
+                        <f:setPropertyActionListener value="#{keyword}" target="#{assetList.keywords}" />
+                    </p:commandButton>
+                </p:outputPanel>
             </p:dialog>
         </h:form>
     </h:body>
