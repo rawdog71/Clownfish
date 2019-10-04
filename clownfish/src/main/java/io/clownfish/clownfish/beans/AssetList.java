@@ -76,7 +76,10 @@ public class AssetList {
     private @Getter @Setter Boolean checkedAsset;
     private @Getter @Setter String assetName;
     private @Getter @Setter DualListModel<CfKeyword> keywords;
+    private List<CfKeyword> keywordSource;
+    private List<CfKeyword> keywordTarget;
     private @Getter @Setter boolean isImage;
+    private @Getter @Setter boolean renderDetail;
     
     private List<CfAssetkeyword> assetkeywordlist;
     
@@ -84,11 +87,12 @@ public class AssetList {
 
     @PostConstruct
     public void init() {
+        renderDetail = false;
         assetName = "";
         assetlist = cfassetService.findAll();
         
-        List<CfKeyword> keywordSource = cfkeywordService.findAll();
-        List<CfKeyword> keywordTarget = new ArrayList<>();
+        keywordSource = cfkeywordService.findAll();
+        keywordTarget = new ArrayList<>();
         
         keywords = new DualListModel<>(keywordSource, keywordTarget);
     }
@@ -180,12 +184,15 @@ public class AssetList {
     }
     
     public void onDetail() {
+        keywords.getTarget().clear();
+        keywords.getSource().clear();
+        renderDetail = true;
         keywords.setSource(cfkeywordService.findAll());
-        //keywords.setTarget(keywordTarget);
         assetkeywordlist = cfassetkeywordService.findByAssetRef(selectedAsset.getId());
         for (CfAssetkeyword assetkeyword : assetkeywordlist) {
-            int idx = keywords.getSource().indexOf(assetkeyword);
-            keywords.getSource().remove(keywords.getSource().get(idx));
+            CfKeyword kw = cfkeywordService.findById(assetkeyword.getCfAssetkeywordPK().getKeywordref());
+            keywords.getTarget().add(kw);
+            keywords.getSource().remove(kw);
         }
         if (selectedAsset.getMimetype().contains("jpeg")) {
             isImage = true;
@@ -196,10 +203,15 @@ public class AssetList {
     }
  
     public void onAttach(ActionEvent actionEvent) {
+        assetkeywordlist = cfassetkeywordService.findByAssetRef(selectedAsset.getId());
+        for (CfAssetkeyword assetkeyword : assetkeywordlist) {
+            cfassetkeywordService.delete(assetkeyword);
+        }
         List<CfKeyword> selectedkeyword = keywords.getTarget();
         try {
             for (Object keyword : selectedkeyword) {
-                System.out.println(keyword.toString());
+                CfAssetkeyword assetkeyword = new CfAssetkeyword(selectedAsset.getId(), ((CfKeyword)keyword).getId());
+                cfassetkeywordService.create(assetkeyword);
             }
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());

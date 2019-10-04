@@ -643,33 +643,67 @@
                         <p:growl id="messages" showDetail="true" />
                     </h:form>
                     
-                    <p:dataGrid id="assetlist" var="media" value="#{assetList.assetlist}" columns="6" layout="grid"
-                        rows="24" paginator="true"
-                        paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                        rowsPerPageTemplate="24,48,96,120">
+                    <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
+                        <p:dataGrid id="assetlist" var="media" value="#{assetList.assetlist}" columns="5" layout="grid"
+                            rows="20" paginator="true"
+                            paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                            rowsPerPageTemplate="20,40,80,100">
 
-                        <f:facet name="header">
-                            Medien
-                        </f:facet>
+                            <f:facet name="header">
+                                Medien
+                            </f:facet>
 
-                        <p:panel header="#{media.id}" style="text-align:center">
-                            <h:panelGrid columns="1" style="width:100%">
-                                <p:graphicImage url="GetAssetPreview?mediaid=#{media.id}&amp;width=200" width="200" alt="#{media.name}" title="#{media.name}" /> 
-                                <h:outputText value="#{media.shortName}" />
-                                <p:panelGrid columns="3" layout="grid" styleClass="ui-noborder" id="media-#{media.id}">
-                                    <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
-                                    <p:commandButton icon="fa fa-trash" action="#{assetList.onDelete}" update=":form:tabview:assetlist">
-                                        <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
-                                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
-                                    </p:commandButton>
-                                    
-                                    <p:commandButton update=":form:assetInfoDlg" icon="fa fa-info" action="#{assetList.onDetail}" oncomplete="PF('assetInfo').show();">
-                                        <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
-                                    </p:commandButton>
-                                </p:panelGrid>
+                            <p:panel header="#{media.id}" style="text-align:center">
+                                <h:panelGrid columns="1" style="width:100%">
+                                    <p:graphicImage url="GetAssetPreview?mediaid=#{media.id}&amp;width=200" width="200" alt="#{media.name}" title="#{media.name}" /> 
+                                    <h:outputText value="#{media.shortName}" />
+                                    <p:panelGrid columns="3" layout="grid" styleClass="ui-noborder" id="media-#{media.id}">
+                                        <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
+                                        <p:commandButton icon="fa fa-trash" action="#{assetList.onDelete}" update=":form:tabview:assetlist">
+                                            <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
+                                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                        </p:commandButton>
+
+                                        <p:commandButton update=":form:tabview:assetDetail" icon="fa fa-info" action="#{assetList.onDetail}">
+                                            <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
+                                        </p:commandButton>
+                                    </p:panelGrid>
+                                </h:panelGrid>
+                            </p:panel>
+                        </p:dataGrid>
+                        
+                        <p:outputPanel id="assetDetail">
+                            <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
+                                <p:graphicImage url="GetAssetPreview?mediaid=#{assetList.selectedAsset.id}&amp;width=200" width="200" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" rendered="#{assetList.renderDetail}" /> 
+                                <p:outputPanel>
+                                    <h:panelGrid columns="2" cellpadding="5">
+                                        <h:outputText value="Id:" />
+                                        <h:outputText value="#{assetList.selectedAsset.id}" style="font-weight: bold"/>
+
+                                        <h:outputText value="Name:" />
+                                        <h:outputText value="#{assetList.selectedAsset.name}" style="font-weight: bold"/>
+
+                                        <h:outputText value="Description:" />
+                                        <h:outputText value="#{assetList.selectedAsset.description}" style="font-weight: bold"/>
+
+                                        <h:outputText value="Mimetype:" />
+                                        <h:outputText value="#{assetList.selectedAsset.mimetype}" style="font-weight: bold"/>
+
+                                        <h:outputText value="Width:" rendered="#{assetList.image}" />
+                                        <h:outputText value="#{assetList.selectedAsset.imagewidth}" rendered="#{assetList.image}" style="font-weight: bold"/>
+
+                                        <h:outputText value="Height:" rendered="#{assetList.image}" />
+                                        <h:outputText value="#{assetList.selectedAsset.imageheight}" rendered="#{assetList.image}" style="font-weight: bold"/>
+                                    </h:panelGrid>
+                                </p:outputPanel>
                             </h:panelGrid>
-                        </p:panel>
-                    </p:dataGrid>
+                            <p:pickList id="assetkeywordpicklist" value="#{assetList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" converter="#{keywordConverterBean}" />
+                            <p:commandButton id="attachassetkeyword" value="Attach" actionListener="#{assetList.onAttach}">
+
+                            </p:commandButton>
+                        </p:outputPanel>
+                        
+                    </h:panelGrid>
                 </p:tab>
                 
                 <p:tab title="Keywords" id="keywordpanel" rendered="#{loginBean.login}">
@@ -687,7 +721,7 @@
                         <p:outputLabel for="keywords" value="Keywords: " />
                         <p:chips id="keywords" value="#{keywordList.items}" />
                         
-                        <p:commandButton id="newkeyword" process="form" value="New" actionListener="#{keywordList.onCreate}" update=":form:tabview:keywordlist :form:assetkeywordpicklist" />
+                        <p:commandButton id="newkeyword" process="form" value="New" actionListener="#{keywordList.onCreate}" update=":form:tabview:keywordlist :form:tabview:assetkeywordpicklist" />
                     </h:panelGrid>
                 </p:tab>
                 
@@ -774,39 +808,6 @@
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-times" />
             </p:confirmDialog>
-            
-            <p:dialog header="Asset info" id="assetInfoDlg" widgetVar="assetInfo" modal="true" minHeight="40">
-                <p:outputPanel id="assetDetail">
-                    <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
-                        <p:graphicImage url="GetAssetPreview?mediaid=#{assetList.selectedAsset.id}&amp;width=200" width="200" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" /> 
-                        <p:outputPanel>
-                            <h:panelGrid columns="2" cellpadding="5">
-                                <h:outputText value="Id:" />
-                                <h:outputText value="#{assetList.selectedAsset.id}" style="font-weight: bold"/>
-
-                                <h:outputText value="Name:" />
-                                <h:outputText value="#{assetList.selectedAsset.name}" style="font-weight: bold"/>
-
-                                <h:outputText value="Description:" />
-                                <h:outputText value="#{assetList.selectedAsset.description}" style="font-weight: bold"/>
-                                
-                                <h:outputText value="Mimetype:" />
-                                <h:outputText value="#{assetList.selectedAsset.mimetype}" style="font-weight: bold"/>
-                                
-                                <h:outputText value="Width:" rendered="#{assetList.image}" />
-                                <h:outputText value="#{assetList.selectedAsset.imagewidth}" rendered="#{assetList.image}" style="font-weight: bold"/>
-                                
-                                <h:outputText value="Height:" rendered="#{assetList.image}" />
-                                <h:outputText value="#{assetList.selectedAsset.imageheight}" rendered="#{assetList.image}" style="font-weight: bold"/>
-                            </h:panelGrid>
-                        </p:outputPanel>
-                    </h:panelGrid>
-                    <p:pickList id="assetkeywordpicklist" value="#{assetList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" />
-                    <p:commandButton id="attachassetkeyword" value="Attach" actionListener="#{assetList.onAttach}" update=":form:assetInfoDlg">
-                        <f:setPropertyActionListener value="#{keyword}" target="#{assetList.keywords}" />
-                    </p:commandButton>
-                </p:outputPanel>
-            </p:dialog>
         </h:form>
     </h:body>
 </html>
