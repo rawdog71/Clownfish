@@ -80,6 +80,7 @@ public class AssetList {
     private List<CfKeyword> keywordTarget;
     private @Getter @Setter boolean isImage;
     private @Getter @Setter boolean renderDetail;
+    private @Getter @Setter String description = "";
     
     private List<CfAssetkeyword> assetkeywordlist;
     
@@ -184,6 +185,7 @@ public class AssetList {
     }
     
     public void onDetail() {
+        description = selectedAsset.getDescription();
         keywords.getTarget().clear();
         keywords.getSource().clear();
         renderDetail = true;
@@ -199,7 +201,6 @@ public class AssetList {
         } else {
             isImage = false;
         }
-        logger.info("KLICK DETAIL");
     }
  
     public void onAttach(ActionEvent actionEvent) {
@@ -216,6 +217,13 @@ public class AssetList {
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+    
+    public void editDescription(ActionEvent actionEvent) {
+        selectedAsset.setDescription(description);
+        cfassetService.edit(selectedAsset);
+        FacesMessage message = new FacesMessage("Succesful", selectedAsset.getName() + " has been updated.");
+        FacesContext.getCurrentInstance().addMessage(null, message);
     }
     
 }

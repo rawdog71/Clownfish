@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.templatebeans;
 
+import com.sap.conn.jco.ConversionException;
 import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoTable;
@@ -85,13 +86,12 @@ public class SAPTemplateBean implements Serializable {
             saprfcfunctionparamMap.put(rfcFunction, rfcfunctionparamlist);
 
             List<JsonFormParameter> postmap_async = ClownfishUtil.getJsonFormParameterList(parametermap);
-
+            
+            HashMap<String, Object> sapvalues = new HashMap<>();
+            List<RfcFunctionParam> paramlist = saprfcfunctionparamMap.get(rfcFunction);
+            JCoFunction function;
             try {
-                HashMap<String, Object> sapvalues = new HashMap<>();
-                List<RfcFunctionParam> paramlist = saprfcfunctionparamMap.get(rfcFunction);
-
                 // Setze die Import Parameter des SAP RFC mit den Werten aus den POST Parametern
-                JCoFunction function;
                 if (jcofunctiontable.containsKey(rfcFunction)) {
                     function = jcofunctiontable.get(rfcFunction);
                 } else {
@@ -171,6 +171,8 @@ public class SAPTemplateBean implements Serializable {
                 sapvalues.put("table", saptables);
                 sapexport.put(rfcFunction, sapvalues);
             } catch(JCoException ex) {
+                logger.error(ex.getMessage());
+            } catch(ConversionException ex) {
                 logger.error(ex.getMessage());
             }
             contentmap.put("sap", sapexport);
