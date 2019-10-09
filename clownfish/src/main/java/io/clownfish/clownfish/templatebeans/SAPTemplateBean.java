@@ -157,13 +157,17 @@ public class SAPTemplateBean implements Serializable {
                             }
                             break;
                         case "c":
-                            String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
-                            functions_table = function.getChangingParameterList().getTable(paramname);
-                            if (!functions_table.isEmpty()) {
-                                rpytablereadlist = getRpytablereadlist(param);
-                                //rpytablereadlist = rpytableread.getRpyTableReadList(param);
-                                setTableValues(functions_table, rpytablereadlist, tablevalues);
-                                saptables.put(paramname, tablevalues);
+                            try {
+                                String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
+                                functions_table = function.getChangingParameterList().getTable(paramname);
+                                if (!functions_table.isEmpty()) {
+                                    rpytablereadlist = getRpytablereadlist(param.trim());
+                                    //rpytablereadlist = rpytableread.getRpyTableReadList(param);
+                                    setTableValues(functions_table, rpytablereadlist, tablevalues);
+                                    saptables.put(paramname, tablevalues);
+                                }
+                            } catch(ConversionException ex) {
+                                logger.error(ex.getMessage());
                             }
                         break;
                     }
@@ -171,8 +175,6 @@ public class SAPTemplateBean implements Serializable {
                 sapvalues.put("table", saptables);
                 sapexport.put(rfcFunction, sapvalues);
             } catch(JCoException ex) {
-                logger.error(ex.getMessage());
-            } catch(ConversionException ex) {
                 logger.error(ex.getMessage());
             }
             contentmap.put("sap", sapexport);

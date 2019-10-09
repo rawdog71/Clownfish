@@ -793,6 +793,49 @@
                     </p:panelGrid>
                 </p:tab>
                 
+                <p:tab title="Jobs" id="jobspanel" rendered="#{loginBean.login}">
+                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                        <p:dataTable id="joblist" var="jobcontent" value="#{quartzlist.quartzlist}" 
+                                     selectionMode="single" selection="#{quartzlist.selectedQuartz}" rowKey="#{jobcontent.id}"
+                                     emptyMessage="No content available" filteredValue="#{quartzlist.filteredQuartz}" widgetVar="quartzlist">
+                            <p:ajax event="rowSelect" listener="#{quartzlist.onSelect}" update=":form:tabview:jobpanel :form:tabview:jobbtnpanel" />
+                            <p:column headerText="Name" filterBy="#{jobcontent.name}" filterMatchMode="contains">
+                                <h:outputText value="#{jobcontent.name}" />
+                            </p:column>
+                            <p:column headerText="Value" filterBy="#{jobcontent.schedule}" filterMatchMode="contains">
+                                <h:outputText value="#{jobcontent.schedule}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:scrollPanel>
+                    
+                    <p:panelGrid id="jobpanel" columns="2">
+                        <p:outputLabel for="jobname">Name</p:outputLabel>
+                        <p:inputText id="jobname" value="#{quartzlist.jobname}" >
+                            <p:ajax event="keyup" listener="#{quartzlist.onChangeName(changeEvent)}" update=":form:tabview:jobbtnpanel" />
+                        </p:inputText>
+
+                        <p:outputLabel for="propertyvalue">Job Value</p:outputLabel>
+                        <p:inputText id="jobvalue" value="#{quartzlist.jobvalue}" ></p:inputText>
+                        
+                        <p:outputLabel for="jobactive">Active</p:outputLabel>
+                        <p:selectBooleanCheckbox id="jobactive" value="#{quartzlist.active}" />
+                        
+                        <p:outputLabel for="jobsiteref" value="Site" />
+                        <p:selectOneMenu id="jobsiteref" value="#{quartzlist.siteref}" required="false" converter="#{siteConverterBean}">
+                            <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                            <f:selectItems value="#{quartzlist.sitelist}" />
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                    
+                    <p:panelGrid id="jobbtnpanel" columns="3">
+                        <p:commandButton id="newjob" process="form" value="New" actionListener="#{quartzlist.onCreateJob}" update=":form:msgs :form:tabview:joblist" disabled="#{quartzlist.newJobButtonDisabled}" />
+                        <p:commandButton id="editjob" process="form" value="Edit" actionListener="#{quartzlist.onEditJob}" update=":form:msgs :form:tabview:joblist" />
+                        <p:commandButton id="deletejob" process="form" value="Delete" actionListener="#{quartzlist.onDeleteJob}" disabled="#{quartzlist.deleteJobButtonDisabled}" update=":form:msgs :form:tabview:joblist">
+                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:panelGrid>
+                </p:tab>
+                
                 <p:tab title="User" id="userspanel" rendered="#{loginBean.login}">
                     <p:dataTable id="userlist" var="user" value="#{userlist.userlist}" 
                                  selectionMode="single" selection="#{userlist.selectedUser}" rowKey="#{user.id}"
