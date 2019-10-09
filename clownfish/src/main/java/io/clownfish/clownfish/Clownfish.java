@@ -211,7 +211,7 @@ public class Clownfish {
     
     private Config hazelConfig;
     private HazelcastInstance hcInstance;
-    private @Getter @Setter Map<String, String> hzMetainfomap;
+    private @Getter @Setter Map<String, String> metainfomap;
 
     final transient Logger logger = LoggerFactory.getLogger(Clownfish.class);
 
@@ -346,12 +346,13 @@ public class Clownfish {
             }
            
             // Init Site Metadata Map
-            if (null == hzMetainfomap) {
-                hzMetainfomap = hcInstance.getMap("metainfos");
+            if (null == metainfomap) {
+                //hzMetainfomap = hcInstance.getMap("metainfos");
+                metainfomap = new HashMap();
             }
-            hzMetainfomap.put("version", clownfishutil.getVersion());
-            hzMetainfomap.put("versionMojarra", clownfishutil.getVersionMojarra());
-            hzMetainfomap.put("versionTomcat", clownfishutil.getVersionTomcat());
+            metainfomap.put("version", clownfishutil.getVersion());
+            metainfomap.put("versionMojarra", clownfishutil.getVersionMojarra());
+            metainfomap.put("versionTomcat", clownfishutil.getVersionTomcat());
             
             // Init Lucene Search Map
             if (null == searchcontentmap) {
@@ -663,13 +664,13 @@ public class Clownfish {
                         HashMap<String, HashMap> dbexport = databaseUtil.getDbexport(sitedatasourcelist, datatableproperties, datatablenewproperties, datatabledeleteproperties, datatableupdateproperties);
                         sitecontentmap.put("db", dbexport);
                         // Put meta info to sitecontentmap
-                        hzMetainfomap.put("title", cfsite.getTitle());
-                        hzMetainfomap.put("description", cfsite.getDescription());
-                        hzMetainfomap.put("name", cfsite.getName());
-                        hzMetainfomap.put("encoding", cfsite.getCharacterencoding());
-                        hzMetainfomap.put("contenttype", cfsite.getContenttype());
-                        hzMetainfomap.put("locale", cfsite.getLocale());
-                        hzMetainfomap.put("alias", cfsite.getAliaspath());
+                        metainfomap.put("title", cfsite.getTitle());
+                        metainfomap.put("description", cfsite.getDescription());
+                        metainfomap.put("name", cfsite.getName());
+                        metainfomap.put("encoding", cfsite.getCharacterencoding());
+                        metainfomap.put("contenttype", cfsite.getContenttype());
+                        metainfomap.put("locale", cfsite.getLocale());
+                        metainfomap.put("alias", cfsite.getAliaspath());
 
                         // send a mail, if email properties are set
                         if (emailproperties != null) {
@@ -689,7 +690,7 @@ public class Clownfish {
                                 fmRoot.put("css", cfstylesheet);
                                 fmRoot.put("js", cfjavascript);
                                 fmRoot.put("sitecontent", sitecontentmap);
-                                fmRoot.put("metainfo", hzMetainfomap);
+                                fmRoot.put("metainfo", metainfomap);
 
                                 if (sapSupport) {
                                     List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
@@ -728,7 +729,7 @@ public class Clownfish {
                                 velContext.put("css", cfstylesheet);
                                 velContext.put("js", cfjavascript);
                                 velContext.put("sitecontent", sitecontentmap);
-                                velContext.put("metainfo", hzMetainfomap);
+                                velContext.put("metainfo", metainfomap);
                                 if (sapSupport) {
                                     List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                                     sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
