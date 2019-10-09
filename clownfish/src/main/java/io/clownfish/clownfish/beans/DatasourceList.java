@@ -17,11 +17,15 @@ package io.clownfish.clownfish.beans;
 
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
+import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
@@ -138,6 +142,20 @@ public class DatasourceList implements Serializable {
             newContentButtonDisabled = true;
         } catch (NoResultException ex) {
             newContentButtonDisabled = datasourceName.isEmpty();
+        }
+    }
+    
+    public void onConnectionCheck(ActionEvent actionEvent) {
+        if (selectedDatasource != null) {
+            JDBCUtil jdbcutil = new JDBCUtil(selectedDatasource.getDriverclass(), selectedDatasource.getUrl(), selectedDatasource.getUser(), selectedDatasource.getPassword());
+            Connection con = jdbcutil.getConnection();
+            if (null != con) {
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Connection check", "Connection check successfully");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            } else {
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Connection check", "Connection check error");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
         }
     }
 }
