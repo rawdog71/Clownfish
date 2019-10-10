@@ -77,7 +77,13 @@ public class DatabaseTemplateBean implements Serializable {
                 JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
                 Connection con = jdbcutil.getConnection();
                 if (null != con) {
-                    if (con.getCatalog().compareToIgnoreCase(catalog) == 0) {
+                    String catalogname;
+                    if (cfdatasource.getDriverclass().contains("oracle")) {     // Oracle driver 
+                        catalogname = con.getSchema();
+                    } else {                                                    // other drivers
+                        catalogname = con.getCatalog();
+                    }
+                    if (catalogname.compareToIgnoreCase(catalog) == 0) {
                         Statement stmt = con.createStatement();
                         ResultSet result = stmt.executeQuery(sqlstatement);
                         ResultSetMetaData rmd = result.getMetaData();
@@ -103,6 +109,8 @@ public class DatabaseTemplateBean implements Serializable {
                     logger.warn("Connection to database not established");
                 }
             } catch (SQLException ex) {
+                logger.error(ex.getMessage());
+            } catch (Exception ex) {
                 logger.error(ex.getMessage());
             }
         });

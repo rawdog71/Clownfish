@@ -47,7 +47,7 @@ public class JDBCUtil {
         try {
             Class.forName(className);
         } catch (ClassNotFoundException ex) {
-            logger.error(ex.getMessage());
+            logger.error("JDBC Class not found: " + ex.getMessage());
             return null;
         }
         //get the connection
