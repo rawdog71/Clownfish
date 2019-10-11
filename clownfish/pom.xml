@@ -125,16 +125,6 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-reactivestreams</artifactId>
-            <version>1.11.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
             <type>jar</type>
@@ -230,16 +220,6 @@
             <version>1.22</version>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.jtds</groupId>
-            <artifactId>jtds</artifactId>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>de.destrukt</groupId>
-            <artifactId>SAPConnection</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
@@ -283,11 +263,39 @@
             <artifactId>hazelcast</artifactId>
             <version>3.12.2</version>
         </dependency>
+        
+        <!-- Database dependencies -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.jtds</groupId>
+            <artifactId>jtds</artifactId>
+            <type>jar</type>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-reactivestreams</artifactId>
+            <version>1.11.0</version>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc8</artifactId>
             <version>19.3</version>
+            <optional>true</optional>
 	</dependency>
+        
+        <!-- SAP dependency -->
+        <dependency>
+            <groupId>de.destrukt</groupId>
+            <artifactId>SAPConnection</artifactId>
+            <version>1.1</version>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
