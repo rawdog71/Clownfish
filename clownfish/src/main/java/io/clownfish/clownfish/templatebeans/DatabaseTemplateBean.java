@@ -37,17 +37,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
-@Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value="request")
 @Component
 public class DatabaseTemplateBean implements Serializable {
-    @Autowired transient CfDatasourceService cfdatasourceService;
+    private CfDatasourceService cfdatasourceService;
     private transient @Getter @Setter Map contentmap;
     private List<CfSitedatasource> sitedatasourcelist;
     
@@ -57,8 +56,9 @@ public class DatabaseTemplateBean implements Serializable {
         contentmap = new HashMap<>();
     }
     
-    public void init(List<CfSitedatasource> sitedatasourcelist) {
+    public void init(List<CfSitedatasource> sitedatasourcelist, CfDatasourceService cfdatasourceService) {
         this.sitedatasourcelist = sitedatasourcelist;
+        this.cfdatasourceService = cfdatasourceService;
         contentmap.clear();
     }
     

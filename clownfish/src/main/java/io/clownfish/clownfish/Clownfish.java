@@ -176,13 +176,14 @@ public class Clownfish {
     @Autowired SiteUtil siteutil;
     @Autowired DatabaseUtil databaseUtil;
     @Autowired CfDatasourceService cfdatasourceService;
-    @Autowired DatabaseTemplateBean databasebean;
-    @Autowired EmailTemplateBean emailbean;
-    @Autowired SAPTemplateBean sapbean;
-    @Autowired NetworkTemplateBean networkbean;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired private Scheduler scheduler;
     @Autowired private FolderUtil folderUtil;
+    
+    DatabaseTemplateBean databasebean;
+    EmailTemplateBean emailbean;
+    SAPTemplateBean sapbean;
+    NetworkTemplateBean networkbean;
 
     @Context protected HttpServletResponse response;
     @Context protected HttpServletRequest request;
@@ -681,9 +682,11 @@ public class Clownfish {
                             }
                         }
 
+                        networkbean = new NetworkTemplateBean();
                         // write the output
                         Writer out = new StringWriter();
                         if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
+                            emailbean = new EmailTemplateBean();
                             emailbean.init(propertyUtil.getPropertymap());
                             if (null != fmRoot) {
                                 fmRoot.put("emailBean", emailbean);
@@ -695,11 +698,17 @@ public class Clownfish {
                                 if (sapSupport) {
                                     List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                                     sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                                    sapbean = new SAPTemplateBean();
                                     sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
+                                    fmRoot.put("sapBean", sapbean);
                                 }
-                                fmRoot.put("sapBean", sapbean);
-                                databasebean.init(sitedatasourcelist);
-                                fmRoot.put("databaseBean", databasebean);
+                                
+                                if (!sitedatasourcelist.isEmpty()) {
+                                    databasebean = new DatabaseTemplateBean();
+                                    databasebean.init(sitedatasourcelist, cfdatasourceService);
+                                    fmRoot.put("databaseBean", databasebean);
+                                }
+                                
                                 fmRoot.put("networkBean", networkbean);
 
                                 fmRoot.put("parameter", parametermap);
@@ -723,6 +732,7 @@ public class Clownfish {
                                 }
                             }
                         } else {                                    // Velocity template
+                            emailbean = new EmailTemplateBean();
                             emailbean.init(propertyUtil.getPropertymap());
                             if (null != velContext) {
                                 velContext.put("emailBean", emailbean);
@@ -730,14 +740,21 @@ public class Clownfish {
                                 velContext.put("js", cfjavascript);
                                 velContext.put("sitecontent", sitecontentmap);
                                 velContext.put("metainfo", metainfomap);
+                                
                                 if (sapSupport) {
                                     List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                                     sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                                    sapbean = new SAPTemplateBean();
                                     sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
+                                    velContext.put("sapBean", sapbean);
                                 }
-                                velContext.put("sapBean", sapbean);
-                                databasebean.init(sitedatasourcelist);
-                                velContext.put("databaseBean", databasebean);
+                                
+                                if (!sitedatasourcelist.isEmpty()) {
+                                    databasebean = new DatabaseTemplateBean();
+                                    databasebean.init(sitedatasourcelist, cfdatasourceService);
+                                    velContext.put("databaseBean", databasebean);
+                                }
+                                
                                 velContext.put("networkBean", networkbean);
 
                                 velContext.put("parameter", parametermap);
