@@ -288,6 +288,11 @@
             <version>19.3</version>
             <optional>true</optional>
 	</dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <optional>true</optional>
+        </dependency>
         
         <!-- SAP dependency -->
         <dependency>
