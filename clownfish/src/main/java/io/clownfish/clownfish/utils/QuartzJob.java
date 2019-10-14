@@ -70,7 +70,6 @@ public class QuartzJob implements Job {
     @Autowired CfTemplateversionService cftemplateversionService;
     @Autowired TemplateUtil templateUtil;
     @Autowired CfSitedatasourceService cfsitedatasourceService;
-    @Autowired SAPTemplateBean sapbean;
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired PropertyList propertylist;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
@@ -78,6 +77,7 @@ public class QuartzJob implements Job {
     private @Getter @Setter Map<String, String> propertymap = null;
     private boolean sapSupport = false;
     private freemarker.template.Configuration freemarkerCfg;
+    private SAPTemplateBean sapbean;
     private static SAPConnection sapc = null;
     private RPY_TABLE_READ rpytableread = null;
     private ClownfishConst.ViewModus modus = STAGING;
@@ -181,8 +181,10 @@ public class QuartzJob implements Job {
                 if (sapSupport) {
                     List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                     sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                    sapbean = new SAPTemplateBean();
+                    fmRoot.put("sapBean", sapbean);
                 }
-                fmRoot.put("sapBean", sapbean);
+                
                 DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
                 databasebean.initjob(sitedatasourcelist, cfdatasourceService);
                 fmRoot.put("databaseBean", databasebean);
@@ -209,8 +211,9 @@ public class QuartzJob implements Job {
                 if (sapSupport) {
                     List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                     sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                    sapbean = new SAPTemplateBean();
+                    velContext.put("sapBean", sapbean);
                 }
-                velContext.put("sapBean", sapbean);
                 DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
                 databasebean.initjob(sitedatasourcelist, cfdatasourceService);
                 velContext.put("databaseBean", databasebean);
