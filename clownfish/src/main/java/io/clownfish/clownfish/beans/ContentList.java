@@ -20,14 +20,19 @@ import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
+import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +48,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DualListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +68,8 @@ public class ContentList implements Serializable {
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfAttributService cfattributService;
+    @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
+    @Autowired CfKeywordService cfkeywordService;
     
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter CfClasscontent selectedContent = null;
@@ -90,6 +98,10 @@ public class ContentList implements Serializable {
     private @Getter @Setter boolean isMediaType;
     private @Getter @Setter boolean valueBooleanRendered = false;
     private @Getter @Setter boolean valueDatetimeRendered = false;
+    private @Getter @Setter DualListModel<CfKeyword> keywords;
+    private List<CfKeyword> keywordSource;
+    private List<CfKeyword> keywordTarget;
+    private List<CfClasscontentkeyword> contentkeywordlist;
     
     final transient Logger logger = LoggerFactory.getLogger(ContentList.class);
 
@@ -110,6 +122,11 @@ public class ContentList implements Serializable {
         classcontentlist = cfclasscontentService.findAll();
         classlist = cfclassService.findAll();
         editContent = "";
+        
+        keywordSource = cfkeywordService.findAll();
+        keywordTarget = new ArrayList<>();
+        
+        keywords = new DualListModel<>(keywordSource, keywordTarget);
     }
     
     public void onSelect(SelectEvent event) {
@@ -119,6 +136,16 @@ public class ContentList implements Serializable {
         contentName = selectedContent.getName();
         selectedClass = selectedContent.getClassref();
         newContentButtonDisabled = true;
+        
+        keywords.getTarget().clear();
+        keywords.getSource().clear();
+        keywords.setSource(cfkeywordService.findAll());
+        contentkeywordlist = cfclasscontentkeywordService.findByAssetRef(selectedContent.getId());
+        for (CfClasscontentkeyword contentkeyword : contentkeywordlist) {
+            CfKeyword kw = cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref());
+            keywords.getTarget().add(kw);
+            keywords.getSource().remove(kw);
+        }
     }
     
     public void onSelectAttribut(SelectEvent event) {
@@ -288,5 +315,21 @@ public class ContentList implements Serializable {
                 break;    
         }
         cfattributcontentService.edit(selectedAttribut);
+    }
+    
+    public void onAttach(ActionEvent actionEvent) {
+        contentkeywordlist = cfclasscontentkeywordService.findByAssetRef(selectedContent.getId());
+        for (CfClasscontentkeyword assetkeyword : contentkeywordlist) {
+            cfclasscontentkeywordService.delete(assetkeyword);
+        }
+        List<CfKeyword> selectedkeyword = keywords.getTarget();
+        try {
+            for (Object keyword : selectedkeyword) {
+                CfClasscontentkeyword assetkeyword = new CfClasscontentkeyword(selectedContent.getId(), ((CfKeyword)keyword).getId());
+                cfclasscontentkeywordService.create(assetkeyword);
+            }
+        } catch (ConstraintViolationException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 }

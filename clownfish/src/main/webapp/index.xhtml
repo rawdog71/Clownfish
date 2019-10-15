@@ -474,7 +474,7 @@
                         <p:dataTable id="classcontentlist" var="classcontent" value="#{classcontentList.classcontentlist}" 
                                      selectionMode="single" selection="#{classcontentList.selectedContent}" rowKey="#{classcontent.id}"
                                      emptyMessage="No content available" filteredValue="#{classcontentList.filteredContent}" widgetVar="classcontentlist">
-                            <p:ajax event="rowSelect" listener="#{classcontentList.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:newcontent" />
+                            <p:ajax event="rowSelect" listener="#{classcontentList.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:newcontent :form:tabview:contentkeywordpicklist" />
                             <p:column headerText="Name" filterBy="#{classcontent.name}" filterMatchMode="contains">
                                 <h:outputText value="#{classcontent.name}" />
                             </p:column>
@@ -509,38 +509,50 @@
                         <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                     </p:commandButton>
                     
-                    <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentList.selectedAttributContent}" rowKey="#{attributcontent.id}">
-                        <p:ajax event="rowSelect" listener="#{classcontentList.onSelectAttribut}" update=":form:tabview:attributcontentlist" />
-                        <p:column headerText="Name">
-                            <h:outputText value="#{attributcontent.attributref.name}" />
-                        </p:column>
-                        <p:column headerText="Typ">
-                            <h:outputText value="#{attributcontent.attributref.attributetype}" />
-                        </p:column>
-                        <p:column headerText="Wert">
-                            <p:inputText id="attributvalueString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.stringType}" />
-                            <p:password id="attributvalueHashString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.hashStringType}" />
-                            <p:inputNumber id="attributvalueInt" value="#{classcontentList.editContent}" decimalPlaces="0" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.integerType}" />
-                            <p:inputNumber id="attributvalueReal" value="#{classcontentList.editContent}" decimalPlaces="2" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.realType}" />
-                            <p:textEditor id="attributvalueHtmlText" widgetVar="editor1" value="#{classcontentList.editContent}" height="300" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.HTMLTextType}" />
-                            <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.textType}" />
-                            <p:inputTextarea id="attributvalueMarkdown" widgetVar="editor13" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.markdownType}" />
-                            <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.booleanType}" />
-                            <p:calendar id="attributvalueDatetime" value="#{classcontentList.editContent}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" />
-                            <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" converter="#{mediaConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}">
-                                <f:selectItems value="#{assetlist.assetlist}" />
-                            </p:selectOneMenu>
-                            
-                            <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
-                            <p:commandButton id="editattribut" process="form" value="Edit" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" />
-                            <p:focus for="attributvalueString" />
-                            <p:focus for="attributvalueInt" />
-                            <p:focus for="attributvalueReal" />
-                            <p:focus for="attributvalueHtmlText" />
-                            <p:focus for="attributvalueText" />
-                            <p:focus for="attributvalueMarkdown" />
-                        </p:column>
-                    </p:dataTable>
+                    <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
+                    
+                        <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentList.selectedAttributContent}" rowKey="#{attributcontent.id}">
+                            <p:ajax event="rowSelect" listener="#{classcontentList.onSelectAttribut}" update=":form:tabview:attributcontentlist" />
+                            <p:column headerText="Name">
+                                <h:outputText value="#{attributcontent.attributref.name}" />
+                            </p:column>
+                            <p:column headerText="Typ">
+                                <h:outputText value="#{attributcontent.attributref.attributetype}" />
+                            </p:column>
+                            <p:column headerText="Wert">
+                                <p:inputText id="attributvalueString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.stringType}" />
+                                <p:password id="attributvalueHashString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.hashStringType}" />
+                                <p:inputNumber id="attributvalueInt" value="#{classcontentList.editContent}" decimalPlaces="0" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.integerType}" />
+                                <p:inputNumber id="attributvalueReal" value="#{classcontentList.editContent}" decimalPlaces="2" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.realType}" />
+                                <p:textEditor id="attributvalueHtmlText" widgetVar="editor1" value="#{classcontentList.editContent}" height="300" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.HTMLTextType}" />
+                                <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.textType}" />
+                                <p:inputTextarea id="attributvalueMarkdown" widgetVar="editor13" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.markdownType}" />
+                                <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.booleanType}" />
+                                <p:calendar id="attributvalueDatetime" value="#{classcontentList.editContent}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" />
+                                <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" converter="#{mediaConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}">
+                                    <f:selectItems value="#{assetlist.assetlist}" />
+                                </p:selectOneMenu>
+
+                                <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
+                                <p:commandButton id="editattribut" process="form" value="Edit" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" />
+                                <p:focus for="attributvalueString" />
+                                <p:focus for="attributvalueInt" />
+                                <p:focus for="attributvalueReal" />
+                                <p:focus for="attributvalueHtmlText" />
+                                <p:focus for="attributvalueText" />
+                                <p:focus for="attributvalueMarkdown" />
+                            </p:column>
+                        </p:dataTable>
+
+                        <p:pickList id="contentkeywordpicklist" value="#{classcontentList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" converter="#{keywordConverterBean}" showCheckbox="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains">
+                            <f:facet name="sourceCaption">Unattached</f:facet>
+                            <f:facet name="targetCaption">Attached</f:facet>
+                        </p:pickList>
+                        <p:commandButton id="attachcontentkeyword" value="Attach" actionListener="#{classcontentList.onAttach}">
+
+                        </p:commandButton>
+                    </h:panelGrid>
+                    
                 </p:tab>
                 
                 <p:tab title="Datalists" id="datalistpanel" rendered="#{loginBean.login}">
@@ -756,7 +768,7 @@
                         <p:outputLabel for="keywords" value="Keywords: " />
                         <p:chips id="keywords" value="#{keywordList.items}" />
                         
-                        <p:commandButton id="newkeyword" process="form" value="New" actionListener="#{keywordList.onCreate}" update=":form:tabview:keywordlist :form:tabview:assetkeywordpicklist" />
+                        <p:commandButton id="newkeyword" process="form" value="New" actionListener="#{keywordList.onCreate}" update=":form:tabview:keywordlist :form:tabview:assetkeywordpicklist :form:tabview:contentkeywordpicklist" />
                     </h:panelGrid>
                 </p:tab>
                 

@@ -41,7 +41,6 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,13 +50,13 @@ import org.springframework.stereotype.Component;
 @Scope(value="request")
 @Component
 public class SAPTemplateBean implements Serializable {
-    private static List<JsonFormParameter> postmap;
+    private List<JsonFormParameter> postmap;
     private transient RPY_TABLE_READ rpytableread;
     private transient @Getter @Setter Map contentmap;
     static SAPConnection sapc = null;
     private transient RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
-    private static HashMap<String, JCoFunction> jcofunctiontable = null;
-    private static HashMap<String, List<RpyTableRead>> rpyMap = null;
+    private HashMap<String, JCoFunction> jcofunctiontable = null;
+    private HashMap<String, List<RpyTableRead>> rpyMap = null;
     
     final transient Logger logger = LoggerFactory.getLogger(SAPTemplateBean.class);
 
