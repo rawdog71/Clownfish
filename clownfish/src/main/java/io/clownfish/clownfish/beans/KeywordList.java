@@ -43,6 +43,7 @@ public class KeywordList {
     @Autowired CfKeywordService cfkeywordService;
     @Autowired PropertyList propertylist;
     @Autowired AssetList assetlist;
+    @Autowired ContentList contentlist;
     
     private static Map<String, String> propertymap = null;
     
@@ -76,6 +77,7 @@ public class KeywordList {
             });
             keywordlist = cfkeywordService.findAll();
             assetlist.init();
+            contentlist.init();
         } catch (ConstraintViolationException ex) {
             logger.error(ex.getMessage());
         }

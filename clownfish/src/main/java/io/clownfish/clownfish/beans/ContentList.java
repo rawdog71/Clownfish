@@ -60,7 +60,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("classcontentList")
-@Scope("session")
+@Scope("singleton")
 @Component
 public class ContentList implements Serializable {
     @Autowired transient CfClassService cfclassService;
