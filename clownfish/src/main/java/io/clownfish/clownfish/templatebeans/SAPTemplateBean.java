@@ -156,9 +156,9 @@ public class SAPTemplateBean implements Serializable {
                             }
                             break;
                         case "c":
+                            String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
+                            functions_table = function.getChangingParameterList().getTable(paramname);
                             try {
-                                String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
-                                functions_table = function.getChangingParameterList().getTable(paramname);
                                 if (!functions_table.isEmpty()) {
                                     rpytablereadlist = getRpytablereadlist(param.trim());
                                     //rpytablereadlist = rpytableread.getRpyTableReadList(param);

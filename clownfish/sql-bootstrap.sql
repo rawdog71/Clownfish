@@ -428,7 +428,56 @@ CREATE TABLE IF NOT EXISTS `cf_quartz` (
   `active` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+
+-- --------------------------------------------------------
+--
+-- Tabellenstruktur für Tabelle `cf_assetlist`
+--
+
+CREATE TABLE IF NOT EXISTS `cf_assetlist` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `cf_assetlistcontent`
+--
+
+CREATE TABLE IF NOT EXISTS `cf_assetlistcontent` (
+  `assetlistref` bigint(20) unsigned NOT NULL,
+  `assetref` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`assetlistref`,`assetref`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `cf_keywordlist`
+--
+
+CREATE TABLE IF NOT EXISTS `cf_keywordlist` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `cf_keywordlistcontent`
+--
+
+CREATE TABLE IF NOT EXISTS `cf_keywordlistcontent` (
+  `keywordlistref` bigint(20) unsigned NOT NULL,
+  `keywordref` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`keywordlistref`,`keywordref`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 --
 -- Datenbank: `clownfish`
