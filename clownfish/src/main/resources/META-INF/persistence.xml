@@ -7,6 +7,32 @@
     <class>io.clownfish.clownfish.dbentities.CfAssetlistcontent</class>
     <class>io.clownfish.clownfish.dbentities.CfKeywordlistcontent</class>
     <class>io.clownfish.clownfish.dbentities.CfAssetlist</class>
+    <class>io.clownfish.clownfish.dbentities.CfAsset</class>
+    <class>io.clownfish.clownfish.dbentities.CfAssetkeyword</class>
+    <class>io.clownfish.clownfish.dbentities.CfAttribut</class>
+    <class>io.clownfish.clownfish.dbentities.CfAttributcontent</class>
+    <class>io.clownfish.clownfish.dbentities.CfAttributetype</class>
+    <class>io.clownfish.clownfish.dbentities.CfClass</class>
+    <class>io.clownfish.clownfish.dbentities.CfClasscontent</class>
+    <class>io.clownfish.clownfish.dbentities.CfClasscontentkeyword</class>
+    <class>io.clownfish.clownfish.dbentities.CfDatasource</class>
+    <class>io.clownfish.clownfish.dbentities.CfJavascript</class>
+    <class>io.clownfish.clownfish.dbentities.CfJavascriptversion</class>
+    <class>io.clownfish.clownfish.dbentities.CfKeyword</class>
+    <class>io.clownfish.clownfish.dbentities.CfList</class>
+    <class>io.clownfish.clownfish.dbentities.CfListcontent</class>
+    <class>io.clownfish.clownfish.dbentities.CfProperty</class>
+    <class>io.clownfish.clownfish.dbentities.CfRelation</class>
+    <class>io.clownfish.clownfish.dbentities.CfSite</class>
+    <class>io.clownfish.clownfish.dbentities.CfSitecontent</class>
+    <class>io.clownfish.clownfish.dbentities.CfSitedatasource</class>
+    <class>io.clownfish.clownfish.dbentities.CfSitelist</class>
+    <class>io.clownfish.clownfish.dbentities.CfSitesaprfc</class>
+    <class>io.clownfish.clownfish.dbentities.CfStylesheet</class>
+    <class>io.clownfish.clownfish.dbentities.CfStylesheetversion</class>
+    <class>io.clownfish.clownfish.dbentities.CfTemplate</class>
+    <class>io.clownfish.clownfish.dbentities.CfTemplateversion</class>
+    <class>io.clownfish.clownfish.dbentities.CfUser</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/clownfish?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.user" value="clownfish"/>
