@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.dbrepository;
 
 import io.clownfish.clownfish.daointerface.CfKeywordlistDAO;
-import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfKeywordlist;
 import java.util.List;
 import javax.persistence.TypedQuery;
