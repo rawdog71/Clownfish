@@ -40,8 +40,8 @@ public class EmailTemplateBean implements Serializable {
         this.propertymap = propertymap;
     }
     
-    public void sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
+    public boolean sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
         MailUtil mailutil = new MailUtil(propertymap.get("mail_smtp_host"), propertymap.get("mail_transport_protocol"), propertymap.get("mail_user"), propertymap.get("mail_password"), propertymap.get("mail_sendfrom"));
-        mailutil.sendRespondMail(mailto, subject, mailbody);
+        return mailutil.sendRespondMail(mailto, subject, mailbody);
     }
 }

@@ -24,6 +24,8 @@ import javax.mail.internet.MimeMessage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -38,6 +40,8 @@ public class MailUtil {
     private @Getter @Setter String sendfrom;
     private final Properties props;
     private final String encodingOptions = "text/html; charset=UTF-8";
+    
+    final transient Logger logger = LoggerFactory.getLogger(MailUtil.class);
 
     public MailUtil(String mailsmtphost, String mailtransportprotocol, String mailuser, String mailpassword, String sendfrom) {
         props = System.getProperties();
@@ -48,13 +52,13 @@ public class MailUtil {
         this.mailpassword = mailpassword;
         this.sendfrom = sendfrom;
         
-        props.put("mail_smtp_host", mailsmtphost);
-        props.put("mail_transport_protocol", mailtransportprotocol);
-        props.put("mail_user", mailuser);
-        props.put("mail_password", mailpassword);
+        props.put("mail.smtp.host", mailsmtphost);
+        props.put("mail.transport.protocol", mailtransportprotocol);
+        props.put("mail.user", mailuser);
+        props.put("mail.password", mailpassword);
     }
 
-    public void sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
+    public boolean sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
         Session session = Session.getInstance(props, null);
 
         // Define message
@@ -70,8 +74,16 @@ public class MailUtil {
         message.setContent(mailbody, encodingOptions);
 
         if (mailto.compareToIgnoreCase("noreply@clownfish.io") != 0) {
-        // Send the message
-            Transport.send( message );
+            // Send the message
+            try {
+                Transport.send( message );
+                return true;
+            } catch (Exception ex) {
+                logger.error(ex.getMessage());
+                return false;
+            }
+        } else {
+            return false;
         }
     }
 }
