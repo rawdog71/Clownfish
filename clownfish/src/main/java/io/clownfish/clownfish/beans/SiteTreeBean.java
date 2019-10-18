@@ -16,11 +16,14 @@
 package io.clownfish.clownfish.beans;
 
 import de.destrukt.sapconnection.SAPConnection;
+import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfSite;
+import io.clownfish.clownfish.dbentities.CfSiteassetlist;
+import io.clownfish.clownfish.dbentities.CfSiteassetlistPK;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.dbentities.CfSitecontentPK;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
@@ -35,12 +38,14 @@ import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
 import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
 import io.clownfish.clownfish.sap.models.RfcFunction;
 import io.clownfish.clownfish.sap.models.RfcGroup;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfPropertyService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
+import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
@@ -110,6 +115,8 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter RfcFunction selectedrfcfunction = null;
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter List<CfClasscontent> selectedClasscontentlist;
+    private @Getter @Setter List<CfAssetlist> assetlist;
+    private @Getter @Setter List<CfAssetlist> selectedAssetlist;
     private @Getter @Setter int sitehtmlcompression;
     private @Getter @Setter int sitegzip;
     private @Getter @Setter boolean sitejob;
@@ -131,9 +138,11 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfDatasourceService cfdatasourceService;
     @Autowired transient CfSitedatasourceService cfsitedatasourceService;
     @Autowired transient CfSitecontentService cfsitecontentService;
+    @Autowired transient CfSiteassetlistService cfsiteassetlistService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfSitelistService cfsitelistService;
     @Autowired transient CfClasscontentService cfclasscontentService;
+    @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
     @Autowired transient CfPropertyService cfpropertyService;
     @Autowired transient PropertyList propertylist;
@@ -167,10 +176,12 @@ public class SiteTreeBean implements Serializable {
         datasources = cfdatasourceService.findAll();
         contentlist = cflistService.findAll();
         classcontentlist = cfclasscontentService.findAll();
+        assetlist = cfassetlistService.findAll();
         
         selectedDatasources = new ArrayList<>();
         selectedContentlist = new ArrayList<>();
         selectedClasscontentlist = new ArrayList<>();
+        selectedAssetlist = new ArrayList<>();
         locale = propertymap.get("response_locale");
         contentType = propertymap.get("response_contenttype");
         characterEncoding = propertymap.get("response_characterencoding");
@@ -186,6 +197,10 @@ public class SiteTreeBean implements Serializable {
     
     public void initClassContentlist() {
         classcontentlist = cfclasscontentService.findAll();
+    }
+    
+    public void initAssetlibrarylist() {
+        assetlist = cfassetlistService.findAll();
     }
 
     private void fillChildren(long parentid, TreeNode node) {
@@ -302,6 +317,7 @@ public class SiteTreeBean implements Serializable {
         selectedDatasources.clear();
         selectedContentlist.clear();
         selectedClasscontentlist.clear();
+        selectedAssetlist.clear();
         sitejob = false;
         sitesearchrelevant = false;
         sitestatic = false;
@@ -352,6 +368,14 @@ public class SiteTreeBean implements Serializable {
             CfClasscontent cc = cfclasscontentService.findById(sitecontent.getCfSitecontentPK().getClasscontentref());
             selectedClasscontentlist.add(cc);
         }
+        
+        selectedAssetlist.clear();
+        List<CfSiteassetlist> selectedAssetliste = cfsiteassetlistService.findBySiteref(selectedSite.getId());
+        for (CfSiteassetlist siteassetlist : selectedAssetliste) {
+            CfAssetlist csa = cfassetlistService.findById(siteassetlist.getCfSiteassetlistPK().getAssetlistref());
+            selectedAssetlist.add(csa);
+        }
+        
         siteName = selectedSite.getName();
         siteTitle = selectedSite.getTitle();
         siteDescription = selectedSite.getDescription();
@@ -424,10 +448,10 @@ public class SiteTreeBean implements Serializable {
             if (selectedContentlist.size() > 0) {
                 for (CfList contentlist : selectedContentlist) {
                     CfSitelist sitelist = new CfSitelist();
-                    CfSitelistPK knsitelistPK = new CfSitelistPK();
-                    knsitelistPK.setSiteref(selectedSite.getId());
-                    knsitelistPK.setListref(contentlist.getId());
-                    sitelist.setCfSitelistPK(knsitelistPK);
+                    CfSitelistPK cfsitelistPK = new CfSitelistPK();
+                    cfsitelistPK.setSiteref(selectedSite.getId());
+                    cfsitelistPK.setListref(contentlist.getId());
+                    sitelist.setCfSitelistPK(cfsitelistPK);
                     cfsitelistService.create(sitelist);
                 }
             }
@@ -441,13 +465,31 @@ public class SiteTreeBean implements Serializable {
             if (selectedClasscontentlist.size() > 0) {
                 for (CfClasscontent content : selectedClasscontentlist) {
                     CfSitecontent sitecontent = new CfSitecontent();
-                    CfSitecontentPK knsitecontentPK = new CfSitecontentPK();
-                    knsitecontentPK.setSiteref(selectedSite.getId());
-                    knsitecontentPK.setClasscontentref(content.getId());
-                    sitecontent.setCfSitecontentPK(knsitecontentPK);
+                    CfSitecontentPK cfsitecontentPK = new CfSitecontentPK();
+                    cfsitecontentPK.setSiteref(selectedSite.getId());
+                    cfsitecontentPK.setClasscontentref(content.getId());
+                    sitecontent.setCfSitecontentPK(cfsitecontentPK);
                     cfsitecontentService.create(sitecontent);
                 }
             }
+            
+            // Delete siteassetlist first
+            List<CfSiteassetlist> siteassetlists = cfsiteassetlistService.findBySiteref(selectedSite.getId());
+            for (CfSiteassetlist assetlist : siteassetlists) {
+                cfsiteassetlistService.delete(assetlist);
+            }
+            // Add selected sitecontent
+            if (selectedAssetlist.size() > 0) {
+                for (CfAssetlist content : selectedAssetlist) {
+                    CfSiteassetlist siteassetlist = new CfSiteassetlist();
+                    CfSiteassetlistPK cfsitecontentPK = new CfSiteassetlistPK();
+                    cfsitecontentPK.setSiteref(selectedSite.getId());
+                    cfsitecontentPK.setAssetlistref(content.getId());
+                    siteassetlist.setCfSiteassetlistPK(cfsitecontentPK);
+                    cfsiteassetlistService.create(siteassetlist);
+                }
+            }
+            
             selectedSite.setHtmlcompression(sitehtmlcompression);
             selectedSite.setCharacterencoding(characterEncoding);
             selectedSite.setContenttype(contentType);

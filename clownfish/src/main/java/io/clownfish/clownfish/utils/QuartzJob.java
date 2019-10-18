@@ -87,7 +87,7 @@ public class QuartzJob implements Job {
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         List<CfQuartz> joblist = quartzlist.getQuartzlist();
         joblist.stream().filter((quartz) -> (quartz.getName().compareToIgnoreCase(jec.getJobDetail().getKey().getName()) == 0)).map((quartz) -> {
-            logger.info("JOB CLOWNFISH CMS Version 1.0: " + quartz.getName() + " - " + quartz.getSiteRef());
+            logger.info("JOB CLOWNFISH CMS: " + quartz.getName() + " - " + quartz.getSiteRef());
             return quartz;
         }).forEach((quartz) -> {
             callJob(quartz.getSiteRef().longValue());

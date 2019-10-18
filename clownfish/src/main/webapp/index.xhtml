@@ -123,6 +123,14 @@
                                                     </p:selectCheckboxMenu>
                                                 </p:column>
                                             </p:row>
+                                            <p:row>
+                                                <p:column>
+                                                    <p:outputLabel for="assetlibrarydroplist" value="Assetlibraries:" />
+                                                    <p:selectCheckboxMenu id="assetlibrarydroplist" value="#{sitetree.selectedAssetlist}" required="false" label="Assetlibrary" converter="#{assetlistConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                        <f:selectItems value="#{sitetree.assetlist}" var="assetlist" itemLabel="#{assetlist.name}" itemValue="#{assetlist}" />
+                                                    </p:selectCheckboxMenu>
+                                                </p:column>
+                                            </p:row>
                                         </p:panelGrid>
                                     </p:tab>
                                     <p:tab title="SEO" id="site_seo">
@@ -769,7 +777,9 @@
                         <p:outputLabel for="assetcontentlist" value="Assetlist: " />
                         <p:inputText id="assetcontentlist" value="#{assetLibrary.assetlistname}" />
                         
-                        <p:commandButton id="newassetlist" process="form" value="New" actionListener="#{assetLibrary.onCreate}" update=":form:tabview:assetlistcontent" />
+                        <p:commandButton id="newassetlist" process="form" value="New" actionListener="#{assetLibrary.onCreate}" update=":form:tabview:assetlistcontent :form:tabview:tabsiteview:assetlibrarydroplist">
+                            <f:actionListener binding="#{sitetree.initAssetlibrarylist()}" />
+                        </p:commandButton>
                     </h:panelGrid>
                     
                     <p:selectManyCheckbox id="assetcontentlistbox" value="#{assetLibrary.selectedAssetcontent}" layout="responsive" columns="4" converter="#{assetConverterBean}">

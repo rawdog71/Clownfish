@@ -478,6 +478,18 @@ CREATE TABLE IF NOT EXISTS `cf_keywordlistcontent` (
   PRIMARY KEY (`keywordlistref`,`keywordref`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `cf_siteassetlist`
+--
+
+CREATE TABLE IF NOT EXISTS `cf_siteassetlist` (
+  `siteref` bigint(20) unsigned NOT NULL,
+  `assetlistref` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`siteref`,`assetlistref`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 --
 -- Datenbank: `clownfish`

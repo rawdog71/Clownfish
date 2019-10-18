@@ -15,20 +15,29 @@
  */
 package io.clownfish.clownfish.utils;
 
+import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfAssetlist;
+import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSite;
+import io.clownfish.clownfish.dbentities.CfSiteassetlist;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.dbentities.CfSitelist;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +56,10 @@ public class SiteUtil {
     @Autowired CfListService cflistService;
     @Autowired CfListcontentService cflistcontentService;
     @Autowired CfAttributcontentService cfattributcontentService;
+    @Autowired CfAssetService cfassetService;
+    @Autowired CfAssetlistService cfassetlistService;
+    @Autowired CfSiteassetlistService cfsiteassetlistService;
+    @Autowired CfAssetlistcontentService cfassetlistcontentService;
     @Autowired ClassUtil classutil;
     
     public SiteUtil() {
@@ -80,5 +93,25 @@ public class SiteUtil {
             sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
         }
         return sitecontentmapdummy;
+    }
+    
+    public void getSiteAssetlibrary(CfSite cfsite, Map sitecontentmap) {
+        List<CfSiteassetlist> siteassetlibrary = new ArrayList<>();
+        siteassetlibrary.addAll(cfsiteassetlistService.findBySiteref(cfsite.getId()));
+        
+        HashMap<String, ArrayList> assetlibraryMap = new HashMap<>();
+        for (CfSiteassetlist siteassetlist : siteassetlibrary) {
+            CfAssetlist cfassetlist = cfassetlistService.findById(siteassetlist.getCfSiteassetlistPK().getAssetlistref());
+            List<CfAssetlistcontent> assetlist = new ArrayList<>();
+            assetlist.addAll(cfassetlistcontentService.findByAssetlistref(cfassetlist.getId()));
+            ArrayList<CfAsset> dummyassetlist = new ArrayList<>();
+            for (CfAssetlistcontent assetcontent : assetlist) {
+                CfAsset asset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
+                dummyassetlist.add(asset);
+            }
+            assetlibraryMap.put(cfassetlist.getName(), dummyassetlist);
+            //sitecontentmap.put(, listcontentmap);
+        }
+        sitecontentmap.put("AssetLibrary", assetlibraryMap);
     }
 }

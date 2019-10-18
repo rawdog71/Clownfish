@@ -648,6 +648,9 @@ public class Clownfish {
 
                         // fetch the dependend datalists, if available
                         siteutil.getSitelist_list(cfsite, sitecontentmap);
+                        
+                        // fetch the site assetlibraries
+                        siteutil.getSiteAssetlibrary(cfsite, sitecontentmap);
 
                         // manage parameters 
                         HashMap<String, DatatableProperties> datatableproperties = clownfishutil.getDatatableproperties(postmap);

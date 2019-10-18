@@ -65,7 +65,7 @@ public class MailUtil {
         MimeMessage message = new MimeMessage(session);
         message.setHeader("Content-Type", encodingOptions);
         message.setFrom(new InternetAddress(sendfrom));
-        if (mailto.indexOf(",") > 0) {
+        if (mailto.indexOf(',') > 0) {
             message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(mailto));
         } else {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(mailto));
