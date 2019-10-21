@@ -881,25 +881,163 @@
                         </p:dataTable>
                     </p:scrollPanel>
                     
-                    <p:panelGrid id="jobpanel" columns="2">
-                        <p:outputLabel for="jobname">Name</p:outputLabel>
-                        <p:inputText id="jobname" value="#{quartzlist.jobname}" >
-                            <p:ajax event="keyup" listener="#{quartzlist.onChangeName(changeEvent)}" update=":form:tabview:jobbtnpanel" />
-                        </p:inputText>
+                    <p:panelGrid id="jobpanelcustomize" columns="3">
+                        <p:panelGrid id="jobpanel" columns="2">
+                            <p:outputLabel for="jobname">Name</p:outputLabel>
+                            <p:inputText id="jobname" value="#{quartzlist.jobname}" >
+                                <p:ajax event="keyup" listener="#{quartzlist.onChangeName(changeEvent)}" update=":form:tabview:jobbtnpanel" />
+                            </p:inputText>
 
-                        <p:outputLabel for="propertyvalue">Job Value</p:outputLabel>
-                        <p:inputText id="jobvalue" value="#{quartzlist.jobvalue}" ></p:inputText>
+                            <p:outputLabel for="propertyvalue">Job Value</p:outputLabel>
+                            <p:inputText id="jobvalue" value="#{quartzlist.jobvalue}" ></p:inputText>
+
+                            <p:outputLabel for="jobactive">Active</p:outputLabel>
+                            <p:selectBooleanCheckbox id="jobactive" value="#{quartzlist.active}" />
+
+                            <p:outputLabel for="jobsiteref" value="Site" />
+                            <p:selectOneMenu id="jobsiteref" value="#{quartzlist.siteref}" required="false" converter="#{siteConverterBean}">
+                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                <f:selectItems value="#{quartzlist.sitelist}" />
+                            </p:selectOneMenu>
+                        </p:panelGrid>
                         
-                        <p:outputLabel for="jobactive">Active</p:outputLabel>
-                        <p:selectBooleanCheckbox id="jobactive" value="#{quartzlist.active}" />
+                        <p:tabView>
+                            <p:tab title="Seconds">
+                                <p:selectOneRadio id="customRadioSecond" value="#{quartzlist.secondsType}" layout="custom">
+                                    <p:ajax event="change" listener="#{quartzlist.secondsValueChange}" update=":form:tabview:jobpreview" />
+                                    <f:selectItem itemLabel="Every second" itemValue="0" />
+                                    <f:selectItem itemLabel="Every" itemValue="1" />
+                                    <f:selectItem itemLabel="Specific second (choose one or many)" itemValue="2" />
+                                    <f:selectItem itemLabel="Every second between second" itemValue="3" />
+                                </p:selectOneRadio>
+
+                                <h:panelGrid columns="5" cellpadding="5">
+                                    <p:radioButton id="opt1_second" for="customRadioSecond" itemIndex="0" />
+                                    <h:outputLabel for="opt1_second" value="Every second" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+
+                                    <p:radioButton id="opt2_second" for="customRadioSecond" itemIndex="1" />
+                                    <h:outputLabel for="opt2_second" value="Every" />
+                                    <p:selectOneMenu id="everysecond" value="#{quartzlist.everysecond}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.everysecondsValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.secondslist1}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="second(s) starting at second" />
+                                    <p:selectOneMenu id="startingatsecond" value="#{quartzlist.startingsecond}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingatsecondValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.secondslist2}" />
+                                    </p:selectOneMenu>
+
+                                    <p:radioButton id="opt3_second" for="customRadioSecond" itemIndex="2" />
+                                    <h:outputLabel for="opt3_second" value="Specific second (choose one or many)" />
+                                    <p:selectCheckboxMenu id="multipleseconds" value="#{quartzlist.selectedSeconds}" label="Seconds">
+                                        <p:ajax event="change" listener="#{quartzlist.multisecondsValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.secondslist2}" />
+                                    </p:selectCheckboxMenu>
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    
+                                    <p:radioButton id="opt4_second" for="customRadioSecond" itemIndex="3" />
+                                    <h:outputLabel for="opt4_second" value="Every second between second" />
+                                    <p:selectOneMenu id="startingsecond" value="#{quartzlist.startingatsecond}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.secondslist2}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="and second" />
+                                    <p:selectOneMenu id="endingsecond" value="#{quartzlist.endingatsecond}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.endingValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.secondslist2}" />
+                                    </p:selectOneMenu>
+                                </h:panelGrid>
+                            </p:tab>
+                            <p:tab title="Minutes">
+                                <p:selectOneRadio id="customRadioMinute" value="#{quartzlist.minutesType}" layout="custom">
+                                    <p:ajax event="change" listener="#{quartzlist.minutesValueChange}" update=":form:tabview:jobpreview" />
+                                    <f:selectItem itemLabel="Every minute" itemValue="0" />
+                                    <f:selectItem itemLabel="Every" itemValue="1" />
+                                    <f:selectItem itemLabel="Specific minute (choose one or many)" itemValue="2" />
+                                    <f:selectItem itemLabel="Every minute between minute" itemValue="3" />
+                                </p:selectOneRadio>
+
+                                <h:panelGrid columns="5" cellpadding="5">
+                                    <p:radioButton id="opt1_minute" for="customRadioMinute" itemIndex="0" />
+                                    <h:outputLabel for="opt1_minute" value="Every minute" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+
+                                    <p:radioButton id="opt2_minute" for="customRadioMinute" itemIndex="1" />
+                                    <h:outputLabel for="opt2_minute" value="Every" />
+                                    <p:selectOneMenu id="everyminute" value="#{quartzlist.everyminute}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.everyminutesValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.minuteslist1}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="minute(s) starting at minute" />
+                                    <p:selectOneMenu id="startingatminute" value="#{quartzlist.startingminute}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingatminuteValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.minuteslist2}" />
+                                    </p:selectOneMenu>
+
+                                    <p:radioButton id="opt3_minute" for="customRadioMinute" itemIndex="2" />
+                                    <h:outputLabel for="opt3_minute" value="Specific minute (choose one or many)" />
+                                    <p:selectCheckboxMenu id="multipleminutes" value="#{quartzlist.selectedMinutes}" label="Minutes">
+                                        <p:ajax event="change" listener="#{quartzlist.multiminutesValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.minuteslist2}" />
+                                    </p:selectCheckboxMenu>
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    
+                                    <p:radioButton id="opt4_minute" for="customRadioMinute" itemIndex="3" />
+                                    <h:outputLabel for="opt4_minute" value="Every minute between minute" />
+                                    <p:selectOneMenu id="startingminute" value="#{quartzlist.startingatminute}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingMinutesValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.minuteslist2}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="and minute" />
+                                    <p:selectOneMenu id="endingminute" value="#{quartzlist.endingatminute}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.endingMinutesValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.minuteslist2}" />
+                                    </p:selectOneMenu>
+                                </h:panelGrid>
+                            </p:tab>
+                            <p:tab title="Hours">
+                                <h:panelGrid columns="2" cellpadding="10">
+                                    <p:graphicImage name="demo/images/godfather/godfather3.jpg" />
+                                    <h:outputText value="After a break of more than 15 years, director Francis Ford Coppola and writer Mario Puzo returned to the well for this third and final story of the fictional Corleone crime family. 
+                                        Two decades have passed, and crime kingpin Michael Corleone, now divorced from his wife Kay has nearly succeeded in keeping his promise that his family would one day be completely legitimate." />
+                                </h:panelGrid>
+                            </p:tab>
+                            <p:tab title="Day">
+                                <h:panelGrid columns="2" cellpadding="10">
+                                    <p:graphicImage name="demo/images/godfather/godfather3.jpg" />
+                                    <h:outputText value="After a break of more than 15 years, director Francis Ford Coppola and writer Mario Puzo returned to the well for this third and final story of the fictional Corleone crime family. 
+                                        Two decades have passed, and crime kingpin Michael Corleone, now divorced from his wife Kay has nearly succeeded in keeping his promise that his family would one day be completely legitimate." />
+                                </h:panelGrid>
+                            </p:tab>
+                            <p:tab title="Month">
+                                <h:panelGrid columns="2" cellpadding="10">
+                                    <p:graphicImage name="demo/images/godfather/godfather3.jpg" />
+                                    <h:outputText value="After a break of more than 15 years, director Francis Ford Coppola and writer Mario Puzo returned to the well for this third and final story of the fictional Corleone crime family. 
+                                        Two decades have passed, and crime kingpin Michael Corleone, now divorced from his wife Kay has nearly succeeded in keeping his promise that his family would one day be completely legitimate." />
+                                </h:panelGrid>
+                            </p:tab>
+                            <p:tab title="Year">
+                                <h:panelGrid columns="2" cellpadding="10">
+                                    <p:graphicImage name="demo/images/godfather/godfather3.jpg" />
+                                    <h:outputText value="After a break of more than 15 years, director Francis Ford Coppola and writer Mario Puzo returned to the well for this third and final story of the fictional Corleone crime family. 
+                                        Two decades have passed, and crime kingpin Michael Corleone, now divorced from his wife Kay has nearly succeeded in keeping his promise that his family would one day be completely legitimate." />
+                                </h:panelGrid>
+                            </p:tab>
+                        </p:tabView>
                         
-                        <p:outputLabel for="jobsiteref" value="Site" />
-                        <p:selectOneMenu id="jobsiteref" value="#{quartzlist.siteref}" required="false" converter="#{siteConverterBean}">
-                            <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                            <f:selectItems value="#{quartzlist.sitelist}" />
-                        </p:selectOneMenu>
+                        <p:panelGrid id="jobpreviewpanel" columns="2">
+                            <p:outputLabel for="jobpreview">Preview</p:outputLabel>
+                            <p:inputText id="jobpreview" value="#{quartzlist.jobPreview}" disabled="true" />
+                        </p:panelGrid>
                     </p:panelGrid>
-                    
+                        
                     <p:panelGrid id="jobbtnpanel" columns="3">
                         <p:commandButton id="newjob" process="form" value="New" actionListener="#{quartzlist.onCreateJob}" update=":form:msgs :form:tabview:joblist" disabled="#{quartzlist.newJobButtonDisabled}" />
                         <p:commandButton id="editjob" process="form" value="Edit" actionListener="#{quartzlist.onEditJob}" update=":form:msgs :form:tabview:joblist" />
