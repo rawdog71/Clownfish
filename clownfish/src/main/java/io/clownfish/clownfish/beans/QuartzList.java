@@ -80,6 +80,15 @@ public class QuartzList {
     private String[] selectedMinutes;
     
     private @Getter @Setter String hoursPart;
+    private @Getter @Setter int hoursType;
+    private @Getter @Setter int everyhour;
+    private @Getter @Setter int startinghour;
+    private @Getter @Setter int startingathour;
+    private @Getter @Setter int endingathour;
+    private @Getter @Setter List<Integer> hourslist1 = null;
+    private @Getter @Setter List<Integer> hourslist2 = null;
+    private String[] selectedHours;
+    
     private @Getter @Setter String daysPart;
     private @Getter @Setter String monthsPart;
     private @Getter @Setter String yearsPart;
@@ -120,6 +129,19 @@ public class QuartzList {
         startingminute = 0;
         startingatminute = 0;
         endingatminute = 0;
+        
+        hourslist1 = new ArrayList<>();
+        for (int i = 1; i <= 24; i++) {
+            hourslist1.add(i);
+        }
+        hourslist2 = new ArrayList<>();
+        for (int i = 0; i <= 23; i++) {
+            hourslist2.add(i);
+        }
+        everyhour = 1;
+        startinghour = 0;
+        startingathour = 0;
+        endingathour = 0;
         
         secondsPart = "*";
         minutesPart = "*";
@@ -327,6 +349,76 @@ public class QuartzList {
         }
     }
     
+    public void hoursValueChange() {
+        switch (hoursType) {
+            case 0:
+                hoursPart = "*";
+                break;
+            case 1:
+                hoursPart = startinghour + "/" + everyhour;
+                break;
+            case 2:
+                if (null == selectedHours) {
+                    hoursPart = "0";
+                } else {
+                    hoursPart = "";
+                    for (String hour : selectedHours) {
+                        hoursPart += hour + ",";
+                    }
+                    hoursPart = hoursPart.substring(0, hoursPart.length()-1);
+                }
+                break;
+            case 3:
+                hoursPart = startingathour + "-" + endingathour;
+                break;
+        }
+        jobPreview = combine();
+    }
+    
+    public void everyhoursValueChange() {
+        if (1 == hoursType) {
+            hoursPart = startinghour + "/" + everyhour;
+            jobPreview = combine();
+        }
+    }
+    
+    public void startingathourValueChange() {
+        if (1 == hoursType) {
+            hoursPart = startinghour + "/" + everyhour;
+            jobPreview = combine();
+        }
+    }
+
+    public void multihoursValueChange() {
+        if (2 == hoursType) {
+            if (0 == selectedHours.length) {
+                hoursPart = "0";
+                jobPreview = combine();
+            } else {
+                hoursPart = "";
+                for (String hour : selectedHours) {
+                    hoursPart += hour + ",";
+                }
+                hoursPart = hoursPart.substring(0, hoursPart.length()-1);
+                jobPreview = combine();
+            }
+        }
+    }
+    
+    public void startingHoursValueChange() {
+        if (3 == hoursType) {
+            hoursPart = startingathour + "-" + endingathour;
+            jobPreview = combine();
+        }
+    }
+    
+    public void endingHoursValueChange() {
+        if (3 == hoursType) {
+            hoursPart = startingathour + "-" + endingathour;
+            jobPreview = combine();
+        }
+    }
+    
     public String[] getSelectedSeconds() {
         return selectedSeconds;
     }
@@ -335,15 +427,23 @@ public class QuartzList {
         this.selectedSeconds = selectedSeconds;
     }
 
-    private String combine() {
-        return secondsPart + " " + minutesPart + " " + hoursPart + " " + daysPart + " " + monthsPart + " " + yearsPart;
-    }
-
     public String[] getSelectedMinutes() {
         return selectedMinutes;
     }
 
-    public void setSelectedMinutes(String[] selectedMinutes) {
-        this.selectedMinutes = selectedMinutes;
+    public void setSelectedMinutes(String[] selectedHours) {
+        this.selectedHours = selectedHours;
+    }
+    
+    public String[] getSelectedHours() {
+        return selectedHours;
+    }
+
+    public void setSelectedHours(String[] selectedHours) {
+        this.selectedHours = selectedHours;
+    }
+    
+    private String combine() {
+        return secondsPart + " " + minutesPart + " " + hoursPart + " " + daysPart + " " + monthsPart + " " + yearsPart;
     }
 }

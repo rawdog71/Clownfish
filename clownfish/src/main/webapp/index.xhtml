@@ -1003,10 +1003,53 @@
                                 </h:panelGrid>
                             </p:tab>
                             <p:tab title="Hours">
-                                <h:panelGrid columns="2" cellpadding="10">
-                                    <p:graphicImage name="demo/images/godfather/godfather3.jpg" />
-                                    <h:outputText value="After a break of more than 15 years, director Francis Ford Coppola and writer Mario Puzo returned to the well for this third and final story of the fictional Corleone crime family. 
-                                        Two decades have passed, and crime kingpin Michael Corleone, now divorced from his wife Kay has nearly succeeded in keeping his promise that his family would one day be completely legitimate." />
+                                <p:selectOneRadio id="customRadioHour" value="#{quartzlist.hoursType}" layout="custom">
+                                    <p:ajax event="change" listener="#{quartzlist.hoursValueChange}" update=":form:tabview:jobpreview" />
+                                    <f:selectItem itemLabel="Every hour" itemValue="0" />
+                                    <f:selectItem itemLabel="Every" itemValue="1" />
+                                    <f:selectItem itemLabel="Specific hour (choose one or many)" itemValue="2" />
+                                    <f:selectItem itemLabel="Every hour between hour" itemValue="3" />
+                                </p:selectOneRadio>
+
+                                <h:panelGrid columns="5" cellpadding="5">
+                                    <p:radioButton id="opt1_hour" for="customRadioHour" itemIndex="0" />
+                                    <h:outputLabel for="opt1_hour" value="Every hour" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+
+                                    <p:radioButton id="opt2_hour" for="customRadioHour" itemIndex="1" />
+                                    <h:outputLabel for="opt2_hour" value="Every" />
+                                    <p:selectOneMenu id="everyhour" value="#{quartzlist.everyhour}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.everyhoursValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.hourslist1}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="hour(s) starting at hour" />
+                                    <p:selectOneMenu id="startingathour" value="#{quartzlist.startinghour}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingathourValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.hourslist2}" />
+                                    </p:selectOneMenu>
+
+                                    <p:radioButton id="opt3_hour" for="customRadioHour" itemIndex="2" />
+                                    <h:outputLabel for="opt3_hour" value="Specific hour (choose one or many)" />
+                                    <p:selectCheckboxMenu id="multiplehours" value="#{quartzlist.selectedHours}" label="Hours">
+                                        <p:ajax event="change" listener="#{quartzlist.multihoursValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.hourslist2}" />
+                                    </p:selectCheckboxMenu>
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    
+                                    <p:radioButton id="opt4_hour" for="customRadioHour" itemIndex="3" />
+                                    <h:outputLabel for="opt4_hour" value="Every hour between hour" />
+                                    <p:selectOneMenu id="startinhour" value="#{quartzlist.startingathour}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingHoursValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.hourslist2}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="and hour" />
+                                    <p:selectOneMenu id="endinghour" value="#{quartzlist.endingathour}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.endingHoursValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.hourslist2}" />
+                                    </p:selectOneMenu>
                                 </h:panelGrid>
                             </p:tab>
                             <p:tab title="Day">
