@@ -21,6 +21,7 @@ import io.clownfish.clownfish.serviceinterface.CfQuartzService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.event.ActionEvent;
@@ -89,9 +90,23 @@ public class QuartzList {
     private @Getter @Setter List<Integer> hourslist2 = null;
     private String[] selectedHours;
     
-    private @Getter @Setter String daysPart;
+    private @Getter @Setter String dayOfMonthPart;
+    private @Getter @Setter String dayOfWeekPart;
+    
     private @Getter @Setter String monthsPart;
+    private @Getter @Setter int monthType;
+    private @Getter @Setter int everymonth;
+    private @Getter @Setter int startingmonth;
+    private @Getter @Setter int startingatmonth;
+    private @Getter @Setter int endingatmonth;
+    private @Getter @Setter List<Integer> monthslist1 = null;
+    private @Getter @Setter List<Integer> monthslist2 = null;
+    private String[] selectedMonths;
+    
+    private @Getter @Setter LinkedHashMap<String, Integer> monthlist;
+    
     private @Getter @Setter String yearsPart;
+    
     private @Getter @Setter String jobPreview;
     
     final transient Logger logger = LoggerFactory.getLogger(QuartzList.class);
@@ -101,6 +116,20 @@ public class QuartzList {
     
     @PostConstruct
     public void init() {
+        monthlist = new LinkedHashMap<>();
+        monthlist.put("JAN", 1);
+        monthlist.put("FEB", 2);
+        monthlist.put("MAR", 3);
+        monthlist.put("APR", 4);
+        monthlist.put("MAY", 5);
+        monthlist.put("JUN", 6);
+        monthlist.put("JUL", 7);
+        monthlist.put("AUG", 8);
+        monthlist.put("SEP", 9);
+        monthlist.put("OCT", 10);
+        monthlist.put("NOV", 11);
+        monthlist.put("DEC", 12);
+        
         newJobButtonDisabled = false;
         quartzlist = cfquartzService.findAll();
         sitelist = cfsiteService.findAll();
@@ -146,8 +175,23 @@ public class QuartzList {
         secondsPart = "*";
         minutesPart = "*";
         hoursPart = "*";
-        daysPart = "*";
+        dayOfMonthPart = "?";
+        dayOfWeekPart = "*";
+        
         monthsPart = "*";
+        monthslist1 = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            monthslist1.add(i);
+        }
+        monthslist2 = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            monthslist2.add(i);
+        }
+        everymonth = 1;
+        startingmonth = 1;
+        startingatmonth = 1;
+        endingatmonth = 1;
+        
         yearsPart = "*";
         
         jobPreview = combine();
@@ -419,6 +463,76 @@ public class QuartzList {
         }
     }
     
+    public void monthsValueChange() {
+        switch (monthType) {
+            case 0:
+                monthsPart = "*";
+                break;
+            case 1:
+                monthsPart = startingmonth + "/" + everymonth;
+                break;
+            case 2:
+                if (null == selectedMonths) {
+                    monthsPart = "1";
+                } else {
+                    monthsPart = "";
+                    for (String month : selectedMonths) {
+                        monthsPart += monthlist.get(Integer.valueOf(month)) + ",";
+                    }
+                    monthsPart = monthsPart.substring(0, monthsPart.length()-1);
+                }
+                break;
+            case 3:
+                monthsPart = startingatmonth + "-" + endingatmonth;
+                break;
+        }
+        jobPreview = combine();
+    }
+    
+    public void everymonthsValueChange() {
+        if (1 == monthType) {
+            monthsPart = startingmonth + "/" + everymonth;
+            jobPreview = combine();
+        }
+    }
+    
+    public void startingatmonthValueChange() {
+        if (1 == monthType) {
+            monthsPart = startingmonth + "/" + everymonth;
+            jobPreview = combine();
+        }
+    }
+
+    public void multimonthsValueChange() {
+        if (2 == monthType) {
+            if (0 == selectedMonths.length) {
+                monthsPart = "1";
+                jobPreview = combine();
+            } else {
+                monthsPart = "";
+                for (String month : selectedMonths) {
+                    monthsPart += getKeyFromValue(monthlist, Integer.parseInt(month)) + ",";
+                }
+                monthsPart = monthsPart.substring(0, monthsPart.length()-1);
+                jobPreview = combine();
+            }
+        }
+    }
+    
+    public void startingMonthsValueChange() {
+        if (3 == monthType) {
+            monthsPart = startingatmonth + "-" + endingatmonth;
+            jobPreview = combine();
+        }
+    }
+    
+    public void endingMonthsValueChange() {
+        if (3 == monthType) {
+            monthsPart = startingatmonth + "-" + endingatmonth;
+            jobPreview = combine();
+        }
+    }
+    
     public String[] getSelectedSeconds() {
         return selectedSeconds;
     }
@@ -431,8 +545,8 @@ public class QuartzList {
         return selectedMinutes;
     }
 
-    public void setSelectedMinutes(String[] selectedHours) {
-        this.selectedHours = selectedHours;
+    public void setSelectedMinutes(String[] selectedMinutes) {
+        this.selectedMinutes = selectedMinutes;
     }
     
     public String[] getSelectedHours() {
@@ -442,8 +556,29 @@ public class QuartzList {
     public void setSelectedHours(String[] selectedHours) {
         this.selectedHours = selectedHours;
     }
+
+    public String[] getSelectedMonths() {
+        return selectedMonths;
+    }
+
+    public void setSelectedMonths(String[] selectedMonths) {
+        this.selectedMonths = selectedMonths;
+    }
     
     private String combine() {
-        return secondsPart + " " + minutesPart + " " + hoursPart + " " + daysPart + " " + monthsPart + " " + yearsPart;
+        return secondsPart + " " + minutesPart + " " + hoursPart + " " + dayOfMonthPart + " " + monthsPart + " " + dayOfWeekPart + " " + yearsPart;
+    }
+    
+    private String getKeyFromValue(LinkedHashMap lhm, Integer value) {
+        if (lhm.containsValue(value)) {
+            for (Object entry : lhm.keySet()) {
+                if (lhm.get(entry) == value) {
+                    return entry.toString();
+                }
+            }
+        } else {
+            return null;
+        }
+        return null;
     }
 }

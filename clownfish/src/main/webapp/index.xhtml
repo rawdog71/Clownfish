@@ -1060,10 +1060,53 @@
                                 </h:panelGrid>
                             </p:tab>
                             <p:tab title="Month">
-                                <h:panelGrid columns="2" cellpadding="10">
-                                    <p:graphicImage name="demo/images/godfather/godfather3.jpg" />
-                                    <h:outputText value="After a break of more than 15 years, director Francis Ford Coppola and writer Mario Puzo returned to the well for this third and final story of the fictional Corleone crime family. 
-                                        Two decades have passed, and crime kingpin Michael Corleone, now divorced from his wife Kay has nearly succeeded in keeping his promise that his family would one day be completely legitimate." />
+                                <p:selectOneRadio id="customRadioMonth" value="#{quartzlist.monthType}" layout="custom">
+                                    <p:ajax event="change" listener="#{quartzlist.monthsValueChange}" update=":form:tabview:jobpreview" />
+                                    <f:selectItem itemLabel="Every month" itemValue="0" />
+                                    <f:selectItem itemLabel="Every" itemValue="1" />
+                                    <f:selectItem itemLabel="Specific month (choose one or many)" itemValue="2" />
+                                    <f:selectItem itemLabel="Every month between month" itemValue="3" />
+                                </p:selectOneRadio>
+
+                                <h:panelGrid columns="5" cellpadding="5">
+                                    <p:radioButton id="opt1_month" for="customRadioMonth" itemIndex="0" />
+                                    <h:outputLabel for="opt1_month" value="Every month" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+
+                                    <p:radioButton id="opt2_month" for="customRadioMonth" itemIndex="1" />
+                                    <h:outputLabel for="opt2_month" value="Every" />
+                                    <p:selectOneMenu id="everymonth" value="#{quartzlist.everymonth}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.everymonthsValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.monthslist1}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="month(s) starting at month" />
+                                    <p:selectOneMenu id="startingatmonth" value="#{quartzlist.startingmonth}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingatmonthValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.monthlist}" />
+                                    </p:selectOneMenu>
+
+                                    <p:radioButton id="opt3_month" for="customRadioMonth" itemIndex="2" />
+                                    <h:outputLabel for="opt3_month" value="Specific month (choose one or many)" />
+                                    <p:selectCheckboxMenu id="multiplemonth" value="#{quartzlist.selectedMonths}" label="Months">
+                                        <p:ajax event="change" listener="#{quartzlist.multimonthsValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.monthlist}" />
+                                    </p:selectCheckboxMenu>
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    
+                                    <p:radioButton id="opt4_month" for="customRadioMonth" itemIndex="3" />
+                                    <h:outputLabel for="opt4_month" value="Every month between month" />
+                                    <p:selectOneMenu id="startinmonth" value="#{quartzlist.startingatmonth}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingMonthsValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.monthlist}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="and month" />
+                                    <p:selectOneMenu id="endingmonth" value="#{quartzlist.endingatmonth}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.endingMonthsValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.monthlist}" />
+                                    </p:selectOneMenu>
                                 </h:panelGrid>
                             </p:tab>
                             <p:tab title="Year">
