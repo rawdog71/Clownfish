@@ -1110,10 +1110,53 @@
                                 </h:panelGrid>
                             </p:tab>
                             <p:tab title="Year">
-                                <h:panelGrid columns="2" cellpadding="10">
-                                    <p:graphicImage name="demo/images/godfather/godfather3.jpg" />
-                                    <h:outputText value="After a break of more than 15 years, director Francis Ford Coppola and writer Mario Puzo returned to the well for this third and final story of the fictional Corleone crime family. 
-                                        Two decades have passed, and crime kingpin Michael Corleone, now divorced from his wife Kay has nearly succeeded in keeping his promise that his family would one day be completely legitimate." />
+                                <p:selectOneRadio id="customRadioYear" value="#{quartzlist.yearType}" layout="custom">
+                                    <p:ajax event="change" listener="#{quartzlist.yearsValueChange}" update=":form:tabview:jobpreview" />
+                                    <f:selectItem itemLabel="Any year" itemValue="0" />
+                                    <f:selectItem itemLabel="Every" itemValue="1" />
+                                    <f:selectItem itemLabel="Specific year (choose one or many)" itemValue="2" />
+                                    <f:selectItem itemLabel="Every year between year" itemValue="3" />
+                                </p:selectOneRadio>
+
+                                <h:panelGrid columns="5" cellpadding="5">
+                                    <p:radioButton id="opt1_year" for="customRadioYear" itemIndex="0" />
+                                    <h:outputLabel for="opt1_year" value="Any year" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+
+                                    <p:radioButton id="opt2_year" for="customRadioYear" itemIndex="1" />
+                                    <h:outputLabel for="opt2_year" value="Every" />
+                                    <p:selectOneMenu id="everyyear" value="#{quartzlist.everyyear}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.everyyearsValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.yearlist1}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="year(s) starting at year" />
+                                    <p:selectOneMenu id="startingatyear" value="#{quartzlist.startingyear}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingatyearValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.yearlist2}" />
+                                    </p:selectOneMenu>
+
+                                    <p:radioButton id="opt3_year" for="customRadioYear" itemIndex="2" />
+                                    <h:outputLabel for="opt3_year" value="Specific year (choose one or many)" />
+                                    <p:selectCheckboxMenu id="multipleyears" value="#{quartzlist.selectedYears}" label="Years">
+                                        <p:ajax event="change" listener="#{quartzlist.multiyearsValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.yearlist2}" />
+                                    </p:selectCheckboxMenu>
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    
+                                    <p:radioButton id="opt4_year" for="customRadioYear" itemIndex="3" />
+                                    <h:outputLabel for="opt4_year" value="Every year between year" />
+                                    <p:selectOneMenu id="startingyear" value="#{quartzlist.startingatyear}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingYearsValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.yearlist2}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="and year" />
+                                    <p:selectOneMenu id="endingyear" value="#{quartzlist.endingatyear}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.endingYearsValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.yearlist2}" />
+                                    </p:selectOneMenu>
                                 </h:panelGrid>
                             </p:tab>
                         </p:tabView>

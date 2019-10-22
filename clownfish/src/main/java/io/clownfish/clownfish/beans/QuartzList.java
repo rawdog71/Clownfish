@@ -31,6 +31,7 @@ import javax.persistence.NoResultException;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
+import org.joda.time.DateTime;
 import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +107,15 @@ public class QuartzList {
     private @Getter @Setter LinkedHashMap<String, Integer> monthlist;
     
     private @Getter @Setter String yearsPart;
+    private @Getter @Setter int yearType;
+    private @Getter @Setter int everyyear;
+    private @Getter @Setter int startingyear;
+    private @Getter @Setter int startingatyear;
+    private @Getter @Setter int endingatyear;
+    private @Getter @Setter List<Integer> yearlist1 = null;
+    private @Getter @Setter List<Integer> yearlist2 = null;
+    private int currentYear;
+    private String[] selectedYears;
     
     private @Getter @Setter String jobPreview;
     
@@ -133,6 +143,8 @@ public class QuartzList {
         newJobButtonDisabled = false;
         quartzlist = cfquartzService.findAll();
         sitelist = cfsiteService.findAll();
+        
+        secondsPart = "*";
         secondslist1 = new ArrayList<>();
         for (int i = 1; i <= 60; i++) {
             secondslist1.add(i);
@@ -145,7 +157,8 @@ public class QuartzList {
         startingsecond = 0;
         startingatsecond = 0;
         endingatsecond = 0;
-        
+
+        minutesPart = "*";
         minuteslist1 = new ArrayList<>();
         for (int i = 1; i <= 60; i++) {
             minuteslist1.add(i);
@@ -158,7 +171,8 @@ public class QuartzList {
         startingminute = 0;
         startingatminute = 0;
         endingatminute = 0;
-        
+
+        hoursPart = "*";
         hourslist1 = new ArrayList<>();
         for (int i = 1; i <= 24; i++) {
             hourslist1.add(i);
@@ -172,9 +186,6 @@ public class QuartzList {
         startingathour = 0;
         endingathour = 0;
         
-        secondsPart = "*";
-        minutesPart = "*";
-        hoursPart = "*";
         dayOfMonthPart = "?";
         dayOfWeekPart = "*";
         
@@ -193,6 +204,19 @@ public class QuartzList {
         endingatmonth = 1;
         
         yearsPart = "*";
+        currentYear = new DateTime().getYear(); 
+        yearlist1 = new ArrayList<>();
+        for (int i = 1; i <= 50; i++) {
+            yearlist1.add(i);
+        }
+        yearlist2 = new ArrayList<>();
+        for (int i = currentYear; i <= currentYear+15; i++) {
+            yearlist2.add(i);
+        }
+        everyyear = 1;
+        startingyear = currentYear;
+        startingatyear = currentYear;
+        endingatyear = currentYear;
         
         jobPreview = combine();
     }
@@ -477,7 +501,7 @@ public class QuartzList {
                 } else {
                     monthsPart = "";
                     for (String month : selectedMonths) {
-                        monthsPart += monthlist.get(Integer.valueOf(month)) + ",";
+                        monthsPart += getKeyFromValue(monthlist, Integer.parseInt(month)) + ",";
                     }
                     monthsPart = monthsPart.substring(0, monthsPart.length()-1);
                 }
@@ -533,6 +557,76 @@ public class QuartzList {
         }
     }
     
+    public void yearsValueChange() {
+        switch (yearType) {
+            case 0:
+                yearsPart = "*";
+                break;
+            case 1:
+                yearsPart = startingyear + "/" + everyyear;
+                break;
+            case 2:
+                if (null == selectedYears) {
+                    yearsPart = String.valueOf(currentYear);
+                } else {
+                    yearsPart = "";
+                    for (String year : selectedYears) {
+                        yearsPart += year + ",";
+                    }
+                    yearsPart = yearsPart.substring(0, yearsPart.length()-1);
+                }
+                break;
+            case 3:
+                yearsPart = startingatyear + "-" + endingatyear;
+                break;
+        }
+        jobPreview = combine();
+    }
+    
+    public void everyyearsValueChange() {
+        if (1 == yearType) {
+            yearsPart = startingyear + "/" + everyyear;
+            jobPreview = combine();
+        }
+    }
+    
+    public void startingatyearValueChange() {
+        if (1 == yearType) {
+            yearsPart = startingyear + "/" + everyyear;
+            jobPreview = combine();
+        }
+    }
+
+    public void multiyearsValueChange() {
+        if (2 == yearType) {
+            if (0 == selectedYears.length) {
+                yearsPart = String.valueOf(currentYear);
+                jobPreview = combine();
+            } else {
+                yearsPart = "";
+                for (String year : selectedYears) {
+                    yearsPart += year + ",";
+                }
+                yearsPart = yearsPart.substring(0, yearsPart.length()-1);
+                jobPreview = combine();
+            }
+        }
+    }
+    
+    public void startingYearsValueChange() {
+        if (3 == yearType) {
+            yearsPart = startingatyear + "-" + endingatyear;
+            jobPreview = combine();
+        }
+    }
+    
+    public void endingYearsValueChange() {
+        if (3 == yearType) {
+            yearsPart = startingatyear + "-" + endingatyear;
+            jobPreview = combine();
+        }
+    }
+    
     public String[] getSelectedSeconds() {
         return selectedSeconds;
     }
@@ -563,6 +657,14 @@ public class QuartzList {
 
     public void setSelectedMonths(String[] selectedMonths) {
         this.selectedMonths = selectedMonths;
+    }
+
+    public String[] getSelectedYears() {
+        return selectedYears;
+    }
+
+    public void setSelectedYears(String[] selectedYears) {
+        this.selectedYears = selectedYears;
     }
     
     private String combine() {
