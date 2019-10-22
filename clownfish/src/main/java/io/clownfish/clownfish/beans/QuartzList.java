@@ -97,6 +97,8 @@ public class QuartzList {
     private @Getter @Setter int everyday;
     private @Getter @Setter int startingweekday;
     private @Getter @Setter int startingday;
+    private @Getter @Setter int lastweekday;
+    private @Getter @Setter int daysbeforeend;
     private @Getter @Setter List<Integer> dayslist1 = null;
     private @Getter @Setter LinkedHashMap<String, Integer> weekdaylist;
     private String[] selectedWeekdays;
@@ -213,6 +215,8 @@ public class QuartzList {
         everyday = 1;
         startingday = 1;
         startingweekday = 1;
+        lastweekday = 1;
+        daysbeforeend = 1;
         
         monthsPart = "*";
         monthslist1 = new ArrayList<>();
@@ -560,7 +564,15 @@ public class QuartzList {
             case 6:
                 dayOfMonthPart = "LW";
                 dayOfWeekPart = "?";
-                break;        
+                break;
+            case 7:
+                dayOfMonthPart = "?";
+                dayOfWeekPart = "1L";
+                break;
+            case 8:
+                dayOfWeekPart = "?";
+                dayOfMonthPart = "L-" + daysbeforeend;
+                break;
         }
         jobPreview = combine();
     }
@@ -629,6 +641,18 @@ public class QuartzList {
             }
         }
     }
+    
+    public void lastweekdayValueChange() {
+        dayOfMonthPart = "?";
+        dayOfWeekPart = lastweekday + "L";
+        jobPreview = combine();
+    }
+    
+    public void daysbeforemonthValueChange() {
+        dayOfWeekPart = "?";
+        dayOfMonthPart = "L-" + daysbeforeend;
+        jobPreview = combine();
+    }        
 
     /*
     public void startingHoursValueChange() {

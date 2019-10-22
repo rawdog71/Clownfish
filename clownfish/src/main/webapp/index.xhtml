@@ -1062,6 +1062,8 @@
                                     <f:selectItem itemLabel="Specific days of month (choose one or many)" itemValue="4" />
                                     <f:selectItem itemLabel="On the last day of the month" itemValue="5" />
                                     <f:selectItem itemLabel="On the last weekday of the month" itemValue="6" />
+                                    <f:selectItem itemLabel="On the last" itemValue="7" />
+                                    <f:selectItem itemLabel="Days before" itemValue="8" />
                                 </p:selectOneRadio>
 
                                 <h:panelGrid columns="5" cellpadding="5">
@@ -1124,6 +1126,25 @@
                                     <h:outputText value="" />
                                     <h:outputText value="" />
                                     <h:outputText value="" />
+                                    
+                                    <p:radioButton id="opt8_day" for="customRadioDay" itemIndex="7" />
+                                    <h:outputLabel for="opt8_day" value="On the last" />
+                                    <p:selectOneMenu id="lastweekday" value="#{quartzlist.lastweekday}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.lastweekdayValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.weekdaylist}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="of the month" />
+                                    <h:outputText value="" />
+                                    
+                                    <p:radioButton id="opt9_day" for="customRadioDay" itemIndex="8" />
+                                    <p:selectOneMenu id="daybeforeend" value="#{quartzlist.daysbeforeend}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.daysbeforemonthValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.dayslist1}" />
+                                    </p:selectOneMenu>
+                                    <h:outputLabel value="day(s) before the end of the month" />
+                                    <h:outputLabel value="" />
+                                    <h:outputLabel value="" />
+                                    
                                 </h:panelGrid>
                             </p:tab>
                             <p:tab title="Month">
