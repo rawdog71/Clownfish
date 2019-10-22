@@ -553,6 +553,14 @@ public class QuartzList {
                     dayOfMonthPart = dayOfMonthPart.substring(0, dayOfMonthPart.length()-1);
                 }
                 break;
+            case 5:
+                dayOfMonthPart = "L";
+                dayOfWeekPart = "?";
+                break;    
+            case 6:
+                dayOfMonthPart = "LW";
+                dayOfWeekPart = "?";
+                break;        
         }
         jobPreview = combine();
     }

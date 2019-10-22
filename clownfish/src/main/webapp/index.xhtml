@@ -1060,6 +1060,8 @@
                                     <f:selectItem itemLabel="Every" itemValue="2" />
                                     <f:selectItem itemLabel="Specific days of week (choose one or many)" itemValue="3" />
                                     <f:selectItem itemLabel="Specific days of month (choose one or many)" itemValue="4" />
+                                    <f:selectItem itemLabel="On the last day of the month" itemValue="5" />
+                                    <f:selectItem itemLabel="On the last weekday of the month" itemValue="6" />
                                 </p:selectOneRadio>
 
                                 <h:panelGrid columns="5" cellpadding="5">
@@ -1111,6 +1113,17 @@
                                     <h:outputText value="" />
                                     <h:outputText value="" />
                                     
+                                    <p:radioButton id="opt6_day" for="customRadioDay" itemIndex="5" />
+                                    <h:outputLabel for="opt6_day" value="On the last day of the month" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    
+                                    <p:radioButton id="opt7_day" for="customRadioDay" itemIndex="6" />
+                                    <h:outputLabel for="opt7_day" value="On the last weekday of the month" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
                                 </h:panelGrid>
                             </p:tab>
                             <p:tab title="Month">
