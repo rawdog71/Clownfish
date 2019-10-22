@@ -1053,10 +1053,64 @@
                                 </h:panelGrid>
                             </p:tab>
                             <p:tab title="Day">
-                                <h:panelGrid columns="2" cellpadding="10">
-                                    <p:graphicImage name="demo/images/godfather/godfather3.jpg" />
-                                    <h:outputText value="After a break of more than 15 years, director Francis Ford Coppola and writer Mario Puzo returned to the well for this third and final story of the fictional Corleone crime family. 
-                                        Two decades have passed, and crime kingpin Michael Corleone, now divorced from his wife Kay has nearly succeeded in keeping his promise that his family would one day be completely legitimate." />
+                                <p:selectOneRadio id="customRadioDay" value="#{quartzlist.daysType}" layout="custom">
+                                    <p:ajax event="change" listener="#{quartzlist.daysValueChange}" update=":form:tabview:jobpreview" />
+                                    <f:selectItem itemLabel="Every day" itemValue="0" />
+                                    <f:selectItem itemLabel="Every" itemValue="1" />
+                                    <f:selectItem itemLabel="Every" itemValue="2" />
+                                    <f:selectItem itemLabel="Specific days of week (choose one or many)" itemValue="3" />
+                                    <f:selectItem itemLabel="Specific days of month (choose one or many)" itemValue="4" />
+                                </p:selectOneRadio>
+
+                                <h:panelGrid columns="5" cellpadding="5">
+                                    <p:radioButton id="opt1_day" for="customRadioDay" itemIndex="0" />
+                                    <h:outputLabel for="opt1_day" value="Every day" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    
+                                    <p:radioButton id="opt2_day" for="customRadioDay" itemIndex="1" />
+                                    <h:outputLabel for="opt2_day" value="Every" />
+                                    <p:selectOneMenu id="everyday" value="#{quartzlist.everyday}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.everydayValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.dayslist1}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="days(s) starting on" />
+                                    <p:selectOneMenu id="startingatweekday" value="#{quartzlist.startingweekday}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingatweekdayValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.weekdaylist}" />
+                                    </p:selectOneMenu>
+                                    
+                                    <p:radioButton id="opt3_day" for="customRadioDay" itemIndex="2" />
+                                    <h:outputLabel for="opt3_day" value="Every" />
+                                    <p:selectOneMenu id="everyday2" value="#{quartzlist.everyday}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.everydayValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.dayslist1}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="days(s) starting on" />
+                                    <p:selectOneMenu id="startingatday" value="#{quartzlist.startingday}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.startingatdayValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.dayslist1}" />
+                                    </p:selectOneMenu>
+                                    
+                                    <p:radioButton id="opt4_day" for="customRadioDay" itemIndex="3" />
+                                    <h:outputLabel for="opt4_day" value="Specific weekdays (choose one or many)" />
+                                    <p:selectCheckboxMenu id="multipleweekdays" value="#{quartzlist.selectedWeekdays}" label="Weekdays">
+                                        <p:ajax event="change" listener="#{quartzlist.multiweekdaysValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.weekdaylist}" />
+                                    </p:selectCheckboxMenu>
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    
+                                    <p:radioButton id="opt5_day" for="customRadioDay" itemIndex="4" />
+                                    <h:outputLabel for="opt5_day" value="Specific days (choose one or many)" />
+                                    <p:selectCheckboxMenu id="multipledays" value="#{quartzlist.selectedDays}" label="Days">
+                                        <p:ajax event="change" listener="#{quartzlist.multidaysValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.dayslist1}" />
+                                    </p:selectCheckboxMenu>
+                                    <h:outputText value="" />
+                                    <h:outputText value="" />
+                                    
                                 </h:panelGrid>
                             </p:tab>
                             <p:tab title="Month">

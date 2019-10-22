@@ -93,6 +93,14 @@ public class QuartzList {
     
     private @Getter @Setter String dayOfMonthPart;
     private @Getter @Setter String dayOfWeekPart;
+    private @Getter @Setter int daysType;
+    private @Getter @Setter int everyday;
+    private @Getter @Setter int startingweekday;
+    private @Getter @Setter int startingday;
+    private @Getter @Setter List<Integer> dayslist1 = null;
+    private @Getter @Setter LinkedHashMap<String, Integer> weekdaylist;
+    private String[] selectedWeekdays;
+    private String[] selectedDays;
     
     private @Getter @Setter String monthsPart;
     private @Getter @Setter int monthType;
@@ -115,6 +123,7 @@ public class QuartzList {
     private @Getter @Setter List<Integer> yearlist1 = null;
     private @Getter @Setter List<Integer> yearlist2 = null;
     private int currentYear;
+    private int diffYear;
     private String[] selectedYears;
     
     private @Getter @Setter String jobPreview;
@@ -139,6 +148,15 @@ public class QuartzList {
         monthlist.put("OCT", 10);
         monthlist.put("NOV", 11);
         monthlist.put("DEC", 12);
+        
+        weekdaylist = new LinkedHashMap<>();
+        weekdaylist.put("SUN", 1);
+        weekdaylist.put("MON", 2);
+        weekdaylist.put("TUE", 3);
+        weekdaylist.put("WED", 4);
+        weekdaylist.put("THU", 5);
+        weekdaylist.put("FRI", 6);
+        weekdaylist.put("SAT", 7);
         
         newJobButtonDisabled = false;
         quartzlist = cfquartzService.findAll();
@@ -188,6 +206,13 @@ public class QuartzList {
         
         dayOfMonthPart = "?";
         dayOfWeekPart = "*";
+        dayslist1 = new ArrayList<>();
+        for (int i = 1; i <= 31; i++) {
+            dayslist1.add(i);
+        }
+        everyday = 1;
+        startingday = 1;
+        startingweekday = 1;
         
         monthsPart = "*";
         monthslist1 = new ArrayList<>();
@@ -205,12 +230,13 @@ public class QuartzList {
         
         yearsPart = "*";
         currentYear = new DateTime().getYear(); 
+        diffYear = 50;
         yearlist1 = new ArrayList<>();
-        for (int i = 1; i <= 50; i++) {
+        for (int i = 1; i <= diffYear; i++) {
             yearlist1.add(i);
         }
         yearlist2 = new ArrayList<>();
-        for (int i = currentYear; i <= currentYear+15; i++) {
+        for (int i = currentYear; i <= currentYear+diffYear; i++) {
             yearlist2.add(i);
         }
         everyyear = 1;
@@ -487,6 +513,131 @@ public class QuartzList {
         }
     }
     
+    public void daysValueChange() {
+        switch (daysType) {
+            case 0:
+                dayOfMonthPart = "?";
+                dayOfWeekPart = "*";
+                break;
+            case 1:
+                dayOfMonthPart = "?";
+                dayOfWeekPart = startingweekday + "/" + everyday;
+                break;
+            case 2:
+                dayOfMonthPart = "?";
+                dayOfWeekPart = startingday + "/" + everyday;
+                break;    
+            case 3:
+                if ((null == selectedWeekdays) || (0 == selectedWeekdays.length)) {
+                    dayOfMonthPart = "?";
+                    dayOfWeekPart = "SUN";
+                } else {
+                    dayOfMonthPart = "?";
+                    dayOfWeekPart = "";
+                    for (String weekday : selectedWeekdays) {
+                        dayOfWeekPart += getKeyFromValue(weekdaylist, Integer.parseInt(weekday)) + ",";
+                    }
+                    dayOfWeekPart = dayOfWeekPart.substring(0, dayOfWeekPart.length()-1);
+                }
+                break;
+            case 4:
+                if ((null == selectedDays) || (0 == selectedDays.length)) {
+                    dayOfMonthPart = "1";
+                    dayOfWeekPart = "?";
+                } else {
+                    dayOfMonthPart = "";
+                    dayOfWeekPart = "?";
+                    for (String day : selectedDays) {
+                        dayOfMonthPart += day + ",";
+                    }
+                    dayOfMonthPart = dayOfMonthPart.substring(0, dayOfMonthPart.length()-1);
+                }
+                break;
+        }
+        jobPreview = combine();
+    }
+    
+    public void everydayValueChange() {
+        if (1 == daysType) {
+            dayOfMonthPart = "?";
+            dayOfWeekPart = startingweekday + "/" + everyday;
+            jobPreview = combine();
+        }
+        if (2 == daysType) {
+            dayOfMonthPart = "?";
+            dayOfWeekPart = startingday + "/" + everyday;
+            jobPreview = combine();
+        }
+    }
+    
+    public void startingatweekdayValueChange() {
+        if (1 == daysType) {
+            dayOfMonthPart = "?";
+            dayOfWeekPart = startingweekday + "/" + everyday;
+            jobPreview = combine();
+        }
+    }
+    
+    public void startingatdayValueChange() {
+        if (2 == daysType) {
+            dayOfMonthPart = "?";
+            dayOfWeekPart = startingday + "/" + everyday;
+            jobPreview = combine();
+        }
+    }
+
+    public void multiweekdaysValueChange() {
+        if (3 == daysType) {
+            if (0 == selectedWeekdays.length) {
+                dayOfMonthPart = "?";
+                dayOfWeekPart = "SUN";
+                jobPreview = combine();
+            } else {
+                dayOfMonthPart = "?";
+                dayOfWeekPart = "";
+                for (String weekday : selectedWeekdays) {
+                    dayOfWeekPart += getKeyFromValue(weekdaylist, Integer.parseInt(weekday)) + ",";
+                }
+                dayOfWeekPart = dayOfWeekPart.substring(0, dayOfWeekPart.length()-1);
+                jobPreview = combine();
+            }
+        }
+    }
+    
+    public void multidaysValueChange() {
+        if (4 == daysType) {
+            if (0 == selectedDays.length) {
+                dayOfMonthPart = "1";
+                dayOfWeekPart = "?";
+                jobPreview = combine();
+            } else {
+                dayOfMonthPart = "";
+                dayOfWeekPart = "?";
+                for (String day : selectedDays) {
+                    dayOfMonthPart += day + ",";
+                }
+                dayOfMonthPart = dayOfMonthPart.substring(0, dayOfMonthPart.length()-1);
+                jobPreview = combine();
+            }
+        }
+    }
+
+    /*
+    public void startingHoursValueChange() {
+        if (3 == hoursType) {
+            hoursPart = startingathour + "-" + endingathour;
+            jobPreview = combine();
+        }
+    }
+    
+    public void endingHoursValueChange() {
+        if (3 == hoursType) {
+            hoursPart = startingathour + "-" + endingathour;
+            jobPreview = combine();
+        }
+    }
+    */
+    
     public void monthsValueChange() {
         switch (monthType) {
             case 0:
@@ -653,6 +804,22 @@ public class QuartzList {
 
     public String[] getSelectedMonths() {
         return selectedMonths;
+    }
+
+    public String[] getSelectedWeekdays() {
+        return selectedWeekdays;
+    }
+
+    public void setSelectedWeekdays(String[] selectedWeekdays) {
+        this.selectedWeekdays = selectedWeekdays;
+    }
+
+    public String[] getSelectedDays() {
+        return selectedDays;
+    }
+
+    public void setSelectedDays(String[] selectedDays) {
+        this.selectedDays = selectedDays;
     }
 
     public void setSelectedMonths(String[] selectedMonths) {
