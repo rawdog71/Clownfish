@@ -1064,6 +1064,8 @@
                                     <f:selectItem itemLabel="On the last weekday of the month" itemValue="6" />
                                     <f:selectItem itemLabel="On the last" itemValue="7" />
                                     <f:selectItem itemLabel="Days before" itemValue="8" />
+                                    <f:selectItem itemLabel="Nearest weekday" itemValue="9" />
+                                    <f:selectItem itemLabel="On the" itemValue="10" />
                                 </p:selectOneRadio>
 
                                 <h:panelGrid columns="5" cellpadding="5">
@@ -1145,6 +1147,26 @@
                                     <h:outputLabel value="" />
                                     <h:outputLabel value="" />
                                     
+                                    <p:radioButton id="opt10_day" for="customRadioDay" itemIndex="9" />
+                                    <h:outputLabel for="opt10_day" value="Nearest weekday (Monday to Friday) to the" />
+                                    <p:selectOneMenu id="nearestweekday" value="#{quartzlist.nearestweekday}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.nearestweekdayValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.dayslist1}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="of the month" />
+                                    <h:outputText value="" />
+                                    
+                                    <p:radioButton id="opt11_day" for="customRadioDay" itemIndex="10" />
+                                    <h:outputLabel for="opt11_day" value="On the" />
+                                    <p:selectOneMenu id="factorday" value="#{quartzlist.factorday}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.factordayValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.factorlist}" />
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu id="factorweekday" value="#{quartzlist.factorweekday}" required="false">
+                                        <p:ajax event="change" listener="#{quartzlist.factorweekdayValueChange}" update=":form:tabview:jobpreview" />
+                                        <f:selectItems value="#{quartzlist.weekdaylist}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="of the month" />
                                 </h:panelGrid>
                             </p:tab>
                             <p:tab title="Month">
@@ -1252,6 +1274,8 @@
                         <p:panelGrid id="jobpreviewpanel" columns="2">
                             <p:outputLabel for="jobpreview">Preview</p:outputLabel>
                             <p:inputText id="jobpreview" value="#{quartzlist.jobPreview}" disabled="true" />
+                            
+                            <p:commandButton id="transferjob" process="form" value="Transfer to job" actionListener="#{quartzlist.onTransferJob}" update=":form:msgs :form:tabview:jobpanel" />
                         </p:panelGrid>
                     </p:panelGrid>
                         

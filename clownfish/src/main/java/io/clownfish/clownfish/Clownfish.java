@@ -372,6 +372,7 @@ public class Clownfish {
                 scheduler.clear();
                 // Fetch the Quartz jobs
                 quartzlist.init();
+                quartzlist.setClownfish(this);
                 List<CfQuartz> joblist = quartzlist.getQuartzlist();
                 joblist.stream().forEach((quartz) -> {
                     try {

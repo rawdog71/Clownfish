@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.dbentities.CfQuartz;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.serviceinterface.CfQuartzService;
@@ -49,6 +50,8 @@ import org.springframework.stereotype.Component;
 public class QuartzList {
     @Autowired CfQuartzService cfquartzService;
     @Autowired CfSiteService cfsiteService;
+    
+    private Clownfish clownfish;
     
     private @Getter @Setter List<CfQuartz> quartzlist;
     private @Getter @Setter CfQuartz selectedQuartz;
@@ -98,8 +101,12 @@ public class QuartzList {
     private @Getter @Setter int startingweekday;
     private @Getter @Setter int startingday;
     private @Getter @Setter int lastweekday;
+    private @Getter @Setter int nearestweekday;
     private @Getter @Setter int daysbeforeend;
+    private @Getter @Setter int factorday;
+    private @Getter @Setter int factorweekday;
     private @Getter @Setter List<Integer> dayslist1 = null;
+    private @Getter @Setter List<Integer> factorlist = null;
     private @Getter @Setter LinkedHashMap<String, Integer> weekdaylist;
     private String[] selectedWeekdays;
     private String[] selectedDays;
@@ -212,11 +219,18 @@ public class QuartzList {
         for (int i = 1; i <= 31; i++) {
             dayslist1.add(i);
         }
+        factorlist = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            factorlist.add(i);
+        }
         everyday = 1;
         startingday = 1;
         startingweekday = 1;
         lastweekday = 1;
         daysbeforeend = 1;
+        nearestweekday = 1;
+        factorday = 1;
+        factorweekday = 1;
         
         monthsPart = "*";
         monthslist1 = new ArrayList<>();
@@ -251,6 +265,10 @@ public class QuartzList {
         jobPreview = combine();
     }
     
+    public void setClownfish(Clownfish clownfish) {
+        this.clownfish = clownfish;
+    }
+    
     public void onSelect(SelectEvent event) {
         selectedQuartz = (CfQuartz) event.getObject();
         jobname = selectedQuartz.getName();
@@ -270,6 +288,7 @@ public class QuartzList {
             cfquartzService.create(newquartz);
 
             quartzlist = cfquartzService.findAll();
+            clownfish.init();
             //fillPropertyMap();
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
@@ -285,6 +304,7 @@ public class QuartzList {
                 selectedQuartz.setSiteRef(BigInteger.valueOf(siteref.getId()));
                 cfquartzService.edit(selectedQuartz);
                 quartzlist = cfquartzService.findAll();
+                clownfish.init();
             }
         } catch (ConstraintViolationException ex) {
             System.out.println(ex.getMessage());
@@ -295,6 +315,7 @@ public class QuartzList {
         if (null != selectedQuartz) {
             cfquartzService.delete(selectedQuartz);
             quartzlist = cfquartzService.findAll();
+            clownfish.init();
         }
     }
     
@@ -307,6 +328,11 @@ public class QuartzList {
         }
     }
     
+    
+    public void onTransferJob(ActionEvent actionEvent) {
+        jobvalue = jobPreview;
+    }
+    
     public void secondsValueChange() {
         switch (secondsType) {
             case 0:
@@ -316,7 +342,7 @@ public class QuartzList {
                 secondsPart = startingsecond + "/" + everysecond;
                 break;
             case 2:
-                if (null == selectedSeconds) {
+                if ((null == selectedSeconds) || (0 == selectedSeconds.length)) {
                     secondsPart = "0";
                 } else {
                     secondsPart = "";
@@ -386,7 +412,7 @@ public class QuartzList {
                 minutesPart = startingminute + "/" + everyminute;
                 break;
             case 2:
-                if (null == selectedMinutes) {
+                if ((null == selectedMinutes) || (0 == selectedMinutes.length)) {
                     minutesPart = "0";
                 } else {
                     minutesPart = "";
@@ -456,7 +482,7 @@ public class QuartzList {
                 hoursPart = startinghour + "/" + everyhour;
                 break;
             case 2:
-                if (null == selectedHours) {
+                if ((null == selectedHours) || (0 == selectedHours.length)) {
                     hoursPart = "0";
                 } else {
                     hoursPart = "";
@@ -573,6 +599,14 @@ public class QuartzList {
                 dayOfWeekPart = "?";
                 dayOfMonthPart = "L-" + daysbeforeend;
                 break;
+            case 9:
+                dayOfWeekPart = "?";
+                dayOfMonthPart = nearestweekday + "W";
+                break;
+            case 10:
+                dayOfMonthPart = "?";
+                dayOfWeekPart = factorweekday + "#" + factorday;
+                break;
         }
         jobPreview = combine();
     }
@@ -652,23 +686,25 @@ public class QuartzList {
         dayOfWeekPart = "?";
         dayOfMonthPart = "L-" + daysbeforeend;
         jobPreview = combine();
-    }        
+    }
 
-    /*
-    public void startingHoursValueChange() {
-        if (3 == hoursType) {
-            hoursPart = startingathour + "-" + endingathour;
-            jobPreview = combine();
-        }
+    public void nearestweekdayValueChange() {
+        dayOfWeekPart = "?";
+        dayOfMonthPart = nearestweekday + "W";
+        jobPreview = combine();
     }
     
-    public void endingHoursValueChange() {
-        if (3 == hoursType) {
-            hoursPart = startingathour + "-" + endingathour;
-            jobPreview = combine();
-        }
+    public void factordayValueChange() {
+        dayOfMonthPart = "?";
+        dayOfWeekPart = factorweekday + "#" + factorday;
+        jobPreview = combine();
     }
-    */
+    
+    public void factorweekdayValueChange() {
+        dayOfMonthPart = "?";
+        dayOfWeekPart = factorweekday + "#" + factorday;
+        jobPreview = combine();
+    }
     
     public void monthsValueChange() {
         switch (monthType) {
@@ -679,7 +715,7 @@ public class QuartzList {
                 monthsPart = startingmonth + "/" + everymonth;
                 break;
             case 2:
-                if (null == selectedMonths) {
+                if ((null == selectedMonths) || (0 == selectedMonths.length)) {
                     monthsPart = "1";
                 } else {
                     monthsPart = "";
@@ -749,7 +785,7 @@ public class QuartzList {
                 yearsPart = startingyear + "/" + everyyear;
                 break;
             case 2:
-                if (null == selectedYears) {
+                if ((null == selectedYears) || (0 == selectedYears.length)) {
                     yearsPart = String.valueOf(currentYear);
                 } else {
                     yearsPart = "";
