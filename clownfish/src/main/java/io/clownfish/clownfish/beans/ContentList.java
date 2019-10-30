@@ -44,9 +44,6 @@ import javax.persistence.NoResultException;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DualListModel;
 import org.slf4j.Logger;
@@ -86,6 +83,7 @@ public class ContentList implements Serializable {
     private @Getter @Setter long selectedAttributId;
     private @Getter @Setter CfAsset selectedMedia;
     private @Getter @Setter String editContent;
+    private @Getter @Setter Date editCalendar;
     private @Getter @Setter boolean isBooleanType;
     private @Getter @Setter boolean isStringType;
     private @Getter @Setter boolean isHashStringType;
@@ -190,6 +188,7 @@ public class ContentList implements Serializable {
                 break;    
             case "datetime":
                 isDatetimeType = true;
+                editCalendar = selectedAttribut.getContentDate();
                 break;
             case "media":
                 isMediaType = true;
@@ -305,10 +304,7 @@ public class ContentList implements Serializable {
                 selectedAttribut.setContentText(editContent);
                 break;    
             case "datetime":
-                DateTimeFormatter dtf = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss ZZZ yyyy").withLocale(Locale.US);
-                DateTime dt = DateTime.parse(editContent, dtf);
-                
-                selectedAttribut.setContentDate(dt.toDate());
+                selectedAttribut.setContentDate(editCalendar);
                 break;
             case "media":
                 selectedAttribut.setContentInteger(BigInteger.valueOf(selectedMedia.getId()));

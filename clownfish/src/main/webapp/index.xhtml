@@ -536,13 +536,15 @@
                                 <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.textType}" />
                                 <p:inputTextarea id="attributvalueMarkdown" widgetVar="editor13" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.markdownType}" />
                                 <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.booleanType}" />
-                                <p:calendar id="attributvalueDatetime" value="#{classcontentList.editContent}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" />
+                                <p:calendar id="attributvalueDatetime" value="#{classcontentList.editCalendar}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" />
                                 <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" converter="#{mediaConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}">
                                     <f:selectItems value="#{assetlist.assetlist}" />
                                 </p:selectOneMenu>
 
                                 <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
-                                <p:commandButton id="editattribut" process="form" value="Edit" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" />
+                                <p:commandButton id="editattribut" process="form" value="Edit" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" >
+                                    
+                                </p:commandButton>
                                 <p:focus for="attributvalueString" />
                                 <p:focus for="attributvalueInt" />
                                 <p:focus for="attributvalueReal" />
