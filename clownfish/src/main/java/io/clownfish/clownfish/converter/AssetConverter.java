@@ -43,7 +43,7 @@ public class AssetConverter implements Converter, Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            Object o = cfassetservice.findById(new Long(value));
+            Object o = cfassetservice.findByName(value);
             return o;
         }
     }
@@ -53,7 +53,7 @@ public class AssetConverter implements Converter, Serializable {
         if (value == null) {
             return "-1";
         } else {
-            String returnname = ((CfAsset) value).getId().toString();
+            String returnname = ((CfAsset) value).getName();
             return  returnname;
         }
     }

@@ -4,7 +4,8 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:pe="http://primefaces.org/ui/extensions">
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>Clownfish CMS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -537,8 +538,15 @@
                                 <p:inputTextarea id="attributvalueMarkdown" widgetVar="editor13" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.markdownType}" />
                                 <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.booleanType}" />
                                 <p:calendar id="attributvalueDatetime" value="#{classcontentList.editCalendar}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" />
-                                <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" converter="#{mediaConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}">
-                                    <f:selectItems value="#{assetlist.assetlist}" />
+                                <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" var="mp" converter="#{assetConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}">
+                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                    <f:selectItems value="#{classcontentList.assetlist}" var="media" itemLabel="#{media.name}" itemValue="#{media}" />
+                                    <p:column>
+                                    <p:graphicImage url="GetAssetPreview?mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
+                                    </p:column>
+                                    <p:column>
+                                    #{mp.name}
+                                    </p:column>
                                 </p:selectOneMenu>
 
                                 <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />

@@ -35,7 +35,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
@@ -100,6 +99,7 @@ public class ContentList implements Serializable {
     private List<CfKeyword> keywordSource;
     private List<CfKeyword> keywordTarget;
     private List<CfClasscontentkeyword> contentkeywordlist;
+    private @Getter @Setter List<CfAsset> assetlist;
     
     final transient Logger logger = LoggerFactory.getLogger(ContentList.class);
 
@@ -119,6 +119,7 @@ public class ContentList implements Serializable {
     public void init() {
         classcontentlist = cfclasscontentService.findAll();
         classlist = cfclassService.findAll();
+        assetlist = cfassetService.findAll();
         editContent = "";
         
         keywordSource = cfkeywordService.findAll();
@@ -149,6 +150,7 @@ public class ContentList implements Serializable {
     public void onSelectAttribut(SelectEvent event) {
         selectedAttribut = (CfAttributcontent) event.getObject();
         selectedAttributId = selectedAttribut.getId();
+        selectedMedia = null;
         
         isBooleanType = false;
         isStringType = false;

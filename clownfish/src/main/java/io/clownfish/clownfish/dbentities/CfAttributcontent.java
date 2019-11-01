@@ -98,7 +98,7 @@ public class CfAttributcontent implements Serializable {
     private String salt;
     @Column(name = "indexed")
     private boolean indexed;
-
+    
     public CfAttributcontent() {
     }
 
