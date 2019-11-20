@@ -16,8 +16,11 @@
 package io.clownfish.clownfish;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
+import net.anotheria.moskito.webui.embedded.MoSKitoInspectStartException;
+import net.anotheria.moskito.webui.embedded.StartMoSKitoInspectBackendForRemote;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -53,6 +56,11 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 public class Main extends SpringBootServletInitializer implements ServletContextAware, WebMvcConfigurer {
 
     public static void main(String[] args) {
+        try {
+            StartMoSKitoInspectBackendForRemote.startMoSKitoInspectBackend(9401);
+        } catch (MoSKitoInspectStartException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        }
         SpringApplication.run(Main.class, args);
     }
 
