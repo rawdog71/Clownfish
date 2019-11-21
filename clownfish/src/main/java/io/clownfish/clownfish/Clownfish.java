@@ -105,7 +105,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
@@ -116,9 +115,6 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 import lombok.Getter;
 import lombok.Setter;
-import net.anotheria.moskito.aop.annotation.Monitor;
-import net.anotheria.moskito.webui.embedded.MoSKitoInspectStartException;
-import net.anotheria.moskito.webui.embedded.StartMoSKitoInspectBackendForRemote;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.lucene.queryparser.classic.ParseException;
 import static org.fusesource.jansi.Ansi.Color.*;
@@ -155,7 +151,6 @@ import org.springframework.web.servlet.HandlerMapping;
 @RestController
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
 @Component
-@Monitor
 public class Clownfish {
     @Autowired CfSiteService cfsiteService;
     @Autowired CfSitecontentService cfsitecontentService;
