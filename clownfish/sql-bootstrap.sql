@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS `cf_attributcontent` (
   `content_text` longtext,
   `content_date` datetime DEFAULT NULL,
   `salt` varchar(30) DEFAULT NULL,
+  `indexed` tinyint(4) NOT NULL DEFAULT '0',  
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
