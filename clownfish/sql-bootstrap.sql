@@ -516,7 +516,6 @@ INSERT INTO `cf_attributetype` (`id`, `name`, `searchrelevant`) VALUES
 --
 
 INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
-('folder_static', '', 1),
 ('html_compression', 'on', 1),
 ('html_gzip', 'on', 1),
 ('mail_password', '', 1),
@@ -524,9 +523,13 @@ INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
 ('mail_smtp_host', '', 1),
 ('mail_transport_protocol', 'smtp', 1),
 ('mail_user', '', 1),
+('folder_cache', '', 1),
 ('folder_media', '', 1),
 ('folder_static', '', 1),
 ('folder_index', '', 1),
+('folder_icon', '', 1),
+('job_support', 'true', 1),
+('lucene_searchlimit', '25', 1),
 ('response_characterencoding', 'UTF-8', 1),
 ('response_contenttype', 'text/html', 1),
 ('response_locale', 'de', 1),
