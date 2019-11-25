@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS `cf_asset` (
   `imagewidth` varchar(255) DEFAULT NULL,
   `imageheight` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
+  `indexed` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
