@@ -40,6 +40,8 @@ import io.clownfish.clownfish.dbentities.CfSitedatasource;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfTemplate;
+import io.clownfish.clownfish.dbentities.CfTemplateversion;
+import io.clownfish.clownfish.dbentities.CfTemplateversionPK;
 import io.clownfish.clownfish.interceptor.GzipSwitch;
 import io.clownfish.clownfish.jdbc.DatatableDeleteProperties;
 import io.clownfish.clownfish.jdbc.DatatableNewProperties;
@@ -74,6 +76,7 @@ import io.clownfish.clownfish.templatebeans.EmailTemplateBean;
 import io.clownfish.clownfish.templatebeans.NetworkTemplateBean;
 import io.clownfish.clownfish.templatebeans.SAPTemplateBean;
 import io.clownfish.clownfish.utils.ClownfishUtil;
+import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.DatabaseUtil;
 import io.clownfish.clownfish.utils.DefaultUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
@@ -89,22 +92,28 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
@@ -141,6 +150,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.web.servlet.HandlerMapping;
 
 
@@ -151,6 +165,10 @@ import org.springframework.web.servlet.HandlerMapping;
 @RestController
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
 @Component
+@Configuration
+@PropertySources({
+    @PropertySource("file:application.properties")
+})
 public class Clownfish {
     @Autowired CfSiteService cfsiteService;
     @Autowired CfSitecontentService cfsitecontentService;
@@ -215,6 +233,7 @@ public class Clownfish {
     private @Getter @Setter Map<String, String> metainfomap;
 
     final transient Logger logger = LoggerFactory.getLogger(Clownfish.class);
+    @Value("${bootstrap}") int bootstrap;
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -239,6 +258,30 @@ public class Clownfish {
     @PostConstruct
     @GetMapping(path = "/init") 
     public void init() {
+        if (1 == bootstrap) {
+            bootstrap = 0;
+            try {
+                Properties props = new Properties();
+                String propsfile = "application.properties";
+                InputStream is = new FileInputStream(propsfile);
+                if (null != is) {
+                    props.load(is);
+                    props.setProperty("bootstrap", String.valueOf(bootstrap));
+                    File f = new File("application.properties");
+                    
+                    bootstrap();
+                    
+                    OutputStream out = new FileOutputStream( f );
+                    DefaultPropertiesPersister p = new DefaultPropertiesPersister();
+                    p.store(props, out, "Application properties");
+                } else {
+                    logger.error("application.properties file not found");
+                }
+              } catch (Exception e ) {
+                e.printStackTrace();
+              }
+        }
+        
         /* Hazelcast test */
         if (null == hazelConfig) {
             hazelConfig = new Config();
@@ -900,6 +943,23 @@ public class Clownfish {
                 }
             } catch (IOException ex) {
                 logger.error(ex.getMessage());
+            }
+        }
+    }
+    
+    private void bootstrap() {
+        List<CfTemplate> cftemplatelist = cftemplateService.findAll();
+        for (CfTemplate template : cftemplatelist) {
+            try {
+                templateUtil.setTemplateContent(template.getContent());
+                
+                String content = templateUtil.getTemplateContent();
+                byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
+                
+                templateUtil.setCurrentVersion(1);
+                templateUtil.writeVersion(template.getId(), templateUtil.getCurrentVersion(), output, 0);
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

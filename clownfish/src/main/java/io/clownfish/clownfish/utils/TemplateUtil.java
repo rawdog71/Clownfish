@@ -22,12 +22,15 @@ import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.dbentities.CfTemplateversion;
+import io.clownfish.clownfish.dbentities.CfTemplateversionPK;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +76,19 @@ public class TemplateUtil implements Serializable {
             logger.error(ex.getMessage());
             return null;
         }
+    }
+    
+    public void writeVersion(long templateref, long version, byte[] content, long currentuserid) {
+        CfTemplateversionPK templateversionpk = new CfTemplateversionPK();
+        templateversionpk.setTemplateref(templateref);
+        templateversionpk.setVersion(version);
+
+        CfTemplateversion cftemplateversion = new CfTemplateversion();
+        cftemplateversion.setCfTemplateversionPK(templateversionpk);
+        cftemplateversion.setContent(content);
+        cftemplateversion.setTstamp(new Date());
+        cftemplateversion.setCommitedby(BigInteger.valueOf(currentuserid));
+        cftemplateversionService.create(cftemplateversion);
     }
     
     public boolean hasDifference(CfTemplate selectedTemplate) {
