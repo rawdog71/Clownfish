@@ -39,8 +39,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.http.CacheControl;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.context.ServletContextAware;
@@ -115,7 +113,12 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer.setUseTrailingSlashMatch(true);
     }
-    
+
+    /**
+     * Checks the applications.properties file and runs the bootstrap routine when the bootstrap parameter is set to 1
+     * Fetches the database (MySQL) parameters from applications.properties and runs the sql-bootstrap.sql script
+     * The script creates the database user for reading/writing (user=clownfish), creates all tables and initializes some tables with data
+     */
     public static void bootstrap() {
         InputStream is = null;
         try {
@@ -131,12 +134,10 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             String dbuser = props.getProperty("app.datasource.root");
             String dbpassword = props.getProperty("app.datasource.rootpw");
             if (1 == bootstrap) {
-                
                 JDBCUtil jdbcutil = new JDBCUtil(dbclass, dburl, dbuser, dbpassword);
                 ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), true, false);
                 String file = "sql-bootstrap.sql";
                 runner.runScript(new BufferedReader(new FileReader(file)));
-            
             }
         } catch (FileNotFoundException ex) {
             logger.error(ex.getMessage());

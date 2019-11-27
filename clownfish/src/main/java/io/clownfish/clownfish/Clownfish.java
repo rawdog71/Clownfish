@@ -161,6 +161,7 @@ import org.springframework.web.servlet.HandlerMapping;
 /**
  *
  * @author sulzbachr
+ * Central class of the Clownfish server
  */
 @RestController
 @EnableAutoConfiguration(exclude = HibernateJpaAutoConfiguration.class)
@@ -239,6 +240,10 @@ public class Clownfish {
     @Value("${app.datasource.url}") String dburl;
     @Value("${app.datasource.driverClassName}") String dbclass;
 
+    /**
+     * Call of the "root" site
+     * Fetches the root site from the system property "site_root" and calls universalGet 
+     */
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
         String root_site = propertyUtil.getPropertyValue("site_root");
@@ -249,6 +254,10 @@ public class Clownfish {
         universalGet(root_site, request, response);
     }
     
+    /**
+     * Call of the "error" site
+     * Fetches the error site from the system property "site_error" and calls universalGet 
+     */
     @RequestMapping("/error")
     public void error(@Context HttpServletRequest request, @Context HttpServletResponse response) {
         String error_site = propertyUtil.getPropertyValue("site_error");
@@ -259,6 +268,12 @@ public class Clownfish {
         universalGet(error_site, request, response);
     }
 
+    /**
+     * Call of the "init" site
+     * Init is called at the beginning of the Clownfish startup and after changing system properties
+     * Checks the bootstrap flag of the application.properties and calls a bootstrap routine
+     * Initializes several variables and starts Quartz job triggers
+     */
     @PostConstruct
     @GetMapping(path = "/init") 
     public void init() {
@@ -445,6 +460,12 @@ public class Clownfish {
     public Clownfish() {
     }
     
+    /**
+     * Call of the "search" site
+     * Fetches the search site from the system property "site_search" and calls universalGet
+     * Instantiates the Searcher class
+     * Clears and fills the searchmetadata
+     */
     @GetMapping(path = "/search/{query}")
     public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
@@ -477,6 +498,13 @@ public class Clownfish {
         }
     }
     
+    /**
+     * GET
+     * 
+     * @param name
+     * @param request
+     * @param response
+     */
     @GetMapping(path = "/{name}/**")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
@@ -522,6 +550,13 @@ public class Clownfish {
         }
     }
 
+    /**
+     * POST
+     * 
+     * @param name
+     * @param request
+     * @param response
+     */
     @PostMapping("/{name}/**")
     public void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
@@ -559,6 +594,14 @@ public class Clownfish {
         }
     }
 
+    /**
+     * makeResponse
+     * 
+     * @param name
+     * @param postmap
+     * @param makestatic
+     * @return 
+     */
     @Async
     public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, boolean makestatic) {
         ClownfishResponse cfresponse = new ClownfishResponse();
@@ -858,11 +901,19 @@ public class Clownfish {
         }
     }
     
+    /**
+     * sendRespondMail
+     * 
+     */
     private void sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
         MailUtil mailutil = new MailUtil(propertyUtil.getPropertyValue("mail_smtp_host"), propertyUtil.getPropertyValue("mail_transport_protocol"), propertyUtil.getPropertyValue("mail_user"), propertyUtil.getPropertyValue("mail_password"), propertyUtil.getPropertyValue("mail_sendfrom"));
         mailutil.sendRespondMail(mailto, subject, mailbody);
     }
 
+    /**
+     * manageSessionVariables
+     * 
+     */
     private void manageSessionVariables(List<JsonFormParameter> postmap) {
         if (postmap != null) {
             postmap.stream().filter((jfp) -> (jfp.getName().startsWith("session"))).forEach((jfp) -> {
@@ -871,6 +922,10 @@ public class Clownfish {
         }
     }
 
+    /**
+     * writeSessionVariables
+     * 
+     */
     private void writeSessionVariables(Map parametermap) {
         Collections.list(userSession.getAttributeNames()).stream().filter((key) -> (key.startsWith("session"))).forEach((key) -> {
             String attributevalue = (String) userSession.getAttribute(key);
@@ -878,17 +933,29 @@ public class Clownfish {
         });
     }
 
+    /**
+     * addHeader
+     * 
+     */
     private void addHeader(HttpServletResponse response, String version) {
         response.addHeader("Server", "Clownfish Server Open Source Version " + version);
         response.addHeader("X-Powered-By", "Clownfish Server Open Source Version " + version + " by Rainer Sulzbach");
     }
 
+    /**
+     * newJob
+     * 
+     */
     private JobDetail newJob(String identity) {
         return JobBuilder.newJob().ofType(QuartzJob.class).storeDurably()
             .withIdentity(JobKey.jobKey(identity))
             .build();
     }
 
+    /**
+     * trigger
+     * 
+     */
     private CronTrigger trigger(JobDetail jobDetail, String schedule) {
         return TriggerBuilder.newTrigger().forJob(jobDetail)
             .withIdentity(jobDetail.getKey().getName(), jobDetail.getKey().getGroup())
@@ -896,6 +963,10 @@ public class Clownfish {
             .build();
     }
     
+    /**
+     * getStaticSite
+     * 
+     */
     private ClownfishResponse getStaticSite(String sitename) {
         ClownfishResponse cfResponse = new ClownfishResponse();
         BufferedReader br = null;
@@ -927,6 +998,10 @@ public class Clownfish {
         }
     }
     
+    /**
+     * generateStaticSite
+     * 
+     */
     private void generateStaticSite(String sitename, String content) {
         FileOutputStream fileStream = null;
         try {
@@ -951,6 +1026,10 @@ public class Clownfish {
         }
     }
     
+    /**
+     * bootstrap
+     * 
+     */
     private void bootstrap() throws FileNotFoundException {
         List<CfTemplate> cftemplatelist = cftemplateService.findAll();
         for (CfTemplate template : cftemplatelist) {
