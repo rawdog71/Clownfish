@@ -952,28 +952,19 @@ public class Clownfish {
     }
     
     private void bootstrap() throws FileNotFoundException {
-        try {
-            JDBCUtil jdbcutil = new JDBCUtil(dbclass, dburl, dbuser, dbpassword);
-            ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), false, false);
-            String file = "sql-bootstrap.sql";
-            runner.runScript(new BufferedReader(new FileReader(file)));
-            
-            List<CfTemplate> cftemplatelist = cftemplateService.findAll();
-            for (CfTemplate template : cftemplatelist) {
-                try {
-                    templateUtil.setTemplateContent(template.getContent());
-                    
-                    String content = templateUtil.getTemplateContent();
-                    byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
-                    
-                    templateUtil.setCurrentVersion(1);
-                    templateUtil.writeVersion(template.getId(), templateUtil.getCurrentVersion(), output, 0);
-                } catch (IOException ex) {
-                    java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        List<CfTemplate> cftemplatelist = cftemplateService.findAll();
+        for (CfTemplate template : cftemplatelist) {
+            try {
+                templateUtil.setTemplateContent(template.getContent());
+
+                String content = templateUtil.getTemplateContent();
+                byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
+
+                templateUtil.setCurrentVersion(1);
+                templateUtil.writeVersion(template.getId(), templateUtil.getCurrentVersion(), output, 0);
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (IOException | SQLException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

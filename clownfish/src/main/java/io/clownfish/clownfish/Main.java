@@ -15,9 +15,18 @@
  */
 package io.clownfish.clownfish;
 
+import io.clownfish.clownfish.jdbc.JDBCUtil;
+import io.clownfish.clownfish.jdbc.ScriptRunner;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -29,6 +38,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.http.CacheControl;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.context.ServletContextAware;
@@ -50,9 +61,18 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 @ServletComponentScan
 @EnableWebMvc
 @EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class})
+@PropertySources({
+    @PropertySource("file:application.properties")
+})
 public class Main extends SpringBootServletInitializer implements ServletContextAware, WebMvcConfigurer {
-
+    @Value("${bootstrap}") static int bootstrap;
+    @Value("${app.datasource.root}") static String dbuser;
+    @Value("${app.datasource.rootpw}") static String dbpassword;
+    @Value("${app.datasource.url}") static String dburl;
+    @Value("${app.datasource.driverClassName}") static String dbclass;
+        
     public static void main(String[] args) {
+        bootstrap();
         SpringApplication.run(Main.class, args);
     }
 
@@ -98,5 +118,18 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer.setUseTrailingSlashMatch(true);
+    }
+    
+    public static void bootstrap() {
+        if (1 == bootstrap) {
+            try {
+                JDBCUtil jdbcutil = new JDBCUtil(dbclass, dburl, dbuser, dbpassword);
+                ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), false, false);
+                String file = "sql-bootstrap.sql";
+                runner.runScript(new BufferedReader(new FileReader(file)));
+            } catch (IOException | SQLException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }
