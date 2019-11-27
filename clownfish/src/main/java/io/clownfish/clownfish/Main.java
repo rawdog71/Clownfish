@@ -18,15 +18,16 @@ package io.clownfish.clownfish;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.ScriptRunner;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -48,6 +49,8 @@ import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.PathResourceResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -61,16 +64,9 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 @ServletComponentScan
 @EnableWebMvc
 @EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class})
-@PropertySources({
-    @PropertySource("file:application.properties")
-})
 public class Main extends SpringBootServletInitializer implements ServletContextAware, WebMvcConfigurer {
-    @Value("${bootstrap}") static int bootstrap;
-    @Value("${app.datasource.root}") static String dbuser;
-    @Value("${app.datasource.rootpw}") static String dbpassword;
-    @Value("${app.datasource.url}") static String dburl;
-    @Value("${app.datasource.driverClassName}") static String dbclass;
-        
+    final static transient Logger logger = LoggerFactory.getLogger(Main.class);
+    
     public static void main(String[] args) {
         bootstrap();
         SpringApplication.run(Main.class, args);
@@ -121,14 +117,36 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     }
     
     public static void bootstrap() {
-        if (1 == bootstrap) {
-            try {
+        InputStream is = null;
+        try {
+            Properties props = new Properties();
+            String propsfile = "application.properties";
+            is = new FileInputStream(propsfile);
+            if (null != is) {
+                props.load(is);
+            }
+            int bootstrap = Integer.parseInt(props.getProperty("bootstrap"));
+            String dbclass = props.getProperty("app.datasource.driverClassName");
+            String dburl = props.getProperty("app.datasource.urlroot");
+            String dbuser = props.getProperty("app.datasource.root");
+            String dbpassword = props.getProperty("app.datasource.rootpw");
+            if (1 == bootstrap) {
+                
                 JDBCUtil jdbcutil = new JDBCUtil(dbclass, dburl, dbuser, dbpassword);
-                ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), false, false);
+                ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), true, false);
                 String file = "sql-bootstrap.sql";
                 runner.runScript(new BufferedReader(new FileReader(file)));
-            } catch (IOException | SQLException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            
+            }
+        } catch (FileNotFoundException ex) {
+            logger.error(ex.getMessage());
+        } catch (IOException | SQLException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            try {
+                is.close();
+            } catch (IOException ex) {
+                logger.error(ex.getMessage());
             }
         }
     }
