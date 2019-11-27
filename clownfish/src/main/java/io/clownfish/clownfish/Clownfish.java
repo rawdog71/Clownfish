@@ -40,13 +40,13 @@ import io.clownfish.clownfish.dbentities.CfSitedatasource;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfTemplate;
-import io.clownfish.clownfish.dbentities.CfTemplateversion;
-import io.clownfish.clownfish.dbentities.CfTemplateversionPK;
 import io.clownfish.clownfish.interceptor.GzipSwitch;
 import io.clownfish.clownfish.jdbc.DatatableDeleteProperties;
 import io.clownfish.clownfish.jdbc.DatatableNewProperties;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
+import io.clownfish.clownfish.jdbc.JDBCUtil;
+import io.clownfish.clownfish.jdbc.ScriptRunner;
 import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
@@ -91,6 +91,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -101,10 +102,9 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -231,9 +231,13 @@ public class Clownfish {
     private Config hazelConfig;
     private HazelcastInstance hcInstance;
     private @Getter @Setter Map<String, String> metainfomap;
-
+    
     final transient Logger logger = LoggerFactory.getLogger(Clownfish.class);
     @Value("${bootstrap}") int bootstrap;
+    @Value("${app.datasource.username}") String dbuser;
+    @Value("${app.datasource.password}") String dbpassword;
+    @Value("${app.datasource.url}") String dburl;
+    @Value("${app.datasource.driverClassName}") String dbclass;
 
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -267,12 +271,12 @@ public class Clownfish {
                 if (null != is) {
                     props.load(is);
                     props.setProperty("bootstrap", String.valueOf(bootstrap));
-                    File f = new File("application.properties");
+                File f = new File("application.properties");
                     
-                    bootstrap();
+                bootstrap();
                     
-                    OutputStream out = new FileOutputStream( f );
-                    DefaultPropertiesPersister p = new DefaultPropertiesPersister();
+                OutputStream out = new FileOutputStream( f );
+                DefaultPropertiesPersister p = new DefaultPropertiesPersister();
                     p.store(props, out, "Application properties");
                 } else {
                     logger.error("application.properties file not found");
@@ -947,20 +951,29 @@ public class Clownfish {
         }
     }
     
-    private void bootstrap() {
-        List<CfTemplate> cftemplatelist = cftemplateService.findAll();
-        for (CfTemplate template : cftemplatelist) {
-            try {
-                templateUtil.setTemplateContent(template.getContent());
-                
-                String content = templateUtil.getTemplateContent();
-                byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
-                
-                templateUtil.setCurrentVersion(1);
-                templateUtil.writeVersion(template.getId(), templateUtil.getCurrentVersion(), output, 0);
-            } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+    private void bootstrap() throws FileNotFoundException {
+        try {
+            JDBCUtil jdbcutil = new JDBCUtil(dbclass, dburl, dbuser, dbpassword);
+            ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), false, false);
+            String file = "sql-bootstrap.sql";
+            runner.runScript(new BufferedReader(new FileReader(file)));
+            
+            List<CfTemplate> cftemplatelist = cftemplateService.findAll();
+            for (CfTemplate template : cftemplatelist) {
+                try {
+                    templateUtil.setTemplateContent(template.getContent());
+                    
+                    String content = templateUtil.getTemplateContent();
+                    byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
+                    
+                    templateUtil.setCurrentVersion(1);
+                    templateUtil.writeVersion(template.getId(), templateUtil.getCurrentVersion(), output, 0);
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+        } catch (IOException | SQLException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
