@@ -28,6 +28,9 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.ansi;
+import org.fusesource.jansi.AnsiConsole;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -134,6 +137,10 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             String dbuser = props.getProperty("app.datasource.root");
             String dbpassword = props.getProperty("app.datasource.rootpw");
             if (1 == bootstrap) {
+                AnsiConsole.systemInstall();
+                System.out.println(ansi().fg(GREEN));
+                System.out.println("BOOTSTRAPPING I");
+                System.out.println(ansi().reset());
                 JDBCUtil jdbcutil = new JDBCUtil(dbclass, dburl, dbuser, dbpassword);
                 ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), true, false);
                 String file = "sql-bootstrap.sql";

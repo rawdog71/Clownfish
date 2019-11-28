@@ -280,6 +280,11 @@ public class Clownfish {
         if (1 == bootstrap) {
             bootstrap = 0;
             try {
+                AnsiConsole.systemInstall();
+                System.out.println(ansi().fg(GREEN));
+                System.out.println("BOOTSTRAPPING II");
+                System.out.println(ansi().reset());
+                
                 Properties props = new Properties();
                 String propsfile = "application.properties";
                 InputStream is = new FileInputStream(propsfile);
