@@ -275,7 +275,7 @@ public class ContentList implements Serializable {
                                 found = true;
                             }
                         } catch (javax.persistence.NoResultException | NullPointerException ex) {
-                            
+                            logger.error(ex.getMessage());
                         }
                     }
                     if (!found) {
@@ -327,7 +327,7 @@ public class ContentList implements Serializable {
                 cfclasscontentkeywordService.create(assetkeyword);
             }
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex.getMessage());
         }
     }
 }

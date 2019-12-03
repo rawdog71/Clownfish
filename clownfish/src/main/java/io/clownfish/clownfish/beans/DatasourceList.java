@@ -71,6 +71,10 @@ public class DatasourceList implements Serializable {
         newContentButtonDisabled = false;
     }
     
+    /**
+     * Selects an external datasource
+     * @param event
+     */
     public void onSelect(SelectEvent event) {
         selectedDatasource = (CfDatasource) event.getObject();
         
@@ -86,6 +90,10 @@ public class DatasourceList implements Serializable {
         newContentButtonDisabled = true;
     }
     
+    /**
+     * Creates an external datasource
+     * @param actionEvent
+     */
     public void onCreateContent(ActionEvent actionEvent) {
         try {
             CfDatasource newdatasourcecontent = new CfDatasource();
@@ -105,6 +113,10 @@ public class DatasourceList implements Serializable {
         }
     }
     
+    /**
+     * Edits an external datasource
+     * @param actionEvent
+     */
     public void onEditContent(ActionEvent actionEvent) {
         try {
             if (selectedDatasource != null) {
@@ -124,6 +136,10 @@ public class DatasourceList implements Serializable {
         }
     }
     
+    /**
+     * Deletes an external datasource
+     * @param actionEvent
+     */
     public void onDeleteContent(ActionEvent actionEvent) {
         if (selectedDatasource != null) {
             List<CfSitedatasource> sitedatasourcelist = cfsitedatasourceService.findByDatasourceref(selectedDatasource.getId());
@@ -132,10 +148,13 @@ public class DatasourceList implements Serializable {
             });
             cfdatasourceService.delete(selectedDatasource);
             datasourcelist = cfdatasourceService.findAll();
-            
         }
     }
     
+    /**
+     * Changes the name of an external datasource
+     * @param changeEvent
+     */
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
             cfdatasourceService.findByName(datasourceName);
@@ -145,6 +164,10 @@ public class DatasourceList implements Serializable {
         }
     }
     
+    /**
+     * Checks the connection to an external datasource
+     * @param actionEvent
+     */
     public void onConnectionCheck(ActionEvent actionEvent) {
         if (selectedDatasource != null) {
             JDBCUtil jdbcutil = new JDBCUtil(selectedDatasource.getDriverclass(), selectedDatasource.getUrl(), selectedDatasource.getUser(), selectedDatasource.getPassword());

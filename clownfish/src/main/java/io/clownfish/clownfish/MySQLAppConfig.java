@@ -44,6 +44,10 @@ public class MySQLAppConfig {
     @Value("${app.datasource.username}") String username;
     @Value("${app.datasource.password}") String password;
     
+    /**
+     * Returns the datasource configured in the application.properties settings
+     * @return 
+     */
     @Bean(name = "dataSource")
     public DataSource getDataSource() {
         DataSource dataSource = DataSourceBuilder
@@ -55,6 +59,11 @@ public class MySQLAppConfig {
         return dataSource;
     }
     
+    /**
+     * Scans the dbentities in the package folder and returns the SessionFactory
+     * @param dataSource
+     * @return 
+     */
     @Bean(name = "sessionFactory")
     public SessionFactory getSessionFactory(DataSource dataSource) {
         LocalSessionFactoryBuilder sessionBuilder = new LocalSessionFactoryBuilder(dataSource);
@@ -62,12 +71,22 @@ public class MySQLAppConfig {
         return sessionBuilder.buildSessionFactory();
     }
     
+    /**
+     * Sets the Hibernate Transaction Manager
+     * @param sessionFactory
+     * @return 
+     */
     @Bean(name = "transactionManager")
     public HibernateTransactionManager getTransactionManager(SessionFactory sessionFactory) {
         HibernateTransactionManager transactionManager = new HibernateTransactionManager(sessionFactory);
         return transactionManager;
     }   
     
+    /**
+     * Sets the datasource and returns the DataSourceInitializer
+     * @param dataSource
+     * @return 
+     */
     @Bean
     public DataSourceInitializer dataSourceInitializer(final DataSource dataSource) {
         final DataSourceInitializer initializer = new DataSourceInitializer();

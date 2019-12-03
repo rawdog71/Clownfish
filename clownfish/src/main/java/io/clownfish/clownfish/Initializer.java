@@ -15,11 +15,9 @@
  */
 package io.clownfish.clownfish;
 
-import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +29,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class Initializer implements ServletContextInitializer {
 
+    /**
+     * Ititialization of custom settings
+     * Sets Primefaces configuartion
+     * @param servletContext
+     * @throws javax.servlet.ServletException
+     */
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         servletContext.setInitParameter("primefaces.CLIENT_SIDE_VALIDATION", "true");
@@ -40,6 +44,10 @@ public class Initializer implements ServletContextInitializer {
         //servletContext.setInitParameter("primefaces.THEME", "cupertino");
     }
     
+    /**
+     * Initializes the file upload filter for the backend
+     * @return 
+     */
     @Bean
     public FilterRegistrationBean FileUploadFilter() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
@@ -48,14 +56,4 @@ public class Initializer implements ServletContextInitializer {
         registration.setAsyncSupported(true);
         return registration;
     }
-    
-    /*
-    @Bean
-    public MultipartConfigElement multipartConfigElement() {
-        MultipartConfigFactory factory = new MultipartConfigFactory();
-        factory.setMaxFileSize("100MB");
-        factory.setMaxRequestSize("100MB");
-        return factory.createMultipartConfig();
-    }
-    */
 }

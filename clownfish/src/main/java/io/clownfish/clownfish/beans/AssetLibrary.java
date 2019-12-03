@@ -61,6 +61,11 @@ public class AssetLibrary {
     
     final transient Logger logger = LoggerFactory.getLogger(AssetLibrary.class);
     
+    /**
+     * Initializes the AssetLibrary
+     * Retrieves all assetlists from db
+     * Retrieves all assets from db
+     */
     @PostConstruct
     public void init() {
         assetlist = cfassetlistService.findAll();
@@ -69,6 +74,10 @@ public class AssetLibrary {
         selectedAssetcontent = new ArrayList<>();
     }
 
+    /**
+     * Creates an asset library in db
+     * @param actionEvent
+     */
     public void onCreate(ActionEvent actionEvent) {
         try {
             cfassetlistService.findByName(assetlistname);
@@ -83,6 +92,11 @@ public class AssetLibrary {
         }
     }
     
+    /**
+     * Selection of an asset list
+     * Updates the selected assets in the asset list
+     * @param event
+     */
     public void onSelect(SelectEvent event) {
         selectedAssetlist = (CfAssetlist) event.getObject();
         
@@ -98,6 +112,11 @@ public class AssetLibrary {
         }
     }
     
+    /**
+     * Changing of an asset list
+     * Updates the selected assets in the asset list database
+     * @param event
+     */
     public void onChangeContent(AjaxBehaviorEvent event) {
         // Delete listcontent first
         List<CfAssetlistcontent> assetList = cfassetlistcontentService.findByAssetlistref(selectedAssetlist.getId());

@@ -86,6 +86,11 @@ public class AssetList {
     
     final transient Logger logger = LoggerFactory.getLogger(AssetList.class);
 
+    /**
+     * Initializes the AssetList
+     * Retrieves all assetlists from db
+     * Retrieves all assets from db
+     */
     @PostConstruct
     public void init() {
         renderDetail = false;
@@ -98,6 +103,15 @@ public class AssetList {
         keywords = new DualListModel<>(keywordSource, keywordTarget);
     }
     
+    /**
+     * Handles the file upload
+     * Stores the files in the media path
+     * Tika parser retrieves the metadata
+     * Lucene indexes the assets
+     * @param event
+     * @throws org.apache.tika.exception.TikaException
+     * @throws org.xml.sax.SAXException
+     */
     public void handleFileUpload(FileUploadEvent event) throws TikaException, SAXException {
         String filename = event.getFile().getFileName().toLowerCase();
         logger.info("UPLOAD: {}", filename);
@@ -167,6 +181,11 @@ public class AssetList {
         } 
     }
     
+    /**
+     * Handles the file delete
+     * Deletes the files from the media path and the database
+     * Removes from Lucene index
+     */
     public void onDelete() {
         try {
             assetIndexer.removeDocument(selectedAsset);
@@ -184,6 +203,10 @@ public class AssetList {
         }
     }
     
+    /**
+     * Handles the detail event
+     * Retrieves the metadata from the asset
+     */
     public void onDetail() {
         description = selectedAsset.getDescription();
         keywords.getTarget().clear();
@@ -203,6 +226,10 @@ public class AssetList {
         }
     }
  
+    /**
+     * Attache/Detaches the keywords to assetss 
+     * @param actionEvent
+     */
     public void onAttach(ActionEvent actionEvent) {
         assetkeywordlist = cfassetkeywordService.findByAssetRef(selectedAsset.getId());
         for (CfAssetkeyword assetkeyword : assetkeywordlist) {
@@ -219,6 +246,10 @@ public class AssetList {
         }
     }
     
+    /**
+     * Edits the description for an asset
+     * @param actionEvent
+     */
     public void editDescription(ActionEvent actionEvent) {
         selectedAsset.setDescription(description);
         cfassetService.edit(selectedAsset);

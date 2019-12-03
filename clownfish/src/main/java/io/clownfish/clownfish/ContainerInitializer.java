@@ -29,16 +29,13 @@ public class ContainerInitializer implements WebServerFactoryCustomizer<TomcatSe
     @Value("${server.port:9000}")
     int serverPort;
 
+    /**
+     * Customize the embedded tomcat server port
+     * @param factory
+     */
     @Override
     public void customize(TomcatServletWebServerFactory factory) {
         factory.setContextPath("");
         factory.setPort(serverPort);
-        /*
-        factory.addConnectorCustomizers(
-                (connector) -> {
-                    connector.setMaxPostSize(20000000); // 10 MB
-                }
-            );
-        */
     }
 }
