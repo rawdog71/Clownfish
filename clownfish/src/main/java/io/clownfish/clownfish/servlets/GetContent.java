@@ -29,6 +29,7 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +61,7 @@ public class GetContent extends HttpServlet {
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter HashMap<String, String> searchmap;
     private static transient @Getter @Setter HashMap<String, String> outputmap;
+    private static transient @Getter @Setter ArrayList<HashMap> outputlist;
     
     final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
 
@@ -97,6 +99,7 @@ public class GetContent extends HttpServlet {
      * @param response servlet response
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
+        outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("class") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
@@ -105,8 +108,8 @@ public class GetContent extends HttpServlet {
         searchmap = new HashMap<>();
         parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("search$"))).forEach((paramname) -> {
             String[] keys = paramname.split("\\$");
-            String[] values = parameters.get(paramname);
-            searchmap.put(keys[1], values[0]);
+            //String[] values = parameters.get(paramname);
+            searchmap.put(keys[1], keys[2]);
         });
         
         CfClass cfclass = cfclassService.findByName(klasse);
@@ -141,16 +144,17 @@ public class GetContent extends HttpServlet {
                 }
             }
             if (found) {
-                outputmap.put("contentfound", "true");
-                contentOutput(outputmap, attributcontentList);
-                break;
+                //outputmap.put("contentfound", "true");
+                outputlist = contentOutput(attributcontentList, outputlist);
+                //break;
             }
         }
         if (!found) {
             outputmap.put("contentfound", "false");
+            //outputlist = contentOutput(null, outputlist);
         }
         Gson gson = new Gson(); 
-        String json = gson.toJson(outputmap);
+        String json = gson.toJson(outputlist);
         response.setContentType("application/json;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             out.print(json);
@@ -227,7 +231,8 @@ public class GetContent extends HttpServlet {
         }
     }
     
-    private void contentOutput(HashMap<String, String> outputmap, List<CfAttributcontent> attributcontentList) {
+    private ArrayList contentOutput(List<CfAttributcontent> attributcontentList, ArrayList outputlist) {
+        HashMap<String, String> outputmap = new HashMap<>();
         attributcontentList.stream().forEach((attributcontent) -> {
             CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
             long attributtypeid = knattribut.getAttributetype().getId();
@@ -236,5 +241,7 @@ public class GetContent extends HttpServlet {
                 outputmap.put(knattribut.getName(), attributdef.getValue());
             }
         });
+        outputlist.add(outputmap);
+        return outputlist;
     }
 }
