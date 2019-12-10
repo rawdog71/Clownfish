@@ -263,6 +263,21 @@ CREATE TABLE IF NOT EXISTS `cf_relation` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `cf_relationcontent`
+--
+
+CREATE TABLE IF NOT EXISTS `cf_relationcontent` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `relationref` bigint(20) unsigned NOT NULL,
+  `content1ref` bigint(20) unsigned NOT NULL,
+  `content2ref` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `cf_site`
 --
 
