@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS `cf_datasource` (
 CREATE TABLE IF NOT EXISTS `cf_javascript` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
-  `content` text,
+  `content` mediumtext,
   `checkedoutby` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -272,7 +272,7 @@ CREATE TABLE IF NOT EXISTS `cf_relationcontent` (
   `content1ref` bigint(20) unsigned NOT NULL,
   `content2ref` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- --------------------------------------------------------
@@ -362,7 +362,7 @@ CREATE TABLE IF NOT EXISTS `cf_sitesaprfc` (
 CREATE TABLE IF NOT EXISTS `cf_stylesheet` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
-  `content` text NOT NULL,
+  `content` mediumtext NOT NULL,
   `checkedoutby` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
@@ -392,7 +392,7 @@ CREATE TABLE IF NOT EXISTS `cf_stylesheetversion` (
 CREATE TABLE IF NOT EXISTS `cf_template` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
-  `content` text NOT NULL,
+  `content` mediumtext NOT NULL,
   `scriptlanguage` int(11) NOT NULL,
   `checkedoutby` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),

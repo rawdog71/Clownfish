@@ -62,7 +62,7 @@ public class CfTemplate implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Lob
-    @Size(min = 1, max = 65535)
+    @Size(min = 1, max = 16777215)
     @Column(name = "content")
     private String content;
     @Basic(optional = false)

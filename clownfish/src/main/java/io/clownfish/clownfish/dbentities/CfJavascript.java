@@ -59,7 +59,7 @@ public class CfJavascript implements Serializable {
     @Column(name = "name")
     private String name;
     @Lob
-    @Size(max = 65535)
+    @Size(max = 16777215)
     @Column(name = "content")
     private String content;
     @Column(name = "checkedoutby")

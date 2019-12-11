@@ -478,6 +478,25 @@
                     <p:commandButton id="changeattribut" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" />
                 </p:tab>
                 
+                <p:tab title="Relations" id="relationpanel" rendered="#{loginBean.login}">
+                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                        
+                    </p:scrollPanel>
+
+                    <p:outputLabel for="relationtclass1" value="Class 1:" />
+                    <p:selectOneMenu id="relationtclass1" value="#{relationList.selectedClass1}" required="false" converter="#{classConverterBean}">
+                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                        <f:selectItems value="#{relationList.classListe}" />
+                    </p:selectOneMenu>
+                    
+                    <p:outputLabel for="relationtclass2" value="Class 2:" />
+                    <p:selectOneMenu id="relationtclass2" value="#{relationList.selectedClass2}" required="false" converter="#{classConverterBean}">
+                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                        <f:selectItems value="#{relationList.classListe}" />
+                    </p:selectOneMenu>
+                    
+                </p:tab>
+                
                 <p:tab title="Content" id="contentlistpanel" rendered="#{loginBean.login}">
                     <p:scrollPanel id="contentpanel" style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="classcontentlist" var="classcontent" value="#{classcontentList.classcontentlist}" 
