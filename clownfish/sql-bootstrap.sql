@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS `cf_javascript` (
 CREATE TABLE IF NOT EXISTS `cf_javascriptversion` (
   `javascriptref` bigint(20) unsigned NOT NULL,
   `version` bigint(20) NOT NULL,
-  `content` varbinary(64000) DEFAULT NULL,
+  `content` blob,
   `tstamp` datetime NOT NULL,
   `commitedby` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`javascriptref`,`version`)
@@ -377,7 +377,7 @@ CREATE TABLE IF NOT EXISTS `cf_stylesheet` (
 CREATE TABLE IF NOT EXISTS `cf_stylesheetversion` (
   `stylesheetref` bigint(20) unsigned NOT NULL,
   `version` bigint(20) NOT NULL,
-  `content` varbinary(64000) DEFAULT NULL,
+  `content` blob,
   `tstamp` datetime NOT NULL,
   `commitedby` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`stylesheetref`,`version`)
@@ -408,7 +408,7 @@ CREATE TABLE IF NOT EXISTS `cf_template` (
 CREATE TABLE IF NOT EXISTS `cf_templateversion` (
   `templateref` bigint(20) unsigned NOT NULL,
   `version` bigint(20) NOT NULL,
-  `content` varbinary(64000) DEFAULT NULL,
+  `content` blob,
   `tstamp` datetime NOT NULL,
   `commitedby` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`templateref`,`version`)
