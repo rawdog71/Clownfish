@@ -104,7 +104,7 @@ public class QuartzJob implements Job {
             sapSupport = true;
         }
         if (sapSupport) {
-            sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
+            sapc = new SAPConnection(SAPCONNECTION, "Clownfish5");
             rpytableread = new RPY_TABLE_READ(sapc);
         }
         
