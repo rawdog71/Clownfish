@@ -182,6 +182,7 @@ public class QuartzJob implements Job {
                     List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                     sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
                     sapbean = new SAPTemplateBean();
+                    sapbean.init(sapc, sitesaprfclist, rpytableread, null);
                     fmRoot.put("sapBean", sapbean);
                 }
                 
