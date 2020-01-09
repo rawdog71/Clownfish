@@ -128,6 +128,10 @@ public class ContentList implements Serializable {
         keywords = new DualListModel<>(keywordSource, keywordTarget);
     }
     
+    public void initAssetlist() {
+        assetlist = cfassetService.findAll();
+    }
+    
     public void onSelect(SelectEvent event) {
         selectedContent = (CfClasscontent) event.getObject();
         attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);

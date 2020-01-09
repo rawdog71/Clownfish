@@ -70,6 +70,7 @@ public class AssetList {
     @Autowired IndexService indexService;
     @Autowired AssetIndexer assetIndexer;
     @Autowired FolderUtil folderUtil;
+    @Autowired ContentList classcontentlist;
     
     private @Getter @Setter List<CfAsset> assetlist;
     private @Getter @Setter CfAsset selectedAsset;
@@ -172,6 +173,7 @@ public class AssetList {
             
             assetName = "";
             
+            classcontentlist.initAssetlist();
             FacesMessage message = new FacesMessage("Succesful", filename + " is uploaded.");
             FacesContext.getCurrentInstance().addMessage(null, message);
         } catch (IOException e) {
