@@ -22,6 +22,7 @@ import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ public class ClassUtil {
     @Autowired CfAttributService cfattributService;
     @Autowired CfAttributetypeService cfattributetypeService;
     @Autowired CfAttributcontentService cfattributcontentService;
+    @Autowired CfClasscontentService cfclasscontentService;
     @Autowired MarkdownUtil markdownUtil;
     
     public ClassUtil() {
@@ -87,7 +89,17 @@ public class ClassUtil {
                     attributcontentmap.put(cfattribut.getName(), markdownUtil.parseMarkdown(attributcontent.getContentText(), markdownUtil.getMarkdownOptions()));
                     break;
                 case "classref":
-                    attributcontentmap.put(cfattribut.getName(), attributcontent.getContentInteger());
+                    if (null != attributcontent.getClasscontentlistref()) {
+                        Map listcontentmap = new LinkedHashMap();
+                        List<CfClasscontent> classcontentlist = null;
+                        classcontentlist = cfclasscontentService.findByClassref(attributcontent.getClasscontentlistref().getClassref());
+                        for (CfClasscontent cc : classcontentlist) {
+                            Map dummy_attributcontentmap = new LinkedHashMap();
+                            dummy_attributcontentmap = getattributmap(cc);
+                            listcontentmap.put(cc.getName(), dummy_attributcontentmap);
+                        }
+                        attributcontentmap.put(attributcontent.getClasscontentlistref().getName(), listcontentmap);
+                    }
                     break;
             }
         }

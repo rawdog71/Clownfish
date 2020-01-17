@@ -136,6 +136,7 @@ public class ClassList implements Serializable {
             newclass.setSearchrelevant(classSearchrelevant);
             cfclassService.create(newclass);
             classListe = cfclassService.findAll();
+            classListeRef = cfclassService.findAll();
             className = "";
             classSearchrelevant = false;
             contentlist.init();
