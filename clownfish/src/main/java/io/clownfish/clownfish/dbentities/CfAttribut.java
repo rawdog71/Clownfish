@@ -71,6 +71,9 @@ public class CfAttribut implements Serializable {
     private Boolean identity;
     @Column(name = "autoincrementor")
     private Boolean autoincrementor;
+    @JoinColumn(name = "relationref", referencedColumnName = "id")
+    @ManyToOne(optional = true)
+    private CfClass relationref;
 
     public CfAttribut() {
     }
@@ -132,6 +135,14 @@ public class CfAttribut implements Serializable {
 
     public void setAutoincrementor(Boolean autoincrementor) {
         this.autoincrementor = autoincrementor;
+    }
+
+    public CfClass getRelationref() {
+        return relationref;
+    }
+
+    public void setRelationref(CfClass relationref) {
+        this.relationref = relationref;
     }
 
     @Override

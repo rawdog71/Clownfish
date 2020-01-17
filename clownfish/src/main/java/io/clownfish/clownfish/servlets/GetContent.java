@@ -225,7 +225,9 @@ public class GetContent extends HttpServlet {
             case "media":
                 return new AttributDef(attributcontent.getContentInteger().toString(), "media");
             case "text":
-                return new AttributDef(attributcontent.getContentInteger().toString(), "text");        
+                return new AttributDef(attributcontent.getContentInteger().toString(), "text");
+            case "classref":
+                return new AttributDef(attributcontent.getContentInteger().toString(), "classref");    
             default:
                 return null;
         }

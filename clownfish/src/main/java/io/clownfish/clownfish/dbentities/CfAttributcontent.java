@@ -98,6 +98,9 @@ public class CfAttributcontent implements Serializable {
     private String salt;
     @Column(name = "indexed")
     private boolean indexed;
+    @JoinColumn(name = "content_classref", referencedColumnName = "id")
+    @ManyToOne(optional = true)
+    private CfList classcontentlistref;
     
     public CfAttributcontent() {
     }
@@ -200,6 +203,14 @@ public class CfAttributcontent implements Serializable {
         this.indexed = indexed;
     }
 
+    public CfList getClasscontentlistref() {
+        return classcontentlistref;
+    }
+
+    public void setClasscontentlistref(CfList classcontentlistref) {
+        this.classcontentlistref = classcontentlistref;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -288,7 +299,13 @@ public class CfAttributcontent implements Serializable {
                     return getContentText();
                 } else {
                     return "";
-                }    
+                } 
+            case 11: // 
+                if (null != getClasscontentlistref()) {
+                    return getClasscontentlistref().getName();
+                } else {
+                    return "";
+                }     
         }
         return "?";
     }

@@ -69,8 +69,11 @@ public class ClassList implements Serializable {
     private @Getter @Setter String attributName;
     private @Getter @Setter boolean identity;
     private @Getter @Setter boolean autoinc;
+    private @Getter @Setter List<CfClass> classListeRef;
+    private @Getter @Setter CfClass selectedClassRef = null;
     private @Getter @Setter boolean newButtonDisabled;
     private @Getter @Setter boolean newAttributButtonDisabled;
+    private @Getter @Setter boolean renderClass;
     
     @Autowired transient private @Getter @Setter AttributList attributlist;
     final transient Logger logger = LoggerFactory.getLogger(ClassList.class);
@@ -78,7 +81,9 @@ public class ClassList implements Serializable {
     @PostConstruct
     public void init() {
         classListe = cfclassService.findAll();
+        classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
+        renderClass = false;
     }
     
     public void onSelect(SelectEvent event) {
@@ -95,6 +100,12 @@ public class ClassList implements Serializable {
         selectedAttribut = (CfAttribut) event.getObject();
         attributName = selectedAttribut.getName();
         selectedAttributeType = selectedAttribut.getAttributetype();
+        if (selectedAttributeType.getName().compareToIgnoreCase("classref") == 0) {
+            renderClass = true;
+            selectedClassRef = selectedAttribut.getRelationref();
+        } else {
+            renderClass = false;
+        }
         identity = selectedAttribut.getIdentity();
         autoinc = selectedAttribut.getAutoincrementor();
         newAttributButtonDisabled = true;
@@ -155,6 +166,7 @@ public class ClassList implements Serializable {
             newattribut.setIdentity(identity);
             newattribut.setAutoincrementor(autoinc);
             newattribut.setAttributetype(selectedAttributeType);
+            newattribut.setRelationref(selectedClassRef);
             
             cfattributService.create(newattribut);
             selectedAttributList = attributlist.init(selectedClass);
@@ -180,6 +192,7 @@ public class ClassList implements Serializable {
             selectedAttribut.setAttributetype(selectedAttributeType);
             selectedAttribut.setIdentity(identity);
             selectedAttribut.setAutoincrementor(autoinc);
+            selectedAttribut.setRelationref(selectedClassRef);
             cfattributService.edit(selectedAttribut);
         }
     }

@@ -22,6 +22,7 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfKeyword;
+import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
@@ -29,6 +30,7 @@ import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -64,6 +66,7 @@ public class ContentList implements Serializable {
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfAttributService cfattributService;
+    @Autowired transient CfListService cflistService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired CfKeywordService cfkeywordService;
     
@@ -81,8 +84,10 @@ public class ContentList implements Serializable {
     private @Getter @Setter CfAttributcontent selectedAttribut = null;
     private @Getter @Setter long selectedAttributId;
     private @Getter @Setter CfAsset selectedMedia;
+    private @Getter @Setter List<CfList> selectedList;
     private @Getter @Setter String editContent;
     private @Getter @Setter Date editCalendar;
+    private @Getter @Setter CfList editDatalist;
     private @Getter @Setter boolean isBooleanType;
     private @Getter @Setter boolean isStringType;
     private @Getter @Setter boolean isHashStringType;
@@ -93,6 +98,7 @@ public class ContentList implements Serializable {
     private @Getter @Setter boolean isTextType;
     private @Getter @Setter boolean isMarkdownType;
     private @Getter @Setter boolean isMediaType;
+    private @Getter @Setter boolean isClassrefType;
     private @Getter @Setter boolean valueBooleanRendered = false;
     private @Getter @Setter boolean valueDatetimeRendered = false;
     private @Getter @Setter DualListModel<CfKeyword> keywords;
@@ -166,6 +172,7 @@ public class ContentList implements Serializable {
         isMarkdownType = false;
         isDatetimeType = false;
         isMediaType = false;
+        isClassrefType = false;
         
         switch (selectedAttribut.getAttributref().getAttributetype().getName()) {
             case "boolean":
@@ -201,7 +208,16 @@ public class ContentList implements Serializable {
                 if (selectedAttribut.getContentInteger() != null) {
                     selectedMedia = cfassetService.findById(selectedAttribut.getContentInteger().longValue());
                 }
-                break;    
+                break;
+            case "classref":
+                isClassrefType = true;
+                editDatalist = null;
+                CfClass ref = selectedAttribut.getAttributref().getRelationref();
+                selectedList = cflistService.findByClassref(ref);
+                if (selectedAttribut.getClasscontentlistref() != null) {
+                    editDatalist = cflistService.findById(selectedAttribut.getClasscontentlistref().getId());
+                }
+                break;
         }
         editContent = selectedAttribut.toString();
     }
@@ -314,6 +330,9 @@ public class ContentList implements Serializable {
                 break;
             case "media":
                 selectedAttribut.setContentInteger(BigInteger.valueOf(selectedMedia.getId()));
+                break;
+            case "classref":
+                selectedAttribut.setClasscontentlistref(editDatalist);
                 break;    
         }
         cfattributcontentService.edit(selectedAttribut);

@@ -443,7 +443,7 @@
                     <p:commandButton id="updateclass" process="form" value="Edit" actionListener="#{classList.onEdit}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" />
 
                     <p:dataTable id="attributlist" var="attribut" value="#{classList.selectedAttributList}" selectionMode="single" selection="#{classList.selectedAttribut}" rowKey="#{attribut.id}">
-                        <p:ajax event="rowSelect" listener="#{classList.onSelectAttribute}" update=":form:msgs :form:tabview:attributname :form:tabview:attributtype :form:tabview:attributidentity :form:tabview:attributautoinc :form:tabview:newattribut" />
+                        <p:ajax event="rowSelect" listener="#{classList.onSelectAttribute}" update=":form:msgs :form:tabview:attributname :form:tabview:attributtype :form:tabview:classeditor" />
                         <p:column headerText="Name">
                             <h:outputText value="#{attribut.name}" />
                         </p:column>
@@ -456,45 +456,37 @@
                         <p:column headerText="Autoinc">
                             <h:outputText value="#{attribut.autoincrementor}" />
                         </p:column>
+                        <p:column headerText="Class">
+                            <h:outputText value="#{attribut.relationref}" />
+                        </p:column>
                     </p:dataTable>
 
-                    <p:outputLabel for="attributname">Name</p:outputLabel>
-                    <p:inputText id="attributname" value="#{classList.attributName}" >
-                        <p:ajax event="keyup" listener="#{classList.onChangeAttributName(changeEvent)}" update=":form:tabview:newattribut" />
-                    </p:inputText>
+                    <p:panel id="classeditor">
+                        <p:outputLabel for="attributname">Name</p:outputLabel>
+                        <p:inputText id="attributname" value="#{classList.attributName}" >
+                            <p:ajax event="keyup" listener="#{classList.onChangeAttributName(changeEvent)}" update=":form:tabview:newattribut" />
+                        </p:inputText>
 
-                    <p:outputLabel for="attributtype" value="Typ:" />
-                    <p:selectOneMenu id="attributtype" value="#{classList.selectedAttributeType}" required="true" converter="#{attributetypeConverterBean}">
-                        <f:selectItems value="#{classList.attributetypelist}" />
-                    </p:selectOneMenu>
-                    
-                    <p:outputLabel for="attributidentity" value="Identity:" />
-                    <p:selectBooleanCheckbox id="attributidentity" value="#{classList.identity}" />
-                    
-                    <p:outputLabel for="attributautoinc" value="Autoinc:" />
-                    <p:selectBooleanCheckbox id="attributautoinc" value="#{classList.autoinc}" />
+                        <p:outputLabel for="attributtype" value="Typ:" />
+                        <p:selectOneMenu id="attributtype" value="#{classList.selectedAttributeType}" required="true" converter="#{attributetypeConverterBean}">
+                            <f:selectItems value="#{classList.attributetypelist}" />
+                        </p:selectOneMenu>
 
-                    <p:commandButton id="newattribut" process="form" value="New" actionListener="#{classList.onCreateAttribut}" update=":form:msgs :form:tabview:attributlist :form:tabview:classname" disabled="#{classlist.newAttributButtonDisabled}" />
-                    <p:commandButton id="changeattribut" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" />
-                </p:tab>
-                
-                <p:tab title="Relations" id="relationpanel" rendered="#{loginBean.login}">
-                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        
-                    </p:scrollPanel>
+                        <p:outputLabel for="attributidentity" value="Identity:" />
+                        <p:selectBooleanCheckbox id="attributidentity" value="#{classList.identity}" />
 
-                    <p:outputLabel for="relationtclass1" value="Class 1:" />
-                    <p:selectOneMenu id="relationtclass1" value="#{relationList.selectedClass1}" required="false" converter="#{classConverterBean}">
-                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                        <f:selectItems value="#{relationList.classListe}" />
-                    </p:selectOneMenu>
-                    
-                    <p:outputLabel for="relationtclass2" value="Class 2:" />
-                    <p:selectOneMenu id="relationtclass2" value="#{relationList.selectedClass2}" required="false" converter="#{classConverterBean}">
-                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                        <f:selectItems value="#{relationList.classListe}" />
-                    </p:selectOneMenu>
-                    
+                        <p:outputLabel for="attributautoinc" value="Autoinc:" />
+                        <p:selectBooleanCheckbox id="attributautoinc" value="#{classList.autoinc}" />
+
+                        <p:outputLabel for="relationclass" value="Class:" rendered="#{classList.renderClass}" />
+                        <p:selectOneMenu id="relationclass" value="#{classList.selectedClassRef}" required="false" converter="#{classConverterBean}" rendered="#{classList.renderClass}">
+                            <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                            <f:selectItems value="#{classList.classListeRef}" />
+                        </p:selectOneMenu>
+
+                        <p:commandButton id="newattribut" process="form" value="New" actionListener="#{classList.onCreateAttribut}" update=":form:msgs :form:tabview:attributlist :form:tabview:classname" disabled="#{classlist.newAttributButtonDisabled}" />
+                        <p:commandButton id="changeattribut" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" />
+                    </p:panel>
                 </p:tab>
                 
                 <p:tab title="Content" id="contentlistpanel" rendered="#{loginBean.login}">
@@ -567,6 +559,10 @@
                                     #{mp.name}
                                     </p:column>
                                 </p:selectOneMenu>
+                                <p:selectOneMenu id="classref" value="#{classcontentList.editDatalist}" converter="#{sitelistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType}">
+                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                    <f:selectItems value="#{classcontentList.selectedList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
+                                </p:selectOneMenu>
 
                                 <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
                                 <p:commandButton id="editattribut" process="form" value="Edit" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" >
@@ -580,7 +576,9 @@
                                 <p:focus for="attributvalueMarkdown" />
                             </p:column>
                         </p:dataTable>
-
+                    </h:panelGrid>
+                    
+                    <p:panel id="contentkeywordattacher">
                         <p:pickList id="contentkeywordpicklist" value="#{classcontentList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" converter="#{keywordConverterBean}" showCheckbox="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains">
                             <f:facet name="sourceCaption">Unattached</f:facet>
                             <f:facet name="targetCaption">Attached</f:facet>
@@ -588,7 +586,7 @@
                         <p:commandButton id="attachcontentkeyword" value="Attach" actionListener="#{classcontentList.onAttach}">
 
                         </p:commandButton>
-                    </h:panelGrid>
+                    </p:panel>    
                     
                 </p:tab>
                 

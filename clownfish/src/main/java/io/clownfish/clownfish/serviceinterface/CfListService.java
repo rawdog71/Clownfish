@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.serviceinterface;
 
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public interface CfListService {
     List<CfList> findAll();
     CfList findById(Long id);
     CfList findByName(String name);
+    List<CfList> findByClassref(CfClass ref);
     boolean create(CfList entity);
     boolean delete(CfList entity);
     boolean edit(CfList entity);

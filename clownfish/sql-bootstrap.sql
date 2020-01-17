@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS `cf_attribut` (
   `classref` bigint(20) unsigned NOT NULL,
   `identity` tinyint(1) DEFAULT '0',
   `autoincrementor` tinyint(1) DEFAULT '0',
+  `relationref` bigint(20) unsigned DEFAULT NULL,  
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
@@ -89,7 +90,8 @@ CREATE TABLE IF NOT EXISTS `cf_attributcontent` (
   `content_text` longtext,
   `content_date` datetime DEFAULT NULL,
   `salt` varchar(30) DEFAULT NULL,
-  `indexed` tinyint(4) NOT NULL DEFAULT '0',  
+  `indexed` tinyint(4) NOT NULL DEFAULT '0',
+  `content_classref` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
@@ -526,7 +528,8 @@ INSERT INTO `cf_attributetype` (`id`, `name`, `searchrelevant`) VALUES
 (7, 'hashstring', 0),
 (8, 'media', 0),
 (9, 'text', 1),
-(10, 'markdown', 1);
+(10, 'markdown', 1),
+(11, 'classref', 0);
 
 --
 -- Daten für Tabelle `cf_property`

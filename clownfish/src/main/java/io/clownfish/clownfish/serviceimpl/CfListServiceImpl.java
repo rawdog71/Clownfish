@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.serviceimpl;
 
 import io.clownfish.clownfish.daointerface.CfListDAO;
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import java.util.List;
@@ -65,6 +66,11 @@ public class CfListServiceImpl implements CfListService {
     @Override
     public CfList findByName(String name) {
         return this.cflistDAO.findByName(name);
+    }
+
+    @Override
+    public List<CfList> findByClassref(CfClass ref) {
+        return this.cflistDAO.findByClassref(ref);
     }
     
 }
