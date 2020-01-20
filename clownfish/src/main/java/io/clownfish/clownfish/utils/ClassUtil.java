@@ -19,10 +19,12 @@ import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,6 +44,7 @@ public class ClassUtil {
     @Autowired CfAttributetypeService cfattributetypeService;
     @Autowired CfAttributcontentService cfattributcontentService;
     @Autowired CfClasscontentService cfclasscontentService;
+    @Autowired CfListcontentService cflistcontentService;
     @Autowired MarkdownUtil markdownUtil;
     
     public ClassUtil() {
@@ -91,14 +94,21 @@ public class ClassUtil {
                 case "classref":
                     if (null != attributcontent.getClasscontentlistref()) {
                         Map listcontentmap = new LinkedHashMap();
-                        List<CfClasscontent> classcontentlist = null;
-                        classcontentlist = cfclasscontentService.findByClassref(attributcontent.getClasscontentlistref().getClassref());
-                        for (CfClasscontent cc : classcontentlist) {
+                        List<CfListcontent> selectedcontent = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
+                        List<CfClasscontent> selectedListcontent = new ArrayList<>();;
+                        selectedListcontent.clear();
+                        if (selectedcontent.size() > 0) {
+                            for (CfListcontent listcontent : selectedcontent) {
+                                CfClasscontent selectedContent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                                selectedListcontent.add(selectedContent);
+                            }
+                        }
+                        for (CfClasscontent cc : selectedListcontent) {
                             Map dummy_attributcontentmap = new LinkedHashMap();
                             dummy_attributcontentmap = getattributmap(cc);
                             listcontentmap.put(cc.getName(), dummy_attributcontentmap);
                         }
-                        attributcontentmap.put(attributcontent.getClasscontentlistref().getName(), listcontentmap);
+                        attributcontentmap.put(attributcontent.getAttributref().getName(), listcontentmap);
                     }
                     break;
             }
