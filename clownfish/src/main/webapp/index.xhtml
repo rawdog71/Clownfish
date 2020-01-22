@@ -530,13 +530,12 @@
                     </p:commandButton>
                     
                     <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
-                    
                         <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentList.selectedAttributContent}" rowKey="#{attributcontent.id}">
                             <p:ajax event="rowSelect" listener="#{classcontentList.onSelectAttribut}" update=":form:tabview:attributcontentlist" />
-                            <p:column headerText="Name">
+                            <p:column headerText="Name" style="width: 200px;">
                                 <h:outputText value="#{attributcontent.attributref.name}" />
                             </p:column>
-                            <p:column headerText="Typ">
+                            <p:column headerText="Typ" style="width: 200px;">
                                 <h:outputText value="#{attributcontent.attributref.attributetype}" />
                             </p:column>
                             <p:column headerText="Wert">
@@ -544,9 +543,9 @@
                                 <p:password id="attributvalueHashString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.hashStringType}" />
                                 <p:inputNumber id="attributvalueInt" value="#{classcontentList.editContent}" decimalPlaces="0" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.integerType}" />
                                 <p:inputNumber id="attributvalueReal" value="#{classcontentList.editContent}" decimalPlaces="2" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.realType}" />
-                                <p:textEditor id="attributvalueHtmlText" widgetVar="editor1" value="#{classcontentList.editContent}" height="300" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.HTMLTextType}" />
-                                <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.textType}" />
-                                <p:inputTextarea id="attributvalueMarkdown" widgetVar="editor13" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.markdownType}" />
+                                <p:textEditor id="attributvalueHtmlText" widgetVar="editor1" value="#{classcontentList.editContent}" height="300" style="margin-bottom:10px; width:100%" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.HTMLTextType}" />
+                                <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px; width:100%" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.textType}" />
+                                <p:inputTextarea id="attributvalueMarkdown" widgetVar="editor13" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px; width:100%" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.markdownType}" />
                                 <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.booleanType}" />
                                 <p:calendar id="attributvalueDatetime" value="#{classcontentList.editCalendar}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" />
                                 <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" var="mp" converter="#{assetConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}">
@@ -687,7 +686,7 @@
                 <p:tab title="Assets" id="assetpanel" rendered="#{loginBean.login}">
                     <h:form enctype="multipart/form-data">
                         <p:fileUpload fileUploadListener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true"
-                                              update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|svg)$/i" >
+                                              update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|svg|ppt|pptx)$/i" >
                         </p:fileUpload>
                         <p:growl id="messages" showDetail="true" />
                     </h:form>

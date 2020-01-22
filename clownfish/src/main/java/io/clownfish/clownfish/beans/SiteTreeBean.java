@@ -490,6 +490,7 @@ public class SiteTreeBean implements Serializable {
                 }
             }
             
+            selectedSite.setName(siteName);
             selectedSite.setHtmlcompression(sitehtmlcompression);
             selectedSite.setCharacterencoding(characterEncoding);
             selectedSite.setContenttype(contentType);

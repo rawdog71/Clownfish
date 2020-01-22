@@ -256,6 +256,7 @@ public class ContentList implements Serializable {
                     cfattributcontentService.create(newcontent);
                 }
             });
+            classcontentlist.clear();
             classcontentlist = cfclasscontentService.findAll();
         } catch (ConstraintViolationException ex) {
             logger.error(ex.getMessage());
@@ -329,7 +330,11 @@ public class ContentList implements Serializable {
                 selectedAttribut.setContentDate(editCalendar);
                 break;
             case "media":
-                selectedAttribut.setContentInteger(BigInteger.valueOf(selectedMedia.getId()));
+                if (null != selectedMedia) {
+                    selectedAttribut.setContentInteger(BigInteger.valueOf(selectedMedia.getId()));
+                } else {
+                    selectedAttribut.setContentInteger(null);
+                }
                 break;
             case "classref":
                 selectedAttribut.setClasscontentlistref(editDatalist);

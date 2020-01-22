@@ -104,6 +104,7 @@ public class ClassList implements Serializable {
             renderClass = true;
             selectedClassRef = selectedAttribut.getRelationref();
         } else {
+            selectedClassRef = null;
             renderClass = false;
         }
         identity = selectedAttribut.getIdentity();
