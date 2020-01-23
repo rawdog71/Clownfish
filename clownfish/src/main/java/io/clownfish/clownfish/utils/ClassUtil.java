@@ -89,7 +89,11 @@ public class ClassUtil {
                     break;    
                 case "markdown":
                     markdownUtil.initOptions();
-                    attributcontentmap.put(cfattribut.getName(), markdownUtil.parseMarkdown(attributcontent.getContentText(), markdownUtil.getMarkdownOptions()));
+                    if (null != attributcontent.getContentText()) {
+                        attributcontentmap.put(cfattribut.getName(), markdownUtil.parseMarkdown(attributcontent.getContentText(), markdownUtil.getMarkdownOptions()));
+                    } else {
+                        attributcontentmap.put(cfattribut.getName(), markdownUtil.parseMarkdown("", markdownUtil.getMarkdownOptions()));
+                    }
                     break;
                 case "classref":
                     if (null != attributcontent.getClasscontentlistref()) {
