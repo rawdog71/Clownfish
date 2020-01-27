@@ -19,11 +19,14 @@ import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -45,6 +48,8 @@ public class ClassUtil {
     @Autowired CfAttributcontentService cfattributcontentService;
     @Autowired CfClasscontentService cfclasscontentService;
     @Autowired CfListcontentService cflistcontentService;
+    @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
+    @Autowired CfKeywordService cfkeywordService;
     @Autowired MarkdownUtil markdownUtil;
     
     public ClassUtil() {
@@ -118,6 +123,15 @@ public class ClassUtil {
             }
         }
         /* add keywords  */
+        List<CfClasscontentkeyword> contentkeywordlist;
+        contentkeywordlist = cfclasscontentkeywordService.findByAssetRef(classcontent.getId());
+        if (contentkeywordlist.size() > 0) {
+            ArrayList listcontentmap = new ArrayList();
+            for (CfClasscontentkeyword contentkeyword : contentkeywordlist) {
+                listcontentmap.add(cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref()));
+            }
+            attributcontentmap.put("keywords", listcontentmap);
+        }
         
         return attributcontentmap;
     }
