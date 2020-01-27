@@ -462,6 +462,49 @@ public class Clownfish {
     public Clownfish() {
     }
     
+    @PostMapping(path = "/search")
+    public void postsearch(@Context HttpServletRequest request, @Context HttpServletResponse response) throws ParseException {
+        try {
+            userSession = request.getSession();
+            this.request = request;
+            this.response = response;
+            String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+
+            Gson gson = new Gson();
+            List<JsonFormParameter> map;
+            map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
+            
+            Map parametermap = clownfishutil.getParametermap(map);
+            
+            Searcher searcher = new Searcher(folderUtil.getIndex_folder(), cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService, cfassetService);
+            long startTime = System.currentTimeMillis();
+            SearchResult searchresult = searcher.search(parametermap.get("searchparam").toString(), searchlimit);
+            long endTime = System.currentTimeMillis();
+            
+            logger.info("Search Time :" + (endTime - startTime));
+            searchmetadata.clear();
+            searchmetadata.put("cfSearchQuery", parametermap.get("searchparam").toString());
+            searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
+            searchcontentmap.clear();
+            searchresult.getFoundSites().stream().forEach((site) -> {
+                searchcontentmap.put(site.getName(), site);
+            });
+            searchassetmap.clear();
+            searchresult.getFoundAssets().stream().forEach((asset) -> {
+                searchassetmap.put(asset.getName(), asset);
+            });
+            
+            String search_site = propertyUtil.getPropertyValue("site_search");
+            if (null == search_site) {
+                search_site = "searchresult";
+            }
+            request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, search_site);
+            universalGet(search_site, request, response);
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
+        }    
+    }
+    
     /**
      * Call of the "search" site
      * Fetches the search site from the system property "site_search" and calls universalGet
