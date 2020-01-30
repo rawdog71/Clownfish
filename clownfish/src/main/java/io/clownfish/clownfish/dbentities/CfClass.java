@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.dbentities;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -57,6 +58,8 @@ public class CfClass implements Serializable {
     @NotNull
     @Column(name = "searchrelevant")
     private boolean searchrelevant;
+    @Column(name = "templateref")
+    private BigInteger templateref;
 
     public CfClass() {
     }
@@ -94,6 +97,14 @@ public class CfClass implements Serializable {
 
     public void setSearchrelevant(boolean searchrelevant) {
         this.searchrelevant = searchrelevant;
+    }
+
+    public BigInteger getTemplateref() {
+        return templateref;
+    }
+
+    public void setTemplateref(BigInteger templateref) {
+        this.templateref = templateref;
     }
 
     @Override

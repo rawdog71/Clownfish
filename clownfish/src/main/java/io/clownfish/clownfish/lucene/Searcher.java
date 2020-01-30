@@ -16,16 +16,19 @@
 package io.clownfish.clownfish.lucene;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +64,7 @@ public class Searcher {
     CfListService cflistservice;
     CfSitelistService cfsitelistservice;
     CfAssetService cfassetservice;
+    CfClassService cfclassservice;
     
     final transient Logger logger = LoggerFactory.getLogger(Searcher.class);
 
@@ -102,6 +106,11 @@ public class Searcher {
                         foundSites.add(foundsite);
                     });
                 });
+                // Search in classes and put it via template to the output
+                CfClass findclass = cfclassservice.findById(classcontentref);
+                if ((findclass.isSearchrelevant()) && (findclass.getTemplateref().compareTo(BigInteger.ZERO) > 0)) {
+                    Long templateref = findclass.getTemplateref().longValue();
+                }
             } else {
                 try {
                     String assetid = doc.getField(LuceneConstants.ID).stringValue();
