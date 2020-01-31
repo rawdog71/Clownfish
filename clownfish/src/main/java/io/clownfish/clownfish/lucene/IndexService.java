@@ -26,7 +26,6 @@ import javax.inject.Named;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.IndexNotFoundException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;

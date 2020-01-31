@@ -56,6 +56,8 @@ import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
+import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
@@ -193,8 +195,11 @@ public class Clownfish {
     @Autowired DatabaseUtil databaseUtil;
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired @Getter @Setter IndexService indexService;
+    @Autowired CfClassService cfclassService;
+    @Autowired CfClasscontentService cfclasscontentService;
     @Autowired private Scheduler scheduler;
     @Autowired private FolderUtil folderUtil;
+    @Autowired Searcher searcher;
     
     DatabaseTemplateBean databasebean;
     EmailTemplateBean emailbean;
@@ -219,6 +224,7 @@ public class Clownfish {
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map searchcontentmap;
     private @Getter @Setter Map searchassetmap;
+    private @Getter @Setter Map searchclasscontentmap;
     private @Getter @Setter Map searchmetadata;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     private @Getter @Setter MarkdownUtil markdownUtil;
@@ -426,6 +432,9 @@ public class Clownfish {
             if (null == searchassetmap) {
                 searchassetmap = new HashMap<>();
             }
+            if (null == searchclasscontentmap) {
+                searchclasscontentmap = new HashMap<>();
+            }
             if (null == searchmetadata) {
                 searchmetadata = new HashMap<>();
             }
@@ -476,7 +485,9 @@ public class Clownfish {
             
             Map parametermap = clownfishutil.getParametermap(map);
             
-            Searcher searcher = new Searcher(folderUtil.getIndex_folder(), cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService, cfassetService);
+            //Searcher searcher = new Searcher(folderUtil.getIndex_folder(), cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService, cfassetService, cfclassService, cfclasscontentService, cftemplateService);
+            //Searcher searcher = new Searcher();
+            searcher.setIndexPath(folderUtil.getIndex_folder());
             long startTime = System.currentTimeMillis();
             SearchResult searchresult = searcher.search(parametermap.get("searchparam").toString(), searchlimit);
             long endTime = System.currentTimeMillis();
@@ -493,6 +504,10 @@ public class Clownfish {
             searchresult.getFoundAssets().stream().forEach((asset) -> {
                 searchassetmap.put(asset.getName(), asset);
             });
+            searchclasscontentmap.clear();
+            for (Object key : searchresult.getFoundClasscontent().keySet()) {
+                searchclasscontentmap.put(key.toString(), searchresult.getFoundClasscontent().get(key).toString());
+            }
             
             String search_site = propertyUtil.getPropertyValue("site_search");
             if (null == search_site) {
@@ -514,7 +529,9 @@ public class Clownfish {
     @GetMapping(path = "/search/{query}")
     public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
-            Searcher searcher = new Searcher(folderUtil.getIndex_folder(), cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService, cfassetService);
+            //Searcher searcher = new Searcher(folderUtil.getIndex_folder(), cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService, cfassetService, cfclassService, cfclasscontentService, cftemplateService);
+            //Searcher searcher = new Searcher();
+            searcher.setIndexPath(folderUtil.getIndex_folder());
             long startTime = System.currentTimeMillis();
             SearchResult searchresult = searcher.search(query, searchlimit);
             long endTime = System.currentTimeMillis();
@@ -531,6 +548,10 @@ public class Clownfish {
             searchresult.getFoundAssets().stream().forEach((asset) -> {
                 searchassetmap.put(asset.getName(), asset);
             });
+            searchclasscontentmap.clear();
+            for (Object key : searchresult.getFoundClasscontent().keySet()) {
+                searchclasscontentmap.put(key.toString(), searchresult.getFoundClasscontent().get(key).toString());
+            }
             
             String search_site = propertyUtil.getPropertyValue("site_search");
             if (null == search_site) {
@@ -861,6 +882,9 @@ public class Clownfish {
                                 if (!searchassetmap.isEmpty()) {
                                     fmRoot.put("searchassetlist", searchassetmap);
                                 }
+                                if (!searchclasscontentmap.isEmpty()) {
+                                    fmRoot.put("searchclasscontentlist", searchclasscontentmap);
+                                }
                                 try {
                                     if (null != fmTemplate) {
                                         freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
@@ -906,6 +930,9 @@ public class Clownfish {
                                 }
                                 if (!searchassetmap.isEmpty()) {
                                     velContext.put("searchassetlist", searchassetmap);
+                                }
+                                if (!searchclasscontentmap.isEmpty()) {
+                                    velContext.put("searchclasscontentlist", searchclasscontentmap);
                                 }
                                 if (null != velTemplate) {
                                     velTemplate.merge(velContext, out);

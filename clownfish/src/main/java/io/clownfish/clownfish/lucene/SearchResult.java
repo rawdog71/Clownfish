@@ -18,6 +18,7 @@ package io.clownfish.clownfish.lucene;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfSite;
 import java.util.ArrayList;
+import java.util.HashMap;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,6 +29,7 @@ import lombok.Setter;
 public class SearchResult {
     @Getter @Setter ArrayList<CfSite> foundSites;
     @Getter @Setter ArrayList<CfAsset> foundAssets;
+    @Getter @Setter HashMap<String, String> foundClasscontent;
 
     public SearchResult() {
     }

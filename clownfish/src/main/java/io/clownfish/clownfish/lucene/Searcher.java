@@ -17,21 +17,32 @@ package io.clownfish.clownfish.lucene;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfClass;
+import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
+import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
+import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import io.clownfish.clownfish.utils.ClassUtil;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.faces.bean.ViewScoped;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
@@ -47,40 +58,50 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
+@ViewScoped
+@Component
 public class Searcher {
     IndexSearcher indexSearcher;
     MultiFieldQueryParser queryParser;
     Query query;
     ArrayList<CfSite> foundSites;
     ArrayList<CfAsset> foundAssets;
-    CfSitecontentService sitecontentservice;
-    CfSiteService siteservice;
-    CfListcontentService sitelistservice;
-    CfListService cflistservice;
-    CfSitelistService cfsitelistservice;
-    CfAssetService cfassetservice;
-    CfClassService cfclassservice;
+    HashMap<String, String> foundClasscontent;
+    @Autowired CfSitecontentService sitecontentservice;
+    @Autowired CfSiteService siteservice;
+    @Autowired CfListcontentService sitelistservice;
+    @Autowired CfListService cflistservice;
+    @Autowired CfSitelistService cfsitelistservice;
+    @Autowired CfAssetService cfassetservice;
+    @Autowired CfClassService cfclassservice;
+    @Autowired CfClasscontentService cfclasscontentservice;
+    @Autowired CfTemplateService cftemplateservice;
+    @Autowired ClassUtil classutil;
     
     final transient Logger logger = LoggerFactory.getLogger(Searcher.class);
 
-    public Searcher(String indexDirectoryPath, CfSitecontentService sitecontentservice, CfSiteService siteservice, CfListcontentService sitelistservice, CfListService cflistservice, CfSitelistService cfsitelistservice, CfAssetService cfassetservice) throws IOException {
-        this.sitecontentservice = sitecontentservice;
-        this.siteservice = siteservice;
-        this.sitelistservice = sitelistservice;
-        this.cflistservice = cflistservice;
-        this.cfsitelistservice = cfsitelistservice;
-        this.cfassetservice = cfassetservice;
-        Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
-        IndexReader reader = DirectoryReader.open(indexDirectory);
-        indexSearcher = new IndexSearcher(reader);
-        queryParser = new MultiFieldQueryParser(new String[] {LuceneConstants.CONTENT_TEXT, LuceneConstants.CONTENT_STRING, LuceneConstants.ASSET_NAME, LuceneConstants.ASSET_TEXT, LuceneConstants.ASSET_DESCRIPTION}, new StandardAnalyzer());
+    public Searcher() {
         foundSites = new ArrayList<>();
         foundAssets = new ArrayList<>();
+        foundClasscontent = new HashMap<>();
+    }
+   
+    public void setIndexPath(String indexDirectoryPath) {
+        try {
+            Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
+            IndexReader reader = DirectoryReader.open(indexDirectory);
+            indexSearcher = new IndexSearcher(reader);
+            queryParser = new MultiFieldQueryParser(new String[] {LuceneConstants.CONTENT_TEXT, LuceneConstants.CONTENT_STRING, LuceneConstants.ASSET_NAME, LuceneConstants.ASSET_TEXT, LuceneConstants.ASSET_DESCRIPTION}, new StandardAnalyzer());
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(Searcher.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public SearchResult search(String searchQuery, int searchlimit) throws IOException, ParseException {
@@ -89,6 +110,7 @@ public class Searcher {
         foundAssets.clear();
         query = queryParser.parse(searchQuery);
         TopDocs hits = indexSearcher.search(query, searchlimit);
+        foundClasscontent.clear();
         for (ScoreDoc scoreDoc : hits.scoreDocs) {
             Document doc = getDocument(scoreDoc);
             String contenttype = doc.get(LuceneConstants.CONTENT_TYPE);
@@ -107,9 +129,31 @@ public class Searcher {
                     });
                 });
                 // Search in classes and put it via template to the output
-                CfClass findclass = cfclassservice.findById(classcontentref);
+                CfClasscontent findclasscontent = cfclasscontentservice.findById(classcontentref);
+                CfClass findclass = cfclassservice.findById(findclasscontent.getClassref().getId());
+                
                 if ((findclass.isSearchrelevant()) && (findclass.getTemplateref().compareTo(BigInteger.ZERO) > 0)) {
                     Long templateref = findclass.getTemplateref().longValue();
+                    
+                    CfTemplate cftemplate = cftemplateservice.findById(templateref);
+                    String searchtemplatecontent = cftemplate.getContent();
+                    Map attributmap = classutil.getattributmap(findclasscontent);
+                    for (Object key : attributmap.keySet()) {
+                        if (null != attributmap.get(key.toString())) {
+                            Pattern pattern = Pattern.compile("(\\[\\[" + findclass.getName() + "." + key.toString() + "\\]\\])");
+                            Matcher matcher = pattern.matcher(searchtemplatecontent);
+                            while (matcher.find()) {
+                                String lastmatch = searchtemplatecontent.substring(matcher.start(), matcher.end());
+                                searchtemplatecontent = searchtemplatecontent.replace(lastmatch, attributmap.get(key.toString()).toString());
+                                matcher = pattern.matcher(searchtemplatecontent);
+                            }
+                        }
+                    }
+                    if (foundClasscontent.containsKey(findclass.getName())) {
+                        foundClasscontent.put(findclass.getName(), foundClasscontent.get(findclass.getName()) + searchtemplatecontent);
+                    } else {
+                        foundClasscontent.put(findclass.getName(), searchtemplatecontent);
+                    }
                 }
             } else {
                 try {
@@ -125,6 +169,7 @@ public class Searcher {
         }
         searchresult.foundSites = foundSites;
         searchresult.foundAssets = foundAssets;
+        searchresult.foundClasscontent = foundClasscontent;
         return searchresult;
     }
     
