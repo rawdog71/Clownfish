@@ -134,33 +134,13 @@ public class Searcher {
                 CfClass findclass = cfclassservice.findById(findclasscontent.getClassref().getId());
                 
                 if (findclass.isSearchrelevant()) {
-                    //Long templateref = findclass.getTemplateref().longValue();
-                    
-                    //CfTemplate cftemplate = cftemplateservice.findById(templateref);
-                    //String searchtemplatecontent = cftemplate.getContent();
                     Map attributmap = classutil.getattributmap(findclasscontent);
-                    /*
-                    for (Object key : attributmap.keySet()) {
-                        if (null != attributmap.get(key.toString())) {
-                            Pattern pattern = Pattern.compile("(\\[\\[" + findclass.getName() + "." + key.toString() + "\\]\\])");
-                            Matcher matcher = pattern.matcher(searchtemplatecontent);
-                            while (matcher.find()) {
-                                String lastmatch = searchtemplatecontent.substring(matcher.start(), matcher.end());
-                                searchtemplatecontent = searchtemplatecontent.replace(lastmatch, attributmap.get(key.toString()).toString());
-                                matcher = pattern.matcher(searchtemplatecontent);
-                            }
-                        }
-                    }
-                    if (foundClasscontent.containsKey(findclass.getName())) {
-                        foundClasscontent.put(findclass.getName(), foundClasscontent.get(findclass.getName()) + searchtemplatecontent);                        
-                    } else {
-                        foundClasscontent.put(findclass.getName(), searchtemplatecontent);
-                    }
-*/
                     if (searchclasscontentmap.containsKey(findclass.getName())) {
                         ArrayList searchclassarray = (ArrayList) searchclasscontentmap.get(findclass.getName());
-                        searchclassarray.add(attributmap);
-                        searchclasscontentmap.put(findclass.getName(), searchclassarray);
+                        if (!searchclassarray.contains(attributmap)) {
+                            searchclassarray.add(attributmap);
+                            searchclasscontentmap.put(findclass.getName(), searchclassarray);
+                        }
                     } else {
                         ArrayList searchclassarray = new ArrayList<Map>();
                         searchclassarray.add(attributmap);

@@ -23,6 +23,8 @@ import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfList;
+import io.clownfish.clownfish.lucene.ContentIndexer;
+import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
@@ -31,12 +33,15 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
@@ -69,6 +74,9 @@ public class ContentList implements Serializable {
     @Autowired transient CfListService cflistService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired CfKeywordService cfkeywordService;
+    @Autowired IndexService indexService;
+    @Autowired ContentIndexer contentIndexer;
+    @Autowired FolderUtil folderUtil;
     
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter CfClasscontent selectedContent = null;
@@ -340,7 +348,18 @@ public class ContentList implements Serializable {
                 selectedAttribut.setClasscontentlistref(editDatalist);
                 break;    
         }
+        selectedAttribut.setIndexed(false);
         cfattributcontentService.edit(selectedAttribut);
+        // Index the changed content and merge the Index files
+        if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
+            try {
+                contentIndexer.run();
+                indexService.getWriter().commit();
+                indexService.getWriter().forceMerge(10);
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(ContentList.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
     
     public void onAttach(ActionEvent actionEvent) {
