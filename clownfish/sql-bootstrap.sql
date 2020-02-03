@@ -118,8 +118,7 @@ CREATE TABLE IF NOT EXISTS `cf_attributetype` (
 CREATE TABLE IF NOT EXISTS `cf_class` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
-  `searchrelevant` tinyint(4) NOT NULL DEFAULT '0',
-  `templateref` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `searchrelevant` tinyint(4) NOT NULL DEFAULT '0'
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

@@ -506,7 +506,7 @@ public class Clownfish {
             });
             searchclasscontentmap.clear();
             for (Object key : searchresult.getFoundClasscontent().keySet()) {
-                searchclasscontentmap.put(key.toString(), searchresult.getFoundClasscontent().get(key).toString());
+                searchclasscontentmap.put(key.toString(), searchresult.getFoundClasscontent().get(key));
             }
             
             String search_site = propertyUtil.getPropertyValue("site_search");

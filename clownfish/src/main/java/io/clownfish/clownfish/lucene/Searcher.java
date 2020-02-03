@@ -111,9 +111,10 @@ public class Searcher {
         query = queryParser.parse(searchQuery);
         TopDocs hits = indexSearcher.search(query, searchlimit);
         foundClasscontent.clear();
+        HashMap searchclasscontentmap = new HashMap<String, ArrayList>();       
         for (ScoreDoc scoreDoc : hits.scoreDocs) {
             Document doc = getDocument(scoreDoc);
-            String contenttype = doc.get(LuceneConstants.CONTENT_TYPE);
+            String contenttype = doc.get(LuceneConstants.CONTENT_TYPE);           
             if (0 == contenttype.compareToIgnoreCase("Clownfish/Content")) {
                 long classcontentref = Long.parseLong(doc.get(LuceneConstants.CLASSCONTENT_REF));
                 // Search directly in site
@@ -132,12 +133,13 @@ public class Searcher {
                 CfClasscontent findclasscontent = cfclasscontentservice.findById(classcontentref);
                 CfClass findclass = cfclassservice.findById(findclasscontent.getClassref().getId());
                 
-                if ((findclass.isSearchrelevant()) && (findclass.getTemplateref().compareTo(BigInteger.ZERO) > 0)) {
-                    Long templateref = findclass.getTemplateref().longValue();
+                if (findclass.isSearchrelevant()) {
+                    //Long templateref = findclass.getTemplateref().longValue();
                     
-                    CfTemplate cftemplate = cftemplateservice.findById(templateref);
-                    String searchtemplatecontent = cftemplate.getContent();
+                    //CfTemplate cftemplate = cftemplateservice.findById(templateref);
+                    //String searchtemplatecontent = cftemplate.getContent();
                     Map attributmap = classutil.getattributmap(findclasscontent);
+                    /*
                     for (Object key : attributmap.keySet()) {
                         if (null != attributmap.get(key.toString())) {
                             Pattern pattern = Pattern.compile("(\\[\\[" + findclass.getName() + "." + key.toString() + "\\]\\])");
@@ -150,9 +152,19 @@ public class Searcher {
                         }
                     }
                     if (foundClasscontent.containsKey(findclass.getName())) {
-                        foundClasscontent.put(findclass.getName(), foundClasscontent.get(findclass.getName()) + searchtemplatecontent);
+                        foundClasscontent.put(findclass.getName(), foundClasscontent.get(findclass.getName()) + searchtemplatecontent);                        
                     } else {
                         foundClasscontent.put(findclass.getName(), searchtemplatecontent);
+                    }
+*/
+                    if (searchclasscontentmap.containsKey(findclass.getName())) {
+                        ArrayList searchclassarray = (ArrayList) searchclasscontentmap.get(findclass.getName());
+                        searchclassarray.add(attributmap);
+                        searchclasscontentmap.put(findclass.getName(), searchclassarray);
+                    } else {
+                        ArrayList searchclassarray = new ArrayList<Map>();
+                        searchclassarray.add(attributmap);
+                        searchclasscontentmap.put(findclass.getName(), searchclassarray);
                     }
                 }
             } else {
@@ -169,7 +181,7 @@ public class Searcher {
         }
         searchresult.foundSites = foundSites;
         searchresult.foundAssets = foundAssets;
-        searchresult.foundClasscontent = foundClasscontent;
+        searchresult.foundClasscontent = searchclasscontentmap;
         return searchresult;
     }
     
