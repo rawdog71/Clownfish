@@ -127,6 +127,12 @@ public class AssetIndexer implements Runnable {
             case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                 document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
                 break;
+            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
+                break;
+            case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+                document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
+                break;    
         }
     
         return document;

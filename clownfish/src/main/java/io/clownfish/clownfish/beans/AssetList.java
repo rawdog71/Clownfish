@@ -37,6 +37,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
+import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
@@ -176,11 +177,11 @@ public class AssetList {
             classcontentlist.initAssetlist();
             FacesMessage message = new FacesMessage("Succesful", filename + " is uploaded.");
             FacesContext.getCurrentInstance().addMessage(null, message);
-        } catch (IOException e) {
+        } catch (IOException | PersistenceException e) {
             logger.error(e.getMessage());
             FacesMessage error = new FacesMessage("The files were not uploaded!");
             FacesContext.getCurrentInstance().addMessage(null, error);
-        } 
+        }
     }
     
     /**
