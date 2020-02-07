@@ -804,10 +804,10 @@ public class Clownfish {
                         sitecontentmap = siteutil.getSitecontentmapList(sitecontentlist);
 
                         // fetch the dependend datalists, if available
-                        siteutil.getSitelist_list(cfsite, sitecontentmap);
+                        sitecontentmap = siteutil.getSitelist_list(cfsite, sitecontentmap);
                         
                         // fetch the site assetlibraries
-                        siteutil.getSiteAssetlibrary(cfsite, sitecontentmap);
+                        sitecontentmap = siteutil.getSiteAssetlibrary(cfsite, sitecontentmap);
 
                         // manage parameters 
                         HashMap<String, DatatableProperties> datatableproperties = clownfishutil.getDatatableproperties(postmap);

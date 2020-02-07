@@ -35,6 +35,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
@@ -55,6 +57,7 @@ public class GetAsset extends HttpServlet {
     
     private static int width = 0;
     private static int height = 0;
+    private static int download = 0;
     
     final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
     
@@ -75,6 +78,14 @@ public class GetAsset extends HttpServlet {
         
         acontext.start(() -> {
             try {
+                String paramdownload = acontext.getRequest().getParameter("dl");
+                if (paramdownload != null) {
+                    try {
+                        download = Integer.parseInt(paramdownload);
+                    } catch (NumberFormatException nfe) {
+                        download = 0;
+                    }
+                }
                 width = 0;
                 height = 0;
                 CfAsset asset = null;
@@ -89,6 +100,11 @@ public class GetAsset extends HttpServlet {
                     imagefilename = asset.getName();
                 }
                 if (null != asset) {
+                    if (1 == download) {
+                        response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(imagefilename, StandardCharsets.UTF_8.toString()));
+                    } else {
+                        response.setHeader("Content-disposition", "inline; filename=" + URLEncoder.encode(imagefilename, StandardCharsets.UTF_8.toString()));
+                    }
                     if (asset.getMimetype().contains("image")) {
                         if (asset.getMimetype().contains("svg")) {
                             acontext.getResponse().setContentType(asset.getMimetype());

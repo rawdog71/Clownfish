@@ -65,23 +65,26 @@ public class SiteUtil {
     public SiteUtil() {
     }
     
-    public void getSitelist_list(CfSite cfsite, Map sitecontentmap) {
+    public Map getSitelist_list(CfSite cfsite, Map sitecontentmap) {
         List<CfSitelist> sitelist_list = new ArrayList<>();
         sitelist_list.addAll(cfsitelistService.findBySiteref(cfsite.getId()));
-        for (CfSitelist sitelist : sitelist_list) {
-            CfList cflist = cflistService.findById(sitelist.getCfSitelistPK().getListref());
-            Map listcontentmap = new LinkedHashMap();
+        if (!sitelist_list.isEmpty()) {
+            for (CfSitelist sitelist : sitelist_list) {
+                CfList cflist = cflistService.findById(sitelist.getCfSitelistPK().getListref());
+                Map listcontentmap = new LinkedHashMap();
 
-            List<CfListcontent> contentlist = cflistcontentService.findByListref(cflist.getId());
-            for (CfListcontent listcontent : contentlist) {
-                CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                cfclassService.findById(classcontent.getClassref().getId());
-                List<CfAttributcontent> attributcontentlist = new ArrayList<>();
-                attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
-                listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
+                List<CfListcontent> contentlist = cflistcontentService.findByListref(cflist.getId());
+                for (CfListcontent listcontent : contentlist) {
+                    CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                    cfclassService.findById(classcontent.getClassref().getId());
+                    List<CfAttributcontent> attributcontentlist = new ArrayList<>();
+                    attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
+                    listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
+                }
+                sitecontentmap.put(cflist.getName(), listcontentmap);
             }
-            sitecontentmap.put(cflist.getName(), listcontentmap);
         }
+        return sitecontentmap;
     }
     
     public Map getSitecontentmapList(List<CfSitecontent> sitecontentlist) {
@@ -95,7 +98,7 @@ public class SiteUtil {
         return sitecontentmapdummy;
     }
     
-    public void getSiteAssetlibrary(CfSite cfsite, Map sitecontentmap) {
+    public Map getSiteAssetlibrary(CfSite cfsite, Map sitecontentmap) {
         List<CfSiteassetlist> siteassetlibrary = new ArrayList<>();
         siteassetlibrary.addAll(cfsiteassetlistService.findBySiteref(cfsite.getId()));
         
@@ -113,5 +116,6 @@ public class SiteUtil {
             //sitecontentmap.put(, listcontentmap);
         }
         sitecontentmap.put("AssetLibrary", assetlibraryMap);
+        return sitecontentmap;
     }
 }

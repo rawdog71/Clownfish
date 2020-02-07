@@ -88,56 +88,67 @@ public class InsertContent extends HttpServlet {
 
         Gson gson = new Gson();
         InsertContentParameter icp = gson.fromJson(jb.toString(), InsertContentParameter.class);
-        response.getOutputStream().print(icp.getClassname());
-        insertContent(icp);
+        response.getOutputStream().println(icp.getClassname());
+        insertContent(icp, response);
     }
     
-    private void insertContent(InsertContentParameter icp) {
+    private void insertContent(InsertContentParameter icp, HttpServletResponse response) {
         try {
             CfClass clazz = cfclassService.findByName(icp.getClassname());
             System.out.println(clazz.isSearchrelevant());
             
             try {
                 CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());
-                System.out.println("Duplicate Classcontent found! OhOh!");
+                response.getOutputStream().println("Duplicate Classcontent: " + icp.getContentname());
             } catch (javax.persistence.NoResultException ex) {
-                CfClasscontent newclasscontent = new CfClasscontent();
-                newclasscontent.setName(icp.getContentname());
-                newclasscontent.setClassref(clazz);
-                cfclasscontentService.create(newclasscontent);
-
-                List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
-                attributlist.stream().forEach((attribut) -> {
-                    if (attribut.getAutoincrementor() == true) {
-                        List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
-                        long max = 0;
-                        for (CfClasscontent classcontent : classcontentlist2) {
-                            try {
-                                CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);
-                                if (attributcontent.getContentInteger().longValue() > max) {
-                                    max = attributcontent.getContentInteger().longValue();
+                try {
+                    CfClasscontent newclasscontent = new CfClasscontent();
+                    newclasscontent.setName(icp.getContentname());
+                    newclasscontent.setClassref(clazz);
+                    cfclasscontentService.create(newclasscontent);
+                    response.getOutputStream().println(newclasscontent.getName());
+                    
+                    List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
+                    attributlist.stream().forEach((attribut) -> {
+                        if (attribut.getAutoincrementor() == true) {
+                            List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
+                            long max = 0;
+                            for (CfClasscontent classcontent : classcontentlist2) {
+                                try {
+                                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);
+                                    if (attributcontent.getContentInteger().longValue() > max) {
+                                        max = attributcontent.getContentInteger().longValue();
+                                    }
+                                } catch (javax.persistence.NoResultException ex2) {
+                                    logger.error(ex2.getMessage());
                                 }
-                            } catch (javax.persistence.NoResultException ex2) {
-                                logger.error(ex2.getMessage());
-                            }    
+                            }
+                            CfAttributcontent newcontent = new CfAttributcontent();
+                            newcontent.setAttributref(attribut);    
+                            newcontent.setClasscontentref(newclasscontent);
+                            newcontent.setContentInteger(BigInteger.valueOf(max+1));
+                            cfattributcontentService.create(newcontent);
+                        } else {
+                            CfAttributcontent newcontent = new CfAttributcontent();
+                            newcontent.setAttributref(attribut);
+                            newcontent.setClasscontentref(newclasscontent);
+                            newcontent = setAttributValue(newcontent, icp.getAttributmap().get(attribut.getName()));
+                            
+                            cfattributcontentService.create(newcontent);
                         }
-                        CfAttributcontent newcontent = new CfAttributcontent();
-                        newcontent.setAttributref(attribut);
-                        newcontent.setClasscontentref(newclasscontent);
-                        newcontent.setContentInteger(BigInteger.valueOf(max+1));
-                        cfattributcontentService.create(newcontent);
-                    } else {
-                        CfAttributcontent newcontent = new CfAttributcontent();
-                        newcontent.setAttributref(attribut);
-                        newcontent.setClasscontentref(newclasscontent);
-                        newcontent = setAttributValue(newcontent, icp.getAttributmap().get(attribut.getName()));
-                        
-                        cfattributcontentService.create(newcontent);
-                    }
-                });
+                    });
+                } catch (IOException ex1) {
+                    java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex);
             }    
         } catch (javax.persistence.NoResultException ex) {
-            System.out.println("Class not found");
+            try {
+                response.getOutputStream().println("Class not found: " + icp.getClassname());
+            } catch (IOException ex1) {
+                java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         }
     }
     
