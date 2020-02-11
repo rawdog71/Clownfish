@@ -32,7 +32,8 @@ import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
 import io.clownfish.clownfish.datamodels.ClownfishResponse;
-import io.clownfish.clownfish.datamodels.InsertContentParameter;
+import io.clownfish.clownfish.dbentities.CfAttributcontent;
+import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfQuartz;
 import io.clownfish.clownfish.dbentities.CfSite;
@@ -1117,5 +1118,23 @@ public class Clownfish {
                 java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    private boolean checkConsistency() {
+        logger.info("CHECK INCONSISTENCY");
+        boolean isConsistent = true;
+        List<CfAttributcontent> attributcontentlist;
+        attributcontentlist = cfattributcontentService.findAll();
+        for (CfAttributcontent attributcontent : attributcontentlist) {
+            try {
+                CfClasscontent classcontent = cfclasscontentService.findById(attributcontent.getClasscontentref().getId());
+            } catch (Exception ex) {
+                isConsistent = false;
+                logger.info("INCONSISTENCY: " + attributcontent.getId());
+                logger.info("INCONSISTENCY: " + attributcontent.getClasscontentref());
+                logger.info("---------------");
+            }
+        }
+        return isConsistent;
     }
 }
