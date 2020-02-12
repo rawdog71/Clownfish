@@ -439,7 +439,8 @@ public class ContentList implements Serializable {
                     break;
                 case "media":
                     if (null != attributcontent.getContentInteger()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                        CfAsset asset = cfassetService.findById(attributcontent.getContentInteger().longValue());
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), asset.getName());
                     }
                     break;
                 case "classref":

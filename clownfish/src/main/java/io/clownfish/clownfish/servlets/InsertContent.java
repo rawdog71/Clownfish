@@ -17,12 +17,14 @@ package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.InsertContentParameter;
+import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
@@ -57,6 +59,7 @@ public class InsertContent extends HttpServlet {
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired transient CfAttributetypeService cfattributetypeService;
+    @Autowired transient CfAssetService cfassetService;
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired FolderUtil folderUtil;
@@ -202,13 +205,21 @@ public class InsertContent extends HttpServlet {
             case "datetime":
                 selectedAttribut.setContentDate(editCalendar);
                 break;
+            */
             case "media":
-                if (null != selectedMedia) {
-                    selectedAttribut.setContentInteger(BigInteger.valueOf(selectedMedia.getId()));
+                if (null != editContent) {
+                    try {
+                        CfAsset asset = cfassetService.findByName(editContent);
+                        selectedAttribut.setContentInteger(BigInteger.valueOf(asset.getId()));
+                    } catch (Exception ex) {
+                        selectedAttribut.setContentInteger(null);
+                        logger.error("INSERTCONTENT: Media " + editContent + " not found!");
+                    }
                 } else {
                     selectedAttribut.setContentInteger(null);
                 }
                 break;
+            /*    
             case "classref":
                 selectedAttribut.setClasscontentlistref(editDatalist);
                 break;    
