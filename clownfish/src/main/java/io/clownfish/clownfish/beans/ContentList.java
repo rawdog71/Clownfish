@@ -25,6 +25,8 @@ import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfList;
+import io.clownfish.clownfish.dbentities.CfListcontent;
+import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
@@ -35,6 +37,8 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.IOException;
@@ -74,6 +78,8 @@ public class ContentList implements Serializable {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfListService cflistService;
+    @Autowired transient CfListcontentService cflistcontentService;
+    @Autowired transient CfSitecontentService cfsitecontentService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired CfKeywordService cfkeywordService;
     @Autowired IndexService indexService;
@@ -276,6 +282,30 @@ public class ContentList implements Serializable {
     
     public void onDeleteContent(ActionEvent actionEvent) {
         if (selectedContent != null) {
+            // Delete corresponding attributcontent entries
+            List<CfAttributcontent> attributcontentlistdummy = cfattributcontentService.findByClasscontentref(selectedContent);
+            for (CfAttributcontent attributcontent : attributcontentlistdummy) {
+                cfattributcontentService.delete(attributcontent);
+            }
+            
+            // Delete corresponding listcontent entries
+            List<CfListcontent> selectedcontent = cflistcontentService.findByClasscontentref(selectedContent.getId());
+            for (CfListcontent listcontent : selectedcontent) {
+                cflistcontentService.delete(listcontent);
+            }
+            
+            // Delete corresponding keywordcontent entries
+            List<CfClasscontentkeyword> keywordcontentdummy = cfclasscontentkeywordService.findByAssetRef(selectedContent.getId());
+            for (CfClasscontentkeyword keywordcontent : keywordcontentdummy) {
+                cfclasscontentkeywordService.delete(keywordcontent);
+            }
+            
+            // Delete corresponding sitecontent entries
+            List<CfSitecontent> sitecontentdummy = cfsitecontentService.findByClasscontentref(selectedContent.getId());
+            for (CfSitecontent sitecontent : sitecontentdummy) {
+                cfsitecontentService.delete(sitecontent);
+            }
+            
             cfclasscontentService.delete(selectedContent);
             classcontentlist = cfclasscontentService.findAll();
         }

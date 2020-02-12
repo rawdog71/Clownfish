@@ -327,6 +327,7 @@ public class SiteTreeBean implements Serializable {
     public void onSelect(NodeSelectEvent event) {
         selectedNode = event.getTreeNode();
         selectedSite = (CfSite) selectedNode.getData();
+        classcontentlist = cfclasscontentService.findAll();
         if (null != selectedSite.getTemplateref()) {
             CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().longValue());
             int idx = templatelist.getTemplateListe().indexOf(template);
