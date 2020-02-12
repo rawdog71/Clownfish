@@ -510,6 +510,9 @@
                         </p:dataTable>
                     </p:scrollPanel>
                     
+                    <p:commandButton id="refreshcontent" process="form" value="Refresh" actionListener="#{classcontentList.onRefreshContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
+                    </p:commandButton>
+                    
                     <p:outputLabel for="contentname">Name</p:outputLabel>
                     <p:inputText id="contentname" value="#{classcontentList.contentName}" >
                         <p:ajax event="keyup" listener="#{classcontentList.onChangeName(changeEvent)}" update="newcontent" />

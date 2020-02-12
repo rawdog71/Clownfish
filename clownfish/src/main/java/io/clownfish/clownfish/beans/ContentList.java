@@ -381,6 +381,11 @@ public class ContentList implements Serializable {
         }
     }
     
+    public void onRefreshContent() {
+        classcontentlist.clear();
+        classcontentlist = cfclasscontentService.findAll();
+    }
+    
     public void jsonExport() {
         InsertContentParameter contentparameter = new InsertContentParameter();
         contentparameter.setClassname(selectedContent.getClassref().getName());
