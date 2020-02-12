@@ -388,37 +388,59 @@ public class ContentList implements Serializable {
         for (CfAttributcontent attributcontent : attributcontentlist) {
             switch (attributcontent.getAttributref().getAttributetype().getName()) {
                 case "boolean":
-                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentBoolean().toString());
+                    if (null != attributcontent.getContentBoolean()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentBoolean().toString());
+                    }
                     break;
                 case "string":
-                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentString());
+                    if (null != attributcontent.getContentString()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentString());
+                    }
                     break;
                 case "hashstring":
-                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentString());
+                    if (null != attributcontent.getContentString()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentString());
+                    }
                     break;    
                 case "integer":
-                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                    if (null != attributcontent.getContentInteger()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                    }
                     break;
                 case "real":
-                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentReal().toString());
+                    if (null != attributcontent.getContentReal()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentReal().toString());
+                    }
                     break;
                 case "htmltext":
-                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    if (null != attributcontent.getContentText()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    }
                     break;    
                 case "text":
-                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    if (null != attributcontent.getContentText()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    }
                     break;
                 case "markdown":
-                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    if (null != attributcontent.getContentText()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    }
                     break;    
                 case "datetime":
-                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentDate().toString());
+                    if (null != attributcontent.getContentDate()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentDate().toString());
+                    }
                     break;
                 case "media":
-                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                    if (null != attributcontent.getContentInteger()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                    }
                     break;
                 case "classref":
-                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                    if (null != attributcontent.getContentInteger()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                    }
                     break;
             }
         }
