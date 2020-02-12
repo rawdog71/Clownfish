@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.datamodels;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import lombok.Getter;
 import lombok.Setter;

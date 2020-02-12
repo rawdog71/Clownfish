@@ -15,6 +15,8 @@
  */
 package io.clownfish.clownfish.beans;
 
+import com.google.gson.Gson;
+import io.clownfish.clownfish.datamodels.InsertContentParameter;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
@@ -114,6 +116,7 @@ public class ContentList implements Serializable {
     private List<CfKeyword> keywordTarget;
     private List<CfClasscontentkeyword> contentkeywordlist;
     private @Getter @Setter List<CfAsset> assetlist;
+    private @Getter @Setter String contentJson;
     
     final transient Logger logger = LoggerFactory.getLogger(ContentList.class);
 
@@ -376,5 +379,50 @@ public class ContentList implements Serializable {
         } catch (ConstraintViolationException ex) {
             logger.error(ex.getMessage());
         }
+    }
+    
+    public void jsonExport() {
+        InsertContentParameter contentparameter = new InsertContentParameter();
+        contentparameter.setClassname(selectedContent.getClassref().getName());
+        contentparameter.setContentname(selectedContent.getName());
+        for (CfAttributcontent attributcontent : attributcontentlist) {
+            switch (attributcontent.getAttributref().getAttributetype().getName()) {
+                case "boolean":
+                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentBoolean().toString());
+                    break;
+                case "string":
+                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentString());
+                    break;
+                case "hashstring":
+                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentString());
+                    break;    
+                case "integer":
+                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                    break;
+                case "real":
+                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentReal().toString());
+                    break;
+                case "htmltext":
+                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    break;    
+                case "text":
+                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    break;
+                case "markdown":
+                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    break;    
+                case "datetime":
+                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentDate().toString());
+                    break;
+                case "media":
+                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                    break;
+                case "classref":
+                    contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                    break;
+            }
+        }
+        Gson gson = new Gson();
+        contentJson = gson.toJson(contentparameter);
     }
 }

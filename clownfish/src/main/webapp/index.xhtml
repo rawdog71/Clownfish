@@ -582,8 +582,10 @@
                             <f:facet name="sourceCaption">Unattached</f:facet>
                             <f:facet name="targetCaption">Attached</f:facet>
                         </p:pickList>
+                        <p:inputTextarea id="contentJson" value="#{classcontentList.contentJson}" rows="8" cols="50"></p:inputTextarea>
                         <p:commandButton id="attachcontentkeyword" value="Attach" actionListener="#{classcontentList.onAttach}">
-
+                        </p:commandButton>
+                        <p:commandButton id="generateJsonContent" value="Json Export" actionListener="#{classcontentList.jsonExport}" update=":form:tabview:contentJson">
                         </p:commandButton>
                     </p:panel>    
                     
