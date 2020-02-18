@@ -35,6 +35,7 @@ import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
@@ -42,6 +43,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,6 +144,7 @@ public class InsertContent extends HttpServlet {
                             newcontent = setAttributValue(newcontent, icp.getAttributmap().get(attribut.getName()));
                             
                             cfattributcontentService.create(newcontent);
+                            indexContent();
                         }
                     });
                 } catch (IOException ex1) {
@@ -201,11 +208,19 @@ public class InsertContent extends HttpServlet {
             case "markdown":
                 selectedAttribut.setContentText(editContent);
                 break;
-            /*    
             case "datetime":
-                selectedAttribut.setContentDate(editCalendar);
+                Date datum;
+                DateTime dt = new DateTime();
+                DateTimeFormatter fmt = DateTimeFormat.forPattern("dd.MM.yyyy").withZone(DateTimeZone.forID("Europe/Berlin"));
+                try {
+                    datum = dt.parse(editContent, fmt).toDate();
+                    selectedAttribut.setContentDate(datum);
+                } catch (IllegalArgumentException ex) {
+                    fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(DateTimeZone.forID("Europe/Berlin"));
+                    datum = dt.parse(editContent, fmt).toDate();
+                    selectedAttribut.setContentDate(datum);
+                }
                 break;
-            */
             case "media":
                 if (null != editContent) {
                     try {
@@ -226,6 +241,10 @@ public class InsertContent extends HttpServlet {
             */
         }
         selectedAttribut.setIndexed(false);
+        return selectedAttribut;
+    }
+    
+    private void indexContent() {
         // Index the changed content and merge the Index files
         if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
             try {
@@ -236,7 +255,6 @@ public class InsertContent extends HttpServlet {
                 java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return selectedAttribut;
     }
     
 }
