@@ -480,6 +480,27 @@ CREATE TABLE IF NOT EXISTS `cf_siteassetlist` (
   PRIMARY KEY (`siteref`,`assetlistref`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Tabellenstruktur für Tabelle `cf_backend`
+--
+
+CREATE TABLE IF NOT EXISTS `cf_backend` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `cf_userbackend`
+--
+
+CREATE TABLE IF NOT EXISTS `cf_userbackend` (
+  `userref` bigint(20) unsigned NOT NULL,
+  `backendref` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`userref`,`backendref`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Datenbank: `clownfish`
@@ -529,8 +550,48 @@ INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
 ('site_root', 'root', 1),
 ('site_search', 'searchresult', 1);
 
+--
+-- Daten für Tabelle `cf_backend`
+--
+
+INSERT INTO `cf_backend` (`id`, `name`) VALUES
+(1, 'Siteoverview'),
+(2, 'Templates'),
+(3, 'Stylesheets'),
+(4, 'Javascripts'),
+(5, 'Classes'),
+(6, 'Content'),
+(7, 'Datalists'),
+(8, 'Datasources'),
+(9, 'Assets'),
+(10, 'AssetLibraries'),
+(11, 'Keywords'),
+(12, 'KeywordLists'),
+(13, 'Properties'),
+(14, 'Jobs'),
+(15, 'User'),
+(16, 'Management');
+
 INSERT INTO `cf_user` (`id`, `vorname`, `nachname`, `email`, `passwort`, `salt`) VALUES
 (1, 'Admin', 'Istrator', 'admin', 'Ll66CGHeusR7eoQPejg8t3CKkpVdpm2IlN/dZif4aGE=', 'zm85UW0YCIyBCxOXTagQQYcezjLzIQ');
+
+INSERT INTO `cf_userbackend` (`userref`, `backendref`) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(1, 5),
+(1, 6),
+(1, 7),
+(1, 8),
+(1, 9),
+(1, 10),
+(1, 11),
+(1, 12),
+(1, 13),
+(1, 14),
+(1, 15),
+(1, 16);
 
 INSERT INTO `cf_site` (`id`, `name`, `templateref`, `parentref`, `stylesheetref`, `javascriptref`, `htmlcompression`, `characterencoding`, `contenttype`, `locale`, `aliaspath`, `gzip`, `title`, `job`, `description`, `staticsite`, `searchrelevant`) VALUES
 (1, 'root', 1, 0, NULL, NULL, 0, 'UTF-8', 'text/html', 'de', 'root', 0, 'Clownfish root', 0, 'Default root site', 0, 0),

@@ -39,7 +39,7 @@
                     </h:panelGrid>
                 </p:tab>
                 
-                <p:tab title="Siteoverview" id="sitetreepanel" rendered="#{loginBean.login}">
+                <p:tab title="Siteoverview" id="sitetreepanel" rendered="#{loginBean.login and loginBean.hasRights(1)}">
                     <p:panelGrid>
                         <p:row>
                             <p:column colspan="12" style="vertical-align: top;">
@@ -283,7 +283,7 @@
                     </p:panelGrid>
                 </p:tab>
                 
-                <p:tab title="Templates" id="templatepanel" rendered="#{loginBean.login}">
+                <p:tab title="Templates" id="templatepanel" rendered="#{loginBean.login and loginBean.hasRights(2)}">
                     <p:selectOneMenu id="templatelist" value="#{templateList.selectedTemplate}" converter="#{templateConverterBean}">
                         <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
@@ -332,7 +332,7 @@
                     </h:panelGroup>
                 </p:tab>
                 
-                <p:tab title="Stylesheets" id="stylesheetpanel" rendered="#{loginBean.login}">
+                <p:tab title="Stylesheets" id="stylesheetpanel" rendered="#{loginBean.login and loginBean.hasRights(3)}">
                     <p:selectOneMenu id="stylesheetlist" value="#{stylesheetList.selectedStylesheet}" converter="#{stylesheetConverterBean}">
                         <p:ajax listener="#{stylesheetList.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:diffstylesheetPanel" />
                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
@@ -378,7 +378,7 @@
                     </h:panelGroup>
                 </p:tab>
                 
-                <p:tab title="Javascripts" id="javascriptpanel" rendered="#{loginBean.login}">
+                <p:tab title="Javascripts" id="javascriptpanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
                     <p:selectOneMenu id="javascriptlist" value="#{javascriptList.selectedJavascript}" converter="#{javascriptConverterBean}">
                         <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:diffjavascriptPanel" />
                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
@@ -423,7 +423,7 @@
                     </h:panelGroup>
                 </p:tab>
                 
-                <p:tab title="Classes" id="classpanel" rendered="#{loginBean.login}">
+                <p:tab title="Classes" id="classpanel" rendered="#{loginBean.login and loginBean.hasRights(5)}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="classlist" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
                             <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:newclass" />
@@ -489,7 +489,7 @@
                     </p:panel>
                 </p:tab>
                 
-                <p:tab title="Content" id="contentlistpanel" rendered="#{loginBean.login}">
+                <p:tab title="Content" id="contentlistpanel" rendered="#{loginBean.login and loginBean.hasRights(6)}">
                     <p:scrollPanel id="contentpanel" style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="classcontentlist" var="classcontent" value="#{classcontentList.classcontentlist}" 
                                      selectionMode="single" selection="#{classcontentList.selectedContent}" rowKey="#{classcontent.id}"
@@ -594,7 +594,7 @@
                     
                 </p:tab>
                 
-                <p:tab title="Datalists" id="datalistpanel" rendered="#{loginBean.login}">
+                <p:tab title="Datalists" id="datalistpanel" rendered="#{loginBean.login and loginBean.hasRights(7)}">
                     <p:scrollPanel id="datapanel" style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="datalistcontent" var="datalist" value="#{datacontentList.datacontentlist}" selectionMode="single" selection="#{datacontentList.selectedList}" rowKey="#{datalist.id}" widgetVar="datalistcontent">
                             <p:ajax event="rowSelect" listener="#{datacontentList.onSelect}" update=":form:msgs :form:tabview:datacontentname :form:tabview:datacontentclass :form:tabview:newcontentlist :form:tabview:datacontentlistbox" />
@@ -637,7 +637,7 @@
                     </p:selectManyCheckbox>
                 </p:tab>
                 
-                <p:tab title="Datasources" id="datasourcepanel" rendered="#{loginBean.login}">
+                <p:tab title="Datasources" id="datasourcepanel" rendered="#{loginBean.login and loginBean.hasRights(8)}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="datasourcelist" var="datasource" value="#{datasourceList.datasourcelist}" selectionMode="single" selection="#{datasourceList.selectedDatasource}" rowKey="#{datasource.id}">
                             <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver" />
@@ -688,7 +688,7 @@
                     </p:panelGrid>
                 </p:tab>
                 
-                <p:tab title="Assets" id="assetpanel" rendered="#{loginBean.login}">
+                <p:tab title="Assets" id="assetpanel" rendered="#{loginBean.login and loginBean.hasRights(9)}">
                     <h:form enctype="multipart/form-data">
                         <p:fileUpload fileUploadListener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true"
                                               update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|svg|ppt|pptx|xls|xlsx)$/i" >
@@ -793,7 +793,7 @@
                     </h:panelGrid>
                 </p:tab>
                 
-                <p:tab title="AssetLibraries" id="assetlistpanel" rendered="#{loginBean.login}">
+                <p:tab title="AssetLibraries" id="assetlistpanel" rendered="#{loginBean.login and loginBean.hasRights(10)}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="assetlistcontent" var="assetlistcontent" value="#{assetLibrary.assetlist}" 
                                      selectionMode="single" selection="#{assetLibrary.selectedAssetlist}" rowKey="#{assetlistcontent.id}"
@@ -820,7 +820,7 @@
                     </p:selectManyCheckbox>
                 </p:tab>
                 
-                <p:tab title="Keywords" id="keywordpanel" rendered="#{loginBean.login}">
+                <p:tab title="Keywords" id="keywordpanel" rendered="#{loginBean.login and loginBean.hasRights(11)}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="keywordlist" var="keywordcontent" value="#{keywordList.keywordlist}" 
                                      selectionMode="single" selection="#{keywordList.selectedKeyword}" rowKey="#{keywordcontent.id}"
@@ -839,7 +839,7 @@
                     </h:panelGrid>
                 </p:tab>
                 
-                <p:tab title="KeywordLists" id="keywordlistpanel" rendered="#{loginBean.login}">
+                <p:tab title="KeywordLists" id="keywordlistpanel" rendered="#{loginBean.login and loginBean.hasRights(12)}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="keywordlistcontent" var="keywordlistcontent" value="#{keywordContentList.keywordlist}" 
                                      selectionMode="single" selection="#{keywordContentList.selectedKeywordlist}" rowKey="#{keywordlistcontent.id}"
@@ -864,7 +864,7 @@
                     </p:selectManyCheckbox>
                 </p:tab>
                 
-                <p:tab title="Properties" id="propertiespanel" rendered="#{loginBean.login}">
+                <p:tab title="Properties" id="propertiespanel" rendered="#{loginBean.login and loginBean.hasRights(13)}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="propertylist" var="propertycontent" value="#{propertylist.propertylist}" 
                                      selectionMode="single" selection="#{propertylist.selectedProperty}" rowKey="#{propertycontent.hashkey}"
@@ -898,7 +898,7 @@
                     </p:panelGrid>
                 </p:tab>
                 
-                <p:tab title="Jobs" id="jobspanel" rendered="#{loginBean.login}">
+                <p:tab title="Jobs" id="jobspanel" rendered="#{loginBean.login and loginBean.hasRights(14)}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="joblist" var="jobcontent" value="#{quartzlist.quartzlist}" 
                                      selectionMode="single" selection="#{quartzlist.selectedQuartz}" rowKey="#{jobcontent.id}"
@@ -1320,11 +1320,11 @@
                     </p:panelGrid>
                 </p:tab>
                 
-                <p:tab title="User" id="userspanel" rendered="#{loginBean.login}">
+                <p:tab title="User" id="userspanel" rendered="#{loginBean.login and loginBean.hasRights(15)}">
                     <p:dataTable id="userlist" var="user" value="#{userlist.userlist}" 
                                  selectionMode="single" selection="#{userlist.selectedUser}" rowKey="#{user.id}"
                                  emptyMessage="No content available">
-                        <p:ajax event="rowSelect" listener="#{userlist.onSelect}" update=":form:tabview:userpanel :form:tabview:userbtnpanel" />
+                        <p:ajax event="rowSelect" listener="#{userlist.onSelect}" update=":form:tabview:userpanel :form:tabview:userbtnpanel :form:tabview:userbackendpanel" />
                         <p:column headerText="E-Mail">
                             <h:outputText value="#{user.email}" />
                         </p:column>
@@ -1362,6 +1362,12 @@
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                     </p:panelGrid>
+                    
+                    <p:selectCheckboxMenu id="userbackendpanel" value="#{userlist.selectedbackendListcontent}" required="false" label="User rights" converter="#{backendConverterBean}" filter="true" filterMatchMode="startsWith">
+                        <f:selectItems value="#{userlist.backendListcontent}" var="backend" itemLabel="#{backend.name}" itemValue="#{backend}" />
+                        <p:ajax listener="#{userlist.onChangeContent}" />
+                    </p:selectCheckboxMenu>
+                    
                 </p:tab>
             </p:tabView>
             

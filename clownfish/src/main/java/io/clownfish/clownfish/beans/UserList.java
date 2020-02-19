@@ -15,12 +15,19 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.dbentities.CfBackend;
 import io.clownfish.clownfish.dbentities.CfUser;
+import io.clownfish.clownfish.dbentities.CfUserbackend;
+import io.clownfish.clownfish.dbentities.CfUserbackendPK;
+import io.clownfish.clownfish.serviceinterface.CfBackendService;
+import io.clownfish.clownfish.serviceinterface.CfUserBackendService;
 import io.clownfish.clownfish.serviceinterface.CfUserService;
 import io.clownfish.clownfish.utils.PasswordUtil;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
@@ -45,6 +52,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserList {
     @Autowired CfUserService cfuserService;
+    @Autowired CfBackendService cfbackendService;
+    @Autowired CfUserBackendService cfuserbackendService;
     
     private @Getter @Setter List<CfUser> userlist;
     private @Getter @Setter CfUser selectedUser;
@@ -54,6 +63,8 @@ public class UserList {
     private @Getter @Setter String passwort;
     private @Getter @Setter String passwort_validate;
     private @Getter @Setter boolean newUserButtonDisabled;
+    private transient @Getter @Setter List<CfBackend> selectedbackendListcontent = null;
+    private transient @Getter @Setter List<CfBackend> backendListcontent = null;
     
     final transient Logger logger = LoggerFactory.getLogger(SiteTreeBean.class);
 
@@ -61,6 +72,8 @@ public class UserList {
     public void init() {
         userlist = cfuserService.findAll();
         newUserButtonDisabled = false;
+        backendListcontent = cfbackendService.findAll();
+        selectedbackendListcontent = new ArrayList<>();
     }
     
     public void onSelect(SelectEvent event) {
@@ -72,6 +85,16 @@ public class UserList {
         passwort = selectedUser.getPasswort();
         
         newUserButtonDisabled = true;
+        
+        List<CfUserbackend> selectedcontent = cfuserbackendService.findByUserRef(selectedUser.getId());
+        
+        selectedbackendListcontent.clear();
+        if (selectedcontent.size() > 0) {
+            for (CfUserbackend listcontent : selectedcontent) {
+                CfBackend selectedContent = cfbackendService.findById(listcontent.getCfUserbackendPK().getBackendref());
+                selectedbackendListcontent.add(selectedContent);
+            }
+        }
     }
     
     public void onCreateUser(ActionEvent actionEvent) {
@@ -121,6 +144,25 @@ public class UserList {
             newUserButtonDisabled = true;
         } catch (NoResultException ex) {
             newUserButtonDisabled = email.isEmpty();
+        }
+    }
+    
+    public void onChangeContent(AjaxBehaviorEvent event) {
+        // Delete listcontent first
+        List<CfUserbackend> contentList = cfuserbackendService.findByUserRef(selectedUser.getId());
+        for (CfUserbackend content : contentList) {
+            cfuserbackendService.delete(content);
+        }
+        // Add selected listcontent
+        if (selectedbackendListcontent.size() > 0) {
+            for (CfBackend selected : selectedbackendListcontent) {
+                CfUserbackend listcontent = new CfUserbackend();
+                CfUserbackendPK cflistcontentPK = new CfUserbackendPK();
+                cflistcontentPK.setUserref(selectedUser.getId());
+                cflistcontentPK.setBackendref(selected.getId());
+                listcontent.setCfUserbackendPK(cflistcontentPK);
+                cfuserbackendService.create(listcontent);
+            }
         }
     }
 }
