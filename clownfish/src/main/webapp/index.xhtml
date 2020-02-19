@@ -494,7 +494,7 @@
                         <p:dataTable id="classcontentlist" var="classcontent" value="#{classcontentList.classcontentlist}" 
                                      selectionMode="single" selection="#{classcontentList.selectedContent}" rowKey="#{classcontent.id}"
                                      emptyMessage="No content available" filteredValue="#{classcontentList.filteredContent}" widgetVar="classcontentlist">
-                            <p:ajax event="rowSelect" listener="#{classcontentList.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:newcontent :form:tabview:contentkeywordpicklist" />
+                            <p:ajax event="rowSelect" listener="#{classcontentList.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:contentbtnpanel :form:tabview:contentkeywordpicklist" />
                             <p:column headerText="Name" filterBy="#{classcontent.name}" filterMatchMode="contains">
                                 <h:outputText value="#{classcontent.name}" />
                             </p:column>
@@ -524,13 +524,15 @@
                         <f:selectItems value="#{classcontentList.classlist}" />
                     </p:selectOneMenu>
                     
-                    <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}">
-                        <f:actionListener binding="#{sitetree.initClassContentlist()}" />
-                    </p:commandButton>
-                    <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
-                        <f:actionListener binding="#{sitetree.initClassContentlist()}" />
-                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
-                    </p:commandButton>
+                    <p:panelGrid id="contentbtnpanel" columns="2">
+                        <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}">
+                            <f:actionListener binding="#{sitetree.initClassContentlist()}" />
+                        </p:commandButton>
+                        <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
+                            <f:actionListener binding="#{sitetree.initClassContentlist()}" />
+                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:panelGrid>
                     
                     <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
                         <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentList.selectedAttributContent}" rowKey="#{attributcontent.id}">

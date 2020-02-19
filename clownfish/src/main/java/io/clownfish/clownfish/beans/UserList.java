@@ -31,7 +31,6 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
-import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,7 +45,6 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@Transactional
 @Named("userlist")
 @Scope("session")
 @Component
