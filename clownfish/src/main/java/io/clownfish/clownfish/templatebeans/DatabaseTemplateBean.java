@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@Scope(value="request")
+@Scope("prototype")
 @Component
 public class DatabaseTemplateBean implements Serializable {
     private CfDatasourceService cfdatasourceService;

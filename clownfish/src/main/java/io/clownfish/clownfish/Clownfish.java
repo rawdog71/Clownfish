@@ -486,8 +486,6 @@ public class Clownfish {
             
             Map parametermap = clownfishutil.getParametermap(map);
             
-            //Searcher searcher = new Searcher(folderUtil.getIndex_folder(), cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService, cfassetService, cfclassService, cfclasscontentService, cftemplateService);
-            //Searcher searcher = new Searcher();
             searcher.setIndexPath(folderUtil.getIndex_folder());
             long startTime = System.currentTimeMillis();
             SearchResult searchresult = searcher.search(parametermap.get("searchparam").toString(), searchlimit);
@@ -530,8 +528,6 @@ public class Clownfish {
     @GetMapping(path = "/search/{query}")
     public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
-            //Searcher searcher = new Searcher(folderUtil.getIndex_folder(), cfsitecontentService, cfsiteService, cflistcontentService, cflistService, cfsitelistService, cfassetService, cfclassService, cfclasscontentService, cftemplateService);
-            //Searcher searcher = new Searcher();
             searcher.setIndexPath(folderUtil.getIndex_folder());
             long startTime = System.currentTimeMillis();
             SearchResult searchresult = searcher.search(query, searchlimit);

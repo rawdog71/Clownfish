@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@Scope(value="request")
+@Scope("prototype")
 @Component
 public class SAPTemplateBean implements Serializable {
     private List<JsonFormParameter> postmap;

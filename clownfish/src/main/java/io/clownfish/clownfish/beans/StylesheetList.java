@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("stylesheetList")
-@Scope("session")
+@Scope("singleton")
 @Component
 public class StylesheetList {
     @Inject
