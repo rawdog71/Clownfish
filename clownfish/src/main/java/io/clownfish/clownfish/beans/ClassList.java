@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("classList")
-@Scope("session")
+@Scope("singleton")
 @Component
 public class ClassList implements Serializable {
     @Autowired transient CfClassService cfclassService;
@@ -84,6 +84,12 @@ public class ClassList implements Serializable {
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
         renderClass = false;
+    }
+    
+    public void onRefreshAll() {
+        classListe = cfclassService.findAll();
+        classListeRef = cfclassService.findAll();
+        attributetypelist = cfattributetypeService.findAll();
     }
     
     public void onSelect(SelectEvent event) {

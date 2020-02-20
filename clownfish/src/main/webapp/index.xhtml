@@ -25,6 +25,8 @@
             </p:menu>
             
             <p:outputLabel rendered="#{loginBean.login}" value="#{loginBean.cfuser.vorname}" /> <p:outputLabel rendered="#{loginBean.login}" value="#{loginBean.cfuser.nachname}" />
+            <p:commandButton id="refreshcontentall" process="form" value="Refresh" actionListener="#{backendBean.onRefreshAll()}" update=":form:msgs :form:tabview" rendered="#{loginBean.login}">
+            </p:commandButton>
             
             <p:tabView id="tabview">
                 <p:tab title="Login" id="loginpanel" rendered="#{!loginBean.login}">

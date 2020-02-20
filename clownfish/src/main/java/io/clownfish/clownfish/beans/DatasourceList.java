@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("datasourceList")
-@Scope("session")
+@Scope("singleton")
 @Component
 public class DatasourceList implements Serializable {
     @Autowired transient CfDatasourceService cfdatasourceService;
@@ -69,6 +69,10 @@ public class DatasourceList implements Serializable {
     public void init() {
         datasourcelist = cfdatasourceService.findAll();
         newContentButtonDisabled = false;
+    }
+    
+    public void onRefreshAll() {
+        datasourcelist = cfdatasourceService.findAll();
     }
     
     /**

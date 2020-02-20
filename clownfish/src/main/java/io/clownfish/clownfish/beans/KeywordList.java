@@ -37,13 +37,14 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("keywordList")
-@Scope("session")
+@Scope("singleton")
 @Component
 public class KeywordList {
     @Autowired CfKeywordService cfkeywordService;
     @Autowired PropertyList propertylist;
     @Autowired AssetList assetlist;
     @Autowired ContentList contentlist;
+    @Autowired Message globalmessage;
     
     private static Map<String, String> propertymap = null;
     
@@ -63,6 +64,10 @@ public class KeywordList {
             propertymap = propertylist.fillPropertyMap();
         }
     }
+    
+    public void onRefreshAll() {
+        keywordlist = cfkeywordService.findAll();
+    }
 
     public void onCreate(ActionEvent actionEvent) {
         try {
@@ -75,6 +80,7 @@ public class KeywordList {
                     cfkeywordService.create(newkeyword);
                 }
             });
+            globalmessage.displayMessage("Added Keywords");
             keywordlist = cfkeywordService.findAll();
             assetlist.init();
             contentlist.init();

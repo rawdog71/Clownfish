@@ -105,6 +105,11 @@ public class AssetList {
         keywords = new DualListModel<>(keywordSource, keywordTarget);
     }
     
+    public void onRefreshAll() {
+        assetlist = cfassetService.findAll();
+        keywordSource = cfkeywordService.findAll();
+    }
+    
     /**
      * Handles the file upload
      * Stores the files in the media path

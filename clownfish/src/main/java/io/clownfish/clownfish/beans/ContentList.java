@@ -411,6 +411,14 @@ public class ContentList implements Serializable {
         }
     }
     
+    public void onRefreshAll() {
+        classcontentlist = cfclasscontentService.findAll();
+        classlist = cfclassService.findAll();
+        assetlist = cfassetService.findAll();
+        keywordSource = cfkeywordService.findAll();
+        assetlist = cfassetService.findAll();
+    }
+    
     public void onRefreshContent() {
         classcontentlist.clear();
         classcontentlist = cfclasscontentService.findAll();

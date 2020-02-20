@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("assetLibrary")
-@Scope("session")
+@Scope("singleton")
 @Component
 public class AssetLibrary {
     @Autowired CfAssetService cfassetService;
@@ -72,6 +72,11 @@ public class AssetLibrary {
         assets = cfassetService.findAll();
         
         selectedAssetcontent = new ArrayList<>();
+    }
+    
+    public void onRefreshAll() {
+        assetlist = cfassetlistService.findAll();
+        assets = cfassetService.findAll();
     }
 
     /**
