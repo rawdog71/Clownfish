@@ -202,6 +202,13 @@ public class SiteTreeBean implements Serializable {
     public void initAssetlibrarylist() {
         assetlist = cfassetlistService.findAll();
     }
+    
+    public void onRefreshAll() {
+        datasources = cfdatasourceService.findAll();
+        contentlist = cflistService.findAll();
+        classcontentlist = cfclasscontentService.findAll();
+        assetlist = cfassetlistService.findAll();
+    }
 
     private void fillChildren(long parentid, TreeNode node) {
         List<CfSite> sitelist = cfsiteService.findByParentref(parentid);
