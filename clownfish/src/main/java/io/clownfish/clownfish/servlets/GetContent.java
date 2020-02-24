@@ -108,8 +108,13 @@ public class GetContent extends HttpServlet {
         searchmap = new HashMap<>();
         parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("search$"))).forEach((paramname) -> {
             String[] keys = paramname.split("\\$");
-            //String[] values = parameters.get(paramname);
-            searchmap.put(keys[1], keys[2]);
+            int counter = 0;
+            for (String key : keys) {
+                if ((counter > 0) && ((counter%2) == 0)) {
+                    searchmap.put(keys[counter-1], keys[counter]);
+                }
+                counter++;
+            }
         });
         
         CfClass cfclass = cfclassService.findByName(klasse);
@@ -122,6 +127,23 @@ public class GetContent extends HttpServlet {
                 CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
                 for (String searchcontent : searchmap.keySet()) {
                     String searchvalue = searchmap.get(searchcontent);
+                    String comparator = "eq";
+                    if (searchvalue.startsWith(":co:")) {
+                        comparator = "co";
+                        searchvalue = searchvalue.substring(4);
+                    }
+                    if (searchvalue.startsWith(":eq:")) {
+                        comparator = "eq";
+                        searchvalue = searchvalue.substring(4);
+                    }
+                    if (searchvalue.startsWith(":ew:")) {
+                        comparator = "ew";
+                        searchvalue = searchvalue.substring(4);
+                    }
+                    if (searchvalue.startsWith(":sw:")) {
+                        comparator = "sw";
+                        searchvalue = searchvalue.substring(4);
+                    }
                     if (knattribut.getName().compareToIgnoreCase(searchcontent) == 0) {
                         long attributtypeid = knattribut.getAttributetype().getId();
                         AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
@@ -135,7 +157,16 @@ public class GetContent extends HttpServlet {
                             if (attributdef.getValue() == null) {
                                 found = false;
                             } else {
-                                if (searchvalue.compareToIgnoreCase(attributdef.getValue()) != 0) {
+                                if ((comparator.compareToIgnoreCase("co") == 0) && (!attributdef.getValue().toLowerCase().contains(searchvalue))) {
+                                    found = false;
+                                }
+                                if ((comparator.compareToIgnoreCase("sw") == 0) && (!attributdef.getValue().toLowerCase().startsWith(searchvalue))) {
+                                    found = false;
+                                }
+                                if ((comparator.compareToIgnoreCase("eq") == 0) && (attributdef.getValue().toLowerCase().compareToIgnoreCase(searchvalue) != 0)) {
+                                    found = false;
+                                }
+                                if ((comparator.compareToIgnoreCase("ew") == 0) && (!attributdef.getValue().toLowerCase().endsWith(searchvalue))) {
                                     found = false;
                                 }
                             }
@@ -207,27 +238,71 @@ public class GetContent extends HttpServlet {
         CfAttributetype knattributtype = cfattributetypeService.findById(attributtypeid);
         switch (knattributtype.getName()) {
             case "boolean":
-                return new AttributDef(attributcontent.getContentBoolean().toString(), "boolean");
+                if (null != attributcontent.getContentBoolean()) {
+                    return new AttributDef(attributcontent.getContentBoolean().toString(), "boolean");
+                } else {
+                    return new AttributDef(null, "boolean");
+                }
             case "string":
-                return new AttributDef(attributcontent.getContentString(), "string");
+                if (null != attributcontent.getContentString()) {
+                    return new AttributDef(attributcontent.getContentString(), "string");
+                } else {
+                    return new AttributDef(null, "string");
+                }
             case "hashstring":
-                return new AttributDef(attributcontent.getContentString(), "hashstring");
+                if (null != attributcontent.getContentString()) {
+                    return new AttributDef(attributcontent.getContentString(), "hashstring");
+                } else {
+                    return new AttributDef(null, "hashstring");
+                }
             case "integer":
-                return new AttributDef(attributcontent.getContentInteger().toString(), "integer");
+                if (null != attributcontent.getContentInteger()) {
+                    return new AttributDef(attributcontent.getContentInteger().toString(), "integer");
+                } else {
+                    return new AttributDef(null, "integer");
+                }
             case "real":
-                return new AttributDef(attributcontent.getContentReal().toString(), "real");
+                if (null != attributcontent.getContentReal()) {
+                    return new AttributDef(attributcontent.getContentReal().toString(), "real");
+                } else {
+                    return new AttributDef(null, "real");
+                }
             case "htmltext":
-                return new AttributDef(attributcontent.getContentText(), "htmltext");
+                if (null != attributcontent.getContentText()) {
+                    return new AttributDef(attributcontent.getContentText(), "htmltext");
+                } else {
+                    return new AttributDef(null, "htmltext");
+                }
             case "markdown":
-                return new AttributDef(attributcontent.getContentText(), "markdown");    
+                if (null != attributcontent.getContentText()) {
+                    return new AttributDef(attributcontent.getContentText(), "markdown");
+                } else {
+                    return new AttributDef(null, "markdown");
+                }
             case "datetime":
-                return new AttributDef(attributcontent.getContentDate().toString(), "datetime");
+                if (null != attributcontent.getContentDate()) {
+                    return new AttributDef(attributcontent.getContentDate().toString(), "datetime");
+                } else {
+                    return new AttributDef(null, "datetime");
+                }
             case "media":
-                return new AttributDef(attributcontent.getContentInteger().toString(), "media");
+                if (null != attributcontent.getContentInteger()) {
+                    return new AttributDef(attributcontent.getContentInteger().toString(), "media");
+                } else {
+                    return new AttributDef(null, "media");
+                }
             case "text":
-                return new AttributDef(attributcontent.getContentInteger().toString(), "text");
+                if (null != attributcontent.getContentText()) {
+                    return new AttributDef(attributcontent.getContentText().toString(), "text");
+                } else {
+                    return new AttributDef(null, "text");
+                }
             case "classref":
-                return new AttributDef(attributcontent.getContentInteger().toString(), "classref");    
+                if (null != attributcontent.getContentInteger()) {
+                    return new AttributDef(attributcontent.getContentInteger().toString(), "classref");
+                } else {
+                    return new AttributDef(null, "classref");
+                }
             default:
                 return null;
         }
