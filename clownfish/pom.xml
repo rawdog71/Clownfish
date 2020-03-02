@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>9.0.30</version>
+            <version>9.0.31</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -60,7 +60,6 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>9.0.29</version>
             <type>jar</type>
         </dependency>
         <dependency>
