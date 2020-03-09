@@ -36,6 +36,7 @@ import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfQuartz;
+import io.clownfish.clownfish.dbentities.CfSearchhistory;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
@@ -65,6 +66,7 @@ import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.serviceinterface.CfSearchhistoryService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
@@ -198,6 +200,7 @@ public class Clownfish {
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired CfClassService cfclassService;
     @Autowired CfClasscontentService cfclasscontentService;
+    @Autowired CfSearchhistoryService cfsearchhistoryService;
     @Autowired private Scheduler scheduler;
     @Autowired private FolderUtil folderUtil;
     @Autowired Searcher searcher;
@@ -486,6 +489,20 @@ public class Clownfish {
             
             Map parametermap = clownfishutil.getParametermap(map);
             
+            String[] searchexpressions = parametermap.get("searchparam").toString().split(" ");
+            for (String expression : searchexpressions) {
+                try {
+                    CfSearchhistory searchhistory = cfsearchhistoryService.findByExpression(expression.toLowerCase());
+                    searchhistory.setCounter(searchhistory.getCounter()+1);
+                    cfsearchhistoryService.edit(searchhistory);
+                } catch (NoResultException ex) {
+                    CfSearchhistory newsearchhistory = new CfSearchhistory();
+                    newsearchhistory.setExpression(expression.toLowerCase());
+                    newsearchhistory.setCounter(1);
+                    cfsearchhistoryService.create(newsearchhistory);
+                }
+            }
+            
             searcher.setIndexPath(folderUtil.getIndex_folder());
             long startTime = System.currentTimeMillis();
             SearchResult searchresult = searcher.search(parametermap.get("searchparam").toString(), searchlimit);
@@ -528,6 +545,20 @@ public class Clownfish {
     @GetMapping(path = "/search/{query}")
     public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
+            String[] searchexpressions = query.split(" ");
+            for (String expression : searchexpressions) {
+                try {
+                    CfSearchhistory searchhistory = cfsearchhistoryService.findByExpression(expression.toLowerCase());
+                    searchhistory.setCounter(searchhistory.getCounter()+1);
+                    cfsearchhistoryService.edit(searchhistory);
+                } catch (NoResultException ex) {
+                    CfSearchhistory newsearchhistory = new CfSearchhistory();
+                    newsearchhistory.setExpression(expression.toLowerCase());
+                    newsearchhistory.setCounter(1);
+                    cfsearchhistoryService.create(newsearchhistory);
+                }
+            }
+            
             searcher.setIndexPath(folderUtil.getIndex_folder());
             long startTime = System.currentTimeMillis();
             SearchResult searchresult = searcher.search(query, searchlimit);
