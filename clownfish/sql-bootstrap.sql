@@ -502,6 +502,20 @@ CREATE TABLE IF NOT EXISTS `cf_userbackend` (
   PRIMARY KEY (`userref`,`backendref`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `cf_searchhistory`
+--
+
+CREATE TABLE `clownfish`.`cf_searchhistory` (
+  `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `expression` VARCHAR(255) NULL,
+  `counter` INT UNSIGNED NULL DEFAULT 1,
+  PRIMARY KEY (`id`));
+
+
 --
 -- Datenbank: `clownfish`
 --
