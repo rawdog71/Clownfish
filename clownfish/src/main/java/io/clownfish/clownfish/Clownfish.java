@@ -788,7 +788,7 @@ public class Clownfish {
                         }
                         String htmlcompression = propertyUtil.getPropertySwitch("html_compression", cfsite.getHtmlcompression());
                         HtmlCompressor htmlcompressor = new HtmlCompressor();
-                        htmlcompressor.setRemoveSurroundingSpaces(HtmlCompressor.ALL_TAGS);
+                        htmlcompressor.setRemoveSurroundingSpaces(HtmlCompressor.BLOCK_TAGS_MAX);
                         htmlcompressor.setPreserveLineBreaks(false);
                         // fetch the dependend styleshett, if available
                         String cfstylesheet = "";
