@@ -547,6 +547,7 @@ public class SiteTreeBean implements Serializable {
     public void onCreate(ActionEvent actionEvent) {
         try {
             CfSite newsite = new CfSite();
+            newsite.setHitcounter(BigInteger.ZERO);
             newsite.setName(siteName);
             if (null != selectedSite) {
                 newsite.setParentref(BigInteger.valueOf(selectedSite.getId()));
