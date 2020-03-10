@@ -104,6 +104,8 @@ public class CfSite implements Serializable {
     private boolean staticsite;
     @Column(name = "searchrelevant")
     private boolean searchrelevant;
+    @Column(name = "hitcounter")
+    private BigInteger hitcounter;
 
     public CfSite() {
     }
@@ -280,6 +282,14 @@ public class CfSite implements Serializable {
 
     public void setSearchrelevant(boolean searchrelevant) {
         this.searchrelevant = searchrelevant;
+    }
+
+    public BigInteger getHitcounter() {
+        return hitcounter;
+    }
+
+    public void setHitcounter(BigInteger hitcounter) {
+        this.hitcounter = hitcounter;
     }
 
     @Override

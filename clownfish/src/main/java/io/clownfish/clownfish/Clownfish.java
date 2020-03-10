@@ -105,6 +105,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -490,18 +491,7 @@ public class Clownfish {
             Map parametermap = clownfishutil.getParametermap(map);
             
             String[] searchexpressions = parametermap.get("searchparam").toString().split(" ");
-            for (String expression : searchexpressions) {
-                try {
-                    CfSearchhistory searchhistory = cfsearchhistoryService.findByExpression(expression.toLowerCase());
-                    searchhistory.setCounter(searchhistory.getCounter()+1);
-                    cfsearchhistoryService.edit(searchhistory);
-                } catch (NoResultException ex) {
-                    CfSearchhistory newsearchhistory = new CfSearchhistory();
-                    newsearchhistory.setExpression(expression.toLowerCase());
-                    newsearchhistory.setCounter(1);
-                    cfsearchhistoryService.create(newsearchhistory);
-                }
-            }
+            updateSearchhistory(searchexpressions);
             
             searcher.setIndexPath(folderUtil.getIndex_folder());
             long startTime = System.currentTimeMillis();
@@ -546,18 +536,7 @@ public class Clownfish {
     public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
             String[] searchexpressions = query.split(" ");
-            for (String expression : searchexpressions) {
-                try {
-                    CfSearchhistory searchhistory = cfsearchhistoryService.findByExpression(expression.toLowerCase());
-                    searchhistory.setCounter(searchhistory.getCounter()+1);
-                    cfsearchhistoryService.edit(searchhistory);
-                } catch (NoResultException ex) {
-                    CfSearchhistory newsearchhistory = new CfSearchhistory();
-                    newsearchhistory.setExpression(expression.toLowerCase());
-                    newsearchhistory.setCounter(1);
-                    cfsearchhistoryService.create(newsearchhistory);
-                }
-            }
+            updateSearchhistory(searchexpressions);
             
             searcher.setIndexPath(folderUtil.getIndex_folder());
             long startTime = System.currentTimeMillis();
@@ -726,6 +705,11 @@ public class Clownfish {
             }
             // Site has not job flag
             if (!cfsite.isJob()) {
+                // increment site hitcounter
+                long hitcounter = cfsite.getHitcounter().longValue();
+                cfsite.setHitcounter(BigInteger.valueOf(hitcounter+1));
+                cfsiteService.edit(cfsite);
+                
                 // Site has static flag
                 if ((cfsite.isStaticsite()) && (!makestatic)) {
                     cfresponse = getStaticSite(name);
@@ -1163,5 +1147,22 @@ public class Clownfish {
             }
         }
         return isConsistent;
+    }
+    
+    private void updateSearchhistory(String[] searchexpressions) {
+        for (String expression : searchexpressions) {
+                if ((expression.length() >= 3) && (!expression.endsWith("*"))) {
+                    try {
+                        CfSearchhistory searchhistory = cfsearchhistoryService.findByExpression(expression.toLowerCase());
+                        searchhistory.setCounter(searchhistory.getCounter()+1);
+                        cfsearchhistoryService.edit(searchhistory);
+                    } catch (NoResultException ex) {
+                        CfSearchhistory newsearchhistory = new CfSearchhistory();
+                        newsearchhistory.setExpression(expression.toLowerCase());
+                        newsearchhistory.setCounter(1);
+                        cfsearchhistoryService.create(newsearchhistory);
+                    }
+                }
+            }
     }
 }
