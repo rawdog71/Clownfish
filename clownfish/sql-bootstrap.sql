@@ -272,6 +272,7 @@ CREATE TABLE IF NOT EXISTS `cf_site` (
   `description` text DEFAULT '',
   `staticsite` tinyint(4) NOT NULL DEFAULT '0',
   `searchrelevant` tinyint(4) NOT NULL DEFAULT '0',
+  `hitcounter` bigint(20) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `alias` (`aliaspath`)
