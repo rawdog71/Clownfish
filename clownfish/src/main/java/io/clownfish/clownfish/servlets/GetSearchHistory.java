@@ -17,11 +17,11 @@ package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
 import io.clownfish.clownfish.dbentities.CfSearchhistory;
-import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfSearchhistoryService;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,10 +62,25 @@ public class GetSearchHistory extends HttpServlet {
         acontext.start(() -> {
             try {
                 String expression = acontext.getRequest().getParameter("expression");
+                int max = 25;
+                String maxentry = acontext.getRequest().getParameter("maxentry");
+                if (null != maxentry) {
+                    max = Integer.parseInt(maxentry);
+                }
                 List<CfSearchhistory> searchhistory = cfsearchhistoryService.findByExpressionBeginning(expression);
+                ArrayList<String> searchlist = new ArrayList<>();
+                int counter = 0;
+                for (CfSearchhistory search : searchhistory) {
+                    if (counter < max) {
+                        counter++;
+                        searchlist.add(search.getExpression());
+                    } else {
+                        break;
+                    }
+                }
                 
                 Gson gson = new Gson(); 
-                String json = gson.toJson(searchhistory);
+                String json = gson.toJson(searchlist);
                 response.setContentType("application/json;charset=UTF-8");
                 try (PrintWriter out = response.getWriter()) {
                     out.print(json);

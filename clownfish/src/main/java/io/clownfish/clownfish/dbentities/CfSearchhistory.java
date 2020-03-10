@@ -39,7 +39,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfSearchhistory.findAll", query = "SELECT c FROM CfSearchhistory c"),
     @NamedQuery(name = "CfSearchhistory.findById", query = "SELECT c FROM CfSearchhistory c WHERE c.id = :id"),
     @NamedQuery(name = "CfSearchhistory.findByExpression", query = "SELECT c FROM CfSearchhistory c WHERE c.expression = :expression"),
-    @NamedQuery(name = "CfSearchhistory.findByExpressionBeginning", query = "SELECT c FROM CfSearchhistory c WHERE c.expression LIKE :expression"),
+    @NamedQuery(name = "CfSearchhistory.findByExpressionBeginning", query = "SELECT c FROM CfSearchhistory c WHERE c.expression LIKE :expression ORDER BY c.counter DESC"),
     @NamedQuery(name = "CfSearchhistory.findByCounter", query = "SELECT c FROM CfSearchhistory c WHERE c.counter = :counter")
 })
 public class CfSearchhistory implements Serializable {
