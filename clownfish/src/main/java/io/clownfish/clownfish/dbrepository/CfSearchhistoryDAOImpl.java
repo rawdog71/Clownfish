@@ -60,7 +60,7 @@ public class CfSearchhistoryDAOImpl implements CfSearchhistoryDAO {
     public List<CfSearchhistory> findByExpressionBeginning(String expression) {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfSearchhistory.findByExpressionBeginning");
-        query.setParameter("expression", expression + "*");
+        query.setParameter("expression", expression + "%");
         List<CfSearchhistory> cfsearchhistorylist = query.getResultList();
         return cfsearchhistorylist;
     }
