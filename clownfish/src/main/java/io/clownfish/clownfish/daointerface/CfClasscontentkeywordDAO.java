@@ -24,7 +24,7 @@ import java.util.List;
  */
 public interface CfClasscontentkeywordDAO {
     List<CfClasscontentkeyword> findAll();
-    List<CfClasscontentkeyword> findByAssetRef(Long id);
+    List<CfClasscontentkeyword> findByClassContentRef(Long id);
     List<CfClasscontentkeyword> findByKeywordRef(Long id);
     boolean create(CfClasscontentkeyword entity);
     boolean delete(CfClasscontentkeyword entity);

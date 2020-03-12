@@ -54,8 +54,8 @@ public class CfClasscontentKeywordServiceImpl implements CfClasscontentKeywordSe
     }    
 
     @Override
-    public List<CfClasscontentkeyword> findByAssetRef(Long id) {
-        return this.cfclasscontentkeywordDAO.findByAssetRef(id);
+    public List<CfClasscontentkeyword> findByClassContentRef(Long id) {
+        return this.cfclasscontentkeywordDAO.findByClassContentRef(id);
     }
 
     @Override

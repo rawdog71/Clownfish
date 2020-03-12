@@ -166,7 +166,7 @@ public class ContentList implements Serializable {
         keywords.getTarget().clear();
         keywords.getSource().clear();
         keywords.setSource(cfkeywordService.findAll());
-        contentkeywordlist = cfclasscontentkeywordService.findByAssetRef(selectedContent.getId());
+        contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(selectedContent.getId());
         for (CfClasscontentkeyword contentkeyword : contentkeywordlist) {
             CfKeyword kw = cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref());
             keywords.getTarget().add(kw);
@@ -295,7 +295,7 @@ public class ContentList implements Serializable {
             }
             
             // Delete corresponding keywordcontent entries
-            List<CfClasscontentkeyword> keywordcontentdummy = cfclasscontentkeywordService.findByAssetRef(selectedContent.getId());
+            List<CfClasscontentkeyword> keywordcontentdummy = cfclasscontentkeywordService.findByClassContentRef(selectedContent.getId());
             for (CfClasscontentkeyword keywordcontent : keywordcontentdummy) {
                 cfclasscontentkeywordService.delete(keywordcontent);
             }
@@ -396,7 +396,7 @@ public class ContentList implements Serializable {
     }
     
     public void onAttach(ActionEvent actionEvent) {
-        contentkeywordlist = cfclasscontentkeywordService.findByAssetRef(selectedContent.getId());
+        contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(selectedContent.getId());
         for (CfClasscontentkeyword assetkeyword : contentkeywordlist) {
             cfclasscontentkeywordService.delete(assetkeyword);
         }

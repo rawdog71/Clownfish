@@ -124,7 +124,7 @@ public class ClassUtil {
         }
         /* add keywords  */
         List<CfClasscontentkeyword> contentkeywordlist;
-        contentkeywordlist = cfclasscontentkeywordService.findByAssetRef(classcontent.getId());
+        contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(classcontent.getId());
         if (contentkeywordlist.size() > 0) {
             ArrayList listcontentmap = new ArrayList();
             for (CfClasscontentkeyword contentkeyword : contentkeywordlist) {

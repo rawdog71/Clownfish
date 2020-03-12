@@ -69,7 +69,7 @@ public class CfClasscontentKeywordDAOImpl implements CfClasscontentkeywordDAO {
     }
 
     @Override
-    public List<CfClasscontentkeyword> findByAssetRef(Long id) {
+    public List<CfClasscontentkeyword> findByClassContentRef(Long id) {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontentkeyword.findByClasscontentref");
         query.setParameter("classcontentref", id);

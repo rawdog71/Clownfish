@@ -21,13 +21,16 @@ import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.PasswordUtil;
@@ -63,6 +66,8 @@ public class GetContent extends HttpServlet {
     @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfListcontentService cflistcontentService;
+    @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
+    @Autowired transient CfKeywordService cfkeywordService;
     
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter String datalist;
@@ -206,6 +211,16 @@ public class GetContent extends HttpServlet {
                 }
                 if (found) {
                     outputlist = contentOutput(attributcontentList, outputlist);
+                    HashMap<String, ArrayList<String>> contentkeyword = new HashMap<>();
+                    List<CfClasscontentkeyword> keywordlist = cfclasscontentkeywordService.findByClassContentRef(classcontent.getId());
+                    if (keywordlist.size() > 0) {
+                        ArrayList<String> keywords = new ArrayList<>();
+                        for (CfClasscontentkeyword cck : keywordlist) {
+                            keywords.add(cfkeywordService.findById(cck.getCfClasscontentkeywordPK().getKeywordref()).getName());
+                        }
+                        contentkeyword.put("keywords", keywords);
+                    }
+                    //outputlist.add(contentkeyword);
                 }
             }
         }
@@ -337,16 +352,16 @@ public class GetContent extends HttpServlet {
     }
     
     private ArrayList contentOutput(List<CfAttributcontent> attributcontentList, ArrayList outputlist) {
-        HashMap<String, String> outputmap = new HashMap<>();
+        HashMap<String, String> dummyoutputmap = new HashMap<>();
         attributcontentList.stream().forEach((attributcontent) -> {
             CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
             long attributtypeid = knattribut.getAttributetype().getId();
             AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
             if (attributdef.getType().compareToIgnoreCase("hashstring") != 0) {
-                outputmap.put(knattribut.getName(), attributdef.getValue());
+                dummyoutputmap.put(knattribut.getName(), attributdef.getValue());
             }
         });
-        outputlist.add(outputmap);
+        outputlist.add(dummyoutputmap);
         return outputlist;
     }
 }
