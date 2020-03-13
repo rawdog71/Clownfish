@@ -33,6 +33,7 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.utils.ContentOutput;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -72,8 +73,9 @@ public class GetContent extends HttpServlet {
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter String datalist;
     private static transient @Getter @Setter HashMap<String, String> searchmap;
+    private static transient @Getter @Setter ArrayList<String> searchkeywords;
     private static transient @Getter @Setter HashMap<String, String> outputmap;
-    private static transient @Getter @Setter ArrayList<HashMap> outputlist;
+    private static transient @Getter @Setter ArrayList<ContentOutput> outputlist;
     private List<CfListcontent> listcontent = null;
     
     final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
@@ -103,7 +105,7 @@ public class GetContent extends HttpServlet {
             this.type = type;
         }
     }
-
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -137,7 +139,17 @@ public class GetContent extends HttpServlet {
                 counter++;
             }
         });
-        
+        searchkeywords = new ArrayList<>();
+        parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("keywords"))).forEach((paramname) -> {
+            String[] keys = paramname.split("\\$");
+            int counter = 0;
+            for (String key : keys) {
+                if (counter > 0) {
+                    searchkeywords.add(key);
+                }
+                counter++;
+            }
+        });
         CfClass cfclass = cfclassService.findByName(klasse);
         List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
         boolean found = true;
@@ -209,18 +221,27 @@ public class GetContent extends HttpServlet {
                         }
                     }
                 }
-                if (found) {
-                    outputlist = contentOutput(attributcontentList, outputlist);
-                    HashMap<String, ArrayList<String>> contentkeyword = new HashMap<>();
-                    List<CfClasscontentkeyword> keywordlist = cfclasscontentkeywordService.findByClassContentRef(classcontent.getId());
-                    if (keywordlist.size() > 0) {
-                        ArrayList<String> keywords = new ArrayList<>();
-                        for (CfClasscontentkeyword cck : keywordlist) {
-                            keywords.add(cfkeywordService.findById(cck.getCfClasscontentkeywordPK().getKeywordref()).getName());
+                // Check the keyword filter (MUST find all keywords)
+                if (searchkeywords.size() > 0) {
+                    ArrayList contentkeywords = getContentOutputKeywords(classcontent, true);
+                    boolean dummyfound = true;
+                    for (String keyword : searchkeywords) {
+                        if (!contentkeywords.contains(keyword)) {
+                            dummyfound = false;
                         }
-                        contentkeyword.put("keywords", keywords);
                     }
-                    //outputlist.add(contentkeyword);
+                    if (dummyfound) {
+                        found = true;
+                    } else {
+                        found = false;
+                    }
+                }
+                
+                if (found) {
+                    ContentOutput co = new ContentOutput();
+                    co.setKeyvals(getContentOutputKeyval(attributcontentList));
+                    co.setKeywords(getContentOutputKeywords(classcontent, false));
+                    outputlist.add(co);
                 }
             }
         }
@@ -351,7 +372,8 @@ public class GetContent extends HttpServlet {
         }
     }
     
-    private ArrayList contentOutput(List<CfAttributcontent> attributcontentList, ArrayList outputlist) {
+    private ArrayList getContentOutputKeyval(List<CfAttributcontent> attributcontentList) {
+        ArrayList<HashMap> output = new ArrayList<>();
         HashMap<String, String> dummyoutputmap = new HashMap<>();
         attributcontentList.stream().forEach((attributcontent) -> {
             CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
@@ -361,7 +383,22 @@ public class GetContent extends HttpServlet {
                 dummyoutputmap.put(knattribut.getName(), attributdef.getValue());
             }
         });
-        outputlist.add(dummyoutputmap);
-        return outputlist;
+        output.add(dummyoutputmap);
+        return output;
+    }
+    
+    private ArrayList getContentOutputKeywords(CfClasscontent classcontent, boolean toLower) {
+        ArrayList<String> keywords = new ArrayList<>();
+        List<CfClasscontentkeyword> keywordlist = cfclasscontentkeywordService.findByClassContentRef(classcontent.getId());
+        if (keywordlist.size() > 0) {
+            for (CfClasscontentkeyword cck : keywordlist) {
+                if (toLower) {
+                    keywords.add(cfkeywordService.findById(cck.getCfClasscontentkeywordPK().getKeywordref()).getName().toLowerCase());
+                } else {
+                    keywords.add(cfkeywordService.findById(cck.getCfClasscontentkeywordPK().getKeywordref()).getName());
+                }
+            }
+        }
+        return keywords;
     }
 }
