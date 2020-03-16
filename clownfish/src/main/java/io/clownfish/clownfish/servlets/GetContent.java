@@ -33,7 +33,7 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
-import io.clownfish.clownfish.utils.ContentOutput;
+import io.clownfish.clownfish.datamodels.ContentOutput;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
