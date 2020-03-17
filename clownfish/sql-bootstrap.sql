@@ -327,6 +327,16 @@ CREATE TABLE IF NOT EXISTS `cf_sitesaprfc` (
   PRIMARY KEY (`siteref`,`rfcgroup`,`rfcfunction`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Tabellenstruktur für Tabelle `cf_sitekeywordlist`
+--
+
+CREATE TABLE `cf_sitekeywordlist` (
+  `keywordlistref` bigint(20) UNSIGNED NOT NULL,
+  `siteref` bigint(20) UNSIGNED NOT NULL,
+  PRIMARY KEY (`siteref`,`keywordlistref`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- --------------------------------------------------------
 
 --
