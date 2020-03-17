@@ -72,13 +72,13 @@ public class GetAssetData extends HttpServlet {
 
             if (null != asset) {
                 ArrayList<String> keywords = getAssetKeywords(asset, true);
-                AssetDataOutput assetkeywordoutput = new AssetDataOutput();
+                AssetDataOutput assetdataoutput = new AssetDataOutput();
                 
-                assetkeywordoutput.setAsset(asset);
-                assetkeywordoutput.setKeywords(keywords);
+                assetdataoutput.setAsset(asset);
+                assetdataoutput.setKeywords(keywords);
                 
                 Gson gson = new Gson(); 
-                String json = gson.toJson(assetkeywordoutput);
+                String json = gson.toJson(assetdataoutput);
                 response.setContentType("application/json;charset=UTF-8");
                 try (PrintWriter out = response.getWriter()) {
                     out.print(json);

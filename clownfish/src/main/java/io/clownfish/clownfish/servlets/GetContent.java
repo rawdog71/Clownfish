@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import io.clownfish.clownfish.datamodels.AttributDef;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
@@ -79,32 +80,6 @@ public class GetContent extends HttpServlet {
     private List<CfListcontent> listcontent = null;
     
     final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
-
-    class AttributDef {
-        String value;
-        String type;
-
-        public AttributDef(String value, String type) {
-            this.value = value;
-            this.type = type;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-    }
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
