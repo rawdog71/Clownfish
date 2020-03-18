@@ -20,11 +20,15 @@ import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfKeyword;
+import io.clownfish.clownfish.dbentities.CfKeywordlist;
+import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSiteassetlist;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
+import io.clownfish.clownfish.dbentities.CfSitekeywordlist;
 import io.clownfish.clownfish.dbentities.CfSitelist;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
@@ -32,9 +36,13 @@ import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
+import io.clownfish.clownfish.serviceinterface.CfSitekeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,6 +68,10 @@ public class SiteUtil {
     @Autowired CfAssetlistService cfassetlistService;
     @Autowired CfSiteassetlistService cfsiteassetlistService;
     @Autowired CfAssetlistcontentService cfassetlistcontentService;
+    @Autowired CfKeywordService cfkeywordService;
+    @Autowired CfSitekeywordlistService cfsitekeywordlistService;
+    @Autowired CfKeywordlistService cfkeywordlistService;
+    @Autowired CfKeywordlistcontentService cfkeywordlistcontentService;
     @Autowired ClassUtil classutil;
     
     public SiteUtil() {
@@ -116,6 +128,27 @@ public class SiteUtil {
             //sitecontentmap.put(, listcontentmap);
         }
         sitecontentmap.put("AssetLibrary", assetlibraryMap);
+        return sitecontentmap;
+    }
+    
+    public Map getSiteKeywordlibrary(CfSite cfsite, Map sitecontentmap) {
+        List<CfSitekeywordlist> sitekeywordlibrary = new ArrayList<>();
+        sitekeywordlibrary.addAll(cfsitekeywordlistService.findBySiteref(cfsite.getId()));
+        
+        HashMap<String, ArrayList> keywordlibraryMap = new HashMap<>();
+        for (CfSitekeywordlist sitekeywordlist : sitekeywordlibrary) {
+            CfKeywordlist cfkeywordlist = cfkeywordlistService.findById(sitekeywordlist.getCfSitekeywordlistPK().getKeywordlistref());
+            List<CfKeywordlistcontent> keywordlist = new ArrayList<>();
+            keywordlist.addAll(cfkeywordlistcontentService.findByKeywordlistref(cfkeywordlist.getId()));
+            ArrayList<CfKeyword> dummykeywordlist = new ArrayList<>();
+            for (CfKeywordlistcontent keywordcontent : keywordlist) {
+                CfKeyword keyword = cfkeywordService.findById(keywordcontent.getCfKeywordlistcontentPK().getKeywordref());
+                dummykeywordlist.add(keyword);
+            }
+            keywordlibraryMap.put(cfkeywordlist.getName(), dummykeywordlist);
+            //sitecontentmap.put(, listcontentmap);
+        }
+        sitecontentmap.put("KeywordLibrary", keywordlibraryMap);
         return sitecontentmap;
     }
 }

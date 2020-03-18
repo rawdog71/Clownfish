@@ -820,6 +820,9 @@ public class Clownfish {
                         
                         // fetch the site assetlibraries
                         sitecontentmap = siteutil.getSiteAssetlibrary(cfsite, sitecontentmap);
+                        
+                        // fetch the site keywordlibraries
+                        sitecontentmap = siteutil.getSiteKeywordlibrary(cfsite, sitecontentmap);
 
                         // manage parameters 
                         HashMap<String, DatatableProperties> datatableproperties = clownfishutil.getDatatableproperties(postmap);

@@ -135,6 +135,14 @@
                                                     </p:selectCheckboxMenu>
                                                 </p:column>
                                             </p:row>
+                                            <p:row>
+                                                <p:column>
+                                                    <p:outputLabel for="keywordlibrarydroplist" value="Keywordlists:" />
+                                                    <p:selectCheckboxMenu id="keywordlibrarydroplist" value="#{sitetree.selectedKeywordlist}" required="false" label="Keywordlist" converter="#{keywordlistConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                        <f:selectItems value="#{sitetree.keywordlist}" var="keywordlist" itemLabel="#{keywordlist.name}" itemValue="#{keywordlist}" />
+                                                    </p:selectCheckboxMenu>
+                                                </p:column>
+                                            </p:row>
                                         </p:panelGrid>
                                     </p:tab>
                                     <p:tab title="SEO" id="site_seo">
@@ -860,7 +868,9 @@
                         <p:outputLabel for="keywordcontentlist" value="Keywordlist: " />
                         <p:inputText id="keywordcontentlist" value="#{keywordContentList.keywordlistname}" />
                         
-                        <p:commandButton id="newkeywordlist" process="form" value="New" actionListener="#{keywordContentList.onCreate}" update=":form:tabview:keywordlistcontent" />
+                        <p:commandButton id="newkeywordlist" process="form" value="New" actionListener="#{keywordContentList.onCreate}" update=":form:tabview:keywordlistcontent :form:tabview:tabsiteview:keywordlibrarydroplist">
+                            <f:actionListener binding="#{sitetree.initKeywordlibrarylist()}" />
+                        </p:commandButton>
                     </h:panelGrid>
                     
                     <p:selectManyCheckbox id="keywordcontentlistbox" value="#{keywordContentList.selectedKeywordcontent}" layout="responsive" columns="4" converter="#{keywordConverterBean}">

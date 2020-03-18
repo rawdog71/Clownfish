@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfJavascript;
+import io.clownfish.clownfish.dbentities.CfKeywordlist;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSiteassetlist;
@@ -28,6 +29,8 @@ import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.dbentities.CfSitecontentPK;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
 import io.clownfish.clownfish.dbentities.CfSitedatasourcePK;
+import io.clownfish.clownfish.dbentities.CfSitekeywordlist;
+import io.clownfish.clownfish.dbentities.CfSitekeywordlistPK;
 import io.clownfish.clownfish.dbentities.CfSitelist;
 import io.clownfish.clownfish.dbentities.CfSitelistPK;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
@@ -42,12 +45,14 @@ import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfPropertyService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfSitekeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
@@ -117,6 +122,8 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfClasscontent> selectedClasscontentlist;
     private @Getter @Setter List<CfAssetlist> assetlist;
     private @Getter @Setter List<CfAssetlist> selectedAssetlist;
+    private @Getter @Setter List<CfKeywordlist> keywordlist;
+    private @Getter @Setter List<CfKeywordlist> selectedKeywordlist;
     private @Getter @Setter int sitehtmlcompression;
     private @Getter @Setter int sitegzip;
     private @Getter @Setter boolean sitejob;
@@ -139,10 +146,12 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfSitedatasourceService cfsitedatasourceService;
     @Autowired transient CfSitecontentService cfsitecontentService;
     @Autowired transient CfSiteassetlistService cfsiteassetlistService;
+    @Autowired transient CfSitekeywordlistService cfsitekeywordlistService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfSitelistService cfsitelistService;
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfAssetlistService cfassetlistService;
+    @Autowired transient CfKeywordlistService cfkeywordlistService;
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
     @Autowired transient CfPropertyService cfpropertyService;
     @Autowired transient PropertyList propertylist;
@@ -177,11 +186,13 @@ public class SiteTreeBean implements Serializable {
         contentlist = cflistService.findAll();
         classcontentlist = cfclasscontentService.findAll();
         assetlist = cfassetlistService.findAll();
+        keywordlist = cfkeywordlistService.findAll();
         
         selectedDatasources = new ArrayList<>();
         selectedContentlist = new ArrayList<>();
         selectedClasscontentlist = new ArrayList<>();
         selectedAssetlist = new ArrayList<>();
+        selectedKeywordlist = new ArrayList<>();
         locale = propertymap.get("response_locale");
         contentType = propertymap.get("response_contenttype");
         characterEncoding = propertymap.get("response_characterencoding");
@@ -201,6 +212,10 @@ public class SiteTreeBean implements Serializable {
     
     public void initAssetlibrarylist() {
         assetlist = cfassetlistService.findAll();
+    }
+    
+    public void initKeywordlibrarylist() {
+        keywordlist = cfkeywordlistService.findAll();
     }
     
     public void onRefreshAll() {
@@ -325,6 +340,7 @@ public class SiteTreeBean implements Serializable {
         selectedContentlist.clear();
         selectedClasscontentlist.clear();
         selectedAssetlist.clear();
+        selectedKeywordlist.clear();
         sitejob = false;
         sitesearchrelevant = false;
         sitestatic = false;
@@ -382,6 +398,13 @@ public class SiteTreeBean implements Serializable {
         for (CfSiteassetlist siteassetlist : selectedAssetliste) {
             CfAssetlist csa = cfassetlistService.findById(siteassetlist.getCfSiteassetlistPK().getAssetlistref());
             selectedAssetlist.add(csa);
+        }
+        
+        selectedKeywordlist.clear();
+        List<CfSitekeywordlist> selectedKeywordliste = cfsitekeywordlistService.findBySiteref(selectedSite.getId());
+        for (CfSitekeywordlist sitekeywordlist : selectedKeywordliste) {
+            CfKeywordlist kwl = cfkeywordlistService.findById(sitekeywordlist.getCfSitekeywordlistPK().getKeywordlistref());
+            selectedKeywordlist.add(kwl);
         }
         
         siteName = selectedSite.getName();
@@ -495,6 +518,23 @@ public class SiteTreeBean implements Serializable {
                     cfsitecontentPK.setAssetlistref(content.getId());
                     siteassetlist.setCfSiteassetlistPK(cfsitecontentPK);
                     cfsiteassetlistService.create(siteassetlist);
+                }
+            }
+            
+            // Delete sitekeywordlist first
+            List<CfSitekeywordlist> sitekeywordlists = cfsitekeywordlistService.findBySiteref(selectedSite.getId());
+            for (CfSitekeywordlist keywordlist : sitekeywordlists) {
+                cfsitekeywordlistService.delete(keywordlist);
+            }
+            // Add selected sitecontent
+            if (selectedKeywordlist.size() > 0) {
+                for (CfKeywordlist content : selectedKeywordlist) {
+                    CfSitekeywordlist sitekeywordlist = new CfSitekeywordlist();
+                    CfSitekeywordlistPK cfsitecontentPK = new CfSitekeywordlistPK();
+                    cfsitecontentPK.setSiteref(selectedSite.getId());
+                    cfsitecontentPK.setKeywordlistref(content.getId());
+                    sitekeywordlist.setCfSitekeywordlistPK(cfsitecontentPK);
+                    cfsitekeywordlistService.create(sitekeywordlist);
                 }
             }
             
