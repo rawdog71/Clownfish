@@ -196,13 +196,13 @@ public class GetContent extends HttpServlet {
                         }
                     }
                 }
-                // Check the keyword filter (MUST find all keywords)
+                // Check the keyword filter (at least one keyword must be found (OR))
                 if (searchkeywords.size() > 0) {
                     ArrayList contentkeywords = getContentOutputKeywords(classcontent, true);
-                    boolean dummyfound = true;
+                    boolean dummyfound = false;
                     for (String keyword : searchkeywords) {
-                        if (!contentkeywords.contains(keyword)) {
-                            dummyfound = false;
+                        if (contentkeywords.contains(keyword)) {
+                            dummyfound = true;
                         }
                     }
                     if (dummyfound) {
