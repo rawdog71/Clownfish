@@ -242,6 +242,7 @@ public class ContentList implements Serializable {
     public void onCreateContent(ActionEvent actionEvent) {
         try {
             CfClasscontent newclasscontent = new CfClasscontent();
+            contentName = contentName.replaceAll("\\s+", "_");
             newclasscontent.setName(contentName);
             newclasscontent.setClassref(selectedClass);
             cfclasscontentService.create(newclasscontent);

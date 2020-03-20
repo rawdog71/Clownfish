@@ -116,6 +116,9 @@ public class AssetIndexer implements Runnable {
             metamap.put(name, metadata.get(name));
         }
 
+        
+        document.add(new StoredField(LuceneConstants.ASSET_AUTHOR, metamap.get("Author")));
+        document.add(new StoredField(LuceneConstants.ASSET_DATE, metamap.get("date")));
         document.add(new StoredField(LuceneConstants.CONTENT_TYPE, metamap.get("Content-Type")));
         switch (metamap.get("Content-Type")) {
             case "application/pdf":
