@@ -16,14 +16,20 @@
 package io.clownfish.clownfish.lucene;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfAssetkeyword;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
+import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
+import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
@@ -80,6 +86,9 @@ public class Searcher {
     @Autowired CfClasscontentService cfclasscontentservice;
     @Autowired CfTemplateService cftemplateservice;
     @Autowired ClassUtil classutil;
+    @Autowired CfKeywordService cfkeywordservice;
+    @Autowired CfClasscontentKeywordService cfclasscontentkeywordservice;
+    @Autowired CfAssetKeywordService cfassetkeywordservice;
     
     final transient Logger logger = LoggerFactory.getLogger(Searcher.class);
 
@@ -124,25 +133,8 @@ public class Searcher {
                     foundsitelist.stream().map((sitelistentry) -> siteservice.findById(sitelistentry.getCfSitelistPK().getSiteref())).filter((foundsite) -> ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant()))).forEach((foundsite) -> {
                         foundSites.add(foundsite);
                     });
-                });
-                // Search in classes and put it via template to the output
-                CfClasscontent findclasscontent = cfclasscontentservice.findById(classcontentref);
-                CfClass findclass = cfclassservice.findById(findclasscontent.getClassref().getId());
-                
-                if (findclass.isSearchrelevant()) {
-                    Map attributmap = classutil.getattributmap(findclasscontent);
-                    if (searchclasscontentmap.containsKey(findclass.getName())) {
-                        ArrayList searchclassarray = (ArrayList) searchclasscontentmap.get(findclass.getName());
-                        if (!searchclassarray.contains(attributmap)) {
-                            searchclassarray.add(attributmap);
-                            searchclasscontentmap.put(findclass.getName(), searchclassarray);
-                        }
-                    } else {
-                        ArrayList searchclassarray = new ArrayList<Map>();
-                        searchclassarray.add(attributmap);
-                        searchclasscontentmap.put(findclass.getName(), searchclassarray);
-                    }
-                }
+                });                
+                addClasscontentMap(classcontentref, searchclasscontentmap);
             } else {
                 try {
                     String assetid = doc.getField(LuceneConstants.ID).stringValue();
@@ -158,10 +150,56 @@ public class Searcher {
         searchresult.foundSites = foundSites;
         searchresult.foundAssets = foundAssets;
         searchresult.foundClasscontent = searchclasscontentmap;
+        
+        String[] searchtermlist = searchQuery.split(" ");
+        for (String searchterm : searchtermlist) {
+            try {
+                CfKeyword keyword = cfkeywordservice.findByName(searchterm);
+                // Search in classcontent associations
+                List<CfClasscontentkeyword> classcontentlist = cfclasscontentkeywordservice.findByKeywordRef(keyword.getId());
+                for (CfClasscontentkeyword cck : classcontentlist) {
+                    addClasscontentMap(cck.getCfClasscontentkeywordPK().getClasscontentref(), searchclasscontentmap);
+                }
+                
+                // Search in asset associations
+                List<CfAssetkeyword> assetlist = cfassetkeywordservice.findByKeywordRef(keyword.getId());
+                for (CfAssetkeyword ask : assetlist) {
+                    CfAsset asset = cfassetservice.findById(ask.getCfAssetkeywordPK().getAssetref());
+                    if (!foundAssets.contains(asset)) {
+                        foundAssets.add(asset);
+                    }
+                }
+                
+            } catch (Exception ex) {
+                // Is not a keyword...do nothing at all
+            }
+        }
+        
         return searchresult;
     }
     
     public Document getDocument(ScoreDoc scoreDoc) throws CorruptIndexException, IOException {
         return indexSearcher.doc(scoreDoc.doc);  
+    }
+    
+    private void addClasscontentMap(long classcontentref, HashMap searchclasscontentmap) {
+        // Search in classes and put it via template to the output
+        CfClasscontent findclasscontent = cfclasscontentservice.findById(classcontentref);
+        CfClass findclass = cfclassservice.findById(findclasscontent.getClassref().getId());
+
+        if (findclass.isSearchrelevant()) {
+            Map attributmap = classutil.getattributmap(findclasscontent);
+            if (searchclasscontentmap.containsKey(findclass.getName())) {
+                ArrayList searchclassarray = (ArrayList) searchclasscontentmap.get(findclass.getName());
+                if (!searchclassarray.contains(attributmap)) {
+                    searchclassarray.add(attributmap);
+                    searchclasscontentmap.put(findclass.getName(), searchclassarray);
+                }
+            } else {
+                ArrayList searchclassarray = new ArrayList<Map>();
+                searchclassarray.add(attributmap);
+                searchclasscontentmap.put(findclass.getName(), searchclassarray);
+            }
+        }
     }
 }

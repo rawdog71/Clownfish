@@ -16,7 +16,9 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfSearchhistory;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfSearchhistoryService;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
@@ -42,6 +44,7 @@ import org.springframework.stereotype.Component;
 public class GetSearchHistory extends HttpServlet {
     @Autowired transient CfSearchhistoryService cfsearchhistoryService;
     @Autowired transient PropertyUtil propertyUtil;
+    @Autowired transient CfKeywordService cfkeywordservice;
     
     final transient Logger logger = LoggerFactory.getLogger(GetSearchHistory.class);
     
@@ -74,6 +77,17 @@ public class GetSearchHistory extends HttpServlet {
                     if (counter < max) {
                         counter++;
                         searchlist.add(search.getExpression());
+                    } else {
+                        break;
+                    }
+                }
+                
+                // Add keywords to the output
+                List<CfKeyword> keywordlist = cfkeywordservice.findByNameBeginning(expression);
+                for (CfKeyword keyword : keywordlist) {
+                    if (counter < max) {
+                        counter++;
+                        searchlist.add(keyword.getName());
                     } else {
                         break;
                     }

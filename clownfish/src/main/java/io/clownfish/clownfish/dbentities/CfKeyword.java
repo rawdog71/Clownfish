@@ -39,6 +39,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "CfKeyword.findAll", query = "SELECT c FROM CfKeyword c"),
     @NamedQuery(name = "CfKeyword.findById", query = "SELECT c FROM CfKeyword c WHERE c.id = :id"),
+    @NamedQuery(name = "CfKeyword.findByNameBeginning", query = "SELECT c FROM CfKeyword c WHERE c.name LIKE :name"),
     @NamedQuery(name = "CfKeyword.findByName", query = "SELECT c FROM CfKeyword c WHERE c.name = :name")})
 public class CfKeyword implements Serializable {
 

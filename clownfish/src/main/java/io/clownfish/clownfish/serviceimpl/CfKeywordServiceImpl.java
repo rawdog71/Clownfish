@@ -66,4 +66,9 @@ public class CfKeywordServiceImpl implements CfKeywordService {
     public CfKeyword findByName(String name) {
         return this.cfkeywordDAO.findByName(name);
     }
+
+    @Override
+    public List<CfKeyword> findByNameBeginning(String name) {
+        return this.cfkeywordDAO.findByNameBeginning(name);
+    }
 }

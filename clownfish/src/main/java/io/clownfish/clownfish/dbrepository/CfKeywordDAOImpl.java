@@ -84,4 +84,13 @@ public class CfKeywordDAOImpl implements CfKeywordDAO {
         CfKeyword cfkeyword = (CfKeyword) query.getSingleResult();
         return cfkeyword;
     }
+
+    @Override
+    public List<CfKeyword> findByNameBeginning(String name) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfKeyword.findByNameBeginning");
+        query.setParameter("name", name + "%");
+        List<CfKeyword> cfkeywordlist = query.getResultList();
+        return cfkeywordlist;
+    }
 }
