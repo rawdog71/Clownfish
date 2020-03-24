@@ -86,8 +86,10 @@ public class GetSearchHistory extends HttpServlet {
                 List<CfKeyword> keywordlist = cfkeywordservice.findByNameBeginning(expression);
                 for (CfKeyword keyword : keywordlist) {
                     if (counter < max) {
-                        counter++;
-                        searchlist.add(keyword.getName());
+                        if (!searchlist.contains(keyword.getName().toLowerCase())) {
+                            counter++;
+                            searchlist.add(keyword.getName().toLowerCase());
+                        }
                     } else {
                         break;
                     }
