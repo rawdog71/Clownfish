@@ -104,19 +104,18 @@ public class ClassUtil {
                     if (null != attributcontent.getClasscontentlistref()) {
                         Map listcontentmap = new LinkedHashMap();
                         List<CfListcontent> selectedcontent = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
-                        List<CfClasscontent> selectedListcontent = new ArrayList<>();;
+                        List<CfClasscontent> selectedListcontent = new ArrayList<>();
                         selectedListcontent.clear();
                         if (selectedcontent.size() > 0) {
-                            for (CfListcontent listcontent : selectedcontent) {
-                                CfClasscontent selectedContent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                            selectedcontent.stream().map((listcontent) -> cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref())).forEach((selectedContent) -> {
                                 selectedListcontent.add(selectedContent);
-                            }
+                            });
                         }
-                        for (CfClasscontent cc : selectedListcontent) {
+                        selectedListcontent.stream().forEach((cc) -> {
                             Map dummy_attributcontentmap = new LinkedHashMap();
                             dummy_attributcontentmap = getattributmap(cc);
                             listcontentmap.put(cc.getName(), dummy_attributcontentmap);
-                        }
+                });
                         attributcontentmap.put(attributcontent.getAttributref().getName(), listcontentmap);
                     }
                     break;
@@ -127,9 +126,9 @@ public class ClassUtil {
         contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(classcontent.getId());
         if (contentkeywordlist.size() > 0) {
             ArrayList listcontentmap = new ArrayList();
-            for (CfClasscontentkeyword contentkeyword : contentkeywordlist) {
+            contentkeywordlist.stream().forEach((contentkeyword) -> {
                 listcontentmap.add(cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref()));
-            }
+            });
             attributcontentmap.put("keywords", listcontentmap);
         }
         

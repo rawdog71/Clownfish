@@ -116,7 +116,7 @@ public class Searcher {
         query = queryParser.parse(searchQuery);
         TopDocs hits = indexSearcher.search(query, searchlimit);
         foundClasscontent.clear();
-        HashMap searchclasscontentmap = new HashMap<String, ArrayList>();       
+        HashMap searchclasscontentmap = new HashMap<>();       
         for (ScoreDoc scoreDoc : hits.scoreDocs) {
             Document doc = getDocument(scoreDoc);
             String contenttype = doc.get(LuceneConstants.CONTENT_TYPE);           
@@ -157,18 +157,15 @@ public class Searcher {
                 CfKeyword keyword = cfkeywordservice.findByName(searchterm);
                 // Search in classcontent associations
                 List<CfClasscontentkeyword> classcontentlist = cfclasscontentkeywordservice.findByKeywordRef(keyword.getId());
-                for (CfClasscontentkeyword cck : classcontentlist) {
+                classcontentlist.stream().forEach((cck) -> {
                     addClasscontentMap(cck.getCfClasscontentkeywordPK().getClasscontentref(), searchclasscontentmap);
-                }
+                });
                 
                 // Search in asset associations
                 List<CfAssetkeyword> assetlist = cfassetkeywordservice.findByKeywordRef(keyword.getId());
-                for (CfAssetkeyword ask : assetlist) {
-                    CfAsset asset = cfassetservice.findById(ask.getCfAssetkeywordPK().getAssetref());
-                    if (!foundAssets.contains(asset)) {
-                        foundAssets.add(asset);
-                    }
-                }
+                assetlist.stream().map((ask) -> cfassetservice.findById(ask.getCfAssetkeywordPK().getAssetref())).filter((asset) -> (!foundAssets.contains(asset))).forEach((asset) -> {
+                    foundAssets.add(asset);
+                });
                 
             } catch (Exception ex) {
                 // Is not a keyword...do nothing at all
@@ -196,7 +193,7 @@ public class Searcher {
                     searchclasscontentmap.put(findclass.getName(), searchclassarray);
                 }
             } else {
-                ArrayList searchclassarray = new ArrayList<Map>();
+                ArrayList searchclassarray = new ArrayList<>();
                 searchclassarray.add(attributmap);
                 searchclasscontentmap.put(findclass.getName(), searchclassarray);
             }

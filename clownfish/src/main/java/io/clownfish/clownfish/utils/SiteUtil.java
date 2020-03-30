@@ -146,7 +146,6 @@ public class SiteUtil {
                 dummykeywordlist.add(keyword);
             }
             keywordlibraryMap.put(cfkeywordlist.getName(), dummykeywordlist);
-            //sitecontentmap.put(, listcontentmap);
         }
         sitecontentmap.put("KeywordLibrary", keywordlibraryMap);
         return sitecontentmap;

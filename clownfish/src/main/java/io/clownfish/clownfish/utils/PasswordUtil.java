@@ -57,7 +57,7 @@ public class PasswordUtil {
     }
 
     public static String generateSecurePassword(String password, String salt) {
-        String returnValue = null;
+        String returnValue;
 
         byte[] securePassword = hash(password.toCharArray(), salt.getBytes());
         returnValue = Base64.getEncoder().encodeToString(securePassword);
@@ -65,7 +65,7 @@ public class PasswordUtil {
     }
 
     public static boolean verifyUserPassword(String providedPassword, String securedPassword, String salt) {
-        boolean returnValue = false;
+        boolean returnValue;
 
         // Generate New secure password with the same salt
         String newSecurePassword = generateSecurePassword(providedPassword, salt);
