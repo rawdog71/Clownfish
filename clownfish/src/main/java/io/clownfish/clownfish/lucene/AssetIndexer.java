@@ -84,6 +84,8 @@ public class AssetIndexer implements Runnable {
         description (if available)
         content-type
         content (if asset type has content)
+        author
+        date
     */
     private Document getDocument(CfAsset assetcontent) throws IOException {
         if (propertymap == null) {
