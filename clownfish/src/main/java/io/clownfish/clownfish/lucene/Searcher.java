@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.lucene;
 
+import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetkeyword;
 import io.clownfish.clownfish.dbentities.CfClass;
@@ -36,6 +37,7 @@ import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import io.clownfish.clownfish.utils.AssetUtil;
 import io.clownfish.clownfish.utils.ClassUtil;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -75,6 +77,8 @@ public class Searcher {
     Query query;
     ArrayList<CfSite> foundSites;
     ArrayList<CfAsset> foundAssets;
+    AssetUtil assetutil;
+    HashMap<String, HashMap> foundAssetMetadata;
     HashMap<String, String> foundClasscontent;
     @Autowired CfSitecontentService sitecontentservice;
     @Autowired CfSiteService siteservice;
@@ -96,6 +100,11 @@ public class Searcher {
         foundSites = new ArrayList<>();
         foundAssets = new ArrayList<>();
         foundClasscontent = new HashMap<>();
+        foundAssetMetadata = new HashMap<>();
+    }
+    
+    public void setPropertyList(PropertyList propertylist) {
+        assetutil = new AssetUtil(propertylist);
     }
    
     public void setIndexPath(String indexDirectoryPath) {
@@ -116,6 +125,7 @@ public class Searcher {
         query = queryParser.parse(searchQuery);
         TopDocs hits = indexSearcher.search(query, searchlimit);
         foundClasscontent.clear();
+        foundAssetMetadata.clear();
         HashMap searchclasscontentmap = new HashMap<>();       
         for (ScoreDoc scoreDoc : hits.scoreDocs) {
             Document doc = getDocument(scoreDoc);
@@ -141,15 +151,13 @@ public class Searcher {
                     CfAsset asset = cfassetservice.findById(Long.parseLong(assetid));
                     if (!foundAssets.contains(asset)) {
                         foundAssets.add(asset);
+                        foundAssetMetadata.put(asset.getName(), assetutil.getMetadata(asset));
                     }
                 } catch (Exception ex) {
                     logger.warn(ex.getMessage());
                 }
             }
         }
-        searchresult.foundSites = foundSites;
-        searchresult.foundAssets = foundAssets;
-        searchresult.foundClasscontent = searchclasscontentmap;
         
         String[] searchtermlist = searchQuery.split(" ");
         for (String searchterm : searchtermlist) {
@@ -165,12 +173,22 @@ public class Searcher {
                 List<CfAssetkeyword> assetlist = cfassetkeywordservice.findByKeywordRef(keyword.getId());
                 assetlist.stream().map((ask) -> cfassetservice.findById(ask.getCfAssetkeywordPK().getAssetref())).filter((asset) -> (!foundAssets.contains(asset))).forEach((asset) -> {
                     foundAssets.add(asset);
+                    try {
+                        foundAssetMetadata.put(asset.getName(), assetutil.getMetadata(asset));
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(Searcher.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 });
                 
             } catch (Exception ex) {
                 // Is not a keyword...do nothing at all
             }
         }
+        
+        searchresult.foundSites = foundSites;
+        searchresult.foundAssets = foundAssets;
+        searchresult.foundClasscontent = searchclasscontentmap;
+        searchresult.foundAssetsMetadata = foundAssetMetadata;
         
         return searchresult;
     }

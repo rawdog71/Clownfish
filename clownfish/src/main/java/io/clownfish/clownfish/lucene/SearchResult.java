@@ -29,6 +29,7 @@ import lombok.Setter;
 public class SearchResult {
     @Getter @Setter ArrayList<CfSite> foundSites;
     @Getter @Setter ArrayList<CfAsset> foundAssets;
+    @Getter @Setter HashMap<String, HashMap> foundAssetsMetadata;
     @Getter @Setter HashMap<String, ArrayList> foundClasscontent;
 
     public SearchResult() {

@@ -494,6 +494,7 @@ public class Clownfish {
             updateSearchhistory(searchexpressions);
             
             searcher.setIndexPath(folderUtil.getIndex_folder());
+            searcher.setPropertyList(propertylist);
             long startTime = System.currentTimeMillis();
             SearchResult searchresult = searcher.search(parametermap.get("searchparam").toString(), searchlimit);
             long endTime = System.currentTimeMillis();
