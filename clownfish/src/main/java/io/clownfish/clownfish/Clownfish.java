@@ -229,6 +229,7 @@ public class Clownfish {
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map searchcontentmap;
     private @Getter @Setter Map searchassetmap;
+    private @Getter @Setter Map searchassetmetadatamap;
     private @Getter @Setter Map searchclasscontentmap;
     private @Getter @Setter Map searchmetadata;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
@@ -437,6 +438,9 @@ public class Clownfish {
             if (null == searchassetmap) {
                 searchassetmap = new HashMap<>();
             }
+            if (null == searchassetmetadatamap) {
+                searchassetmetadatamap = new HashMap<>();
+            }
             if (null == searchclasscontentmap) {
                 searchclasscontentmap = new HashMap<>();
             }
@@ -511,6 +515,10 @@ public class Clownfish {
             searchresult.getFoundAssets().stream().forEach((asset) -> {
                 searchassetmap.put(asset.getName(), asset);
             });
+            searchassetmetadatamap.clear();
+            searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
+                searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
+            });
             searchclasscontentmap.clear();
             searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
                 searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
@@ -532,6 +540,9 @@ public class Clownfish {
      * Fetches the search site from the system property "site_search" and calls universalGet
      * Instantiates the Searcher class
      * Clears and fills the searchmetadata
+     * @param query
+     * @param request
+     * @param response
      */
     @GetMapping(path = "/search/{query}")
     public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -556,10 +567,14 @@ public class Clownfish {
             searchresult.getFoundAssets().stream().forEach((asset) -> {
                 searchassetmap.put(asset.getName(), asset);
             });
+            searchassetmetadatamap.clear();
+            searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
+                searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
+            });
             searchclasscontentmap.clear();
-            for (Object key : searchresult.getFoundClasscontent().keySet()) {
-                searchclasscontentmap.put(key.toString(), searchresult.getFoundClasscontent().get(key).toString());
-            }
+            searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
+                searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key).toString());
+            });
             
             String search_site = propertyUtil.getPropertyValue("site_search");
             if (null == search_site) {
@@ -898,6 +913,9 @@ public class Clownfish {
                                 if (!searchassetmap.isEmpty()) {
                                     fmRoot.put("searchassetlist", searchassetmap);
                                 }
+                                if (!searchassetmetadatamap.isEmpty()) {
+                                    fmRoot.put("searchassetmetadatalist", searchassetmetadatamap);
+                                }
                                 if (!searchclasscontentmap.isEmpty()) {
                                     fmRoot.put("searchclasscontentlist", searchclasscontentmap);
                                 }
@@ -946,6 +964,9 @@ public class Clownfish {
                                 }
                                 if (!searchassetmap.isEmpty()) {
                                     velContext.put("searchassetlist", searchassetmap);
+                                }
+                                if (!searchassetmetadatamap.isEmpty()) {
+                                    velContext.put("searchassetmetadatalist", searchassetmetadatamap);
                                 }
                                 if (!searchclasscontentmap.isEmpty()) {
                                     velContext.put("searchclasscontentlist", searchclasscontentmap);
