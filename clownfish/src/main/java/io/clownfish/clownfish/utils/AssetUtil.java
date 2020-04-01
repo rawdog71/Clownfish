@@ -41,7 +41,6 @@ public class AssetUtil {
     private final PropertyList propertylist;
     BodyContentHandler handler;
     private final Parser parser;
-    HashMap<String, String> metamap;
     
     final transient Logger logger = LoggerFactory.getLogger(AssetUtil.class);
     
@@ -49,10 +48,9 @@ public class AssetUtil {
         this.propertylist = propertylist;
         
         parser = new AutoDetectParser();
-        metamap = new HashMap<>();
     }
     
-    public HashMap<String, String> getMetadata(CfAsset assetcontent) throws IOException {
+    public HashMap<String, String> getMetadata(CfAsset assetcontent, HashMap metamap) throws IOException {
         if (propertymap == null) {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
