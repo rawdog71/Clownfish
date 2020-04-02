@@ -98,6 +98,7 @@ public class PropertyList {
     public void onCreateProperty(ActionEvent actionEvent) {
         try {
             CfProperty newproperty = new CfProperty();
+            propertykey = propertykey.replaceAll("\\s+", "_");
             propertykey = propertykey.replace(".", "_");
             newproperty.setHashkey(propertykey);
             newproperty.setValue(propertyvalue);
@@ -113,6 +114,7 @@ public class PropertyList {
     public void onEditProperty(ActionEvent actionEvent) {
         try {
             if (null != selectedProperty) {
+                propertykey = propertykey.replaceAll("\\s+", "_");
                 propertykey = propertykey.replace(".", "_");
                 selectedProperty.setHashkey(propertykey);
                 selectedProperty.setValue(propertyvalue);
