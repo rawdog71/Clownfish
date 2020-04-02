@@ -573,7 +573,8 @@ INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
 ('sap_support', 'false', 1),
 ('site_error', 'error', 1),
 ('site_root', 'root', 1),
-('site_search', 'searchresult', 1);
+('site_search', 'searchresult', 1),
+('info_assetmetadata', 'true', 1);
 
 --
 -- Daten für Tabelle `cf_backend`

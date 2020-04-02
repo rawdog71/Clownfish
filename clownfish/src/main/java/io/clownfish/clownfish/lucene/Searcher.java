@@ -39,6 +39,7 @@ import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.utils.AssetUtil;
 import io.clownfish.clownfish.utils.ClassUtil;
+import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -78,6 +79,8 @@ public class Searcher {
     ArrayList<CfSite> foundSites;
     ArrayList<CfAsset> foundAssets;
     AssetUtil assetutil;
+    PropertyUtil propertyUtil;
+    boolean getAssetMetadata;
     HashMap<String, HashMap> foundAssetMetadata;
     HashMap<String, String> foundClasscontent;
     @Autowired CfSitecontentService sitecontentservice;
@@ -105,6 +108,10 @@ public class Searcher {
     
     public void setPropertyList(PropertyList propertylist) {
         assetutil = new AssetUtil(propertylist);
+        if (null == propertyUtil) {
+            propertyUtil = new PropertyUtil(propertylist);
+        }
+        getAssetMetadata = propertyUtil.getPropertyBoolean("info_assetmetadata", false);
     }
    
     public void setIndexPath(String indexDirectoryPath) {
@@ -151,9 +158,11 @@ public class Searcher {
                     CfAsset asset = cfassetservice.findById(Long.parseLong(assetid));
                     if (!foundAssets.contains(asset)) {
                         foundAssets.add(asset);
-                        HashMap<String, String> metamap = new HashMap<>();
-                        assetutil.getMetadata(asset, metamap);
-                        foundAssetMetadata.put(asset.getName(), metamap);
+                        if (getAssetMetadata) {
+                            HashMap<String, String> metamap = new HashMap<>();
+                            assetutil.getMetadata(asset, metamap);
+                            foundAssetMetadata.put(asset.getName(), metamap);
+                        }
                     }
                 } catch (Exception ex) {
                     logger.warn(ex.getMessage());
@@ -175,12 +184,14 @@ public class Searcher {
                 List<CfAssetkeyword> assetlist = cfassetkeywordservice.findByKeywordRef(keyword.getId());
                 assetlist.stream().map((ask) -> cfassetservice.findById(ask.getCfAssetkeywordPK().getAssetref())).filter((asset) -> (!foundAssets.contains(asset))).forEach((asset) -> {
                     foundAssets.add(asset);
-                    try {
-                        HashMap<String, String> metamap = new HashMap<>();
-                        assetutil.getMetadata(asset, metamap);
-                        foundAssetMetadata.put(asset.getName(), metamap);
-                    } catch (IOException ex) {
-                        java.util.logging.Logger.getLogger(Searcher.class.getName()).log(Level.SEVERE, null, ex);
+                    if (getAssetMetadata) {
+                        try {
+                            HashMap<String, String> metamap = new HashMap<>();
+                            assetutil.getMetadata(asset, metamap);
+                            foundAssetMetadata.put(asset.getName(), metamap);
+                        } catch (IOException ex) {
+                            java.util.logging.Logger.getLogger(Searcher.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 });
                 
