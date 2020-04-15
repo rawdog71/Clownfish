@@ -201,7 +201,7 @@ public class GetContent extends HttpServlet {
                     ArrayList contentkeywords = getContentOutputKeywords(classcontent, true);
                     boolean dummyfound = false;
                     for (String keyword : searchkeywords) {
-                        if (contentkeywords.contains(keyword)) {
+                        if (contentkeywords.contains(keyword.toLowerCase())) {
                             dummyfound = true;
                         }
                     }
