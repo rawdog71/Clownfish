@@ -50,12 +50,4 @@ public class ApiKeyUtil {
             return false;
         }
     }
-    
-    public String decode(String value) {
-        try {
-            return URLDecoder.decode(value, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException ex) {
-            return null;
-        }
-    }
 }

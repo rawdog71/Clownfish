@@ -94,7 +94,8 @@ public class InsertContent extends HttpServlet {
                 jb.append(line);
             }
         } catch (Exception e) {
-            /*report an error*/ }
+            /*report an error*/ 
+        }
 
         Gson gson = new Gson();
         InsertContentParameter icp = gson.fromJson(jb.toString(), InsertContentParameter.class);
@@ -104,56 +105,65 @@ public class InsertContent extends HttpServlet {
     
     private void insertContent(InsertContentParameter icp, HttpServletResponse response) {
         try {
-            CfClass clazz = cfclassService.findByName(icp.getClassname());
-            System.out.println(clazz.isSearchrelevant());
-            
-            try {
-                CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());
-                response.getOutputStream().println("Duplicate Classcontent: " + icp.getContentname());
-            } catch (javax.persistence.NoResultException ex) {
+            String apikey = icp.getApikey();
+            if (apikeyutil.checkApiKey(apikey, "InsertContent")) {
+                CfClass clazz = cfclassService.findByName(icp.getClassname());
+                System.out.println(clazz.isSearchrelevant());
+
                 try {
-                    CfClasscontent newclasscontent = new CfClasscontent();
-                    newclasscontent.setName(icp.getContentname());
-                    newclasscontent.setClassref(clazz);
-                    cfclasscontentService.create(newclasscontent);
-                    response.getOutputStream().println(newclasscontent.getName());
-                    
-                    List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
-                    attributlist.stream().forEach((attribut) -> {
-                        if (attribut.getAutoincrementor() == true) {
-                            List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
-                            long max = 0;
-                            for (CfClasscontent classcontent : classcontentlist2) {
-                                try {
-                                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);
-                                    if (attributcontent.getContentInteger().longValue() > max) {
-                                        max = attributcontent.getContentInteger().longValue();
+                    CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());
+                    response.getOutputStream().println("Duplicate Classcontent: " + icp.getContentname());
+                } catch (javax.persistence.NoResultException ex) {
+                    try {
+                        CfClasscontent newclasscontent = new CfClasscontent();
+                        newclasscontent.setName(icp.getContentname());
+                        newclasscontent.setClassref(clazz);
+                        cfclasscontentService.create(newclasscontent);
+                        response.getOutputStream().println(newclasscontent.getName());
+
+                        List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
+                        attributlist.stream().forEach((attribut) -> {
+                            if (attribut.getAutoincrementor() == true) {
+                                List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
+                                long max = 0;
+                                for (CfClasscontent classcontent : classcontentlist2) {
+                                    try {
+                                        CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);
+                                        if (attributcontent.getContentInteger().longValue() > max) {
+                                            max = attributcontent.getContentInteger().longValue();
+                                        }
+                                    } catch (javax.persistence.NoResultException ex2) {
+                                        logger.error(ex2.getMessage());
                                     }
-                                } catch (javax.persistence.NoResultException ex2) {
-                                    logger.error(ex2.getMessage());
                                 }
+                                CfAttributcontent newcontent = new CfAttributcontent();
+                                newcontent.setAttributref(attribut);    
+                                newcontent.setClasscontentref(newclasscontent);
+                                newcontent.setContentInteger(BigInteger.valueOf(max+1));
+                                cfattributcontentService.create(newcontent);
+                            } else {
+                                CfAttributcontent newcontent = new CfAttributcontent();
+                                newcontent.setAttributref(attribut);
+                                newcontent.setClasscontentref(newclasscontent);
+                                newcontent = setAttributValue(newcontent, icp.getAttributmap().get(attribut.getName()));
+
+                                cfattributcontentService.create(newcontent);
+                                indexContent();
                             }
-                            CfAttributcontent newcontent = new CfAttributcontent();
-                            newcontent.setAttributref(attribut);    
-                            newcontent.setClasscontentref(newclasscontent);
-                            newcontent.setContentInteger(BigInteger.valueOf(max+1));
-                            cfattributcontentService.create(newcontent);
-                        } else {
-                            CfAttributcontent newcontent = new CfAttributcontent();
-                            newcontent.setAttributref(attribut);
-                            newcontent.setClasscontentref(newclasscontent);
-                            newcontent = setAttributValue(newcontent, icp.getAttributmap().get(attribut.getName()));
-                            
-                            cfattributcontentService.create(newcontent);
-                            indexContent();
-                        }
-                    });
+                        });
+                    } catch (IOException ex1) {
+                        java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex1);
+                    }
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                try {
+                    response.getOutputStream().println("Wrong API KEY");
                 } catch (IOException ex1) {
                     java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex1);
                 }
-            } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex);
-            }    
+            }
         } catch (javax.persistence.NoResultException ex) {
             try {
                 response.getOutputStream().println("Class not found: " + icp.getClassname());
