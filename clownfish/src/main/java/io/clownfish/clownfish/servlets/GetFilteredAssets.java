@@ -26,6 +26,7 @@ import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
+import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -57,12 +58,14 @@ public class GetFilteredAssets extends HttpServlet {
     @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
     @Autowired transient CfAssetKeywordService cfassetkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
+    @Autowired ApiKeyUtil apikeyutil;
     
     private static transient @Getter @Setter String assetlibrary;
     private static transient @Getter @Setter ArrayList<String> searchkeywords;
     private List<CfAssetlistcontent> assetlistcontent = null;
     private static transient @Getter @Setter HashMap<String, String> outputmap;
     private static transient @Getter @Setter ArrayList<AssetDataOutput> outputlist;
+    private static transient @Getter @Setter String apikey;
     
     final transient Logger logger = LoggerFactory.getLogger(GetFilteredAssets.class);
     
@@ -81,70 +84,84 @@ public class GetFilteredAssets extends HttpServlet {
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("assetlibrary") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            assetlibrary = values[0];
+         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+            apikey = values[0];
         });
-        
-        assetlistcontent = null;
-        if (null != assetlibrary) {
-            CfAssetlist assetList = cfassetlistService.findByName(assetlibrary);
-            assetlistcontent = cfassetlistcontentService.findByAssetlistref(assetList.getId());
-        }
-        
-        searchkeywords = new ArrayList<>();
-        parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("keywords"))).forEach((paramname) -> {
-            String[] keys = paramname.split("\\$");
-            int counter = 0;
-            for (String key : keys) {
-                if (counter > 0) {
-                    searchkeywords.add(key);
-                }
-                counter++;
+        if (apikeyutil.checkApiKey(apikey, "GetFilteredAssets")) {
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("assetlibrary") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                assetlibrary = values[0];
+            });
+
+            assetlistcontent = null;
+            if (null != assetlibrary) {
+                CfAssetlist assetList = cfassetlistService.findByName(assetlibrary);
+                assetlistcontent = cfassetlistcontentService.findByAssetlistref(assetList.getId());
             }
-        });
-        
-        boolean found = true;
-        for (CfAssetlistcontent assetcontent : assetlistcontent) {
-            CfAsset asset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
-            
-            // Check the keyword filter (at least one keyword must be found (OR))
-            if (searchkeywords.size() > 0) {
-                ArrayList contentkeywords = getContentOutputKeywords(asset, true);
-                boolean dummyfound = false;
-                for (String keyword : searchkeywords) {
-                    if (contentkeywords.contains(keyword.toLowerCase())) {
-                        dummyfound = true;
+
+            searchkeywords = new ArrayList<>();
+            parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("keywords"))).forEach((paramname) -> {
+                String[] keys = paramname.split("\\$");
+                int counter = 0;
+                for (String key : keys) {
+                    if (counter > 0) {
+                        searchkeywords.add(key);
                     }
+                    counter++;
                 }
-                if (dummyfound) {
-                    found = true;
+            });
+
+            boolean found = true;
+            for (CfAssetlistcontent assetcontent : assetlistcontent) {
+                CfAsset asset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
+
+                // Check the keyword filter (at least one keyword must be found (OR))
+                if (searchkeywords.size() > 0) {
+                    ArrayList contentkeywords = getContentOutputKeywords(asset, true);
+                    boolean dummyfound = false;
+                    for (String keyword : searchkeywords) {
+                        if (contentkeywords.contains(keyword.toLowerCase())) {
+                            dummyfound = true;
+                        }
+                    }
+                    if (dummyfound) {
+                        found = true;
+                    } else {
+                        found = false;
+                    }
                 } else {
-                    found = false;
+                    found = true;
                 }
-            } else {
-                found = true;
+
+                if (found) {
+                    AssetDataOutput ao = new AssetDataOutput();
+                    ao.setAsset(asset);
+                    ao.setKeywords(getContentOutputKeywords(asset, false));
+                    outputlist.add(ao);
+                }
             }
-            
-            if (found) {
-                AssetDataOutput ao = new AssetDataOutput();
-                ao.setAsset(asset);
-                ao.setKeywords(getContentOutputKeywords(asset, false));
-                outputlist.add(ao);
+
+            if (!found) {
+                outputmap.put("contentfound", "false");
+            }
+            Gson gson = new Gson(); 
+            String json = gson.toJson(outputlist);
+            response.setContentType("application/json;charset=UTF-8");
+            try (PrintWriter out = response.getWriter()) {
+                out.print(json);
+            } catch (IOException ex) {
+                logger.error(ex.getMessage());
+            }
+        } else {
+            PrintWriter out = null;
+            try {
+                out = response.getWriter();
+                out.print("Wrong API KEY");
+            } catch (IOException ex) {
+                logger.error(ex.getMessage());
+            } finally {
+                out.close();
             }
         }
-        
-        if (!found) {
-            outputmap.put("contentfound", "false");
-        }
-        Gson gson = new Gson(); 
-        String json = gson.toJson(outputlist);
-        response.setContentType("application/json;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            out.print(json);
-        } catch (IOException ex) {
-            logger.error(ex.getMessage());
-        }
-        
     }
 
     /**

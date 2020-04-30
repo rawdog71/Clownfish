@@ -526,10 +526,30 @@ CREATE TABLE `clownfish`.`cf_searchhistory` (
   `counter` INT UNSIGNED NULL DEFAULT 1,
   PRIMARY KEY (`id`));
 
+-- --------------------------------------------------------
 
 --
--- Datenbank: `clownfish`
+-- Tabellenstruktur für Tabelle `cf_webservice`
 --
+
+CREATE TABLE IF NOT EXISTS `cf_webservice` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `cf_webserviceauth`
+--
+
+CREATE TABLE IF NOT EXISTS `cf_webserviceauth` (
+  `user_ref` bigint(20) unsigned NOT NULL,
+  `webservice_ref` bigint(20) unsigned NOT NULL,
+  `hash` varchar(255) NOT NULL,
+  PRIMARY KEY (`user_ref`,`webservice_ref`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Daten für Tabelle `cf_attributetype`
@@ -597,6 +617,21 @@ INSERT INTO `cf_backend` (`id`, `name`) VALUES
 (14, 'Jobs'),
 (15, 'User'),
 (16, 'Management');
+
+--
+-- Daten für Tabelle `cf_webservice`
+--
+
+INSERT INTO `cf_webservice` (`id`, `name`) VALUES
+(1, 'BarcodeServlet'),
+(2, 'GetAsset'),
+(3, 'GetAssetData'),
+(4, 'GetAssetPreview'),
+(5, 'GetContent'),
+(6, 'GetContentData'),
+(7, 'GetFilteredAssets'),
+(8, 'GetSearchHistory'),
+(9, 'InsertContent');
 
 INSERT INTO `cf_user` (`id`, `vorname`, `nachname`, `email`, `passwort`, `salt`) VALUES
 (1, 'Admin', 'Istrator', 'admin', 'Ll66CGHeusR7eoQPejg8t3CKkpVdpm2IlN/dZif4aGE=', 'zm85UW0YCIyBCxOXTagQQYcezjLzIQ');

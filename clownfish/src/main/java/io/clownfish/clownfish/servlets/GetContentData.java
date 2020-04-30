@@ -29,11 +29,13 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.utils.ApiKeyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +58,7 @@ public class GetContentData extends HttpServlet {
     @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired ApiKeyUtil apikeyutil;
         
     final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
 
@@ -69,30 +72,36 @@ public class GetContentData extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            CfClasscontent content = null;
-            String contentid = request.getParameter("contentid");
-            if (contentid != null) {
-                content = cfclasscontentService.findById(Long.parseLong(contentid));
-            }
-
-            if (null != content) {
-                List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(content);
-                ArrayList<HashMap> keyvals = getContentOutputKeyval(attributcontentList);
-                ArrayList<String> keywords = getAssetKeywords(content, true);
-                ContentDataOutput contentdataoutput = new ContentDataOutput();
-                
-                contentdataoutput.setContent(content);
-                contentdataoutput.setKeywords(keywords);
-                contentdataoutput.setKeyvals(keyvals);
-                
-                Gson gson = new Gson(); 
-                String json = gson.toJson(contentdataoutput);
-                response.setContentType("application/json;charset=UTF-8");
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(json);
-                } catch (IOException ex) {
-                    logger.error(ex.getMessage());
+            String apikey = request.getParameter("apikey");
+            if (apikeyutil.checkApiKey(apikey, "GetContentData")) {
+                CfClasscontent content = null;
+                String contentid = request.getParameter("contentid");
+                if (contentid != null) {
+                    content = cfclasscontentService.findById(Long.parseLong(contentid));
                 }
+
+                if (null != content) {
+                    List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(content);
+                    ArrayList<HashMap> keyvals = getContentOutputKeyval(attributcontentList);
+                    ArrayList<String> keywords = getAssetKeywords(content, true);
+                    ContentDataOutput contentdataoutput = new ContentDataOutput();
+
+                    contentdataoutput.setContent(content);
+                    contentdataoutput.setKeywords(keywords);
+                    contentdataoutput.setKeyvals(keyvals);
+
+                    Gson gson = new Gson(); 
+                    String json = gson.toJson(contentdataoutput);
+                    response.setContentType("application/json;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        out.print(json);
+                    } catch (IOException ex) {
+                        logger.error(ex.getMessage());
+                    }
+                }
+            } else {
+                PrintWriter out = response.getWriter();
+                out.print("Wrong API KEY");
             }
         } catch (javax.persistence.NoResultException | java.lang.IllegalArgumentException ex) {
             response.setContentType("text/html;charset=UTF-8");
@@ -101,6 +110,8 @@ public class GetContentData extends HttpServlet {
             } catch (IOException ex1) {
                 logger.error(ex1.getMessage());
             }
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
         }
     }
 

@@ -17,6 +17,7 @@ package io.clownfish.clownfish.servlets;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -54,6 +55,7 @@ import org.springframework.stereotype.Component;
 public class GetAsset extends HttpServlet {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient PropertyUtil propertyUtil;
+    @Autowired ApiKeyUtil apikeyutil;
     
     private static int width = 0;
     private static int height = 0;
@@ -78,35 +80,106 @@ public class GetAsset extends HttpServlet {
         
         acontext.start(() -> {
             try {
-                String paramdownload = acontext.getRequest().getParameter("dl");
-                if (paramdownload != null) {
-                    try {
-                        download = Integer.parseInt(paramdownload);
-                    } catch (NumberFormatException nfe) {
-                        download = 0;
+                String apikey = acontext.getRequest().getParameter("apikey");
+                if (apikeyutil.checkApiKey(apikey, "GetAsset")) {
+                
+                    String paramdownload = acontext.getRequest().getParameter("dl");
+                    if (paramdownload != null) {
+                        try {
+                            download = Integer.parseInt(paramdownload);
+                        } catch (NumberFormatException nfe) {
+                            download = 0;
+                        }
                     }
-                }
-                width = 0;
-                height = 0;
-                CfAsset asset = null;
-                String imagefilename = acontext.getRequest().getParameter("file");
-                if (imagefilename != null) {
-                    asset = cfassetService.findByName(imagefilename);
-                    imagefilename = asset.getName();
-                }
-                String mediaid = acontext.getRequest().getParameter("mediaid");
-                if (mediaid != null) {
-                    asset = cfassetService.findById(Long.parseLong(mediaid));
-                    imagefilename = asset.getName();
-                }
-                if (null != asset) {
-                    if (1 == download) {
-                        response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(imagefilename, StandardCharsets.UTF_8.toString()));
-                    } else {
-                        response.setHeader("Content-disposition", "inline; filename=" + URLEncoder.encode(imagefilename, StandardCharsets.UTF_8.toString()));
+                    width = 0;
+                    height = 0;
+                    CfAsset asset = null;
+                    String imagefilename = acontext.getRequest().getParameter("file");
+                    if (imagefilename != null) {
+                        asset = cfassetService.findByName(imagefilename);
+                        imagefilename = asset.getName();
                     }
-                    if (asset.getMimetype().contains("image")) {
-                        if (asset.getMimetype().contains("svg")) {
+                    String mediaid = acontext.getRequest().getParameter("mediaid");
+                    if (mediaid != null) {
+                        asset = cfassetService.findById(Long.parseLong(mediaid));
+                        imagefilename = asset.getName();
+                    }
+                    if (null != asset) {
+                        if (1 == download) {
+                            response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(imagefilename, StandardCharsets.UTF_8.toString()));
+                        } else {
+                            response.setHeader("Content-disposition", "inline; filename=" + URLEncoder.encode(imagefilename, StandardCharsets.UTF_8.toString()));
+                        }
+                        if (asset.getMimetype().contains("image")) {
+                            if (asset.getMimetype().contains("svg")) {
+                                acontext.getResponse().setContentType(asset.getMimetype());
+                                InputStream in;
+                                File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
+                                try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                    in = new FileInputStream(f);
+                                    IOUtils.copy(in, out);
+                                } catch (IOException ex) {
+                                    logger.error(ex.getMessage());
+                                    acontext.complete();
+                                }
+                            } else {
+                                String paramwidth = acontext.getRequest().getParameter("width");
+                                if (paramwidth != null) {
+                                    try {
+                                        width = Integer.parseInt(paramwidth);
+                                    } catch (NumberFormatException nfe) {
+                                        width = 100;
+                                    }
+                                }
+                                String paramheight = acontext.getRequest().getParameter("height");
+                                if (paramheight != null) {
+                                    try {
+                                        height = Integer.parseInt(paramheight);
+                                    } catch (NumberFormatException nfe) {
+                                        height = 100;
+                                    }
+                                }
+                                String cacheKey = "cache" + imagefilename + "W" + String.valueOf(width) + "H" + String.valueOf(height);
+                                if (new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey).exists()) {
+                                    File f = new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey);
+                                    InputStream in;
+                                    try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                        in = new FileInputStream(f);
+                                        IOUtils.copy(in, out);
+                                    } catch (IOException ex) {
+                                        logger.error(ex.getMessage());
+                                        acontext.complete();
+                                    }
+                                } else {
+                                    acontext.getResponse().setContentType(asset.getMimetype());
+                                    InputStream in;
+                                    File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
+
+                                    if ((width > 0) || (height > 0)) {
+                                        BufferedImage result = AsyncScalr.resize(ImageIO.read(f), width).get();
+                                        ByteArrayOutputStream os = new ByteArrayOutputStream();
+                                        ImageIO.write(result, asset.getFileextension(), os);
+                                        ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey));
+
+                                        try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                            in = new ByteArrayInputStream(os.toByteArray());
+                                            IOUtils.copy(in, out);
+                                        } catch (IOException ex) {
+                                            logger.error(ex.getMessage());
+                                            acontext.complete();
+                                        }
+                                    } else {
+                                        try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                            in = new FileInputStream(f);
+                                            IOUtils.copy(in, out);
+                                        } catch (IOException ex) {
+                                            logger.error(ex.getMessage());
+                                            acontext.complete();
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
                             acontext.getResponse().setContentType(asset.getMimetype());
                             InputStream in;
                             File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
@@ -117,75 +190,12 @@ public class GetAsset extends HttpServlet {
                                 logger.error(ex.getMessage());
                                 acontext.complete();
                             }
-                        } else {
-                            String paramwidth = acontext.getRequest().getParameter("width");
-                            if (paramwidth != null) {
-                                try {
-                                    width = Integer.parseInt(paramwidth);
-                                } catch (NumberFormatException nfe) {
-                                    width = 100;
-                                }
-                            }
-                            String paramheight = acontext.getRequest().getParameter("height");
-                            if (paramheight != null) {
-                                try {
-                                    height = Integer.parseInt(paramheight);
-                                } catch (NumberFormatException nfe) {
-                                    height = 100;
-                                }
-                            }
-                            String cacheKey = "cache" + imagefilename + "W" + String.valueOf(width) + "H" + String.valueOf(height);
-                            if (new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey).exists()) {
-                                File f = new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey);
-                                InputStream in;
-                                try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
-                                    in = new FileInputStream(f);
-                                    IOUtils.copy(in, out);
-                                } catch (IOException ex) {
-                                    logger.error(ex.getMessage());
-                                    acontext.complete();
-                                }
-                            } else {
-                                acontext.getResponse().setContentType(asset.getMimetype());
-                                InputStream in;
-                                File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
-
-                                if ((width > 0) || (height > 0)) {
-                                    BufferedImage result = AsyncScalr.resize(ImageIO.read(f), width).get();
-                                    ByteArrayOutputStream os = new ByteArrayOutputStream();
-                                    ImageIO.write(result, asset.getFileextension(), os);
-                                    ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey));
-
-                                    try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
-                                        in = new ByteArrayInputStream(os.toByteArray());
-                                        IOUtils.copy(in, out);
-                                    } catch (IOException ex) {
-                                        logger.error(ex.getMessage());
-                                        acontext.complete();
-                                    }
-                                } else {
-                                    try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
-                                        in = new FileInputStream(f);
-                                        IOUtils.copy(in, out);
-                                    } catch (IOException ex) {
-                                        logger.error(ex.getMessage());
-                                        acontext.complete();
-                                    }
-                                }
-                            }
                         }
-                    } else {
-                        acontext.getResponse().setContentType(asset.getMimetype());
-                        InputStream in;
-                        File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
-                        try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
-                            in = new FileInputStream(f);
-                            IOUtils.copy(in, out);
-                        } catch (IOException ex) {
-                            logger.error(ex.getMessage());
-                            acontext.complete();
-                        }
+                        acontext.complete();
                     }
+                } else {
+                    OutputStream outputStream = acontext.getResponse().getOutputStream();
+                    outputStream.close();
                     acontext.complete();
                 }
                 

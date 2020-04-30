@@ -56,7 +56,7 @@ public class PropertyList {
     private @Getter @Setter boolean deletePropertyButtonDisabled;
     private Clownfish clownfish;
     
-    final transient Logger logger = LoggerFactory.getLogger(KeywordList.class);
+    final transient Logger logger = LoggerFactory.getLogger(PropertyList.class);
 
     public PropertyList() {
         propertymap = new HashMap<>();

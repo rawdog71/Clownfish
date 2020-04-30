@@ -38,7 +38,9 @@
                         <h:outputText value="Passwort: *" />
                         <p:inputText type="password" value="#{loginBean.passwort}" required="true" requiredMessage="Bitte Passwort eingeben" />
 
-                        <p:commandButton id="LoginButton" value="Login" actionListener="#{loginBean.onLogin}" update=":form" />
+                        <p:commandButton id="LoginButton" value="Login" actionListener="#{loginBean.onLogin}" update=":form">
+                            <f:actionListener binding="#{webserviceauthlist.setUser(loginBean.cfuser)}" />
+                        </p:commandButton>
                     </h:panelGrid>
                 </p:tab>
                 
@@ -568,7 +570,7 @@
                                     <f:selectItem itemValue="#{null}" itemLabel="--select--" />
                                     <f:selectItems value="#{classcontentList.assetlist}" var="media" itemLabel="#{media.name}" itemValue="#{media}" />
                                     <p:column>
-                                    <p:graphicImage url="GetAssetPreview?mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
+                                    <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
                                     </p:column>
                                     <p:column>
                                     #{mp.name}
@@ -718,7 +720,7 @@
                             <p:dataViewGridItem>
                                 <p:panel header="#{media.id}" style="text-align:center">
                                     <h:panelGrid columns="1" style="width:100%">
-                                        <p:graphicImage url="GetAssetPreview?mediaid=#{media.id}&amp;width=150" width="150" alt="#{media.name}" title="#{media.name}" /> 
+                                        <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{media.id}&amp;width=150" width="150" alt="#{media.name}" title="#{media.name}" /> 
 
                                         <h:outputText value="#{media.shortName}" />
 
@@ -743,7 +745,7 @@
 
                             <p:dataViewListItem>
                                 <h:panelGrid columns="3" style="width:100%" columnClasses="logo,detail">
-                                    <p:graphicImage url="GetAssetPreview?mediaid=#{media.id}&amp;width=150" width="150" alt="#{media.name}" title="#{media.name}" /> 
+                                    <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{media.id}&amp;width=150" width="150" alt="#{media.name}" title="#{media.name}" /> 
 
                                     <p:outputPanel>
                                         <h:panelGrid columns="2" cellpadding="5">
@@ -768,7 +770,7 @@
                         </p:dataView>
                         
                         <p:outputPanel id="assetDetail">
-                            <p:graphicImage url="GetAssetPreview?mediaid=#{assetList.selectedAsset.id}&amp;width=500" width="500" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" rendered="#{assetList.renderDetail}" /> 
+                            <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{assetList.selectedAsset.id}&amp;width=500" width="500" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" rendered="#{assetList.renderDetail}" /> 
                             <h:panelGrid columns="1" style="width:100%" columnClasses="detail">
                                 <p:outputPanel>
                                     <h:panelGrid columns="2" cellpadding="5">
@@ -1383,6 +1385,28 @@
                         <p:ajax listener="#{userlist.onChangeContent}" />
                     </p:selectCheckboxMenu>
                     
+                </p:tab>
+                
+                <p:tab title="Webservice" id="webservice" rendered="#{loginBean.login}">
+                    
+                    <p:dataTable id="webserviceauthlist" var="webserviceauth" value="#{webserviceauthlist.webserviceauthlist}" 
+                                 selectionMode="single" selection="#{webserviceauthlist.selectedWebserviceauth}" rowKey="#{webserviceauth.hash}"
+                                emptyMessage="No content available">
+                        <p:ajax event="rowSelect" listener="#{webserviceauthlist.onSelect}" />
+                        <p:column headerText="Webservice">
+                            <h:outputText value="#{webserviceauth.cfWebserviceauthPK.webserviceRef}" />
+                        </p:column>
+                        <p:column headerText="Hash">
+                            <h:outputText value="#{webserviceauth.hash}" />
+                        </p:column>
+                    </p:dataTable>
+                    
+                    <p:outputLabel for="webservicelist" value="Webservices" />
+                    <p:selectOneMenu id="webservicelist" value="#{webserviceauthlist.selectedWebservice}" required="false" converter="#{webserviceConverterBean}">
+                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                        <f:selectItems value="#{webserviceauthlist.webservicelist}" />
+                    </p:selectOneMenu>
+                    <p:commandButton id="newwebserviceauth" process="form" value="New" actionListener="#{webserviceauthlist.onCreateWebserviceAuth}" update=":form:msgs :form:tabview:webserviceauthlist" disabled="#{webserviceauthlist.newAuthButtonDisabled}" />
                 </p:tab>
             </p:tabView>
             

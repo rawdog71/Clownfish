@@ -22,10 +22,13 @@ import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetkeyword;
 import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.utils.ApiKeyUtil;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +48,7 @@ public class GetAssetData extends HttpServlet {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfAssetKeywordService cfassetkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
+    @Autowired ApiKeyUtil apikeyutil;
         
     final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
 
@@ -58,33 +62,39 @@ public class GetAssetData extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            CfAsset asset = null;
-            String imagefilename = request.getParameter("file");
-            if (imagefilename != null) {
-                asset = cfassetService.findByName(imagefilename);
-                imagefilename = asset.getName();
-            }
-            String mediaid = request.getParameter("mediaid");
-            if (mediaid != null) {
-                asset = cfassetService.findById(Long.parseLong(mediaid));
-                imagefilename = asset.getName();
-            }
-
-            if (null != asset) {
-                ArrayList<String> keywords = getAssetKeywords(asset, true);
-                AssetDataOutput assetdataoutput = new AssetDataOutput();
-                
-                assetdataoutput.setAsset(asset);
-                assetdataoutput.setKeywords(keywords);
-                
-                Gson gson = new Gson(); 
-                String json = gson.toJson(assetdataoutput);
-                response.setContentType("application/json;charset=UTF-8");
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(json);
-                } catch (IOException ex) {
-                    logger.error(ex.getMessage());
+            String apikey = request.getParameter("apikey");
+            if (apikeyutil.checkApiKey(apikey, "GetAssetData")) {
+                CfAsset asset = null;
+                String imagefilename = request.getParameter("file");
+                if (imagefilename != null) {
+                    asset = cfassetService.findByName(imagefilename);
+                    imagefilename = asset.getName();
                 }
+                String mediaid = request.getParameter("mediaid");
+                if (mediaid != null) {
+                    asset = cfassetService.findById(Long.parseLong(mediaid));
+                    imagefilename = asset.getName();
+                }
+
+                if (null != asset) {
+                    ArrayList<String> keywords = getAssetKeywords(asset, true);
+                    AssetDataOutput assetdataoutput = new AssetDataOutput();
+
+                    assetdataoutput.setAsset(asset);
+                    assetdataoutput.setKeywords(keywords);
+
+                    Gson gson = new Gson(); 
+                    String json = gson.toJson(assetdataoutput);
+                    response.setContentType("application/json;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        out.print(json);
+                    } catch (IOException ex) {
+                        logger.error(ex.getMessage());
+                    }
+                }
+            } else {
+                PrintWriter out = response.getWriter();
+                out.print("Wrong API KEY");
             }
         } catch (javax.persistence.NoResultException | java.lang.IllegalArgumentException ex) {
             response.setContentType("text/html;charset=UTF-8");
@@ -93,6 +103,8 @@ public class GetAssetData extends HttpServlet {
             } catch (IOException ex1) {
                 logger.error(ex1.getMessage());
             }
+        } catch (IOException ex) {
+            logger.error(ex.getMessage());
         }
     }
 

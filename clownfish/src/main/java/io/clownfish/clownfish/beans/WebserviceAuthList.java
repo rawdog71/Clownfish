@@ -17,11 +17,14 @@ package io.clownfish.clownfish.beans;
 
 import io.clownfish.clownfish.dbentities.CfBackend;
 import io.clownfish.clownfish.dbentities.CfUser;
-import io.clownfish.clownfish.dbentities.CfUserbackend;
-import io.clownfish.clownfish.dbentities.CfUserbackendPK;
+import io.clownfish.clownfish.dbentities.CfWebservice;
+import io.clownfish.clownfish.dbentities.CfWebserviceauth;
+import io.clownfish.clownfish.dbentities.CfWebserviceauthPK;
 import io.clownfish.clownfish.serviceinterface.CfBackendService;
 import io.clownfish.clownfish.serviceinterface.CfUserBackendService;
 import io.clownfish.clownfish.serviceinterface.CfUserService;
+import io.clownfish.clownfish.serviceinterface.CfWebserviceService;
+import io.clownfish.clownfish.serviceinterface.CfWebserviceauthService;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,41 +42,59 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
-@Named("userlist")
-@Scope("session")
+@Named("webserviceauthlist")
+@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
-public class UserList {
+public class WebserviceAuthList {
     @Autowired CfUserService cfuserService;
-    @Autowired CfBackendService cfbackendService;
-    @Autowired CfUserBackendService cfuserbackendService;
+    @Autowired CfWebserviceauthService cfwebserviceauthService;
+    @Autowired CfWebserviceService cfwebserviceService;
     
-    private @Getter @Setter List<CfUser> userlist;
-    private @Getter @Setter CfUser selectedUser;
-    private @Getter @Setter String email;
-    private @Getter @Setter String vorname;
-    private @Getter @Setter String nachname;
-    private @Getter @Setter String passwort;
-    private @Getter @Setter String passwort_validate;
-    private @Getter @Setter boolean newUserButtonDisabled;
+    private @Getter @Setter List<CfWebserviceauth> webserviceauthlist;
+    private @Getter @Setter CfWebserviceauth selectedWebserviceauth;
+    private @Getter @Setter List<CfWebservice> webservicelist;
+    private @Getter @Setter CfWebservice selectedWebservice;
+    private @Getter @Setter boolean newAuthButtonDisabled;
+    private @Getter @Setter CfUser currentUser;
     private transient @Getter @Setter List<CfBackend> selectedbackendListcontent = null;
     private transient @Getter @Setter List<CfBackend> backendListcontent = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(UserList.class);
+    final transient Logger logger = LoggerFactory.getLogger(WebserviceAuthList.class);
 
     @PostConstruct
     public void init() {
-        userlist = cfuserService.findAll();
-        newUserButtonDisabled = false;
-        backendListcontent = cfbackendService.findAll();
-        selectedbackendListcontent = new ArrayList<>();
+        webservicelist = cfwebserviceService.findAll();
+        newAuthButtonDisabled = false;
     }
     
+    public void setUser(CfUser user) {
+        currentUser = user;
+        webserviceauthlist = cfwebserviceauthService.findByUserRef(currentUser);
+    }
+    
+    public void onSelect(SelectEvent event) {
+        selectedWebserviceauth = (CfWebserviceauth) event.getObject();
+    }
+    
+    public void onCreateWebserviceAuth(ActionEvent actionEvent) {
+        CfWebserviceauth webserviceauth = new CfWebserviceauth();
+        CfWebserviceauthPK cfWebserviceauthPK = new CfWebserviceauthPK();
+        cfWebserviceauthPK.setUserRef(currentUser);
+        cfWebserviceauthPK.setWebserviceRef(selectedWebservice);
+        webserviceauth.setCfWebserviceauthPK(cfWebserviceauthPK);
+        String hash = PasswordUtil.generateSecurePassword(currentUser.getEmail()+selectedWebservice.getName(), currentUser.getEmail()+selectedWebservice.getName());
+        webserviceauth.setHash(hash);
+        cfwebserviceauthService.create(webserviceauth);
+    }
+    
+    /*
     public void onSelect(SelectEvent event) {
         selectedUser = (CfUser) event.getObject();
         
@@ -163,4 +184,5 @@ public class UserList {
             }
         }
     }
+    */
 }
