@@ -69,7 +69,7 @@ public class GetSearchHistory extends HttpServlet {
         acontext.start(() -> {
             try {
                 String apikey = acontext.getRequest().getParameter("apikey");
-                if (apikeyutil.checkApiKey(apikey, "BarcodeServlet")) {
+                if (apikeyutil.checkApiKey(apikey, "GetSearchHistory")) {
                     String expression = acontext.getRequest().getParameter("expression");
                     int max = 25;
                     String maxentry = acontext.getRequest().getParameter("maxentry");
