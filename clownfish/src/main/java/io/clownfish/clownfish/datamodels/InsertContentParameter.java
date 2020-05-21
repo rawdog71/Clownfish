@@ -24,6 +24,7 @@ import lombok.Setter;
  * @author sulzbachr
  */
 public class InsertContentParameter {
+    private @Getter @Setter String returncode;
     private @Getter @Setter String apikey;
     private @Getter @Setter String classname;
     private @Getter @Setter String contentname;
