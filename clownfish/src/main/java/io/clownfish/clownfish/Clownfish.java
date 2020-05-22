@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish;
 
+import io.clownfish.clownfish.exceptions.PageNotFoundException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
@@ -636,6 +637,13 @@ public class Clownfish {
             outwriter.println(cfResponse.get().getOutput());
         } catch (IOException | InterruptedException | ExecutionException ex) {
             logger.error(ex.getMessage());
+        } catch (PageNotFoundException ex) {
+            String error_site = propertyUtil.getPropertyValue("site_error");
+            if (null == error_site) {
+                error_site = "error";
+            }
+            request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, error_site);
+            universalGet(error_site, request, response);
         }
     }
 
@@ -680,6 +688,8 @@ public class Clownfish {
             }
         } catch (IOException | InterruptedException | ExecutionException ex) {
             logger.error(ex.getMessage());
+        } catch (PageNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -690,9 +700,10 @@ public class Clownfish {
      * @param postmap
      * @param makestatic
      * @return 
+     * @throws io.clownfish.clownfish.PageNotFoundException 
      */
     @Async
-    public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, boolean makestatic) {
+    public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, boolean makestatic) throws PageNotFoundException {
         ClownfishResponse cfresponse = new ClownfishResponse();
         
         try {
@@ -713,11 +724,15 @@ public class Clownfish {
             }
 
             // fetch site by name or aliasname
-            CfSite cfsite;
+            CfSite cfsite = null;
             try {
                 cfsite = cfsiteService.findByName(name);
             } catch (Exception ex) {
-                cfsite = cfsiteService.findByAliaspath(name);
+                try {
+                    cfsite = cfsiteService.findByAliaspath(name);
+                } catch (Exception e1) {
+                    throw new PageNotFoundException("PageNotFound Exception: " + name);
+                }
             }
             // Site has not job flag
             if (!cfsite.isJob()) {
