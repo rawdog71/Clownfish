@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 sulzbachr.
+ * Copyright 2020 SulzbachR.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.servlets;
+package io.clownfish.clownfish.rest;
 
-import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.InsertContentParameter;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAttribut;
@@ -30,21 +29,15 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.servlets.InsertContent;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -52,15 +45,16 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
- * @author sulzbachr
+ * @author SulzbachR
  */
-@WebServlet(name = "InsertContent", urlPatterns = {"/InsertContent"}, asyncSupported = true)
-@Component
-public class InsertContent extends HttpServlet {
+@RestController
+public class RestInsertContent {
     @Autowired transient CfClassService cfclassService;
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfAttributService cfattributService;
@@ -71,44 +65,14 @@ public class InsertContent extends HttpServlet {
     @Autowired ContentIndexer contentIndexer;
     @Autowired FolderUtil folderUtil;
     @Autowired ApiKeyUtil apikeyutil;
-    
-    final transient Logger logger = LoggerFactory.getLogger(GetAssetPreview.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestInsertContent.class);
 
-    public InsertContent() {
+    @PostMapping("/insertcontent")
+    public InsertContentParameter restInsertContent(@RequestBody InsertContentParameter icp) {
+        return insertContent(icp);
     }
     
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        System.out.println("GET");
-    }
-    
-    @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        StringBuffer jb = new StringBuffer();
-        String line = null;
-        try {
-            BufferedReader reader = request.getReader();
-            while ((line = reader.readLine()) != null) {
-                jb.append(line);
-            }
-        } catch (Exception e) {
-            /*report an error*/ 
-        }
-
-        Gson gson = new Gson();
-        InsertContentParameter icp = gson.fromJson(jb.toString(), InsertContentParameter.class);
-        //response.getOutputStream().println(icp.getClassname());
-        insertContent(icp, response);
-        
-        String json = gson.toJson(icp);
-        response.setContentType("application/json;charset=UTF-8");
-        response.getOutputStream().println(json);
-    }
-    
-    private void insertContent(InsertContentParameter icp, HttpServletResponse response) {
+    private InsertContentParameter insertContent(InsertContentParameter icp) {
         try {
             String apikey = icp.getApikey();
             if (apikeyutil.checkApiKey(apikey, "InsertContent")) {
@@ -117,65 +81,52 @@ public class InsertContent extends HttpServlet {
 
                 try {
                     CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());
-                    response.getOutputStream().println("Duplicate Classcontent: " + icp.getContentname());
+                    icp.setReturncode("Duplicate Classcontent");
                 } catch (javax.persistence.NoResultException ex) {
-                    try {
-                        CfClasscontent newclasscontent = new CfClasscontent();
-                        newclasscontent.setName(icp.getContentname());
-                        newclasscontent.setClassref(clazz);
-                        cfclasscontentService.create(newclasscontent);
-                        response.getOutputStream().println(newclasscontent.getName());
-
-                        List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
-                        attributlist.stream().forEach((attribut) -> {
-                            if (attribut.getAutoincrementor() == true) {
-                                List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
-                                long max = 0;
-                                for (CfClasscontent classcontent : classcontentlist2) {
-                                    try {
-                                        CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);
-                                        if (attributcontent.getContentInteger().longValue() > max) {
-                                            max = attributcontent.getContentInteger().longValue();
-                                        }
-                                    } catch (javax.persistence.NoResultException ex2) {
-                                        logger.error(ex2.getMessage());
+                    CfClasscontent newclasscontent = new CfClasscontent();
+                    newclasscontent.setName(icp.getContentname());
+                    newclasscontent.setClassref(clazz);
+                    cfclasscontentService.create(newclasscontent);
+                    List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
+                    attributlist.stream().forEach((attribut) -> {
+                        if (attribut.getAutoincrementor() == true) {
+                            List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
+                            long max = 0;
+                            for (CfClasscontent classcontent : classcontentlist2) {
+                                try {
+                                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);
+                                    if (attributcontent.getContentInteger().longValue() > max) {
+                                        max = attributcontent.getContentInteger().longValue();
                                     }
+                                } catch (javax.persistence.NoResultException ex2) {
+                                    logger.error(ex2.getMessage());
                                 }
-                                CfAttributcontent newcontent = new CfAttributcontent();
-                                newcontent.setAttributref(attribut);    
-                                newcontent.setClasscontentref(newclasscontent);
-                                newcontent.setContentInteger(BigInteger.valueOf(max+1));
-                                cfattributcontentService.create(newcontent);
-                            } else {
-                                CfAttributcontent newcontent = new CfAttributcontent();
-                                newcontent.setAttributref(attribut);
-                                newcontent.setClasscontentref(newclasscontent);
-                                newcontent = setAttributValue(newcontent, icp.getAttributmap().get(attribut.getName()));
-
-                                cfattributcontentService.create(newcontent);
-                                indexContent();
                             }
-                        });
-                    } catch (IOException ex1) {
-                        java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex1);
-                    }
-                } catch (IOException ex) {
-                    java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex);
+                            CfAttributcontent newcontent = new CfAttributcontent();
+                            newcontent.setAttributref(attribut);
+                            newcontent.setClasscontentref(newclasscontent);
+                            newcontent.setContentInteger(BigInteger.valueOf(max+1));
+                            cfattributcontentService.create(newcontent);
+                            icp.setReturncode("OK");
+                        } else {
+                            CfAttributcontent newcontent = new CfAttributcontent();
+                            newcontent.setAttributref(attribut);
+                            newcontent.setClasscontentref(newclasscontent);
+                            newcontent = setAttributValue(newcontent, icp.getAttributmap().get(attribut.getName()));
+                            
+                            cfattributcontentService.create(newcontent);
+                            indexContent();
+                            icp.setReturncode("OK");
+                        }
+                    });
                 }
             } else {
-                try {
-                    response.getOutputStream().println("Wrong API KEY");
-                } catch (IOException ex1) {
-                    java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex1);
-                }
+                icp.setReturncode("Wrong API KEY");
             }
         } catch (javax.persistence.NoResultException ex) {
-            try {
-                response.getOutputStream().println("Class not found: " + icp.getClassname());
-            } catch (IOException ex1) {
-                java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex1);
-            }
+            icp.setReturncode("Class not found");
         }
+        return icp;
     }
     
     private CfAttributcontent setAttributValue(CfAttributcontent selectedAttribut, String editContent) {
@@ -278,5 +229,4 @@ public class InsertContent extends HttpServlet {
             }
         }
     }
-    
 }
