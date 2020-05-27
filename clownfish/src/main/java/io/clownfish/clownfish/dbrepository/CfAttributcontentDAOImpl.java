@@ -49,10 +49,10 @@ public class CfAttributcontentDAOImpl implements CfAttributcontentDAO {
     }
     
     @Override
-    public boolean create(CfAttributcontent entity) {
+    public CfAttributcontent create(CfAttributcontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -63,10 +63,10 @@ public class CfAttributcontentDAOImpl implements CfAttributcontentDAO {
     }
 
     @Override
-    public boolean edit(CfAttributcontent entity) {
+    public CfAttributcontent edit(CfAttributcontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

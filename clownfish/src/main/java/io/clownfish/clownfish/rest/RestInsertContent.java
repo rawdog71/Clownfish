@@ -86,11 +86,11 @@ public class RestInsertContent {
                     CfClasscontent newclasscontent = new CfClasscontent();
                     newclasscontent.setName(icp.getContentname());
                     newclasscontent.setClassref(clazz);
-                    cfclasscontentService.create(newclasscontent);
-                    List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
+                    CfClasscontent newclasscontent2 = cfclasscontentService.create(newclasscontent);
+                    List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent2.getClassref());
                     attributlist.stream().forEach((attribut) -> {
                         if (attribut.getAutoincrementor() == true) {
-                            List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
+                            List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent2.getClassref());
                             long max = 0;
                             for (CfClasscontent classcontent : classcontentlist2) {
                                 try {
@@ -106,7 +106,8 @@ public class RestInsertContent {
                             newcontent.setAttributref(attribut);
                             newcontent.setClasscontentref(newclasscontent);
                             newcontent.setContentInteger(BigInteger.valueOf(max+1));
-                            cfattributcontentService.create(newcontent);
+                            CfAttributcontent newcontent2 = cfattributcontentService.create(newcontent);
+                            icp.getAttributmap().put(attribut.getName(), newcontent2.getContentInteger().toString());
                             icp.setReturncode("OK");
                         } else {
                             CfAttributcontent newcontent = new CfAttributcontent();

@@ -27,7 +27,7 @@ public interface CfAssetService {
     CfAsset findById(Long id);
     CfAsset findByName(String name);
     List<CfAsset> findByIndexed(boolean indexed);
-    boolean create(CfAsset entity);
+    CfAsset create(CfAsset entity);
     boolean delete(CfAsset entity);
-    boolean edit(CfAsset entity);
+    CfAsset edit(CfAsset entity);
 }

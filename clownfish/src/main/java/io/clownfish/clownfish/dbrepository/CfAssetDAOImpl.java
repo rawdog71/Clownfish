@@ -48,10 +48,10 @@ public class CfAssetDAOImpl implements CfAssetDAO {
     }
 
     @Override
-    public boolean create(CfAsset entity) {
+    public CfAsset create(CfAsset entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -62,10 +62,10 @@ public class CfAssetDAOImpl implements CfAssetDAO {
     }
 
     @Override
-    public boolean edit(CfAsset entity) {
+    public CfAsset edit(CfAsset entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

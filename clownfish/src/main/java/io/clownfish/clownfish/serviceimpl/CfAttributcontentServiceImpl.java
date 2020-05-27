@@ -43,7 +43,7 @@ public class CfAttributcontentServiceImpl implements CfAttributcontentService {
     }
 
     @Override
-    public boolean create(CfAttributcontent entity) {
+    public CfAttributcontent create(CfAttributcontent entity) {
         return this.cfattributcontentDAO.create(entity);
     }
 
@@ -53,7 +53,7 @@ public class CfAttributcontentServiceImpl implements CfAttributcontentService {
     }
 
     @Override
-    public boolean edit(CfAttributcontent entity) {
+    public CfAttributcontent edit(CfAttributcontent entity) {
         return this.cfattributcontentDAO.edit(entity);
     }
 

@@ -108,7 +108,7 @@ public class InsertContent extends HttpServlet {
         response.getOutputStream().println(json);
     }
     
-    private void insertContent(InsertContentParameter icp, HttpServletResponse response) {
+    private InsertContentParameter insertContent(InsertContentParameter icp, HttpServletResponse response) {
         try {
             String apikey = icp.getApikey();
             if (apikeyutil.checkApiKey(apikey, "InsertContent")) {
@@ -123,13 +123,13 @@ public class InsertContent extends HttpServlet {
                         CfClasscontent newclasscontent = new CfClasscontent();
                         newclasscontent.setName(icp.getContentname());
                         newclasscontent.setClassref(clazz);
-                        cfclasscontentService.create(newclasscontent);
+                        CfClasscontent newclasscontent2 = cfclasscontentService.create(newclasscontent);
                         response.getOutputStream().println(newclasscontent.getName());
 
-                        List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
+                        List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent2.getClassref());
                         attributlist.stream().forEach((attribut) -> {
                             if (attribut.getAutoincrementor() == true) {
-                                List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
+                                List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent2.getClassref());
                                 long max = 0;
                                 for (CfClasscontent classcontent : classcontentlist2) {
                                     try {
@@ -176,6 +176,7 @@ public class InsertContent extends HttpServlet {
                 java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
+        return icp;
     }
     
     private CfAttributcontent setAttributValue(CfAttributcontent selectedAttribut, String editContent) {

@@ -56,8 +56,7 @@ public class RestInsertAsset {
     }
     
     @PostMapping(value = "/insertasset", consumes = "multipart/form-data")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file,
-            RedirectAttributes redirectAttributes) {
+    public String handleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
         if (!file.isEmpty()) { 
            //your logic
         }

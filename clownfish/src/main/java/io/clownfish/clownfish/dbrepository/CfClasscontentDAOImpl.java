@@ -66,10 +66,10 @@ public class CfClasscontentDAOImpl implements CfClasscontentDAO {
     }
     
     @Override
-    public boolean create(CfClasscontent entity) {
+    public CfClasscontent create(CfClasscontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -80,10 +80,10 @@ public class CfClasscontentDAOImpl implements CfClasscontentDAO {
     }
 
     @Override
-    public boolean edit(CfClasscontent entity) {
+    public CfClasscontent edit(CfClasscontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

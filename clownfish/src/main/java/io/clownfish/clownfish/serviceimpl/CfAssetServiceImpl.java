@@ -38,7 +38,7 @@ public class CfAssetServiceImpl implements CfAssetService {
     }
     
     @Override
-    public boolean create(CfAsset entity) {
+    public CfAsset create(CfAsset entity) {
         return this.cfassetDAO.create(entity);
     }
 
@@ -48,7 +48,7 @@ public class CfAssetServiceImpl implements CfAssetService {
     }
 
     @Override
-    public boolean edit(CfAsset entity) {
+    public CfAsset edit(CfAsset entity) {
         return this.cfassetDAO.edit(entity);
     }    
 

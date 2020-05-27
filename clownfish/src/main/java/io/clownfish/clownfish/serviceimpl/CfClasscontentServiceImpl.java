@@ -52,7 +52,7 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
     }
 
     @Override
-    public boolean create(CfClasscontent entity) {
+    public CfClasscontent create(CfClasscontent entity) {
         return this.cfclasscontentDAO.create(entity);
     }
 
@@ -62,7 +62,7 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
     }
 
     @Override
-    public boolean edit(CfClasscontent entity) {
+    public CfClasscontent edit(CfClasscontent entity) {
         return this.cfclasscontentDAO.edit(entity);
     }
 

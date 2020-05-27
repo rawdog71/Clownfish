@@ -28,7 +28,7 @@ public interface CfClasscontentService {
     List<CfClasscontent> findByClassref(CfClass classref);
     CfClasscontent findById(Long id);
     CfClasscontent findByName(String name);
-    boolean create(CfClasscontent entity);
+    CfClasscontent create(CfClasscontent entity);
     boolean delete(CfClasscontent entity);
-    boolean edit(CfClasscontent entity);
+    CfClasscontent edit(CfClasscontent entity);
 }
