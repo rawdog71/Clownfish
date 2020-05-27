@@ -15,12 +15,14 @@
  */
 package io.clownfish.clownfish;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.multipart.support.MultipartFilter;
 
 /**
  *
@@ -45,15 +47,34 @@ public class Initializer implements ServletContextInitializer {
     }
     
     /**
+     * Initializes the file upload filter for the servlet
+     * @return 
+     */
+    @Bean
+    public FilterRegistrationBean ServletFileUploadFilter() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(new MultipartFilter());
+        registration.setName("Servlet Upload Filter");
+        registration.addUrlPatterns("/InsertAsset");
+        registration.setOrder(0);
+        registration.setDispatcherTypes(DispatcherType.FORWARD, DispatcherType.REQUEST);
+        registration.setAsyncSupported(true);
+        return registration;
+    }
+    
+    /**
      * Initializes the file upload filter for the backend
      * @return 
      */
     @Bean
-    public FilterRegistrationBean FileUploadFilter() {
+    public FilterRegistrationBean PrimefacesFileUploadFilter() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(new org.primefaces.webapp.filter.FileUploadFilter());
         registration.setName("PrimeFaces FileUpload Filter");
+        registration.addUrlPatterns("/*");
+        registration.setOrder(1);
+        registration.setDispatcherTypes(DispatcherType.FORWARD, DispatcherType.REQUEST);
         registration.setAsyncSupported(true);
         return registration;
     }
-}
+} 

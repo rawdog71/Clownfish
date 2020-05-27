@@ -705,7 +705,7 @@
                 
                 <p:tab title="Assets" id="assetpanel" rendered="#{loginBean.login and loginBean.hasRights(9)}">
                     <h:form enctype="multipart/form-data">
-                        <p:fileUpload fileUploadListener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true"
+                        <p:fileUpload fileUploadListener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true" 
                                               update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|svg|ppt|pptx|xls|xlsx|zip)$/i" >
                         </p:fileUpload>
                         <p:growl id="messages" showDetail="true" />
