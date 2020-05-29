@@ -49,6 +49,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +90,16 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         servletRegistrationBean.setName("XHTML Faces Servlet");
         servletRegistrationBean.setLoadOnStartup(1);
         return servletRegistrationBean;
+    }
+    
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/GetContent").allowedOrigins("http://localhost");
+            }
+        };
     }
     
     @Override

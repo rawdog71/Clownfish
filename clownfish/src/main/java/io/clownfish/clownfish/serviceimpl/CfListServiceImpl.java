@@ -49,7 +49,7 @@ public class CfListServiceImpl implements CfListService {
     }
 
     @Override
-    public boolean create(CfList entity) {
+    public CfList create(CfList entity) {
         return this.cflistDAO.create(entity);
     }
 
@@ -59,7 +59,7 @@ public class CfListServiceImpl implements CfListService {
     }
 
     @Override
-    public boolean edit(CfList entity) {
+    public CfList edit(CfList entity) {
         return this.cflistDAO.edit(entity);
     }
 

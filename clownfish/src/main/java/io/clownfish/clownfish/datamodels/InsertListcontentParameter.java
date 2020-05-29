@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 sulzbachr.
+ * Copyright 2020 sulzbachr.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.daointerface;
+package io.clownfish.clownfish.datamodels;
 
-import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.dbentities.CfList;
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author sulzbachr
  */
-public interface CfListDAO {
-    List<CfList> findAll();
-    CfList findById(Long id);
-    CfList findByName(String name);
-    List<CfList> findByClassref(CfClass id);
-    CfList create(CfList entity);
-    boolean delete(CfList entity);
-    CfList edit(CfList entity);
+public class InsertListcontentParameter {
+    private @Getter @Setter String returncode;
+    private @Getter @Setter String apikey;
+    private @Getter @Setter String classcontentname;
+    private @Getter @Setter String listname;
+
+    public InsertListcontentParameter() {
+    }
 }

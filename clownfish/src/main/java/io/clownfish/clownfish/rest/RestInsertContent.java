@@ -21,6 +21,8 @@ import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfList;
+import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
@@ -29,6 +31,7 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.servlets.InsertContent;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
@@ -61,6 +64,7 @@ public class RestInsertContent {
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfAssetService cfassetService;
+    @Autowired transient CfListService cflistService;
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired FolderUtil folderUtil;
@@ -125,7 +129,7 @@ public class RestInsertContent {
                 icp.setReturncode("Wrong API KEY");
             }
         } catch (javax.persistence.NoResultException ex) {
-            icp.setReturncode("Class not found");
+            icp.setReturncode("NoResultException");
         }
         return icp;
     }
@@ -207,12 +211,11 @@ public class RestInsertContent {
                 } else {
                     selectedAttribut.setContentInteger(null);
                 }
-                break;
-            /*    
-            case "classref":
-                selectedAttribut.setClasscontentlistref(editDatalist);
                 break;    
-            */
+            case "classref":
+                CfList list_ref = cflistService.findById(Long.parseLong(editContent));
+                selectedAttribut.setClasscontentlistref(list_ref);
+                break;    
         }
         selectedAttribut.setIndexed(false);
         return selectedAttribut;

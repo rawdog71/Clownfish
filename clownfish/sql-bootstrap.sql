@@ -631,7 +631,10 @@ INSERT INTO `cf_webservice` (`id`, `name`) VALUES
 (6, 'GetContentData'),
 (7, 'GetFilteredAssets'),
 (8, 'GetSearchHistory'),
-(9, 'InsertContent');
+(9, 'InsertContent'),
+(10, 'InsertAsset'),
+(11, 'InsertDatalist'),
+(12, 'InsertListcontent');
 
 INSERT INTO `cf_user` (`id`, `vorname`, `nachname`, `email`, `passwort`, `salt`) VALUES
 (1, 'Admin', 'Istrator', 'admin', 'Ll66CGHeusR7eoQPejg8t3CKkpVdpm2IlN/dZif4aGE=', 'zm85UW0YCIyBCxOXTagQQYcezjLzIQ');
@@ -663,6 +666,9 @@ INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,6
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,7,'LCCg7qrIkpH0C3Ke21c6OT3smWp+/Fj3pQx894ywO3c=');
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,8,'/HXD6g4NltEmt8eqgWU7fSVcvNnj0p6uzFt6IRNEvjY=');
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,9,'iCLANmx6evKdk3D40ct7EG24tusD76yndBpdPCdsBt8=');
+INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,10,'VtKfOXVJRJwjsgR9AWDs29Xpyc6mepUjbVKMBLU2hek=');
+INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,11,'mIuG5M3jPG/Jf1q3MWe+Xc7l3lBPAmHGb9QvxSsfuGU=');
+INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,12,'vv9qPoZ8STG0huRrX+TsbDlDH+vu6NGEdpXKuNE1aA4=');
 
 INSERT INTO `cf_site` (`id`, `name`, `templateref`, `parentref`, `stylesheetref`, `javascriptref`, `htmlcompression`, `characterencoding`, `contenttype`, `locale`, `aliaspath`, `gzip`, `title`, `job`, `description`, `staticsite`, `searchrelevant`) VALUES
 (1, 'root', 1, 0, NULL, NULL, 0, 'UTF-8', 'text/html', 'de', 'root', 0, 'Clownfish root', 0, 'Default root site', 0, 0),

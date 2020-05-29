@@ -56,10 +56,10 @@ public class CfListDAOImpl implements CfListDAO {
     }
 
     @Override
-    public boolean create(CfList entity) {
+    public CfList create(CfList entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -70,10 +70,10 @@ public class CfListDAOImpl implements CfListDAO {
     }
 
     @Override
-    public boolean edit(CfList entity) {
+    public CfList edit(CfList entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

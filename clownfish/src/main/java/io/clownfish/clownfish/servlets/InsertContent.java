@@ -22,6 +22,7 @@ import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
@@ -30,12 +31,12 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +68,7 @@ public class InsertContent extends HttpServlet {
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfAssetService cfassetService;
+    @Autowired transient CfListService cflistService;
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired FolderUtil folderUtil;
@@ -100,7 +102,6 @@ public class InsertContent extends HttpServlet {
 
         Gson gson = new Gson();
         InsertContentParameter icp = gson.fromJson(jb.toString(), InsertContentParameter.class);
-        //response.getOutputStream().println(icp.getClassname());
         insertContent(icp, response);
         
         String json = gson.toJson(icp);
@@ -257,11 +258,10 @@ public class InsertContent extends HttpServlet {
                     selectedAttribut.setContentInteger(null);
                 }
                 break;
-            /*    
             case "classref":
-                selectedAttribut.setClasscontentlistref(editDatalist);
-                break;    
-            */
+                CfList list_ref = cflistService.findById(Long.parseLong(editContent));
+                selectedAttribut.setClasscontentlistref(list_ref);
+                break;   
         }
         selectedAttribut.setIndexed(false);
         return selectedAttribut;

@@ -28,7 +28,7 @@ public interface CfListService {
     CfList findById(Long id);
     CfList findByName(String name);
     List<CfList> findByClassref(CfClass ref);
-    boolean create(CfList entity);
+    CfList create(CfList entity);
     boolean delete(CfList entity);
-    boolean edit(CfList entity);
+    CfList edit(CfList entity);
 }
