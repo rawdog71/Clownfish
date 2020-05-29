@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.rest;
 
 import io.clownfish.clownfish.datamodels.InsertListcontentParameter;
-import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
