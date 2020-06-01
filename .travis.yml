@@ -1,4 +1,4 @@
 language: java
 sudo: false
 before_script: cd clownfish
-script: mvn clean build
+script: mvn clean compile
