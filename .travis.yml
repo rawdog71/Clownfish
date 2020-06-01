@@ -1,10 +1,8 @@
 language: java
 before_script: 
-- wget -O sapjco-3.8.jar.zip http://www.clownfish-cms.de/GetAsset?apikey=5omcWwYPuFXOv/WSdnmYgZv7vMJ3DNGkUH0NvfWpIKs=\&mediaid=15
-- unzip sapjco-3.8.jar.zip
+- wget -O sapjco-3.8.jar http://www.clownfish-cms.de/GetAsset?apikey=5omcWwYPuFXOv/WSdnmYgZv7vMJ3DNGkUH0NvfWpIKs=\&mediaid=17
 - mvn install:install-file -Dfile=sapjco-3.8.jar -DgroupId=SAPJco -DartifactId=SAPJco -Dversion=3.8 -Dpackaging=jar
-- wget -O ojdbc8-19.3.jar.zip http://www.clownfish-cms.de/GetAsset?apikey=5omcWwYPuFXOv/WSdnmYgZv7vMJ3DNGkUH0NvfWpIKs=\&mediaid=16
-- unzip ojdbc8-19.3.jar.zip
+- wget -O ojdbc8-19.3.jar http://www.clownfish-cms.de/GetAsset?apikey=5omcWwYPuFXOv/WSdnmYgZv7vMJ3DNGkUH0NvfWpIKs=\&mediaid=18
 - mvn install:install-file -Dfile=ojdbc8-19.3.jar -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=19.3 -Dpackaging=jar
 - cd clownfish
 script: mvn clean compile
