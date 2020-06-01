@@ -1,4 +1,8 @@
 language: java
 sudo: false
+before_script: wget http://www.clownfish-cms.de/GetAsset?apikey=5omcWwYPuFXOv/WSdnmYgZv7vMJ3DNGkUH0NvfWpIKs=&mediaid=15
+before_script: unzip sapjco-3.8.jar.zip
+before_script: wget http://www.clownfish-cms.de/GetAsset?apikey=5omcWwYPuFXOv/WSdnmYgZv7vMJ3DNGkUH0NvfWpIKs=&mediaid=16
+before_script: unzip ojdbc8-19.3.jar.zip
 before_script: cd clownfish
 script: mvn clean compile
