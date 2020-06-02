@@ -1,4 +1,6 @@
 language: java
+jdk:
+  - openjdk8
 before_script: 
 - wget -O SAPJCo-3.8.jar http://www.clownfish-cms.de/GetAsset?apikey=5omcWwYPuFXOv/WSdnmYgZv7vMJ3DNGkUH0NvfWpIKs=\&mediaid=17
 - mvn install:install-file -Dfile=SAPJCo-3.8.jar -DgroupId=SAPJCo -DartifactId=SAPJCo -Dversion=3.8 -Dpackaging=jar
