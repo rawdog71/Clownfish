@@ -7,4 +7,4 @@ before_script:
 - wget -O ojdbc8-19.3.jar http://www.clownfish-cms.de/GetAsset?apikey=5omcWwYPuFXOv/WSdnmYgZv7vMJ3DNGkUH0NvfWpIKs=\&mediaid=18
 - mvn install:install-file -Dfile=ojdbc8-19.3.jar -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=19.3 -Dpackaging=jar
 - cd clownfish
-script: mvn clean install
+script: mvn -U -X clean install
