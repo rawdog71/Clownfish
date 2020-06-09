@@ -25,6 +25,7 @@ import lombok.Setter;
  * @author sulzbachr
  */
 public class ContentOutput {
+    private @Getter @Setter String identifier;
     private @Getter @Setter ArrayList<HashMap> keyvals;
     private @Getter @Setter ArrayList<String> keywords;
 }

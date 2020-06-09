@@ -74,6 +74,7 @@ public class GetContent extends HttpServlet {
     @Autowired ApiKeyUtil apikeyutil;
     
     private static transient @Getter @Setter String klasse;
+    private static transient @Getter @Setter String identifier;
     private static transient @Getter @Setter String datalist;
     private static transient @Getter @Setter String apikey;
     private static transient @Getter @Setter HashMap<String, String> searchmap;
@@ -101,6 +102,10 @@ public class GetContent extends HttpServlet {
         if (apikeyutil.checkApiKey(apikey, "GetContent")) {
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("class") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 klasse = values[0];
+            });
+            identifier = "";
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("identifier") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                identifier = values[0];
             });
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("datalist") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 datalist = values[0];
@@ -137,6 +142,10 @@ public class GetContent extends HttpServlet {
             boolean found = true;
             for (CfClasscontent classcontent : classcontentList) {
                 boolean inList = true;
+                // Check if identifier is set and matches classcontent
+                if ((!identifier.isEmpty()) && (0 != identifier.compareToIgnoreCase(classcontent.getName()))) {
+                    inList = false;
+                }
                 // Check if content is in datalist 
                 if (null != listcontent) {
                     boolean foundinlist = false;
@@ -221,6 +230,7 @@ public class GetContent extends HttpServlet {
 
                     if (found) {
                         ContentOutput co = new ContentOutput();
+                        co.setIdentifier(classcontent.getName());
                         co.setKeyvals(getContentOutputKeyval(attributcontentList));
                         co.setKeywords(getContentOutputKeywords(classcontent, false));
                         outputlist.add(co);
