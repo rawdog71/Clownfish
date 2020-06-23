@@ -102,6 +102,7 @@ public class GetContent extends HttpServlet {
             apikey = values[0];
         });
         if (apikeyutil.checkApiKey(apikey, "GetContent")) {
+            klasse = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("class") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 klasse = values[0];
             });
@@ -109,11 +110,12 @@ public class GetContent extends HttpServlet {
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("identifier") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 identifier = values[0];
             });
+            datalist = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("datalist") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 datalist = values[0];
             });
             listcontent = null;
-            if (null != datalist) {
+            if (!datalist.isEmpty()) {
                 CfList dataList = cflistService.findByName(datalist);
                 listcontent = cflistcontentService.findByListref(dataList.getId());
             }
