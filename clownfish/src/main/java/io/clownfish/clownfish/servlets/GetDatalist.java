@@ -101,7 +101,6 @@ public class GetDatalist extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         outputlist = new ArrayList<>();
-        //outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             apikey = values[0];
@@ -112,24 +111,21 @@ public class GetDatalist extends HttpServlet {
                 name = values[0];
             });
             CfList cflist = cflistService.findByName(name);
-            
             List<CfListcontent> listcontentList = cflistcontentService.findByListref(cflist.getId());
             
             List<CfClasscontent> classcontentList = new ArrayList<>();
             for (CfListcontent listcontent : listcontentList) {
                 CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                
                 classcontentList.add(classcontent);
             }
             
-            for (CfClasscontent classcontent : classcontentList) {
-                
-                    List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
-                    ContentOutput co = new ContentOutput();
-                    co.setIdentifier(classcontent.getName());
-                    co.setKeyvals(getContentOutputKeyval(attributcontentList));
-                    co.setKeywords(getContentOutputKeywords(classcontent, false));
-                    outputlist.add(co);
+            for (CfClasscontent classcontent : classcontentList) {    
+                List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
+                ContentOutput co = new ContentOutput();
+                co.setIdentifier(classcontent.getName());
+                co.setKeyvals(getContentOutputKeyval(attributcontentList));
+                co.setKeywords(getContentOutputKeywords(classcontent, false));
+                outputlist.add(co);
             }
 
             Gson gson = new Gson(); 
