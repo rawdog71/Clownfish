@@ -203,8 +203,8 @@ public class GetContentData extends HttpServlet {
                     return new AttributDef(null, "text");
                 }
             case "classref":
-                if (null != attributcontent.getContentInteger()) {
-                    return new AttributDef(attributcontent.getContentInteger().toString(), "classref");
+                if (null != attributcontent.getClasscontentref()) {
+                    return new AttributDef(attributcontent.getClasscontentref().getName(), "classref");
                 } else {
                     return new AttributDef(null, "classref");
                 }
