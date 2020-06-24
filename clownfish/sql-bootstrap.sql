@@ -616,7 +616,8 @@ INSERT INTO `cf_backend` (`id`, `name`) VALUES
 (13, 'Properties'),
 (14, 'Jobs'),
 (15, 'User'),
-(16, 'Management');
+(16, 'Management'),
+(17, 'Reef');
 
 --
 -- Daten für Tabelle `cf_webservice`
@@ -634,7 +635,8 @@ INSERT INTO `cf_webservice` (`id`, `name`) VALUES
 (9, 'InsertContent'),
 (10, 'InsertAsset'),
 (11, 'InsertDatalist'),
-(12, 'InsertListcontent');
+(12, 'InsertListcontent'),
+(13, 'GetDatalist');
 
 INSERT INTO `cf_user` (`id`, `vorname`, `nachname`, `email`, `passwort`, `salt`) VALUES
 (1, 'Admin', 'Istrator', 'admin', 'Ll66CGHeusR7eoQPejg8t3CKkpVdpm2IlN/dZif4aGE=', 'zm85UW0YCIyBCxOXTagQQYcezjLzIQ');
@@ -655,7 +657,8 @@ INSERT INTO `cf_userbackend` (`userref`, `backendref`) VALUES
 (1, 13),
 (1, 14),
 (1, 15),
-(1, 16);
+(1, 16),
+(1, 17);
 
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,1,'jt/TFHczpIkYVyAaOHODbHxMSkl3BTw7QuIbJ8sDZwA=');
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,2,'5omcWwYPuFXOv/WSdnmYgZv7vMJ3DNGkUH0NvfWpIKs=');
@@ -669,6 +672,7 @@ INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,9
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,10,'VtKfOXVJRJwjsgR9AWDs29Xpyc6mepUjbVKMBLU2hek=');
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,11,'mIuG5M3jPG/Jf1q3MWe+Xc7l3lBPAmHGb9QvxSsfuGU=');
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,12,'vv9qPoZ8STG0huRrX+TsbDlDH+vu6NGEdpXKuNE1aA4=');
+INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,13,'v/Mz0ukm1Ru2diFZyk8pbdC9WFsE8FGxyzO2eZd1RYQ=');
 
 INSERT INTO `cf_site` (`id`, `name`, `templateref`, `parentref`, `stylesheetref`, `javascriptref`, `htmlcompression`, `characterencoding`, `contenttype`, `locale`, `aliaspath`, `gzip`, `title`, `job`, `description`, `staticsite`, `searchrelevant`) VALUES
 (1, 'root', 1, 0, NULL, NULL, 0, 'UTF-8', 'text/html', 'de', 'root', 0, 'Clownfish root', 0, 'Default root site', 0, 0),
