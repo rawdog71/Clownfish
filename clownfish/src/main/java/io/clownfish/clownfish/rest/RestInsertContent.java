@@ -212,8 +212,10 @@ public class RestInsertContent {
                 }
                 break;    
             case "classref":
-                CfList list_ref = cflistService.findById(Long.parseLong(editContent));
-                selectedAttribut.setClasscontentlistref(list_ref);
+                if (null != editContent) {
+                    CfList list_ref = cflistService.findById(Long.parseLong(editContent));
+                    selectedAttribut.setClasscontentlistref(list_ref);
+                }
                 break;    
         }
         selectedAttribut.setIndexed(false);

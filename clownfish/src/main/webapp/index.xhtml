@@ -496,7 +496,7 @@
                             <f:selectItem itemValue="#{null}" itemLabel="--select--" />
                             <f:selectItems value="#{classList.classListeRef}" />
                         </p:selectOneMenu>
-
+                        
                         <p:commandButton id="newattribut" process="form" value="New" actionListener="#{classList.onCreateAttribut}" update=":form:msgs :form:tabview:attributlist :form:tabview:classname" disabled="#{classlist.newAttributButtonDisabled}" />
                         <p:commandButton id="changeattribut" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" />
                     </p:panel>
@@ -579,6 +579,10 @@
                                 <p:selectOneMenu id="classref" value="#{classcontentList.editDatalist}" converter="#{sitelistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType}">
                                     <f:selectItem itemValue="#{null}" itemLabel="--select--" />
                                     <f:selectItems value="#{classcontentList.selectedList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
+                                </p:selectOneMenu>
+                                <p:selectOneMenu id="assetref" value="#{classcontentList.editAssetlist}" converter="#{assetlistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.assetrefType}">
+                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                    <f:selectItems value="#{classcontentList.selectedAssetList}" var="assetdatalist" itemLabel="#{assetdatalist.name}" itemValue="#{assetdatalist}" />
                                 </p:selectOneMenu>
 
                                 <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
