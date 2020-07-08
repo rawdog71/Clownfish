@@ -18,6 +18,7 @@ package io.clownfish.clownfish.beans;
 import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.InsertContentParameter;
 import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
@@ -30,6 +31,7 @@ import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
@@ -76,6 +78,7 @@ public class ContentList implements Serializable {
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired transient CfAssetService cfassetService;
+    @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfListcontentService cflistcontentService;
@@ -94,6 +97,7 @@ public class ContentList implements Serializable {
     private @Getter @Setter String contentName;
     private @Getter @Setter CfClass selectedClass;
     private transient @Getter @Setter List<CfClass> classlist = null;
+    private transient @Getter @Setter List<CfAssetlist> assetlibrarylist = null;
     private @Getter @Setter boolean newContentButtonDisabled = false;
     private @Getter @Setter boolean contentValueBoolean = false;
     private @Getter @Setter Date contentValueDatetime;
@@ -101,9 +105,11 @@ public class ContentList implements Serializable {
     private @Getter @Setter long selectedAttributId;
     private @Getter @Setter CfAsset selectedMedia;
     private @Getter @Setter List<CfList> selectedList;
+    private @Getter @Setter List<CfAssetlist> selectedAssetList;
     private @Getter @Setter String editContent;
     private @Getter @Setter Date editCalendar;
     private @Getter @Setter CfList editDatalist;
+    private @Getter @Setter CfAssetlist editAssetlist;
     private @Getter @Setter boolean isBooleanType;
     private @Getter @Setter boolean isStringType;
     private @Getter @Setter boolean isHashStringType;
@@ -115,6 +121,7 @@ public class ContentList implements Serializable {
     private @Getter @Setter boolean isMarkdownType;
     private @Getter @Setter boolean isMediaType;
     private @Getter @Setter boolean isClassrefType;
+    private @Getter @Setter boolean isAssetrefType;
     private @Getter @Setter boolean valueBooleanRendered = false;
     private @Getter @Setter boolean valueDatetimeRendered = false;
     private @Getter @Setter DualListModel<CfKeyword> keywords;
@@ -143,6 +150,7 @@ public class ContentList implements Serializable {
         classcontentlist = cfclasscontentService.findAll();
         classlist = cfclassService.findAll();
         assetlist = cfassetService.findAll();
+        selectedAssetList = cfassetlistService.findAll();
         editContent = "";
         
         keywordSource = cfkeywordService.findAll();
@@ -190,6 +198,7 @@ public class ContentList implements Serializable {
         isDatetimeType = false;
         isMediaType = false;
         isClassrefType = false;
+        isAssetrefType = false;
         
         switch (selectedAttribut.getAttributref().getAttributetype().getName()) {
             case "boolean":
@@ -235,6 +244,13 @@ public class ContentList implements Serializable {
                     editDatalist = cflistService.findById(selectedAttribut.getClasscontentlistref().getId());
                 }
                 break;
+            case "assetref":
+                isAssetrefType = true;
+                editAssetlist = null;
+                if (selectedAttribut.getAssetcontentlistref() != null) {
+                    editAssetlist = cfassetlistService.findById(selectedAttribut.getAssetcontentlistref().getId());
+                }
+                break;    
         }
         editContent = selectedAttribut.toString();
     }
@@ -380,6 +396,9 @@ public class ContentList implements Serializable {
                 break;
             case "classref":
                 selectedAttribut.setClasscontentlistref(editDatalist);
+                break;
+            case "assetref":
+                selectedAttribut.setAssetcontentlistref(editAssetlist);
                 break;    
         }
         selectedAttribut.setIndexed(false);
@@ -483,10 +502,15 @@ public class ContentList implements Serializable {
                     }
                     break;
                 case "classref":
-                    if (null != attributcontent.getContentInteger()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                    if (null != attributcontent.getClasscontentref()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getClasscontentref().getName());
                     }
                     break;
+                case "assetref":
+                    if (null != attributcontent.getAssetcontentlistref()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getAssetcontentlistref().getName());
+                    }
+                    break;    
             }
         }
         Gson gson = new Gson();

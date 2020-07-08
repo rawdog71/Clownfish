@@ -115,10 +115,29 @@ public class ClassUtil {
                             Map dummy_attributcontentmap = new LinkedHashMap();
                             dummy_attributcontentmap = getattributmap(cc);
                             listcontentmap.put(cc.getName(), dummy_attributcontentmap);
-                });
+                        });
                         attributcontentmap.put(attributcontent.getAttributref().getName(), listcontentmap);
                     }
                     break;
+                case "assetref":
+                    if (null != attributcontent.getAssetcontentlistref()) {
+                        Map listcontentmap = new LinkedHashMap();
+                        List<CfListcontent> selectedcontent = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
+                        List<CfClasscontent> selectedListcontent = new ArrayList<>();
+                        selectedListcontent.clear();
+                        if (selectedcontent.size() > 0) {
+                            selectedcontent.stream().map((listcontent) -> cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref())).forEach((selectedContent) -> {
+                                selectedListcontent.add(selectedContent);
+                            });
+                        }
+                        selectedListcontent.stream().forEach((cc) -> {
+                            Map dummy_attributcontentmap = new LinkedHashMap();
+                            dummy_attributcontentmap = getattributmap(cc);
+                            listcontentmap.put(cc.getName(), dummy_attributcontentmap);
+                        });
+                        attributcontentmap.put(attributcontent.getAttributref().getName(), listcontentmap);
+                    }
+                    break;    
             }
         }
         /* add keywords  */

@@ -101,6 +101,9 @@ public class CfAttributcontent implements Serializable {
     @JoinColumn(name = "content_classref", referencedColumnName = "id")
     @ManyToOne(optional = true)
     private CfList classcontentlistref;
+    @JoinColumn(name = "content_assetref", referencedColumnName = "id")
+    @ManyToOne(optional = true)
+    private CfAssetlist assetcontentlistref;
     
     public CfAttributcontent() {
     }
@@ -211,6 +214,14 @@ public class CfAttributcontent implements Serializable {
         this.classcontentlistref = classcontentlistref;
     }
 
+    public CfAssetlist getAssetcontentlistref() {
+        return assetcontentlistref;
+    }
+
+    public void setAssetcontentlistref(CfAssetlist assetcontentlistref) {
+        this.assetcontentlistref = assetcontentlistref;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -303,6 +314,12 @@ public class CfAttributcontent implements Serializable {
             case 11: // 
                 if (null != getClasscontentlistref()) {
                     return getClasscontentlistref().getName();
+                } else {
+                    return "";
+                }
+            case 12: // 
+                if (null != getAssetcontentlistref()) {
+                    return getAssetcontentlistref().getName();
                 } else {
                     return "";
                 }     
