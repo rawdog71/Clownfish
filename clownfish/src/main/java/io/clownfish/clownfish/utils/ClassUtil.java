@@ -15,12 +15,16 @@
  */
 package io.clownfish.clownfish.utils;
 
+import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfListcontent;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
@@ -50,6 +54,8 @@ public class ClassUtil {
     @Autowired CfListcontentService cflistcontentService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired CfKeywordService cfkeywordService;
+    @Autowired CfAssetlistcontentService cfassetlistcontentService;
+    @Autowired CfAssetService cfassetService;
     @Autowired MarkdownUtil markdownUtil;
     
     public ClassUtil() {
@@ -121,21 +127,19 @@ public class ClassUtil {
                     break;
                 case "assetref":
                     if (null != attributcontent.getAssetcontentlistref()) {
-                        Map listcontentmap = new LinkedHashMap();
-                        List<CfListcontent> selectedcontent = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
-                        List<CfClasscontent> selectedListcontent = new ArrayList<>();
-                        selectedListcontent.clear();
-                        if (selectedcontent.size() > 0) {
-                            selectedcontent.stream().map((listcontent) -> cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref())).forEach((selectedContent) -> {
-                                selectedListcontent.add(selectedContent);
+                        Map assetlistcontentmap = new LinkedHashMap();
+                        List<CfAssetlistcontent> selectedlistassets = cfassetlistcontentService.findByAssetlistref(attributcontent.getAssetcontentlistref().getId());
+                        List<CfAsset> selectedAssets = new ArrayList<>();
+                        selectedAssets.clear();
+                        if (selectedlistassets.size() > 0) {
+                            selectedlistassets.stream().map((listcontent) -> cfassetService.findById(listcontent.getCfAssetlistcontentPK().getAssetref())).forEach((selectedContent) -> {
+                                selectedAssets.add(selectedContent);
                             });
-                        }
-                        selectedListcontent.stream().forEach((cc) -> {
-                            Map dummy_attributcontentmap = new LinkedHashMap();
-                            dummy_attributcontentmap = getattributmap(cc);
-                            listcontentmap.put(cc.getName(), dummy_attributcontentmap);
+                        }                        
+                        selectedAssets.stream().forEach((asset) -> {
+                            assetlistcontentmap.put(asset.getName(), asset);
                         });
-                        attributcontentmap.put(attributcontent.getAttributref().getName(), listcontentmap);
+                        attributcontentmap.put(attributcontent.getAttributref().getName(), assetlistcontentmap);
                     }
                     break;    
             }
