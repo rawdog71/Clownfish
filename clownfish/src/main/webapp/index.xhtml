@@ -1408,6 +1408,65 @@
                     </p:selectOneMenu>
                     <p:commandButton id="newwebserviceauth" process="form" value="New" actionListener="#{webserviceauthlist.onCreateWebserviceAuth}" update=":form:msgs :form:tabview:webserviceauthlist" disabled="#{webserviceauthlist.newAuthButtonDisabled}" />
                 </p:tab>
+                
+                
+                <p:tab title="Reef" id="reef" rendered="#{loginBean.login}">
+                    
+                    <p:panelGrid id="reef_content">
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="reefname">Name</p:outputLabel>
+                                <p:inputText id="reefname" value="#{reefbean.reef.name}" />
+                            </p:column>
+                        </p:row>
+                        
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="reefclasses" value="Classes:" />
+                                <p:selectCheckboxMenu id="reefclasses" value="#{reefbean.reef.classlist}" required="false" label="Classes" converter="#{classConverterBean}" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItems value="#{reefbean.classlist}" var="reefclass" itemLabel="#{reefclass.name}" itemValue="#{reefclass}" />
+                                </p:selectCheckboxMenu>
+                            </p:column>
+                        </p:row>
+                        
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="reeftemplates" value="Templates:" />
+                                <p:selectCheckboxMenu id="reeftemplates" value="#{reefbean.reef.templatelist}" required="false" label="Templates" converter="#{templateConverterBean}" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItems value="#{reefbean.templatelist}" var="reeftemplate" itemLabel="#{reeftemplate.name}" itemValue="#{reeftemplate}" />
+                                </p:selectCheckboxMenu>
+                            </p:column>
+                        </p:row>
+                        
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="reefstylesheets" value="Stylesheets" />
+                                <p:selectCheckboxMenu id="reefstylesheets" value="#{reefbean.reef.stylesheetlist}" required="false" label="Stylesheets" converter="#{stylesheetConverterBean}" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItems value="#{reefbean.stylesheetlist}" var="reefstylesheet" itemLabel="#{reefstylesheet.name}" itemValue="#{reefstylesheet}" />
+                                </p:selectCheckboxMenu>
+                            </p:column>
+                        </p:row>
+                        
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="reefjavascripts" value="Javascripts" />
+                                <p:selectCheckboxMenu id="reefjavascripts" value="#{reefbean.reef.javascriptlist}" required="false" label="Javascripts" converter="#{javascriptConverterBean}" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItems value="#{reefbean.javascriptlist}" var="reefjavascript" itemLabel="#{reefjavascript.name}" itemValue="#{reefjavascript}" />
+                                </p:selectCheckboxMenu>
+                            </p:column>
+                        </p:row>
+                        
+                    </p:panelGrid>
+                    
+                    <p:panelGrid>    
+                        <p:row>
+                            <p:column>
+                                <p:commandButton id="exportButton" value="Export" actionListener="#{reefbean.onExport}" update=":form:msgs" />
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                    
+                </p:tab>
             </p:tabView>
             
             <p:confirmDialog global="true">
