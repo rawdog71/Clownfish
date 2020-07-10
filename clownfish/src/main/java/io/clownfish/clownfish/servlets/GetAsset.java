@@ -57,10 +57,6 @@ public class GetAsset extends HttpServlet {
     @Autowired transient PropertyUtil propertyUtil;
     @Autowired ApiKeyUtil apikeyutil;
     
-    private static int width = 0;
-    private static int height = 0;
-    private static int download = 0;
-    
     final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
     
     public GetAsset() {
@@ -79,6 +75,9 @@ public class GetAsset extends HttpServlet {
         final AsyncContext acontext = request.startAsync();
         
         acontext.start(() -> {
+            int inst_width = 0;
+            int inst_height = 0;
+            int inst_download = 0;
             try {
                 String apikey = acontext.getRequest().getParameter("apikey");
                 if (apikeyutil.checkApiKey(apikey, "GetAsset")) {
@@ -86,13 +85,13 @@ public class GetAsset extends HttpServlet {
                     String paramdownload = acontext.getRequest().getParameter("dl");
                     if (paramdownload != null) {
                         try {
-                            download = Integer.parseInt(paramdownload);
+                            inst_download = Integer.parseInt(paramdownload);
                         } catch (NumberFormatException nfe) {
-                            download = 0;
+                            inst_download = 0;
                         }
                     }
-                    width = 0;
-                    height = 0;
+                    inst_width = 0;
+                    inst_height = 0;
                     CfAsset asset = null;
                     String imagefilename = acontext.getRequest().getParameter("file");
                     if (imagefilename != null) {
@@ -105,7 +104,7 @@ public class GetAsset extends HttpServlet {
                         imagefilename = asset.getName();
                     }
                     if (null != asset) {
-                        if (1 == download) {
+                        if (1 == inst_download) {
                             response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(imagefilename, StandardCharsets.UTF_8.toString()));
                         } else {
                             response.setHeader("Content-disposition", "inline; filename=" + URLEncoder.encode(imagefilename, StandardCharsets.UTF_8.toString()));
@@ -126,20 +125,20 @@ public class GetAsset extends HttpServlet {
                                 String paramwidth = acontext.getRequest().getParameter("width");
                                 if (paramwidth != null) {
                                     try {
-                                        width = Integer.parseInt(paramwidth);
+                                        inst_width = Integer.parseInt(paramwidth);
                                     } catch (NumberFormatException nfe) {
-                                        width = 100;
+                                        inst_width = 100;
                                     }
                                 }
                                 String paramheight = acontext.getRequest().getParameter("height");
                                 if (paramheight != null) {
                                     try {
-                                        height = Integer.parseInt(paramheight);
+                                        inst_height = Integer.parseInt(paramheight);
                                     } catch (NumberFormatException nfe) {
-                                        height = 100;
+                                        inst_height = 100;
                                     }
                                 }
-                                String cacheKey = "cache" + imagefilename + "W" + String.valueOf(width) + "H" + String.valueOf(height);
+                                String cacheKey = "cache" + imagefilename + "W" + String.valueOf(inst_width) + "H" + String.valueOf(inst_height);
                                 if (new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey).exists()) {
                                     File f = new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey);
                                     InputStream in;
@@ -155,8 +154,8 @@ public class GetAsset extends HttpServlet {
                                     InputStream in;
                                     File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
 
-                                    if ((width > 0) || (height > 0)) {
-                                        BufferedImage result = AsyncScalr.resize(ImageIO.read(f), width).get();
+                                    if ((inst_width > 0) || (inst_height > 0)) {
+                                        BufferedImage result = AsyncScalr.resize(ImageIO.read(f), inst_width).get();
                                         ByteArrayOutputStream os = new ByteArrayOutputStream();
                                         ImageIO.write(result, asset.getFileextension(), os);
                                         ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey));

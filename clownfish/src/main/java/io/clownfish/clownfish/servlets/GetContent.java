@@ -79,11 +79,6 @@ public class GetContent extends HttpServlet {
     private static transient @Getter @Setter String identifier;
     private static transient @Getter @Setter String datalist;
     private static transient @Getter @Setter String apikey;
-    private static transient @Getter @Setter HashMap<String, String> searchmap;
-    private static transient @Getter @Setter ArrayList<String> searchkeywords;
-    private static transient @Getter @Setter HashMap<String, String> outputmap;
-    private static transient @Getter @Setter ArrayList<ContentOutput> outputlist;
-    private List<CfListcontent> listcontent = null;
     
     final transient Logger logger = LoggerFactory.getLogger(GetContent.class);
     
@@ -95,28 +90,42 @@ public class GetContent extends HttpServlet {
      * @param response servlet response
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
+        String inst_klasse;
+        String inst_identifier;
+        String inst_datalist;
+        String inst_apikey = "";
+        HashMap<String, String> searchmap;
+        ArrayList<String> searchkeywords;
+        HashMap<String, String> outputmap;
+        ArrayList<ContentOutput> outputlist;
+        List<CfListcontent> listcontent = null;
+        
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             apikey = values[0];
         });
-        if (apikeyutil.checkApiKey(apikey, "GetContent")) {
+        inst_apikey = apikey;
+        if (apikeyutil.checkApiKey(inst_apikey, "GetContent")) {
             klasse = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("class") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 klasse = values[0];
             });
+            inst_klasse = klasse;
             identifier = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("identifier") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 identifier = values[0];
             });
+            inst_identifier = identifier;
             datalist = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("datalist") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 datalist = values[0];
             });
+            inst_datalist = datalist;
             listcontent = null;
-            if (!datalist.isEmpty()) {
-                CfList dataList = cflistService.findByName(datalist);
+            if (!inst_datalist.isEmpty()) {
+                CfList dataList = cflistService.findByName(inst_datalist);
                 listcontent = cflistcontentService.findByListref(dataList.getId());
             }
             searchmap = new HashMap<>();
@@ -141,13 +150,13 @@ public class GetContent extends HttpServlet {
                     counter++;
                 }
             });
-            CfClass cfclass = cfclassService.findByName(klasse);
+            CfClass cfclass = cfclassService.findByName(inst_klasse);
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
             boolean found = true;
             for (CfClasscontent classcontent : classcontentList) {
                 boolean inList = true;
                 // Check if identifier is set and matches classcontent
-                if ((!identifier.isEmpty()) && (0 != identifier.compareToIgnoreCase(classcontent.getName()))) {
+                if ((!inst_identifier.isEmpty()) && (0 != inst_identifier.compareToIgnoreCase(classcontent.getName()))) {
                     inList = false;
                 }
                 // Check if content is in datalist 
@@ -237,7 +246,9 @@ public class GetContent extends HttpServlet {
                         co.setIdentifier(classcontent.getName());
                         co.setKeyvals(getContentOutputKeyval(attributcontentList));
                         co.setKeywords(getContentOutputKeywords(classcontent, false));
-                        outputlist.add(co);
+                        if (!inlist(outputlist, co)) {
+                            outputlist.add(co);
+                        }
                     }
                 }
             }
@@ -274,6 +285,11 @@ public class GetContent extends HttpServlet {
      * @return GetContentParameters
      */
     protected GetContentParameter processRequest(GetContentParameter gcp, HttpServletResponse response) {
+        HashMap<String, String> searchmap;
+        ArrayList<String> searchkeywords;
+        HashMap<String, String> outputmap;
+        ArrayList<ContentOutput> outputlist;
+        List<CfListcontent> listcontent = null;
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
         apikey = gcp.getApikey();
@@ -587,5 +603,15 @@ public class GetContent extends HttpServlet {
             }
         }
         return keywords;
+    }
+
+    private boolean inlist(ArrayList<ContentOutput> outputlist, ContentOutput co) {
+        boolean found = false;
+        for (ContentOutput content : outputlist) {
+            if (0 == content.getIdentifier().compareTo(co.getIdentifier())) {
+                found = true;
+            }
+        }
+        return found;
     }
 }

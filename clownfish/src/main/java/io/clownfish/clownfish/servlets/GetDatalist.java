@@ -73,7 +73,6 @@ public class GetDatalist extends HttpServlet {
     
     private static transient @Getter @Setter String name;
     private static transient @Getter @Setter String apikey;
-    private static transient @Getter @Setter ArrayList<ContentOutput> outputlist;
     
     final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
     
@@ -100,17 +99,22 @@ public class GetDatalist extends HttpServlet {
      * @param response servlet response
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
-        outputlist = new ArrayList<>();
+        ArrayList<ContentOutput> outputlist = new ArrayList<>();
+        String inst_apikey = "";
+        String inst_name = "";
+        
         Map<String, String[]> parameters = request.getParameterMap();
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             apikey = values[0];
         });
-        if (apikeyutil.checkApiKey(apikey, "GetDatalist")) {
+        inst_apikey = apikey;
+        if (apikeyutil.checkApiKey(inst_apikey, "GetDatalist")) {
             name = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("name") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 name = values[0];
             });
-            CfList cflist = cflistService.findByName(name);
+            inst_name = name;
+            CfList cflist = cflistService.findByName(inst_name);
             List<CfListcontent> listcontentList = cflistcontentService.findByListref(cflist.getId());
             
             List<CfClasscontent> classcontentList = new ArrayList<>();
@@ -218,6 +222,12 @@ public class GetDatalist extends HttpServlet {
                 } else {
                     return new AttributDef(null, "classref");
                 }
+            case "assetref":
+                if (null != attributcontent.getAssetcontentlistref()) {
+                    return new AttributDef(attributcontent.getAssetcontentlistref().getName(), "assetref");
+                } else {
+                    return new AttributDef(null, "assetref");
+                }    
             default:
                 return null;
         }

@@ -55,10 +55,7 @@ public class GetAssetPreview extends HttpServlet {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient PropertyUtil propertyUtil;
     @Autowired ApiKeyUtil apikeyutil;
-    
-    private static int width = 0;
-    private static int height = 0;
-    
+        
     final transient Logger logger = LoggerFactory.getLogger(GetAssetPreview.class);
     
     public GetAssetPreview() {
@@ -82,8 +79,8 @@ public class GetAssetPreview extends HttpServlet {
                 String apikey = acontext.getRequest().getParameter("apikey");
                 if (apikeyutil.checkApiKey(apikey, "GetAssetPreview")) {
                 
-                    width = 0;
-                    height = 0;
+                    int width = 0;
+                    int height = 0;
                     CfAsset asset = null;
                     String imagefilename = acontext.getRequest().getParameter("file");
                     if (imagefilename != null) {

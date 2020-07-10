@@ -61,10 +61,6 @@ public class GetFilteredAssets extends HttpServlet {
     @Autowired ApiKeyUtil apikeyutil;
     
     private static transient @Getter @Setter String assetlibrary;
-    private static transient @Getter @Setter ArrayList<String> searchkeywords;
-    private List<CfAssetlistcontent> assetlistcontent = null;
-    private static transient @Getter @Setter HashMap<String, String> outputmap;
-    private static transient @Getter @Setter ArrayList<AssetDataOutput> outputlist;
     private static transient @Getter @Setter String apikey;
     
     final transient Logger logger = LoggerFactory.getLogger(GetFilteredAssets.class);
@@ -81,20 +77,28 @@ public class GetFilteredAssets extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        String inst_assetlibrary = null;
+        String inst_apikey = "";
+        ArrayList<String> searchkeywords;
+        List<CfAssetlistcontent> assetlistcontent = null;
+        HashMap<String, String> outputmap;
+        ArrayList<AssetDataOutput> outputlist;
+        
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
-         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             apikey = values[0];
         });
-        if (apikeyutil.checkApiKey(apikey, "GetFilteredAssets")) {
+        inst_apikey = apikey;
+        if (apikeyutil.checkApiKey(inst_apikey, "GetFilteredAssets")) {
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("assetlibrary") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 assetlibrary = values[0];
             });
-
+            inst_assetlibrary = assetlibrary;
             assetlistcontent = null;
-            if (null != assetlibrary) {
-                CfAssetlist assetList = cfassetlistService.findByName(assetlibrary);
+            if (null != inst_assetlibrary) {
+                CfAssetlist assetList = cfassetlistService.findByName(inst_assetlibrary);
                 assetlistcontent = cfassetlistcontentService.findByAssetlistref(assetList.getId());
             }
 
