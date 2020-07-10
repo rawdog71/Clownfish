@@ -31,7 +31,7 @@ public class RFC_FUNCTION_SEARCH {
     JCoTable functions_table = null;
     
     public RFC_FUNCTION_SEARCH(SAPConnection sapc) {
-       RFC_FUNCTION_SEARCH. sapc = sapc;
+       RFC_FUNCTION_SEARCH.sapc = sapc;
     }
     
     public List<RfcFunction> getRfcFunctionsList(String groupname) {
