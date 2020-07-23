@@ -27,7 +27,7 @@
     <repositories>
         <repository>
             <id>milton-repo</id>
-            <url>https://milton.io/maven/</url>
+            <url>http://dl.bintray.com/milton/Milton</url>
         </repository>
     </repositories>
     
