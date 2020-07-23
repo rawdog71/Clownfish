@@ -23,6 +23,14 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring-boot.version>1.2.4.RELEASE</spring-boot.version>
     </properties>
+    
+    <repositories>
+        <repository>
+            <id>milton-repo</id>
+            <url>https://milton.io/maven/</url>
+        </repository>
+    </repositories>
+    
     <dependencies>
         <!-- SPRING -->
         <dependency>
@@ -304,6 +312,30 @@
             <version>1.1</version>
             <optional>true</optional>
         </dependency>
+        
+        <!-- Jackrabbit dependencies -->
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-core</artifactId>
+            <version>2.21.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-webdav</artifactId>
+            <version>2.21.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-jcr-server</artifactId>
+            <version>2.21.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.milton</groupId>
+            <artifactId>milton-server-ce</artifactId>
+            <version>2.7.2.4</version>
+        </dependency>
+        
     </dependencies>
     <build>
         <plugins>

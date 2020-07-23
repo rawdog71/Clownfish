@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish;
 
+import io.milton.servlet.MiltonFilter;
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -75,6 +76,25 @@ public class Initializer implements ServletContextInitializer {
         registration.setOrder(1);
         registration.setDispatcherTypes(DispatcherType.FORWARD, DispatcherType.REQUEST);
         registration.setAsyncSupported(true);
+        return registration;
+    }
+    
+    /**
+     * Initializes the WEBDAV filter
+     * @return 
+     */
+    @Bean
+    public FilterRegistrationBean ServletWebDAVFilter() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(new MiltonFilter());
+        registration.setName("WebDAV Filter");
+        registration.addUrlPatterns("/webdav/*");
+        registration.addInitParameter("resource.factory.class", "io.milton.http.annotated.AnnotationResourceFactory");
+        registration.addInitParameter("controllerPackagesToScan", "io.clownfish.clownfish.webdav");
+        registration.addInitParameter("milton.configurator", "io.clownfish.clownfish.webdav.WebDAVConfigurator");
+        registration.addInitParameter("contextPath", "/webdav");
+        registration.setOrder(2);
+        registration.setDispatcherTypes(DispatcherType.FORWARD, DispatcherType.REQUEST);
         return registration;
     }
 } 
