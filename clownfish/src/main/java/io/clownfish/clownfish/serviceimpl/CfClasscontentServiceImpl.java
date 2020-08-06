@@ -70,5 +70,10 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
     public List<CfClasscontent> findByClassref(CfClass classref) {
         return this.cfclasscontentDAO.findByClassref(classref);
     }
+
+    @Override
+    public List<CfClasscontent> findByScrapped(boolean scrapped) {
+        return this.cfclasscontentDAO.findByScrapped(scrapped);
+    }
     
 }

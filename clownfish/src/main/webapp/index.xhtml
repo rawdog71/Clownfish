@@ -541,7 +541,7 @@
                         <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}">
                             <f:actionListener binding="#{sitetree.initClassContentlist()}" />
                         </p:commandButton>
-                        <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onDeleteContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
+                        <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onScrappContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
                             <f:actionListener binding="#{sitetree.initClassContentlist()}" />
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
@@ -732,7 +732,7 @@
                                             <h:panelGrid columns="2" cellpadding="5">
                                                 <p:panelGrid columns="3" layout="grid" styleClass="ui-noborder">
                                                     <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
-                                                    <p:commandButton icon="fa fa-trash" action="#{assetList.onDelete}" update=":form:tabview:assetlist">
+                                                    <p:commandButton icon="fa fa-trash" action="#{assetList.onScrapp}" update=":form:tabview:assetlist">
                                                         <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                                         <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                     </p:commandButton>
@@ -758,7 +758,7 @@
 
                                             <p:panelGrid columns="3" layout="grid" styleClass="ui-noborder">
                                                 <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
-                                                <p:commandButton icon="fa fa-trash" action="#{assetList.onDelete}" update=":form:tabview:assetlist">
+                                                <p:commandButton icon="fa fa-trash" action="#{assetList.onScrapp}" update=":form:tabview:assetlist">
                                                     <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                                     <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>

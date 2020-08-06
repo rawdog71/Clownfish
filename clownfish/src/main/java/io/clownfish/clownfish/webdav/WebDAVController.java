@@ -27,12 +27,14 @@ import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import io.milton.annotations.ChildrenOf;
 import io.milton.annotations.ContentLength;
+import io.milton.annotations.Delete;
 import io.milton.annotations.Get;
 import io.milton.annotations.ModifiedDate;
 import io.milton.annotations.Name;
 import io.milton.annotations.PutChild;
 import io.milton.annotations.ResourceController;
 import io.milton.annotations.Root;
+import io.milton.annotations.UniqueId;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -40,8 +42,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -81,6 +81,7 @@ public class WebDAVController  {
     
     @PostConstruct
     public void init() {
+        logger.info("PostConstruct WebDAVController");
         assetService = cfassetService;
         propUtil = propertyUtil;
         folderUtiliy = folderUtil;
@@ -148,7 +149,6 @@ public class WebDAVController  {
             try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
                 byte[] buffer = new byte[64535];
                 int bulk;
-                //inputStream = event.getFile().getInputstream();
                 while (true) {
                     bulk = inputStream.read(buffer);
                     if (bulk < 0) {
@@ -209,29 +209,14 @@ public class WebDAVController  {
         }
     }
     
-    /*
-    @PutChild
-    public CfAsset upload(String filename, byte[] bytes) {
-        File result = new File(folderUtil.getMedia_folder() + File.separator + filename);
-        InputStream inputStream;
-        try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
-            byte[] buffer = new byte[64535];
-            int bulk;
-            inputStream = event.getFile().getInputstream();
-            while (true) {
-                bulk = inputStream.read(buffer);
-                if (bulk < 0) {
-                    break;
-                }
-                fileOutputStream.write(buffer, 0, bulk);
-                fileOutputStream.flush();
-            }
-            fileOutputStream.close();
-        } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(WebDAVController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        inputStream.close();
-        return null;
+    @UniqueId
+    public String getUniqueId(CfAsset asset) {
+        return asset.getName();
     }
-    */
+    
+    @Delete
+    public void delete(CfAsset asset) {
+        assetService.delete(asset);
+        assetlist = assetService.findAll();
+    }
 }

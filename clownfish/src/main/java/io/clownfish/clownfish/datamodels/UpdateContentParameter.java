@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 sulzbachr.
+ * Copyright 2020 sulzbachr.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.serviceinterface;
+package io.clownfish.clownfish.datamodels;
 
-import io.clownfish.clownfish.dbentities.CfAsset;
-import java.util.List;
+import java.util.HashMap;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author sulzbachr
  */
-public interface CfAssetService {
-    List<CfAsset> findAll();
-    CfAsset findById(Long id);
-    CfAsset findByName(String name);
-    List<CfAsset> findByIndexed(boolean indexed);
-    List<CfAsset> findByScrapped(boolean scrapped);
-    CfAsset create(CfAsset entity);
-    boolean delete(CfAsset entity);
-    CfAsset edit(CfAsset entity);
+public class UpdateContentParameter {
+    private @Getter @Setter String returncode;
+    private @Getter @Setter String apikey;
+    private @Getter @Setter String classname;
+    private @Getter @Setter String contentname;
+    private @Getter @Setter HashMap<String, String> attributmap;
+
+    public UpdateContentParameter() {
+        attributmap = new HashMap<>();
+    }
 }

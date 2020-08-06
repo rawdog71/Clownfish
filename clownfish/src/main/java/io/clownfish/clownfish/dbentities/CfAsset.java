@@ -39,14 +39,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Cacheable(false)
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "CfAsset.findAll", query = "SELECT c FROM CfAsset c"),
+    @NamedQuery(name = "CfAsset.findAll", query = "SELECT c FROM CfAsset c WHERE c.scrapped = 0"),
     @NamedQuery(name = "CfAsset.findById", query = "SELECT c FROM CfAsset c WHERE c.id = :id"),
     @NamedQuery(name = "CfAsset.findByName", query = "SELECT c FROM CfAsset c WHERE c.name = :name"),
     @NamedQuery(name = "CfAsset.findByFileextension", query = "SELECT c FROM CfAsset c WHERE c.fileextension = :fileextension"),
     @NamedQuery(name = "CfAsset.findByMimetype", query = "SELECT c FROM CfAsset c WHERE c.mimetype = :mimetype"),
     @NamedQuery(name = "CfAsset.findByImagewidth", query = "SELECT c FROM CfAsset c WHERE c.imagewidth = :imagewidth"),
     @NamedQuery(name = "CfAsset.findByImageheight", query = "SELECT c FROM CfAsset c WHERE c.imageheight = :imageheight"),
-    @NamedQuery(name = "CfAsset.findByIndexed", query = "SELECT c FROM CfAsset c WHERE c.indexed = :indexed")
+    @NamedQuery(name = "CfAsset.findByIndexed", query = "SELECT c FROM CfAsset c WHERE c.indexed = :indexed"),
+    @NamedQuery(name = "CfAsset.findByScrapped", query = "SELECT c FROM CfAsset c WHERE c.scrapped = :scrapped")
 })
 public class CfAsset implements Serializable {
 
@@ -78,6 +79,8 @@ public class CfAsset implements Serializable {
     private String description;
     @Column(name = "indexed")
     private boolean indexed;
+    @Column(name = "scrapped")
+    private boolean scrapped;
 
     public CfAsset() {
     }
@@ -162,6 +165,14 @@ public class CfAsset implements Serializable {
 
     public void setIndexed(boolean indexed) {
         this.indexed = indexed;
+    }
+
+    public boolean isScrapped() {
+        return scrapped;
+    }
+
+    public void setScrapped(boolean scrapped) {
+        this.scrapped = scrapped;
     }
 
     @Override

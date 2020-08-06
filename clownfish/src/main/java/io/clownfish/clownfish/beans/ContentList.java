@@ -51,6 +51,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
@@ -295,6 +297,33 @@ public class ContentList implements Serializable {
         } catch (ConstraintViolationException ex) {
             logger.error(ex.getMessage());
         }
+    }
+    
+    /**
+     * Handles the content scrapping
+     * Sets the scrapped flag to indicate the content is on the scrapyard
+     * @param actionEvent
+     */
+    public void onScrappContent(ActionEvent actionEvent) {
+        if (selectedContent != null) {
+            selectedContent.setScrapped(true);
+            cfclasscontentService.edit(selectedContent);
+            classcontentlist = cfclasscontentService.findAll();
+            FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been scrapped.");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    /**
+     * Handles the content recycling
+     * Sets the scrapped flag to indicate the content is recycled from the scrapyard
+     */
+    public void onRecycle() {
+        selectedContent.setScrapped(true);
+        cfclasscontentService.edit(selectedContent);
+        classcontentlist = cfclasscontentService.findAll();
+        FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been recycled.");
+        FacesContext.getCurrentInstance().addMessage(null, message);
     }
     
     public void onDeleteContent(ActionEvent actionEvent) {

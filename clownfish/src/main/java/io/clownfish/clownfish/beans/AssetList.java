@@ -190,10 +190,35 @@ public class AssetList {
     }
     
     /**
+     * Handles the file scrapping
+     * Sets the scrapped flag to indicate the asset is on the scrapyard
+     */
+    public void onScrapp() {
+        selectedAsset.setScrapped(true);
+        cfassetService.edit(selectedAsset);
+        assetlist = cfassetService.findAll();
+        FacesMessage message = new FacesMessage("Succesful", selectedAsset.getName() + " has been scrapped.");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+    
+    /**
+     * Handles the file recycling
+     * Sets the scrapped flag to indicate the asset is recycled from the scrapyard
+     */
+    public void onRecycle() {
+        selectedAsset.setScrapped(true);
+        cfassetService.edit(selectedAsset);
+        assetlist = cfassetService.findAll();
+        FacesMessage message = new FacesMessage("Succesful", selectedAsset.getName() + " has been recycled.");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+    
+    /**
      * Handles the file delete
      * Deletes the files from the media path and the database
      * Removes from Lucene index
      */
+    /*
     public void onDelete() {
         try {
             assetIndexer.removeDocument(selectedAsset);
@@ -210,6 +235,7 @@ public class AssetList {
             logger.error(ex.getMessage());
         }
     }
+    */
     
     /**
      * Handles the detail event

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 sulzbachr.
+ * Copyright 2020 SulzbachR.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.serviceinterface;
+package io.clownfish.clownfish.servlets;
 
-import io.clownfish.clownfish.dbentities.CfAsset;
-import java.util.List;
+import javax.jcr.Repository;
+import org.apache.jackrabbit.webdav.simple.SimpleWebdavServlet;
 
 /**
  *
- * @author sulzbachr
+ * @author SulzbachR
  */
-public interface CfAssetService {
-    List<CfAsset> findAll();
-    CfAsset findById(Long id);
-    CfAsset findByName(String name);
-    List<CfAsset> findByIndexed(boolean indexed);
-    List<CfAsset> findByScrapped(boolean scrapped);
-    CfAsset create(CfAsset entity);
-    boolean delete(CfAsset entity);
-    CfAsset edit(CfAsset entity);
+public class ClownfishWebdavServlet extends SimpleWebdavServlet {
+    private static Repository repo;
+
+    @Override
+    public Repository getRepository() {
+        return getAssetRepository();
+    }
+
+    private Repository getAssetRepository() {
+        if (null == repo) {
+            return null;
+        } else {
+            return null;
+        }
+    }
+    
 }

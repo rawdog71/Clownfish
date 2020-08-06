@@ -28,6 +28,7 @@ public interface CfClasscontentDAO {
     List<CfClasscontent> findByClassref(CfClass classref);
     CfClasscontent findById(Long id);
     CfClasscontent findByName(String name);
+    List<CfClasscontent> findByScrapped(boolean scrapped);
     CfClasscontent create(CfClasscontent entity);
     boolean delete(CfClasscontent entity);
     CfClasscontent edit(CfClasscontent entity);

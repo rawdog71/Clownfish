@@ -53,7 +53,11 @@ public class CfClasscontentDAOImpl implements CfClasscontentDAO {
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findById");
         query.setParameter("id", id);
         CfClasscontent cfclasscontent = (CfClasscontent) query.getSingleResult();
-        return cfclasscontent;
+        if (!cfclasscontent.isScrapped()) {
+            return cfclasscontent;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -62,7 +66,11 @@ public class CfClasscontentDAOImpl implements CfClasscontentDAO {
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findByName");
         query.setParameter("name", name);
         CfClasscontent cfclasscontent = (CfClasscontent) query.getSingleResult();
-        return cfclasscontent;
+        if (!cfclasscontent.isScrapped()) {
+            return cfclasscontent;
+        } else {
+            return null;
+        }
     }
     
     @Override
@@ -91,6 +99,15 @@ public class CfClasscontentDAOImpl implements CfClasscontentDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findByClassref");
         query.setParameter("classref", classref);
+        List<CfClasscontent> cfclasscontentlist = query.getResultList();
+        return cfclasscontentlist;
+    }
+
+    @Override
+    public List<CfClasscontent> findByScrapped(boolean scrapped) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findByScrapped");
+        query.setParameter("scrapped", scrapped);
         List<CfClasscontent> cfclasscontentlist = query.getResultList();
         return cfclasscontentlist;
     }

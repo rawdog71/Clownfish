@@ -17,7 +17,10 @@ package io.clownfish.clownfish;
 
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.ScriptRunner;
+import io.clownfish.clownfish.servlets.ClownfishWebdavServlet;
+import io.milton.config.HttpManagerBuilder;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -92,6 +95,16 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         return servletRegistrationBean;
     }
     
+    /*
+    @Bean
+    public ServletRegistrationBean webdavRegistratiton() {
+        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new ClownfishWebdavServlet(), "/webdav/*");
+        servletRegistrationBean.setName("WebDAV Servlet");
+        servletRegistrationBean.setLoadOnStartup(1);
+        return servletRegistrationBean;
+    }
+    */
+    
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -102,6 +115,13 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         };
     }
     
+    @Bean
+    HttpManagerBuilder httpManagerBuilder() {
+        HttpManagerBuilder builder = new HttpManagerBuilder();
+        builder.setRootDir(new File("/webdav/"));
+        return builder;
+    }
+    
     @Override
     public void setServletContext(ServletContext servletContext) {
         servletContext.setInitParameter("com.sun.faces.forceLoadConfiguration", Boolean.TRUE.toString());
@@ -109,18 +129,22 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-       // Register resource handler for CSS and JS
-       registry.addResourceHandler("resources/**").addResourceLocations("/WEB-INF/resources/")
+        // Register resource handler for CSS and JS
+        registry.addResourceHandler("resources/**").addResourceLocations("/WEB-INF/resources/")
             .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
             .resourceChain(true)
             .addResolver(new PathResourceResolver());
 
-       // Register resource handler for images
-       registry.addResourceHandler("images/**").addResourceLocations("/WEB-INF/images/")
+        // Register resource handler for images
+        registry.addResourceHandler("images/**").addResourceLocations("/WEB-INF/images/")
             .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
             .resourceChain(true)
             .addResolver(new PathResourceResolver());
-       registry.setOrder(-1);
+        
+        // Register resource handler for webdav
+        //registry.addResourceHandler("webdav/**").addResourceLocations("/WEB-INF/webdavtest/");
+        
+        registry.setOrder(-1);
     }
     
     @Override

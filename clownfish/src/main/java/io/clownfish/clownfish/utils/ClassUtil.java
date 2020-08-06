@@ -114,7 +114,9 @@ public class ClassUtil {
                         selectedListcontent.clear();
                         if (selectedcontent.size() > 0) {
                             selectedcontent.stream().map((listcontent) -> cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref())).forEach((selectedContent) -> {
-                                selectedListcontent.add(selectedContent);
+                                if (null != selectedContent) {
+                                    selectedListcontent.add(selectedContent);
+                                }
                             });
                         }
                         selectedListcontent.stream().forEach((cc) -> {
@@ -133,7 +135,9 @@ public class ClassUtil {
                         selectedAssets.clear();
                         if (selectedlistassets.size() > 0) {
                             selectedlistassets.stream().map((listcontent) -> cfassetService.findById(listcontent.getCfAssetlistcontentPK().getAssetref())).forEach((selectedContent) -> {
-                                selectedAssets.add(selectedContent);
+                                if (null != selectedContent) {
+                                    selectedAssets.add(selectedContent);
+                                }
                             });
                         }                        
                         selectedAssets.stream().forEach((asset) -> {

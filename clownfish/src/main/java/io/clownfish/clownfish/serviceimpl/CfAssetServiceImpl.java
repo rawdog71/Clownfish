@@ -71,4 +71,9 @@ public class CfAssetServiceImpl implements CfAssetService {
     public List<CfAsset> findByIndexed(boolean indexed) {
         return this.cfassetDAO.findByIndexed(indexed);
     }
+
+    @Override
+    public List<CfAsset> findByScrapped(boolean scrapped) {
+        return this.cfassetDAO.findByScrapped(scrapped);
+    }
 }

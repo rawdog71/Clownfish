@@ -27,6 +27,7 @@ public interface CfAssetDAO {
     CfAsset findById(Long id);
     CfAsset findByName(String name);
     List<CfAsset> findByIndexed(boolean indexed);
+    List<CfAsset> findByScrapped(boolean scrapped);
     CfAsset create(CfAsset entity);
     boolean delete(CfAsset entity);
     CfAsset edit(CfAsset entity);

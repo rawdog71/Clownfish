@@ -39,10 +39,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "cf_classcontent", catalog = "clownfish", schema = "")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "CfClasscontent.findAll", query = "SELECT c FROM CfClasscontent c"),
+    @NamedQuery(name = "CfClasscontent.findAll", query = "SELECT c FROM CfClasscontent c WHERE c.scrapped = 0"),
     @NamedQuery(name = "CfClasscontent.findById", query = "SELECT c FROM CfClasscontent c WHERE c.id = :id"),
     @NamedQuery(name = "CfClasscontent.findByClassref", query = "SELECT c FROM CfClasscontent c WHERE c.classref = :classref"),
-    @NamedQuery(name = "CfClasscontent.findByName", query = "SELECT c FROM CfClasscontent c WHERE c.name = :name")})
+    @NamedQuery(name = "CfClasscontent.findByName", query = "SELECT c FROM CfClasscontent c WHERE c.name = :name"),
+    @NamedQuery(name = "CfClasscontent.findByScrapped", query = "SELECT c FROM CfClasscontent c WHERE c.scrapped = :scrapped")
+})
 public class CfClasscontent implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -59,6 +61,8 @@ public class CfClasscontent implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
+    @Column(name = "scrapped")
+    private boolean scrapped;
 
     public CfClasscontent() {
     }
@@ -95,6 +99,14 @@ public class CfClasscontent implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isScrapped() {
+        return scrapped;
+    }
+
+    public void setScrapped(boolean scrapped) {
+        this.scrapped = scrapped;
     }
 
     @Override

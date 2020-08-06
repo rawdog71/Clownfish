@@ -66,29 +66,38 @@ public class GetAssetData extends HttpServlet {
                 String imagefilename = request.getParameter("file");
                 if (imagefilename != null) {
                     asset = cfassetService.findByName(imagefilename);
-                    imagefilename = asset.getName();
+                    if (null != asset) {
+                        imagefilename = asset.getName();
+                    }
                 }
                 String mediaid = request.getParameter("mediaid");
                 if (mediaid != null) {
                     asset = cfassetService.findById(Long.parseLong(mediaid));
-                    imagefilename = asset.getName();
+                    if (null != asset) {
+                        imagefilename = asset.getName();
+                    }
                 }
 
                 if (null != asset) {
-                    ArrayList<String> keywords = getAssetKeywords(asset, true);
-                    AssetDataOutput assetdataoutput = new AssetDataOutput();
+                    if (!asset.isScrapped()) {
+                        ArrayList<String> keywords = getAssetKeywords(asset, true);
+                        AssetDataOutput assetdataoutput = new AssetDataOutput();
 
-                    assetdataoutput.setAsset(asset);
-                    assetdataoutput.setKeywords(keywords);
+                        assetdataoutput.setAsset(asset);
+                        assetdataoutput.setKeywords(keywords);
 
-                    Gson gson = new Gson(); 
-                    String json = gson.toJson(assetdataoutput);
-                    response.setContentType("application/json;charset=UTF-8");
-                    try (PrintWriter out = response.getWriter()) {
-                        out.print(json);
-                    } catch (IOException ex) {
-                        logger.error(ex.getMessage());
+                        Gson gson = new Gson(); 
+                        String json = gson.toJson(assetdataoutput);
+                        response.setContentType("application/json;charset=UTF-8");
+                        try (PrintWriter out = response.getWriter()) {
+                            out.print(json);
+                        } catch (IOException ex) {
+                            logger.error(ex.getMessage());
+                        }
                     }
+                } else {
+                    PrintWriter out = response.getWriter();
+                    out.print("No asset found");
                 }
             } else {
                 PrintWriter out = response.getWriter();

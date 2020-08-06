@@ -103,9 +103,13 @@ public class SiteUtil {
         Map sitecontentmapdummy = new LinkedHashMap();
         for (CfSitecontent sitecontent : sitecontentlist) {
             CfClasscontent classcontent = cfclasscontentService.findById(sitecontent.getCfSitecontentPK().getClasscontentref());
-            List<CfAttributcontent> attributcontentlist = new ArrayList<>();
-            attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
-            sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
+            if (null != classcontent) {
+                List<CfAttributcontent> attributcontentlist = new ArrayList<>();
+                attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
+                sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
+            } else {
+                System.out.println("CLASSCONTENT NOT FOUND!" + sitecontent.getCfSitecontentPK().getClasscontentref());
+            }
         }
         return sitecontentmapdummy;
     }
@@ -122,7 +126,11 @@ public class SiteUtil {
             ArrayList<CfAsset> dummyassetlist = new ArrayList<>();
             for (CfAssetlistcontent assetcontent : assetlist) {
                 CfAsset asset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
-                dummyassetlist.add(asset);
+                if (null != asset) {
+                    dummyassetlist.add(asset);
+                } else {
+                    System.out.println("ASSET NOT FOUND!" + assetcontent.getCfAssetlistcontentPK().getAssetref());
+                }
             }
             assetlibraryMap.put(cfassetlist.getName(), dummyassetlist);
             //sitecontentmap.put(, listcontentmap);

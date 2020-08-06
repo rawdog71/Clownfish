@@ -44,7 +44,11 @@ public class CfAssetDAOImpl implements CfAssetDAO {
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findById");  
         query.setParameter("id", id);
         CfAsset cfasset = (CfAsset) query.getSingleResult();
-        return cfasset;
+        if (!cfasset.isScrapped()) {
+            return cfasset;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -90,6 +94,15 @@ public class CfAssetDAOImpl implements CfAssetDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findByIndexed");
         query.setParameter("indexed", indexed);
+        List<CfAsset> cfassetlist = query.getResultList();
+        return cfassetlist;
+    }
+
+    @Override
+    public List<CfAsset> findByScrapped(boolean scrapped) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findByScrapped");
+        query.setParameter("scrapped", scrapped);
         List<CfAsset> cfassetlist = query.getResultList();
         return cfassetlist;
     }
