@@ -92,7 +92,9 @@ public class RestUpdateContent {
                         CfAttribut attribut = attributcontent.getAttributref();
                         setAttributValue(attributcontent, ucp.getAttributmap().get(attribut.getName()));
                         cfattributcontentService.edit(attributcontent);
-                        indexContent();
+                        if (ucp.isIndexing()) {
+                            indexContent();
+                        }
                         ucp.setReturncode("OK");
                     }                    
                 } catch (javax.persistence.NoResultException ex) {

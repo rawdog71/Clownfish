@@ -28,6 +28,7 @@ public class InsertContentParameter {
     private @Getter @Setter String apikey;
     private @Getter @Setter String classname;
     private @Getter @Setter String contentname;
+    private @Getter @Setter boolean indexing;
     private @Getter @Setter HashMap<String, String> attributmap;
 
     public InsertContentParameter() {

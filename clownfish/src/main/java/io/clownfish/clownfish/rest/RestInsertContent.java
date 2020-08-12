@@ -119,7 +119,9 @@ public class RestInsertContent {
                             newcontent = setAttributValue(newcontent, icp.getAttributmap().get(attribut.getName()));
                             
                             cfattributcontentService.create(newcontent);
-                            indexContent();
+                            if (icp.isIndexing()) {
+                                indexContent();
+                            }
                             icp.setReturncode("OK");
                         }
                     });
