@@ -90,12 +90,15 @@ public class RestUpdateContent {
                     List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
                     for (CfAttributcontent attributcontent : attributcontentlist) {
                         CfAttribut attribut = attributcontent.getAttributref();
-                        setAttributValue(attributcontent, ucp.getAttributmap().get(attribut.getName()));
-                        cfattributcontentService.edit(attributcontent);
-                        if (ucp.isIndexing()) {
-                            indexContent();
+                        // Check, if attribut exists in attributmap
+                        if (ucp.getAttributmap().containsKey(attribut.getName())) {
+                            setAttributValue(attributcontent, ucp.getAttributmap().get(attribut.getName()));
+                            cfattributcontentService.edit(attributcontent);
+                            if (ucp.isIndexing()) {
+                                indexContent();
+                            }
+                            ucp.setReturncode("OK");
                         }
-                        ucp.setReturncode("OK");
                     }                    
                 } catch (javax.persistence.NoResultException ex) {
                     ucp.setReturncode("Classcontent not found");
