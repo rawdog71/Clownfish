@@ -269,7 +269,14 @@ public class ContentList implements Serializable {
             attributlist.stream().forEach((attribut) -> {
                 if (attribut.getAutoincrementor() == true) {
                     List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
-                    long max = 0;
+                    long max = 0;    
+                    int last = classcontentlist2.size();
+                    CfClasscontent classcontent = classcontentlist2.get(last - 2);
+                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
+                    if (attributcontent.getContentInteger().longValue() > max) {
+                        max = attributcontent.getContentInteger().longValue();
+                    }
+                    /*
                     for (CfClasscontent classcontent : classcontentlist2) {
                         try {
                             CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);
@@ -280,6 +287,7 @@ public class ContentList implements Serializable {
                             logger.error(ex.getMessage());
                         }    
                     }
+                    */
                     CfAttributcontent newcontent = new CfAttributcontent();
                     newcontent.setAttributref(attribut);
                     newcontent.setClasscontentref(newclasscontent);
