@@ -49,6 +49,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -73,6 +75,7 @@ public class SiteUtil {
     @Autowired CfKeywordlistService cfkeywordlistService;
     @Autowired CfKeywordlistcontentService cfkeywordlistcontentService;
     @Autowired ClassUtil classutil;
+    final transient Logger logger = LoggerFactory.getLogger(SiteUtil.class);
     
     public SiteUtil() {
     }
@@ -108,7 +111,7 @@ public class SiteUtil {
                 attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
                 sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
             } else {
-                System.out.println("CLASSCONTENT NOT FOUND!" + sitecontent.getCfSitecontentPK().getClasscontentref());
+                logger.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + sitecontent.getCfSitecontentPK().getClasscontentref());
             }
         }
         return sitecontentmapdummy;
@@ -129,7 +132,7 @@ public class SiteUtil {
                 if (null != asset) {
                     dummyassetlist.add(asset);
                 } else {
-                    System.out.println("ASSET NOT FOUND!" + assetcontent.getCfAssetlistcontentPK().getAssetref());
+                    logger.warn("ASSET NOT FOUND (deleted or on scrapyard): " + assetcontent.getCfAssetlistcontentPK().getAssetref());
                 }
             }
             assetlibraryMap.put(cfassetlist.getName(), dummyassetlist);

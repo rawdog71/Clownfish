@@ -27,10 +27,17 @@ import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,15 +72,38 @@ public class ReefBean implements Serializable {
     }
     
     public void onExport() {
-        reef.getAttributlist().clear();
-        for (CfClass clazz : reef.getClasslist()) {
-            List<CfAttribut> attributliste = cfattributService.findByClassref(clazz);
-            for (CfAttribut attribut : attributliste) {
-                reef.getAttributlist().add(attribut);
+        try {
+            reef.getAttributlist().clear();
+            for (CfClass clazz : reef.getClasslist()) {
+                List<CfAttribut> attributliste = cfattributService.findByClassref(clazz);
+                for (CfAttribut attribut : attributliste) {
+                    reef.getAttributlist().add(attribut);
+                }
             }
+            Gson gson = new Gson();
+            String json = gson.toJson(reef);
+            System.out.println(json);
+            System.out.println("Export Reef");
+            OutputStream out = null;
+            String filename = reef.getName() + ".json";
+            FacesContext fc = FacesContext.getCurrentInstance();
+            HttpServletResponse response = (HttpServletResponse) fc.getExternalContext().getResponse();
+            out = response.getOutputStream();
+            response.setContentType("application/json");
+            response.addHeader("Content-Disposition", "attachment; filename=\""+filename+"\"");
+            out.write(json.getBytes(Charset.forName("UTF-8")));
+            out.flush();
+            try {
+                if (null != out) {
+                    out.close();
+                }
+                FacesContext.getCurrentInstance().responseComplete();
+            } catch (IOException ex) {
+                
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Gson gson = new Gson(); 
-        String json = gson.toJson(reef);
-        System.out.println("Export Reef");
+        
     }
 }
