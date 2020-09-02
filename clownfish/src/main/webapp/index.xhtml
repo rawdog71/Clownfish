@@ -1416,6 +1416,13 @@
                 
                 <p:tab title="Reef" id="reef" rendered="#{loginBean.login}">
                     
+                    <h:form enctype="multipart/form-data">
+                        <p:fileUpload fileUploadListener="#{reefbean.handleFileUpload}" mode="advanced" dragDropSupport="true" 
+                                              update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(json)$/i" >
+                        </p:fileUpload>
+                        <p:growl id="messages" showDetail="true" />
+                    </h:form>
+                    
                     <p:panelGrid id="reef_content">
                         <p:row>
                             <p:column>

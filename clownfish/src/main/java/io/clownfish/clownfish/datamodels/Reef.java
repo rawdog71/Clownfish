@@ -20,15 +20,10 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfTemplate;
-import io.clownfish.clownfish.serviceinterface.CfClassService;
-import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
-import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
-import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,6 +38,7 @@ public class Reef {
     private @Getter @Setter List<CfTemplate> templatelist;
     private @Getter @Setter List<CfStylesheet> stylesheetlist;
     private @Getter @Setter List<CfJavascript> javascriptlist;
+    private @Getter @Setter String checksum;
     
     public Reef() {
         attributlist = new ArrayList<>();

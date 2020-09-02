@@ -27,19 +27,26 @@ import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.event.FileUploadEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -63,6 +70,8 @@ public class ReefBean implements Serializable {
     @Autowired transient CfJavascriptService cfjavascriptService;
     @Autowired transient CfAttributService cfattributService;
     
+    final transient Logger logger = LoggerFactory.getLogger(ReefBean.class);
+    
     @PostConstruct
     public void init() {
         classlist = cfclassService.findAll();
@@ -80,6 +89,8 @@ public class ReefBean implements Serializable {
                     reef.getAttributlist().add(attribut);
                 }
             }
+            long checksum = getCRC32Checksum(reefcheck(reef).getBytes());
+            reef.setChecksum(String.valueOf(checksum));
             Gson gson = new Gson();
             String json = gson.toJson(reef);
             System.out.println(json);
@@ -102,8 +113,59 @@ public class ReefBean implements Serializable {
                 
             }
         } catch (IOException ex) {
-            Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage());
         }
         
+    }
+    
+    public void handleFileUpload(FileUploadEvent event) throws IOException {
+        String filename = event.getFile().getFileName().toLowerCase();
+        logger.info("FILE: " + filename);
+        InputStream inputStream;
+        inputStream = event.getFile().getInputstream();
+        StringBuilder json = new StringBuilder();
+        try (Reader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
+            int c = 0;
+            while ((c = reader.read()) != -1) {
+                json.append((char) c);
+            }
+        }
+        logger.info("UPLOAD: " + json);
+        Gson gson = new Gson();
+        Reef newreef = gson.fromJson(json.toString(), Reef.class);
+        long checksum = getCRC32Checksum(reefcheck(newreef).getBytes());
+        if (0 == newreef.getChecksum().compareToIgnoreCase(String.valueOf(checksum))) {
+            logger.info("CHECKSUM OK");
+        } else {
+            logger.info("CHECKSUM NOT OK");
+        }
+        logger.info(reef.getName());
+    }
+    
+    private String reefcheck(Reef chkreef) {
+        String reefchk = "";
+        reefchk += chkreef.getName();
+        for (CfClass cfclass : chkreef.getClasslist()) {
+            reefchk += cfclass.getName();
+        }
+        for (CfAttribut cfattribut : chkreef.getAttributlist()) {
+            reefchk += cfattribut.getName()+cfattribut.getAttributetype().getName();
+        }
+        for (CfTemplate cftemplate : chkreef.getTemplatelist()) {
+            reefchk += cftemplate.getName()+cftemplate.getContent()+cftemplate.getScriptLanguageTxt();
+        }
+        for (CfJavascript cfjavascript : chkreef.getJavascriptlist()) {
+            reefchk += cfjavascript.getName()+cfjavascript.getContent();
+        }
+        for (CfStylesheet cfstylesheet : chkreef.getStylesheetlist()) {
+            reefchk += cfstylesheet.getName()+cfstylesheet.getContent();
+        }
+        return reefchk;
+    }
+    
+    private static long getCRC32Checksum(byte[] bytes) {
+        Checksum crc32 = new CRC32();
+        crc32.update(bytes, 0, bytes.length);
+        return crc32.getValue();
     }
 }
