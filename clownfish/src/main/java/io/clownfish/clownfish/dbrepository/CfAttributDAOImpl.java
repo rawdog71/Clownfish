@@ -87,5 +87,4 @@ public class CfAttributDAOImpl implements CfAttributDAO {
         CfAttribut cfattribut = (CfAttribut) query.getSingleResult();
         return cfattribut;
     }
-    
 }

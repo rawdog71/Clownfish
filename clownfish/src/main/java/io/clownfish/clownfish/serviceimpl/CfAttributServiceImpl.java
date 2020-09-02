@@ -67,5 +67,5 @@ public class CfAttributServiceImpl implements CfAttributService {
     public CfAttribut findByNameAndClassref(String name, CfClass classref) {
         return this.cfattributDAO.findByNameAndClassref(name, classref);
     }
-    
+
 }

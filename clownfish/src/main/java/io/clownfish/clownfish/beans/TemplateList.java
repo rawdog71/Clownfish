@@ -101,6 +101,10 @@ public class TemplateList {
         access = false;
     }
     
+    public void refresh() {
+        templateListe = cftemplateService.findAll();
+    }
+    
     public void onSelect(AjaxBehaviorEvent event) {
         difference = false;
         if (null != selectedTemplate) {

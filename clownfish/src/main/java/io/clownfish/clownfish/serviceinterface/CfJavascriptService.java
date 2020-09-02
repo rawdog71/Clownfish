@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.serviceinterface;
 
 import io.clownfish.clownfish.dbentities.CfJavascript;
-import java.io.Serializable;
 import java.util.List;
 
 /**

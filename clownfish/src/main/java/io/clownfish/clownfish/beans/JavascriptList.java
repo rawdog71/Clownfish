@@ -99,6 +99,10 @@ public class JavascriptList {
         access = false;
     }
     
+    public void refresh() {
+        javascriptListe = cfjavascriptService.findAll();
+    }
+    
     public void onSelect(AjaxBehaviorEvent event) {
         difference = false;
         if (null != selectedJavascript) {

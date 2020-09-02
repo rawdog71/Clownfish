@@ -41,6 +41,7 @@ import java.util.zip.Checksum;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
+import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
@@ -119,8 +120,8 @@ public class ReefBean implements Serializable {
     }
     
     public void handleFileUpload(FileUploadEvent event) throws IOException {
-        String filename = event.getFile().getFileName().toLowerCase();
-        logger.info("FILE: " + filename);
+        //String filename = event.getFile().getFileName().toLowerCase();
+        //logger.info("FILE: " + filename);
         InputStream inputStream;
         inputStream = event.getFile().getInputstream();
         StringBuilder json = new StringBuilder();
@@ -130,16 +131,17 @@ public class ReefBean implements Serializable {
                 json.append((char) c);
             }
         }
-        logger.info("UPLOAD: " + json);
+        //logger.info("UPLOAD: " + json);
         Gson gson = new Gson();
         Reef newreef = gson.fromJson(json.toString(), Reef.class);
         long checksum = getCRC32Checksum(reefcheck(newreef).getBytes());
         if (0 == newreef.getChecksum().compareToIgnoreCase(String.valueOf(checksum))) {
             logger.info("CHECKSUM OK");
+            importReef(newreef);
         } else {
             logger.info("CHECKSUM NOT OK");
         }
-        logger.info(reef.getName());
+        logger.info(newreef.getName());
     }
     
     private String reefcheck(Reef chkreef) {
@@ -167,5 +169,61 @@ public class ReefBean implements Serializable {
         Checksum crc32 = new CRC32();
         crc32.update(bytes, 0, bytes.length);
         return crc32.getValue();
+    }
+    
+    private void importReef(Reef importreef) {
+        for (CfClass cfclass : importreef.getClasslist()) {
+            try {
+                CfClass checkclass = cfclassService.findByName(cfclass.getName());
+                logger.error("CLASS {} already exists.", cfclass.getName());
+            } catch (NoResultException ex) {
+                //long maxid = cfclassService.findMaxID();
+                long oldid = cfclass.getId();
+                cfclass.setId(null);
+                cfclassService.create(cfclass);
+                reorgAttributs(importreef, oldid, cfclass);
+            }
+        }
+        
+        for (CfTemplate cftemplate : importreef.getTemplatelist()) {
+            try {
+                CfTemplate checktemplate = cftemplateService.findByName(cftemplate.getName());
+                logger.error("TEMPLATE {} already exists.", cftemplate.getName());
+            } catch (NoResultException ex) {
+                //long maxid = cftemplateService.findMaxID();
+                cftemplate.setId(null);
+                cftemplateService.create(cftemplate);
+            }
+        }
+        for (CfJavascript cfjavascript : importreef.getJavascriptlist()) {
+            try {
+                CfJavascript checkjavascript = cfjavascriptService.findByName(cfjavascript.getName());
+                logger.error("JAVASCRIPT {} already exists.", cfjavascript.getName());
+            } catch (NoResultException ex) {
+                //long maxid = cfjavascriptService.findMaxID();
+                cfjavascript.setId(null);
+                cfjavascriptService.create(cfjavascript);
+            }
+        }
+        for (CfStylesheet cfstylesheet : importreef.getStylesheetlist()) {
+            try {
+                CfStylesheet checkstylesheet = cfstylesheetService.findByName(cfstylesheet.getName());
+                logger.error("STYLESHEET {} already exists.", cfstylesheet.getName());
+            } catch (NoResultException ex) {
+                //long maxid = cfstylesheetService.findMaxID();
+                cfstylesheet.setId(null);
+                cfstylesheetService.create(cfstylesheet);
+            }
+        }
+    }
+
+    private void reorgAttributs(Reef importreef, Long oldid, CfClass newclass) {
+        for (CfAttribut cfattribut : importreef.getAttributlist()) {
+            if (cfattribut.getClassref().getId() == oldid) {
+                cfattribut.setClassref(newclass);
+                cfattribut.setId(null);
+                cfattributService.create(cfattribut);
+            }
+        }
     }
 }
