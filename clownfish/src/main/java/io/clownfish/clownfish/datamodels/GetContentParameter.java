@@ -19,6 +19,7 @@ public class GetContentParameter {
     private @Getter @Setter String listname;
     private @Getter @Setter String identifier;
     private @Getter @Setter String searches;
+    private @Getter @Setter String range;
     private @Getter @Setter String keywords;
     private @Getter @Setter String json;
 

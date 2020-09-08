@@ -79,6 +79,7 @@ public class GetContent extends HttpServlet {
     private static transient @Getter @Setter String identifier;
     private static transient @Getter @Setter String datalist;
     private static transient @Getter @Setter String apikey;
+    private static transient @Getter @Setter String range;
     
     final transient Logger logger = LoggerFactory.getLogger(GetContent.class);
     
@@ -93,12 +94,15 @@ public class GetContent extends HttpServlet {
         String inst_klasse;
         String inst_identifier;
         String inst_datalist;
+        String inst_range;
         String inst_apikey = "";
         HashMap<String, String> searchmap;
         ArrayList<String> searchkeywords;
         HashMap<String, String> outputmap;
         ArrayList<ContentOutput> outputlist;
         List<CfListcontent> listcontent = null;
+        int range_start;
+        int range_end;
         
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
@@ -123,6 +127,29 @@ public class GetContent extends HttpServlet {
                 datalist = values[0];
             });
             inst_datalist = datalist;
+            range = "";
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("range") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                range = values[0];
+            });
+            inst_range = range;
+            range_start = 0;
+            range_end = 0;
+            if (!inst_range.isEmpty()) {
+                if (inst_range.contains("-")) {
+                    String[] ranges = inst_range.split("-");
+                    range_start = Integer.parseInt(ranges[0]);
+                    range_end = Integer.parseInt(ranges[1]);
+                    if (range_start > range_end) {
+                        int dummy = range_start;
+                        range_start = range_end;
+                        range_end = dummy;
+                    }
+                } else {
+                    range_start = Integer.parseInt(inst_range);
+                    range_end = range_start;
+                }
+            }
+            
             listcontent = null;
             if (!inst_datalist.isEmpty()) {
                 CfList dataList = cflistService.findByName(inst_datalist);
@@ -153,6 +180,7 @@ public class GetContent extends HttpServlet {
             CfClass cfclass = cfclassService.findByName(inst_klasse);
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
             boolean found = true;
+            int listcounter = 0;
             for (CfClasscontent classcontent : classcontentList) {
                 boolean inList = true;
                 // Check if identifier is set and matches classcontent
@@ -242,12 +270,25 @@ public class GetContent extends HttpServlet {
                     }
 
                     if (found) {
-                        ContentOutput co = new ContentOutput();
-                        co.setIdentifier(classcontent.getName());
-                        co.setKeyvals(getContentOutputKeyval(attributcontentList));
-                        co.setKeywords(getContentOutputKeywords(classcontent, false));
-                        if (!inlist(outputlist, co)) {
-                            outputlist.add(co);
+                        listcounter++;
+                        if (range_start > 0){
+                            if ((listcounter >= range_start) && (listcounter <= range_end)) {
+                                ContentOutput co = new ContentOutput();
+                                co.setIdentifier(classcontent.getName());
+                                co.setKeyvals(getContentOutputKeyval(attributcontentList));
+                                co.setKeywords(getContentOutputKeywords(classcontent, false));
+                                //if (!inlist(outputlist, co)) {
+                                    outputlist.add(co);
+                                //}
+                            }
+                        } else {
+                            ContentOutput co = new ContentOutput();
+                            co.setIdentifier(classcontent.getName());
+                            co.setKeyvals(getContentOutputKeyval(attributcontentList));
+                            co.setKeywords(getContentOutputKeywords(classcontent, false));
+                            //if (!inlist(outputlist, co)) {
+                                outputlist.add(co);
+                            //}
                         }
                     }
                 }
@@ -290,6 +331,23 @@ public class GetContent extends HttpServlet {
         HashMap<String, String> outputmap;
         ArrayList<ContentOutput> outputlist;
         List<CfListcontent> listcontent = null;
+        int range_start = 0;
+        int range_end = 0;
+        if (!gcp.getRange().isEmpty()) {
+            if (gcp.getRange().contains("-")) {
+                String[] ranges = gcp.getRange().split("-");
+                range_start = Integer.parseInt(ranges[0]);
+                range_end = Integer.parseInt(ranges[1]);
+                if (range_start > range_end) {
+                    int dummy = range_start;
+                    range_start = range_end;
+                    range_end = dummy;
+                }
+            } else {
+                range_start = Integer.parseInt(gcp.getRange());
+                range_end = range_start;
+            }
+        }
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
         apikey = gcp.getApikey();
@@ -332,6 +390,7 @@ public class GetContent extends HttpServlet {
             CfClass cfclass = cfclassService.findByName(klasse);
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
             boolean found = true;
+            int listcounter = 0;
             for (CfClasscontent classcontent : classcontentList) {
                 boolean inList = true;
                 // Check if identifier is set and matches classcontent
@@ -421,18 +480,33 @@ public class GetContent extends HttpServlet {
                     }
 
                     if (found) {
-                        ContentOutput co = new ContentOutput();
-                        co.setIdentifier(classcontent.getName());
-                        co.setKeyvals(getContentOutputKeyval(attributcontentList));
-                        co.setKeywords(getContentOutputKeywords(classcontent, false));
-                        outputlist.add(co);
+                        listcounter++;
+                        if (range_start > 0){
+                            if ((listcounter >= range_start) && (listcounter <= range_end)) {
+                                ContentOutput co = new ContentOutput();
+                                co.setIdentifier(classcontent.getName());
+                                co.setKeyvals(getContentOutputKeyval(attributcontentList));
+                                co.setKeywords(getContentOutputKeywords(classcontent, false));
+                                //if (!inlist(outputlist, co)) {
+                                    outputlist.add(co);
+                                //}
+                            }
+                        } else {
+                            ContentOutput co = new ContentOutput();
+                            co.setIdentifier(classcontent.getName());
+                            co.setKeyvals(getContentOutputKeyval(attributcontentList));
+                            co.setKeywords(getContentOutputKeywords(classcontent, false));
+                            //if (!inlist(outputlist, co)) {
+                                outputlist.add(co);
+                            //}
+                        }
                     }
                 }
             }
             if (!found) {
                 outputmap.put("contentfound", "false");
             }
-            Gson gson = new Gson(); 
+            Gson gson = new Gson();
             String json = gson.toJson(outputlist);
             gcp.setJson(json);
             gcp.setReturncode("TRUE");
@@ -605,6 +679,7 @@ public class GetContent extends HttpServlet {
         return keywords;
     }
 
+    /*
     private boolean inlist(ArrayList<ContentOutput> outputlist, ContentOutput co) {
         boolean found = false;
         for (ContentOutput content : outputlist) {
@@ -614,4 +689,5 @@ public class GetContent extends HttpServlet {
         }
         return found;
     }
+    */
 }
