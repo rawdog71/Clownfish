@@ -18,6 +18,7 @@ package io.clownfish.clownfish.servlets;
 import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.AttributDef;
 import io.clownfish.clownfish.datamodels.ContentOutput;
+import io.clownfish.clownfish.datamodels.DatalistOutput;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
@@ -99,6 +100,7 @@ public class GetDatalist extends HttpServlet {
      * @param response servlet response
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
+        DatalistOutput datalistoutput = new DatalistOutput();
         ArrayList<ContentOutput> outputlist = new ArrayList<>();
         String inst_apikey = "";
         String inst_name = "";
@@ -120,7 +122,11 @@ public class GetDatalist extends HttpServlet {
             List<CfClasscontent> classcontentList = new ArrayList<>();
             for (CfListcontent listcontent : listcontentList) {
                 CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                classcontentList.add(classcontent);
+                if (null != classcontent) {
+                    classcontentList.add(classcontent);
+                } else {
+                    logger.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
+                }
             }
             
             for (CfClasscontent classcontent : classcontentList) {    
@@ -132,8 +138,10 @@ public class GetDatalist extends HttpServlet {
                 outputlist.add(co);
             }
 
+            datalistoutput.setCflist(cflist);
+            datalistoutput.setOutputlist(outputlist);
             Gson gson = new Gson(); 
-            String json = gson.toJson(outputlist);
+            String json = gson.toJson(datalistoutput);
             response.setContentType("application/json;charset=UTF-8");
             try (PrintWriter out = response.getWriter()) {
                 out.print(json);

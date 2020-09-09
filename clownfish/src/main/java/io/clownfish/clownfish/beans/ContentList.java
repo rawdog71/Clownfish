@@ -313,7 +313,7 @@ public class ContentList implements Serializable {
      * @param actionEvent
      */
     public void onScrappContent(ActionEvent actionEvent) {
-        if (selectedContent != null) {
+        if (selectedContent != null) {            
             selectedContent.setScrapped(true);
             cfclasscontentService.edit(selectedContent);
             classcontentlist = cfclasscontentService.findAll();

@@ -43,6 +43,6 @@ public class AttributContentList {
     
     @PostConstruct
     public void init() {
-        attributcontentlist = cfattributcontentService.findAll();
+        //attributcontentlist = cfattributcontentService.findAll();
     }
 }

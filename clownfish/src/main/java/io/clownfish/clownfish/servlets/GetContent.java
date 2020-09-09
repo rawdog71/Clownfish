@@ -83,6 +83,16 @@ public class GetContent extends HttpServlet {
     
     final transient Logger logger = LoggerFactory.getLogger(GetContent.class);
     
+    private class SearchValues {
+        private @Getter @Setter String comparartor;
+        private @Getter @Setter String searchvalue;
+        
+        SearchValues(String comparator, String searchvalue) {
+            this.comparartor = comparator;
+            this.searchvalue = searchvalue;
+        }
+    }
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -181,6 +191,7 @@ public class GetContent extends HttpServlet {
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
             boolean found = true;
             int listcounter = 0;
+            logger.info("StartOfSearch: " + request.getParameterMap());
             for (CfClasscontent classcontent : classcontentList) {
                 boolean inList = true;
                 // Check if identifier is set and matches classcontent
@@ -204,26 +215,11 @@ public class GetContent extends HttpServlet {
                     for (CfAttributcontent attributcontent : attributcontentList) {
                         CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
                         for (String searchcontent : searchmap.keySet()) {
-                            String searchvalue = searchmap.get(searchcontent);
-                            String comparator = "eq";
-                            if (searchvalue.startsWith(":co:")) {
-                                comparator = "co";
-                                searchvalue = searchvalue.substring(4);
-                            }
-                            if (searchvalue.startsWith(":eq:")) {
-                                comparator = "eq";
-                                searchvalue = searchvalue.substring(4);
-                            }
-                            if (searchvalue.startsWith(":ew:")) {
-                                comparator = "ew";
-                                searchvalue = searchvalue.substring(4);
-                            }
-                            if (searchvalue.startsWith(":sw:")) {
-                                comparator = "sw";
-                                searchvalue = searchvalue.substring(4);
-                            }
-                            searchvalue = searchvalue.toLowerCase();
                             if (knattribut.getName().compareToIgnoreCase(searchcontent) == 0) {
+                                String searchvalue = searchmap.get(searchcontent);
+                                SearchValues sv = getSearchValues(searchvalue);
+                                searchvalue = sv.getSearchvalue().toLowerCase();
+                                
                                 long attributtypeid = knattribut.getAttributetype().getId();
                                 AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
                                 if (null != attributdef) {
@@ -236,16 +232,16 @@ public class GetContent extends HttpServlet {
                                     if (attributdef.getValue() == null) {
                                         found = false;
                                     } else {
-                                        if ((comparator.compareToIgnoreCase("co") == 0) && (!attributdef.getValue().toLowerCase().contains(searchvalue))) {
+                                        if ((sv.getComparartor().compareToIgnoreCase("co") == 0) && (!attributdef.getValue().toLowerCase().contains(searchvalue))) {
                                             found = false;
                                         }
-                                        if ((comparator.compareToIgnoreCase("sw") == 0) && (!attributdef.getValue().toLowerCase().startsWith(searchvalue))) {
+                                        if ((sv.getComparartor().compareToIgnoreCase("sw") == 0) && (!attributdef.getValue().toLowerCase().startsWith(searchvalue))) {
                                             found = false;
                                         }
-                                        if ((comparator.compareToIgnoreCase("eq") == 0) && (attributdef.getValue().toLowerCase().compareToIgnoreCase(searchvalue) != 0)) {
+                                        if ((sv.getComparartor().compareToIgnoreCase("eq") == 0) && (attributdef.getValue().toLowerCase().compareToIgnoreCase(searchvalue) != 0)) {
                                             found = false;
                                         }
-                                        if ((comparator.compareToIgnoreCase("ew") == 0) && (!attributdef.getValue().toLowerCase().endsWith(searchvalue))) {
+                                        if ((sv.getComparartor().compareToIgnoreCase("ew") == 0) && (!attributdef.getValue().toLowerCase().endsWith(searchvalue))) {
                                             found = false;
                                         }
                                     }
@@ -297,6 +293,7 @@ public class GetContent extends HttpServlet {
                 outputmap.put("contentfound", "false");
             }
             Gson gson = new Gson(); 
+            logger.info("EndOfSearch " + request.getParameterMap());
             String json = gson.toJson(outputlist);
             response.setContentType("application/json;charset=UTF-8");
             try (PrintWriter out = response.getWriter()) {
@@ -414,26 +411,11 @@ public class GetContent extends HttpServlet {
                     for (CfAttributcontent attributcontent : attributcontentList) {
                         CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
                         for (String searchcontent : searchmap.keySet()) {
-                            String searchvalue = searchmap.get(searchcontent);
-                            String comparator = "eq";
-                            if (searchvalue.startsWith(":co:")) {
-                                comparator = "co";
-                                searchvalue = searchvalue.substring(4);
-                            }
-                            if (searchvalue.startsWith(":eq:")) {
-                                comparator = "eq";
-                                searchvalue = searchvalue.substring(4);
-                            }
-                            if (searchvalue.startsWith(":ew:")) {
-                                comparator = "ew";
-                                searchvalue = searchvalue.substring(4);
-                            }
-                            if (searchvalue.startsWith(":sw:")) {
-                                comparator = "sw";
-                                searchvalue = searchvalue.substring(4);
-                            }
-                            searchvalue = searchvalue.toLowerCase();
                             if (knattribut.getName().compareToIgnoreCase(searchcontent) == 0) {
+                                String searchvalue = searchmap.get(searchcontent);
+                                SearchValues sv = getSearchValues(searchvalue);
+                                searchvalue = sv.getSearchvalue().toLowerCase(); 
+                                
                                 long attributtypeid = knattribut.getAttributetype().getId();
                                 AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
                                 if (null != attributdef) {
@@ -446,16 +428,16 @@ public class GetContent extends HttpServlet {
                                     if (attributdef.getValue() == null) {
                                         found = false;
                                     } else {
-                                        if ((comparator.compareToIgnoreCase("co") == 0) && (!attributdef.getValue().toLowerCase().contains(searchvalue))) {
+                                        if ((sv.getComparartor().compareToIgnoreCase("co") == 0) && (!attributdef.getValue().toLowerCase().contains(searchvalue))) {
                                             found = false;
                                         }
-                                        if ((comparator.compareToIgnoreCase("sw") == 0) && (!attributdef.getValue().toLowerCase().startsWith(searchvalue))) {
+                                        if ((sv.getComparartor().compareToIgnoreCase("sw") == 0) && (!attributdef.getValue().toLowerCase().startsWith(searchvalue))) {
                                             found = false;
                                         }
-                                        if ((comparator.compareToIgnoreCase("eq") == 0) && (attributdef.getValue().toLowerCase().compareToIgnoreCase(searchvalue) != 0)) {
+                                        if ((sv.getComparartor().compareToIgnoreCase("eq") == 0) && (attributdef.getValue().toLowerCase().compareToIgnoreCase(searchvalue) != 0)) {
                                             found = false;
                                         }
-                                        if ((comparator.compareToIgnoreCase("ew") == 0) && (!attributdef.getValue().toLowerCase().endsWith(searchvalue))) {
+                                        if ((sv.getComparartor().compareToIgnoreCase("ew") == 0) && (!attributdef.getValue().toLowerCase().endsWith(searchvalue))) {
                                             found = false;
                                         }
                                     }
@@ -677,6 +659,28 @@ public class GetContent extends HttpServlet {
             }
         }
         return keywords;
+    }
+    
+    private SearchValues getSearchValues(String searchvalue) {
+        String comparator = "eq";
+        if (searchvalue.startsWith(":co:")) {
+            comparator = "co";
+            searchvalue = searchvalue.substring(4);
+        }
+        if (searchvalue.startsWith(":eq:")) {
+            comparator = "eq";
+            searchvalue = searchvalue.substring(4);
+        }
+        if (searchvalue.startsWith(":ew:")) {
+            comparator = "ew";
+            searchvalue = searchvalue.substring(4);
+        }
+        if (searchvalue.startsWith(":sw:")) {
+            comparator = "sw";
+            searchvalue = searchvalue.substring(4);
+        }
+        searchvalue = searchvalue.toLowerCase();
+        return new SearchValues(comparator, searchvalue);
     }
 
     /*
