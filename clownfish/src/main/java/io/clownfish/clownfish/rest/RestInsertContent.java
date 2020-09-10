@@ -96,10 +96,14 @@ public class RestInsertContent {
                             List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent2.getClassref());
                             long max = 0;
                             int last = classcontentlist2.size();
-                            CfClasscontent classcontent = classcontentlist2.get(last - 2);
-                            CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
-                            if (attributcontent.getContentInteger().longValue() > max) {
-                                max = attributcontent.getContentInteger().longValue();
+                            if (1 == last) {
+                                max = 0;
+                            } else {
+                                CfClasscontent classcontent = classcontentlist2.get(last - 2);
+                                CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
+                                if (attributcontent.getContentInteger().longValue() > max) {
+                                    max = attributcontent.getContentInteger().longValue();
+                                }
                             }
                             /*
                             for (CfClasscontent classcontent : classcontentlist2) {
