@@ -18,6 +18,7 @@ package io.clownfish.clownfish.servlets;
 import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.ContentOutput;
 import io.clownfish.clownfish.datamodels.DatalistOutput;
+import io.clownfish.clownfish.datamodels.GetContentParameter;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
@@ -33,9 +34,11 @@ import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -87,6 +90,37 @@ public class GetDatalist extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+    }
+    
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        StringBuffer jb = new StringBuffer();
+        String line = null;
+        try {
+            BufferedReader reader = request.getReader();
+            while ((line = reader.readLine()) != null) {
+                jb.append(line);
+            }
+        } catch (Exception e) {
+            /*report an error*/ 
+        }
+
+        Gson gson = new Gson();
+        GetContentParameter gcp = gson.fromJson(jb.toString(), GetContentParameter.class);
+        processRequest(gcp, response);
+        
+        String json = gson.toJson(gcp);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getOutputStream().println(json);
     }
     
     /**
@@ -155,6 +189,79 @@ public class GetDatalist extends HttpServlet {
             } finally {
                 out.close();
             }
+        }    
+    }
+    
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param gcp GetContentParameters
+     * @param response servlet response
+     * @return GetContentParameters
+     */
+    protected GetContentParameter processRequest(GetContentParameter gcp, HttpServletResponse response) {
+        DatalistOutput datalistoutput = new DatalistOutput();
+        ArrayList<ContentOutput> outputlist = new ArrayList<>();
+        //HashMap<String, String> outputmap;
+        String inst_name = "";
+        int range_start = 0;
+        int range_end = 0;
+        if (!gcp.getRange().isEmpty()) {
+            if (gcp.getRange().contains("-")) {
+                String[] ranges = gcp.getRange().split("-");
+                range_start = Integer.parseInt(ranges[0]);
+                range_end = Integer.parseInt(ranges[1]);
+                if (range_start > range_end) {
+                    int dummy = range_start;
+                    range_start = range_end;
+                    range_end = dummy;
+                }
+            } else {
+                range_start = Integer.parseInt(gcp.getRange());
+                range_end = range_start;
+            }
+        }
+        outputlist = new ArrayList<>();
+        //outputmap = new HashMap<>();
+        apikey = gcp.getApikey();
+        if (apikeyutil.checkApiKey(apikey, "GetDatalist")) {
+            name = "";
+            name = gcp.getListname();
+            inst_name = name;
+            CfList cflist = cflistService.findByName(inst_name);
+            List<CfListcontent> listcontentList = cflistcontentService.findByListref(cflist.getId());
+            
+            List<CfClasscontent> classcontentList = new ArrayList<>();
+            for (CfListcontent listcontent : listcontentList) {
+                CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                if (null != classcontent) {
+                    classcontentList.add(classcontent);
+                } else {
+                    logger.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
+                }
+            }
+            
+            for (CfClasscontent classcontent : classcontentList) {    
+                List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
+                ContentOutput co = new ContentOutput();
+                co.setIdentifier(classcontent.getName());
+                co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
+                outputlist.add(co);
+            }
+
+            datalistoutput.setCflist(cflist);
+            datalistoutput.setOutputlist(outputlist);
+            Gson gson = new Gson();
+            String json = gson.toJson(datalistoutput);
+            gcp.setJson(json);
+            gcp.setReturncode("TRUE");
+            return gcp;
+        } else {
+            gcp.setReturncode("FALSE");
+            gcp.setJson("[]");
+            return gcp;
         }    
     }
 }
