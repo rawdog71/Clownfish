@@ -59,6 +59,8 @@ import org.joda.time.format.DateTimeFormatter;
     @NamedQuery(name = "CfAttributcontent.findByContentString", query = "SELECT c FROM CfAttributcontent c WHERE c.contentString = :contentString"),
     @NamedQuery(name = "CfAttributcontent.findByContentDate", query = "SELECT c FROM CfAttributcontent c WHERE c.contentDate = :contentDate"),
     @NamedQuery(name = "CfAttributcontent.findBySalt", query = "SELECT c FROM CfAttributcontent c WHERE c.salt = :salt"),
+    @NamedQuery(name = "CfAttributcontent.findByContentclassRef", query = "SELECT c FROM CfAttributcontent c WHERE c.classcontentlistref = :classcontentlistref"),
+    @NamedQuery(name = "CfAttributcontent.findByContentAssetRef", query = "SELECT c FROM CfAttributcontent c WHERE c.assetcontentlistref = :assetcontentlistref"),
     @NamedQuery(name = "CfAttributcontent.findByAttributrefAndClasscontentref", query = "SELECT c FROM CfAttributcontent c WHERE c.attributref = :attributref AND c.classcontentref = :classcontentref"),
     @NamedQuery(name = "CfAttributcontent.findByIndexed", query = "SELECT c FROM CfAttributcontent c WHERE c.indexed = :indexed")
 })

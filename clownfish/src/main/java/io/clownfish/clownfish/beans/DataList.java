@@ -15,11 +15,13 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfListcontentPK;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
@@ -55,6 +57,7 @@ public class DataList implements Serializable {
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired transient CfClassService cfclassService;
     @Autowired transient CfClasscontentService cfclasscontentService;
+    @Autowired transient CfAttributcontentService cfattributcontentService;
     
     private transient @Getter @Setter List<CfList> datacontentlist = null;
     private @Getter @Setter CfList selectedList = null;
@@ -113,6 +116,14 @@ public class DataList implements Serializable {
     
     public void onDeleteContent(ActionEvent actionEvent) {
         if (selectedList != null) {
+            
+            // Lösche die Verknüpfungen aus den Attributswerten
+            List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByContentclassRef(selectedList);
+            for (CfAttributcontent attributcontent : attributcontentlist) {
+                attributcontent.setClasscontentlistref(null);
+                cfattributcontentService.edit(attributcontent);
+            }
+            
             cflistService.delete(selectedList);
             datacontentlist = cflistService.findAll();
         }

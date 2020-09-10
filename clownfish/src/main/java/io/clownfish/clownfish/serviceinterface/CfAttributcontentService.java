@@ -15,9 +15,11 @@
  */
 package io.clownfish.clownfish.serviceinterface;
 
+import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfList;
 import java.util.List;
 
 /**
@@ -32,4 +34,6 @@ public interface CfAttributcontentService {
     CfAttributcontent create(CfAttributcontent entity);
     boolean delete(CfAttributcontent entity);
     CfAttributcontent edit(CfAttributcontent entity);
+    List<CfAttributcontent> findByContentclassRef(CfList classcontentref);
+    List<CfAttributcontent> findByContentAssetRef(CfAssetlist classcontentref);
 }

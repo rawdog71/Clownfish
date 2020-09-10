@@ -16,9 +16,11 @@
 package io.clownfish.clownfish.dbrepository;
 
 import io.clownfish.clownfish.daointerface.CfAttributcontentDAO;
+import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfList;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -93,6 +95,24 @@ public class CfAttributcontentDAOImpl implements CfAttributcontentDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findByIndexed");
         query.setParameter("indexed", indexed);
+        List<CfAttributcontent> cfattributcontentlist = query.getResultList();
+        return cfattributcontentlist;
+    }
+
+    @Override
+    public List<CfAttributcontent> findByContentclassRef(CfList classcontentref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findByContentclassRef");
+        query.setParameter("classcontentlistref", classcontentref);
+        List<CfAttributcontent> cfattributcontentlist = query.getResultList();
+        return cfattributcontentlist;
+    }
+
+    @Override
+    public List<CfAttributcontent> findByContentAssetRef(CfAssetlist classcontentref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findByContentAssetRef");
+        query.setParameter("assetcontentlistref", classcontentref);
         List<CfAttributcontent> cfattributcontentlist = query.getResultList();
         return cfattributcontentlist;
     }
