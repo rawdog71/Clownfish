@@ -17,11 +17,6 @@ package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.dbentities.CfWebserviceauth;
 import io.clownfish.clownfish.serviceinterface.CfWebserviceauthService;
-import io.clownfish.clownfish.servlets.GetAssetPreview;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
 import javax.faces.bean.ViewScoped;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

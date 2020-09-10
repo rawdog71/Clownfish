@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "CfClasscontent.findAll", query = "SELECT c FROM CfClasscontent c WHERE c.scrapped = 0"),
     @NamedQuery(name = "CfClasscontent.findById", query = "SELECT c FROM CfClasscontent c WHERE c.id = :id"),
-    @NamedQuery(name = "CfClasscontent.findByClassref", query = "SELECT c FROM CfClasscontent c WHERE c.classref = :classref"),
+    @NamedQuery(name = "CfClasscontent.findByClassref", query = "SELECT c FROM CfClasscontent c WHERE c.classref = :classref AND c.scrapped = 0"),
     @NamedQuery(name = "CfClasscontent.findByName", query = "SELECT c FROM CfClasscontent c WHERE c.name = :name"),
     @NamedQuery(name = "CfClasscontent.findByScrapped", query = "SELECT c FROM CfClasscontent c WHERE c.scrapped = :scrapped")
 })

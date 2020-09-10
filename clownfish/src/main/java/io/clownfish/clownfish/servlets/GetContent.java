@@ -19,10 +19,8 @@ import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.AttributDef;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
-import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
-import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
@@ -37,6 +35,7 @@ import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.datamodels.ContentOutput;
 import io.clownfish.clownfish.datamodels.GetContentParameter;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
+import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -73,6 +72,7 @@ public class GetContent extends HttpServlet {
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
+    @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
     
     private static transient @Getter @Setter String klasse;
@@ -221,7 +221,7 @@ public class GetContent extends HttpServlet {
                                 searchvalue = sv.getSearchvalue().toLowerCase();
                                 
                                 long attributtypeid = knattribut.getAttributetype().getId();
-                                AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
+                                AttributDef attributdef = contentUtil.getAttributContent(attributtypeid, attributcontent);
                                 if (null != attributdef) {
                                     if (attributdef.getType().compareToIgnoreCase("hashstring") == 0) {
                                         String salt = attributcontent.getSalt();
@@ -251,7 +251,7 @@ public class GetContent extends HttpServlet {
                     }
                     // Check the keyword filter (at least one keyword must be found (OR))
                     if (searchkeywords.size() > 0) {
-                        ArrayList contentkeywords = getContentOutputKeywords(classcontent, true);
+                        ArrayList contentkeywords = contentUtil.getContentOutputKeywords(classcontent, true);
                         boolean dummyfound = false;
                         for (String keyword : searchkeywords) {
                             if (contentkeywords.contains(keyword.toLowerCase())) {
@@ -271,8 +271,8 @@ public class GetContent extends HttpServlet {
                             if ((listcounter >= range_start) && (listcounter <= range_end)) {
                                 ContentOutput co = new ContentOutput();
                                 co.setIdentifier(classcontent.getName());
-                                co.setKeyvals(getContentOutputKeyval(attributcontentList));
-                                co.setKeywords(getContentOutputKeywords(classcontent, false));
+                                co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                                co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
                                 //if (!inlist(outputlist, co)) {
                                     outputlist.add(co);
                                 //}
@@ -280,8 +280,8 @@ public class GetContent extends HttpServlet {
                         } else {
                             ContentOutput co = new ContentOutput();
                             co.setIdentifier(classcontent.getName());
-                            co.setKeyvals(getContentOutputKeyval(attributcontentList));
-                            co.setKeywords(getContentOutputKeywords(classcontent, false));
+                            co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                            co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
                             //if (!inlist(outputlist, co)) {
                                 outputlist.add(co);
                             //}
@@ -417,7 +417,7 @@ public class GetContent extends HttpServlet {
                                 searchvalue = sv.getSearchvalue().toLowerCase(); 
                                 
                                 long attributtypeid = knattribut.getAttributetype().getId();
-                                AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
+                                AttributDef attributdef = contentUtil.getAttributContent(attributtypeid, attributcontent);
                                 if (null != attributdef) {
                                     if (attributdef.getType().compareToIgnoreCase("hashstring") == 0) {
                                         String salt = attributcontent.getSalt();
@@ -447,7 +447,7 @@ public class GetContent extends HttpServlet {
                     }
                     // Check the keyword filter (at least one keyword must be found (OR))
                     if (searchkeywords.size() > 0) {
-                        ArrayList contentkeywords = getContentOutputKeywords(classcontent, true);
+                        ArrayList contentkeywords = contentUtil.getContentOutputKeywords(classcontent, true);
                         boolean dummyfound = false;
                         for (String keyword : searchkeywords) {
                             if (contentkeywords.contains(keyword.toLowerCase())) {
@@ -467,8 +467,8 @@ public class GetContent extends HttpServlet {
                             if ((listcounter >= range_start) && (listcounter <= range_end)) {
                                 ContentOutput co = new ContentOutput();
                                 co.setIdentifier(classcontent.getName());
-                                co.setKeyvals(getContentOutputKeyval(attributcontentList));
-                                co.setKeywords(getContentOutputKeywords(classcontent, false));
+                                co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                                co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
                                 //if (!inlist(outputlist, co)) {
                                     outputlist.add(co);
                                 //}
@@ -476,8 +476,8 @@ public class GetContent extends HttpServlet {
                         } else {
                             ContentOutput co = new ContentOutput();
                             co.setIdentifier(classcontent.getName());
-                            co.setKeyvals(getContentOutputKeyval(attributcontentList));
-                            co.setKeywords(getContentOutputKeywords(classcontent, false));
+                            co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                            co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
                             //if (!inlist(outputlist, co)) {
                                 outputlist.add(co);
                             //}
@@ -555,111 +555,6 @@ public class GetContent extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
-    
-    private AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent) {
-        CfAttributetype knattributtype = cfattributetypeService.findById(attributtypeid);
-        switch (knattributtype.getName()) {
-            case "boolean":
-                if (null != attributcontent.getContentBoolean()) {
-                    return new AttributDef(attributcontent.getContentBoolean().toString(), "boolean");
-                } else {
-                    return new AttributDef(null, "boolean");
-                }
-            case "string":
-                if (null != attributcontent.getContentString()) {
-                    return new AttributDef(attributcontent.getContentString(), "string");
-                } else {
-                    return new AttributDef(null, "string");
-                }
-            case "hashstring":
-                if (null != attributcontent.getContentString()) {
-                    return new AttributDef(attributcontent.getContentString(), "hashstring");
-                } else {
-                    return new AttributDef(null, "hashstring");
-                }
-            case "integer":
-                if (null != attributcontent.getContentInteger()) {
-                    return new AttributDef(attributcontent.getContentInteger().toString(), "integer");
-                } else {
-                    return new AttributDef(null, "integer");
-                }
-            case "real":
-                if (null != attributcontent.getContentReal()) {
-                    return new AttributDef(attributcontent.getContentReal().toString(), "real");
-                } else {
-                    return new AttributDef(null, "real");
-                }
-            case "htmltext":
-                if (null != attributcontent.getContentText()) {
-                    return new AttributDef(attributcontent.getContentText(), "htmltext");
-                } else {
-                    return new AttributDef(null, "htmltext");
-                }
-            case "markdown":
-                if (null != attributcontent.getContentText()) {
-                    return new AttributDef(attributcontent.getContentText(), "markdown");
-                } else {
-                    return new AttributDef(null, "markdown");
-                }
-            case "datetime":
-                if (null != attributcontent.getContentDate()) {
-                    return new AttributDef(attributcontent.getContentDate().toString(), "datetime");
-                } else {
-                    return new AttributDef(null, "datetime");
-                }
-            case "media":
-                if (null != attributcontent.getContentInteger()) {
-                    return new AttributDef(attributcontent.getContentInteger().toString(), "media");
-                } else {
-                    return new AttributDef(null, "media");
-                }
-            case "text":
-                if (null != attributcontent.getContentText()) {
-                    return new AttributDef(attributcontent.getContentText(), "text");
-                } else {
-                    return new AttributDef(null, "text");
-                }
-            case "classref":
-                if (null != attributcontent.getClasscontentref()) {
-                    return new AttributDef(attributcontent.getClasscontentref().getName(), "classref");
-                } else {
-                    return new AttributDef(null, "classref");
-                }
-            default:
-                return null;
-        }
-    }
-    
-    private ArrayList getContentOutputKeyval(List<CfAttributcontent> attributcontentList) {
-        ArrayList<HashMap> output = new ArrayList<>();
-        HashMap<String, String> dummyoutputmap = new HashMap<>();
-        attributcontentList.stream().forEach((attributcontent) -> {
-            CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
-            long attributtypeid = knattribut.getAttributetype().getId();
-            AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
-            if (attributdef.getType().compareToIgnoreCase("hashstring") != 0) {
-                dummyoutputmap.put(knattribut.getName(), attributdef.getValue());
-            }
-        });
-        output.add(dummyoutputmap);
-        return output;
-    }
-    
-    private ArrayList getContentOutputKeywords(CfClasscontent classcontent, boolean toLower) {
-        ArrayList<String> keywords = new ArrayList<>();
-        List<CfClasscontentkeyword> keywordlist = cfclasscontentkeywordService.findByClassContentRef(classcontent.getId());
-        if (keywordlist.size() > 0) {
-            for (CfClasscontentkeyword cck : keywordlist) {
-                if (toLower) {
-                    keywords.add(cfkeywordService.findById(cck.getCfClasscontentkeywordPK().getKeywordref()).getName().toLowerCase());
-                } else {
-                    keywords.add(cfkeywordService.findById(cck.getCfClasscontentkeywordPK().getKeywordref()).getName());
-                }
-            }
-        }
-        return keywords;
-    }
     
     private SearchValues getSearchValues(String searchvalue) {
         String comparator = "eq";

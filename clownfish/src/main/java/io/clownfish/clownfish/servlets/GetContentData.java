@@ -16,11 +16,8 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
-import io.clownfish.clownfish.datamodels.AttributDef;
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
-import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
-import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
@@ -30,6 +27,7 @@ import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
+import io.clownfish.clownfish.utils.ContentUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -57,6 +55,7 @@ public class GetContentData extends HttpServlet {
     @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
         
     final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
@@ -81,7 +80,7 @@ public class GetContentData extends HttpServlet {
 
                 if (null != content) {
                     List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(content);
-                    ArrayList<HashMap> keyvals = getContentOutputKeyval(attributcontentList);
+                    ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
                     ArrayList<String> keywords = getAssetKeywords(content, true);
                     ContentDataOutput contentdataoutput = new ContentDataOutput();
 
@@ -137,94 +136,5 @@ public class GetContentData extends HttpServlet {
             }
         }
         return keywords;
-    }
-    
-    private AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent) {
-        CfAttributetype knattributtype = cfattributetypeService.findById(attributtypeid);
-        switch (knattributtype.getName()) {
-            case "boolean":
-                if (null != attributcontent.getContentBoolean()) {
-                    return new AttributDef(attributcontent.getContentBoolean().toString(), "boolean");
-                } else {
-                    return new AttributDef(null, "boolean");
-                }
-            case "string":
-                if (null != attributcontent.getContentString()) {
-                    return new AttributDef(attributcontent.getContentString(), "string");
-                } else {
-                    return new AttributDef(null, "string");
-                }
-            case "hashstring":
-                if (null != attributcontent.getContentString()) {
-                    return new AttributDef(attributcontent.getContentString(), "hashstring");
-                } else {
-                    return new AttributDef(null, "hashstring");
-                }
-            case "integer":
-                if (null != attributcontent.getContentInteger()) {
-                    return new AttributDef(attributcontent.getContentInteger().toString(), "integer");
-                } else {
-                    return new AttributDef(null, "integer");
-                }
-            case "real":
-                if (null != attributcontent.getContentReal()) {
-                    return new AttributDef(attributcontent.getContentReal().toString(), "real");
-                } else {
-                    return new AttributDef(null, "real");
-                }
-            case "htmltext":
-                if (null != attributcontent.getContentText()) {
-                    return new AttributDef(attributcontent.getContentText(), "htmltext");
-                } else {
-                    return new AttributDef(null, "htmltext");
-                }
-            case "markdown":
-                if (null != attributcontent.getContentText()) {
-                    return new AttributDef(attributcontent.getContentText(), "markdown");
-                } else {
-                    return new AttributDef(null, "markdown");
-                }
-            case "datetime":
-                if (null != attributcontent.getContentDate()) {
-                    return new AttributDef(attributcontent.getContentDate().toString(), "datetime");
-                } else {
-                    return new AttributDef(null, "datetime");
-                }
-            case "media":
-                if (null != attributcontent.getContentInteger()) {
-                    return new AttributDef(attributcontent.getContentInteger().toString(), "media");
-                } else {
-                    return new AttributDef(null, "media");
-                }
-            case "text":
-                if (null != attributcontent.getContentText()) {
-                    return new AttributDef(attributcontent.getContentText().toString(), "text");
-                } else {
-                    return new AttributDef(null, "text");
-                }
-            case "classref":
-                if (null != attributcontent.getClasscontentref()) {
-                    return new AttributDef(attributcontent.getClasscontentref().getName(), "classref");
-                } else {
-                    return new AttributDef(null, "classref");
-                }
-            default:
-                return null;
-        }
-    }
-    
-    private ArrayList getContentOutputKeyval(List<CfAttributcontent> attributcontentList) {
-        ArrayList<HashMap> output = new ArrayList<>();
-        HashMap<String, String> dummyoutputmap = new HashMap<>();
-        attributcontentList.stream().forEach((attributcontent) -> {
-            CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
-            long attributtypeid = knattribut.getAttributetype().getId();
-            AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
-            if (attributdef.getType().compareToIgnoreCase("hashstring") != 0) {
-                dummyoutputmap.put(knattribut.getName(), attributdef.getValue());
-            }
-        });
-        output.add(dummyoutputmap);
-        return output;
     }
 }
