@@ -132,14 +132,14 @@ public class InsertContent extends HttpServlet {
                             if (attribut.getAutoincrementor() == true) {
                                 List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent2.getClassref());
                                 long max = 0;
-                                for (CfClasscontent classcontent : classcontentlist2) {
-                                    try {
-                                        CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);
-                                        if (attributcontent.getContentInteger().longValue() > max) {
-                                            max = attributcontent.getContentInteger().longValue();
-                                        }
-                                    } catch (javax.persistence.NoResultException ex2) {
-                                        logger.error(ex2.getMessage());
+                                int last = classcontentlist2.size();
+                                if (1 == last) {
+                                    max = 0;
+                                } else {
+                                    CfClasscontent classcontent = classcontentlist2.get(last - 2);
+                                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
+                                    if (attributcontent.getContentInteger().longValue() > max) {
+                                        max = attributcontent.getContentInteger().longValue();
                                     }
                                 }
                                 CfAttributcontent newcontent = new CfAttributcontent();

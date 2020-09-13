@@ -16,8 +16,7 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
-import io.clownfish.clownfish.datamodels.AttributDef;
-import io.clownfish.clownfish.dbentities.CfAttribut;
+import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
@@ -32,11 +31,10 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
-import io.clownfish.clownfish.datamodels.ContentOutput;
 import io.clownfish.clownfish.datamodels.GetContentParameter;
+import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
-import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -72,6 +70,7 @@ public class GetContent extends HttpServlet {
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
+    @Autowired transient CfClasscontentKeywordService cfcontentkeywordService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
     
@@ -109,7 +108,7 @@ public class GetContent extends HttpServlet {
         HashMap<String, String> searchmap;
         ArrayList<String> searchkeywords;
         HashMap<String, String> outputmap;
-        ArrayList<ContentOutput> outputlist;
+        ArrayList<ContentDataOutput> outputlist;
         List<CfListcontent> listcontent = null;
         int range_start;
         int range_end;
@@ -189,7 +188,7 @@ public class GetContent extends HttpServlet {
             });
             CfClass cfclass = cfclassService.findByName(inst_klasse);
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
-            boolean found = true;
+            boolean found = false;
             int listcounter = 0;
             logger.info("StartOfSearch: " + request.getParameterMap());
             for (CfClasscontent classcontent : classcontentList) {
@@ -211,80 +210,49 @@ public class GetContent extends HttpServlet {
                 }
                 if (inList) {
                     List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
-                    found = true;
-                    for (CfAttributcontent attributcontent : attributcontentList) {
-                        CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
-                        for (String searchcontent : searchmap.keySet()) {
-                            if (knattribut.getName().compareToIgnoreCase(searchcontent) == 0) {
-                                String searchvalue = searchmap.get(searchcontent);
-                                SearchValues sv = getSearchValues(searchvalue);
-                                searchvalue = sv.getSearchvalue().toLowerCase();
-                                
-                                long attributtypeid = knattribut.getAttributetype().getId();
-                                AttributDef attributdef = contentUtil.getAttributContent(attributtypeid, attributcontent);
-                                if (null != attributdef) {
-                                    if (attributdef.getType().compareToIgnoreCase("hashstring") == 0) {
-                                        String salt = attributcontent.getSalt();
-                                        if (salt != null) {
-                                            searchvalue = PasswordUtil.generateSecurePassword(searchvalue, salt);
-                                        }
-                                    }
-                                    if (attributdef.getValue() == null) {
-                                        found = false;
-                                    } else {
-                                        if ((sv.getComparartor().compareToIgnoreCase("co") == 0) && (!attributdef.getValue().toLowerCase().contains(searchvalue))) {
-                                            found = false;
-                                        }
-                                        if ((sv.getComparartor().compareToIgnoreCase("sw") == 0) && (!attributdef.getValue().toLowerCase().startsWith(searchvalue))) {
-                                            found = false;
-                                        }
-                                        if ((sv.getComparartor().compareToIgnoreCase("eq") == 0) && (attributdef.getValue().toLowerCase().compareToIgnoreCase(searchvalue) != 0)) {
-                                            found = false;
-                                        }
-                                        if ((sv.getComparartor().compareToIgnoreCase("ew") == 0) && (!attributdef.getValue().toLowerCase().endsWith(searchvalue))) {
-                                            found = false;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
+                    ArrayList<String> keywords = getContentKeywords(classcontent, true);
+                    boolean putToList = true;
+                    for (String searchcontent : searchmap.keySet()) {
+                        String searchvalue = searchmap.get(searchcontent);
+                        SearchValues sv = getSearchValues(searchvalue);
+                        if (!compareAttribut(keyvals, sv, searchcontent)) {
+                            putToList = false;
+                            break;
+                        } 
                     }
                     // Check the keyword filter (at least one keyword must be found (OR))
                     if (searchkeywords.size() > 0) {
-                        ArrayList contentkeywords = contentUtil.getContentOutputKeywords(classcontent, true);
                         boolean dummyfound = false;
                         for (String keyword : searchkeywords) {
-                            if (contentkeywords.contains(keyword.toLowerCase())) {
+                            if (keywords.contains(keyword.toLowerCase())) {
                                 dummyfound = true;
                             }
                         }
                         if (dummyfound) {
-                            found = true;
+                            putToList = true;
                         } else {
-                            found = false;
+                            putToList = false;
                         }
                     }
-
-                    if (found) {
+                    if (putToList) {
+                        found = true;
+                        
                         listcounter++;
                         if (range_start > 0){
                             if ((listcounter >= range_start) && (listcounter <= range_end)) {
-                                ContentOutput co = new ContentOutput();
-                                co.setIdentifier(classcontent.getName());
-                                co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
-                                co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
-                                //if (!inlist(outputlist, co)) {
-                                    outputlist.add(co);
-                                //}
+                                ContentDataOutput contentdataoutput = new ContentDataOutput();
+                                contentdataoutput.setContent(classcontent);
+                                contentdataoutput.setKeywords(keywords);
+                                contentdataoutput.setKeyvals(keyvals);
+                                outputlist.add(contentdataoutput);
                             }
                         } else {
-                            ContentOutput co = new ContentOutput();
-                            co.setIdentifier(classcontent.getName());
-                            co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
-                            co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
-                            //if (!inlist(outputlist, co)) {
-                                outputlist.add(co);
-                            //}
+                            ContentDataOutput contentdataoutput = new ContentDataOutput();
+                            contentdataoutput.setContent(classcontent);
+                            contentdataoutput.setKeywords(keywords);
+                            contentdataoutput.setKeyvals(keyvals);
+                            outputlist.add(contentdataoutput);
                         }
                     }
                 }
@@ -326,7 +294,7 @@ public class GetContent extends HttpServlet {
         HashMap<String, String> searchmap;
         ArrayList<String> searchkeywords;
         HashMap<String, String> outputmap;
-        ArrayList<ContentOutput> outputlist;
+        ArrayList<ContentDataOutput> outputlist;
         List<CfListcontent> listcontent = null;
         int range_start = 0;
         int range_end = 0;
@@ -373,9 +341,9 @@ public class GetContent extends HttpServlet {
                 }
             }
             searchkeywords = new ArrayList<>();
-            String keywords = gcp.getKeywords();
-            if (null != keywords) {
-                String[] keys = keywords.split("\\$");
+            String keywordlist = gcp.getKeywords();
+            if (null != keywordlist) {
+                String[] keys = keywordlist.split("\\$");
                 int counter = 0;
                 for (String key : keys) {
                     if (counter > 0) {
@@ -384,10 +352,12 @@ public class GetContent extends HttpServlet {
                     counter++;
                 }
             }
+            
             CfClass cfclass = cfclassService.findByName(klasse);
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
-            boolean found = true;
+            boolean found = false;
             int listcounter = 0;
+            //logger.info("StartOfSearch: " + request.getParameterMap());
             for (CfClasscontent classcontent : classcontentList) {
                 boolean inList = true;
                 // Check if identifier is set and matches classcontent
@@ -407,80 +377,49 @@ public class GetContent extends HttpServlet {
                 }
                 if (inList) {
                     List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
-                    found = true;
-                    for (CfAttributcontent attributcontent : attributcontentList) {
-                        CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
-                        for (String searchcontent : searchmap.keySet()) {
-                            if (knattribut.getName().compareToIgnoreCase(searchcontent) == 0) {
-                                String searchvalue = searchmap.get(searchcontent);
-                                SearchValues sv = getSearchValues(searchvalue);
-                                searchvalue = sv.getSearchvalue().toLowerCase(); 
-                                
-                                long attributtypeid = knattribut.getAttributetype().getId();
-                                AttributDef attributdef = contentUtil.getAttributContent(attributtypeid, attributcontent);
-                                if (null != attributdef) {
-                                    if (attributdef.getType().compareToIgnoreCase("hashstring") == 0) {
-                                        String salt = attributcontent.getSalt();
-                                        if (salt != null) {
-                                            searchvalue = PasswordUtil.generateSecurePassword(searchvalue, salt);
-                                        }
-                                    }
-                                    if (attributdef.getValue() == null) {
-                                        found = false;
-                                    } else {
-                                        if ((sv.getComparartor().compareToIgnoreCase("co") == 0) && (!attributdef.getValue().toLowerCase().contains(searchvalue))) {
-                                            found = false;
-                                        }
-                                        if ((sv.getComparartor().compareToIgnoreCase("sw") == 0) && (!attributdef.getValue().toLowerCase().startsWith(searchvalue))) {
-                                            found = false;
-                                        }
-                                        if ((sv.getComparartor().compareToIgnoreCase("eq") == 0) && (attributdef.getValue().toLowerCase().compareToIgnoreCase(searchvalue) != 0)) {
-                                            found = false;
-                                        }
-                                        if ((sv.getComparartor().compareToIgnoreCase("ew") == 0) && (!attributdef.getValue().toLowerCase().endsWith(searchvalue))) {
-                                            found = false;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
+                    ArrayList<String> keywords = getContentKeywords(classcontent, true);
+                    boolean putToList = true;
+                    for (String searchcontent : searchmap.keySet()) {
+                        String searchvalue = searchmap.get(searchcontent);
+                        SearchValues sv = getSearchValues(searchvalue);
+                        if (!compareAttribut(keyvals, sv, searchcontent)) {
+                            putToList = false;
+                            break;
+                        } 
                     }
                     // Check the keyword filter (at least one keyword must be found (OR))
                     if (searchkeywords.size() > 0) {
-                        ArrayList contentkeywords = contentUtil.getContentOutputKeywords(classcontent, true);
                         boolean dummyfound = false;
                         for (String keyword : searchkeywords) {
-                            if (contentkeywords.contains(keyword.toLowerCase())) {
+                            if (keywords.contains(keyword.toLowerCase())) {
                                 dummyfound = true;
                             }
                         }
                         if (dummyfound) {
-                            found = true;
+                            putToList = true;
                         } else {
-                            found = false;
+                            putToList = false;
                         }
                     }
-
-                    if (found) {
+                    if (putToList) {
+                        found = true;
+                        
                         listcounter++;
                         if (range_start > 0){
                             if ((listcounter >= range_start) && (listcounter <= range_end)) {
-                                ContentOutput co = new ContentOutput();
-                                co.setIdentifier(classcontent.getName());
-                                co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
-                                co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
-                                //if (!inlist(outputlist, co)) {
-                                    outputlist.add(co);
-                                //}
+                                ContentDataOutput contentdataoutput = new ContentDataOutput();
+                                contentdataoutput.setContent(classcontent);
+                                contentdataoutput.setKeywords(keywords);
+                                contentdataoutput.setKeyvals(keyvals);
+                                outputlist.add(contentdataoutput);
                             }
                         } else {
-                            ContentOutput co = new ContentOutput();
-                            co.setIdentifier(classcontent.getName());
-                            co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
-                            co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
-                            //if (!inlist(outputlist, co)) {
-                                outputlist.add(co);
-                            //}
+                            ContentDataOutput contentdataoutput = new ContentDataOutput();
+                            contentdataoutput.setContent(classcontent);
+                            contentdataoutput.setKeywords(keywords);
+                            contentdataoutput.setKeyvals(keyvals);
+                            outputlist.add(contentdataoutput);
                         }
                     }
                 }
@@ -589,4 +528,48 @@ public class GetContent extends HttpServlet {
         return found;
     }
     */
+    
+    private ArrayList getContentKeywords(CfClasscontent content, boolean toLower) {
+        ArrayList<String> keywords = new ArrayList<>();
+        List<CfClasscontentkeyword> keywordlist = cfcontentkeywordService.findByClassContentRef(content.getId());
+        if (keywordlist.size() > 0) {
+            for (CfClasscontentkeyword ak : keywordlist) {
+                if (toLower) {
+                    keywords.add(cfkeywordService.findById(ak.getCfClasscontentkeywordPK().getKeywordref()).getName().toLowerCase());
+                } else {
+                    keywords.add(cfkeywordService.findById(ak.getCfClasscontentkeywordPK().getKeywordref()).getName());
+                }
+            }
+        }
+        return keywords;
+    }
+    
+    private boolean compareAttribut(ArrayList<HashMap> keyvals, SearchValues sv, String searchcontent) {
+        boolean found = true;
+        String searchvalue = sv.getSearchvalue().toLowerCase();
+        for (HashMap keyval : keyvals) {
+            if (null != keyval.get(searchcontent)) {
+                if ((sv.getComparartor().compareToIgnoreCase("co") == 0) && (!((String)(keyval.get(searchcontent))).toLowerCase().contains(searchvalue))) {
+                    found = false;
+                    break;
+                }
+                if ((sv.getComparartor().compareToIgnoreCase("sw") == 0) && (!((String)(keyval.get(searchcontent))).toLowerCase().startsWith(searchvalue))) {
+                    found = false;
+                    break;
+                }
+                if ((sv.getComparartor().compareToIgnoreCase("eq") == 0) && (((String)(keyval.get(searchcontent))).toLowerCase().compareToIgnoreCase(searchvalue) != 0)) {
+                    found = false;
+                    break;
+                }
+                if ((sv.getComparartor().compareToIgnoreCase("ew") == 0) && (!((String)(keyval.get(searchcontent))).toLowerCase().endsWith(searchvalue))) {
+                    found = false;
+                    break;
+                }
+            } else {
+                found = false;
+                break;
+            }
+        }
+        return found;
+    }
 }
