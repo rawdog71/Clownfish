@@ -17,6 +17,7 @@ package io.clownfish.clownfish;
 
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.ScriptRunner;
+import io.clownfish.clownfish.utils.HttpsUtil;
 import io.milton.config.HttpManagerBuilder;
 import java.io.BufferedReader;
 import java.io.File;
@@ -55,7 +56,11 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 /**
  *
@@ -70,8 +75,15 @@ import org.springframework.cache.annotation.EnableCaching;
 @ServletComponentScan
 @EnableWebMvc
 @EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class})
+@PropertySources({
+    @PropertySource("file:application.properties")
+})
 public class Main extends SpringBootServletInitializer implements ServletContextAware, WebMvcConfigurer {
     final static transient Logger logger = LoggerFactory.getLogger(Main.class);
+    @Value("${server.port.https:9090}")
+    int serverPortHttps;
+    @Value("${server.port:9000}")
+    int serverPortHttp;
     
     public static void main(String[] args) {
         bootstrap();
@@ -112,6 +124,13 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/GetContent").allowedOrigins("http://localhost");
+            }
+            @Override
+            public void addInterceptors(InterceptorRegistry registry) {
+                HttpsUtil httpsUtil = new HttpsUtil();
+                httpsUtil.setServerPortHttp(serverPortHttp);
+                httpsUtil.setServerPortHttps(serverPortHttps);
+                registry.addInterceptor(httpsUtil);
             }
         };
     }
