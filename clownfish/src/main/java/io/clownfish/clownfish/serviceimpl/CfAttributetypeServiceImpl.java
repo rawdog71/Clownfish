@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ public class CfAttributetypeServiceImpl implements CfAttributetypeService {
         this.cfattributetypeDAO = cfattributetypeDAO;
     }
     
+    @Cacheable("attributtype")
     @Override
     public CfAttributetype findById(Long id) {
         return this.cfattributetypeDAO.findById(id);
@@ -57,11 +59,13 @@ public class CfAttributetypeServiceImpl implements CfAttributetypeService {
         return this.cfattributetypeDAO.edit(entity);
     }
 
+    @Cacheable("attributtype")
     @Override
     public List<CfAttributetype> findAll() {
         return this.cfattributetypeDAO.findAll();
     }
 
+    @Cacheable("attributtype")
     @Override
     public CfAttributetype findByName(String name) {
         return this.cfattributetypeDAO.findByName(name);

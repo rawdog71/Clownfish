@@ -21,6 +21,7 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ public class CfAttributServiceImpl implements CfAttributService {
         this.cfattributDAO = cfattributDAO;
     }
     
+    @Cacheable("attribut")
     @Override
     public CfAttribut findById(Long id) {
         return this.cfattributDAO.findById(id);
@@ -58,11 +60,13 @@ public class CfAttributServiceImpl implements CfAttributService {
         return this.cfattributDAO.edit(entity);
     }
 
+    @Cacheable("attribut")
     @Override
     public List<CfAttribut> findByClassref(CfClass classref) {
         return this.cfattributDAO.findByClassref(classref);
     }
 
+    @Cacheable("attribut")
     @Override
     public CfAttribut findByNameAndClassref(String name, CfClass classref) {
         return this.cfattributDAO.findByNameAndClassref(name, classref);

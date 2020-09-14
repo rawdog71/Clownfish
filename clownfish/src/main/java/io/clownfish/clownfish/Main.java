@@ -17,7 +17,6 @@ package io.clownfish.clownfish;
 
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.ScriptRunner;
-import io.clownfish.clownfish.servlets.ClownfishWebdavServlet;
 import io.milton.config.HttpManagerBuilder;
 import java.io.BufferedReader;
 import java.io.File;
@@ -56,6 +55,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.EnableCaching;
 
 /**
  *
@@ -66,6 +66,7 @@ import org.slf4j.LoggerFactory;
 @Configuration
 @ComponentScan("io.clownfish.*")
 @EnableScheduling
+@EnableCaching
 @ServletComponentScan
 @EnableWebMvc
 @EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class})

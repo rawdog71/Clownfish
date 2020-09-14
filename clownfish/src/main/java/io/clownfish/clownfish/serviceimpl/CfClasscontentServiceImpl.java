@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import java.util.List;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,16 +37,19 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
         this.cfclasscontentDAO = cfclasscontentDAO;
     }
 
+    @Cacheable("classcontent")
     @Override
     public List<CfClasscontent> findAll() {
         return this.cfclasscontentDAO.findAll();
     }
 
+    @Cacheable("classcontent")
     @Override
     public CfClasscontent findById(Long id) {
         return this.cfclasscontentDAO.findById(id);
     }
 
+    @Cacheable("classcontent")
     @Override
     public CfClasscontent findByName(String name) {
         return this.cfclasscontentDAO.findByName(name);
@@ -66,11 +70,13 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
         return this.cfclasscontentDAO.edit(entity);
     }
 
+    @Cacheable("classcontent")
     @Override
     public List<CfClasscontent> findByClassref(CfClass classref) {
         return this.cfclasscontentDAO.findByClassref(classref);
     }
 
+    @Cacheable("classcontent")
     @Override
     public List<CfClasscontent> findByScrapped(boolean scrapped) {
         return this.cfclasscontentDAO.findByScrapped(scrapped);

@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfSitelist;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,11 +38,13 @@ public class CfSitelistServiceImpl implements CfSitelistService {
         this.cfsitelistDAO = cfsitelistDAO;
     }
 
+    @Cacheable("sitelist")
     @Override
     public List<CfSitelist> findAll() {
         return this.cfsitelistDAO.findAll();
     }
     
+    @Cacheable("sitelist")
     @Override
     public List<CfSitelist> findBySiteref(Long ref) {
         return this.cfsitelistDAO.findBySiteref(ref);
@@ -62,6 +65,7 @@ public class CfSitelistServiceImpl implements CfSitelistService {
         return this.cfsitelistDAO.edit(entity);
     }
 
+    @Cacheable("sitelist")
     @Override
     public List<CfSitelist> findByListref(Long ref) {
         return this.cfsitelistDAO.findByListref(ref);

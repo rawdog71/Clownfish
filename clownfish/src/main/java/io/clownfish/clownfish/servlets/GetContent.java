@@ -188,9 +188,8 @@ public class GetContent extends HttpServlet {
             });
             CfClass cfclass = cfclassService.findByName(inst_klasse);
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
-            boolean found = false;
+            boolean found = true;
             int listcounter = 0;
-            logger.info("StartOfSearch: " + request.getParameterMap());
             for (CfClasscontent classcontent : classcontentList) {
                 boolean inList = true;
                 // Check if identifier is set and matches classcontent
@@ -209,17 +208,19 @@ public class GetContent extends HttpServlet {
                     inList = foundinlist;
                 }
                 if (inList) {
+                    boolean putToList = true;
                     List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
                     ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
-                    ArrayList<String> keywords = getContentKeywords(classcontent, true);
-                    boolean putToList = true;
-                    for (String searchcontent : searchmap.keySet()) {
-                        String searchvalue = searchmap.get(searchcontent);
-                        SearchValues sv = getSearchValues(searchvalue);
-                        if (!compareAttribut(keyvals, sv, searchcontent)) {
-                            putToList = false;
-                            break;
-                        } 
+                    ArrayList<String> keywords = contentUtil.getContentOutputKeywords(classcontent, true);
+                    if (!searchmap.isEmpty()) {
+                        for (String searchcontent : searchmap.keySet()) {
+                            String searchvalue = searchmap.get(searchcontent);
+                            SearchValues sv = getSearchValues(searchvalue);
+                            if (!compareAttribut(keyvals, sv, searchcontent)) {
+                                putToList = false;
+                                break;
+                            } 
+                        }
                     }
                     // Check the keyword filter (at least one keyword must be found (OR))
                     if (searchkeywords.size() > 0) {
@@ -246,6 +247,7 @@ public class GetContent extends HttpServlet {
                                 contentdataoutput.setKeywords(keywords);
                                 contentdataoutput.setKeyvals(keyvals);
                                 outputlist.add(contentdataoutput);
+                                //System.out.println(inst_klasse + " - " + listcounter);
                             }
                         } else {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
@@ -253,15 +255,16 @@ public class GetContent extends HttpServlet {
                             contentdataoutput.setKeywords(keywords);
                             contentdataoutput.setKeyvals(keyvals);
                             outputlist.add(contentdataoutput);
+                            //System.out.println(inst_klasse + " - " + listcounter);
                         }
                     }
                 }
+
             }
             if (!found) {
                 outputmap.put("contentfound", "false");
             }
             Gson gson = new Gson(); 
-            logger.info("EndOfSearch " + request.getParameterMap());
             String json = gson.toJson(outputlist);
             response.setContentType("application/json;charset=UTF-8");
             try (PrintWriter out = response.getWriter()) {
@@ -357,7 +360,6 @@ public class GetContent extends HttpServlet {
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
             boolean found = false;
             int listcounter = 0;
-            //logger.info("StartOfSearch: " + request.getParameterMap());
             for (CfClasscontent classcontent : classcontentList) {
                 boolean inList = true;
                 // Check if identifier is set and matches classcontent
@@ -376,17 +378,19 @@ public class GetContent extends HttpServlet {
                     inList = foundinlist;
                 }
                 if (inList) {
+                    boolean putToList = true;
                     List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
                     ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
-                    ArrayList<String> keywords = getContentKeywords(classcontent, true);
-                    boolean putToList = true;
-                    for (String searchcontent : searchmap.keySet()) {
-                        String searchvalue = searchmap.get(searchcontent);
-                        SearchValues sv = getSearchValues(searchvalue);
-                        if (!compareAttribut(keyvals, sv, searchcontent)) {
-                            putToList = false;
-                            break;
-                        } 
+                    ArrayList<String> keywords = contentUtil.getContentOutputKeywords(classcontent, true);
+                    if (!searchmap.isEmpty()) {
+                        for (String searchcontent : searchmap.keySet()) {
+                            String searchvalue = searchmap.get(searchcontent);
+                            SearchValues sv = getSearchValues(searchvalue);
+                            if (!compareAttribut(keyvals, sv, searchcontent)) {
+                                putToList = false;
+                                break;
+                            } 
+                        }
                     }
                     // Check the keyword filter (at least one keyword must be found (OR))
                     if (searchkeywords.size() > 0) {
@@ -413,6 +417,7 @@ public class GetContent extends HttpServlet {
                                 contentdataoutput.setKeywords(keywords);
                                 contentdataoutput.setKeyvals(keyvals);
                                 outputlist.add(contentdataoutput);
+                                //System.out.println(inst_klasse + " - " + listcounter);
                             }
                         } else {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
@@ -420,6 +425,7 @@ public class GetContent extends HttpServlet {
                             contentdataoutput.setKeywords(keywords);
                             contentdataoutput.setKeyvals(keyvals);
                             outputlist.add(contentdataoutput);
+                            //System.out.println(inst_klasse + " - " + listcounter);
                         }
                     }
                 }

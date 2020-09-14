@@ -21,6 +21,7 @@ import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,11 +39,13 @@ public class CfListServiceImpl implements CfListService {
         this.cflistDAO = cflistDAO;
     }
 
+    @Cacheable("list")
     @Override
     public List<CfList> findAll() {
         return this.cflistDAO.findAll();
     }
 
+    @Cacheable("list")
     @Override
     public CfList findById(Long id) {
         return this.cflistDAO.findById(id);
@@ -63,11 +66,13 @@ public class CfListServiceImpl implements CfListService {
         return this.cflistDAO.edit(entity);
     }
 
+    @Cacheable("list")
     @Override
     public CfList findByName(String name) {
         return this.cflistDAO.findByName(name);
     }
 
+    @Cacheable("list")
     @Override
     public List<CfList> findByClassref(CfClass ref) {
         return this.cflistDAO.findByClassref(ref);

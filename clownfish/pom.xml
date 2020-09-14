@@ -50,6 +50,11 @@
             <artifactId>spring-boot-starter-jdbc</artifactId>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+            <type>jar</type>
+        </dependency>
 
         <!-- DEPENDENCIES FROM EMBEDDED TOMCAT -->
         <!-- https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core -->
@@ -271,7 +276,7 @@
         </dependency>
         <dependency>
             <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast</artifactId>
+            <artifactId>hazelcast-all</artifactId>
             <version>3.12.4</version>
         </dependency>
         

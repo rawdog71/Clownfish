@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,21 +53,25 @@ public class CfKeywordServiceImpl implements CfKeywordService {
         return this.cfkeywordDAO.edit(entity);
     }    
 
+    @Cacheable("keyword")
     @Override
     public List<CfKeyword> findAll() {
         return this.cfkeywordDAO.findAll();
     }
 
+    @Cacheable("keyword")
     @Override
     public CfKeyword findById(Long id) {
         return this.cfkeywordDAO.findById(id);
     }
 
+    @Cacheable("keyword")
     @Override
     public CfKeyword findByName(String name) {
         return this.cfkeywordDAO.findByName(name);
     }
 
+    @Cacheable("keyword")
     @Override
     public List<CfKeyword> findByNameBeginning(String name) {
         return this.cfkeywordDAO.findByNameBeginning(name);

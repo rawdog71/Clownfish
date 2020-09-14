@@ -15,12 +15,12 @@
  */
 package io.clownfish.clownfish.serviceimpl;
 
-import io.clownfish.clownfish.daointerface.CfKeywordlistDAO;
 import io.clownfish.clownfish.daointerface.CfKeywordlistcontentDAO;
 import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,16 +38,19 @@ public class CfKeywordlistcontentServiceImpl implements CfKeywordlistcontentServ
         this.cfkeywordlistcontentDAO = cfkeywordlistcontentDAO;
     }
 
+    @Cacheable("keywordlistcontent")
     @Override
     public List<CfKeywordlistcontent> findAll() {
         return cfkeywordlistcontentDAO.findAll();
     }
 
+    @Cacheable("keywordlistcontent")
     @Override
     public List<CfKeywordlistcontent> findByKeywordlistref(long keywordlistref) {
         return cfkeywordlistcontentDAO.findByKeywordlistref(keywordlistref);
     }
 
+    @Cacheable("keywordlistcontent")
     @Override
     public List<CfKeywordlistcontent> findByKeywordref(long keywordref) {
         return cfkeywordlistcontentDAO.findByKeywordref(keywordref);
