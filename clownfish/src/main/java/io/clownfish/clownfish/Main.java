@@ -125,6 +125,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/GetContent").allowedOrigins("http://localhost");
             }
+            /*
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
                 HttpsUtil httpsUtil = new HttpsUtil();
@@ -132,6 +133,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
                 httpsUtil.setServerPortHttps(serverPortHttps);
                 registry.addInterceptor(httpsUtil);
             }
+            */
         };
     }
     

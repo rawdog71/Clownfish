@@ -72,10 +72,10 @@ public class CfSitesaprfcDAOImpl implements CfSitesaprfcDAO {
     }
 
     @Override
-    public boolean create(CfSitesaprfc entity) {
+    public CfSitesaprfc create(CfSitesaprfc entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -86,10 +86,10 @@ public class CfSitesaprfcDAOImpl implements CfSitesaprfcDAO {
     }
 
     @Override
-    public boolean edit(CfSitesaprfc entity) {
+    public CfSitesaprfc edit(CfSitesaprfc entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
     
 }

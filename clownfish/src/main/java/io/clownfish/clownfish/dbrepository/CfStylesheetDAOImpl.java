@@ -47,10 +47,10 @@ public class CfStylesheetDAOImpl implements CfStylesheetDAO {
     }
 
     @Override
-    public boolean create(CfStylesheet entity) {
+    public CfStylesheet create(CfStylesheet entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -61,10 +61,10 @@ public class CfStylesheetDAOImpl implements CfStylesheetDAO {
     }
 
     @Override
-    public boolean edit(CfStylesheet entity) {
+    public CfStylesheet edit(CfStylesheet entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

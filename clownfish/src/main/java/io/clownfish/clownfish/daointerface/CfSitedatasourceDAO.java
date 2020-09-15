@@ -26,7 +26,7 @@ public interface CfSitedatasourceDAO {
     List<CfSitedatasource> findAll();
     List<CfSitedatasource> findBySiteref(Long siteref);
     List<CfSitedatasource> findByDatasourceref(Long datasourceref);
-    boolean create(CfSitedatasource entity);
+    CfSitedatasource create(CfSitedatasource entity);
     boolean delete(CfSitedatasource entity);
-    boolean edit(CfSitedatasource entity);
+    CfSitedatasource edit(CfSitedatasource entity);
 }

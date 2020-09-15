@@ -29,7 +29,7 @@ public interface CfSiteDAO {
     CfSite findByAliaspath(String alias);
     CfSite findByTemplateref(Long ref);
     List<CfSite> findByParentref(Long ref);
-    boolean create(CfSite entity);
+    CfSite create(CfSite entity);
     boolean delete(CfSite entity);
-    boolean edit(CfSite entity);
+    CfSite edit(CfSite entity);
 }

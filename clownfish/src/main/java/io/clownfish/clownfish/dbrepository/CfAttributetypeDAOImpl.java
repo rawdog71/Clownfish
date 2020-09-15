@@ -48,10 +48,10 @@ public class CfAttributetypeDAOImpl implements CfAttributetypeDAO {
     }
 
     @Override
-    public boolean create(CfAttributetype entity) {
+    public CfAttributetype create(CfAttributetype entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -62,10 +62,10 @@ public class CfAttributetypeDAOImpl implements CfAttributetypeDAO {
     }
 
     @Override
-    public boolean edit(CfAttributetype entity) {
+    public CfAttributetype edit(CfAttributetype entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

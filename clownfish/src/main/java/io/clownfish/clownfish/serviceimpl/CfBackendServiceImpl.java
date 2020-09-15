@@ -38,7 +38,7 @@ public class CfBackendServiceImpl implements CfBackendService {
     }
     
     @Override
-    public boolean create(CfBackend entity) {
+    public CfBackend create(CfBackend entity) {
         return this.cfbackendDAO.create(entity);
     }
 
@@ -48,7 +48,7 @@ public class CfBackendServiceImpl implements CfBackendService {
     }
 
     @Override
-    public boolean edit(CfBackend entity) {
+    public CfBackend edit(CfBackend entity) {
         return this.cfbackendDAO.edit(entity);
     }    
 

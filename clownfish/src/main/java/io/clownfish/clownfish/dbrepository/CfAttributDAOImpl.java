@@ -49,10 +49,10 @@ public class CfAttributDAOImpl implements CfAttributDAO {
     }
 
     @Override
-    public boolean create(CfAttribut entity) {
+    public CfAttribut create(CfAttribut entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -63,10 +63,10 @@ public class CfAttributDAOImpl implements CfAttributDAO {
     }
 
     @Override
-    public boolean edit(CfAttribut entity) {
+    public CfAttribut edit(CfAttribut entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

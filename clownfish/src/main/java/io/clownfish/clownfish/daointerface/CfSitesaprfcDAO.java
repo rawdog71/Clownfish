@@ -27,7 +27,7 @@ public interface CfSitesaprfcDAO {
     List<CfSitesaprfc> findBySiteref(long siteref);
     List<CfSitesaprfc> findByRfcgroup(String rfcgroup);
     List<CfSitesaprfc> findByRfcfunction(String rfcfunction);
-    boolean create(CfSitesaprfc entity);
+    CfSitesaprfc create(CfSitesaprfc entity);
     boolean delete(CfSitesaprfc entity);
-    boolean edit(CfSitesaprfc entity);
+    CfSitesaprfc edit(CfSitesaprfc entity);
 }

@@ -64,10 +64,10 @@ public class CfKeywordlistcontentDAOImpl implements CfKeywordlistcontentDAO {
     }
     
     @Override
-    public boolean create(CfKeywordlistcontent entity) {
+    public CfKeywordlistcontent create(CfKeywordlistcontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -78,9 +78,9 @@ public class CfKeywordlistcontentDAOImpl implements CfKeywordlistcontentDAO {
     }
 
     @Override
-    public boolean edit(CfKeywordlistcontent entity) {
+    public CfKeywordlistcontent edit(CfKeywordlistcontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 }

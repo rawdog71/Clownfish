@@ -53,7 +53,7 @@ public class CfUserServiceImpl implements CfUserService {
     }
 
     @Override
-    public boolean create(CfUser entity) {
+    public CfUser create(CfUser entity) {
         return this.cfuserDAO.create(entity);
     }
 
@@ -63,7 +63,7 @@ public class CfUserServiceImpl implements CfUserService {
     }
 
     @Override
-    public boolean edit(CfUser entity) {
+    public CfUser edit(CfUser entity) {
         return this.cfuserDAO.edit(entity);
     }
     

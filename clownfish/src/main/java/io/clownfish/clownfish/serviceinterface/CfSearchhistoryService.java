@@ -27,7 +27,7 @@ public interface CfSearchhistoryService {
     CfSearchhistory findById(Long id);
     CfSearchhistory findByExpression(String expression);
     List<CfSearchhistory> findByExpressionBeginning(String expression);
-    boolean create(CfSearchhistory entity);
+    CfSearchhistory create(CfSearchhistory entity);
     boolean delete(CfSearchhistory entity);
-    boolean edit(CfSearchhistory entity);
+    CfSearchhistory edit(CfSearchhistory entity);
 }

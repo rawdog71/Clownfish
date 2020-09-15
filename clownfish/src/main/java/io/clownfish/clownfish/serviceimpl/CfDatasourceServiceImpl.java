@@ -48,7 +48,7 @@ public class CfDatasourceServiceImpl implements CfDatasourceService {
     }
 
     @Override
-    public boolean create(CfDatasource entity) {
+    public CfDatasource create(CfDatasource entity) {
         return this.cfdatasourceDAO.create(entity);
     }
 
@@ -58,7 +58,7 @@ public class CfDatasourceServiceImpl implements CfDatasourceService {
     }
 
     @Override
-    public boolean edit(CfDatasource entity) {
+    public CfDatasource edit(CfDatasource entity) {
         return this.cfdatasourceDAO.edit(entity);
     }
 

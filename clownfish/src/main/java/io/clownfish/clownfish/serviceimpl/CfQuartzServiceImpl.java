@@ -53,7 +53,7 @@ public class CfQuartzServiceImpl implements CfQuartzService {
     }
 
     @Override
-    public boolean create(CfQuartz entity) {
+    public CfQuartz create(CfQuartz entity) {
         return this.cfquartzDAO.create(entity);
     }
 
@@ -63,7 +63,7 @@ public class CfQuartzServiceImpl implements CfQuartzService {
     }
 
     @Override
-    public boolean edit(CfQuartz entity) {
+    public CfQuartz edit(CfQuartz entity) {
         return this.cfquartzDAO.edit(entity);
     }
 }

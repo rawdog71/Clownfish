@@ -27,7 +27,7 @@ public interface CfTemplateversionDAO {
     long findMaxVersion(long ref);
     CfTemplateversion findByPK(long ref, long version);
     List<CfTemplateversion> findAll();
-    boolean create(CfTemplateversion entity);
+    CfTemplateversion create(CfTemplateversion entity);
     boolean delete(CfTemplateversion entity);
-    boolean edit(CfTemplateversion entity);
+    CfTemplateversion edit(CfTemplateversion entity);
 }

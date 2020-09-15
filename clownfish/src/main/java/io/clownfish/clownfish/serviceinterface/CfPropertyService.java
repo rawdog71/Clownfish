@@ -26,7 +26,7 @@ public interface CfPropertyService {
     List<CfProperty> findAll();
     CfProperty findByHashkey(String hashkey);
     CfProperty findByValue(String value);
-    boolean create(CfProperty entity);
+    CfProperty create(CfProperty entity);
     boolean delete(CfProperty entity);
-    boolean edit(CfProperty entity);
+    CfProperty edit(CfProperty entity);
 }

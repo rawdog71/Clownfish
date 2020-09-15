@@ -44,7 +44,7 @@ public class CfStylesheetServiceImpl implements CfStylesheetService, Serializabl
     }
     
     @Override
-    public boolean create(CfStylesheet entity) {
+    public CfStylesheet create(CfStylesheet entity) {
         return this.cfstylesheetDAO.create(entity);
     }
 
@@ -54,7 +54,7 @@ public class CfStylesheetServiceImpl implements CfStylesheetService, Serializabl
     }
 
     @Override
-    public boolean edit(CfStylesheet entity) {
+    public CfStylesheet edit(CfStylesheet entity) {
         return this.cfstylesheetDAO.edit(entity);
     }
 

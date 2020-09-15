@@ -26,7 +26,7 @@ public interface CfQuartzService {
     List<CfQuartz> findAll();
     CfQuartz findById(Long id);
     CfQuartz findByName(String name);
-    boolean create(CfQuartz entity);
+    CfQuartz create(CfQuartz entity);
     boolean delete(CfQuartz entity);
-    boolean edit(CfQuartz entity);
+    CfQuartz edit(CfQuartz entity);
 }

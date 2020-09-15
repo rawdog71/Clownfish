@@ -26,7 +26,7 @@ public interface CfKeywordlistDAO {
     List<CfKeywordlist> findAll();
     CfKeywordlist findById(Long id);
     CfKeywordlist findByName(String name);
-    boolean create(CfKeywordlist entity);
+    CfKeywordlist create(CfKeywordlist entity);
     boolean delete(CfKeywordlist entity);
-    boolean edit(CfKeywordlist entity);
+    CfKeywordlist edit(CfKeywordlist entity);
 }

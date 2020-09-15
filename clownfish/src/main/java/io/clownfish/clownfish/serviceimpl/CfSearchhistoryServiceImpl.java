@@ -39,7 +39,7 @@ public class CfSearchhistoryServiceImpl implements CfSearchhistoryService {
     }
     
     @Override
-    public boolean create(CfSearchhistory entity) {
+    public CfSearchhistory create(CfSearchhistory entity) {
         return this.cfsearchhistoryDAO.create(entity);
     }
 
@@ -49,7 +49,7 @@ public class CfSearchhistoryServiceImpl implements CfSearchhistoryService {
     }
 
     @Override
-    public boolean edit(CfSearchhistory entity) {
+    public CfSearchhistory edit(CfSearchhistory entity) {
         return this.cfsearchhistoryDAO.edit(entity);
     }    
 

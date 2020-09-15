@@ -40,10 +40,10 @@ public class CfAssetKeywordDAOImpl implements CfAssetkeywordDAO {
     
 
     @Override
-    public boolean create(CfAssetkeyword entity) {
+    public CfAssetkeyword create(CfAssetkeyword entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -54,10 +54,10 @@ public class CfAssetKeywordDAOImpl implements CfAssetkeywordDAO {
     }
 
     @Override
-    public boolean edit(CfAssetkeyword entity) {
+    public CfAssetkeyword edit(CfAssetkeyword entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

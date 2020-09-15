@@ -26,7 +26,7 @@ public interface CfBackendService {
     List<CfBackend> findAll();
     CfBackend findById(Long id);
     CfBackend findByName(String name);
-    boolean create(CfBackend entity);
+    CfBackend create(CfBackend entity);
     boolean delete(CfBackend entity);
-    boolean edit(CfBackend entity);
+    CfBackend edit(CfBackend entity);
 }

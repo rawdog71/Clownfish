@@ -26,7 +26,7 @@ public interface CfJavascriptDAO {
     CfJavascript findById(Long id);
     CfJavascript findByName(String name);
     List<CfJavascript> findAll();
-    boolean create(CfJavascript entity);
+    CfJavascript create(CfJavascript entity);
     boolean delete(CfJavascript entity);
-    boolean edit(CfJavascript entity);
+    CfJavascript edit(CfJavascript entity);
 }

@@ -39,7 +39,7 @@ public class CfStylesheetversionServiceImpl implements CfStylesheetversionServic
     }
 
     @Override
-    public boolean create(CfStylesheetversion entity) {
+    public CfStylesheetversion create(CfStylesheetversion entity) {
         return this.cfstylesheetversionDAO.create(entity);
     }
 
@@ -49,7 +49,7 @@ public class CfStylesheetversionServiceImpl implements CfStylesheetversionServic
     }
 
     @Override
-    public boolean edit(CfStylesheetversion entity) {
+    public CfStylesheetversion edit(CfStylesheetversion entity) {
         return this.cfstylesheetversionDAO.edit(entity);
     }
 

@@ -57,10 +57,10 @@ public class CfTemplateversionDAOImpl implements CfTemplateversionDAO {
     }
 
     @Override
-    public boolean create(CfTemplateversion entity) {
+    public CfTemplateversion create(CfTemplateversion entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -71,10 +71,10 @@ public class CfTemplateversionDAOImpl implements CfTemplateversionDAO {
     }
 
     @Override
-    public boolean edit(CfTemplateversion entity) {
+    public CfTemplateversion edit(CfTemplateversion entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

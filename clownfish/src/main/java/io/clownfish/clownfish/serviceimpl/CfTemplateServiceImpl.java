@@ -39,7 +39,7 @@ public class CfTemplateServiceImpl implements CfTemplateService, Serializable {
     }
 
     @Override
-    public boolean create(CfTemplate entity) {
+    public CfTemplate create(CfTemplate entity) {
         return this.cftemplateDAO.create(entity);
     }
 
@@ -49,7 +49,7 @@ public class CfTemplateServiceImpl implements CfTemplateService, Serializable {
     }
 
     @Override
-    public boolean edit(CfTemplate entity) {
+    public CfTemplate edit(CfTemplate entity) {
         return this.cftemplateDAO.edit(entity);
     }
 

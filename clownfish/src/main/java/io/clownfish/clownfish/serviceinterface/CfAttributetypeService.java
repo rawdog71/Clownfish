@@ -26,7 +26,7 @@ public interface CfAttributetypeService {
     List<CfAttributetype> findAll();
     CfAttributetype findById(Long id);
     CfAttributetype findByName(String name);
-    boolean create(CfAttributetype entity);
+    CfAttributetype create(CfAttributetype entity);
     boolean delete(CfAttributetype entity);
-    boolean edit(CfAttributetype entity);
+    CfAttributetype edit(CfAttributetype entity);
 }

@@ -56,7 +56,7 @@ public class CfSitesaprfcServiceImpl implements CfSitesaprfcService {
     }
 
     @Override
-    public boolean create(CfSitesaprfc entity) {
+    public CfSitesaprfc create(CfSitesaprfc entity) {
         return this.cfsitesaprfcDAO.create(entity);
     }
 
@@ -66,7 +66,7 @@ public class CfSitesaprfcServiceImpl implements CfSitesaprfcService {
     }
 
     @Override
-    public boolean edit(CfSitesaprfc entity) {
+    public CfSitesaprfc edit(CfSitesaprfc entity) {
         return this.cfsitesaprfcDAO.edit(entity);
     }
     

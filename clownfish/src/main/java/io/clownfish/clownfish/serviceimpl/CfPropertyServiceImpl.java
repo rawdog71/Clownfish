@@ -53,7 +53,7 @@ public class CfPropertyServiceImpl implements CfPropertyService {
     }
 
     @Override
-    public boolean create(CfProperty entity) {
+    public CfProperty create(CfProperty entity) {
         return this.cfpropertyDAO.create(entity);
     }
 
@@ -63,7 +63,7 @@ public class CfPropertyServiceImpl implements CfPropertyService {
     }
 
     @Override
-    public boolean edit(CfProperty entity) {
+    public CfProperty edit(CfProperty entity) {
         return this.cfpropertyDAO.edit(entity);
     }
 }

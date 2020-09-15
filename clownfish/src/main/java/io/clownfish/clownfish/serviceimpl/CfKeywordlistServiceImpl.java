@@ -20,6 +20,8 @@ import io.clownfish.clownfish.dbentities.CfKeywordlist;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,36 +40,39 @@ public class CfKeywordlistServiceImpl implements CfKeywordlistService {
         this.cfkeywordlistDAO = cfkeywordlistDAO;
     }
 
-    @Cacheable("keywordlist")
+    @Cacheable(value = "keywordlist")
     @Override
     public List<CfKeywordlist> findAll() {
         return cfkeywordlistDAO.findAll();
     }
 
-    @Cacheable("keywordlist")
+    @Cacheable(value = "keywordlist")
     @Override
     public CfKeywordlist findById(Long id) {
         return cfkeywordlistDAO.findById(id);
     }
 
-    @Cacheable("keywordlist")
+    @Cacheable(value = "keywordlist")
     @Override
     public CfKeywordlist findByName(String name) {
         return cfkeywordlistDAO.findByName(name);
     }
 
+    @CachePut(value = "keywordlist")
     @Override
-    public boolean create(CfKeywordlist entity) {
+    public CfKeywordlist create(CfKeywordlist entity) {
         return cfkeywordlistDAO.create(entity);
     }
 
+    @CacheEvict(value = "keywordlist")
     @Override
     public boolean delete(CfKeywordlist entity) {
         return cfkeywordlistDAO.delete(entity);
     }
 
+    @CachePut(value = "keywordlist")
     @Override
-    public boolean edit(CfKeywordlist entity) {
+    public CfKeywordlist edit(CfKeywordlist entity) {
         return cfkeywordlistDAO.edit(entity);
     }
 

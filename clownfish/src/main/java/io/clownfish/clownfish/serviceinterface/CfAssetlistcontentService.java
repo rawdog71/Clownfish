@@ -26,7 +26,7 @@ public interface CfAssetlistcontentService {
     List<CfAssetlistcontent> findAll();
     List<CfAssetlistcontent> findByAssetlistref(long assetlistref);
     List<CfAssetlistcontent> findByAssetref(long assetref);
-    boolean create(CfAssetlistcontent entity);
+    CfAssetlistcontent create(CfAssetlistcontent entity);
     boolean delete(CfAssetlistcontent entity);
-    boolean edit(CfAssetlistcontent entity);
+    CfAssetlistcontent edit(CfAssetlistcontent entity);
 }

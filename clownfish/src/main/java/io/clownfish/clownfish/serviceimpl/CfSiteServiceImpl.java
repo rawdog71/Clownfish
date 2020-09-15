@@ -58,7 +58,7 @@ public class CfSiteServiceImpl implements CfSiteService {
     }
 
     @Override
-    public boolean create(CfSite entity) {
+    public CfSite create(CfSite entity) {
         return this.cfsiteDAO.create(entity);
     }
 
@@ -68,7 +68,7 @@ public class CfSiteServiceImpl implements CfSiteService {
     }
 
     @Override
-    public boolean edit(CfSite entity) {
+    public CfSite edit(CfSite entity) {
         return this.cfsiteDAO.edit(entity);
     }
 

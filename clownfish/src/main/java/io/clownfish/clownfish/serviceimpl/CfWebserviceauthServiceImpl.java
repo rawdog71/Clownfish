@@ -49,7 +49,7 @@ public class CfWebserviceauthServiceImpl implements CfWebserviceauthService {
     }
     
     @Override
-    public boolean create(CfWebserviceauth entity) {
+    public CfWebserviceauth create(CfWebserviceauth entity) {
         return cfwebserviceauthDAO.create(entity);
     }
 
@@ -59,7 +59,7 @@ public class CfWebserviceauthServiceImpl implements CfWebserviceauthService {
     }
 
     @Override
-    public boolean edit(CfWebserviceauth entity) {
+    public CfWebserviceauth edit(CfWebserviceauth entity) {
         return cfwebserviceauthDAO.edit(entity);
     }
 }

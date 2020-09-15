@@ -26,7 +26,7 @@ public interface CfSiteassetlistDAO {
     List<CfSiteassetlist> findAll();
     List<CfSiteassetlist> findBySiteref(Long ref);
     List<CfSiteassetlist> findByAssetlistref(Long ref);
-    boolean create(CfSiteassetlist entity);
+    CfSiteassetlist create(CfSiteassetlist entity);
     boolean delete(CfSiteassetlist entity);
-    boolean edit(CfSiteassetlist entity);
+    CfSiteassetlist edit(CfSiteassetlist entity);
 }

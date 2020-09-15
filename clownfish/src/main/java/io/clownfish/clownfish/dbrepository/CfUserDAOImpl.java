@@ -57,10 +57,10 @@ public class CfUserDAOImpl implements CfUserDAO {
     }
 
     @Override
-    public boolean create(CfUser entity) {
+    public CfUser create(CfUser entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -71,10 +71,10 @@ public class CfUserDAOImpl implements CfUserDAO {
     }
 
     @Override
-    public boolean edit(CfUser entity) {
+    public CfUser edit(CfUser entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

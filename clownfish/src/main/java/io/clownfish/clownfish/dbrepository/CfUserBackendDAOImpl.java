@@ -40,10 +40,10 @@ public class CfUserBackendDAOImpl implements CfUserBackendDAO {
     
 
     @Override
-    public boolean create(CfUserbackend entity) {
+    public CfUserbackend create(CfUserbackend entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -54,10 +54,10 @@ public class CfUserBackendDAOImpl implements CfUserBackendDAO {
     }
 
     @Override
-    public boolean edit(CfUserbackend entity) {
+    public CfUserbackend edit(CfUserbackend entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

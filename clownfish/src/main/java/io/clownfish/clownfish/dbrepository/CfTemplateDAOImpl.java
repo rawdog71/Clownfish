@@ -47,10 +47,10 @@ public class CfTemplateDAOImpl implements CfTemplateDAO {
     }
 
     @Override
-    public boolean create(CfTemplate entity) {
+    public CfTemplate create(CfTemplate entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -61,10 +61,10 @@ public class CfTemplateDAOImpl implements CfTemplateDAO {
     }
 
     @Override
-    public boolean edit(CfTemplate entity) {
+    public CfTemplate edit(CfTemplate entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

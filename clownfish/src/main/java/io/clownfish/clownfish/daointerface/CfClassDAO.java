@@ -26,7 +26,7 @@ public interface CfClassDAO {
     List<CfClass> findAll();
     CfClass findById(Long id);
     CfClass findByName(String name);
-    boolean create(CfClass entity);
+    CfClass create(CfClass entity);
     boolean delete(CfClass entity);
-    boolean edit(CfClass entity);
+    CfClass edit(CfClass entity);
 }

@@ -15,13 +15,9 @@
  */
 package io.clownfish.clownfish.serviceimpl;
 
-
 import io.clownfish.clownfish.daointerface.CfSiteassetlistDAO;
-import io.clownfish.clownfish.daointerface.CfSitecontentDAO;
 import io.clownfish.clownfish.dbentities.CfSiteassetlist;
-import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
-import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,7 +48,7 @@ public class CfSiteassetlistServiceImpl implements CfSiteassetlistService {
     }
 
     @Override
-    public boolean create(CfSiteassetlist entity) {
+    public CfSiteassetlist create(CfSiteassetlist entity) {
         return this.cfsiteassetlistDAO.create(entity);
     }
 
@@ -62,7 +58,7 @@ public class CfSiteassetlistServiceImpl implements CfSiteassetlistService {
     }
 
     @Override
-    public boolean edit(CfSiteassetlist entity) {
+    public CfSiteassetlist edit(CfSiteassetlist entity) {
         return this.cfsiteassetlistDAO.edit(entity);
     }
 

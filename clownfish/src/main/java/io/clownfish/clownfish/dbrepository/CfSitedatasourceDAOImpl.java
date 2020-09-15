@@ -56,10 +56,10 @@ public class CfSitedatasourceDAOImpl implements CfSitedatasourceDAO {
     }
 
     @Override
-    public boolean create(CfSitedatasource entity) {
+    public CfSitedatasource create(CfSitedatasource entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -70,10 +70,10 @@ public class CfSitedatasourceDAOImpl implements CfSitedatasourceDAO {
     }
 
     @Override
-    public boolean edit(CfSitedatasource entity) {
+    public CfSitedatasource edit(CfSitedatasource entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

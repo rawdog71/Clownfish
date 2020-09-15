@@ -57,10 +57,10 @@ public class CfQuartzDAOImpl implements CfQuartzDAO {
     }
 
     @Override
-    public boolean create(CfQuartz entity) {
+    public CfQuartz create(CfQuartz entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -71,10 +71,10 @@ public class CfQuartzDAOImpl implements CfQuartzDAO {
     }
 
     @Override
-    public boolean edit(CfQuartz entity) {
+    public CfQuartz edit(CfQuartz entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

@@ -20,6 +20,8 @@ import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,36 +40,39 @@ public class CfKeywordlistcontentServiceImpl implements CfKeywordlistcontentServ
         this.cfkeywordlistcontentDAO = cfkeywordlistcontentDAO;
     }
 
-    @Cacheable("keywordlistcontent")
+    @Cacheable(value = "keywordlistcontent")
     @Override
     public List<CfKeywordlistcontent> findAll() {
         return cfkeywordlistcontentDAO.findAll();
     }
 
-    @Cacheable("keywordlistcontent")
+    @Cacheable(value = "keywordlistcontent")
     @Override
     public List<CfKeywordlistcontent> findByKeywordlistref(long keywordlistref) {
         return cfkeywordlistcontentDAO.findByKeywordlistref(keywordlistref);
     }
 
-    @Cacheable("keywordlistcontent")
+    @Cacheable(value = "keywordlistcontent")
     @Override
     public List<CfKeywordlistcontent> findByKeywordref(long keywordref) {
         return cfkeywordlistcontentDAO.findByKeywordref(keywordref);
     }
 
+    @CachePut(value = "keywordlistcontent")
     @Override
-    public boolean create(CfKeywordlistcontent entity) {
+    public CfKeywordlistcontent create(CfKeywordlistcontent entity) {
         return cfkeywordlistcontentDAO.create(entity);
     }
 
+    @CacheEvict(value = "keywordlistcontent")
     @Override
     public boolean delete(CfKeywordlistcontent entity) {
         return cfkeywordlistcontentDAO.delete(entity);
     }
 
+    @CachePut(value = "keywordlistcontent")
     @Override
-    public boolean edit(CfKeywordlistcontent entity) {
+    public CfKeywordlistcontent edit(CfKeywordlistcontent entity) {
         return cfkeywordlistcontentDAO.edit(entity);
     }
 

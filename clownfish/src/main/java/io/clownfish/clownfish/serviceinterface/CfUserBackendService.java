@@ -26,7 +26,7 @@ public interface CfUserBackendService {
     List<CfUserbackend> findAll();
     List<CfUserbackend> findByUserRef(Long id);
     List<CfUserbackend> findByBackendRef(Long id);
-    boolean create(CfUserbackend entity);
+    CfUserbackend create(CfUserbackend entity);
     boolean delete(CfUserbackend entity);
-    boolean edit(CfUserbackend entity);
+    CfUserbackend edit(CfUserbackend entity);
 }

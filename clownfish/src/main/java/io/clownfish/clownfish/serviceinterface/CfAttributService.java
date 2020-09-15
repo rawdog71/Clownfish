@@ -27,7 +27,7 @@ public interface CfAttributService {
     List<CfAttribut> findByClassref(CfClass classref);
     CfAttribut findById(Long id);
     CfAttribut findByNameAndClassref(String name, CfClass classref);
-    boolean create(CfAttribut entity);
+    CfAttribut create(CfAttribut entity);
     boolean delete(CfAttribut entity);
-    boolean edit(CfAttribut entity);
+    CfAttribut edit(CfAttribut entity);
 }

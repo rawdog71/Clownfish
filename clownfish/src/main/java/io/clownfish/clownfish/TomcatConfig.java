@@ -32,12 +32,12 @@ import org.springframework.context.annotation.PropertySources;
  *
  * @author SulzbachR
  */
-@Configuration
+//@Configuration
 @PropertySources({
     @PropertySource("file:application.properties")
 })
 public class TomcatConfig implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
-    @Value("${server.port.https:9090}")
+    @Value("${server.port.https:9443}")
     int serverPortHttps;
     @Value("${server.port:9000}")
     int serverPortHttp;

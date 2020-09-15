@@ -66,10 +66,10 @@ public class CfSearchhistoryDAOImpl implements CfSearchhistoryDAO {
     }
 
     @Override
-    public boolean create(CfSearchhistory entity) {
+    public CfSearchhistory create(CfSearchhistory entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -80,10 +80,10 @@ public class CfSearchhistoryDAOImpl implements CfSearchhistoryDAO {
     }
 
     @Override
-    public boolean edit(CfSearchhistory entity) {
+    public CfSearchhistory edit(CfSearchhistory entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

@@ -27,7 +27,7 @@ import java.util.List;
 public interface CfWebserviceauthDAO {
     CfWebserviceauth findByHash(String hash);
     List<CfWebserviceauth> findByUserRef(CfUser ref);
-    boolean create(CfWebserviceauth entity);
+    CfWebserviceauth create(CfWebserviceauth entity);
     boolean delete(CfWebserviceauth entity);
-    boolean edit(CfWebserviceauth entity);
+    CfWebserviceauth edit(CfWebserviceauth entity);
 }

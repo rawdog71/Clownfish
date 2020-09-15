@@ -23,6 +23,8 @@ import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import java.util.List;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,52 +42,55 @@ public class CfAttributcontentServiceImpl implements CfAttributcontentService {
         this.cfattributcontentDAO = cfattributcontentDAO;
     }
 
-    @Cacheable("attributcontent")
+    @Cacheable(value = "attributcontent")
     @Override
     public List<CfAttributcontent> findAll() {
         return this.cfattributcontentDAO.findAll();
     }
 
+    @CachePut(value = "attributcontent")
     @Override
     public CfAttributcontent create(CfAttributcontent entity) {
         return this.cfattributcontentDAO.create(entity);
     }
 
+    @CacheEvict(value = "attributcontent")
     @Override
     public boolean delete(CfAttributcontent entity) {
         return this.cfattributcontentDAO.delete(entity);
     }
 
+    @CachePut(value = "attributcontent")
     @Override
     public CfAttributcontent edit(CfAttributcontent entity) {
         return this.cfattributcontentDAO.edit(entity);
     }
 
-    @Cacheable("attributcontent")
+    @Cacheable(value = "attributcontent")
     @Override
     public List<CfAttributcontent> findByClasscontentref(CfClasscontent classcontentref) {
         return this.cfattributcontentDAO.findByClasscontentref(classcontentref);
     }
 
-    @Cacheable("attributcontent")
+    @Cacheable(value = "attributcontent")
     @Override
     public CfAttributcontent findByAttributrefAndClasscontentref(CfAttribut attributref, CfClasscontent classcontentref) {
         return this.cfattributcontentDAO.findByAttributrefAndClasscontentref(attributref, classcontentref);
     }
 
-    @Cacheable("attributcontent")
+    @Cacheable(value = "attributcontent")
     @Override
     public List<CfAttributcontent> findByIndexed(boolean indexed) {
         return this.cfattributcontentDAO.findByIndexed(indexed);
     }
 
-    @Cacheable("attributcontent")
+    @Cacheable(value = "attributcontent")
     @Override
     public List<CfAttributcontent> findByContentclassRef(CfList classcontentref) {
         return this.cfattributcontentDAO.findByContentclassRef(classcontentref);
     }
 
-    @Cacheable("attributcontent")
+    @Cacheable(value = "attributcontent")
     @Override
     public List<CfAttributcontent> findByContentAssetRef(CfAssetlist classcontentref) {
         return this.cfattributcontentDAO.findByContentAssetRef(classcontentref);

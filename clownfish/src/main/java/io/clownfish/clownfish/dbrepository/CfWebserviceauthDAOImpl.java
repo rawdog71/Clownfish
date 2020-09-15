@@ -49,10 +49,10 @@ public class CfWebserviceauthDAOImpl implements CfWebserviceauthDAO {
     }
 
     @Override
-    public boolean create(CfWebserviceauth entity) {
+    public CfWebserviceauth create(CfWebserviceauth entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -63,10 +63,10 @@ public class CfWebserviceauthDAOImpl implements CfWebserviceauthDAO {
     }
 
     @Override
-    public boolean edit(CfWebserviceauth entity) {
+    public CfWebserviceauth edit(CfWebserviceauth entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

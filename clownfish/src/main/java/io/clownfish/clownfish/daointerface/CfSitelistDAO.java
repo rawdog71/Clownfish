@@ -26,7 +26,7 @@ public interface CfSitelistDAO {
     List<CfSitelist> findAll();
     List<CfSitelist> findBySiteref(Long ref);
     List<CfSitelist> findByListref(Long ref);
-    boolean create(CfSitelist entity);
+    CfSitelist create(CfSitelist entity);
     boolean delete(CfSitelist entity);
-    boolean edit(CfSitelist entity);
+    CfSitelist edit(CfSitelist entity);
 }

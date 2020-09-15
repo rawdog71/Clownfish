@@ -26,7 +26,7 @@ public interface CfTemplateDAO {
     CfTemplate findById(Long id);
     CfTemplate findByName(String name);
     List<CfTemplate> findAll();
-    boolean create(CfTemplate entity);
+    CfTemplate create(CfTemplate entity);
     boolean delete(CfTemplate entity);
-    boolean edit(CfTemplate entity);
+    CfTemplate edit(CfTemplate entity);
 }

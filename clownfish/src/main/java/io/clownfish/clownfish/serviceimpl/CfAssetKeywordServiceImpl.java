@@ -39,7 +39,7 @@ public class CfAssetKeywordServiceImpl implements CfAssetKeywordService {
     }
     
     @Override
-    public boolean create(CfAssetkeyword entity) {
+    public CfAssetkeyword create(CfAssetkeyword entity) {
         return this.cfassetkeywordDAO.create(entity);
     }
 
@@ -49,7 +49,7 @@ public class CfAssetKeywordServiceImpl implements CfAssetKeywordService {
     }
 
     @Override
-    public boolean edit(CfAssetkeyword entity) {
+    public CfAssetkeyword edit(CfAssetkeyword entity) {
         return this.cfassetkeywordDAO.edit(entity);
     }    
 

@@ -26,7 +26,7 @@ public interface CfListcontentDAO {
     List<CfListcontent> findAll();
     List<CfListcontent> findByListref(long listref);
     List<CfListcontent> findByClasscontentref(long classcontentref);
-    boolean create(CfListcontent entity);
+    CfListcontent create(CfListcontent entity);
     boolean delete(CfListcontent entity);
-    boolean edit(CfListcontent entity);
+    CfListcontent edit(CfListcontent entity);
 }

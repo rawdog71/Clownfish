@@ -16,9 +16,7 @@
 package io.clownfish.clownfish.dbrepository;
 
 import io.clownfish.clownfish.daointerface.CfAssetlistcontentDAO;
-import io.clownfish.clownfish.daointerface.CfKeywordlistcontentDAO;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
-import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -66,10 +64,10 @@ public class CfAssetlistcontentDAOImpl implements CfAssetlistcontentDAO {
     }
     
     @Override
-    public boolean create(CfAssetlistcontent entity) {
+    public CfAssetlistcontent create(CfAssetlistcontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -80,9 +78,9 @@ public class CfAssetlistcontentDAOImpl implements CfAssetlistcontentDAO {
     }
 
     @Override
-    public boolean edit(CfAssetlistcontent entity) {
+    public CfAssetlistcontent edit(CfAssetlistcontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 }

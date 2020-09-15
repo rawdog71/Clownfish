@@ -48,7 +48,7 @@ public class CfSitedatasourceServiceImpl implements CfSitedatasourceService {
     }
 
     @Override
-    public boolean create(CfSitedatasource entity) {
+    public CfSitedatasource create(CfSitedatasource entity) {
         return this.cfsitedatasourceDAO.create(entity);
     }
 
@@ -58,7 +58,7 @@ public class CfSitedatasourceServiceImpl implements CfSitedatasourceService {
     }
 
     @Override
-    public boolean edit(CfSitedatasource entity) {
+    public CfSitedatasource edit(CfSitedatasource entity) {
         return this.cfsitedatasourceDAO.edit(entity);
     }
 

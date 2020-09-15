@@ -44,7 +44,7 @@ public class CfJavascriptServiceImpl implements CfJavascriptService, Serializabl
     }
 
     @Override
-    public boolean create(CfJavascript entity) {
+    public CfJavascript create(CfJavascript entity) {
         return this.cfjavascriptDAO.create(entity);
     }
 
@@ -54,7 +54,7 @@ public class CfJavascriptServiceImpl implements CfJavascriptService, Serializabl
     }
 
     @Override
-    public boolean edit(CfJavascript entity) {
+    public CfJavascript edit(CfJavascript entity) {
         return this.cfjavascriptDAO.edit(entity);
     }
 

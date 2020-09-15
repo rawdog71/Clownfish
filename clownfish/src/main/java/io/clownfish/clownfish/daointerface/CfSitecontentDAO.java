@@ -26,7 +26,7 @@ public interface CfSitecontentDAO {
     List<CfSitecontent> findAll();
     List<CfSitecontent> findBySiteref(Long ref);
     List<CfSitecontent> findByClasscontentref(Long ref);
-    boolean create(CfSitecontent entity);
+    CfSitecontent create(CfSitecontent entity);
     boolean delete(CfSitecontent entity);
-    boolean edit(CfSitecontent entity);
+    CfSitecontent edit(CfSitecontent entity);
 }

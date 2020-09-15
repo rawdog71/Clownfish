@@ -48,7 +48,7 @@ public class CfWebserviceServiceImpl implements CfWebserviceService {
     }
 
     @Override
-    public boolean create(CfWebservice entity) {
+    public CfWebservice create(CfWebservice entity) {
         return cfwebserviceDAO.create(entity);
     }
 
@@ -58,7 +58,7 @@ public class CfWebserviceServiceImpl implements CfWebserviceService {
     }
 
     @Override
-    public boolean edit(CfWebservice entity) {
+    public CfWebservice edit(CfWebservice entity) {
         return cfwebserviceDAO.edit(entity);
     }
 

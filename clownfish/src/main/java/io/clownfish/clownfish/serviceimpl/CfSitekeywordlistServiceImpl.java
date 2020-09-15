@@ -49,7 +49,7 @@ public class CfSitekeywordlistServiceImpl implements CfSitekeywordlistService {
     }
 
     @Override
-    public boolean create(CfSitekeywordlist entity) {
+    public CfSitekeywordlist create(CfSitekeywordlist entity) {
         return this.cfsitekeywordlistDAO.create(entity);
     }
 
@@ -59,7 +59,7 @@ public class CfSitekeywordlistServiceImpl implements CfSitekeywordlistService {
     }
 
     @Override
-    public boolean edit(CfSitekeywordlist entity) {
+    public CfSitekeywordlist edit(CfSitekeywordlist entity) {
         return this.cfsitekeywordlistDAO.edit(entity);
     }
 

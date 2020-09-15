@@ -27,7 +27,7 @@ public interface CfJavascriptversionDAO {
     long findMaxVersion(long ref);
     CfJavascriptversion findByPK(long ref, long version);
     List<CfJavascriptversion> findAll();
-    boolean create(CfJavascriptversion entity);
+    CfJavascriptversion create(CfJavascriptversion entity);
     boolean delete(CfJavascriptversion entity);
-    boolean edit(CfJavascriptversion entity);
+    CfJavascriptversion edit(CfJavascriptversion entity);
 }

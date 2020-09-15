@@ -26,7 +26,7 @@ public interface CfJavascriptService {
     List<CfJavascript> findAll();
     CfJavascript findById(Long id);
     CfJavascript findByName(String name);
-    boolean create(CfJavascript entity);
+    CfJavascript create(CfJavascript entity);
     boolean delete(CfJavascript entity);
-    boolean edit(CfJavascript entity);
+    CfJavascript edit(CfJavascript entity);
 }

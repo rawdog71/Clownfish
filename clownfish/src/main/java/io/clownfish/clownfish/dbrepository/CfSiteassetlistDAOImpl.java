@@ -56,10 +56,10 @@ public class CfSiteassetlistDAOImpl implements CfSiteassetlistDAO {
     }
 
     @Override
-    public boolean create(CfSiteassetlist entity) {
+    public CfSiteassetlist create(CfSiteassetlist entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -70,10 +70,10 @@ public class CfSiteassetlistDAOImpl implements CfSiteassetlistDAO {
     }
 
     @Override
-    public boolean edit(CfSiteassetlist entity) {
+    public CfSiteassetlist edit(CfSiteassetlist entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

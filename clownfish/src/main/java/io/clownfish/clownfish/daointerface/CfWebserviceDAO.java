@@ -26,7 +26,7 @@ public interface CfWebserviceDAO {
     CfWebservice findById(Long id);
     CfWebservice findByName(String name);
     List<CfWebservice> findAll();
-    boolean create(CfWebservice entity);
+    CfWebservice create(CfWebservice entity);
     boolean delete(CfWebservice entity);
-    boolean edit(CfWebservice entity);
+    CfWebservice edit(CfWebservice entity);
 }

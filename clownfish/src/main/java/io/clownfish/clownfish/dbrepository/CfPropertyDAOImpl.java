@@ -65,10 +65,10 @@ public class CfPropertyDAOImpl implements CfPropertyDAO {
     }
 
     @Override
-    public boolean create(CfProperty entity) {
+    public CfProperty create(CfProperty entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -79,10 +79,10 @@ public class CfPropertyDAOImpl implements CfPropertyDAO {
     }
 
     @Override
-    public boolean edit(CfProperty entity) {
+    public CfProperty edit(CfProperty entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
     
 }

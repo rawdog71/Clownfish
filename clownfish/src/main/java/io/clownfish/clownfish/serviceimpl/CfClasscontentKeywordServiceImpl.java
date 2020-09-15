@@ -21,6 +21,8 @@ import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,34 +41,37 @@ public class CfClasscontentKeywordServiceImpl implements CfClasscontentKeywordSe
         this.cfclasscontentkeywordDAO = cfclasscontentkeywordDAO;
     }
     
+    @CachePut(value = "classcontentkeyword")
     @Override
-    public boolean create(CfClasscontentkeyword entity) {
+    public CfClasscontentkeyword create(CfClasscontentkeyword entity) {
         return this.cfclasscontentkeywordDAO.create(entity);
     }
 
+    @CacheEvict(value = "classcontentkeyword")
     @Override
     public boolean delete(CfClasscontentkeyword entity) {
         return this.cfclasscontentkeywordDAO.delete(entity);
     }
 
+    @CachePut(value = "classcontentkeyword")
     @Override
-    public boolean edit(CfClasscontentkeyword entity) {
+    public CfClasscontentkeyword edit(CfClasscontentkeyword entity) {
         return this.cfclasscontentkeywordDAO.edit(entity);
     }    
 
-    @Cacheable("classcontentkeyword")
+    @Cacheable(value = "classcontentkeyword")
     @Override
     public List<CfClasscontentkeyword> findByClassContentRef(Long id) {
         return this.cfclasscontentkeywordDAO.findByClassContentRef(id);
     }
 
-    @Cacheable("classcontentkeyword")
+    @Cacheable(value = "classcontentkeyword")
     @Override
     public List<CfClasscontentkeyword> findByKeywordRef(Long id) {
         return this.cfclasscontentkeywordDAO.findByKeywordRef(id);
     }
 
-    @Cacheable("classcontentkeyword")
+    @Cacheable(value = "classcontentkeyword")
     @Override
     public List<CfClasscontentkeyword> findAll() {
         return this.cfclasscontentkeywordDAO.findAll();

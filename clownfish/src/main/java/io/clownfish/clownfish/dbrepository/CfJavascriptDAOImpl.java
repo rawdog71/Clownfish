@@ -47,10 +47,10 @@ public class CfJavascriptDAOImpl implements CfJavascriptDAO {
     }
 
     @Override
-    public boolean create(CfJavascript entity) {
+    public CfJavascript create(CfJavascript entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -61,10 +61,10 @@ public class CfJavascriptDAOImpl implements CfJavascriptDAO {
     }
 
     @Override
-    public boolean edit(CfJavascript entity) {
+    public CfJavascript edit(CfJavascript entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

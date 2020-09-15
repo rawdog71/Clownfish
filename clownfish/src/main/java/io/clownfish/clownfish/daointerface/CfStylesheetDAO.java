@@ -26,7 +26,7 @@ public interface CfStylesheetDAO {
     CfStylesheet findById(Long id);
     CfStylesheet findByName(String name);
     List<CfStylesheet> findAll();
-    boolean create(CfStylesheet entity);
+    CfStylesheet create(CfStylesheet entity);
     boolean delete(CfStylesheet entity);
-    boolean edit(CfStylesheet entity);
+    CfStylesheet edit(CfStylesheet entity);
 }

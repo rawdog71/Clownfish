@@ -21,6 +21,8 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,34 +41,37 @@ public class CfAttributServiceImpl implements CfAttributService {
         this.cfattributDAO = cfattributDAO;
     }
     
-    @Cacheable("attribut")
+    @Cacheable(value = "attribut")
     @Override
     public CfAttribut findById(Long id) {
         return this.cfattributDAO.findById(id);
     }
     
+    @CachePut(value = "attribut")
     @Override
-    public boolean create(CfAttribut entity) {
+    public CfAttribut create(CfAttribut entity) {
         return this.cfattributDAO.create(entity);
     }
 
+    @CacheEvict(value = "attribut")
     @Override
     public boolean delete(CfAttribut entity) {
         return this.cfattributDAO.delete(entity);
     }
 
+    @CachePut(value = "attribut")
     @Override
-    public boolean edit(CfAttribut entity) {
+    public CfAttribut edit(CfAttribut entity) {
         return this.cfattributDAO.edit(entity);
     }
 
-    @Cacheable("attribut")
+    @Cacheable(value = "attribut")
     @Override
     public List<CfAttribut> findByClassref(CfClass classref) {
         return this.cfattributDAO.findByClassref(classref);
     }
 
-    @Cacheable("attribut")
+    @Cacheable(value = "attribut")
     @Override
     public CfAttribut findByNameAndClassref(String name, CfClass classref) {
         return this.cfattributDAO.findByNameAndClassref(name, classref);

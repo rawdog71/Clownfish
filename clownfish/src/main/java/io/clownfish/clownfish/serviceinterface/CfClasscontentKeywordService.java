@@ -26,7 +26,7 @@ public interface CfClasscontentKeywordService {
     List<CfClasscontentkeyword> findAll();
     List<CfClasscontentkeyword> findByClassContentRef(Long id);
     List<CfClasscontentkeyword> findByKeywordRef(Long id);
-    boolean create(CfClasscontentkeyword entity);
+    CfClasscontentkeyword create(CfClasscontentkeyword entity);
     boolean delete(CfClasscontentkeyword entity);
-    boolean edit(CfClasscontentkeyword entity);
+    CfClasscontentkeyword edit(CfClasscontentkeyword entity);
 }

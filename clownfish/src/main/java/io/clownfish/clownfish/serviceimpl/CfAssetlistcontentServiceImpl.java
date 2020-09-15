@@ -53,7 +53,7 @@ public class CfAssetlistcontentServiceImpl implements CfAssetlistcontentService 
     }
 
     @Override
-    public boolean create(CfAssetlistcontent entity) {
+    public CfAssetlistcontent create(CfAssetlistcontent entity) {
         return cfassetlistcontentDAO.create(entity);
     }
 
@@ -63,7 +63,7 @@ public class CfAssetlistcontentServiceImpl implements CfAssetlistcontentService 
     }
 
     @Override
-    public boolean edit(CfAssetlistcontent entity) {
+    public CfAssetlistcontent edit(CfAssetlistcontent entity) {
         return cfassetlistcontentDAO.edit(entity);
     }
 

@@ -57,10 +57,10 @@ public class CfJavascriptversionDAOImpl implements CfJavascriptversionDAO {
     }
 
     @Override
-    public boolean create(CfJavascriptversion entity) {
+    public CfJavascriptversion create(CfJavascriptversion entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -71,10 +71,10 @@ public class CfJavascriptversionDAOImpl implements CfJavascriptversionDAO {
     }
 
     @Override
-    public boolean edit(CfJavascriptversion entity) {
+    public CfJavascriptversion edit(CfJavascriptversion entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

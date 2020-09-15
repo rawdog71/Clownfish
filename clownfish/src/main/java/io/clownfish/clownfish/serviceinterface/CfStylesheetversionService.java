@@ -27,7 +27,7 @@ public interface CfStylesheetversionService {
     long findMaxVersion(long ref);
     CfStylesheetversion findByPK(long ref, long version);
     List<CfStylesheetversion> findAll();
-    boolean create(CfStylesheetversion entity);
+    CfStylesheetversion create(CfStylesheetversion entity);
     boolean delete(CfStylesheetversion entity);
-    boolean edit(CfStylesheetversion entity);
+    CfStylesheetversion edit(CfStylesheetversion entity);
 }

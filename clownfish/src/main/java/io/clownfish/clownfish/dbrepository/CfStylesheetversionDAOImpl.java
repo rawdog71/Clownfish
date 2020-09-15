@@ -57,10 +57,10 @@ public class CfStylesheetversionDAOImpl implements CfStylesheetversionDAO {
     }
 
     @Override
-    public boolean create(CfStylesheetversion entity) {
+    public CfStylesheetversion create(CfStylesheetversion entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
-        return true;
+        return entity;
     }
 
     @Override
@@ -71,10 +71,10 @@ public class CfStylesheetversionDAOImpl implements CfStylesheetversionDAO {
     }
 
     @Override
-    public boolean edit(CfStylesheetversion entity) {
+    public CfStylesheetversion edit(CfStylesheetversion entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
-        return true;
+        return entity;
     }
 
     @Override

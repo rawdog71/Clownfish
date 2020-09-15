@@ -20,6 +20,9 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import java.util.List;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,46 +40,49 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
         this.cfclasscontentDAO = cfclasscontentDAO;
     }
 
-    @Cacheable("classcontent")
+    @Cacheable(value = "classcontent")
     @Override
     public List<CfClasscontent> findAll() {
         return this.cfclasscontentDAO.findAll();
     }
 
-    @Cacheable("classcontent")
+    @Cacheable(value = "classcontent")
     @Override
     public CfClasscontent findById(Long id) {
         return this.cfclasscontentDAO.findById(id);
     }
 
-    @Cacheable("classcontent")
+    @Cacheable(value = "classcontent")
     @Override
     public CfClasscontent findByName(String name) {
         return this.cfclasscontentDAO.findByName(name);
     }
 
+    @CachePut(value = "classcontent")
     @Override
     public CfClasscontent create(CfClasscontent entity) {
         return this.cfclasscontentDAO.create(entity);
     }
 
+    @CacheEvict(value = "classcontent")
     @Override
     public boolean delete(CfClasscontent entity) {
         return this.cfclasscontentDAO.delete(entity);
     }
 
+    @CachePut(value = "classcontent")
     @Override
     public CfClasscontent edit(CfClasscontent entity) {
         return this.cfclasscontentDAO.edit(entity);
     }
 
-    @Cacheable("classcontent")
+    @Cacheable(value = "classcontent")
     @Override
     public List<CfClasscontent> findByClassref(CfClass classref) {
         return this.cfclasscontentDAO.findByClassref(classref);
     }
 
-    @Cacheable("classcontent")
+    @Cacheable(value = "classcontent")
     @Override
     public List<CfClasscontent> findByScrapped(boolean scrapped) {
         return this.cfclasscontentDAO.findByScrapped(scrapped);

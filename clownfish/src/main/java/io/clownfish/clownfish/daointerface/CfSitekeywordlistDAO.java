@@ -26,7 +26,7 @@ public interface CfSitekeywordlistDAO {
     List<CfSitekeywordlist> findAll();
     List<CfSitekeywordlist> findBySiteref(Long ref);
     List<CfSitekeywordlist> findByKeywordlistref(Long ref);
-    boolean create(CfSitekeywordlist entity);
+    CfSitekeywordlist create(CfSitekeywordlist entity);
     boolean delete(CfSitekeywordlist entity);
-    boolean edit(CfSitekeywordlist entity);
+    CfSitekeywordlist edit(CfSitekeywordlist entity);
 }

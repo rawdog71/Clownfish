@@ -26,7 +26,7 @@ public interface CfKeywordlistcontentDAO {
     List<CfKeywordlistcontent> findAll();
     List<CfKeywordlistcontent> findByKeywordlistref(long keywordlistref);
     List<CfKeywordlistcontent> findByKeywordref(long keywordref);
-    boolean create(CfKeywordlistcontent entity);
+    CfKeywordlistcontent create(CfKeywordlistcontent entity);
     boolean delete(CfKeywordlistcontent entity);
-    boolean edit(CfKeywordlistcontent entity);
+    CfKeywordlistcontent edit(CfKeywordlistcontent entity);
 }

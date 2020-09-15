@@ -26,7 +26,7 @@ public interface CfUserService {
     List<CfUser> findAll();
     CfUser findById(Long id);
     CfUser findByEmail(String email);
-    boolean create(CfUser entity);
+    CfUser create(CfUser entity);
     boolean delete(CfUser entity);
-    boolean edit(CfUser entity);
+    CfUser edit(CfUser entity);
 }

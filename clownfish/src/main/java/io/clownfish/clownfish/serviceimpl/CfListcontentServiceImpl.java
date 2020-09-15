@@ -20,6 +20,8 @@ import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,36 +40,39 @@ public class CfListcontentServiceImpl implements CfListcontentService {
         this.cflistcontentDAO = cflistcontentDAO;
     }
 
-    @Cacheable("listcontent")
+    //@Cacheable(value = "listcontent")
     @Override
     public List<CfListcontent> findAll() {
         return this.cflistcontentDAO.findAll();
     }
 
-    @Cacheable("listcontent")
+    //@Cacheable(value = "listcontent")
     @Override
     public List<CfListcontent> findByListref(long listref) {
         return this.cflistcontentDAO.findByListref(listref);
     }
 
-    @Cacheable("listcontent")
+    //@Cacheable(value = "listcontent")
     @Override
     public List<CfListcontent> findByClasscontentref(long classcontentref) {
         return this.cflistcontentDAO.findByClasscontentref(classcontentref);
     }
 
+    //@CachePut(value = "listcontent")
     @Override
-    public boolean create(CfListcontent entity) {
+    public CfListcontent create(CfListcontent entity) {
         return this.cflistcontentDAO.create(entity);
     }
 
+    //@CacheEvict(value = "listcontent")
     @Override
     public boolean delete(CfListcontent entity) {
         return this.cflistcontentDAO.delete(entity);
     }
 
+    //@CachePut(value = "listcontent")
     @Override
-    public boolean edit(CfListcontent entity) {
+    public CfListcontent edit(CfListcontent entity) {
         return this.cflistcontentDAO.edit(entity);
     }
 

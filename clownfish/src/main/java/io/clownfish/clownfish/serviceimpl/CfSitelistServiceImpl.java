@@ -20,6 +20,8 @@ import io.clownfish.clownfish.dbentities.CfSitelist;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,34 +40,37 @@ public class CfSitelistServiceImpl implements CfSitelistService {
         this.cfsitelistDAO = cfsitelistDAO;
     }
 
-    @Cacheable("sitelist")
+    @Cacheable(value = "sitelist")
     @Override
     public List<CfSitelist> findAll() {
         return this.cfsitelistDAO.findAll();
     }
     
-    @Cacheable("sitelist")
+    @Cacheable(value = "sitelist")
     @Override
     public List<CfSitelist> findBySiteref(Long ref) {
         return this.cfsitelistDAO.findBySiteref(ref);
     }
 
+    @CachePut(value = "sitelist")
     @Override
-    public boolean create(CfSitelist entity) {
+    public CfSitelist create(CfSitelist entity) {
         return this.cfsitelistDAO.create(entity);
     }
 
+    @CacheEvict(value = "sitelist")
     @Override
     public boolean delete(CfSitelist entity) {
         return this.cfsitelistDAO.delete(entity);
     }
 
+    @CachePut(value = "sitelist")
     @Override
-    public boolean edit(CfSitelist entity) {
+    public CfSitelist edit(CfSitelist entity) {
         return this.cfsitelistDAO.edit(entity);
     }
 
-    @Cacheable("sitelist")
+    @Cacheable(value = "sitelist")
     @Override
     public List<CfSitelist> findByListref(Long ref) {
         return this.cfsitelistDAO.findByListref(ref);

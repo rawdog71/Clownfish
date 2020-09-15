@@ -39,7 +39,7 @@ public class CfTemplateversionServiceImpl implements CfTemplateversionService, S
     }
 
     @Override
-    public boolean create(CfTemplateversion entity) {
+    public CfTemplateversion create(CfTemplateversion entity) {
         return this.cftemplateversionDAO.create(entity);
     }
 
@@ -49,7 +49,7 @@ public class CfTemplateversionServiceImpl implements CfTemplateversionService, S
     }
 
     @Override
-    public boolean edit(CfTemplateversion entity) {
+    public CfTemplateversion edit(CfTemplateversion entity) {
         return this.cftemplateversionDAO.edit(entity);
     }
 

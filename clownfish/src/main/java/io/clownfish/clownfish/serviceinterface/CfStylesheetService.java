@@ -26,7 +26,7 @@ public interface CfStylesheetService {
     List<CfStylesheet> findAll();
     CfStylesheet findById(Long id);
     CfStylesheet findByName(String name);
-    boolean create(CfStylesheet entity);
+    CfStylesheet create(CfStylesheet entity);
     boolean delete(CfStylesheet entity);
-    boolean edit(CfStylesheet entity);
+    CfStylesheet edit(CfStylesheet entity);
 }

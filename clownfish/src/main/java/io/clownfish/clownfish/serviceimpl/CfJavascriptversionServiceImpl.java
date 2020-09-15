@@ -39,7 +39,7 @@ public class CfJavascriptversionServiceImpl implements CfJavascriptversionServic
     }
 
     @Override
-    public boolean create(CfJavascriptversion entity) {
+    public CfJavascriptversion create(CfJavascriptversion entity) {
         return this.cfjavascriptversionDAO.create(entity);
     }
 
@@ -49,7 +49,7 @@ public class CfJavascriptversionServiceImpl implements CfJavascriptversionServic
     }
 
     @Override
-    public boolean edit(CfJavascriptversion entity) {
+    public CfJavascriptversion edit(CfJavascriptversion entity) {
         return this.cfjavascriptversionDAO.edit(entity);
     }
 
