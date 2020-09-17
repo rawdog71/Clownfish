@@ -40,7 +40,7 @@ public class CfClassServiceImpl implements CfClassService {
         this.cfclassDAO = cfclassDAO;
     }
     
-    @Cacheable(value = "class")
+    @Cacheable(value = "class", key = "#id")
     @Override
     public CfClass findById(Long id) {
         return this.cfclassDAO.findById(id);
@@ -52,25 +52,25 @@ public class CfClassServiceImpl implements CfClassService {
         return this.cfclassDAO.findAll();
     }
 
-    @CachePut(value = "class")
+    @CachePut(value = "class", key = "#entity.id")
     @Override
     public CfClass create(CfClass entity) {
         return this.cfclassDAO.create(entity);
     }
 
-    @CacheEvict(value = "class")
+    @CacheEvict(value = "class", key = "#entity.id")
     @Override
     public boolean delete(CfClass entity) {
         return this.cfclassDAO.delete(entity);
     }
 
-    @CachePut(value = "class")
+    @CachePut(value = "class", key = "#entity.id")
     @Override
     public CfClass edit(CfClass entity) {
         return this.cfclassDAO.edit(entity);
     }
 
-    @Cacheable(value = "class")
+    @Cacheable(value = "class", key = "#name")
     @Override
     public CfClass findByName(String name) {
         return this.cfclassDAO.findByName(name);

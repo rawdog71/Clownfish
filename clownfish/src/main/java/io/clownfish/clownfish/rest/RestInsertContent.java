@@ -82,6 +82,7 @@ public class RestInsertContent {
                 CfClass clazz = cfclassService.findByName(icp.getClassname());
                 System.out.println(clazz.isSearchrelevant());
 
+                cfclasscontentService.evictAll();
                 try {
                     CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());
                     icp.setReturncode("Duplicate Classcontent");

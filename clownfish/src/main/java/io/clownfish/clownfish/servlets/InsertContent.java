@@ -116,6 +116,7 @@ public class InsertContent extends HttpServlet {
                 CfClass clazz = cfclassService.findByName(icp.getClassname());
                 System.out.println(clazz.isSearchrelevant());
 
+                cfclasscontentService.evictAll();
                 try {
                     CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());
                     response.getOutputStream().println("Duplicate Classcontent: " + icp.getContentname());

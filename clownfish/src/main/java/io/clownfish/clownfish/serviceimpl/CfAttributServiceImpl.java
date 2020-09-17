@@ -41,37 +41,37 @@ public class CfAttributServiceImpl implements CfAttributService {
         this.cfattributDAO = cfattributDAO;
     }
     
-    @Cacheable(value = "attribut")
+    @Cacheable(value = "attribut", key = "#id")
     @Override
     public CfAttribut findById(Long id) {
         return this.cfattributDAO.findById(id);
     }
     
-    @CachePut(value = "attribut")
+    @CachePut(value = "attribut", key = "#entity.id")
     @Override
     public CfAttribut create(CfAttribut entity) {
         return this.cfattributDAO.create(entity);
     }
 
-    @CacheEvict(value = "attribut")
+    @CacheEvict(value = "attribut", key = "#entity.id")
     @Override
     public boolean delete(CfAttribut entity) {
         return this.cfattributDAO.delete(entity);
     }
 
-    @CachePut(value = "attribut")
+    @CachePut(value = "attribut", key = "#entity.id")
     @Override
     public CfAttribut edit(CfAttribut entity) {
         return this.cfattributDAO.edit(entity);
     }
 
-    @Cacheable(value = "attribut")
+    @Cacheable(value = "attribut", key = "#classref.id")
     @Override
     public List<CfAttribut> findByClassref(CfClass classref) {
         return this.cfattributDAO.findByClassref(classref);
     }
 
-    @Cacheable(value = "attribut")
+    @Cacheable(value = "attribut", key = "#classref.id")
     @Override
     public CfAttribut findByNameAndClassref(String name, CfClass classref) {
         return this.cfattributDAO.findByNameAndClassref(name, classref);

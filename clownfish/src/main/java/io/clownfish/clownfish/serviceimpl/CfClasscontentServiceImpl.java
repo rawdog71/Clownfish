@@ -20,7 +20,6 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import java.util.List;
-import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -46,7 +45,7 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
         return this.cfclasscontentDAO.findAll();
     }
 
-    @Cacheable(value = "classcontent")
+    @Cacheable(value = "classcontent", key = "#id")
     @Override
     public CfClasscontent findById(Long id) {
         return this.cfclasscontentDAO.findById(id);
@@ -58,19 +57,20 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
         return this.cfclasscontentDAO.findByName(name);
     }
 
-    @CachePut(value = "classcontent")
+    @CachePut(value = "classcontent", key = "#entity.id")
     @Override
     public CfClasscontent create(CfClasscontent entity) {
         return this.cfclasscontentDAO.create(entity);
     }
 
-    @CacheEvict(value = "classcontent")
+    @CacheEvict(value = "classcontent", key = "#entity.id")
     @Override
     public boolean delete(CfClasscontent entity) {
         return this.cfclasscontentDAO.delete(entity);
     }
 
-    @CachePut(value = "classcontent")
+    @CacheEvict(value = "classcontent", key = "#entity.id")
+    @CachePut(value = "classcontent", key = "#entity.id")
     @Override
     public CfClasscontent edit(CfClasscontent entity) {
         return this.cfclasscontentDAO.edit(entity);
@@ -88,4 +88,7 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
         return this.cfclasscontentDAO.findByScrapped(scrapped);
     }
     
+    @Override
+    @CacheEvict(value = "classcontent", allEntries = true)
+    public void evictAll() {}
 }

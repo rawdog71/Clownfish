@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.beans;
 
 import com.google.gson.Gson;
+import com.hazelcast.spring.cache.HazelcastCacheManager;
 import io.clownfish.clownfish.datamodels.InsertContentParameter;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
@@ -90,6 +91,8 @@ public class ContentList implements Serializable {
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired FolderUtil folderUtil;
+    
+    @Autowired private HazelcastCacheManager cacheManager;
     
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter CfClasscontent selectedContent = null;
@@ -308,6 +311,7 @@ public class ContentList implements Serializable {
         if (selectedContent != null) {            
             selectedContent.setScrapped(true);
             cfclasscontentService.edit(selectedContent);
+            cacheManager.getCache("classcontent").clear();                      // Hazelcast Cache clearing
             classcontentlist = cfclasscontentService.findAll();
             FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been scrapped.");
             FacesContext.getCurrentInstance().addMessage(null, message);

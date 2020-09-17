@@ -20,6 +20,9 @@ import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,46 +40,55 @@ public class CfSiteServiceImpl implements CfSiteService {
         this.cfsiteDAO = cfsiteDAO;
     }
 
+    //@Cacheable(value = "site")
     @Override
     public List<CfSite> findAll() {
         return this.cfsiteDAO.findAll();
     }
 
+    //@Cacheable(value = "site", key = "#id")
     @Override
     public CfSite findById(Long id) {
         return this.cfsiteDAO.findById(id);
     }
 
+    //@Cacheable(value = "site", key = "#name")
     @Override
     public CfSite findByName(String name) {
         return this.cfsiteDAO.findByName(name);
     }
 
+    //@Cacheable(value = "site", key = "#ref")
     @Override
     public CfSite findByTemplateref(Long ref) {
         return this.cfsiteDAO.findByTemplateref(ref);
     }
 
+    //@CachePut(value = "site", key = "#entity.id")
     @Override
     public CfSite create(CfSite entity) {
         return this.cfsiteDAO.create(entity);
     }
 
+    //@CacheEvict(value = "site", key = "#entity.id")
     @Override
     public boolean delete(CfSite entity) {
         return this.cfsiteDAO.delete(entity);
     }
 
+    //@CachePut(value = "site", key = "#entity.id")
     @Override
     public CfSite edit(CfSite entity) {
         return this.cfsiteDAO.edit(entity);
     }
 
+    //@Cacheable(value = "site", key = "#ref")
     @Override
     public List<CfSite> findByParentref(Long ref) {
         return this.cfsiteDAO.findByParentref(ref);
     }
 
+    //@Cacheable(value = "site", key = "#alias")
     @Override
     public CfSite findByAliaspath(String alias) {
         return this.cfsiteDAO.findByAliaspath(alias);

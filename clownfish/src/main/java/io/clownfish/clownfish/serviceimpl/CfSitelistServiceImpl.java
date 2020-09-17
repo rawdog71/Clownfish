@@ -46,31 +46,31 @@ public class CfSitelistServiceImpl implements CfSitelistService {
         return this.cfsitelistDAO.findAll();
     }
     
-    @Cacheable(value = "sitelist")
+    @Cacheable(value = "sitelist", key = "#ref")
     @Override
     public List<CfSitelist> findBySiteref(Long ref) {
         return this.cfsitelistDAO.findBySiteref(ref);
     }
 
-    @CachePut(value = "sitelist")
+    @CachePut(value = "sitelist", key = "#entity.id")
     @Override
     public CfSitelist create(CfSitelist entity) {
         return this.cfsitelistDAO.create(entity);
     }
 
-    @CacheEvict(value = "sitelist")
+    @CacheEvict(value = "sitelist", key = "#entity.id")
     @Override
     public boolean delete(CfSitelist entity) {
         return this.cfsitelistDAO.delete(entity);
     }
 
-    @CachePut(value = "sitelist")
+    @CachePut(value = "sitelist", key = "#entity.id")
     @Override
     public CfSitelist edit(CfSitelist entity) {
         return this.cfsitelistDAO.edit(entity);
     }
 
-    @Cacheable(value = "sitelist")
+    @Cacheable(value = "sitelist", key = "#ref")
     @Override
     public List<CfSitelist> findByListref(Long ref) {
         return this.cfsitelistDAO.findByListref(ref);

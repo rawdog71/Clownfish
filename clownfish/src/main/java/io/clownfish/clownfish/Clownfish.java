@@ -19,8 +19,6 @@ import io.clownfish.clownfish.exceptions.PageNotFoundException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
-import com.hazelcast.config.*;
-import com.hazelcast.core.*;
 import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.AssetList;
 import io.clownfish.clownfish.beans.AttributContentList;
@@ -239,8 +237,6 @@ public class Clownfish {
     private @Getter @Setter AssetIndexer assetIndexer;
     private @Getter @Setter int searchlimit;
     
-    private Config hazelConfig;
-    private HazelcastInstance hcInstance;
     private @Getter @Setter Map<String, String> metainfomap;
     
     final transient Logger logger = LoggerFactory.getLogger(Clownfish.class);
@@ -317,12 +313,14 @@ public class Clownfish {
         }
         
         /* Hazelcast test */
+        /*
         if (null == hazelConfig) {
             hazelConfig = new Config();
         }
         if (null == hcInstance) {
             hcInstance = Hazelcast.newHazelcastInstance(hazelConfig);
         }
+        */
         
         Package p = FacesContext.class.getPackage();
         if (null == clownfishutil) {

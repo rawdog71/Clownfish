@@ -47,37 +47,37 @@ public class CfListServiceImpl implements CfListService {
         return this.cflistDAO.findAll();
     }
 
-    @Cacheable(value = "list")
+    @Cacheable(value = "list", key = "#id")
     @Override
     public CfList findById(Long id) {
         return this.cflistDAO.findById(id);
     }
 
-    @CachePut(value = "list")
+    @CachePut(value = "list", key = "#entity.id")
     @Override
     public CfList create(CfList entity) {
         return this.cflistDAO.create(entity);
     }
 
-    @CacheEvict(value = "list")
+    @CacheEvict(value = "list", key = "#entity.id")
     @Override
     public boolean delete(CfList entity) {
         return this.cflistDAO.delete(entity);
     }
 
-    @CachePut(value = "list")
+    @CachePut(value = "list", key = "#entity.id")
     @Override
     public CfList edit(CfList entity) {
         return this.cflistDAO.edit(entity);
     }
 
-    @Cacheable(value = "list")
+    @Cacheable(value = "list", key = "#name")
     @Override
     public CfList findByName(String name) {
         return this.cflistDAO.findByName(name);
     }
 
-    @Cacheable(value = "list")
+    @Cacheable(value = "list", key = "#ref.id")
     @Override
     public List<CfList> findByClassref(CfClass ref) {
         return this.cflistDAO.findByClassref(ref);

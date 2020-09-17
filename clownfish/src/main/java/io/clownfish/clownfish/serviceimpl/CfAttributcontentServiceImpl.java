@@ -48,52 +48,52 @@ public class CfAttributcontentServiceImpl implements CfAttributcontentService {
         return this.cfattributcontentDAO.findAll();
     }
 
-    @CachePut(value = "attributcontent")
+    //@CachePut(value = "attributcontent", key = "#entity.id")
     @Override
     public CfAttributcontent create(CfAttributcontent entity) {
         return this.cfattributcontentDAO.create(entity);
     }
 
-    @CacheEvict(value = "attributcontent")
+    //@CacheEvict(value = "attributcontent", key = "#entity.id")
     @Override
     public boolean delete(CfAttributcontent entity) {
         return this.cfattributcontentDAO.delete(entity);
     }
 
-    @CachePut(value = "attributcontent")
+    //@CachePut(value = "attributcontent", key = "#entity.id")
     @Override
     public CfAttributcontent edit(CfAttributcontent entity) {
         return this.cfattributcontentDAO.edit(entity);
     }
 
-    @Cacheable(value = "attributcontent")
+    //@Cacheable(value = "attributcontent", key = "#classcontentref.id")
     @Override
     public List<CfAttributcontent> findByClasscontentref(CfClasscontent classcontentref) {
         return this.cfattributcontentDAO.findByClasscontentref(classcontentref);
     }
 
-    @Cacheable(value = "attributcontent")
+    //@Cacheable(value = "attributcontent", key = "#attributref.id #classcontentref.id")
     @Override
     public CfAttributcontent findByAttributrefAndClasscontentref(CfAttribut attributref, CfClasscontent classcontentref) {
         return this.cfattributcontentDAO.findByAttributrefAndClasscontentref(attributref, classcontentref);
     }
 
-    @Cacheable(value = "attributcontent")
+    //@Cacheable(value = "attributcontent", key = "#indexed")
     @Override
     public List<CfAttributcontent> findByIndexed(boolean indexed) {
         return this.cfattributcontentDAO.findByIndexed(indexed);
     }
 
-    @Cacheable(value = "attributcontent")
+    //@Cacheable(value = "attributcontent", key = "#classcontentref.id")
     @Override
     public List<CfAttributcontent> findByContentclassRef(CfList classcontentref) {
         return this.cfattributcontentDAO.findByContentclassRef(classcontentref);
     }
 
-    @Cacheable(value = "attributcontent")
+    //@Cacheable(value = "attributcontent", key = "#assetcontentref.id")
     @Override
-    public List<CfAttributcontent> findByContentAssetRef(CfAssetlist classcontentref) {
-        return this.cfattributcontentDAO.findByContentAssetRef(classcontentref);
+    public List<CfAttributcontent> findByContentAssetRef(CfAssetlist assetcontentref) {
+        return this.cfattributcontentDAO.findByContentAssetRef(assetcontentref);
     }
 
 }

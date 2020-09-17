@@ -40,19 +40,19 @@ public class CfKeywordServiceImpl implements CfKeywordService {
         this.cfkeywordDAO = cfkeywordDAO;
     }
     
-    @CachePut(value = "keyword")
+    @CachePut(value = "keyword", key = "#entity.id")
     @Override
     public CfKeyword create(CfKeyword entity) {
         return this.cfkeywordDAO.create(entity);
     }
 
-    @CacheEvict(value = "keyword")
+    @CacheEvict(value = "keyword", key = "#entity.id")
     @Override
     public boolean delete(CfKeyword entity) {
         return this.cfkeywordDAO.delete(entity);
     }
 
-    @CachePut(value = "keyword")
+    @CachePut(value = "keyword", key = "#entity.id")
     @Override
     public CfKeyword edit(CfKeyword entity) {
         return this.cfkeywordDAO.edit(entity);
@@ -64,19 +64,19 @@ public class CfKeywordServiceImpl implements CfKeywordService {
         return this.cfkeywordDAO.findAll();
     }
 
-    @Cacheable(value = "keyword")
+    @Cacheable(value = "keyword", key = "#id")
     @Override
     public CfKeyword findById(Long id) {
         return this.cfkeywordDAO.findById(id);
     }
 
-    @Cacheable(value = "keyword")
+    @Cacheable(value = "keyword", key = "#name")
     @Override
     public CfKeyword findByName(String name) {
         return this.cfkeywordDAO.findByName(name);
     }
 
-    @Cacheable(value = "keyword")
+    @Cacheable(value = "keyword", key = "#name")
     @Override
     public List<CfKeyword> findByNameBeginning(String name) {
         return this.cfkeywordDAO.findByNameBeginning(name);

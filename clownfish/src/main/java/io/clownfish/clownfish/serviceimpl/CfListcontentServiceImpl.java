@@ -46,31 +46,31 @@ public class CfListcontentServiceImpl implements CfListcontentService {
         return this.cflistcontentDAO.findAll();
     }
 
-    //@Cacheable(value = "listcontent")
+    //@Cacheable(value = "listcontent", key = "#listref")
     @Override
     public List<CfListcontent> findByListref(long listref) {
         return this.cflistcontentDAO.findByListref(listref);
     }
 
-    //@Cacheable(value = "listcontent")
+    //@Cacheable(value = "listcontent", key = "#classcontentref")
     @Override
     public List<CfListcontent> findByClasscontentref(long classcontentref) {
         return this.cflistcontentDAO.findByClasscontentref(classcontentref);
     }
 
-    //@CachePut(value = "listcontent")
+    //@CachePut(value = "listcontent", key = "#entity.cfListcontentPK")
     @Override
     public CfListcontent create(CfListcontent entity) {
         return this.cflistcontentDAO.create(entity);
     }
 
-    //@CacheEvict(value = "listcontent")
+    //@CacheEvict(value = "listcontent", key = "#entity.cfListcontentPK")
     @Override
     public boolean delete(CfListcontent entity) {
         return this.cflistcontentDAO.delete(entity);
     }
 
-    //@CachePut(value = "listcontent")
+    //@CachePut(value = "listcontent", key = "#entity.cfListcontentPK")
     @Override
     public CfListcontent edit(CfListcontent entity) {
         return this.cflistcontentDAO.edit(entity);
