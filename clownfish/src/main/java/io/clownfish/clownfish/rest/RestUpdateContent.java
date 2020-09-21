@@ -16,15 +16,10 @@
 package io.clownfish.clownfish.rest;
 
 import io.clownfish.clownfish.datamodels.UpdateContentParameter;
-import io.clownfish.clownfish.dbentities.CfAsset;
-import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
-import io.clownfish.clownfish.dbentities.CfList;
-import io.clownfish.clownfish.lucene.ContentIndexer;
-import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
@@ -33,19 +28,9 @@ import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
-import io.clownfish.clownfish.servlets.InsertContent;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
-import io.clownfish.clownfish.utils.FolderUtil;
-import io.clownfish.clownfish.utils.PasswordUtil;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.Date;
+import io.clownfish.clownfish.utils.ContentUtil;
 import java.util.List;
-import java.util.logging.Level;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,9 +52,7 @@ public class RestUpdateContent {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfAssetlistService cfassetlistService;
-    @Autowired IndexService indexService;
-    @Autowired ContentIndexer contentIndexer;
-    @Autowired FolderUtil folderUtil;
+    @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
     private static final Logger logger = LoggerFactory.getLogger(RestUpdateContent.class);
 
@@ -92,10 +75,10 @@ public class RestUpdateContent {
                         CfAttribut attribut = attributcontent.getAttributref();
                         // Check, if attribut exists in attributmap
                         if (ucp.getAttributmap().containsKey(attribut.getName())) {
-                            setAttributValue(attributcontent, ucp.getAttributmap().get(attribut.getName()));
+                            contentUtil.setAttributValue(attributcontent, ucp.getAttributmap().get(attribut.getName()));
                             cfattributcontentService.edit(attributcontent);
                             if (ucp.isIndexing()) {
-                                indexContent();
+                                contentUtil.indexContent();
                             }
                             ucp.setReturncode("OK");
                         }
@@ -110,113 +93,5 @@ public class RestUpdateContent {
             ucp.setReturncode("NoResultException");
         }
         return ucp;
-    }
-    
-    private CfAttributcontent setAttributValue(CfAttributcontent selectedAttribut, String editContent) {
-        switch (selectedAttribut.getAttributref().getAttributetype().getName()) {
-            case "boolean":
-                selectedAttribut.setContentBoolean(Boolean.valueOf(editContent));
-                break;
-            case "string":
-                if (selectedAttribut.getAttributref().getIdentity() == true) {
-                    List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(selectedAttribut.getClasscontentref().getClassref());
-                    boolean found = false;
-                    for (CfClasscontent classcontent : classcontentlist2) {
-                        try {
-                            CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(selectedAttribut.getAttributref(), classcontent);
-                            if (attributcontent.getContentString().compareToIgnoreCase(editContent) == 0) {
-                                found = true;
-                            }
-                        } catch (javax.persistence.NoResultException | NullPointerException ex) {
-                            logger.error(ex.getMessage());
-                        }
-                    }
-                    if (!found) {
-                        selectedAttribut.setContentString(editContent);
-                    }
-                } else {
-                    selectedAttribut.setContentString(editContent);
-                }
-                break;
-            case "hashstring":
-                String salt = PasswordUtil.getSalt(30);
-                selectedAttribut.setContentString(PasswordUtil.generateSecurePassword(editContent, salt));
-                selectedAttribut.setSalt(salt);
-                break;    
-            case "integer":
-                selectedAttribut.setContentInteger(BigInteger.valueOf(Long.parseLong(editContent)));
-                break;
-            case "real":
-                selectedAttribut.setContentReal(Double.parseDouble(editContent));
-                break;
-            case "htmltext":
-                selectedAttribut.setContentText(editContent);
-                break;    
-            case "text":
-                selectedAttribut.setContentText(editContent);
-                break;
-            case "markdown":
-                selectedAttribut.setContentText(editContent);
-                break;
-            case "datetime":
-                Date datum;
-                DateTime dt = new DateTime();
-                DateTimeFormatter fmt = DateTimeFormat.forPattern("dd.MM.yyyy").withZone(DateTimeZone.forID("Europe/Berlin"));
-                try {
-                    datum = dt.parse(editContent, fmt).toDate();
-                    selectedAttribut.setContentDate(datum);
-                } catch (IllegalArgumentException ex) {
-                    try {
-                        fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(DateTimeZone.forID("Europe/Berlin"));
-                        datum = dt.parse(editContent, fmt).toDate();
-                        selectedAttribut.setContentDate(datum);
-                    } catch (IllegalArgumentException ex2) {
-                        fmt = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZone(DateTimeZone.forID("Europe/Berlin"));
-                        datum = dt.parse(editContent, fmt).toDate();
-                        selectedAttribut.setContentDate(datum);
-                    }
-                }
-                break;
-            case "media":
-                if (null != editContent) {
-                    try {
-                        CfAsset asset = cfassetService.findByName(editContent);
-                        selectedAttribut.setContentInteger(BigInteger.valueOf(asset.getId()));
-                    } catch (Exception ex) {
-                        selectedAttribut.setContentInteger(null);
-                        logger.error("INSERTCONTENT: Media " + editContent + " not found!");
-                    }
-                } else {
-                    selectedAttribut.setContentInteger(null);
-                }
-                break;    
-            case "classref":
-                if (null != editContent) {
-                    CfList list_ref = cflistService.findById(Long.parseLong(editContent));
-                    selectedAttribut.setClasscontentlistref(list_ref);
-                }
-                break;
-            case "assetref":
-                if (null != editContent) {
-                    CfAssetlist assetlist_ref = cfassetlistService.findById(Long.parseLong(editContent));
-                    selectedAttribut.setAssetcontentlistref(assetlist_ref);
-                }
-                break;    
-        }
-        selectedAttribut.setIndexed(false);
-        return selectedAttribut;
-    }
-    
-    private void indexContent() {
-        // Index the changed content and merge the Index files
-        if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
-            try {
-                contentIndexer.run();
-                indexService.getWriter().commit();
-                indexService.getWriter().forceMerge(10);
-            } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(InsertContent.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
     }
 }

@@ -16,18 +16,37 @@
 package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.datamodels.AttributDef;
+import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
+import io.clownfish.clownfish.dbentities.CfList;
+import io.clownfish.clownfish.lucene.ContentIndexer;
+import io.clownfish.clownfish.lucene.IndexService;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
+import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +60,15 @@ public class ContentUtil {
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
+    @Autowired transient CfClasscontentService cfclasscontentService;
+    @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired transient CfAssetService cfassetService;
+    @Autowired transient CfListService cflistService;
+    @Autowired transient CfAssetlistService cfassetlistService;
+    @Autowired FolderUtil folderUtil;
+    @Autowired IndexService indexService;
+    @Autowired ContentIndexer contentIndexer;
+    private static final Logger logger = LoggerFactory.getLogger(ContentUtil.class);
     
     public AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent) {
         CfAttributetype knattributtype = cfattributetypeService.findById(attributtypeid);
@@ -122,6 +150,112 @@ public class ContentUtil {
         }
     }
     
+    public CfAttributcontent setAttributValue(CfAttributcontent selectedAttribut, String editContent) {
+        if (null == editContent) {
+            editContent = "";
+        }
+        try {
+            switch (selectedAttribut.getAttributref().getAttributetype().getName()) {
+                case "boolean":
+                    selectedAttribut.setContentBoolean(Boolean.valueOf(editContent));
+                    break;
+                case "string":
+                    if (editContent.length() > 255) {
+                        editContent = editContent.substring(0, 255);
+                    }
+                    if (selectedAttribut.getAttributref().getIdentity() == true) {
+                        List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(selectedAttribut.getClasscontentref().getClassref());
+                        boolean found = false;
+                        for (CfClasscontent classcontent : classcontentlist2) {
+                            try {
+                                CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(selectedAttribut.getAttributref(), classcontent);
+                                if (attributcontent.getContentString().compareToIgnoreCase(editContent) == 0) {
+                                    found = true;
+                                }
+                            } catch (javax.persistence.NoResultException | NullPointerException ex) {
+                                logger.error(ex.getMessage());
+                            }
+                        }
+                        if (!found) {                        
+                            selectedAttribut.setContentString(editContent);
+                        }
+                    } else {
+                        selectedAttribut.setContentString(editContent);
+                    }
+                    break;
+                case "hashstring":
+                    String salt = PasswordUtil.getSalt(30);
+                    selectedAttribut.setContentString(PasswordUtil.generateSecurePassword(editContent, salt));
+                    selectedAttribut.setSalt(salt);
+                    break;    
+                case "integer":
+                    selectedAttribut.setContentInteger(BigInteger.valueOf(Long.parseLong(editContent)));
+                    break;
+                case "real":
+                    selectedAttribut.setContentReal(Double.parseDouble(editContent));
+                    break;
+                case "htmltext":
+                    selectedAttribut.setContentText(editContent);
+                    break;    
+                case "text":
+                    selectedAttribut.setContentText(editContent);
+                    break;
+                case "markdown":
+                    selectedAttribut.setContentText(editContent);
+                    break;
+                case "datetime":
+                    Date datum;
+                    DateTime dt = new DateTime();
+                    DateTimeFormatter fmt = DateTimeFormat.forPattern("dd.MM.yyyy").withZone(DateTimeZone.forID("Europe/Berlin"));
+                    try {
+                        datum = dt.parse(editContent, fmt).toDate();
+                        selectedAttribut.setContentDate(datum);
+                    } catch (IllegalArgumentException ex) {
+                        try {
+                            fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(DateTimeZone.forID("Europe/Berlin"));
+                            datum = dt.parse(editContent, fmt).toDate();
+                            selectedAttribut.setContentDate(datum);
+                        } catch (IllegalArgumentException ex2) {
+                            fmt = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZone(DateTimeZone.forID("Europe/Berlin"));
+                            datum = dt.parse(editContent, fmt).toDate();
+                            selectedAttribut.setContentDate(datum);
+                        }
+                    }
+                    break;
+                case "media":
+                    if (null != editContent) {
+                        try {
+                            CfAsset asset = cfassetService.findByName(editContent);
+                            selectedAttribut.setContentInteger(BigInteger.valueOf(asset.getId()));
+                        } catch (Exception ex) {
+                            selectedAttribut.setContentInteger(null);
+                            logger.error("INSERTCONTENT: Media " + editContent + " not found!");
+                        }
+                    } else {
+                        selectedAttribut.setContentInteger(null);
+                    }
+                    break;    
+                case "classref":
+                    if (null != editContent) {
+                        CfList list_ref = cflistService.findById(Long.parseLong(editContent));
+                        selectedAttribut.setClasscontentlistref(list_ref);
+                    }
+                    break;
+                case "assetref":
+                    if (null != editContent) {
+                        CfAssetlist assetlist_ref = cfassetlistService.findById(Long.parseLong(editContent));
+                        selectedAttribut.setAssetcontentlistref(assetlist_ref);
+                    }
+                    break;    
+            }
+            selectedAttribut.setIndexed(false);
+            return selectedAttribut;
+        } catch (NullPointerException ex) {
+            logger.warn(ex.getMessage());
+            return selectedAttribut;
+        }
+    }
+    
     public ArrayList getContentOutputKeyval(List<CfAttributcontent> attributcontentList) {
         ArrayList<HashMap> output = new ArrayList<>();
         HashMap<String, String> dummyoutputmap = new HashMap<>();
@@ -150,5 +284,18 @@ public class ContentUtil {
             }
         }
         return keywords;
+    }
+    
+    public void indexContent() {
+        // Index the changed content and merge the Index files
+        if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
+            try {
+                contentIndexer.run();
+                indexService.getWriter().commit();
+                indexService.getWriter().forceMerge(10);
+            } catch (IOException ex) {
+                logger.error(ex.getMessage());
+            }
+        }
     }
 }
