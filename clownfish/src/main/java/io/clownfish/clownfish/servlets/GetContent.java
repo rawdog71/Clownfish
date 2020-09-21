@@ -327,7 +327,7 @@ public class GetContent extends HttpServlet {
             }
             datalist = gcp.getListname();
             listcontent = null;
-            if (null != datalist) {
+            if ((null != datalist) && (!datalist.isEmpty())) {
                 CfList dataList = cflistService.findByName(datalist);
                 listcontent = cflistcontentService.findByListref(dataList.getId());
             }

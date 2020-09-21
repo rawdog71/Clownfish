@@ -29,4 +29,5 @@ public interface CfClassService {
     CfClass create(CfClass entity);
     boolean delete(CfClass entity);
     CfClass edit(CfClass entity);
+    void evictAll();
 }

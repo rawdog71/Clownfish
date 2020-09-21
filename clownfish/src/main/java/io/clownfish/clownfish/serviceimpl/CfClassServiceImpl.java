@@ -74,5 +74,9 @@ public class CfClassServiceImpl implements CfClassService {
     @Override
     public CfClass findByName(String name) {
         return this.cfclassDAO.findByName(name);
-    }  
+    }
+    
+    @Override
+    @CacheEvict(value = "class", allEntries = true)
+    public void evictAll() {}
 }

@@ -88,6 +88,7 @@ public class ClassList implements Serializable {
     }
     
     public void onRefreshAll() {
+        cfclassService.evictAll();
         classListe = cfclassService.findAll();
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
@@ -139,6 +140,7 @@ public class ClassList implements Serializable {
     
     public void onCreate(ActionEvent actionEvent) {
         try {
+            cfclassService.evictAll();
             CfClass newclass = new CfClass();
             newclass.setName(className);
             newclass.setSearchrelevant(classSearchrelevant);
@@ -169,6 +171,7 @@ public class ClassList implements Serializable {
     
     public void onCreateAttribut(ActionEvent actionEvent) {
         try {
+            cfattributService.evictAll();
             CfAttribut newattribut = new CfAttribut();
             newattribut.setClassref(selectedClass);
             newattribut.setName(attributName);

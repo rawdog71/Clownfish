@@ -95,5 +95,4 @@ public class CfAttributcontentServiceImpl implements CfAttributcontentService {
     public List<CfAttributcontent> findByContentAssetRef(CfAssetlist assetcontentref) {
         return this.cfattributcontentDAO.findByContentAssetRef(assetcontentref);
     }
-
 }

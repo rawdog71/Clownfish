@@ -77,4 +77,7 @@ public class CfAttributServiceImpl implements CfAttributService {
         return this.cfattributDAO.findByNameAndClassref(name, classref);
     }
 
+    @Override
+    @CacheEvict(value = "attribut", allEntries = true)
+    public void evictAll() {}
 }
