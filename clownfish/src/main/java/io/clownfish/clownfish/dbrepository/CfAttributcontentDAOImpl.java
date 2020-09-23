@@ -25,6 +25,7 @@ import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.NativeQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -115,5 +116,21 @@ public class CfAttributcontentDAOImpl implements CfAttributcontentDAO {
         query.setParameter("assetcontentlistref", classcontentref);
         List<CfAttributcontent> cfattributcontentlist = query.getResultList();
         return cfattributcontentlist;
+    }
+
+    @Override
+    public boolean delete(long classcontentref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        NativeQuery query = (NativeQuery) session.createSQLQuery("DELETE FROM cf_attributcontent WHERE classcontentref = " + classcontentref);
+        query.executeUpdate();
+        return true;
+    }
+
+    @Override
+    public boolean updateContentref(long contentref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        NativeQuery query = (NativeQuery) session.createSQLQuery("UPDATE cf_attributcontent SET content_classref = null WHERE content_classref = " + contentref);
+        query.executeUpdate();
+        return true;
     }
 }

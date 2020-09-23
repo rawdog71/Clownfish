@@ -33,6 +33,8 @@ public interface CfAttributcontentDAO {
     List<CfAttributcontent> findByIndexed(boolean indexed);
     CfAttributcontent create(CfAttributcontent entity);
     boolean delete(CfAttributcontent entity);
+    boolean delete(long classcontentref);
+    boolean updateContentref(long contentref);
     CfAttributcontent edit(CfAttributcontent entity);
     List<CfAttributcontent> findByContentclassRef(CfList classcontentref);
     List<CfAttributcontent> findByContentAssetRef(CfAssetlist classcontentref);

@@ -80,6 +80,7 @@ import io.clownfish.clownfish.templatebeans.NetworkTemplateBean;
 import io.clownfish.clownfish.templatebeans.SAPTemplateBean;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
+import io.clownfish.clownfish.utils.ConsistencyUtil;
 import io.clownfish.clownfish.utils.DatabaseUtil;
 import io.clownfish.clownfish.utils.DefaultUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
@@ -204,6 +205,7 @@ public class Clownfish {
     @Autowired private Scheduler scheduler;
     @Autowired private FolderUtil folderUtil;
     @Autowired Searcher searcher;
+    @Autowired ConsistencyUtil consistenyUtil;
     
     DatabaseTemplateBean databasebean;
     EmailTemplateBean emailbean;
@@ -364,6 +366,9 @@ public class Clownfish {
             System.out.println("                  ,,***,   *((/(#@@@@@,                                         ");
             System.out.println("                            *@@@@@@@@%                                          ");
             System.out.println(ansi().reset());
+            
+            // Check Consistence
+            consistenyUtil.checkConsistency();
             
             // read all System Properties of the property table
             if (null == propertyUtil) {

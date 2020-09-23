@@ -23,9 +23,6 @@ import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import java.util.List;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +39,7 @@ public class CfAttributcontentServiceImpl implements CfAttributcontentService {
         this.cfattributcontentDAO = cfattributcontentDAO;
     }
 
-    @Cacheable(value = "attributcontent")
+    //@Cacheable(value = "attributcontent")
     @Override
     public List<CfAttributcontent> findAll() {
         return this.cfattributcontentDAO.findAll();
@@ -94,5 +91,15 @@ public class CfAttributcontentServiceImpl implements CfAttributcontentService {
     @Override
     public List<CfAttributcontent> findByContentAssetRef(CfAssetlist assetcontentref) {
         return this.cfattributcontentDAO.findByContentAssetRef(assetcontentref);
+    }
+
+    @Override
+    public boolean delete(long classcontentref) {
+        return this.cfattributcontentDAO.delete(classcontentref);
+    }
+
+    @Override
+    public boolean updateContentref(long contentref) {
+        return this.cfattributcontentDAO.updateContentref(contentref);
     }
 }
