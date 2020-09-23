@@ -72,14 +72,18 @@ public class DataList implements Serializable {
 
     @PostConstruct
     public void init() {
+        cflistService.evictAll();
         datacontentlist = cflistService.findAll();
+        cfclassService.evictAll();
         classlist = cfclassService.findAll();
         
         selectedListcontent = new ArrayList<>();
     }
     
     public void onRefreshAll() {
+        cflistService.evictAll();
         datacontentlist = cflistService.findAll();
+        cfclassService.evictAll();
         classlist = cfclassService.findAll();
     }
     
@@ -103,6 +107,7 @@ public class DataList implements Serializable {
     
     public void onCreateContent(ActionEvent actionEvent) {
         try {
+            cflistService.evictAll();
             CfList newlistcontent = new CfList();
             newlistcontent.setName(contentName);
             newlistcontent.setClassref(selectedClass);
@@ -123,7 +128,7 @@ public class DataList implements Serializable {
                 attributcontent.setClasscontentlistref(null);
                 cfattributcontentService.edit(attributcontent);
             }
-            
+            cflistService.evictAll();
             cflistService.delete(selectedList);
             datacontentlist = cflistService.findAll();
         }

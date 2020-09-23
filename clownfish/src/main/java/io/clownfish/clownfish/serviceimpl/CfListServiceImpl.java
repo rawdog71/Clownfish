@@ -82,5 +82,10 @@ public class CfListServiceImpl implements CfListService {
     public List<CfList> findByClassref(CfClass ref) {
         return this.cflistDAO.findByClassref(ref);
     }
+
+    @CacheEvict(value = "class", allEntries = true)
+    @Override
+    public void evictAll() {
+    }
     
 }

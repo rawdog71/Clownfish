@@ -75,6 +75,7 @@ public class ReefBean implements Serializable {
     
     @PostConstruct
     public void init() {
+        cfclassService.evictAll();
         classlist = cfclassService.findAll();
         templatelist = cftemplateService.findAll();
         stylesheetlist = cfstylesheetService.findAll();

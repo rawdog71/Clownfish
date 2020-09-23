@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.beans;
 
-import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
@@ -81,6 +80,7 @@ public class ClassList implements Serializable {
 
     @PostConstruct
     public void init() {
+        cfclassService.evictAll();
         classListe = cfclassService.findAll();
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
@@ -158,6 +158,7 @@ public class ClassList implements Serializable {
     
     public void onEdit(ActionEvent actionEvent) {
         try {
+            cfclassService.evictAll();
             selectedClass.setName(className);
             selectedClass.setSearchrelevant(classSearchrelevant);
             cfclassService.edit(selectedClass);
