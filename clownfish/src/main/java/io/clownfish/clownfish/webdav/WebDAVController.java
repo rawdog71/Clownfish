@@ -37,6 +37,7 @@ import io.milton.annotations.DisplayName;
 import io.milton.annotations.Get;
 import io.milton.annotations.MakeCollection;
 import io.milton.annotations.ModifiedDate;
+import io.milton.annotations.Move;
 import io.milton.annotations.Name;
 import io.milton.annotations.PutChild;
 import io.milton.annotations.ResourceController;
@@ -259,6 +260,13 @@ public class WebDAVController  {
     public void delete(CfAsset asset) {
         assetService.delete(asset);
         assetlist = assetService.findAll();
+    }
+    
+    @Move
+    public void move(CfAsset asset, CfKeyword keyword, String name) {
+        CfAssetkeyword assetkeyword = new CfAssetkeyword();
+        assetkeyword.setCfAssetkeywordPK(new CfAssetkeywordPK(asset.getId(), keyword.getId()));
+        assetkeywordService.create(assetkeyword);
     }
     
     @ChildrenOf
