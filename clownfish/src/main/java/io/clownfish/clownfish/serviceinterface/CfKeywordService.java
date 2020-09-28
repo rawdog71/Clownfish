@@ -30,4 +30,5 @@ public interface CfKeywordService {
     CfKeyword create(CfKeyword entity);
     boolean delete(CfKeyword entity);
     CfKeyword edit(CfKeyword entity);
+    void evictAll();
 }

@@ -20,15 +20,22 @@ package io.clownfish.clownfish.webdav;
  * @author SulzbachR
  */
 import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfAssetkeyword;
+import io.clownfish.clownfish.dbentities.CfAssetkeywordPK;
+import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
+import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import io.milton.annotations.ChildrenOf;
 import io.milton.annotations.ContentLength;
 import io.milton.annotations.Delete;
+import io.milton.annotations.DisplayName;
 import io.milton.annotations.Get;
+import io.milton.annotations.MakeCollection;
 import io.milton.annotations.ModifiedDate;
 import io.milton.annotations.Name;
 import io.milton.annotations.PutChild;
@@ -42,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +74,8 @@ import org.xml.sax.SAXException;
 @ResourceController
 public class WebDAVController  {
     @Autowired CfAssetService cfassetService;
+    @Autowired CfKeywordService cfkeywordService;
+    @Autowired CfAssetKeywordService cfassetkeywordService;
     @Autowired PropertyUtil propertyUtil;
     @Autowired FolderUtil folderUtil;
     @Autowired IndexService indexService;
@@ -77,12 +87,17 @@ public class WebDAVController  {
     private static FolderUtil folderUtiliy;
     private static IndexService idxService;
     private static AssetIndexer assetIndex;
+    private static CfKeywordService keywordService;
+    private static CfAssetKeywordService assetkeywordService;
+    //private List<CfKeyword> keywords = new ArrayList<CfKeyword>();
     
     
     @PostConstruct
     public void init() {
         logger.info("PostConstruct WebDAVController");
         assetService = cfassetService;
+        keywordService = cfkeywordService;
+        assetkeywordService = cfassetkeywordService;
         propUtil = propertyUtil;
         folderUtiliy = folderUtil;
         assetIndex = assetIndexer;
@@ -98,13 +113,22 @@ public class WebDAVController  {
     }
     
     @ChildrenOf
-    public List<CfAsset> getAssets(WebDAVController root) {
-        assetlist = assetService.findAll();
+    public List<CfAsset> getAssets(CfKeyword keyword) {
+        ArrayList<CfAsset> assetlist = new ArrayList<>();
+        List<CfAssetkeyword> assetkeywordlist = assetkeywordService.findByKeywordRef(keyword.getId());
+        for (CfAssetkeyword assetkeyword : assetkeywordlist) {
+            assetlist.add(assetService.findById(assetkeyword.getCfAssetkeywordPK().getAssetref()));
+        }
         return assetlist;
     }
     
     @Name
     public String getName(CfAsset asset) {
+        return asset.getName();
+    }
+    
+    @DisplayName
+    public String getDisplayName(CfAsset asset) {
         return asset.getName();
     }
     
@@ -141,8 +165,22 @@ public class WebDAVController  {
         }
     }
     
+    @MakeCollection
+    public CfKeyword makeKeyword(WebDAVController root, String filename) {
+        try {
+            CfKeyword newkeyword = new CfKeyword();
+            newkeyword.setName(filename);
+            newkeyword = keywordService.create(newkeyword);
+            return newkeyword;
+        } catch (Exception ex) {
+            java.util.logging.Logger.getLogger(WebDAVController.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    
     @PutChild
-    public CfAsset upload(WebDAVController root, String filename, InputStream inputStream) {
+    public CfAsset upload(CfKeyword keyword, String filename, InputStream inputStream) {
         try {
             HashMap<String, String> metamap = new HashMap<>();
             File result = new File(folderUtiliy.getMedia_folder() + File.separator + filename);
@@ -192,8 +230,11 @@ public class WebDAVController  {
                 newasset.setImagewidth(metamap.get("Image Width"));
                 newasset.setImageheight(metamap.get("Image Height"));
             }
-            assetService.create(newasset);
+            newasset = assetService.create(newasset);
             assetlist = assetService.findAll();
+            CfAssetkeyword assetkeyword = new CfAssetkeyword();
+            assetkeyword.setCfAssetkeywordPK(new CfAssetkeywordPK(newasset.getId(), keyword.getId()));
+            assetkeywordService.create(assetkeyword);
             
             // Index the uploaded assets and merge the Index files
             if ((null != folderUtiliy.getIndex_folder()) && (!folderUtiliy.getMedia_folder().isEmpty())) {
@@ -218,5 +259,11 @@ public class WebDAVController  {
     public void delete(CfAsset asset) {
         assetService.delete(asset);
         assetlist = assetService.findAll();
+    }
+    
+    @ChildrenOf
+    public List<CfKeyword> getKeywords(WebDAVController root) {
+        keywordService.evictAll();
+        return keywordService.findAll();
     }
 }

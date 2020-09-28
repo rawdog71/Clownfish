@@ -81,4 +81,9 @@ public class CfKeywordServiceImpl implements CfKeywordService {
     public List<CfKeyword> findByNameBeginning(String name) {
         return this.cfkeywordDAO.findByNameBeginning(name);
     }
+
+    @CacheEvict(value = "keyword", allEntries = true)
+    @Override
+    public void evictAll() {
+    }
 }

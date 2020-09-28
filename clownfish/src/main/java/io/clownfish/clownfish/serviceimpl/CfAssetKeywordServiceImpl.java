@@ -20,7 +20,7 @@ import io.clownfish.clownfish.dbentities.CfAssetkeyword;
 import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+//import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,19 +53,19 @@ public class CfAssetKeywordServiceImpl implements CfAssetKeywordService {
         return this.cfassetkeywordDAO.edit(entity);
     }    
 
-    @Cacheable("assetkeyword")
+    //@Cacheable("assetkeyword")
     @Override
     public List<CfAssetkeyword> findByAssetRef(Long id) {
         return this.cfassetkeywordDAO.findByAssetRef(id);
     }
 
-    @Cacheable("assetkeyword")
+    //@Cacheable("assetkeyword")
     @Override
     public List<CfAssetkeyword> findByKeywordRef(Long id) {
         return this.cfassetkeywordDAO.findByKeywordRef(id);
     }
 
-    @Cacheable("assetkeyword")
+    //@Cacheable("assetkeyword")
     @Override
     public List<CfAssetkeyword> findAll() {
         return this.cfassetkeywordDAO.findAll();
