@@ -152,6 +152,7 @@ public class ContentList implements Serializable {
     
     @PostConstruct
     public void init() {
+        cfclasscontentService.evictAll();
         classcontentlist = cfclasscontentService.findAll();
         cfclassService.evictAll();
         classlist = cfclassService.findAll();
@@ -466,6 +467,7 @@ public class ContentList implements Serializable {
     }
     
     public void onRefreshAll() {
+        cfclasscontentService.evictAll();
         classcontentlist = cfclasscontentService.findAll();
         cfclassService.evictAll();
         classlist = cfclassService.findAll();
