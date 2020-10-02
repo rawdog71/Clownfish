@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -187,7 +188,7 @@ public class GetAsset extends HttpServlet {
                                 acontext.getResponse().setContentType(asset.getMimetype());
                                 InputStream in;
                                 File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
-                                try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                try (OutputStream out = acontext.getResponse().getOutputStream()) {
                                     in = new FileInputStream(f);
                                     IOUtils.copy(in, out);
                                 } catch (IOException ex) {

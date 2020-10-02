@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
@@ -36,12 +37,19 @@ import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -294,6 +302,10 @@ public class GetContent extends HttpServlet {
      * @return GetContentParameters
      */
     protected GetContentParameter processRequest(GetContentParameter gcp, HttpServletResponse response) {
+        String inst_klasse;
+        String inst_identifier;
+        String inst_datalist;
+        String inst_apikey = "";
         HashMap<String, String> searchmap;
         ArrayList<String> searchkeywords;
         HashMap<String, String> outputmap;
@@ -318,17 +330,17 @@ public class GetContent extends HttpServlet {
         }
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
-        apikey = gcp.getApikey();
-        if (apikeyutil.checkApiKey(apikey, "GetContent")) {
-            klasse = gcp.getClassname();
-            identifier = gcp.getIdentifier();
-            if (null == identifier) {
-                identifier = "";
+        inst_apikey = gcp.getApikey();
+        if (apikeyutil.checkApiKey(inst_apikey, "GetContent")) {
+            inst_klasse = gcp.getClassname();
+            inst_identifier = gcp.getIdentifier();
+            if (null == inst_identifier) {
+                inst_identifier = "";
             }
-            datalist = gcp.getListname();
+            inst_datalist = gcp.getListname();
             listcontent = null;
-            if ((null != datalist) && (!datalist.isEmpty())) {
-                CfList dataList = cflistService.findByName(datalist);
+            if ((null != inst_datalist) && (!inst_datalist.isEmpty())) {
+                CfList dataList = cflistService.findByName(inst_datalist);
                 listcontent = cflistcontentService.findByListref(dataList.getId());
             }
             searchmap = new HashMap<>();
@@ -355,25 +367,25 @@ public class GetContent extends HttpServlet {
                     counter++;
                 }
             }
-            
-            CfClass cfclass = cfclassService.findByName(klasse);
+
+            CfClass cfclass = cfclassService.findByName(inst_klasse);
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
             boolean found = false;
             int listcounter = 0;
             for (CfClasscontent classcontent : classcontentList) {
                 boolean inList = true;
                 // Check if identifier is set and matches classcontent
-                if ((!identifier.isEmpty()) && (0 != identifier.compareToIgnoreCase(classcontent.getName()))) {
+                if ((!inst_identifier.isEmpty()) && (0 != inst_identifier.compareToIgnoreCase(classcontent.getName()))) {
                     inList = false;
                 }
-                // Check if content is in datalist 
+                // Check if content is in datalist
                 if (null != listcontent) {
                     boolean foundinlist = false;
                     for (CfListcontent lc : listcontent) {
                         if (lc.getCfListcontentPK().getClasscontentref() == classcontent.getId()) {
                             foundinlist = true;
                             break;
-                        }
+                        } 
                     }
                     inList = foundinlist;
                 }
@@ -389,7 +401,7 @@ public class GetContent extends HttpServlet {
                             if (!compareAttribut(keyvals, sv, searchcontent)) {
                                 putToList = false;
                                 break;
-                            } 
+                            }
                         }
                     }
                     // Check the keyword filter (at least one keyword must be found (OR))
@@ -408,7 +420,7 @@ public class GetContent extends HttpServlet {
                     }
                     if (putToList) {
                         found = true;
-                        
+
                         listcounter++;
                         if (range_start > 0){
                             if ((listcounter >= range_start) && (listcounter <= range_end)) {
@@ -487,8 +499,11 @@ public class GetContent extends HttpServlet {
         processRequest(gcp, response);
         
         String json = gson.toJson(gcp);
+        response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        response.getOutputStream().println(json);
+        OutputStream out = response.getOutputStream();
+        out.write(json.getBytes("UTF-8"));
+        out.flush();
     }
 
     /**
