@@ -81,6 +81,7 @@ public class ClassList implements Serializable {
     @PostConstruct
     public void init() {
         cfclassService.evictAll();
+        cfattributService.evictAll();
         classListe = cfclassService.findAll();
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
