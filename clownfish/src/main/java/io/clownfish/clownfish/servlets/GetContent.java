@@ -88,7 +88,7 @@ public class GetContent extends HttpServlet {
     private static transient @Getter @Setter String apikey;
     private static transient @Getter @Setter String range;
     
-    final transient Logger logger = LoggerFactory.getLogger(GetContent.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetContent.class);
     
     private class SearchValues {
         private @Getter @Setter String comparartor;
@@ -278,7 +278,7 @@ public class GetContent extends HttpServlet {
             try (PrintWriter out = response.getWriter()) {
                 out.print(json);
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         } else {
             PrintWriter out = null;
@@ -286,7 +286,7 @@ public class GetContent extends HttpServlet {
                 out = response.getWriter();
                 out.print("Wrong API KEY");
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             } finally {
                 out.close();
             }

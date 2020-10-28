@@ -49,7 +49,7 @@ public class DatabaseTemplateBean implements Serializable {
     private transient @Getter @Setter Map contentmap;
     private List<CfSitedatasource> sitedatasourcelist;
     
-    final transient Logger logger = LoggerFactory.getLogger(DatabaseTemplateBean.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(DatabaseTemplateBean.class);
     
     public DatabaseTemplateBean() {
         contentmap = new HashMap<>();
@@ -68,7 +68,7 @@ public class DatabaseTemplateBean implements Serializable {
     }
     
     public Map dbread(String catalog, String tablename, String sqlstatement) {
-        //logger.info("START dbread");
+        //LOGGER.info("START dbread");
         HashMap<String, ArrayList> dbtables = new HashMap<>();
         sitedatasourcelist.stream().forEach((sitedatasource) -> {
             try {
@@ -95,7 +95,7 @@ public class DatabaseTemplateBean implements Serializable {
                                     String value = result.getString(tf.getName());
                                     dbexportvalues.put(tf.getName(), value);
                                 } catch (java.sql.SQLException ex) {
-                                    logger.warn(ex.getMessage());
+                                    LOGGER.warn(ex.getMessage());
                                 }
                             });
                             tablevalues.add(dbexportvalues);
@@ -105,21 +105,21 @@ public class DatabaseTemplateBean implements Serializable {
                     contentmap.put("db", dbtables);
                     con.close();
                 } else {
-                    logger.warn("Connection to database not established");
+                    LOGGER.warn("Connection to database not established");
                 }
             } catch (SQLException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             } catch (Exception ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         });
-        //logger.info("END dbread");
+        //LOGGER.info("END dbread");
         return contentmap;
     }
     
     public boolean dbexecute(String catalog, String sqlstatement) {
         boolean ok = false;
-        logger.info("START dbexecute: " + sqlstatement);
+        LOGGER.info("START dbexecute: " + sqlstatement);
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
             try {
                 CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
@@ -131,21 +131,21 @@ public class DatabaseTemplateBean implements Serializable {
                             int count = stmt.executeUpdate(sqlstatement);
                             if (count > 0 ) {
                                 ok = true;
-                                logger.info("START dbexecute TRUE");
+                                LOGGER.info("START dbexecute TRUE");
                             } else {
-                                logger.info("START dbexecute FALSE");
+                                LOGGER.info("START dbexecute FALSE");
                             }
                         }
                     }
                     con.close();
                 } else {
-                    logger.warn("Connection to database not established");
+                    LOGGER.warn("Connection to database not established");
                 }
             } catch (SQLException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         };
-        logger.info("END dbexecute");
+        LOGGER.info("END dbexecute");
         return ok;
     }
     
@@ -209,7 +209,7 @@ public class DatabaseTemplateBean implements Serializable {
             tfs.setTableFieldsList(tableFieldsList);
             return tfs;
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return null;
         }
     }

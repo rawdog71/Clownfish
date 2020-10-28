@@ -55,7 +55,7 @@ public class MarkdownUtil {
     @Autowired private PropertyList proplist;
     private List<Extension> extensionList;
 
-    final transient Logger logger = LoggerFactory.getLogger(MarkdownUtil.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(MarkdownUtil.class);
     
     public MarkdownUtil() {
     }
@@ -107,7 +107,7 @@ public class MarkdownUtil {
                     break;
             }
         } catch (SecurityException  ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

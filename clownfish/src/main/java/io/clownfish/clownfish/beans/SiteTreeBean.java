@@ -163,7 +163,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
     @Autowired transient FolderUtil folderUtil;
     
-    final transient Logger logger = LoggerFactory.getLogger(SiteTreeBean.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
     @PostConstruct
     public void init() {
@@ -616,7 +616,7 @@ public class SiteTreeBean implements Serializable {
             cfsiteService.create(newsite);
             loadTree();
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     
@@ -628,7 +628,7 @@ public class SiteTreeBean implements Serializable {
                 FacesMessage message = new FacesMessage("Deleted static site for " + selectedSite.getName());
                 FacesContext.getCurrentInstance().addMessage(null, message);
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         }
     }

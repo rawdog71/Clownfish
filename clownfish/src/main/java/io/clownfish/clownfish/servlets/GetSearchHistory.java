@@ -50,7 +50,7 @@ public class GetSearchHistory extends HttpServlet {
     @Autowired transient CfKeywordService cfkeywordservice;
     @Autowired ApiKeyUtil apikeyutil;
     
-    final transient Logger logger = LoggerFactory.getLogger(GetSearchHistory.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetSearchHistory.class);
     
     public GetSearchHistory() {
     }
@@ -107,7 +107,7 @@ public class GetSearchHistory extends HttpServlet {
                     try (PrintWriter out = response.getWriter()) {
                         out.print(json);
                     } catch (IOException ex) {
-                        logger.error(ex.getMessage());
+                        LOGGER.error(ex.getMessage());
                     }
                     acontext.complete();
                 } else {
@@ -121,11 +121,11 @@ public class GetSearchHistory extends HttpServlet {
                     out.print("[]");
                     acontext.complete();
                 } catch (IOException ex1) {
-                    logger.error(ex1.getMessage());
+                    LOGGER.error(ex1.getMessage());
                     acontext.complete();
                 }
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         });
     }

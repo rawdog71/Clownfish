@@ -81,7 +81,7 @@ public class WebDAVController  {
     @Autowired FolderUtil folderUtil;
     @Autowired IndexService indexService;
     @Autowired AssetIndexer assetIndexer;
-    final transient Logger logger = LoggerFactory.getLogger(WebDAVController.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(WebDAVController.class);
     private @Getter @Setter List<CfAsset> assetlist;
     private static CfAssetService assetService;
     private static PropertyUtil propUtil;
@@ -95,7 +95,7 @@ public class WebDAVController  {
     
     @PostConstruct
     public void init() {
-        logger.info("PostConstruct WebDAVController");
+        LOGGER.info("PostConstruct WebDAVController");
         assetService = cfassetService;
         keywordService = cfkeywordService;
         assetkeywordService = cfassetkeywordService;

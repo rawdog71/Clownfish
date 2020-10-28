@@ -56,7 +56,7 @@ public class RestUpdateContent {
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired HibernateUtil hibernateUtil;
-    private static final Logger logger = LoggerFactory.getLogger(RestUpdateContent.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestUpdateContent.class);
 
     @PostMapping("/updatecontent")
     public UpdateContentParameter restUpdateContent(@RequestBody UpdateContentParameter ucp) {

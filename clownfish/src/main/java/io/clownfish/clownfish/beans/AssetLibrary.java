@@ -59,7 +59,7 @@ public class AssetLibrary {
     private transient @Getter @Setter List<CfAsset> selectedAssetcontent = null;
     private transient @Getter @Setter List<CfAsset> filteredAssetcontent = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(AssetLibrary.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(AssetLibrary.class);
     
     /**
      * Initializes the AssetLibrary
@@ -93,7 +93,7 @@ public class AssetLibrary {
             assetlist = cfassetlistService.findAll();
             assets = cfassetService.findAll();
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

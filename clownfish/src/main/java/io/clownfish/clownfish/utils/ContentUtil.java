@@ -68,7 +68,7 @@ public class ContentUtil {
     @Autowired FolderUtil folderUtil;
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
-    private static final Logger logger = LoggerFactory.getLogger(ContentUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContentUtil.class);
     
     public AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent) {
         CfAttributetype knattributtype = cfattributetypeService.findById(attributtypeid);
@@ -173,7 +173,7 @@ public class ContentUtil {
                                     found = true;
                                 }
                             } catch (javax.persistence.NoResultException | NullPointerException ex) {
-                                logger.error(ex.getMessage());
+                                LOGGER.error(ex.getMessage());
                             }
                         }
                         if (!found) {                        
@@ -229,7 +229,7 @@ public class ContentUtil {
                             selectedAttribut.setContentInteger(BigInteger.valueOf(asset.getId()));
                         } catch (Exception ex) {
                             selectedAttribut.setContentInteger(null);
-                            logger.error("INSERTCONTENT: Media " + editContent + " not found!");
+                            LOGGER.error("INSERTCONTENT: Media " + editContent + " not found!");
                         }
                     } else {
                         selectedAttribut.setContentInteger(null);
@@ -251,7 +251,7 @@ public class ContentUtil {
             selectedAttribut.setIndexed(false);
             return selectedAttribut;
         } catch (NullPointerException ex) {
-            logger.warn(ex.getMessage());
+            LOGGER.warn(ex.getMessage());
             return selectedAttribut;
         }
     }
@@ -294,7 +294,7 @@ public class ContentUtil {
                 indexService.getWriter().commit();
                 indexService.getWriter().forceMerge(10);
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         }
     }

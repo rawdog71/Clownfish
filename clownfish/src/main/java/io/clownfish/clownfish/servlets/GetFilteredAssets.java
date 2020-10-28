@@ -63,7 +63,7 @@ public class GetFilteredAssets extends HttpServlet {
     private static transient @Getter @Setter String assetlibrary;
     private static transient @Getter @Setter String apikey;
     
-    final transient Logger logger = LoggerFactory.getLogger(GetFilteredAssets.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetFilteredAssets.class);
     
     public GetFilteredAssets() {
     }
@@ -153,7 +153,7 @@ public class GetFilteredAssets extends HttpServlet {
             try (PrintWriter out = response.getWriter()) {
                 out.print(json);
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         } else {
             PrintWriter out = null;
@@ -161,7 +161,7 @@ public class GetFilteredAssets extends HttpServlet {
                 out = response.getWriter();
                 out.print("Wrong API KEY");
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             } finally {
                 out.close();
             }

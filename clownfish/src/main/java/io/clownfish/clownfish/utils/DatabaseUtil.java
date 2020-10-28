@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
 public class DatabaseUtil {
     @Autowired CfDatasourceService cfdatasourceService;
     
-    final transient Logger logger = LoggerFactory.getLogger(DatabaseUtil.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(DatabaseUtil.class);
 
     public DatabaseUtil() {
     }
@@ -115,7 +115,7 @@ public class DatabaseUtil {
                     dbvalues.put("table", dbtables);
                     dbexport.put(cfdatasource.getDatabasename(), dbvalues);
                 } catch (SQLException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
             } else {
                 return null;
@@ -303,7 +303,7 @@ public class DatabaseUtil {
             try {
                 result.close();
             } catch (SQLException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
             result = stmt.executeQuery(sql_count.toString());
             HashMap<String, String> dbexportvalues = new HashMap<>();
@@ -313,20 +313,20 @@ public class DatabaseUtil {
             }
             dbvalues.put(tablename, dbexportvalues);
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             if (null != stmt) {
                 try {
                     stmt.close();
                 } catch (SQLException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
             }
             if (null != result) {
                 try {
                     result.close();
                 } catch (SQLException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
             }
         }
@@ -377,14 +377,14 @@ public class DatabaseUtil {
             }
             return ok;
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return false;
         } finally {
             if (null != stmt) {
                 try {
                     stmt.close();
                 } catch (SQLException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
             }
         }
@@ -434,14 +434,14 @@ public class DatabaseUtil {
             
             return ok;
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return false;
         } finally {
             if (null != stmt) {
                 try {
                     stmt.close();
                 } catch (SQLException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
             }
         }
@@ -492,14 +492,14 @@ public class DatabaseUtil {
             }
             return ok;
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return false;
         } finally {
             if (null != stmt) {
                 try {
                     stmt.close();
                 } catch (SQLException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
             }
         }
@@ -591,7 +591,7 @@ public class DatabaseUtil {
             tfs.setTableFieldsList(tableFieldsList);
             return tfs;
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return null;
         }
     }

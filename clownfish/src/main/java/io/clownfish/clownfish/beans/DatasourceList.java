@@ -63,7 +63,7 @@ public class DatasourceList implements Serializable {
     private @Getter @Setter String datasourceDriverclass;
     private @Getter @Setter boolean newContentButtonDisabled = false;
     
-    final transient Logger logger = LoggerFactory.getLogger(DatasourceList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(DatasourceList.class);
 
     @PostConstruct
     public void init() {
@@ -113,7 +113,7 @@ public class DatasourceList implements Serializable {
             cfdatasourceService.create(newdatasourcecontent);
             datasourcelist = cfdatasourceService.findAll();
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     
@@ -136,7 +136,7 @@ public class DatasourceList implements Serializable {
                 datasourcelist = cfdatasourceService.findAll();
             }
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

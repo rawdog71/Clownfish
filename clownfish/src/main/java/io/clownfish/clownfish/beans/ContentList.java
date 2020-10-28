@@ -139,7 +139,7 @@ public class ContentList implements Serializable {
     private @Getter @Setter List<CfAsset> assetlist;
     private @Getter @Setter String contentJson;
     
-    final transient Logger logger = LoggerFactory.getLogger(ContentList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(ContentList.class);
 
     public boolean renderSelected(CfAttributcontent attribut) {
         if (selectedAttribut != null) {
@@ -304,7 +304,7 @@ public class ContentList implements Serializable {
             classcontentlist.clear();
             classcontentlist = cfclasscontentService.findAll();
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     
@@ -397,7 +397,7 @@ public class ContentList implements Serializable {
                                 found = true;
                             }
                         } catch (javax.persistence.NoResultException | NullPointerException ex) {
-                            logger.error(ex.getMessage());
+                            LOGGER.error(ex.getMessage());
                         }
                     }
                     if (!found) {
@@ -479,7 +479,7 @@ public class ContentList implements Serializable {
                 cfclasscontentkeywordService.create(assetkeyword);
             }
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

@@ -54,7 +54,7 @@ public class StylesheetUtil implements Serializable {
     private transient @Getter @Setter List<String> source = null;
     private transient @Getter @Setter List<String> target = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(StylesheetUtil.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(StylesheetUtil.class);
 
     public StylesheetUtil() {
     }
@@ -65,7 +65,7 @@ public class StylesheetUtil implements Serializable {
             byte[] decompress = CompressionUtils.decompress(stylesheet.getContent());
             return new String(decompress, StandardCharsets.UTF_8);
         } catch (IOException | DataFormatException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return null;
         }
     }
@@ -91,7 +91,7 @@ public class StylesheetUtil implements Serializable {
                 diff = true;
             }
         } catch (DiffException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
         return diff;
     }

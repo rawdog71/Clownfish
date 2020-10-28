@@ -137,7 +137,7 @@ public class QuartzList {
     
     private @Getter @Setter String jobPreview;
     
-    final transient Logger logger = LoggerFactory.getLogger(QuartzList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(QuartzList.class);
 
     public QuartzList() {
     }

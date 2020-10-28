@@ -32,7 +32,7 @@ public class JDBCUtil {
     private final String password;
     private Connection connection;
     
-    final transient Logger logger = LoggerFactory.getLogger(JDBCUtil.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(JDBCUtil.class);
     
     public JDBCUtil(String className, String url, String user, String password) {
         this.className = className;
@@ -47,17 +47,17 @@ public class JDBCUtil {
         try {
             Class.forName(className);
         } catch (ClassNotFoundException ex) {
-            logger.error("JDBC Class not found: " + ex.getMessage());
+            LOGGER.error("JDBC Class not found: " + ex.getMessage());
             return null;
         }
         //get the connection
         try {
             connection = DriverManager.getConnection(url, user, password);
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return null;
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return null;
         }
         return connection;

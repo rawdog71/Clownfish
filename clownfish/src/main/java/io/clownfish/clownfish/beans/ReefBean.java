@@ -71,7 +71,7 @@ public class ReefBean implements Serializable {
     @Autowired transient CfJavascriptService cfjavascriptService;
     @Autowired transient CfAttributService cfattributService;
     
-    final transient Logger logger = LoggerFactory.getLogger(ReefBean.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(ReefBean.class);
     
     @PostConstruct
     public void init() {
@@ -114,14 +114,14 @@ public class ReefBean implements Serializable {
                 
             }
         } catch (IOException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
         
     }
     
     public void handleFileUpload(FileUploadEvent event) throws IOException {
         //String filename = event.getFile().getFileName().toLowerCase();
-        //logger.info("FILE: " + filename);
+        //LOGGER.info("FILE: " + filename);
         InputStream inputStream;
         inputStream = event.getFile().getInputstream();
         StringBuilder json = new StringBuilder();
@@ -131,17 +131,17 @@ public class ReefBean implements Serializable {
                 json.append((char) c);
             }
         }
-        //logger.info("UPLOAD: " + json);
+        //LOGGER.info("UPLOAD: " + json);
         Gson gson = new Gson();
         Reef newreef = gson.fromJson(json.toString(), Reef.class);
         long checksum = getCRC32Checksum(reefcheck(newreef).getBytes());
         if (0 == newreef.getChecksum().compareToIgnoreCase(String.valueOf(checksum))) {
-            logger.info("CHECKSUM OK");
+            LOGGER.info("CHECKSUM OK");
             importReef(newreef);
         } else {
-            logger.info("CHECKSUM NOT OK");
+            LOGGER.info("CHECKSUM NOT OK");
         }
-        logger.info(newreef.getName());
+        LOGGER.info(newreef.getName());
     }
     
     private String reefcheck(Reef chkreef) {
@@ -175,7 +175,7 @@ public class ReefBean implements Serializable {
         for (CfClass cfclass : importreef.getClasslist()) {
             try {
                 CfClass checkclass = cfclassService.findByName(cfclass.getName());
-                logger.error("CLASS {} already exists.", cfclass.getName());
+                LOGGER.error("CLASS {} already exists.", cfclass.getName());
             } catch (NoResultException ex) {
                 long oldid = cfclass.getId();
                 cfclass.setId(null);
@@ -187,7 +187,7 @@ public class ReefBean implements Serializable {
         for (CfTemplate cftemplate : importreef.getTemplatelist()) {
             try {
                 CfTemplate checktemplate = cftemplateService.findByName(cftemplate.getName());
-                logger.error("TEMPLATE {} already exists.", cftemplate.getName());
+                LOGGER.error("TEMPLATE {} already exists.", cftemplate.getName());
             } catch (NoResultException ex) {
                 cftemplate.setId(null);
                 cftemplateService.create(cftemplate);
@@ -196,7 +196,7 @@ public class ReefBean implements Serializable {
         for (CfJavascript cfjavascript : importreef.getJavascriptlist()) {
             try {
                 CfJavascript checkjavascript = cfjavascriptService.findByName(cfjavascript.getName());
-                logger.error("JAVASCRIPT {} already exists.", cfjavascript.getName());
+                LOGGER.error("JAVASCRIPT {} already exists.", cfjavascript.getName());
             } catch (NoResultException ex) {
                 cfjavascript.setId(null);
                 cfjavascriptService.create(cfjavascript);
@@ -205,7 +205,7 @@ public class ReefBean implements Serializable {
         for (CfStylesheet cfstylesheet : importreef.getStylesheetlist()) {
             try {
                 CfStylesheet checkstylesheet = cfstylesheetService.findByName(cfstylesheet.getName());
-                logger.error("STYLESHEET {} already exists.", cfstylesheet.getName());
+                LOGGER.error("STYLESHEET {} already exists.", cfstylesheet.getName());
             } catch (NoResultException ex) {
                 cfstylesheet.setId(null);
                 cfstylesheetService.create(cfstylesheet);

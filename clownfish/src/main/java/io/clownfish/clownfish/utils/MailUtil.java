@@ -41,7 +41,7 @@ public class MailUtil {
     private final Properties props;
     private final String encodingOptions = "text/html; charset=UTF-8";
     
-    final transient Logger logger = LoggerFactory.getLogger(MailUtil.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(MailUtil.class);
 
     public MailUtil(String mailsmtphost, String mailtransportprotocol, String mailuser, String mailpassword, String sendfrom) {
         props = System.getProperties();
@@ -79,7 +79,7 @@ public class MailUtil {
                 Transport.send( message );
                 return true;
             } catch (Exception ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
                 return false;
             }
         } else {

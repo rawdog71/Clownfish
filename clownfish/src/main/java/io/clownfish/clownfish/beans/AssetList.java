@@ -86,7 +86,7 @@ public class AssetList {
     
     private List<CfAssetkeyword> assetkeywordlist;
     
-    final transient Logger logger = LoggerFactory.getLogger(AssetList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(AssetList.class);
 
     /**
      * Initializes the AssetList
@@ -121,7 +121,7 @@ public class AssetList {
      */
     public void handleFileUpload(FileUploadEvent event) throws TikaException, SAXException {
         String filename = event.getFile().getFileName().toLowerCase();
-        logger.info("UPLOAD: {}", filename);
+        LOGGER.info("UPLOAD: {}", filename);
         HashMap<String, String> metamap = new HashMap<>();
         try {
             File result = new File(folderUtil.getMedia_folder() + File.separator + filename);
@@ -183,7 +183,7 @@ public class AssetList {
             FacesMessage message = new FacesMessage("Succesful", filename + " is uploaded.");
             FacesContext.getCurrentInstance().addMessage(null, message);
         } catch (IOException | PersistenceException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             FacesMessage error = new FacesMessage("The files were not uploaded!");
             FacesContext.getCurrentInstance().addMessage(null, error);
         }
@@ -232,7 +232,7 @@ public class AssetList {
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }
         } catch (IOException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     */

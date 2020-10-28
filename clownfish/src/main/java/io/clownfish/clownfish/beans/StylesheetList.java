@@ -70,7 +70,7 @@ public class StylesheetList {
     private @Getter @Setter boolean access;
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     
-    final transient Logger logger = LoggerFactory.getLogger(StylesheetList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(StylesheetList.class);
 
     public StylesheetList() {
     }
@@ -159,7 +159,7 @@ public class StylesheetList {
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
                 } catch (IOException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
             } else {
                 difference = stylesheetUtility.hasDifference(selectedStylesheet);
@@ -234,7 +234,7 @@ public class StylesheetList {
             stylesheetListe = cfstylesheetService.findAll();
             stylesheetName = "";
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

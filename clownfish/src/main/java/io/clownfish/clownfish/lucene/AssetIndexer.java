@@ -61,7 +61,7 @@ public class AssetIndexer implements Runnable {
     private static Map<String, String> propertymap = null;
     private final PropertyList propertylist;
     
-    final transient Logger logger = LoggerFactory.getLogger(AssetIndexer.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(AssetIndexer.class);
 
     public AssetIndexer(CfAssetService cfassetService, IndexService indexService, PropertyList propertylist) throws IOException {
         this.cfassetService = cfassetService;
@@ -108,7 +108,7 @@ public class AssetIndexer implements Runnable {
             parser.parse(inputstream, handler, metadata, context);
             //System.out.println(handler.toString());
         } catch (SAXException | TikaException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
 
         //getting the list of all meta data elements 
@@ -167,7 +167,7 @@ public class AssetIndexer implements Runnable {
             Term term = new Term(LuceneConstants.ID, String.valueOf(asset.getId()));
             writer.deleteDocuments(term);
         } catch (IOException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
         
     }
@@ -178,7 +178,7 @@ public class AssetIndexer implements Runnable {
             assetList = cfassetService.findByIndexed(false);
             createIndex();
         } catch (IOException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
 }

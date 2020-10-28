@@ -75,7 +75,7 @@ public class GetDatalist extends HttpServlet {
     private static transient @Getter @Setter String name;
     private static transient @Getter @Setter String apikey;
     
-    final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetAsset.class);
     
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -156,7 +156,7 @@ public class GetDatalist extends HttpServlet {
                 if (null != classcontent) {
                     classcontentList.add(classcontent);
                 } else {
-                    logger.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
+                    LOGGER.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
                 }
             }
             
@@ -177,7 +177,7 @@ public class GetDatalist extends HttpServlet {
             try (PrintWriter out = response.getWriter()) {
                 out.print(json);
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         } else {
             PrintWriter out = null;
@@ -185,7 +185,7 @@ public class GetDatalist extends HttpServlet {
                 out = response.getWriter();
                 out.print("Wrong API KEY");
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             } finally {
                 out.close();
             }
@@ -238,7 +238,7 @@ public class GetDatalist extends HttpServlet {
                 if (null != classcontent) {
                     classcontentList.add(classcontent);
                 } else {
-                    logger.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
+                    LOGGER.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
                 }
             }
             

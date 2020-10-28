@@ -70,7 +70,7 @@ public class JavascriptList {
     private @Getter @Setter boolean access;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
     
-    final transient Logger logger = LoggerFactory.getLogger(JavascriptList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(JavascriptList.class);
 
     public JavascriptList() {
     }
@@ -159,7 +159,7 @@ public class JavascriptList {
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
                 } catch (IOException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
             } else {
                 difference = javascriptUtility.hasDifference(selectedJavascript);
@@ -234,7 +234,7 @@ public class JavascriptList {
             
             javascriptName = "";
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

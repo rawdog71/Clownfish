@@ -55,7 +55,7 @@ public class RestInsertContent {
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired HibernateUtil hibernateUtil;
-    private static final Logger logger = LoggerFactory.getLogger(RestInsertContent.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestInsertContent.class);
 
     @PostMapping("/insertcontent")
     public InsertContentParameter restInsertContent(@RequestBody InsertContentParameter icp) {

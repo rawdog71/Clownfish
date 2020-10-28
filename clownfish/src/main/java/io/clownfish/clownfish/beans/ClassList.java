@@ -76,7 +76,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean renderClass;
     
     @Autowired transient private @Getter @Setter AttributList attributlist;
-    final transient Logger logger = LoggerFactory.getLogger(ClassList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(ClassList.class);
 
     @PostConstruct
     public void init() {
@@ -149,7 +149,7 @@ public class ClassList implements Serializable {
             contentlist.init();
             datalist.init();
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     
@@ -162,7 +162,7 @@ public class ClassList implements Serializable {
             contentlist.init();
             datalist.init();
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     
@@ -190,7 +190,7 @@ public class ClassList implements Serializable {
             }
             
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

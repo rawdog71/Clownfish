@@ -48,7 +48,7 @@ public class GetAssetData extends HttpServlet {
     @Autowired transient CfKeywordService cfkeywordService;
     @Autowired ApiKeyUtil apikeyutil;
         
-    final transient Logger logger = LoggerFactory.getLogger(GetAsset.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetAsset.class);
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -92,7 +92,7 @@ public class GetAssetData extends HttpServlet {
                         try (PrintWriter out = response.getWriter()) {
                             out.print(json);
                         } catch (IOException ex) {
-                            logger.error(ex.getMessage());
+                            LOGGER.error(ex.getMessage());
                         }
                     }
                 } else {
@@ -108,10 +108,10 @@ public class GetAssetData extends HttpServlet {
             try (PrintWriter out = response.getWriter()) {
                 out.print("No image");
             } catch (IOException ex1) {
-                logger.error(ex1.getMessage());
+                LOGGER.error(ex1.getMessage());
             }
         } catch (IOException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
 

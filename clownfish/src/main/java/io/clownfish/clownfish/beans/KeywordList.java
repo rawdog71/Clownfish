@@ -53,7 +53,7 @@ public class KeywordList {
     private @Getter @Setter CfKeyword selectedKeyword;
     private @Getter @Setter List<CfKeyword> filteredKeyword;
     
-    final transient Logger logger = LoggerFactory.getLogger(KeywordList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(KeywordList.class);
     
     @PostConstruct
     public void init() {
@@ -85,7 +85,7 @@ public class KeywordList {
             assetlist.init();
             contentlist.init();
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
 }

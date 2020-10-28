@@ -56,7 +56,7 @@ public class GetAssetPreview extends HttpServlet {
     @Autowired transient PropertyUtil propertyUtil;
     @Autowired ApiKeyUtil apikeyutil;
         
-    final transient Logger logger = LoggerFactory.getLogger(GetAssetPreview.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetAssetPreview.class);
     
     public GetAssetPreview() {
     }
@@ -107,7 +107,7 @@ public class GetAssetPreview extends HttpServlet {
                                         in = new FileInputStream(f);
                                         IOUtils.copy(in, out);
                                     } catch (IOException ex) {
-                                        logger.error(ex.getMessage());
+                                        LOGGER.error(ex.getMessage());
                                         acontext.complete();
                                     }
                                 } else {
@@ -127,7 +127,7 @@ public class GetAssetPreview extends HttpServlet {
                                             in = new FileInputStream(f);
                                             IOUtils.copy(in, out);
                                         } catch (IOException ex) {
-                                            logger.error(ex.getMessage());
+                                            LOGGER.error(ex.getMessage());
                                             acontext.complete();
                                         }
                                     } else {
@@ -145,7 +145,7 @@ public class GetAssetPreview extends HttpServlet {
                                                 in = new ByteArrayInputStream(os.toByteArray());
                                                 IOUtils.copy(in, out);
                                             } catch (IOException ex) {
-                                                logger.error(ex.getMessage());
+                                                LOGGER.error(ex.getMessage());
                                                 acontext.complete();
                                             }
                                         } else {
@@ -153,7 +153,7 @@ public class GetAssetPreview extends HttpServlet {
                                                 in = new FileInputStream(f);
                                                 IOUtils.copy(in, out);
                                             } catch (IOException ex) {
-                                                logger.error(ex.getMessage());
+                                                LOGGER.error(ex.getMessage());
                                                 acontext.complete();
                                             }
                                         }
@@ -185,7 +185,7 @@ public class GetAssetPreview extends HttpServlet {
                                     in = new FileInputStream(f);
                                     IOUtils.copy(in, out);
                                 } catch (IOException ex) {
-                                    logger.error(ex.getMessage());
+                                    LOGGER.error(ex.getMessage());
                                     acontext.complete();
                                 }
                             }
@@ -207,11 +207,11 @@ public class GetAssetPreview extends HttpServlet {
                     out.print("No image");
                     acontext.complete();
                 } catch (IOException ex1) {
-                    logger.error(ex1.getMessage());
+                    LOGGER.error(ex1.getMessage());
                     acontext.complete();
                 }
             } catch (IOException | InterruptedException | ExecutionException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         });
     }

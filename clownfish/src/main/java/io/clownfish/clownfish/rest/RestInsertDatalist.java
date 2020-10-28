@@ -39,7 +39,7 @@ public class RestInsertDatalist {
     @Autowired transient CfListService cflistService;
     @Autowired FolderUtil folderUtil;
     @Autowired ApiKeyUtil apikeyutil;
-    private static final Logger logger = LoggerFactory.getLogger(RestInsertDatalist.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestInsertDatalist.class);
 
     @PostMapping("/insertdatalist")
     public InsertDatalistParameter restInsertDatalist(@RequestBody InsertDatalistParameter idp) {

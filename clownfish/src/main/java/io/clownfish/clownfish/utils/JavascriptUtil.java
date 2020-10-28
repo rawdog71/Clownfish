@@ -54,7 +54,7 @@ public class JavascriptUtil implements Serializable {
     private transient @Getter @Setter List<String> source = null;
     private transient @Getter @Setter List<String> target = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(JavascriptUtil.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(JavascriptUtil.class);
 
     public JavascriptUtil() {
     }
@@ -65,7 +65,7 @@ public class JavascriptUtil implements Serializable {
             byte[] decompress = CompressionUtils.decompress(javascript.getContent());
             return new String(decompress, StandardCharsets.UTF_8);
         } catch (IOException | DataFormatException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return null;
         }
     }
@@ -91,7 +91,7 @@ public class JavascriptUtil implements Serializable {
                 diff = true;
             }
         } catch (DiffException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
         return diff;
     }

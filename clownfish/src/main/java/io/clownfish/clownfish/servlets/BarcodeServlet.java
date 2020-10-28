@@ -55,7 +55,7 @@ import org.springframework.stereotype.Component;
 public class BarcodeServlet extends HttpServlet {
     @Autowired ApiKeyUtil apikeyutil;
     
-    final transient Logger logger = LoggerFactory.getLogger(BarcodeServlet.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(BarcodeServlet.class);
     
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -145,10 +145,10 @@ public class BarcodeServlet extends HttpServlet {
                         outputStream.close();
                     }
                 } catch (FileNotFoundException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                     acontext.complete();
                 } catch (IOException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                     acontext.complete();
                 } finally {
                     try {
@@ -157,7 +157,7 @@ public class BarcodeServlet extends HttpServlet {
                         }
                         acontext.complete();
                     } catch (IOException ex) {
-                        logger.error(ex.getMessage());
+                        LOGGER.error(ex.getMessage());
                         acontext.complete();
                     }
                 }

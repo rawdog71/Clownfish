@@ -61,7 +61,7 @@ public class HibernateUtil {
     @Autowired transient CfListcontentService cflistcontentService;
     private @Getter @Setter HashMap<String, Session> classsessions = new HashMap<>();
 
-    private static final Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     
     public void generateTablesDatamodel(int initHibernate) {
         //classsessions = new HashMap<>();
@@ -114,7 +114,7 @@ public class HibernateUtil {
             session.close();
         }
 
-        logger.info("Datamodel created");
+        LOGGER.info("Datamodel created");
     }
 
     private void fillTable(String classname, Session session) {
@@ -127,9 +127,9 @@ public class HibernateUtil {
             try {
                 session.save(classname, entity);
             } catch (org.hibernate.id.IdentifierGenerationException ex) {
-                logger.warn("NOT SAVED:" + classcontent.getName());
+                LOGGER.warn("NOT SAVED:" + classcontent.getName());
             }
-            //logger.info(entity.toString());
+            //LOGGER.info(entity.toString());
         }
     }
     
@@ -145,7 +145,7 @@ public class HibernateUtil {
             tx.commit();
             session.close();
         } catch (org.hibernate.id.IdentifierGenerationException ex) {
-            logger.warn("NOT SAVED:" + classcontent.getName());
+            LOGGER.warn("NOT SAVED:" + classcontent.getName());
         }
     }
     
@@ -162,7 +162,7 @@ public class HibernateUtil {
             tx.commit();
             session.close();
         } catch (org.hibernate.id.IdentifierGenerationException ex) {
-            logger.warn("NOT SAVED:" + classcontent.getName());
+            LOGGER.warn("NOT SAVED:" + classcontent.getName());
         }
     }
     
@@ -179,7 +179,7 @@ public class HibernateUtil {
             tx.commit();
             session.close();
         } catch (org.hibernate.id.IdentifierGenerationException ex) {
-            logger.warn("NOT SAVED:" + classcontent.getName());
+            LOGGER.warn("NOT SAVED:" + classcontent.getName());
         }
     }
 

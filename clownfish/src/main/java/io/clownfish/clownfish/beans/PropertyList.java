@@ -56,7 +56,7 @@ public class PropertyList {
     private @Getter @Setter boolean deletePropertyButtonDisabled;
     private Clownfish clownfish;
     
-    final transient Logger logger = LoggerFactory.getLogger(PropertyList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(PropertyList.class);
 
     public PropertyList() {
         propertymap = new HashMap<>();
@@ -107,7 +107,7 @@ public class PropertyList {
             fillPropertyMap();
             clownfish.init();
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     
@@ -123,7 +123,7 @@ public class PropertyList {
                 clownfish.init();
             }
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

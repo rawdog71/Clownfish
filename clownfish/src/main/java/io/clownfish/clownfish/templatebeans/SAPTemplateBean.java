@@ -58,7 +58,7 @@ public class SAPTemplateBean implements Serializable {
     private HashMap<String, JCoFunction> jcofunctiontable = null;
     private HashMap<String, List<RpyTableRead>> rpyMap = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(SAPTemplateBean.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(SAPTemplateBean.class);
 
     public SAPTemplateBean() {
         contentmap = new HashMap<>();
@@ -76,7 +76,7 @@ public class SAPTemplateBean implements Serializable {
     
     public Map executeAsync(String rfcFunction, Map parametermap) {
         try {
-            //logger.info("START SAP execute");
+            //LOGGER.info("START SAP execute");
             JCoTable functions_table;
             HashMap<String, HashMap> sapexport = new HashMap<>();
             HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
@@ -105,7 +105,7 @@ public class SAPTemplateBean implements Serializable {
                         function.getChangingParameterList().clear();
                     }
                 } catch (Exception ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
                 for (RfcFunctionParam rfcfunctionparam : paramlist) {
                     if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
@@ -117,9 +117,9 @@ public class SAPTemplateBean implements Serializable {
                     }
                 }
                 // SAP RFC ausführen
-                //logger.info("START SAP RFC execute");
+                //LOGGER.info("START SAP RFC execute");
                 function.execute(sapc.getDestination());
-                //logger.info("STOP SAP RFC execute");
+                //LOGGER.info("STOP SAP RFC execute");
                 HashMap<String, ArrayList> saptables = new HashMap<>();
                 for (RfcFunctionParam rfcfunctionparam : paramlist) {    
                     String paramclass = rfcfunctionparam.getParamclass().toLowerCase();
@@ -166,7 +166,7 @@ public class SAPTemplateBean implements Serializable {
                                     saptables.put(paramname, tablevalues);
                                 }
                             } catch(ConversionException ex) {
-                                logger.error(ex.getMessage());
+                                LOGGER.error(ex.getMessage());
                             }
                         break;
                     }
@@ -174,13 +174,13 @@ public class SAPTemplateBean implements Serializable {
                 sapvalues.put("table", saptables);
                 sapexport.put(rfcFunction, sapvalues);
             } catch(JCoException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
             contentmap.put("sap", sapexport);
-            //logger.info("STOP SAP execute");
+            //LOGGER.info("STOP SAP execute");
             return contentmap;
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return contentmap;
         }
     }
@@ -213,7 +213,7 @@ public class SAPTemplateBean implements Serializable {
                     function.getChangingParameterList().clear();
                 }
             } catch (Exception ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
             for (RfcFunctionParam rfcfunctionparam : paramlist) {
                 if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
@@ -279,7 +279,7 @@ public class SAPTemplateBean implements Serializable {
             sapvalues.put("table", saptables);
             sapexport.put(rfcFunction, sapvalues);
         } catch(JCoException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
         contentmap.put("sap", sapexport);
         return contentmap;

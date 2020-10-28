@@ -46,7 +46,7 @@ public class RestDeleteListcontent {
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired FolderUtil folderUtil;
     @Autowired ApiKeyUtil apikeyutil;
-    private static final Logger logger = LoggerFactory.getLogger(RestDeleteListcontent.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestDeleteListcontent.class);
 
     @PostMapping("/deletelistcontent")
     public InsertListcontentParameter restInsertDatalist(@RequestBody InsertListcontentParameter ilcp) {

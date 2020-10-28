@@ -59,7 +59,7 @@ public class KeywordContentList {
     private transient @Getter @Setter List<CfKeyword> selectedKeywordcontent = null;
     private transient @Getter @Setter List<CfKeyword> filteredKeywordcontent = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(KeywordContentList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(KeywordContentList.class);
     
     @PostConstruct
     public void init() {
@@ -79,7 +79,7 @@ public class KeywordContentList {
             keywordlist = cfkeywordlistService.findAll();
             keywords = cfkeywordService.findAll();
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

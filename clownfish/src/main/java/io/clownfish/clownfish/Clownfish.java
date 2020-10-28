@@ -243,7 +243,7 @@ public class Clownfish {
     
     private @Getter @Setter Map<String, String> metainfomap;
     
-    final transient Logger logger = LoggerFactory.getLogger(Clownfish.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(Clownfish.class);
     @Value("${bootstrap}") int bootstrap;
     @Value("${app.datasource.username}") String dbuser;
     @Value("${app.datasource.password}") String dbpassword;
@@ -311,7 +311,7 @@ public class Clownfish {
                 DefaultPropertiesPersister p = new DefaultPropertiesPersister();
                     p.store(props, out, "Application properties");
                 } else {
-                    logger.error("application.properties file not found");
+                    LOGGER.error("application.properties file not found");
                 }
               } catch (Exception e ) {
                 e.printStackTrace();
@@ -482,13 +482,13 @@ public class Clownfish {
 
                         }
                     } catch (SchedulerException ex) {
-                        logger.error(ex.getMessage());
+                        LOGGER.error(ex.getMessage());
                     }
                 });
             }
             AnsiConsole.systemUninstall();
         } catch (SchedulerException | IOException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
 
@@ -518,7 +518,7 @@ public class Clownfish {
             SearchResult searchresult = searcher.search(parametermap.get("searchparam").toString(), searchlimit);
             long endTime = System.currentTimeMillis();
             
-            logger.info("Search Time :" + (endTime - startTime));
+            LOGGER.info("Search Time :" + (endTime - startTime));
             searchmetadata.clear();
             searchmetadata.put("cfSearchQuery", parametermap.get("searchparam").toString());
             searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
@@ -546,7 +546,7 @@ public class Clownfish {
             request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, search_site);
             universalGet(search_site, request, response);
         } catch (IOException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }    
     }
     
@@ -570,7 +570,7 @@ public class Clownfish {
             SearchResult searchresult = searcher.search(query, searchlimit);
             long endTime = System.currentTimeMillis();
             
-            logger.info("Search Time :" + (endTime - startTime));
+            LOGGER.info("Search Time :" + (endTime - startTime));
             searchmetadata.clear();
             searchmetadata.put("cfSearchQuery", query);
             searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
@@ -598,7 +598,7 @@ public class Clownfish {
             request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, search_site);
             universalGet(search_site, request, response);
         } catch (IOException | ParseException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     
@@ -650,7 +650,7 @@ public class Clownfish {
             PrintWriter outwriter = response.getWriter();
             outwriter.println(cfResponse.get().getOutput());
         } catch (IOException | InterruptedException | ExecutionException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } catch (PageNotFoundException ex) {
             String error_site = propertyUtil.getPropertyValue("site_error");
             if (null == error_site) {
@@ -701,7 +701,7 @@ public class Clownfish {
                 outwriter.println(cfResponse.get().getOutput());
             }
         } catch (IOException | InterruptedException | ExecutionException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } catch (PageNotFoundException ex) {
             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -768,7 +768,7 @@ public class Clownfish {
                             generateStaticSite(name, cfStaticResponse.get().getOutput());
                             return makeResponse(name, postmap, false);
                         } catch (InterruptedException | ExecutionException ex) {
-                            logger.error(ex.getMessage());
+                            LOGGER.error(ex.getMessage());
                             return makeResponse(name, postmap, false);
                         }
                     }
@@ -898,7 +898,7 @@ public class Clownfish {
                             try {
                                 sendRespondMail(emailproperties.getSendto(), emailproperties.getSubject(), emailproperties.getBody());
                             } catch (Exception ex) {
-                                logger.error(ex.getMessage());
+                                LOGGER.error(ex.getMessage());
                             }
                         }
 
@@ -954,7 +954,7 @@ public class Clownfish {
                                         env.process();
                                     }
                                 } catch (freemarker.template.TemplateException ex) {
-                                    logger.error(ex.getMessage());
+                                    LOGGER.error(ex.getMessage());
                                 }
                             }
                         } else {                                    // Velocity template
@@ -1011,18 +1011,18 @@ public class Clownfish {
 
                             cfresponse.setErrorcode(0);
                             cfresponse.setOutput(htmlcompressor.compress(out.toString()));
-                            //logger.info("END makeResponse: " + name);
+                            //LOGGER.info("END makeResponse: " + name);
                             return new AsyncResult<>(cfresponse);
                         } else {
                             cfresponse.setErrorcode(0);
                             cfresponse.setOutput(out.toString());
-                            //logger.info("END makeResponse: " + name);
+                            //LOGGER.info("END makeResponse: " + name);
                             return new AsyncResult<>(cfresponse);
                         }
                     } catch (NoResultException ex) {
                         cfresponse.setErrorcode(1);
                         cfresponse.setOutput("No template");
-                        //logger.info("END makeResponse: " + name);
+                        //LOGGER.info("END makeResponse: " + name);
                         return new AsyncResult<>(cfresponse);
                     }
                 }
@@ -1034,7 +1034,7 @@ public class Clownfish {
         } catch (IOException | org.apache.velocity.runtime.parser.ParseException ex) {
             cfresponse.setErrorcode(1);
             cfresponse.setOutput(ex.getMessage());
-            //logger.info("END makeResponse: " + name);
+            //LOGGER.info("END makeResponse: " + name);
             return new AsyncResult<>(cfresponse);
         }
     }
@@ -1120,7 +1120,7 @@ public class Clownfish {
             br.close();
             return cfResponse;
         } catch (IOException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             cfResponse.setOutput("Static site not found");
             cfResponse.setErrorcode(1);
             
@@ -1131,7 +1131,7 @@ public class Clownfish {
                     br.close();
                 }
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         }
     }
@@ -1152,14 +1152,14 @@ public class Clownfish {
                 throw new RuntimeException("Unable to create the destination file", e);
             }
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             try {
                 if (null != fileStream) {
                     fileStream.close();
                 }
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         }
     }
@@ -1186,7 +1186,7 @@ public class Clownfish {
     }
 
     private boolean checkConsistency() {
-        logger.info("CHECK INCONSISTENCY");
+        LOGGER.info("CHECK INCONSISTENCY");
         boolean isConsistent = true;
         List<CfAttributcontent> attributcontentlist;
         attributcontentlist = cfattributcontentService.findAll();
@@ -1195,9 +1195,9 @@ public class Clownfish {
                 CfClasscontent classcontent = cfclasscontentService.findById(attributcontent.getClasscontentref().getId());
             } catch (Exception ex) {
                 isConsistent = false;
-                logger.info("INCONSISTENCY: " + attributcontent.getId());
-                logger.info("INCONSISTENCY: " + attributcontent.getClasscontentref());
-                logger.info("---------------");
+                LOGGER.info("INCONSISTENCY: " + attributcontent.getId());
+                LOGGER.info("INCONSISTENCY: " + attributcontent.getClasscontentref());
+                LOGGER.info("---------------");
             }
         }
         return isConsistent;

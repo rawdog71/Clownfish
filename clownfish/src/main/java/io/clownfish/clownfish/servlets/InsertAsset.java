@@ -67,7 +67,7 @@ public class InsertAsset extends HttpServlet {
     @Autowired FolderUtil folderUtil;
     @Autowired ApiKeyUtil apikeyutil;
     
-    final transient Logger logger = LoggerFactory.getLogger(InsertAsset.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(InsertAsset.class);
     
     /**
      *
@@ -115,7 +115,7 @@ public class InsertAsset extends HttpServlet {
                         ParseContext context = new ParseContext();
                         parser.parse(inputstream, handler, metadata, context);
                     } catch (SAXException | TikaException ex) {
-                        logger.error(ex.getMessage());
+                        LOGGER.error(ex.getMessage());
                     }
 
                     //getting the list of all meta data elements 
@@ -147,12 +147,12 @@ public class InsertAsset extends HttpServlet {
                     try (PrintWriter out = response.getWriter()) {
                         out.print(json);
                     } catch (IOException ex) {
-                        logger.error(ex.getMessage());
+                        LOGGER.error(ex.getMessage());
                     }
                 }
             }
         } catch (IOException | PersistenceException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 }

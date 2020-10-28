@@ -72,7 +72,7 @@ public class TemplateList {
     private @Getter @Setter boolean access;
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
     
-    final transient Logger logger = LoggerFactory.getLogger(TemplateList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(TemplateList.class);
 
     public TemplateList() {
     }
@@ -167,7 +167,7 @@ public class TemplateList {
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
                 } catch (IOException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
             } else {
                 difference = templateUtility.hasDifference(selectedTemplate);
@@ -241,7 +241,7 @@ public class TemplateList {
             templateListe = cftemplateService.findAll();
             templateName = "";
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

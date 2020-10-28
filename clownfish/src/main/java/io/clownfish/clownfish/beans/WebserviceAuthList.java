@@ -66,7 +66,7 @@ public class WebserviceAuthList {
     private transient @Getter @Setter List<CfBackend> selectedbackendListcontent = null;
     private transient @Getter @Setter List<CfBackend> backendListcontent = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(WebserviceAuthList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(WebserviceAuthList.class);
 
     @PostConstruct
     public void init() {

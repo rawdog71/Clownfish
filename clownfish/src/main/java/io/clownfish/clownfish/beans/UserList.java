@@ -64,7 +64,7 @@ public class UserList {
     private transient @Getter @Setter List<CfBackend> selectedbackendListcontent = null;
     private transient @Getter @Setter List<CfBackend> backendListcontent = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(UserList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(UserList.class);
 
     @PostConstruct
     public void init() {
@@ -110,7 +110,7 @@ public class UserList {
 
             userlist = cfuserService.findAll();
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     
@@ -125,7 +125,7 @@ public class UserList {
                 userlist = cfuserService.findAll();
             }
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

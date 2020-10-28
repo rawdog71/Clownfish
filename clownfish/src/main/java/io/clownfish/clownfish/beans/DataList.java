@@ -70,7 +70,7 @@ public class DataList implements Serializable {
     private transient @Getter @Setter List<CfClasscontent> selectedListcontent = null;
     private transient @Getter @Setter List<CfClasscontent> filteredclasscontentlist = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(DataList.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(DataList.class);
 
     @PostConstruct
     public void init() {
@@ -112,7 +112,7 @@ public class DataList implements Serializable {
             cflistService.create(newlistcontent);
             onRefreshAll();
         } catch (ConstraintViolationException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

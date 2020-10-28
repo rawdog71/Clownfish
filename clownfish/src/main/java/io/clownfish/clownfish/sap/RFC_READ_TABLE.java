@@ -34,7 +34,7 @@ public class RFC_READ_TABLE {
     
     private static HashMap<String, String> structurenameProxy = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(RFC_READ_TABLE.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(RFC_READ_TABLE.class);
 
     public RFC_READ_TABLE(Object sapc) {
         RFC_READ_TABLE.sapc = (SAPConnection) sapc;
@@ -72,7 +72,7 @@ public class RFC_READ_TABLE {
                 structurenameProxy.put(hash, value);
                 return value;
             } catch(JCoException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
                 return null;
             }
         }

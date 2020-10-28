@@ -42,30 +42,30 @@ public class ConsistencyUtil {
     @Autowired CfAttributcontentService cfattributcontentservice;
     @Autowired CfAssetlistcontentService cfassetlistcontentservice;
     
-    final transient Logger logger = LoggerFactory.getLogger(ConsistencyUtil.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(ConsistencyUtil.class);
     
     public void checkConsistency() {
-        logger.info("CONSISTENCY CHECK ListContent - START");
+        LOGGER.info("CONSISTENCY CHECK ListContent - START");
         List<CfListcontent> listcontentList = cflistcontentservice.findAll();
         for (CfListcontent listcontent : listcontentList) {
             // Check Classcontent
             try {
                 CfClasscontent cc = cfclasscontentservice.findById(listcontent.getCfListcontentPK().getClasscontentref());
             } catch (Exception ex) {
-                logger.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
+                LOGGER.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
                 cflistcontentservice.delete(listcontent);
             }
             // Check List
             try {
                 CfList l = cflistservice.findById(listcontent.getCfListcontentPK().getListref());
             } catch (Exception ex) {
-                logger.warn("List does not exist: " + listcontent.getCfListcontentPK().getListref());
+                LOGGER.warn("List does not exist: " + listcontent.getCfListcontentPK().getListref());
                 cflistcontentservice.delete(listcontent);
             }
         }
-        logger.info("CONSISTENCY CHECK ListContent - END");
+        LOGGER.info("CONSISTENCY CHECK ListContent - END");
         
-        logger.info("CONSISTENCY CHECK AttributContent - START");     
+        LOGGER.info("CONSISTENCY CHECK AttributContent - START");     
         List<CfClasscontent> classcontentlist = cfclasscontentservice.findAll();
         long lastId = classcontentlist.get(classcontentlist.size()-1).getId();
         for (long i = 0; i <= lastId; i++) {
@@ -101,6 +101,6 @@ public class ConsistencyUtil {
                     
             }
         }
-        logger.info("CONSISTENCY CHECK AttributContent - END");
+        LOGGER.info("CONSISTENCY CHECK AttributContent - END");
     }
 }

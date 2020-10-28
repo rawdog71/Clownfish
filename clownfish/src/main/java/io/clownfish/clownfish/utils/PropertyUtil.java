@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 public class PropertyUtil {
     private @Getter @Setter Map<String, String> propertymap = null;
     
-    final transient Logger logger = LoggerFactory.getLogger(PropertyUtil.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(PropertyUtil.class);
     
     public String getPropertyValue(String key) {
         return propertymap.get(key);
@@ -70,7 +70,7 @@ public class PropertyUtil {
                 value = Integer.parseInt(intvalue);
             } catch (NumberFormatException nex) {
                 value = defaultvalue;
-                logger.warn(nex.getMessage());
+                LOGGER.warn(nex.getMessage());
             }
         } else {
             value = defaultvalue;
@@ -90,7 +90,7 @@ public class PropertyUtil {
                 }
             } catch (NumberFormatException nex) {
                 value = defaultvalue;
-                logger.warn(nex.getMessage());
+                LOGGER.warn(nex.getMessage());
             }
         } else {
             value = defaultvalue;

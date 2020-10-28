@@ -42,7 +42,7 @@ public class AssetUtil {
     BodyContentHandler handler;
     private final Parser parser;
     
-    final transient Logger logger = LoggerFactory.getLogger(AssetUtil.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(AssetUtil.class);
     
     public AssetUtil(PropertyList propertylist) {
         this.propertylist = propertylist;
@@ -66,7 +66,7 @@ public class AssetUtil {
             parser.parse(inputstream, handler, metadata, context);
             //System.out.println(handler.toString());
         } catch (SAXException | TikaException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
 
         //getting the list of all meta data elements 

@@ -61,7 +61,7 @@ public class InsertContent extends HttpServlet {
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
     
-    final transient Logger logger = LoggerFactory.getLogger(InsertContent.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(InsertContent.class);
 
     public InsertContent() {
     }
@@ -84,7 +84,7 @@ public class InsertContent extends HttpServlet {
                 jb.append(line);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
 
         Gson gson = new Gson();
@@ -145,23 +145,23 @@ public class InsertContent extends HttpServlet {
                             }
                         });
                     } catch (IOException ex1) {
-                        logger.error(ex1.getMessage());
+                        LOGGER.error(ex1.getMessage());
                     }
                 } catch (IOException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
             } else {
                 try {
                     response.getOutputStream().println("Wrong API KEY");
                 } catch (IOException ex1) {
-                    logger.error(ex1.getMessage());
+                    LOGGER.error(ex1.getMessage());
                 }
             }
         } catch (javax.persistence.NoResultException ex) {
             try {
                 response.getOutputStream().println("Class not found: " + icp.getClassname());
             } catch (IOException ex1) {
-                logger.error(ex1.getMessage());
+                LOGGER.error(ex1.getMessage());
             }
         }
         return icp;

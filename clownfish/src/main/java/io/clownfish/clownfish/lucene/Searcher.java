@@ -97,7 +97,7 @@ public class Searcher {
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordservice;
     @Autowired CfAssetKeywordService cfassetkeywordservice;
     
-    final transient Logger logger = LoggerFactory.getLogger(Searcher.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(Searcher.class);
 
     public Searcher() {
         foundSites = new ArrayList<>();
@@ -165,7 +165,7 @@ public class Searcher {
                         }
                     }
                 } catch (Exception ex) {
-                    logger.warn(ex.getMessage());
+                    LOGGER.warn(ex.getMessage());
                 }
             }
         }

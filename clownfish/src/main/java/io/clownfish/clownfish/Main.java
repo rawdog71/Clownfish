@@ -79,7 +79,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
     @PropertySource("file:application.properties")
 })
 public class Main extends SpringBootServletInitializer implements ServletContextAware, WebMvcConfigurer {
-    final static transient Logger logger = LoggerFactory.getLogger(Main.class);
+    final static transient Logger LOGGER = LoggerFactory.getLogger(Main.class);
     @Value("${server.port.https:9090}")
     int serverPortHttps;
     @Value("${server.port:9000}")
@@ -204,14 +204,14 @@ public class Main extends SpringBootServletInitializer implements ServletContext
                 runner.runScript(new BufferedReader(new FileReader(file)));
             }
         } catch (FileNotFoundException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } catch (IOException | SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             try {
                 is.close();
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         }
     }

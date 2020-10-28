@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 public class GZIPWriterInterceptor implements WriterInterceptor {
     private GzipSwitch gzipswitch;
     
-    final transient Logger logger = LoggerFactory.getLogger(GZIPWriterInterceptor.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GZIPWriterInterceptor.class);
     
     @Override
     public void aroundWriteTo(WriterInterceptorContext responseContext) {
@@ -46,7 +46,7 @@ public class GZIPWriterInterceptor implements WriterInterceptor {
             responseContext.setOutputStream(new GZIPOutputStream(outputStream));
             responseContext.proceed();
         } catch (IOException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

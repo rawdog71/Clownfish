@@ -75,7 +75,7 @@ public class SiteUtil {
     @Autowired CfKeywordlistService cfkeywordlistService;
     @Autowired CfKeywordlistcontentService cfkeywordlistcontentService;
     @Autowired ClassUtil classutil;
-    final transient Logger logger = LoggerFactory.getLogger(SiteUtil.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(SiteUtil.class);
     
     public SiteUtil() {
     }
@@ -111,7 +111,7 @@ public class SiteUtil {
                 attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
                 sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
             } else {
-                logger.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + sitecontent.getCfSitecontentPK().getClasscontentref());
+                LOGGER.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + sitecontent.getCfSitecontentPK().getClasscontentref());
             }
         }
         return sitecontentmapdummy;
@@ -132,7 +132,7 @@ public class SiteUtil {
                 if (null != asset) {
                     dummyassetlist.add(asset);
                 } else {
-                    logger.warn("ASSET NOT FOUND (deleted or on scrapyard): " + assetcontent.getCfAssetlistcontentPK().getAssetref());
+                    LOGGER.warn("ASSET NOT FOUND (deleted or on scrapyard): " + assetcontent.getCfAssetlistcontentPK().getAssetref());
                 }
             }
             assetlibraryMap.put(cfassetlist.getName(), dummyassetlist);

@@ -43,7 +43,7 @@ public class ContentIndexer implements Runnable {
     private final IndexWriter writer;
     private final CfAttributcontentService cfattributcontentService;
     
-    final transient Logger logger = LoggerFactory.getLogger(ContentIndexer.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(ContentIndexer.class);
     
     public ContentIndexer(CfAttributcontentService cfattributcontentService, IndexService indexService) throws IOException {
         this.cfattributcontentService = cfattributcontentService;
@@ -119,7 +119,7 @@ public class ContentIndexer implements Runnable {
             attributcontentlist = cfattributcontentService.findByIndexed(false);
             createIndex();
         } catch (IOException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
 }

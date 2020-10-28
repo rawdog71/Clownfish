@@ -81,13 +81,13 @@ public class QuartzJob implements Job {
     private static SAPConnection sapc = null;
     private RPY_TABLE_READ rpytableread = null;
     private ClownfishConst.ViewModus modus = STAGING;
-    final transient Logger logger = LoggerFactory.getLogger(QuartzJob.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(QuartzJob.class);
 
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         List<CfQuartz> joblist = quartzlist.getQuartzlist();
         joblist.stream().filter((quartz) -> (quartz.getName().compareToIgnoreCase(jec.getJobDetail().getKey().getName()) == 0)).map((quartz) -> {
-            logger.info("JOB CLOWNFISH CMS: " + quartz.getName() + " - " + quartz.getSiteRef());
+            LOGGER.info("JOB CLOWNFISH CMS: " + quartz.getName() + " - " + quartz.getSiteRef());
             return quartz;
         }).forEach((quartz) -> {
             callJob(quartz.getSiteRef().longValue());
@@ -135,11 +135,11 @@ public class QuartzJob implements Job {
 
                 fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
             } catch (MalformedTemplateNameException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             } catch (ParseException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         } else {                                    
             try {
@@ -162,7 +162,7 @@ public class QuartzJob implements Job {
                 velTemplate.setData(runtimeServices.parse(reader, cftemplate.getName()));
                 velTemplate.initDocument();
             } catch (org.apache.velocity.runtime.parser.ParseException ex) {
-                logger.error(ex.getMessage());
+                LOGGER.error(ex.getMessage());
             }
         }
 
@@ -199,9 +199,9 @@ public class QuartzJob implements Job {
                         env.process();
                     }
                 } catch (freemarker.template.TemplateException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 } catch (IOException ex) {
-                    logger.error(ex.getMessage());
+                    LOGGER.error(ex.getMessage());
                 }
             }
         } else {                                    // Velocity template
