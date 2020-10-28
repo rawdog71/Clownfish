@@ -20,9 +20,6 @@ import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,50 +37,38 @@ public class CfKeywordServiceImpl implements CfKeywordService {
         this.cfkeywordDAO = cfkeywordDAO;
     }
     
-    @CachePut(value = "keyword", key = "#entity.id")
     @Override
     public CfKeyword create(CfKeyword entity) {
         return this.cfkeywordDAO.create(entity);
     }
 
-    @CacheEvict(value = "keyword", key = "#entity.id")
     @Override
     public boolean delete(CfKeyword entity) {
         return this.cfkeywordDAO.delete(entity);
     }
 
-    @CachePut(value = "keyword", key = "#entity.id")
     @Override
     public CfKeyword edit(CfKeyword entity) {
         return this.cfkeywordDAO.edit(entity);
     }    
 
-    @Cacheable(value = "keyword")
     @Override
     public List<CfKeyword> findAll() {
         return this.cfkeywordDAO.findAll();
     }
 
-    @Cacheable(value = "keyword", key = "#id")
     @Override
     public CfKeyword findById(Long id) {
         return this.cfkeywordDAO.findById(id);
     }
 
-    @Cacheable(value = "keyword", key = "#name")
     @Override
     public CfKeyword findByName(String name) {
         return this.cfkeywordDAO.findByName(name);
     }
 
-    @Cacheable(value = "keyword", key = "#name")
     @Override
     public List<CfKeyword> findByNameBeginning(String name) {
         return this.cfkeywordDAO.findByNameBeginning(name);
-    }
-
-    @CacheEvict(value = "keyword", allEntries = true)
-    @Override
-    public void evictAll() {
     }
 }

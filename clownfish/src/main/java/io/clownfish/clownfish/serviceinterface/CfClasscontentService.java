@@ -32,5 +32,4 @@ public interface CfClasscontentService {
     CfClasscontent create(CfClasscontent entity);
     boolean delete(CfClasscontent entity);
     CfClasscontent edit(CfClasscontent entity);
-    void evictAll(); 
 }

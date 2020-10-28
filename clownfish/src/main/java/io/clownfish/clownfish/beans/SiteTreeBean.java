@@ -183,9 +183,7 @@ public class SiteTreeBean implements Serializable {
         //root = new DefaultTreeNode("Root", null);
         loadTree();
         datasources = cfdatasourceService.findAll();
-        cflistService.evictAll();
         contentlist = cflistService.findAll();
-        cfclasscontentService.evictAll();
         classcontentlist = cfclasscontentService.findAll();
         assetlist = cfassetlistService.findAll();
         keywordlist = cfkeywordlistService.findAll();
@@ -205,12 +203,10 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void initContentlist() {
-        cflistService.evictAll();
         contentlist = cflistService.findAll();
     }
     
     public void initClassContentlist() {
-        cfclasscontentService.evictAll();
         classcontentlist = cfclasscontentService.findAll();
     }
     
@@ -224,9 +220,7 @@ public class SiteTreeBean implements Serializable {
     
     public void onRefreshAll() {
         datasources = cfdatasourceService.findAll();
-        cflistService.evictAll();
         contentlist = cflistService.findAll();
-        cfclasscontentService.evictAll();
         classcontentlist = cfclasscontentService.findAll();
         assetlist = cfassetlistService.findAll();
     }

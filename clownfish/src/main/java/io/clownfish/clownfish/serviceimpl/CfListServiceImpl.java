@@ -21,9 +21,6 @@ import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,51 +38,38 @@ public class CfListServiceImpl implements CfListService {
         this.cflistDAO = cflistDAO;
     }
 
-    @Cacheable(value = "list")
     @Override
     public List<CfList> findAll() {
         return this.cflistDAO.findAll();
     }
 
-    @Cacheable(value = "list", key = "#id")
     @Override
     public CfList findById(Long id) {
         return this.cflistDAO.findById(id);
     }
 
-    @CachePut(value = "list", key = "#entity.id")
     @Override
     public CfList create(CfList entity) {
         return this.cflistDAO.create(entity);
     }
 
-    @CacheEvict(value = "list", key = "#entity.id")
     @Override
     public boolean delete(CfList entity) {
         return this.cflistDAO.delete(entity);
     }
 
-    @CachePut(value = "list", key = "#entity.id")
     @Override
     public CfList edit(CfList entity) {
         return this.cflistDAO.edit(entity);
     }
 
-    @Cacheable(value = "list", key = "#name")
     @Override
     public CfList findByName(String name) {
         return this.cflistDAO.findByName(name);
     }
 
-    @Cacheable(value = "list", key = "#ref.id")
     @Override
     public List<CfList> findByClassref(CfClass ref) {
         return this.cflistDAO.findByClassref(ref);
     }
-
-    @CacheEvict(value = "class", allEntries = true)
-    @Override
-    public void evictAll() {
-    }
-    
 }

@@ -57,7 +57,6 @@ public class KeywordList {
     
     @PostConstruct
     public void init() {
-        cfkeywordService.evictAll();
         keywordlist = cfkeywordService.findAll();
         
         if (propertymap == null) {
@@ -67,7 +66,6 @@ public class KeywordList {
     }
     
     public void onRefreshAll() {
-        cfkeywordService.evictAll();
         keywordlist = cfkeywordService.findAll();
     }
 
@@ -83,7 +81,6 @@ public class KeywordList {
                 }
             });
             globalmessage.displayMessage("Added Keywords");
-            cfkeywordService.evictAll();
             keywordlist = cfkeywordService.findAll();
             assetlist.init();
             contentlist.init();

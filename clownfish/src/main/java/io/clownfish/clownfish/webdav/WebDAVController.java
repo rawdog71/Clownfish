@@ -271,7 +271,6 @@ public class WebDAVController  {
     
     @ChildrenOf
     public List<CfKeyword> getKeywords(WebDAVController root) {
-        keywordService.evictAll();
         return keywordService.findAll();
     }
 }

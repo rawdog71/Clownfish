@@ -75,7 +75,6 @@ public class ReefBean implements Serializable {
     
     @PostConstruct
     public void init() {
-        cfclassService.evictAll();
         classlist = cfclassService.findAll();
         templatelist = cftemplateService.findAll();
         stylesheetlist = cfstylesheetService.findAll();
@@ -178,7 +177,6 @@ public class ReefBean implements Serializable {
                 CfClass checkclass = cfclassService.findByName(cfclass.getName());
                 logger.error("CLASS {} already exists.", cfclass.getName());
             } catch (NoResultException ex) {
-                //long maxid = cfclassService.findMaxID();
                 long oldid = cfclass.getId();
                 cfclass.setId(null);
                 cfclassService.create(cfclass);
@@ -191,7 +189,6 @@ public class ReefBean implements Serializable {
                 CfTemplate checktemplate = cftemplateService.findByName(cftemplate.getName());
                 logger.error("TEMPLATE {} already exists.", cftemplate.getName());
             } catch (NoResultException ex) {
-                //long maxid = cftemplateService.findMaxID();
                 cftemplate.setId(null);
                 cftemplateService.create(cftemplate);
             }
@@ -201,7 +198,6 @@ public class ReefBean implements Serializable {
                 CfJavascript checkjavascript = cfjavascriptService.findByName(cfjavascript.getName());
                 logger.error("JAVASCRIPT {} already exists.", cfjavascript.getName());
             } catch (NoResultException ex) {
-                //long maxid = cfjavascriptService.findMaxID();
                 cfjavascript.setId(null);
                 cfjavascriptService.create(cfjavascript);
             }
@@ -211,7 +207,6 @@ public class ReefBean implements Serializable {
                 CfStylesheet checkstylesheet = cfstylesheetService.findByName(cfstylesheet.getName());
                 logger.error("STYLESHEET {} already exists.", cfstylesheet.getName());
             } catch (NoResultException ex) {
-                //long maxid = cfstylesheetService.findMaxID();
                 cfstylesheet.setId(null);
                 cfstylesheetService.create(cfstylesheet);
             }

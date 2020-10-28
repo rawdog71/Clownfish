@@ -29,6 +29,7 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import java.math.BigInteger;
 import java.util.List;
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ public class RestInsertContent {
     @Autowired transient CfListService cflistService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired HibernateUtil hibernateUtil;
     private static final Logger logger = LoggerFactory.getLogger(RestInsertContent.class);
 
     @PostMapping("/insertcontent")
@@ -67,7 +69,6 @@ public class RestInsertContent {
                 CfClass clazz = cfclassService.findByName(icp.getClassname());
                 System.out.println(clazz.isSearchrelevant());
 
-                cfclasscontentService.evictAll();
                 try {
                     CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());
                     icp.setReturncode("Duplicate Classcontent");
@@ -76,6 +77,7 @@ public class RestInsertContent {
                     newclasscontent.setName(icp.getContentname());
                     newclasscontent.setClassref(clazz);
                     CfClasscontent newclasscontent2 = cfclasscontentService.create(newclasscontent);
+                    hibernateUtil.insertContent(newclasscontent);
                     List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent2.getClassref());
                     attributlist.stream().forEach((attribut) -> {
                         if (attribut.getAutoincrementor() == true) {
@@ -91,18 +93,6 @@ public class RestInsertContent {
                                     max = attributcontent.getContentInteger().longValue();
                                 }
                             }
-                            /*
-                            for (CfClasscontent classcontent : classcontentlist2) {
-                                try {
-                                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);
-                                    if (attributcontent.getContentInteger().longValue() > max) {
-                                        max = attributcontent.getContentInteger().longValue();
-                                    }
-                                } catch (javax.persistence.NoResultException ex2) {
-                                    logger.error(ex2.getMessage());
-                                }
-                            }
-                            */
                             CfAttributcontent newcontent = new CfAttributcontent();
                             newcontent.setAttributref(attribut);
                             newcontent.setClasscontentref(newclasscontent);
@@ -123,6 +113,7 @@ public class RestInsertContent {
                             icp.setReturncode("OK");
                         }
                     });
+                    hibernateUtil.updateContent(newclasscontent);
                 }
             } else {
                 icp.setReturncode("Wrong API KEY");

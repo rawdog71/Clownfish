@@ -43,6 +43,7 @@ import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.utils.FolderUtil;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.IOException;
 import java.io.Serializable;
@@ -91,6 +92,7 @@ public class ContentList implements Serializable {
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired FolderUtil folderUtil;
+    @Autowired HibernateUtil hibernateUtil;
     
     @Autowired private HazelcastCacheManager cacheManager;
     
@@ -114,6 +116,7 @@ public class ContentList implements Serializable {
     private @Getter @Setter String editContent;
     private @Getter @Setter Date editCalendar;
     private @Getter @Setter CfList editDatalist;
+    private @Getter @Setter CfList memoryeditDatalist;
     private @Getter @Setter CfAssetlist editAssetlist;
     private @Getter @Setter boolean isBooleanType;
     private @Getter @Setter boolean isStringType;
@@ -152,9 +155,8 @@ public class ContentList implements Serializable {
     
     @PostConstruct
     public void init() {
-        cfclasscontentService.evictAll();
+        memoryeditDatalist = null;
         classcontentlist = cfclasscontentService.findAll();
-        cfclassService.evictAll();
         classlist = cfclassService.findAll();
         assetlist = cfassetService.findAll();
         selectedAssetList = cfassetlistService.findAll();
@@ -249,6 +251,7 @@ public class ContentList implements Serializable {
                 selectedList = cflistService.findByClassref(ref);
                 if (selectedAttribut.getClasscontentlistref() != null) {
                     editDatalist = cflistService.findById(selectedAttribut.getClasscontentlistref().getId());
+                    memoryeditDatalist = editDatalist;
                 }
                 break;
             case "assetref":
@@ -297,6 +300,7 @@ public class ContentList implements Serializable {
                     cfattributcontentService.create(newcontent);
                 }
             });
+            hibernateUtil.insertContent(newclasscontent);
             classcontentlist.clear();
             classcontentlist = cfclasscontentService.findAll();
         } catch (ConstraintViolationException ex) {
@@ -313,6 +317,7 @@ public class ContentList implements Serializable {
         if (selectedContent != null) {            
             selectedContent.setScrapped(true);
             cfclasscontentService.edit(selectedContent);
+            hibernateUtil.updateContent(selectedContent);
             cacheManager.getCache("classcontent").clear();                      // Hazelcast Cache clearing
             classcontentlist = cfclasscontentService.findAll();
             FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been scrapped.");
@@ -327,6 +332,7 @@ public class ContentList implements Serializable {
     public void onRecycle() {
         selectedContent.setScrapped(true);
         cfclasscontentService.edit(selectedContent);
+        hibernateUtil.updateContent(selectedContent);
         classcontentlist = cfclasscontentService.findAll();
         FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been recycled.");
         FacesContext.getCurrentInstance().addMessage(null, message);
@@ -359,6 +365,7 @@ public class ContentList implements Serializable {
             }
             
             cfclasscontentService.delete(selectedContent);
+            hibernateUtil.deleteContent(selectedContent);
             classcontentlist = cfclasscontentService.findAll();
         }
     }
@@ -374,6 +381,7 @@ public class ContentList implements Serializable {
     
     public void onEditAttribut(ActionEvent actionEvent) {
         selectedAttribut.setSalt(null);
+        boolean updateClassref = false;
         switch (selectedAttribut.getAttributref().getAttributetype().getName()) {
             case "boolean":
                 selectedAttribut.setContentBoolean(Boolean.valueOf(editContent));
@@ -431,13 +439,22 @@ public class ContentList implements Serializable {
                 break;
             case "classref":
                 selectedAttribut.setClasscontentlistref(editDatalist);
+                updateClassref = true;
                 break;
             case "assetref":
                 selectedAttribut.setAssetcontentlistref(editAssetlist);
                 break;    
         }
         selectedAttribut.setIndexed(false);
+        if ((updateClassref) && (null == editDatalist)) {
+            hibernateUtil.deleteRelation(memoryeditDatalist, selectedAttribut.getClasscontentref());
+        }
         cfattributcontentService.edit(selectedAttribut);
+        hibernateUtil.updateContent(selectedAttribut.getClasscontentref());
+        if (updateClassref) {
+            hibernateUtil.updateRelation(editDatalist);
+        }
+        
         // Index the changed content and merge the Index files
         if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
             try {
@@ -467,9 +484,7 @@ public class ContentList implements Serializable {
     }
     
     public void onRefreshAll() {
-        cfclasscontentService.evictAll();
         classcontentlist = cfclasscontentService.findAll();
-        cfclassService.evictAll();
         classlist = cfclassService.findAll();
         assetlist = cfassetService.findAll();
         keywordSource = cfkeywordService.findAll();

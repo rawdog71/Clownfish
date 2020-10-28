@@ -30,5 +30,4 @@ public interface CfAttributService {
     CfAttribut create(CfAttribut entity);
     boolean delete(CfAttribut entity);
     CfAttribut edit(CfAttribut entity);
-    void evictAll();
 }

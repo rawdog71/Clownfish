@@ -26,6 +26,7 @@ import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,7 @@ public class DataList implements Serializable {
     @Autowired transient CfClassService cfclassService;
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired HibernateUtil hibernateUtil;
     
     private transient @Getter @Setter List<CfList> datacontentlist = null;
     private @Getter @Setter CfList selectedList = null;
@@ -72,18 +74,14 @@ public class DataList implements Serializable {
 
     @PostConstruct
     public void init() {
-        cflistService.evictAll();
         datacontentlist = cflistService.findAll();
-        cfclassService.evictAll();
         classlist = cfclassService.findAll();
         
         selectedListcontent = new ArrayList<>();
     }
     
     public void onRefreshAll() {
-        cflistService.evictAll();
         datacontentlist = cflistService.findAll();
-        cfclassService.evictAll();
         classlist = cfclassService.findAll();
     }
     
@@ -107,13 +105,12 @@ public class DataList implements Serializable {
     
     public void onCreateContent(ActionEvent actionEvent) {
         try {
-            cflistService.evictAll();
             CfList newlistcontent = new CfList();
             newlistcontent.setName(contentName);
             newlistcontent.setClassref(selectedClass);
             
             cflistService.create(newlistcontent);
-            datacontentlist = cflistService.findAll();
+            onRefreshAll();
         } catch (ConstraintViolationException ex) {
             logger.error(ex.getMessage());
         }
@@ -128,9 +125,8 @@ public class DataList implements Serializable {
                 attributcontent.setClasscontentlistref(null);
                 cfattributcontentService.edit(attributcontent);
             }
-            cflistService.evictAll();
             cflistService.delete(selectedList);
-            datacontentlist = cflistService.findAll();
+            onRefreshAll();
         }
     }
     
@@ -160,5 +156,6 @@ public class DataList implements Serializable {
                 cflistcontentService.create(listcontent);
             }
         }
+        hibernateUtil.updateRelation(selectedList);
     }
 }

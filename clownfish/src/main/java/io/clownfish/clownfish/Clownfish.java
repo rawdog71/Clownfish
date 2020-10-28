@@ -84,6 +84,7 @@ import io.clownfish.clownfish.utils.ConsistencyUtil;
 import io.clownfish.clownfish.utils.DatabaseUtil;
 import io.clownfish.clownfish.utils.DefaultUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.MarkdownUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
@@ -206,6 +207,7 @@ public class Clownfish {
     @Autowired private FolderUtil folderUtil;
     @Autowired Searcher searcher;
     @Autowired ConsistencyUtil consistenyUtil;
+    @Autowired HibernateUtil hibernateUtil;
     
     DatabaseTemplateBean databasebean;
     EmailTemplateBean emailbean;
@@ -247,6 +249,8 @@ public class Clownfish {
     @Value("${app.datasource.password}") String dbpassword;
     @Value("${app.datasource.url}") String dburl;
     @Value("${app.datasource.driverClassName}") String dbclass;
+    @Value("${check.consistency}") int checkConsistency;
+    @Value("${init.hibernate}") int initHibernate;
 
     /**
      * Call of the "root" site
@@ -368,7 +372,14 @@ public class Clownfish {
             System.out.println(ansi().reset());
             
             // Check Consistence
-            consistenyUtil.checkConsistency();
+            if (checkConsistency > 0) {
+                consistenyUtil.checkConsistency();
+            }
+            
+            // Generate Hibernate DOM Mapping
+            hibernateUtil.generateTablesDatamodel(initHibernate);
+            // generate Relation Tables
+            hibernateUtil.generateRelationsDatamodel(initHibernate);
             
             // read all System Properties of the property table
             if (null == propertyUtil) {

@@ -30,6 +30,7 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ public class RestUpdateContent {
     @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired HibernateUtil hibernateUtil;
     private static final Logger logger = LoggerFactory.getLogger(RestUpdateContent.class);
 
     @PostMapping("/updatecontent")
@@ -82,7 +84,8 @@ public class RestUpdateContent {
                             }
                             ucp.setReturncode("OK");
                         }
-                    }                    
+                    }
+                    hibernateUtil.updateContent(classcontent);
                 } catch (javax.persistence.NoResultException ex) {
                     ucp.setReturncode("Classcontent not found");
                 }
