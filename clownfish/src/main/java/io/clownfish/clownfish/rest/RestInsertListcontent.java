@@ -26,6 +26,7 @@ import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ public class RestInsertListcontent {
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired FolderUtil folderUtil;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired HibernateUtil hibernateutil;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestInsertListcontent.class);
 
     @PostMapping("/insertlistcontent")
@@ -66,6 +68,7 @@ public class RestInsertListcontent {
                     cfListcontentPK.setClasscontentref(classcontent.getId());
                     listcontent.setCfListcontentPK(cfListcontentPK);
                     cflistcontentService.create(listcontent);
+                    hibernateutil.updateRelation(list);
                     ilcp.setReturncode("OK");
                 } catch (javax.persistence.EntityExistsException ex) {
                     ilcp.setReturncode("EntityExistsException");

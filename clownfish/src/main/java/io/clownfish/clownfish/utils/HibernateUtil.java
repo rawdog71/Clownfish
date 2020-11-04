@@ -44,7 +44,6 @@ import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,22 +53,31 @@ import org.springframework.stereotype.Component;
 @Component
 public class HibernateUtil {
 
-    @Autowired CfClassService cfclassservice;
-    @Autowired CfAttributService cfattributservice;
-    @Autowired transient CfClasscontentService cfclasscontentService;
-    @Autowired transient CfAttributcontentService cfattributcontentService;
-    @Autowired transient CfListcontentService cflistcontentService;
-    private @Getter @Setter HashMap<String, Session> classsessions = new HashMap<>();
+    private static CfClassService cfclassservice;
+    private static CfAttributService cfattributservice;
+    private static CfClasscontentService cfclasscontentService;
+    private static CfAttributcontentService cfattributcontentService;
+    private static CfListcontentService cflistcontentService;
+    private static @Getter @Setter HashMap<String, Session> classsessions = new HashMap<>();
+    //private static @Getter @Setter Session session_tables;
+    //private static @Getter @Setter Session session_relations;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     
-    public void generateTablesDatamodel(int initHibernate) {
-        //classsessions = new HashMap<>();
+    public void init(CfClassService cfclassservice, CfAttributService cfattributservice, CfClasscontentService cfclasscontentService, CfAttributcontentService cfattributcontentService, CfListcontentService cflistcontentService) {
+        this.cfclassservice = cfclassservice;
+        this.cfattributservice = cfattributservice;
+        this.cfclasscontentService = cfclasscontentService;
+        this.cfattributcontentService = cfattributcontentService;
+        this.cflistcontentService = cflistcontentService;
+    }
+    
+    public static synchronized void generateTablesDatamodel(int initHibernate) {
+        Document xmldoc = DocumentHelper.createDocument();
+        xmldoc.setName("tables");
+        Element root = xmldoc.addElement("hibernate-mapping");
         List<CfClass> classlist = cfclassservice.findAll();
         for (CfClass clazz : classlist) {
-            Document xmldoc = DocumentHelper.createDocument();
-            xmldoc.setName(clazz.getName());
-            Element root = xmldoc.addElement("hibernate-mapping");
             Element elementclass = root.addElement("class");
             elementclass.addAttribute("entity-name", clazz.getName());
             elementclass.addAttribute("table", "usr_" + clazz.getName());
@@ -100,24 +108,23 @@ public class HibernateUtil {
             elementproperty.addAttribute("type", "long");
             elementproperty.addAttribute("not-null", "true");
             elementproperty.addAttribute("index", "idx_cf_contentref");
-            
-            System.out.println(xmldoc.asXML());
-            ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().build();
-            SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
-            Session session = sessionFactory.openSession();
-            classsessions.put(clazz.getName(), session);
-            if (initHibernate > 0) {
-                Transaction tx = session.beginTransaction();
-                fillTable(clazz.getName(), session);
-                tx.commit();
-            }
-            session.close();
         }
+        System.out.println(xmldoc.asXML());
+        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().build();
+        SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
+        Session session_tables = sessionFactory.openSession();
+        classsessions.put("tables", session_tables);
+        for (CfClass clazz : classlist) {
+            if (initHibernate > 0) {
+                fillTable(clazz.getName(), session_tables);
+            }
+        }
+        session_tables.close();
 
-        LOGGER.info("Datamodel created");
+        LOGGER.info("Data Model created");
     }
 
-    private void fillTable(String classname, Session session) {
+    private static void fillTable(String classname, Session session) {
         CfClass cfclass = cfclassservice.findByName(classname);
         List<CfClasscontent> classcontentlist = cfclasscontentService.findByClassref(cfclass);
 
@@ -125,65 +132,72 @@ public class HibernateUtil {
             List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
             Map entity = fillEntity(new HashMap(), classcontent, attributcontentlist);
             try {
+                Transaction tx = session.beginTransaction();
                 session.save(classname, entity);
+                tx.commit();
             } catch (org.hibernate.id.IdentifierGenerationException ex) {
                 LOGGER.warn("NOT SAVED:" + classcontent.getName());
             }
-            //LOGGER.info(entity.toString());
         }
     }
     
     public void insertContent(CfClasscontent classcontent) {
         String classname = classcontent.getClassref().getName();
-        Session session = classsessions.get(classname).getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
+        Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
         
         List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
         Map entity = fillEntity(new HashMap(), classcontent, attributcontentlist);
         try {
-            session.save(classname, entity);
+            Transaction tx = session_tables.beginTransaction();
+            session_tables.save(classname, entity);
             tx.commit();
-            session.close();
+            //session.close();
         } catch (org.hibernate.id.IdentifierGenerationException ex) {
             LOGGER.warn("NOT SAVED:" + classcontent.getName());
+        } finally {
+            session_tables.close();
         }
     }
     
     public void updateContent(CfClasscontent classcontent) {
         String classname = classcontent.getClassref().getName();
-        Session session = classsessions.get(classname).getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        
-        Map entity = (Map) session.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + classcontent.getId()).getSingleResult();
+        Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
+        Map entity = (Map) session_tables.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + classcontent.getId()).getSingleResult();
         List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
         entity = fillEntity(entity, classcontent, attributcontentlist);
         try {
-            session.update(classname, entity);
+            Transaction tx = session_tables.beginTransaction();
+            session_tables.update(classname, entity);
             tx.commit();
-            session.close();
+            //session.close();
         } catch (org.hibernate.id.IdentifierGenerationException ex) {
             LOGGER.warn("NOT SAVED:" + classcontent.getName());
+        } finally {
+            session_tables.close();
         }
     }
     
     public void deleteContent(CfClasscontent classcontent) {
         String classname = classcontent.getClassref().getName();
-        Session session = classsessions.get(classname).getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
+        Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
         
-        Map entity = (Map) session.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + classcontent.getId()).getSingleResult();
+        
+        Map entity = (Map) session_tables.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + classcontent.getId()).getSingleResult();
         List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
         entity = fillEntity(entity, classcontent, attributcontentlist);
         try {
-            session.delete(classname, entity);
+            Transaction tx = session_tables.beginTransaction();
+            session_tables.delete(classname, entity);
             tx.commit();
-            session.close();
+            //session.close();
         } catch (org.hibernate.id.IdentifierGenerationException ex) {
             LOGGER.warn("NOT SAVED:" + classcontent.getName());
+        } finally {
+            session_tables.close();
         }
     }
 
-    private String getHibernateType(String clownfishtype) {
+    private static String getHibernateType(String clownfishtype) {
         switch (clownfishtype) {
             case "boolean":
                 return "boolean";
@@ -214,7 +228,7 @@ public class HibernateUtil {
         }
     }
     
-    private int hasIdentifier(List<CfAttribut> attributlist) {
+    private static int hasIdentifier(List<CfAttribut> attributlist) {
         int count = 0;
         for (CfAttribut attribut : attributlist) {
             if (attribut.getIdentity()) {
@@ -224,7 +238,7 @@ public class HibernateUtil {
         return count;
     }
     
-    private void makePrimaryKey(List<CfAttribut> attributlist, Element elementclass, int idcount) {
+    private static void makePrimaryKey(List<CfAttribut> attributlist, Element elementclass, int idcount) {
         if (idcount == 1) {
             for (CfAttribut attribut : attributlist) {
                 if (attribut.getIdentity()) {
@@ -248,16 +262,16 @@ public class HibernateUtil {
         }
     }
     
-    public void generateRelationsDatamodel(int initHibernate) {
+    public static synchronized void generateRelationsDatamodel(int initHibernate) {
+        Document xmldoc = DocumentHelper.createDocument();
+        xmldoc.setName("relations");
+        Element root = xmldoc.addElement("hibernate-mapping");
         List<CfClass> classlist = cfclassservice.findAll();
         for (CfClass clazz : classlist) {
             List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
             for (CfAttribut attribut : attributlist) {
                 switch (attribut.getAttributetype().getName()) {
                     case "classref":
-                        Document xmldoc = DocumentHelper.createDocument();
-                        xmldoc.setName(clazz.getName());
-                        Element root = xmldoc.addElement("hibernate-mapping");
                         Element elementclass = root.addElement("class");
                         elementclass.addAttribute("entity-name", clazz.getName() + "_" + attribut.getName());
                         elementclass.addAttribute("table", "usr_rel_" + clazz.getName() + "_" + attribut.getName());
@@ -286,30 +300,36 @@ public class HibernateUtil {
                         elementproperty4.addAttribute("column", attribut.getName() + "_usr_ref_");
                         elementproperty4.addAttribute("type", "long");
                         elementproperty4.addAttribute("not-null", "false");
-
-                        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().build();
-                        SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
-                        Session session = sessionFactory.openSession();
-                        Session session_class = classsessions.get(clazz.getName()).getSessionFactory().openSession();
-                        Session session_attribut = classsessions.get(attribut.getRelationref().getName()).getSessionFactory().openSession();
-                        classsessions.put(clazz.getName() + "_" + attribut.getName(), session);
-                        if (initHibernate > 0) {
-                            Transaction tx = session.beginTransaction();                        
-                            fillRelation(clazz.getName(), attribut.getName(), session, session_class, session_attribut);
-                            tx.commit();
-                        }
-                        session_attribut.close();
-                        session_class.close();
-                        session.close();
                         break;
                     case "assetref":
                         break;            
                 }
             }
         }
+        System.out.println(xmldoc.asXML());
+        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().build();
+        SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
+        Session session_relations = sessionFactory.openSession();
+        Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
+        classsessions.put("relations", session_relations);       
+        for (CfClass clazz : classlist) {
+            List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
+            for (CfAttribut attribut : attributlist) {
+                switch (attribut.getAttributetype().getName()) {
+                    case "classref":        
+                        if (initHibernate > 0) {
+                            fillRelation(clazz.getName(), attribut.getName(), session_tables, session_relations);
+                        }
+                        break;
+                }
+            }
+        }
+        session_tables.close();
+        session_relations.close();
+        LOGGER.info("Data Relations created");
     }
     
-    private void fillRelation(String classname, String attributname, Session session, Session session_class, Session session_referenz) {
+    private static void fillRelation(String classname, String attributname, Session session_tables, Session session_relations) {
         CfClass cfclass = cfclassservice.findByName(classname);
         List<CfClasscontent> classcontentlist = cfclasscontentService.findByClassref(cfclass);
 
@@ -322,8 +342,8 @@ public class HibernateUtil {
                         //System.out.println(contentclassref.getName());
                         List<CfListcontent> listcontentlist = cflistcontentService.findByListref(contentclassref.getId());
                         for (CfListcontent listcontent : listcontentlist) {
-                            Map content = (Map) session_class.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + classcontent.getId()).getSingleResult();
-                            Map referenz = (Map) session_referenz.createQuery("FROM " + attributcontent.getAttributref().getRelationref().getName() + " c WHERE c.cf_contentref = " + listcontent.getCfListcontentPK().getClasscontentref()).getSingleResult();
+                            Map content = (Map) session_tables.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + classcontent.getId()).getSingleResult();
+                            Map referenz = (Map) session_tables.createQuery("FROM " + attributcontent.getAttributref().getRelationref().getName() + " c WHERE c.cf_contentref = " + listcontent.getCfListcontentPK().getClasscontentref()).getSingleResult();
                             Map entity = new HashMap();
                             Map id = new HashMap();
                             id.put(classname + "_ref", classcontent.getId());
@@ -331,7 +351,13 @@ public class HibernateUtil {
                             entity.put("id_", id);
                             entity.put(classname + "_usr_ref", content.get("cf_id"));
                             entity.put(attributname + "_usr_ref", referenz.get("cf_id"));
-                            session.save(classname + "_" + attributname, entity);
+                            try {
+                                Transaction tx = session_relations.beginTransaction();
+                                session_relations.save(classname + "_" + attributname, entity);
+                                tx.commit();
+                            } catch (Exception ex) {
+                                LOGGER.error(ex.getMessage());
+                            }
                         }
                     }
                 }
@@ -343,38 +369,46 @@ public class HibernateUtil {
         String referenzname = "";
         if (null != list) {
             referenzname = list.getClassref().getName();
-            Session session_referenz = classsessions.get(referenzname).getSessionFactory().openSession();        
+            //Session session_referenz = classsessions.get("relations").getSessionFactory().openSession();        
             if (null != list) {
-                List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByContentclassRef(list);
-                for (CfAttributcontent attributcontent : attributcontentlist) {
-                    String classname = attributcontent.getClasscontentref().getClassref().getName();
-                    String attributname = attributcontent.getAttributref().getName();
-                    String refname = attributcontent.getClasscontentref().getClassref().getName() + "_" + attributname;
-                    Session session = classsessions.get(refname).getSessionFactory().openSession();
-                    Session session_class = classsessions.get(classname).getSessionFactory().openSession();
-                    Query q = session.createQuery("DELETE FROM " + refname + " WHERE " + classname + "_ref_ = " + attributcontent.getClasscontentref().getId());
-                    Transaction tx = session.beginTransaction();
-                    int count = q.executeUpdate();
+                Session session_relations = classsessions.get("relations").getSessionFactory().openSession();
+                Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
+                try {
+                    List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByContentclassRef(list);
+                    for (CfAttributcontent attributcontent : attributcontentlist) {
+                        String classname = attributcontent.getClasscontentref().getClassref().getName();
+                        String attributname = attributcontent.getAttributref().getName();
+                        String refname = attributcontent.getClasscontentref().getClassref().getName() + "_" + attributname;
 
-                    List<CfListcontent> listcontentlist = cflistcontentService.findByListref(list.getId());
-                    for (CfListcontent listcontent : listcontentlist) {
-                        Map content = (Map) session_class.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + attributcontent.getClasscontentref().getId()).getSingleResult();
-                        Map referenz = (Map) session_referenz.createQuery("FROM " + attributcontent.getAttributref().getRelationref().getName() + " c WHERE c.cf_contentref = " + listcontent.getCfListcontentPK().getClasscontentref()).getSingleResult();
-                        Map entity = new HashMap();
-                        Map id = new HashMap();
-                        id.put(classname + "_ref", attributcontent.getClasscontentref().getId());
-                        id.put(attributname + "_ref", listcontent.getCfListcontentPK().getClasscontentref());
-                        entity.put("id_", id);
-                        entity.put(classname + "_usr_ref", content.get("cf_id"));
-                        entity.put(attributname + "_usr_ref", referenz.get("cf_id"));
-                        session.save(classname + "_" + attributname, entity);
-                    }                        
-                    tx.commit();
-                    session.close();
-                    session_class.close();
+                        Query q = session_relations.createQuery("DELETE FROM " + refname + " WHERE " + classname + "_ref_ = " + attributcontent.getClasscontentref().getId());
+
+                        Transaction tx = session_relations.beginTransaction();
+                        //tx = session_relations.getTransaction();
+                        int count = q.executeUpdate();
+
+                        List<CfListcontent> listcontentlist = cflistcontentService.findByListref(list.getId());
+                        for (CfListcontent listcontent : listcontentlist) {
+                            Map content = (Map) session_tables.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + attributcontent.getClasscontentref().getId()).getSingleResult();
+                            Map referenz = (Map) session_tables.createQuery("FROM " + attributcontent.getAttributref().getRelationref().getName() + " c WHERE c.cf_contentref = " + listcontent.getCfListcontentPK().getClasscontentref()).getSingleResult();
+                            Map entity = new HashMap();
+                            Map id = new HashMap();
+                            id.put(classname + "_ref", attributcontent.getClasscontentref().getId());
+                            id.put(attributname + "_ref", listcontent.getCfListcontentPK().getClasscontentref());
+                            entity.put("id_", id);
+                            entity.put(classname + "_usr_ref", content.get("cf_id"));
+                            entity.put(attributname + "_usr_ref", referenz.get("cf_id"));
+                            session_relations.save(classname + "_" + attributname, entity);
+                        }                        
+                        tx.commit();
+                    }
+                } catch (Exception ex) {
+                    LOGGER.error(ex.getMessage());
+                } finally {   
+                    session_tables.close();
+                    session_relations.close();
                 }
             }
-            session_referenz.close();
+            //session_referenz.close();
         }
     }
     
@@ -385,17 +419,22 @@ public class HibernateUtil {
                 String classname = attributcontent.getClasscontentref().getClassref().getName();
                 String attributname = attributcontent.getAttributref().getName();
                 String refname = attributcontent.getClasscontentref().getClassref().getName() + "_" + attributname;
-                Session session = classsessions.get(refname).getSessionFactory().openSession();
-                Query q = session.createQuery("DELETE FROM " + refname + " WHERE " + classname + "_ref_ = " + attributcontent.getClasscontentref().getId());
-                Transaction tx = session.beginTransaction();
-                int count = q.executeUpdate();                     
-                tx.commit();
-                session.close();
+                Session session_relations = classsessions.get("relations").getSessionFactory().openSession();
+                Query q = session_relations.createQuery("DELETE FROM " + refname + " WHERE " + classname + "_ref_ = " + attributcontent.getClasscontentref().getId());
+                try {
+                    Transaction tx = session_relations.beginTransaction();
+                    int count = q.executeUpdate();                     
+                    tx.commit();
+                } catch (Exception ex) {
+                    LOGGER.error(ex.getMessage());
+                } finally {
+                    session_relations.close();
+                }
             }
         }
     }
     
-    private Map fillEntity(Map entity, CfClasscontent classcontent, List<CfAttributcontent> attributcontentlist) {
+    private static Map fillEntity(Map entity, CfClasscontent classcontent, List<CfAttributcontent> attributcontentlist) {
         entity.put("cf_contentref", classcontent.getId());
         for (CfAttributcontent attributcontent : attributcontentlist) {
             switch (attributcontent.getAttributref().getAttributetype().getName()) {

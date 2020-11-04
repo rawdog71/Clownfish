@@ -30,6 +30,7 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -60,6 +61,7 @@ public class InsertContent extends HttpServlet {
     @Autowired transient CfListService cflistService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired HibernateUtil hibernateUtil;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(InsertContent.class);
 
@@ -112,6 +114,7 @@ public class InsertContent extends HttpServlet {
                         newclasscontent.setName(icp.getContentname());
                         newclasscontent.setClassref(clazz);
                         CfClasscontent newclasscontent2 = cfclasscontentService.create(newclasscontent);
+                        hibernateUtil.insertContent(newclasscontent);
                         response.getOutputStream().println(newclasscontent.getName());
 
                         List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent2.getClassref());
@@ -144,6 +147,7 @@ public class InsertContent extends HttpServlet {
                                 contentUtil.indexContent();
                             }
                         });
+                        hibernateUtil.updateContent(newclasscontent);
                     } catch (IOException ex1) {
                         LOGGER.error(ex1.getMessage());
                     }

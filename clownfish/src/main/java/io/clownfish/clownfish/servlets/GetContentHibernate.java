@@ -35,6 +35,7 @@ import io.clownfish.clownfish.datamodels.GetContentParameter;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -50,6 +51,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,9 +62,9 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@WebServlet(name = "GetContent", urlPatterns = {"/GetContent"})
+@WebServlet(name = "GetContentHibernate", urlPatterns = {"/GetContentHibernate"})
 @Component
-public class GetContent extends HttpServlet {
+public class GetContentHibernate extends HttpServlet {
     @Autowired transient CfClassService cfclassService;
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfAttributService cfattributService;
@@ -74,6 +77,7 @@ public class GetContent extends HttpServlet {
     @Autowired transient CfClasscontentKeywordService cfcontentkeywordService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired HibernateUtil hibernateUtil;
     
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter String identifier;
@@ -81,7 +85,7 @@ public class GetContent extends HttpServlet {
     private static transient @Getter @Setter String apikey;
     private static transient @Getter @Setter String range;
     
-    final transient Logger LOGGER = LoggerFactory.getLogger(GetContent.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetContentHibernate.class);
     
     private class SearchValues {
         private @Getter @Setter String comparartor;
@@ -188,80 +192,48 @@ public class GetContent extends HttpServlet {
                 }
             });
             CfClass cfclass = cfclassService.findByName(inst_klasse);
-            List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
-            boolean found = true;
-            int listcounter = 0;
-            for (CfClasscontent classcontent : classcontentList) {
-                boolean inList = true;
-                // Check if identifier is set and matches classcontent
-                if ((!inst_identifier.isEmpty()) && (0 != inst_identifier.compareToIgnoreCase(classcontent.getName()))) {
-                    inList = false;
+            Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+            //Session session = hibernateUtil.getSession_tables();
+            Query query = null;
+            if (!searchmap.isEmpty()) {
+                String whereclause = " WHERE "; 
+                for (String searchcontent : searchmap.keySet()) {
+                    String searchvalue = searchmap.get(searchcontent);
+                    whereclause += searchcontent + " = '" + searchvalue + "' AND ";
                 }
-                // Check if content is in datalist 
-                if (null != listcontent) {
-                    boolean foundinlist = false;
-                    for (CfListcontent lc : listcontent) {
-                        if (lc.getCfListcontentPK().getClasscontentref() == classcontent.getId()) {
-                            foundinlist = true;
-                            break;
-                        }
-                    }
-                    inList = foundinlist;
-                }
-                if (inList) {
-                    boolean putToList = true;
-                    List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
-                    ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
-                    ArrayList<String> keywords = contentUtil.getContentOutputKeywords(classcontent, true);
-                    if (!searchmap.isEmpty()) {
-                        for (String searchcontent : searchmap.keySet()) {
-                            String searchvalue = searchmap.get(searchcontent);
-                            SearchValues sv = getSearchValues(searchvalue);
-                            if (!compareAttribut(keyvals, sv, searchcontent)) {
-                                putToList = false;
-                                break;
-                            } 
-                        }
-                    }
-                    // Check the keyword filter (at least one keyword must be found (OR))
-                    if (searchkeywords.size() > 0) {
-                        boolean dummyfound = false;
-                        for (String keyword : searchkeywords) {
-                            if (keywords.contains(keyword.toLowerCase())) {
-                                dummyfound = true;
-                            }
-                        }
-                        if (dummyfound) {
-                            putToList = true;
-                        } else {
-                            putToList = false;
-                        }
-                    }
-                    if (putToList) {
-                        found = true;
-                        
-                        listcounter++;
-                        if (range_start > 0) {
-                            if ((listcounter >= range_start) && (listcounter <= range_end)) {
-                                ContentDataOutput contentdataoutput = new ContentDataOutput();
-                                contentdataoutput.setContent(classcontent);
-                                contentdataoutput.setKeywords(keywords);
-                                contentdataoutput.setKeyvals(keyvals);
-                                outputlist.add(contentdataoutput);
-                                //System.out.println(inst_klasse + " - " + listcounter);
-                            }
-                        } else {
-                            ContentDataOutput contentdataoutput = new ContentDataOutput();
-                            contentdataoutput.setContent(classcontent);
-                            contentdataoutput.setKeywords(keywords);
-                            contentdataoutput.setKeyvals(keyvals);
-                            outputlist.add(contentdataoutput);
-                            //System.out.println(inst_klasse + " - " + listcounter);
-                        }
-                    }
-                }
-
+                whereclause = whereclause.substring(0, whereclause.length()-5);
+                query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
+            } else {
+                query = session_tables.createQuery("FROM " + inst_klasse + " c ");
             }
+            
+            List<Map> contentliste = (List<Map>) query.getResultList();
+            session_tables.close();
+            int listcounter = 0;
+            for (Map content : contentliste) {
+                CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
+                if (!cfclasscontent.isScrapped()) {
+                    
+                    listcounter++;
+                    if (range_start > 0){
+                        if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
+                            ContentDataOutput contentdataoutput = new ContentDataOutput();
+                            contentdataoutput.setContent(cfclasscontent);
+                            contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
+                            contentdataoutput.setKeyvals(getContentMap(content));
+                            outputlist.add(contentdataoutput);
+                        }
+                    } else {
+                        ContentDataOutput contentdataoutput = new ContentDataOutput();
+                        contentdataoutput.setContent(cfclasscontent);
+                        contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
+                        contentdataoutput.setKeyvals(getContentMap(content));
+                        outputlist.add(contentdataoutput);
+                    }
+                }
+            }
+            boolean found = true;
+            
             if (!found) {
                 outputmap.put("contentfound", "false");
             }
@@ -511,20 +483,29 @@ public class GetContent extends HttpServlet {
     
     private SearchValues getSearchValues(String searchvalue) {
         String comparator = "eq";
+        // contains
         if (searchvalue.startsWith(":co:")) {
             comparator = "co";
             searchvalue = searchvalue.substring(4);
         }
+        // equals
         if (searchvalue.startsWith(":eq:")) {
             comparator = "eq";
             searchvalue = searchvalue.substring(4);
         }
+        // ends with
         if (searchvalue.startsWith(":ew:")) {
             comparator = "ew";
             searchvalue = searchvalue.substring(4);
         }
+        // starts with
         if (searchvalue.startsWith(":sw:")) {
             comparator = "sw";
+            searchvalue = searchvalue.substring(4);
+        }
+        // not equals
+        if (searchvalue.startsWith(":ne:")) {
+            comparator = "ne";
             searchvalue = searchvalue.substring(4);
         }
         searchvalue = searchvalue.toLowerCase();
@@ -585,5 +566,12 @@ public class GetContent extends HttpServlet {
             }
         }
         return found;
+    }
+    
+    private ArrayList getContentMap(Map content) {
+        HashMap<String, String> contentMap = new HashMap<>(content);
+        ArrayList contenList = new ArrayList<>();
+        contenList.add(contentMap);
+        return contenList;
     }
 }

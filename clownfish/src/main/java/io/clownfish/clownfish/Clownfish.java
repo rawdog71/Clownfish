@@ -57,6 +57,7 @@ import io.clownfish.clownfish.mail.EmailProperties;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
@@ -201,6 +202,7 @@ public class Clownfish {
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired CfClassService cfclassService;
+    @Autowired CfAttributService cfattributservice;
     @Autowired CfClasscontentService cfclasscontentService;
     @Autowired CfSearchhistoryService cfsearchhistoryService;
     @Autowired private Scheduler scheduler;
@@ -377,6 +379,7 @@ public class Clownfish {
             }
             
             // Generate Hibernate DOM Mapping
+            hibernateUtil.init(cfclassService, cfattributservice, cfclasscontentService, cfattributcontentService, cflistcontentService);
             hibernateUtil.generateTablesDatamodel(initHibernate);
             // generate Relation Tables
             hibernateUtil.generateRelationsDatamodel(initHibernate);
