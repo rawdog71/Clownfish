@@ -305,12 +305,12 @@ public class Clownfish {
                 if (null != is) {
                     props.load(is);
                     props.setProperty("bootstrap", String.valueOf(bootstrap));
-                File f = new File("application.properties");
-                    
-                bootstrap();
-                    
-                OutputStream out = new FileOutputStream( f );
-                DefaultPropertiesPersister p = new DefaultPropertiesPersister();
+                    File f = new File("application.properties");
+
+                    bootstrap();
+
+                    OutputStream out = new FileOutputStream(f);
+                    DefaultPropertiesPersister p = new DefaultPropertiesPersister();
                     p.store(props, out, "Application properties");
                 } else {
                     LOGGER.error("application.properties file not found");

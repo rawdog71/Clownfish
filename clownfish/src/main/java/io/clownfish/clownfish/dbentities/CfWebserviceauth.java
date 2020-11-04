@@ -45,7 +45,7 @@ public class CfWebserviceauth implements Serializable {
     @EmbeddedId
     protected CfWebserviceauthPK cfWebserviceauthPK;
     @Basic(optional = false)
-    @NotNull
+    //@NotNull
     @Size(min = 1, max = 255)
     @Column(name = "hash")
     private String hash;

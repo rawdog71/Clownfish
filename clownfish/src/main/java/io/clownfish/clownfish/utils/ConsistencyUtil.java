@@ -67,38 +67,42 @@ public class ConsistencyUtil {
         
         LOGGER.info("CONSISTENCY CHECK AttributContent - START");     
         List<CfClasscontent> classcontentlist = cfclasscontentservice.findAll();
-        long lastId = classcontentlist.get(classcontentlist.size()-1).getId();
-        for (long i = 0; i <= lastId; i++) {
-            try {
-                CfClasscontent cc =  cfclasscontentservice.findById(i);
-            } catch (Exception ex) {
-                CfClasscontent cc = new CfClasscontent();
-                cc.setId(i);
-                //System.out.println(i);
+        if (classcontentlist.size() > 0) {
+            long lastId = classcontentlist.get(classcontentlist.size()-1).getId();
+            for (long i = 0; i <= lastId; i++) {
                 try {
-                    List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
-                } catch (Exception ex2) {
-                    cfattributcontentservice.delete(i);
-                }    
-                    
+                    CfClasscontent cc =  cfclasscontentservice.findById(i);
+                } catch (Exception ex) {
+                    CfClasscontent cc = new CfClasscontent();
+                    cc.setId(i);
+                    //System.out.println(i);
+                    try {
+                        List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
+                    } catch (Exception ex2) {
+                        cfattributcontentservice.delete(i);
+                    }    
+
+                }
             }
         }
         List<CfList> list = cflistservice.findAll();
-        long lastlistId = list.get(list.size()-1).getId();
-        for (long i = 0; i <= lastlistId; i++) {
-            try {
-                CfList l =  cflistservice.findById(i);
-            } catch (Exception ex) {
-                CfList cl = new CfList();
-                cl.setId(i);
-                //System.out.println(i);
+        if (list.size() > 0) {
+            long lastlistId = list.get(list.size()-1).getId();
+            for (long i = 0; i <= lastlistId; i++) {
                 try {
-                    List<CfAttributcontent> aclist = cfattributcontentservice.findByContentclassRef(cl);
-                } catch (Exception ex2) {
+                    CfList l =  cflistservice.findById(i);
+                } catch (Exception ex) {
+                    CfList cl = new CfList();
+                    cl.setId(i);
                     //System.out.println(i);
-                    cfattributcontentservice.updateContentref(i);
-                }    
-                    
+                    try {
+                        List<CfAttributcontent> aclist = cfattributcontentservice.findByContentclassRef(cl);
+                    } catch (Exception ex2) {
+                        //System.out.println(i);
+                        cfattributcontentservice.updateContentref(i);
+                    }    
+
+                }
             }
         }
         LOGGER.info("CONSISTENCY CHECK AttributContent - END");
