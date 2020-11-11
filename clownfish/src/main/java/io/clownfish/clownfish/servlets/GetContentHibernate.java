@@ -334,79 +334,47 @@ public class GetContentHibernate extends HttpServlet {
             }
 
             CfClass cfclass = cfclassService.findByName(inst_klasse);
-            List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
-            boolean found = false;
+            Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+            //Session session = hibernateUtil.getSession_tables();
+            Query query = null;
+            if (!searchmap.isEmpty()) {
+                String whereclause = " WHERE "; 
+                for (String searchcontent : searchmap.keySet()) {
+                    String searchvalue = searchmap.get(searchcontent);
+                    whereclause += searchcontent + " = '" + searchvalue + "' AND ";
+                }
+                whereclause = whereclause.substring(0, whereclause.length()-5);
+                query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
+            } else {
+                query = session_tables.createQuery("FROM " + inst_klasse + " c ");
+            }
+            
+            List<Map> contentliste = (List<Map>) query.getResultList();
+            session_tables.close();
             int listcounter = 0;
-            for (CfClasscontent classcontent : classcontentList) {
-                boolean inList = true;
-                // Check if identifier is set and matches classcontent
-                if ((!inst_identifier.isEmpty()) && (0 != inst_identifier.compareToIgnoreCase(classcontent.getName()))) {
-                    inList = false;
-                }
-                // Check if content is in datalist
-                if (null != listcontent) {
-                    boolean foundinlist = false;
-                    for (CfListcontent lc : listcontent) {
-                        if (lc.getCfListcontentPK().getClasscontentref() == classcontent.getId()) {
-                            foundinlist = true;
-                            break;
-                        } 
-                    }
-                    inList = foundinlist;
-                }
-                if (inList) {
-                    boolean putToList = true;
-                    List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
-                    ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
-                    ArrayList<String> keywords = contentUtil.getContentOutputKeywords(classcontent, true);
-                    if (!searchmap.isEmpty()) {
-                        for (String searchcontent : searchmap.keySet()) {
-                            String searchvalue = searchmap.get(searchcontent);
-                            SearchValues sv = getSearchValues(searchvalue);
-                            if (!compareAttribut(keyvals, sv, searchcontent)) {
-                                putToList = false;
-                                break;
-                            }
-                        }
-                    }
-                    // Check the keyword filter (at least one keyword must be found (OR))
-                    if (searchkeywords.size() > 0) {
-                        boolean dummyfound = false;
-                        for (String keyword : searchkeywords) {
-                            if (keywords.contains(keyword.toLowerCase())) {
-                                dummyfound = true;
-                            }
-                        }
-                        if (dummyfound) {
-                            putToList = true;
-                        } else {
-                            putToList = false;
-                        }
-                    }
-                    if (putToList) {
-                        found = true;
-
-                        listcounter++;
-                        if (range_start > 0){
-                            if ((listcounter >= range_start) && (listcounter <= range_end)) {
-                                ContentDataOutput contentdataoutput = new ContentDataOutput();
-                                contentdataoutput.setContent(classcontent);
-                                contentdataoutput.setKeywords(keywords);
-                                contentdataoutput.setKeyvals(keyvals);
-                                outputlist.add(contentdataoutput);
-                                //System.out.println(inst_klasse + " - " + listcounter);
-                            }
-                        } else {
+            for (Map content : contentliste) {
+                CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
+                if (!cfclasscontent.isScrapped()) {
+                    
+                    listcounter++;
+                    if (range_start > 0){
+                        if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
-                            contentdataoutput.setContent(classcontent);
-                            contentdataoutput.setKeywords(keywords);
-                            contentdataoutput.setKeyvals(keyvals);
+                            contentdataoutput.setContent(cfclasscontent);
+                            contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
+                            contentdataoutput.setKeyvals(getContentMap(content));
                             outputlist.add(contentdataoutput);
-                            //System.out.println(inst_klasse + " - " + listcounter);
                         }
+                    } else {
+                        ContentDataOutput contentdataoutput = new ContentDataOutput();
+                        contentdataoutput.setContent(cfclasscontent);
+                        contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
+                        contentdataoutput.setKeyvals(getContentMap(content));
+                        outputlist.add(contentdataoutput);
                     }
                 }
             }
+            boolean found = true;
             if (!found) {
                 outputmap.put("contentfound", "false");
             }

@@ -136,6 +136,7 @@ public class HibernateUtil {
         List<CfClasscontent> classcontentlist = cfclasscontentService.findByClassref(cfclass);
 
         for (CfClasscontent classcontent : classcontentlist) {
+            LOGGER.info("FILLTABLE:" + classname);
             List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
             Map entity = fillEntity(new HashMap(), classcontent, attributcontentlist);
             try {
@@ -341,6 +342,7 @@ public class HibernateUtil {
         List<CfClasscontent> classcontentlist = cfclasscontentService.findByClassref(cfclass);
 
         for (CfClasscontent classcontent : classcontentlist) {
+            LOGGER.info("FILLRELATION:" + classname);
             List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
             for (CfAttributcontent attributcontent : attributcontentlist) {
                 if (0 == attributcontent.getAttributref().getName().compareToIgnoreCase(attributname)) {
