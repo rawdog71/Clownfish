@@ -25,6 +25,7 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -74,6 +75,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean newButtonDisabled;
     private @Getter @Setter boolean newAttributButtonDisabled;
     private @Getter @Setter boolean renderClass;
+    @Autowired HibernateUtil hibernateUtil;
     
     @Autowired transient private @Getter @Setter AttributList attributlist;
     final transient Logger LOGGER = LoggerFactory.getLogger(ClassList.class);
@@ -148,6 +150,7 @@ public class ClassList implements Serializable {
             classSearchrelevant = false;
             contentlist.init();
             datalist.init();
+            hibernateUtil.generateTablesDatamodel(0);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -161,6 +164,7 @@ public class ClassList implements Serializable {
             classListe = cfclassService.findAll();
             contentlist.init();
             datalist.init();
+            hibernateUtil.generateTablesDatamodel(0);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -188,7 +192,7 @@ public class ClassList implements Serializable {
                 newattributcontent.setClasscontentref(classcontent);
                 cfattributcontentService.create(newattributcontent);
             }
-            
+            hibernateUtil.generateTablesDatamodel(0);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -202,6 +206,7 @@ public class ClassList implements Serializable {
             selectedAttribut.setAutoincrementor(autoinc);
             selectedAttribut.setRelationref(selectedClassRef);
             cfattributService.edit(selectedAttribut);
+            hibernateUtil.generateTablesDatamodel(0);
         }
     }
 }

@@ -26,6 +26,7 @@ import io.clownfish.clownfish.templatebeans.DatabaseTemplateBean;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.beans.QuartzList;
+import io.clownfish.clownfish.beans.ServiceStatus;
 import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
@@ -210,6 +211,7 @@ public class Clownfish {
     @Autowired Searcher searcher;
     @Autowired ConsistencyUtil consistenyUtil;
     @Autowired HibernateUtil hibernateUtil;
+    @Autowired ServiceStatus servicestatus;
     
     DatabaseTemplateBean databasebean;
     EmailTemplateBean emailbean;
@@ -291,6 +293,8 @@ public class Clownfish {
     @PostConstruct
     @GetMapping(path = "/init") 
     public void init() {
+        servicestatus.setMessage("Clownfish is initializing");
+        servicestatus.setOnline(false);
         if (1 == bootstrap) {
             bootstrap = 0;
             try {
@@ -379,7 +383,7 @@ public class Clownfish {
             }
             
             // Generate Hibernate DOM Mapping
-            hibernateUtil.init(cfclassService, cfattributservice, cfclasscontentService, cfattributcontentService, cflistcontentService);
+            hibernateUtil.init(servicestatus, cfclassService, cfattributservice, cfclasscontentService, cfattributcontentService, cflistcontentService);
             hibernateUtil.generateTablesDatamodel(initHibernate);
             // generate Relation Tables
             hibernateUtil.generateRelationsDatamodel(initHibernate);
@@ -493,6 +497,8 @@ public class Clownfish {
         } catch (SchedulerException | IOException ex) {
             LOGGER.error(ex.getMessage());
         }
+        servicestatus.setMessage("Clownfish is online");
+        servicestatus.setOnline(true);
     }
 
     public Clownfish() {
@@ -614,53 +620,65 @@ public class Clownfish {
      */
     @GetMapping(path = "/{name}/**")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        try {
-            if (0 != name.compareToIgnoreCase("searchresult")) {
-                String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-                if (name.compareToIgnoreCase(path) != 0) {
-                    name = path.substring(1);
-                    if (name.lastIndexOf("/")+1 == name.length()) {
-                        name = name.substring(0, name.length()-1);
+        if (servicestatus.isOnline()) {
+            try {
+                if (0 != name.compareToIgnoreCase("searchresult")) {
+                    String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+                    if (name.compareToIgnoreCase(path) != 0) {
+                        name = path.substring(1);
+                        if (name.lastIndexOf("/")+1 == name.length()) {
+                            name = name.substring(0, name.length()-1);
+                        }
                     }
                 }
-            }
-            
-            userSession = request.getSession();
-            this.request = request;
-            this.response = response;
-            Map<String, String[]> querymap = request.getParameterMap();
 
-            ArrayList queryParams = new ArrayList();
-            querymap.keySet().stream().map((key) -> {
-                JsonFormParameter jfp = new JsonFormParameter();
-                jfp.setName((String) key);
-                String[] values = querymap.get((String) key);
-                jfp.setValue(values[0]);
-                return jfp;
-            }).forEach((jfp) -> {
-                queryParams.add(jfp);
-            });
-            
-            addHeader(response, clownfishutil.getVersion());
-            Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams, false);
-            if (cfResponse.get().getErrorcode() == 0) {
-                response.setContentType(this.response.getContentType());
-                response.setCharacterEncoding(this.response.getCharacterEncoding());
-            } else {
-                response.setContentType("text/html");
-                response.setCharacterEncoding("UTF-8");
+                userSession = request.getSession();
+                this.request = request;
+                this.response = response;
+                Map<String, String[]> querymap = request.getParameterMap();
+
+                ArrayList queryParams = new ArrayList();
+                querymap.keySet().stream().map((key) -> {
+                    JsonFormParameter jfp = new JsonFormParameter();
+                    jfp.setName((String) key);
+                    String[] values = querymap.get((String) key);
+                    jfp.setValue(values[0]);
+                    return jfp;
+                }).forEach((jfp) -> {
+                    queryParams.add(jfp);
+                });
+
+                addHeader(response, clownfishutil.getVersion());
+                Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams, false);
+                if (cfResponse.get().getErrorcode() == 0) {
+                    response.setContentType(this.response.getContentType());
+                    response.setCharacterEncoding(this.response.getCharacterEncoding());
+                } else {
+                    response.setContentType("text/html");
+                    response.setCharacterEncoding("UTF-8");
+                }
+                PrintWriter outwriter = response.getWriter();
+                outwriter.println(cfResponse.get().getOutput());
+            } catch (IOException | InterruptedException | ExecutionException ex) {
+                LOGGER.error(ex.getMessage());
+            } catch (PageNotFoundException ex) {
+                String error_site = propertyUtil.getPropertyValue("site_error");
+                if (null == error_site) {
+                    error_site = "error";
+                }
+                request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, error_site);
+                universalGet(error_site, request, response);
             }
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(cfResponse.get().getOutput());
-        } catch (IOException | InterruptedException | ExecutionException ex) {
-            LOGGER.error(ex.getMessage());
-        } catch (PageNotFoundException ex) {
-            String error_site = propertyUtil.getPropertyValue("site_error");
-            if (null == error_site) {
-                error_site = "error";
+        } else {
+            PrintWriter outwriter = null;
+            try {
+                outwriter = response.getWriter();
+                outwriter.println(servicestatus.getMessage());
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            } finally {
+                outwriter.close();
             }
-            request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, error_site);
-            universalGet(error_site, request, response);
         }
     }
 

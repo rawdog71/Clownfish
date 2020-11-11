@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.utils;
 
+import io.clownfish.clownfish.beans.ServiceStatus;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
@@ -59,20 +60,24 @@ public class HibernateUtil {
     private static CfAttributcontentService cfattributcontentService;
     private static CfListcontentService cflistcontentService;
     private static @Getter @Setter HashMap<String, Session> classsessions = new HashMap<>();
+    private static ServiceStatus serviceStatus;
     //private static @Getter @Setter Session session_tables;
     //private static @Getter @Setter Session session_relations;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     
-    public void init(CfClassService cfclassservice, CfAttributService cfattributservice, CfClasscontentService cfclasscontentService, CfAttributcontentService cfattributcontentService, CfListcontentService cflistcontentService) {
+    public void init(ServiceStatus serviceStatus, CfClassService cfclassservice, CfAttributService cfattributservice, CfClasscontentService cfclasscontentService, CfAttributcontentService cfattributcontentService, CfListcontentService cflistcontentService) {
         this.cfclassservice = cfclassservice;
         this.cfattributservice = cfattributservice;
         this.cfclasscontentService = cfclasscontentService;
         this.cfattributcontentService = cfattributcontentService;
         this.cflistcontentService = cflistcontentService;
+        this.serviceStatus = serviceStatus;
     }
     
     public static synchronized void generateTablesDatamodel(int initHibernate) {
+        serviceStatus.setMessage("Generating dynamic tables");
+        serviceStatus.setOnline(false);
         Document xmldoc = DocumentHelper.createDocument();
         xmldoc.setName("tables");
         Element root = xmldoc.addElement("hibernate-mapping");
@@ -122,6 +127,8 @@ public class HibernateUtil {
         session_tables.close();
 
         LOGGER.info("Data Model created");
+        serviceStatus.setMessage("online");
+        serviceStatus.setOnline(true);
     }
 
     private static void fillTable(String classname, Session session) {

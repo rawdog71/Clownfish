@@ -24,7 +24,6 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 
@@ -32,7 +31,6 @@ import org.springframework.context.annotation.PropertySources;
  *
  * @author SulzbachR
  */
-//@Configuration
 @PropertySources({
     @PropertySource("file:application.properties")
 })
