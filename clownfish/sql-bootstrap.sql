@@ -70,7 +70,8 @@ CREATE TABLE IF NOT EXISTS `cf_attribut` (
   `classref` bigint(20) unsigned NOT NULL,
   `identity` tinyint(1) DEFAULT '0',
   `autoincrementor` tinyint(1) DEFAULT '0',
-  `relationref` bigint(20) unsigned DEFAULT NULL,  
+  `relationref` bigint(20) unsigned DEFAULT NULL,
+  `isindex` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 

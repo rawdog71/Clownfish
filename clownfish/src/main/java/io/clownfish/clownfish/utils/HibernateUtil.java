@@ -105,7 +105,10 @@ public class HibernateUtil {
                     elementproperty.addAttribute("column", attribut.getName() + "_");
                     elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
                     elementproperty.addAttribute("not-null", "false");
-                }
+                    if (attribut.getIsindex()) {
+                        elementproperty.addAttribute("index", "idx_" + attribut.getName());
+                    }
+                }                
             }
             Element elementproperty = elementclass.addElement("property");
             elementproperty.addAttribute("name", "cf_contentref");

@@ -469,6 +469,9 @@
                         <p:column headerText="Autoinc">
                             <h:outputText value="#{attribut.autoincrementor}" />
                         </p:column>
+                        <p:column headerText="Index">
+                            <h:outputText value="#{attribut.isindex}" />
+                        </p:column>
                         <p:column headerText="Class">
                             <h:outputText value="#{attribut.relationref}" />
                         </p:column>
@@ -490,6 +493,9 @@
 
                         <p:outputLabel for="attributautoinc" value="Autoinc:" />
                         <p:selectBooleanCheckbox id="attributautoinc" value="#{classList.autoinc}" />
+                        
+                        <p:outputLabel for="attributisindex" value="Index:" />
+                        <p:selectBooleanCheckbox id="attributisindex" value="#{classList.isindex}" />
 
                         <p:outputLabel for="relationclass" value="Class:" rendered="#{classList.renderClass}" />
                         <p:selectOneMenu id="relationclass" value="#{classList.selectedClassRef}" required="false" converter="#{classConverterBean}" rendered="#{classList.renderClass}">

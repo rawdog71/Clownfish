@@ -70,6 +70,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter String attributName;
     private @Getter @Setter boolean identity;
     private @Getter @Setter boolean autoinc;
+    private @Getter @Setter boolean isindex;
     private @Getter @Setter List<CfClass> classListeRef;
     private @Getter @Setter CfClass selectedClassRef = null;
     private @Getter @Setter boolean newButtonDisabled;
@@ -117,6 +118,7 @@ public class ClassList implements Serializable {
         }
         identity = selectedAttribut.getIdentity();
         autoinc = selectedAttribut.getAutoincrementor();
+        isindex = selectedAttribut.getIsindex();
         newAttributButtonDisabled = true;
     }
     
@@ -177,6 +179,7 @@ public class ClassList implements Serializable {
             newattribut.setName(attributName);
             newattribut.setIdentity(identity);
             newattribut.setAutoincrementor(autoinc);
+            newattribut.setIsindex(isindex);
             newattribut.setAttributetype(selectedAttributeType);
             newattribut.setRelationref(selectedClassRef);
             
@@ -204,6 +207,7 @@ public class ClassList implements Serializable {
             selectedAttribut.setAttributetype(selectedAttributeType);
             selectedAttribut.setIdentity(identity);
             selectedAttribut.setAutoincrementor(autoinc);
+            selectedAttribut.setIsindex(isindex);
             selectedAttribut.setRelationref(selectedClassRef);
             cfattributService.edit(selectedAttribut);
             hibernateUtil.generateTablesDatamodel(0);

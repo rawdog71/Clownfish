@@ -45,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfAttribut.findByAttributetype", query = "SELECT c FROM CfAttribut c WHERE c.attributetype = :attributetype"),
     @NamedQuery(name = "CfAttribut.findByClassref", query = "SELECT c FROM CfAttribut c WHERE c.classref = :classref"),
     @NamedQuery(name = "CfAttribut.findByIdentity", query = "SELECT c FROM CfAttribut c WHERE c.identity = :identity"),
+    @NamedQuery(name = "CfAttribut.findByIsindex", query = "SELECT c FROM CfAttribut c WHERE c.isindex = :isindex"),
     @NamedQuery(name = "CfAttribut.findByAutoincrementor", query = "SELECT c FROM CfAttribut c WHERE c.autoincrementor = :autoincrementor"),
     @NamedQuery(name = "CfAttribut.findByNameAndClassref", query = "SELECT c FROM CfAttribut c WHERE c.name = :name AND c.classref = :classref")
 })
@@ -71,6 +72,8 @@ public class CfAttribut implements Serializable {
     private Boolean identity;
     @Column(name = "autoincrementor")
     private Boolean autoincrementor;
+    @Column(name = "isindex")
+    private Boolean isindex;
     @JoinColumn(name = "relationref", referencedColumnName = "id")
     @ManyToOne(optional = true)
     private CfClass relationref;
@@ -135,6 +138,14 @@ public class CfAttribut implements Serializable {
 
     public void setAutoincrementor(Boolean autoincrementor) {
         this.autoincrementor = autoincrementor;
+    }
+    
+    public Boolean getIsindex() {
+        return isindex;
+    }
+
+    public void setIsindex(Boolean isindex) {
+        this.isindex = isindex;
     }
 
     public CfClass getRelationref() {
