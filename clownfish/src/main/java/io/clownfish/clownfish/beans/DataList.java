@@ -98,7 +98,9 @@ public class DataList implements Serializable {
         if (selectedcontent.size() > 0) {
             for (CfListcontent listcontent : selectedcontent) {
                 CfClasscontent selectedContent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                selectedListcontent.add(selectedContent);
+                if (!selectedContent.isScrapped()) {
+                    selectedListcontent.add(selectedContent);
+                }
             }
         }
     }

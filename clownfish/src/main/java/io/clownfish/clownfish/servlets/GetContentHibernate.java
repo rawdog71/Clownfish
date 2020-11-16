@@ -212,23 +212,25 @@ public class GetContentHibernate extends HttpServlet {
             int listcounter = 0;
             for (Map content : contentliste) {
                 CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
-                if (!cfclasscontent.isScrapped()) {
-                    
-                    listcounter++;
-                    if (range_start > 0){
-                        if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
+                if (null != cfclasscontent) {
+                    if (!cfclasscontent.isScrapped()) {
+
+                        listcounter++;
+                        if (range_start > 0){
+                            if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
+                                ContentDataOutput contentdataoutput = new ContentDataOutput();
+                                contentdataoutput.setContent(cfclasscontent);
+                                contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
+                                contentdataoutput.setKeyvals(getContentMap(content));
+                                outputlist.add(contentdataoutput);
+                            }
+                        } else {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
                             contentdataoutput.setContent(cfclasscontent);
                             contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
                             contentdataoutput.setKeyvals(getContentMap(content));
                             outputlist.add(contentdataoutput);
                         }
-                    } else {
-                        ContentDataOutput contentdataoutput = new ContentDataOutput();
-                        contentdataoutput.setContent(cfclasscontent);
-                        contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
-                        contentdataoutput.setKeyvals(getContentMap(content));
-                        outputlist.add(contentdataoutput);
                     }
                 }
             }
@@ -354,23 +356,25 @@ public class GetContentHibernate extends HttpServlet {
             int listcounter = 0;
             for (Map content : contentliste) {
                 CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
-                if (!cfclasscontent.isScrapped()) {
-                    
-                    listcounter++;
-                    if (range_start > 0){
-                        if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
+                if (null != cfclasscontent) {
+                    if (!cfclasscontent.isScrapped()) {
+
+                        listcounter++;
+                        if (range_start > 0){
+                            if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
+                                ContentDataOutput contentdataoutput = new ContentDataOutput();
+                                contentdataoutput.setContent(cfclasscontent);
+                                contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
+                                contentdataoutput.setKeyvals(getContentMap(content));
+                                outputlist.add(contentdataoutput);
+                            }
+                        } else {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
                             contentdataoutput.setContent(cfclasscontent);
                             contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
                             contentdataoutput.setKeyvals(getContentMap(content));
                             outputlist.add(contentdataoutput);
                         }
-                    } else {
-                        ContentDataOutput contentdataoutput = new ContentDataOutput();
-                        contentdataoutput.setContent(cfclasscontent);
-                        contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
-                        contentdataoutput.setKeyvals(getContentMap(content));
-                        outputlist.add(contentdataoutput);
                     }
                 }
             }

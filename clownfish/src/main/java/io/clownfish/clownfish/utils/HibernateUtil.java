@@ -133,6 +133,63 @@ public class HibernateUtil {
         serviceStatus.setMessage("online");
         serviceStatus.setOnline(true);
     }
+    
+    public static synchronized void generateTablesDatamodel(String classname, int initHibernate) {
+        serviceStatus.setMessage("Generating dynamic tables");
+        serviceStatus.setOnline(false);
+        Document xmldoc = DocumentHelper.createDocument();
+        xmldoc.setName("tables");
+        Element root = xmldoc.addElement("hibernate-mapping");
+        CfClass cfclass = cfclassservice.findByName(classname);
+        
+        Element elementclass = root.addElement("class");
+        elementclass.addAttribute("entity-name", cfclass.getName());
+        elementclass.addAttribute("table", "usr_" + cfclass.getName());
+
+        List<CfAttribut> attributlist = cfattributservice.findByClassref(cfclass);
+        int idCount = hasIdentifier(attributlist);
+        // Set the primary key
+        Element elementid = elementclass.addElement("id");
+        elementid.addAttribute("name", "cf_id");
+        elementid.addAttribute("column", "CF_ID__");
+        elementid.addAttribute("type", "long");
+        Element elementgenerator = elementid.addElement("generator");
+        elementgenerator.addAttribute("class", "native");
+        makePrimaryKey(attributlist, elementclass, idCount);
+        // Set the properties
+        for (CfAttribut attribut : attributlist) {
+            if (!attribut.getIdentity()) {
+                Element elementproperty = elementclass.addElement("property");
+                elementproperty.addAttribute("name", attribut.getName());
+                elementproperty.addAttribute("column", attribut.getName() + "_");
+                elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
+                elementproperty.addAttribute("not-null", "false");
+                if (attribut.getIsindex()) {
+                    elementproperty.addAttribute("index", "idx_" + attribut.getName());
+                }
+            }                
+        }
+        Element elementproperty = elementclass.addElement("property");
+        elementproperty.addAttribute("name", "cf_contentref");
+        elementproperty.addAttribute("column", "CF__CONTENTREF__");
+        elementproperty.addAttribute("type", "long");
+        elementproperty.addAttribute("not-null", "true");
+        elementproperty.addAttribute("index", "idx_cf_contentref");
+        
+        System.out.println(xmldoc.asXML());
+        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().build();
+        SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
+        Session session_tables = sessionFactory.openSession();
+        classsessions.put("tables", session_tables);
+        if (initHibernate > 0) {
+            fillTable(classname, session_tables);
+        }
+        session_tables.close();
+
+        LOGGER.info("Data Model created");
+        serviceStatus.setMessage("online");
+        serviceStatus.setOnline(true);
+    }
 
     private static void fillTable(String classname, Session session) {
         CfClass cfclass = cfclassservice.findByName(classname);

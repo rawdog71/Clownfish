@@ -152,7 +152,7 @@ public class ClassList implements Serializable {
             classSearchrelevant = false;
             contentlist.init();
             datalist.init();
-            hibernateUtil.generateTablesDatamodel(0);
+            hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -166,7 +166,7 @@ public class ClassList implements Serializable {
             classListe = cfclassService.findAll();
             contentlist.init();
             datalist.init();
-            hibernateUtil.generateTablesDatamodel(0);
+            hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -195,7 +195,7 @@ public class ClassList implements Serializable {
                 newattributcontent.setClasscontentref(classcontent);
                 cfattributcontentService.create(newattributcontent);
             }
-            hibernateUtil.generateTablesDatamodel(0);
+            hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -210,7 +210,7 @@ public class ClassList implements Serializable {
             selectedAttribut.setIsindex(isindex);
             selectedAttribut.setRelationref(selectedClassRef);
             cfattributService.edit(selectedAttribut);
-            hibernateUtil.generateTablesDatamodel(0);
+            hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         }
     }
 }
