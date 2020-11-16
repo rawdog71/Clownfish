@@ -20,14 +20,18 @@ import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +63,8 @@ public class HibernateUtil {
     private static CfClasscontentService cfclasscontentService;
     private static CfAttributcontentService cfattributcontentService;
     private static CfListcontentService cflistcontentService;
+    private static CfKeywordService cfkeywordService;
+    private static CfClasscontentKeywordService cfclasscontentkeywordService;
     private static @Getter @Setter HashMap<String, Session> classsessions = new HashMap<>();
     private static ServiceStatus serviceStatus;
     //private static @Getter @Setter Session session_tables;
@@ -66,13 +72,15 @@ public class HibernateUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     
-    public void init(ServiceStatus serviceStatus, CfClassService cfclassservice, CfAttributService cfattributservice, CfClasscontentService cfclasscontentService, CfAttributcontentService cfattributcontentService, CfListcontentService cflistcontentService) {
+    public void init(ServiceStatus serviceStatus, CfClassService cfclassservice, CfAttributService cfattributservice, CfClasscontentService cfclasscontentService, CfAttributcontentService cfattributcontentService, CfListcontentService cflistcontentService, CfClasscontentKeywordService cfclasscontentkeywordService, CfKeywordService cfkeywordService) {
         this.cfclassservice = cfclassservice;
         this.cfattributservice = cfattributservice;
         this.cfclasscontentService = cfclasscontentService;
         this.cfattributcontentService = cfattributcontentService;
         this.cflistcontentService = cflistcontentService;
         this.serviceStatus = serviceStatus;
+        this.cfkeywordService = cfkeywordService;
+        this.cfclasscontentkeywordService = cfclasscontentkeywordService;
     }
     
     public static synchronized void generateTablesDatamodel(int initHibernate) {
@@ -562,5 +570,25 @@ public class HibernateUtil {
             }
         }
         return entity;
+    }
+    
+    public Map getContent(String tablename, long contentid) {
+        Session session_tables = getClasssessions().get("tables").getSessionFactory().openSession();
+        Query query = null;
+        query = session_tables.createQuery("FROM " + tablename + " c WHERE cf_contentref = " + contentid);
+        Map contentmap = (Map) query.getSingleResult();
+        session_tables.close();
+        /* add keywords  */
+        List<CfClasscontentkeyword> contentkeywordlist;
+        contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(contentid);
+        if (contentkeywordlist.size() > 0) {
+            ArrayList listcontentmap = new ArrayList();
+            contentkeywordlist.stream().forEach((contentkeyword) -> {
+                listcontentmap.add(cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref()));
+            });
+            contentmap.put("keywords", listcontentmap);
+        }
+        
+        return contentmap;
     }
 }

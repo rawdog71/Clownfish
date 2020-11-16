@@ -41,37 +41,37 @@ public class CfClasscontentKeywordServiceImpl implements CfClasscontentKeywordSe
         this.cfclasscontentkeywordDAO = cfclasscontentkeywordDAO;
     }
     
-    @CachePut(value = "classcontentkeyword", key = "#entity.id")
+    //@CachePut(value = "classcontentkeyword", key = "#entity.id")
     @Override
     public CfClasscontentkeyword create(CfClasscontentkeyword entity) {
         return this.cfclasscontentkeywordDAO.create(entity);
     }
 
-    @CacheEvict(value = "classcontentkeyword", key = "#entity.id")
+    //@CacheEvict(value = "classcontentkeyword", key = "#entity.id")
     @Override
     public boolean delete(CfClasscontentkeyword entity) {
         return this.cfclasscontentkeywordDAO.delete(entity);
     }
 
-    @CachePut(value = "classcontentkeyword", key = "#entity.id")
+    //@CachePut(value = "classcontentkeyword", key = "#entity.id")
     @Override
     public CfClasscontentkeyword edit(CfClasscontentkeyword entity) {
         return this.cfclasscontentkeywordDAO.edit(entity);
     }    
 
-    @Cacheable(value = "classcontentkeyword", key = "#id")
+    //@Cacheable(value = "classcontentkeyword", key = "#id")
     @Override
     public List<CfClasscontentkeyword> findByClassContentRef(Long id) {
         return this.cfclasscontentkeywordDAO.findByClassContentRef(id);
     }
 
-    @Cacheable(value = "classcontentkeyword", key = "#id")
+    //@Cacheable(value = "classcontentkeyword", key = "#id")
     @Override
     public List<CfClasscontentkeyword> findByKeywordRef(Long id) {
         return this.cfclasscontentkeywordDAO.findByKeywordRef(id);
     }
 
-    @Cacheable(value = "classcontentkeyword")
+    //@Cacheable(value = "classcontentkeyword")
     @Override
     public List<CfClasscontentkeyword> findAll() {
         return this.cfclasscontentkeywordDAO.findAll();

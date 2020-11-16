@@ -40,37 +40,37 @@ public class CfSitecontentServiceImpl implements CfSitecontentService {
         this.cfsitecontentDAO = cfsitecontentDAO;
     }
 
-    @Cacheable(value = "sitecontent")
+    //@Cacheable(value = "sitecontent")
     @Override
     public List<CfSitecontent> findAll() {
         return this.cfsitecontentDAO.findAll();
     }
     
-    @Cacheable(value = "sitecontent", key = "#ref")
+    //@Cacheable(value = "sitecontent", key = "#ref")
     @Override
     public List<CfSitecontent> findBySiteref(Long ref) {
         return this.cfsitecontentDAO.findBySiteref(ref);
     }
 
-    @CachePut(value = "sitecontent", key = "#entity.id")
+    //@CachePut(value = "sitecontent", key = "#entity.id")
     @Override
     public CfSitecontent create(CfSitecontent entity) {
         return this.cfsitecontentDAO.create(entity);
     }
 
-    @CacheEvict(value = "sitecontent", key = "#entity.id")
+    //@CacheEvict(value = "sitecontent", key = "#entity.id")
     @Override
     public boolean delete(CfSitecontent entity) {
         return this.cfsitecontentDAO.delete(entity);
     }
 
-    @CachePut(value = "sitecontent", key = "#entity.id")
+    //@CachePut(value = "sitecontent", key = "#entity.id")
     @Override
     public CfSitecontent edit(CfSitecontent entity) {
         return this.cfsitecontentDAO.edit(entity);
     }
 
-    @Cacheable(value = "sitecontent", key = "#ref")
+    //@Cacheable(value = "sitecontent", key = "#ref")
     @Override
     public List<CfSitecontent> findByClasscontentref(Long ref) {
         return this.cfsitecontentDAO.findByClasscontentref(ref);

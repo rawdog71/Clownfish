@@ -52,6 +52,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -75,7 +76,10 @@ public class SiteUtil {
     @Autowired CfKeywordlistService cfkeywordlistService;
     @Autowired CfKeywordlistcontentService cfkeywordlistcontentService;
     @Autowired ClassUtil classutil;
+    @Autowired HibernateUtil hibernateutil;
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteUtil.class);
+    
+    @Value("${hibernate.use}") int useHibernate;
     
     public SiteUtil() {
     }
@@ -94,7 +98,11 @@ public class SiteUtil {
                     cfclassService.findById(classcontent.getClassref().getId());
                     List<CfAttributcontent> attributcontentlist = new ArrayList<>();
                     attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
-                    listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
+                    if (0 == useHibernate) {
+                        listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
+                    } else {
+                        listcontentmap.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId()));
+                    }
                 }
                 sitecontentmap.put(cflist.getName(), listcontentmap);
             }
@@ -109,7 +117,11 @@ public class SiteUtil {
             if (null != classcontent) {
                 List<CfAttributcontent> attributcontentlist = new ArrayList<>();
                 attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
-                sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
+                if (0 == useHibernate) {
+                    sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
+                } else {
+                    sitecontentmapdummy.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId()));
+                }
             } else {
                 LOGGER.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + sitecontent.getCfSitecontentPK().getClasscontentref());
             }

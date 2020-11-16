@@ -40,37 +40,37 @@ public class CfKeywordlistServiceImpl implements CfKeywordlistService {
         this.cfkeywordlistDAO = cfkeywordlistDAO;
     }
 
-    @Cacheable(value = "keywordlist")
+    //@Cacheable(value = "keywordlist")
     @Override
     public List<CfKeywordlist> findAll() {
         return cfkeywordlistDAO.findAll();
     }
 
-    @Cacheable(value = "keywordlist", key = "#id")
+    //@Cacheable(value = "keywordlist", key = "#id")
     @Override
     public CfKeywordlist findById(Long id) {
         return cfkeywordlistDAO.findById(id);
     }
 
-    @Cacheable(value = "keywordlist", key = "#name")
+    //@Cacheable(value = "keywordlist", key = "#name")
     @Override
     public CfKeywordlist findByName(String name) {
         return cfkeywordlistDAO.findByName(name);
     }
 
-    @CachePut(value = "keywordlist", key = "#entity.id")
+    //@CachePut(value = "keywordlist", key = "#entity.id")
     @Override
     public CfKeywordlist create(CfKeywordlist entity) {
         return cfkeywordlistDAO.create(entity);
     }
 
-    @CacheEvict(value = "keywordlist", key = "#entity.id")
+    //@CacheEvict(value = "keywordlist", key = "#entity.id")
     @Override
     public boolean delete(CfKeywordlist entity) {
         return cfkeywordlistDAO.delete(entity);
     }
 
-    @CachePut(value = "keywordlist", key = "#entity.id")
+    //@CachePut(value = "keywordlist", key = "#entity.id")
     @Override
     public CfKeywordlist edit(CfKeywordlist entity) {
         return cfkeywordlistDAO.edit(entity);

@@ -40,37 +40,37 @@ public class CfAttributetypeServiceImpl implements CfAttributetypeService {
         this.cfattributetypeDAO = cfattributetypeDAO;
     }
     
-    @Cacheable(value = "attributtype", key = "#id")
+    //@Cacheable(value = "attributtype", key = "#id")
     @Override
     public CfAttributetype findById(Long id) {
         return this.cfattributetypeDAO.findById(id);
     }
     
-    @CachePut(value = "attributtype", key = "#entity.id")
+    //@CachePut(value = "attributtype", key = "#entity.id")
     @Override
     public CfAttributetype create(CfAttributetype entity) {
         return this.cfattributetypeDAO.create(entity);
     }
 
-    @CacheEvict(value = "attributtype", key = "#entity.id")
+    //@CacheEvict(value = "attributtype", key = "#entity.id")
     @Override
     public boolean delete(CfAttributetype entity) {
         return this.cfattributetypeDAO.delete(entity);
     }
 
-    @CachePut(value = "attributtype", key = "#entity.id")
+    //@CachePut(value = "attributtype", key = "#entity.id")
     @Override
     public CfAttributetype edit(CfAttributetype entity) {
         return this.cfattributetypeDAO.edit(entity);
     }
 
-    @Cacheable(value = "attributtype")
+    //@Cacheable(value = "attributtype")
     @Override
     public List<CfAttributetype> findAll() {
         return this.cfattributetypeDAO.findAll();
     }
 
-    @Cacheable(value = "attributtype", key = "#name")
+    //@Cacheable(value = "attributtype", key = "#name")
     @Override
     public CfAttributetype findByName(String name) {
         return this.cfattributetypeDAO.findByName(name);

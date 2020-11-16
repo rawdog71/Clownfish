@@ -61,10 +61,12 @@ import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSearchhistoryService;
@@ -206,6 +208,8 @@ public class Clownfish {
     @Autowired CfAttributService cfattributservice;
     @Autowired CfClasscontentService cfclasscontentService;
     @Autowired CfSearchhistoryService cfsearchhistoryService;
+    @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
+    @Autowired CfKeywordService cfkeywordService;
     @Autowired private Scheduler scheduler;
     @Autowired private FolderUtil folderUtil;
     @Autowired Searcher searcher;
@@ -383,7 +387,7 @@ public class Clownfish {
             }
             
             // Generate Hibernate DOM Mapping
-            hibernateUtil.init(servicestatus, cfclassService, cfattributservice, cfclasscontentService, cfattributcontentService, cflistcontentService);
+            hibernateUtil.init(servicestatus, cfclassService, cfattributservice, cfclasscontentService, cfattributcontentService, cflistcontentService, cfclasscontentkeywordService, cfkeywordService);
             hibernateUtil.generateTablesDatamodel(initHibernate);
             // generate Relation Tables
             hibernateUtil.generateRelationsDatamodel(initHibernate);

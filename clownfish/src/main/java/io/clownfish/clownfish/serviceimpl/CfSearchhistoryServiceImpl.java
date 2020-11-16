@@ -53,25 +53,25 @@ public class CfSearchhistoryServiceImpl implements CfSearchhistoryService {
         return this.cfsearchhistoryDAO.edit(entity);
     }    
 
-    @Cacheable("searchhistory")
+    //@Cacheable("searchhistory")
     @Override
     public List<CfSearchhistory> findAll() {
         return this.cfsearchhistoryDAO.findAll();
     }
 
-    @Cacheable("searchhistory")
+    //@Cacheable("searchhistory")
     @Override
     public CfSearchhistory findById(Long id) {
         return this.cfsearchhistoryDAO.findById(id);
     }
 
-    @Cacheable("searchhistory")
+    //@Cacheable("searchhistory")
     @Override
     public CfSearchhistory findByExpression(String expression) {
         return this.cfsearchhistoryDAO.findByExpression(expression);
     }
 
-    @Cacheable("searchhistory")
+    //@Cacheable("searchhistory")
     @Override
     public List<CfSearchhistory> findByExpressionBeginning(String expression) {
         return this.cfsearchhistoryDAO.findByExpressionBeginning(expression);
