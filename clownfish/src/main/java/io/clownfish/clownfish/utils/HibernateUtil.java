@@ -201,7 +201,10 @@ public class HibernateUtil {
     private static void fillTable(String classname, Session session) {
         CfClass cfclass = cfclassservice.findByName(classname);
         List<CfClasscontent> classcontentlist = cfclasscontentService.findByClassref(cfclass);
-
+        Query q = session.createSQLQuery("TRUNCATE TABLE usr_" + classname);
+        Transaction txt = session.beginTransaction();
+        int count = q.executeUpdate();
+        txt.commit();
         for (CfClasscontent classcontent : classcontentlist) {
             LOGGER.info("FILLTABLE:" + classname);
             List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
@@ -255,7 +258,6 @@ public class HibernateUtil {
     public void deleteContent(CfClasscontent classcontent) {
         String classname = classcontent.getClassref().getName();
         Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
-        
         
         Map entity = (Map) session_tables.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + classcontent.getId()).getSingleResult();
         List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
@@ -408,6 +410,11 @@ public class HibernateUtil {
         CfClass cfclass = cfclassservice.findByName(classname);
         List<CfClasscontent> classcontentlist = cfclasscontentService.findByClassref(cfclass);
 
+        Query q = session_relations.createSQLQuery("TRUNCATE TABLE usr_rel_" + classname + "_" + attributname);
+        Transaction txt = session_relations.beginTransaction();
+        int count = q.executeUpdate();
+        txt.commit();
+        
         for (CfClasscontent classcontent : classcontentlist) {
             LOGGER.info("FILLRELATION:" + classname);
             List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
@@ -444,8 +451,7 @@ public class HibernateUtil {
     public void updateRelation(CfList list) {
         String referenzname = "";
         if (null != list) {
-            referenzname = list.getClassref().getName();
-            //Session session_referenz = classsessions.get("relations").getSessionFactory().openSession();        
+            referenzname = list.getClassref().getName();      
             if (null != list) {
                 Session session_relations = classsessions.get("relations").getSessionFactory().openSession();
                 Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
@@ -484,7 +490,6 @@ public class HibernateUtil {
                     session_relations.close();
                 }
             }
-            //session_referenz.close();
         }
     }
     
@@ -499,7 +504,7 @@ public class HibernateUtil {
                 Query q = session_relations.createQuery("DELETE FROM " + refname + " WHERE " + classname + "_ref_ = " + attributcontent.getClasscontentref().getId());
                 try {
                     Transaction tx = session_relations.beginTransaction();
-                    int count = q.executeUpdate();                     
+                    int count = q.executeUpdate();                  
                     tx.commit();
                 } catch (Exception ex) {
                     LOGGER.error(ex.getMessage());

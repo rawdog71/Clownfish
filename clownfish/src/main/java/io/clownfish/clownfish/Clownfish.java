@@ -258,7 +258,7 @@ public class Clownfish {
     @Value("${app.datasource.url}") String dburl;
     @Value("${app.datasource.driverClassName}") String dbclass;
     @Value("${check.consistency}") int checkConsistency;
-    @Value("${init.hibernate}") int initHibernate;
+    @Value("${hibernate.init}") int hibernateInit;
 
     /**
      * Call of the "root" site
@@ -388,9 +388,9 @@ public class Clownfish {
             
             // Generate Hibernate DOM Mapping
             hibernateUtil.init(servicestatus, cfclassService, cfattributservice, cfclasscontentService, cfattributcontentService, cflistcontentService, cfclasscontentkeywordService, cfkeywordService);
-            hibernateUtil.generateTablesDatamodel(initHibernate);
+            hibernateUtil.generateTablesDatamodel(hibernateInit);
             // generate Relation Tables
-            hibernateUtil.generateRelationsDatamodel(initHibernate);
+            hibernateUtil.generateRelationsDatamodel(hibernateInit);
             
             // read all System Properties of the property table
             if (null == propertyUtil) {
