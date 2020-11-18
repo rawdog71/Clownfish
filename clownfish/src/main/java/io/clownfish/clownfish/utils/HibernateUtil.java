@@ -57,7 +57,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class HibernateUtil {
-
     private static CfClassService cfclassservice;
     private static CfAttributService cfattributservice;
     private static CfClasscontentService cfclasscontentService;
@@ -67,8 +66,6 @@ public class HibernateUtil {
     private static CfClasscontentKeywordService cfclasscontentkeywordService;
     private static @Getter @Setter HashMap<String, Session> classsessions = new HashMap<>();
     private static ServiceStatus serviceStatus;
-    //private static @Getter @Setter Session session_tables;
-    //private static @Getter @Setter Session session_relations;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     
@@ -143,58 +140,60 @@ public class HibernateUtil {
     }
     
     public static synchronized void generateTablesDatamodel(String classname, int initHibernate) {
-        serviceStatus.setMessage("Generating dynamic tables");
+        serviceStatus.setMessage("Regenerating dynamic tables");
         serviceStatus.setOnline(false);
         Document xmldoc = DocumentHelper.createDocument();
         xmldoc.setName("tables");
         Element root = xmldoc.addElement("hibernate-mapping");
-        CfClass cfclass = cfclassservice.findByName(classname);
-        
-        Element elementclass = root.addElement("class");
-        elementclass.addAttribute("entity-name", cfclass.getName());
-        elementclass.addAttribute("table", "usr_" + cfclass.getName());
+        List<CfClass> classlist = cfclassservice.findAll();
+        for (CfClass clazz : classlist) {
+            Element elementclass = root.addElement("class");
+            elementclass.addAttribute("entity-name", clazz.getName());
+            elementclass.addAttribute("table", "usr_" + clazz.getName());
 
-        List<CfAttribut> attributlist = cfattributservice.findByClassref(cfclass);
-        int idCount = hasIdentifier(attributlist);
-        // Set the primary key
-        Element elementid = elementclass.addElement("id");
-        elementid.addAttribute("name", "cf_id");
-        elementid.addAttribute("column", "CF_ID__");
-        elementid.addAttribute("type", "long");
-        Element elementgenerator = elementid.addElement("generator");
-        elementgenerator.addAttribute("class", "native");
-        makePrimaryKey(attributlist, elementclass, idCount);
-        // Set the properties
-        for (CfAttribut attribut : attributlist) {
-            if (!attribut.getIdentity()) {
-                Element elementproperty = elementclass.addElement("property");
-                elementproperty.addAttribute("name", attribut.getName());
-                elementproperty.addAttribute("column", attribut.getName() + "_");
-                elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
-                elementproperty.addAttribute("not-null", "false");
-                if (attribut.getIsindex()) {
-                    elementproperty.addAttribute("index", "idx_" + attribut.getName());
-                }
-            }                
+            List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
+            int idCount = hasIdentifier(attributlist);
+            // Set the primary key
+            Element elementid = elementclass.addElement("id");
+            elementid.addAttribute("name", "cf_id");
+            elementid.addAttribute("column", "CF_ID__");
+            elementid.addAttribute("type", "long");
+            Element elementgenerator = elementid.addElement("generator");
+            elementgenerator.addAttribute("class", "native");
+            makePrimaryKey(attributlist, elementclass, idCount);
+            // Set the properties
+            for (CfAttribut attribut : attributlist) {
+                if (!attribut.getIdentity()) {
+                    Element elementproperty = elementclass.addElement("property");
+                    elementproperty.addAttribute("name", attribut.getName());
+                    elementproperty.addAttribute("column", attribut.getName() + "_");
+                    elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
+                    elementproperty.addAttribute("not-null", "false");
+                    if (attribut.getIsindex()) {
+                        elementproperty.addAttribute("index", "idx_" + attribut.getName());
+                    }
+                }                
+            }
+            Element elementproperty = elementclass.addElement("property");
+            elementproperty.addAttribute("name", "cf_contentref");
+            elementproperty.addAttribute("column", "CF__CONTENTREF__");
+            elementproperty.addAttribute("type", "long");
+            elementproperty.addAttribute("not-null", "true");
+            elementproperty.addAttribute("index", "idx_cf_contentref");
         }
-        Element elementproperty = elementclass.addElement("property");
-        elementproperty.addAttribute("name", "cf_contentref");
-        elementproperty.addAttribute("column", "CF__CONTENTREF__");
-        elementproperty.addAttribute("type", "long");
-        elementproperty.addAttribute("not-null", "true");
-        elementproperty.addAttribute("index", "idx_cf_contentref");
-        
         System.out.println(xmldoc.asXML());
         ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().build();
         SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
         Session session_tables = sessionFactory.openSession();
         classsessions.put("tables", session_tables);
-        if (initHibernate > 0) {
-            fillTable(classname, session_tables);
+        for (CfClass clazz : classlist) {
+            if ((initHibernate > 0) && (0 == clazz.getName().compareToIgnoreCase(classname))) {
+                fillTable(clazz.getName(), session_tables);
+            }
         }
         session_tables.close();
 
-        LOGGER.info("Data Model created");
+        LOGGER.info("Data Model recreated");
         serviceStatus.setMessage("online");
         serviceStatus.setOnline(true);
     }

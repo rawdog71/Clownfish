@@ -152,7 +152,7 @@ public class ClassList implements Serializable {
             classSearchrelevant = false;
             contentlist.init();
             datalist.init();
-            hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
+            //hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
