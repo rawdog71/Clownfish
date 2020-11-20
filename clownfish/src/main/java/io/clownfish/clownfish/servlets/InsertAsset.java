@@ -131,13 +131,17 @@ public class InsertAsset extends HttpServlet {
                     newasset.setMimetype(metamap.get("Content-Type"));
                     newasset.setImagewidth(metamap.get("Image Width"));
                     newasset.setImageheight(metamap.get("Image Height"));
-                    newasset = cfassetService.create(newasset);
-
-                    // Index the uploaded assets and merge the Index files
-                    if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
-                        assetIndexer.run();
-                        indexService.getWriter().commit();
-                        indexService.getWriter().forceMerge(10);
+                    try {
+                        newasset = cfassetService.create(newasset);
+                        // Index the uploaded assets and merge the Index files
+                        if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
+                            assetIndexer.run();
+                            indexService.getWriter().commit();
+                            indexService.getWriter().forceMerge(10);
+                        }
+                    } catch (PersistenceException ex) {
+                        newasset = cfassetService.findByName(filename);
+                        LOGGER.info("DUPLICATE FOUND " + filename);
                     }
 
                     classcontentlist.initAssetlist();
