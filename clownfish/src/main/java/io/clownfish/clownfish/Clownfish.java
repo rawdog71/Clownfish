@@ -32,6 +32,7 @@ import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
 import io.clownfish.clownfish.datamodels.ClownfishResponse;
+import io.clownfish.clownfish.datamodels.HibernateInit;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfJavascript;
@@ -205,7 +206,7 @@ public class Clownfish {
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired CfClassService cfclassService;
-    @Autowired CfAttributService cfattributservice;
+    @Autowired CfAttributService cfattributService;
     @Autowired CfClasscontentService cfclasscontentService;
     @Autowired CfSearchhistoryService cfsearchhistoryService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
@@ -387,7 +388,8 @@ public class Clownfish {
             }
             
             // Generate Hibernate DOM Mapping
-            hibernateUtil.init(servicestatus, cfclassService, cfattributservice, cfclasscontentService, cfattributcontentService, cflistcontentService, cfclasscontentkeywordService, cfkeywordService);
+            HibernateInit hibernateInitializer = new HibernateInit(servicestatus, cfclassService, cfattributService, cfclasscontentService, cfattributcontentService, cflistcontentService, cfclasscontentkeywordService, cfkeywordService, dburl);
+            hibernateUtil.init(hibernateInitializer);
             hibernateUtil.generateTablesDatamodel(hibernateInit);
             // generate Relation Tables
             hibernateUtil.generateRelationsDatamodel(hibernateInit);

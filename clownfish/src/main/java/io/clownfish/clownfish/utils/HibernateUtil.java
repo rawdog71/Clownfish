@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.beans.ServiceStatus;
+import io.clownfish.clownfish.datamodels.HibernateInit;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
@@ -66,18 +67,20 @@ public class HibernateUtil {
     private static CfClasscontentKeywordService cfclasscontentkeywordService;
     private static @Getter @Setter HashMap<String, Session> classsessions = new HashMap<>();
     private static ServiceStatus serviceStatus;
+    private static String datasourceURL;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     
-    public void init(ServiceStatus serviceStatus, CfClassService cfclassservice, CfAttributService cfattributservice, CfClasscontentService cfclasscontentService, CfAttributcontentService cfattributcontentService, CfListcontentService cflistcontentService, CfClasscontentKeywordService cfclasscontentkeywordService, CfKeywordService cfkeywordService) {
-        this.cfclassservice = cfclassservice;
-        this.cfattributservice = cfattributservice;
-        this.cfclasscontentService = cfclasscontentService;
-        this.cfattributcontentService = cfattributcontentService;
-        this.cflistcontentService = cflistcontentService;
-        this.serviceStatus = serviceStatus;
-        this.cfkeywordService = cfkeywordService;
-        this.cfclasscontentkeywordService = cfclasscontentkeywordService;
+    public void init(HibernateInit hibernateInit) {
+        this.cfclassservice = hibernateInit.getCfclassservice();
+        this.cfattributservice = hibernateInit.getCfattributservice();
+        this.cfclasscontentService = hibernateInit.getCfclasscontentService();
+        this.cfattributcontentService = hibernateInit.getCfattributcontentService();
+        this.cflistcontentService = hibernateInit.getCflistcontentService();
+        this.serviceStatus = hibernateInit.getServiceStatus();
+        this.cfkeywordService = hibernateInit.getCfkeywordService();
+        this.cfclasscontentkeywordService = hibernateInit.getCfclasscontentkeywordService();
+        this.datasourceURL = hibernateInit.getDatasourceURL();
     }
     
     public static synchronized void generateTablesDatamodel(int initHibernate) {
@@ -123,7 +126,7 @@ public class HibernateUtil {
             elementproperty.addAttribute("index", "idx_cf_contentref");
         }
         System.out.println(xmldoc.asXML());
-        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().build();
+        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
         SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
         Session session_tables = sessionFactory.openSession();
         classsessions.put("tables", session_tables);
@@ -182,7 +185,7 @@ public class HibernateUtil {
             elementproperty.addAttribute("index", "idx_cf_contentref");
         }
         System.out.println(xmldoc.asXML());
-        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().build();
+        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
         SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
         Session session_tables = sessionFactory.openSession();
         classsessions.put("tables", session_tables);
@@ -384,7 +387,7 @@ public class HibernateUtil {
             }
         }
         System.out.println(xmldoc.asXML());
-        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().build();
+        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
         SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
         Session session_relations = sessionFactory.openSession();
         Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
