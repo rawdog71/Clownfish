@@ -145,6 +145,12 @@ public class HibernateUtil {
     public static synchronized void generateTablesDatamodel(String classname, int initHibernate) {
         serviceStatus.setMessage("Regenerating dynamic tables");
         serviceStatus.setOnline(false);
+        Session session_tables_drop = classsessions.get("tables").getSessionFactory().openSession();
+        Query q = session_tables_drop.createSQLQuery("DROP TABLE usr_" + classname);
+        Transaction tx = session_tables_drop.beginTransaction();
+        int count = q.executeUpdate();
+        tx.commit();
+        session_tables_drop.close();
         Document xmldoc = DocumentHelper.createDocument();
         xmldoc.setName("tables");
         Element root = xmldoc.addElement("hibernate-mapping");
@@ -580,7 +586,7 @@ public class HibernateUtil {
     }
     
     public Map getContent(String tablename, long contentid) {
-        Session session_tables = getClasssessions().get("tables").getSessionFactory().openSession();
+        Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
         Query query = null;
         query = session_tables.createQuery("FROM " + tablename + " c WHERE cf_contentref = " + contentid);
         Map contentmap = (Map) query.getSingleResult();
