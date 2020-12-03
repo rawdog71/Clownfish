@@ -18,15 +18,16 @@ package io.clownfish.clownfish;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.ScriptRunner;
 import io.clownfish.clownfish.utils.HttpsUtil;
-import io.milton.config.HttpManagerBuilder;
+import io.clownfish.clownfish.servlets.ClownfishWebdavServlet;
+import io.clownfish.clownfish.webdav.WebdavServlet;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.faces.webapp.FacesServlet;
@@ -56,11 +57,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 
 /**
  *
@@ -85,6 +87,9 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     @Value("${server.port:9000}")
     int serverPortHttp;
     
+    @Autowired
+    AutowireCapableBeanFactory beanFactory;
+    
     public static void main(String[] args) {
         bootstrap();
         SpringApplication.run(Main.class, args);
@@ -108,15 +113,18 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         return servletRegistrationBean;
     }
     
-    /*
     @Bean
     public ServletRegistrationBean webdavRegistratiton() {
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new ClownfishWebdavServlet(), "/webdav/*");
+        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
+        final ClownfishWebdavServlet servlet = new ClownfishWebdavServlet();
+        //final WebdavServlet servlet = new WebdavServlet();
+        beanFactory.autowireBean(servlet);
+        servletRegistrationBean.setServlet(servlet);
+        servletRegistrationBean.setUrlMappings(Arrays.asList("/webdav/*"));
         servletRegistrationBean.setName("WebDAV Servlet");
         servletRegistrationBean.setLoadOnStartup(1);
         return servletRegistrationBean;
     }
-    */
     
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -137,12 +145,14 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         };
     }
     
+    /*
     @Bean
     HttpManagerBuilder httpManagerBuilder() {
         HttpManagerBuilder builder = new HttpManagerBuilder();
         builder.setRootDir(new File("/webdav/"));
         return builder;
     }
+    */
     
     @Override
     public void setServletContext(ServletContext servletContext) {

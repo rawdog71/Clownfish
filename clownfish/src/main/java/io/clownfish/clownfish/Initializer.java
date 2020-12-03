@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish;
 
-import io.milton.servlet.MiltonFilter;
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -83,6 +82,7 @@ public class Initializer implements ServletContextInitializer {
      * Initializes the WEBDAV filter
      * @return 
      */
+    /*
     @Bean
     public FilterRegistrationBean ServletWebDAVFilter() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
@@ -97,4 +97,5 @@ public class Initializer implements ServletContextInitializer {
         registration.setDispatcherTypes(DispatcherType.FORWARD, DispatcherType.REQUEST);
         return registration;
     }
+    */
 } 

@@ -30,19 +30,6 @@ import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
-import io.milton.annotations.ChildrenOf;
-import io.milton.annotations.ContentLength;
-import io.milton.annotations.Delete;
-import io.milton.annotations.DisplayName;
-import io.milton.annotations.Get;
-import io.milton.annotations.MakeCollection;
-import io.milton.annotations.ModifiedDate;
-import io.milton.annotations.Move;
-import io.milton.annotations.Name;
-import io.milton.annotations.PutChild;
-import io.milton.annotations.ResourceController;
-import io.milton.annotations.Root;
-import io.milton.annotations.UniqueId;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -72,8 +59,9 @@ import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
 @Component
-@ResourceController
+//@ResourceController
 public class WebDAVController  {
+    /*
     @Autowired CfAssetService cfassetService;
     @Autowired CfKeywordService cfkeywordService;
     @Autowired CfAssetKeywordService cfassetkeywordService;
@@ -273,4 +261,5 @@ public class WebDAVController  {
     public List<CfKeyword> getKeywords(WebDAVController root) {
         return keywordService.findAll();
     }
+*/
 }
