@@ -26,9 +26,6 @@ import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import io.clownfish.clownfish.webdav.WebdavStatus;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -45,9 +42,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
-import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -62,18 +57,12 @@ import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.util.XMLWriter;
 import org.apache.commons.io.IOUtils;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
-import org.imgscalr.AsyncScalr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  *
