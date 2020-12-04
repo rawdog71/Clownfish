@@ -146,10 +146,14 @@ public class HibernateUtil {
         serviceStatus.setMessage("Regenerating dynamic tables");
         serviceStatus.setOnline(false);
         Session session_tables_drop = classsessions.get("tables").getSessionFactory().openSession();
-        Query q = session_tables_drop.createSQLQuery("DROP TABLE usr_" + classname);
-        Transaction tx = session_tables_drop.beginTransaction();
-        int count = q.executeUpdate();
-        tx.commit();
+        try {
+            Query q = session_tables_drop.createSQLQuery("DROP TABLE usr_" + classname);
+            Transaction tx = session_tables_drop.beginTransaction();
+            int count = q.executeUpdate();
+            tx.commit();
+        } catch (Exception ex) {
+            LOGGER.warn("DROP TABLE " + classname + " NOT POSSIBLE.");
+        }
         session_tables_drop.close();
         Document xmldoc = DocumentHelper.createDocument();
         xmldoc.setName("tables");
