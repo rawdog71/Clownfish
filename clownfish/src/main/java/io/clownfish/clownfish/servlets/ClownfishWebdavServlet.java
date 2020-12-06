@@ -17,6 +17,7 @@ package io.clownfish.clownfish.servlets;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetkeyword;
+import io.clownfish.clownfish.dbentities.CfAssetkeywordPK;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
@@ -28,6 +29,7 @@ import io.clownfish.clownfish.utils.PropertyUtil;
 import io.clownfish.clownfish.webdav.WebdavStatus;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,9 +38,11 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -55,7 +59,14 @@ import lombok.Setter;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.util.XMLWriter;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +74,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -96,6 +108,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
     private static final String METHOD_LOCK = "LOCK";
     private static final String METHOD_UNLOCK = "UNLOCK";
     private static final String METHOD_OPTIONS = "OPTIONS";
+    private static final String METHOD_PUT = "PUT";
     /**
      * PROPFIND - Specify a property mask.
      */
@@ -199,6 +212,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
     protected void service(final HttpServletRequest req, final HttpServletResponse resp)
             throws ServletException, IOException {
 
+        Principal userPrincipal = req.getUserPrincipal();
         final String path = getRelativePath(req);
 
         // Block access to special subdirectories.
@@ -236,6 +250,9 @@ public class ClownfishWebdavServlet extends DefaultServlet {
             case METHOD_MOVE:
                 doMove(req, resp);
                 break;
+            case METHOD_PUT:
+                doPut(req, resp);
+                break;    
             case METHOD_LOCK:
                 doLock(req, resp);
                 break;
@@ -477,21 +494,10 @@ public class ClownfishWebdavServlet extends DefaultServlet {
 
                             generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
 
-                            generatedXML.writeElement("D", "creationdate", XMLWriter.OPENING);
-                            generatedXML.writeData(getModifieyDate(asset).toString());
-                            generatedXML.writeElement("D", "creationdate", XMLWriter.CLOSING);
-
-                            generatedXML.writeElement("D", "getlastmodified", XMLWriter.OPENING);
-                            generatedXML.writeData(getModifieyDate(asset).toString());
-                            generatedXML.writeElement("D", "getlastmodified", XMLWriter.CLOSING);
-
-                            generatedXML.writeElement("D", "getcontentlength", XMLWriter.OPENING);
-                            generatedXML.writeData(getContentLength(asset).toString());
-                            generatedXML.writeElement("D", "getcontentlength", XMLWriter.CLOSING);
-
-                            generatedXML.writeElement("D", "getcontenttype", XMLWriter.OPENING);
-                            generatedXML.writeData(getContentType(asset));
-                            generatedXML.writeElement("D", "getcontenttype", XMLWriter.CLOSING);
+                            generatedXML.writeProperty("D", "getcontentlength", Long.toString(getContentLength(asset)));
+                            generatedXML.writeProperty("D", "creationdate", getModifieyDate(asset).toString());
+                            generatedXML.writeProperty("D", "getlastmodified", getModifieyDate(asset).toString());
+                            generatedXML.writeProperty("D", "getcontenttype", getContentType(asset));
 
                             generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
                             generatedXML.writeElement("D", "status", XMLWriter.OPENING);
@@ -515,6 +521,87 @@ public class ClownfishWebdavServlet extends DefaultServlet {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
+        String path = getRelativePath(req);
+        if (path.length() > 1 && path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        String subpath = path.substring(8);
+        //String keyword = subpath.substring(0, subpath.indexOf("/"));
+        String filename = subpath.substring(subpath.indexOf("/") + 1);
+        System.out.println("ASSET: " + filename);
+        
+        CfKeyword keyword = cfkeywordService.findByName(subpath.substring(0, subpath.indexOf("/")));
+        
+        try {
+            HashMap<String, String> metamap = new HashMap<>();
+            File result = new File(folderUtil.getMedia_folder() + File.separator + filename);
+            try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
+                byte[] buffer = new byte[64535];
+                int bulk;
+                while (true) {
+                    bulk = req.getInputStream().read(buffer);
+                    if (bulk < 0) {
+                        break;
+                    }
+                    fileOutputStream.write(buffer, 0, bulk);
+                    fileOutputStream.flush();
+                }
+                fileOutputStream.close();
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+            req.getInputStream().close();
+            
+            
+            //detecting the file type using detect method
+            String fileextension = FilenameUtils.getExtension(folderUtil.getMedia_folder() + File.separator + filename);
+            
+            Parser parser = new AutoDetectParser();
+            BodyContentHandler handler = new BodyContentHandler(-1);
+            Metadata metadata = new Metadata();
+            try (FileInputStream inputstream = new FileInputStream(result)) {
+                ParseContext context = new ParseContext();
+                parser.parse(inputstream, handler, metadata, context);
+                //System.out.println(handler.toString());
+            } catch (SAXException | TikaException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+
+            //getting the list of all meta data elements 
+            String[] metadataNames = metadata.names();
+            for(String name : metadataNames) {		        
+                //System.out.println(name + ": " + metadata.get(name));
+                metamap.put(name, metadata.get(name));
+            }
+            
+            CfAsset newasset = new CfAsset();
+            newasset.setName(filename);
+            newasset.setFileextension(fileextension.toLowerCase());
+            newasset.setMimetype(metamap.get("Content-Type"));
+            if (newasset.getMimetype().contains("jpeg")) {
+                newasset.setImagewidth(metamap.get("Image Width"));
+                newasset.setImageheight(metamap.get("Image Height"));
+            }
+            newasset = cfassetService.create(newasset);
+            assetlist = cfassetService.findAll();
+
+            CfAssetkeyword assetkeyword = new CfAssetkeyword();
+            assetkeyword.setCfAssetkeywordPK(new CfAssetkeywordPK(newasset.getId(), keyword.getId()));
+            cfassetkeywordService.create(assetkeyword);
+            
+            // Index the uploaded assets and merge the Index files
+            if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
+                assetIndexer.run();
+                indexService.getWriter().commit();
+                indexService.getWriter().forceMerge(10);
+            }
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+        }
+    }
+    
     private void doMkcol(HttpServletRequest req, HttpServletResponse resp) {
         try {
             final String path = getRelativePath(req);
@@ -527,7 +614,6 @@ public class ClownfishWebdavServlet extends DefaultServlet {
             CfKeyword newkeyword = new CfKeyword();
             newkeyword.setName(subpath);
             newkeyword = cfkeywordService.create(newkeyword);
-            //return newkeyword;
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -577,34 +663,44 @@ public class ClownfishWebdavServlet extends DefaultServlet {
         
         if (null != asset) {
             if (!asset.isScrapped()) {
-                //if (1 == inst_download) {
-                    response.setHeader("Content-Encoding", "gzip");
-                    response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(assetname, StandardCharsets.UTF_8.toString()));
-                //} else {
-                //    response.setHeader("Content-disposition", "inline; filename=" + URLEncoder.encode(imagefilename, StandardCharsets.UTF_8.toString()));
-                //}
+                //response.setHeader("Content-Encoding", "gzip");
+                response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(assetname, StandardCharsets.UTF_8.toString()));
                 if (asset.getMimetype().contains("image")) {
                     if (asset.getMimetype().contains("svg")) {
                         response.setContentType(asset.getMimetype());
                         InputStream in;
                         File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + assetname);
+                        /*
                         try (OutputStream out = new GZIPOutputStream(response.getOutputStream())) {
                             in = new FileInputStream(f);
                             IOUtils.copy(in, out);
                         } catch (IOException ex) {
                             LOGGER.error(ex.getMessage());
-                            //acontext.complete();
+                        }
+                        */
+                        try (OutputStream out = response.getOutputStream()) {
+                            in = new FileInputStream(f);
+                            IOUtils.copy(in, out);
+                        } catch (IOException ex) {
+                            LOGGER.error(ex.getMessage());
                         }
                     } else {
                         response.setContentType(asset.getMimetype());
                         InputStream in;
                         File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + assetname);
+                        /*
                         try (OutputStream out = new GZIPOutputStream(response.getOutputStream())) {
                             in = new FileInputStream(f);
                             IOUtils.copy(in, out);
                         } catch (IOException ex) {
                             LOGGER.error(ex.getMessage());
-                            //acontext.complete();
+                        }
+                        */
+                        try (OutputStream out = response.getOutputStream()) {
+                            in = new FileInputStream(f);
+                            IOUtils.copy(in, out);
+                        } catch (IOException ex) {
+                            LOGGER.error(ex.getMessage());
                         }
                     }
                 } else {
@@ -616,15 +712,12 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         IOUtils.copy(in, out);
                     } catch (IOException ex) {
                         LOGGER.error(ex.getMessage());
-                        //acontext.complete();
                     }
                 }
             }
-            //acontext.complete();
         } else {
             OutputStream outputStream = response.getOutputStream();
             outputStream.close();
-            //acontext.complete();
         }
         
         
@@ -760,8 +853,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
      * @throws ServletException document builder creation failed (wrapped
      * <code>ParserConfigurationException</code> exception)
      */
-    protected DocumentBuilder getDocumentBuilder()
-            throws ServletException {
+    protected DocumentBuilder getDocumentBuilder() throws ServletException {
         final DocumentBuilder documentBuilder;
         final DocumentBuilderFactory documentBuilderFactory;
         try {
