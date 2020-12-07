@@ -132,6 +132,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
             final EmptyWebdavServlet servlet = new EmptyWebdavServlet();
             servletRegistrationBean.setServlet(servlet);
+            servletRegistrationBean.setUrlMappings(Arrays.asList("/webdav/*"));
             servletRegistrationBean.setName("Empty Servlet");
             servletRegistrationBean.setLoadOnStartup(1);
             return servletRegistrationBean;
