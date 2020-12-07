@@ -19,6 +19,7 @@ import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.ScriptRunner;
 import io.clownfish.clownfish.utils.HttpsUtil;
 import io.clownfish.clownfish.servlets.ClownfishWebdavServlet;
+import io.clownfish.clownfish.servlets.EmptyWebdavServlet;
 import io.clownfish.clownfish.webdav.WebdavServlet;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -86,6 +87,8 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     int serverPortHttps;
     @Value("${server.port:9000}")
     int serverPortHttp;
+    @Value("${webdav.use:0}")
+    int webdavuse;
     
     @Autowired
     AutowireCapableBeanFactory beanFactory;
@@ -115,15 +118,24 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     
     @Bean
     public ServletRegistrationBean webdavRegistratiton() {
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
-        final ClownfishWebdavServlet servlet = new ClownfishWebdavServlet();
-        //final WebdavServlet servlet = new WebdavServlet();
-        beanFactory.autowireBean(servlet);
-        servletRegistrationBean.setServlet(servlet);
-        servletRegistrationBean.setUrlMappings(Arrays.asList("/webdav/*"));
-        servletRegistrationBean.setName("WebDAV Servlet");
-        servletRegistrationBean.setLoadOnStartup(1);
-        return servletRegistrationBean;
+        if (1 == webdavuse) {
+            ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
+            final ClownfishWebdavServlet servlet = new ClownfishWebdavServlet();
+            //final WebdavServlet servlet = new WebdavServlet();
+            beanFactory.autowireBean(servlet);
+            servletRegistrationBean.setServlet(servlet);
+            servletRegistrationBean.setUrlMappings(Arrays.asList("/webdav/*"));
+            servletRegistrationBean.setName("WebDAV Servlet");
+            servletRegistrationBean.setLoadOnStartup(1);
+            return servletRegistrationBean;
+        } else {
+            ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
+            final EmptyWebdavServlet servlet = new EmptyWebdavServlet();
+            servletRegistrationBean.setServlet(servlet);
+            servletRegistrationBean.setName("Empty Servlet");
+            servletRegistrationBean.setLoadOnStartup(1);
+            return servletRegistrationBean;
+        }
     }
     
     @Bean
