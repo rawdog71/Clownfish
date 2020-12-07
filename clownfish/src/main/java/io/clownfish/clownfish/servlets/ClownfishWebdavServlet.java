@@ -620,11 +620,15 @@ public class ClownfishWebdavServlet extends DefaultServlet {
     }
 
     private void doCopy(HttpServletRequest req, HttpServletResponse resp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        final String pathfrom = getRelativePath(req);
+        //final String pathto = getRelativePath(resp);
+        System.out.println(pathfrom);
     }
 
     private void doMove(HttpServletRequest req, HttpServletResponse resp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        final String pathfrom = getRelativePath(req);
+        //final String pathto = getRelativePath(resp);
+        System.out.println(pathfrom);
     }
 
     private void doLock(HttpServletRequest req, HttpServletResponse resp) {

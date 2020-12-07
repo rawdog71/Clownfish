@@ -72,7 +72,7 @@ public class GetAsset extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        response.setHeader("Content-Encoding", "gzip");
+        //response.setHeader("Content-Encoding", "gzip");
         final AsyncContext acontext = request.startAsync();
         
         acontext.start(() -> {
@@ -120,7 +120,7 @@ public class GetAsset extends HttpServlet {
                                     acontext.getResponse().setContentType(asset.getMimetype());
                                     InputStream in;
                                     File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
-                                    try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                    try (OutputStream out = acontext.getResponse().getOutputStream()) {
                                         in = new FileInputStream(f);
                                         IOUtils.copy(in, out);
                                     } catch (IOException ex) {
@@ -148,7 +148,7 @@ public class GetAsset extends HttpServlet {
                                     if (new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey).exists()) {
                                         File f = new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey);
                                         InputStream in;
-                                        try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                        try (OutputStream out = acontext.getResponse().getOutputStream()) {
                                             in = new FileInputStream(f);
                                             IOUtils.copy(in, out);
                                         } catch (IOException ex) {
@@ -166,7 +166,7 @@ public class GetAsset extends HttpServlet {
                                             ImageIO.write(result, asset.getFileextension(), os);
                                             ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey));
 
-                                            try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                            try (OutputStream out = acontext.getResponse().getOutputStream()) {
                                                 in = new ByteArrayInputStream(os.toByteArray());
                                                 IOUtils.copy(in, out);
                                             } catch (IOException ex) {
@@ -174,7 +174,7 @@ public class GetAsset extends HttpServlet {
                                                 acontext.complete();
                                             }
                                         } else {
-                                            try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                            try (OutputStream out = acontext.getResponse().getOutputStream()) {
                                                 in = new FileInputStream(f);
                                                 IOUtils.copy(in, out);
                                             } catch (IOException ex) {
