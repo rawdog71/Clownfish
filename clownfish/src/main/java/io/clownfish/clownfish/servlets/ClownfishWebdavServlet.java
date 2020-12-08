@@ -327,7 +327,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                 generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
                 setCollectionProps(generatedXML, "");
                 generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
-                System.out.println(generatedXML.toString());
+                //System.out.println(generatedXML.toString());
                 generatedXML.sendData();
             } else {
                 List<CfKeyword> keywordlist = cfkeywordService.findAll();
@@ -337,11 +337,14 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                     final XMLWriter generatedXML = new XMLWriter(resp.getWriter());
                     generatedXML.writeXMLHeader();
                     generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
+                    
+                    setCollectionProps(generatedXML, "");
+                    
                     for (CfKeyword keyword : keywordlist) {
                         setCollectionProps(generatedXML, keyword.getName());
                     }
                     generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
-                    System.out.println(generatedXML.toString());
+                    //System.out.println(generatedXML.toString());
                     generatedXML.sendData();
                 }
             }            
@@ -394,7 +397,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
 
                         generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
 
-                        System.out.println(generatedXML.toString());
+                        //System.out.println(generatedXML.toString());
                         generatedXML.sendData();
                     } catch (Exception ex) {
                         
@@ -404,7 +407,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
                         setCollectionProps(generatedXML, "");
                         generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
-                        System.out.println(generatedXML.toString());
+                        //System.out.println(generatedXML.toString());
                         generatedXML.sendData();
                         
                         LOGGER.error(ex.getMessage());
@@ -417,7 +420,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
                         setCollectionProps(generatedXML, subpath);
                         generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
-                        System.out.println(generatedXML.toString());
+                        //System.out.println(generatedXML.toString());
                         generatedXML.sendData();
                     }
                 }
@@ -468,7 +471,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                     
                     generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
 
-                    System.out.println(generatedXML.toString());
+                    //System.out.println(generatedXML.toString());
                     generatedXML.sendData();
                     
                 } else {
@@ -485,6 +488,9 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         final XMLWriter generatedXML = new XMLWriter(resp.getWriter());
                         generatedXML.writeXMLHeader();
                         generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
+                        
+                        setCollectionProps(generatedXML, subpath);
+                        
                         for (CfAsset asset : assetlist) {
                             generatedXML.writeElement("D", "response", XMLWriter.OPENING);
                             String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " " + WebdavStatus.getStatusText(WebdavStatus.SC_OK);
@@ -519,7 +525,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         }
                         generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
 
-                        System.out.println(generatedXML.toString());
+                        //System.out.println(generatedXML.toString());
                         generatedXML.sendData();
                     } else {
                         // Create multistatus object
@@ -528,7 +534,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
                         setCollectionProps(generatedXML, subpath);
                         generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
-                        System.out.println(generatedXML.toString());
+                        //System.out.println(generatedXML.toString());
                         generatedXML.sendData();
                     }
                 }
