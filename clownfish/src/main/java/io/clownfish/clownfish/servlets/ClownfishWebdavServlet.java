@@ -397,6 +397,16 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         System.out.println(generatedXML.toString());
                         generatedXML.sendData();
                     } catch (Exception ex) {
+                        
+                        // Create multistatus object
+                        final XMLWriter generatedXML = new XMLWriter(resp.getWriter());
+                        generatedXML.writeXMLHeader();
+                        generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
+                        setCollectionProps(generatedXML, "");
+                        generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
+                        System.out.println(generatedXML.toString());
+                        generatedXML.sendData();
+                        
                         LOGGER.error(ex.getMessage());
                     }
                 } else {
@@ -509,6 +519,15 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         }
                         generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
 
+                        System.out.println(generatedXML.toString());
+                        generatedXML.sendData();
+                    } else {
+                        // Create multistatus object
+                        final XMLWriter generatedXML = new XMLWriter(resp.getWriter());
+                        generatedXML.writeXMLHeader();
+                        generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
+                        setCollectionProps(generatedXML, subpath);
+                        generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
                         System.out.println(generatedXML.toString());
                         generatedXML.sendData();
                     }
