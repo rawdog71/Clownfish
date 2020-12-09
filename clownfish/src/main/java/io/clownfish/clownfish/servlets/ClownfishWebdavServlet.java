@@ -284,6 +284,8 @@ public class ClownfishWebdavServlet extends DefaultServlet {
             }
         }
         
+        final String methodsAllowed = determineMethodsAllowed(req);
+        
         String path = getRelativePath(req);
         if (path.length() > 1 && path.endsWith("/")) {
             path = path.substring(0, path.length() - 1);
@@ -363,38 +365,8 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         final XMLWriter generatedXML = new XMLWriter(resp.getWriter());
                         generatedXML.writeXMLHeader();
                         generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
-
-                        generatedXML.writeElement("D", "response", XMLWriter.OPENING);
-                        String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " " + WebdavStatus.getStatusText(WebdavStatus.SC_OK);
-
-                        // Generating href element
-                        generatedXML.writeElement("D", "href", XMLWriter.OPENING);
-                        generatedXML.writeText("/webdav/" + subpath);
-                        generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
-
-                        // STATUS OK
-                        generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
-                        generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
-
-                        generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
-                        generatedXML.writeData(getName(asset));
-                        generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
-
-                        generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
-
-                        generatedXML.writeProperty("D", "getcontentlength", Long.toString(getContentLength(asset)));
-                        generatedXML.writeProperty("D", "creationdate", getModifieyDate(asset).toString());
-                        generatedXML.writeProperty("D", "getlastmodified", getModifieyDate(asset).toString());
-                        generatedXML.writeProperty("D", "getcontenttype", getContentType(asset));
-
-                        generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
-                        generatedXML.writeElement("D", "status", XMLWriter.OPENING);
-                        generatedXML.writeText(status);
-                        generatedXML.writeElement("D", "status", XMLWriter.CLOSING);
-                        generatedXML.writeElement("D", "propstat", XMLWriter.CLOSING);
-
-                        generatedXML.writeElement("D", "response", XMLWriter.CLOSING);
-
+                        
+                        setAssetProps(generatedXML, asset, subpath);
                         generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
 
                         //System.out.println(generatedXML.toString());
@@ -438,37 +410,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                     generatedXML.writeXMLHeader();
                     generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
                     
-                    generatedXML.writeElement("D", "response", XMLWriter.OPENING);
-                    String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " " + WebdavStatus.getStatusText(WebdavStatus.SC_OK);
-
-                    // Generating href element
-                    generatedXML.writeElement("D", "href", XMLWriter.OPENING);
-                    generatedXML.writeText("/webdav/" + subpath + "/" + getName(asset));
-                    generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
-
-                    // STATUS OK
-                    generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
-                    generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
-
-                    generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
-                    generatedXML.writeData(getName(asset));
-                    generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
-
-                    generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
-
-                    generatedXML.writeProperty("D", "getcontentlength", Long.toString(getContentLength(asset)));
-                    generatedXML.writeProperty("D", "creationdate", getModifieyDate(asset).toString());
-                    generatedXML.writeProperty("D", "getlastmodified", getModifieyDate(asset).toString());
-                    generatedXML.writeProperty("D", "getcontenttype", getContentType(asset));
-
-                    generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
-                    generatedXML.writeElement("D", "status", XMLWriter.OPENING);
-                    generatedXML.writeText(status);
-                    generatedXML.writeElement("D", "status", XMLWriter.CLOSING);
-                    generatedXML.writeElement("D", "propstat", XMLWriter.CLOSING);
-
-                    generatedXML.writeElement("D", "response", XMLWriter.CLOSING);
-                    
+                    setAssetProps(generatedXML, asset, subpath + "/" + getName(asset));
                     generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
 
                     //System.out.println(generatedXML.toString());
@@ -492,36 +434,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         setCollectionProps(generatedXML, subpath);
                         
                         for (CfAsset asset : assetlist) {
-                            generatedXML.writeElement("D", "response", XMLWriter.OPENING);
-                            String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " " + WebdavStatus.getStatusText(WebdavStatus.SC_OK);
-
-                            // Generating href element
-                            generatedXML.writeElement("D", "href", XMLWriter.OPENING);
-                            generatedXML.writeText("/webdav/" + keyword.getName() + "/" + getName(asset));
-                            generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
-
-                            // STATUS OK
-                            generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
-                            generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
-
-                            generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
-                            generatedXML.writeData(getName(asset));
-                            generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
-
-                            generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
-
-                            generatedXML.writeProperty("D", "getcontentlength", Long.toString(getContentLength(asset)));
-                            generatedXML.writeProperty("D", "creationdate", getModifieyDate(asset).toString());
-                            generatedXML.writeProperty("D", "getlastmodified", getModifieyDate(asset).toString());
-                            generatedXML.writeProperty("D", "getcontenttype", getContentType(asset));
-
-                            generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
-                            generatedXML.writeElement("D", "status", XMLWriter.OPENING);
-                            generatedXML.writeText(status);
-                            generatedXML.writeElement("D", "status", XMLWriter.CLOSING);
-                            generatedXML.writeElement("D", "propstat", XMLWriter.CLOSING);
-
-                            generatedXML.writeElement("D", "response", XMLWriter.CLOSING);
+                            setAssetProps(generatedXML, asset, keyword.getName() + "/" + getName(asset));
                         }
                         generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
 
@@ -543,7 +456,6 @@ public class ClownfishWebdavServlet extends DefaultServlet {
     }
 
     private void doProppatch(HttpServletRequest req, HttpServletResponse resp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -601,20 +513,24 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                 metamap.put(name, metadata.get(name));
             }
             
-            CfAsset newasset = new CfAsset();
-            newasset.setName(filename);
-            newasset.setFileextension(fileextension.toLowerCase());
-            newasset.setMimetype(metamap.get("Content-Type"));
-            if (newasset.getMimetype().contains("jpeg")) {
-                newasset.setImagewidth(metamap.get("Image Width"));
-                newasset.setImageheight(metamap.get("Image Height"));
-            }
-            newasset = cfassetService.create(newasset);
-            assetlist = cfassetService.findAll();
+            try {
+                CfAsset newasset = new CfAsset();
+                newasset.setName(filename);
+                newasset.setFileextension(fileextension.toLowerCase());
+                newasset.setMimetype(metamap.get("Content-Type"));
+                if (newasset.getMimetype().contains("jpeg")) {
+                    newasset.setImagewidth(metamap.get("Image Width"));
+                    newasset.setImageheight(metamap.get("Image Height"));
+                }
+                newasset = cfassetService.create(newasset);
+                assetlist = cfassetService.findAll();
 
-            CfAssetkeyword assetkeyword = new CfAssetkeyword();
-            assetkeyword.setCfAssetkeywordPK(new CfAssetkeywordPK(newasset.getId(), keyword.getId()));
-            cfassetkeywordService.create(assetkeyword);
+                CfAssetkeyword assetkeyword = new CfAssetkeyword();
+                assetkeyword.setCfAssetkeywordPK(new CfAssetkeywordPK(newasset.getId(), keyword.getId()));
+                cfassetkeywordService.create(assetkeyword);
+            } catch (Exception ex) {
+                LOGGER.warn(ex.getMessage());
+            }
             
             // Index the uploaded assets and merge the Index files
             if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
@@ -699,14 +615,6 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         response.setContentType(asset.getMimetype());
                         InputStream in;
                         File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + assetname);
-                        /*
-                        try (OutputStream out = new GZIPOutputStream(response.getOutputStream())) {
-                            in = new FileInputStream(f);
-                            IOUtils.copy(in, out);
-                        } catch (IOException ex) {
-                            LOGGER.error(ex.getMessage());
-                        }
-                        */
                         try (OutputStream out = response.getOutputStream()) {
                             in = new FileInputStream(f);
                             IOUtils.copy(in, out);
@@ -717,14 +625,6 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                         response.setContentType(asset.getMimetype());
                         InputStream in;
                         File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + assetname);
-                        /*
-                        try (OutputStream out = new GZIPOutputStream(response.getOutputStream())) {
-                            in = new FileInputStream(f);
-                            IOUtils.copy(in, out);
-                        } catch (IOException ex) {
-                            LOGGER.error(ex.getMessage());
-                        }
-                        */
                         try (OutputStream out = response.getOutputStream()) {
                             in = new FileInputStream(f);
                             IOUtils.copy(in, out);
@@ -748,17 +648,6 @@ public class ClownfishWebdavServlet extends DefaultServlet {
             OutputStream outputStream = response.getOutputStream();
             outputStream.close();
         }
-        
-        
-        /*
-        try {
-            String imagefilename = asset.getName();
-            return Files.readAllBytes(Paths.get(propUtil.getPropertyValue("folder_media") + File.separator + imagefilename));
-        } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(WebDAVController.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-        */
     }
     
     private String getName(CfAsset asset) {
@@ -845,6 +734,39 @@ public class ClownfishWebdavServlet extends DefaultServlet {
         generatedXML.writeElement("D", "response", XMLWriter.CLOSING);
     }
     
+    private void setAssetProps(XMLWriter generatedXML, CfAsset asset, String subpath) {
+        generatedXML.writeElement("D", "response", XMLWriter.OPENING);
+        String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " " + WebdavStatus.getStatusText(WebdavStatus.SC_OK);
+
+        // Generating href element
+        generatedXML.writeElement("D", "href", XMLWriter.OPENING);
+        generatedXML.writeText("/webdav/" + subpath);
+        generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
+
+        // STATUS OK
+        generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
+        generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
+
+        generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
+        generatedXML.writeData(getName(asset));
+        generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
+
+        generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
+
+        generatedXML.writeProperty("D", "getcontentlength", Long.toString(getContentLength(asset)));
+        generatedXML.writeProperty("D", "creationdate", getModifieyDate(asset).toString());
+        generatedXML.writeProperty("D", "getlastmodified", getModifieyDate(asset).toString());
+        generatedXML.writeProperty("D", "getcontenttype", getContentType(asset));
+
+        generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
+        generatedXML.writeElement("D", "status", XMLWriter.OPENING);
+        generatedXML.writeText(status);
+        generatedXML.writeElement("D", "status", XMLWriter.CLOSING);
+        generatedXML.writeElement("D", "propstat", XMLWriter.CLOSING);
+
+        generatedXML.writeElement("D", "response", XMLWriter.CLOSING);
+    }
+    
     /**
      * Determines the methods normally allowed for the resource.
      *
@@ -853,6 +775,27 @@ public class ClownfishWebdavServlet extends DefaultServlet {
      */
     @Override
     protected String determineMethodsAllowed(final HttpServletRequest req) {
+        final String depthStr = req.getHeader("Depth");
+        
+        // Propfind depth
+        int depth = this.maxDepth;
+        
+        if (depthStr == null) {
+            depth = this.maxDepth;
+        } else {
+            switch (depthStr) {
+                case "0":
+                    depth = 0;
+                    break;
+                case "1":
+                    depth = 1;
+                    break;
+                case "infinity":
+                    depth = this.maxDepth;
+                    break;
+            }
+        }
+        
         final StringBuilder methodsAllowed = new StringBuilder();
         final WebResource resource = this.resources.getResource(getRelativePath(req));
 
