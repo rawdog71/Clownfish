@@ -293,6 +293,7 @@ public class ContentUtil {
                 contentIndexer.run();
                 indexService.getWriter().commit();
                 indexService.getWriter().forceMerge(10);
+                LOGGER.info("CONTENTINDEXER RUN");
             } catch (IOException ex) {
                 LOGGER.error(ex.getMessage());
             }

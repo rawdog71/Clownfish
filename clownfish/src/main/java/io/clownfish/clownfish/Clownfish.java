@@ -443,6 +443,7 @@ public class Clownfish {
                     contentIndexer = new ContentIndexer(cfattributcontentService, indexService);
                 }
                 contentIndexer.run();
+                LOGGER.info("CONTENTINDEXER RUN");
                 if (null == assetIndexer) {
                     assetIndexer = new AssetIndexer(cfassetService, indexService, propertylist);
                 }
@@ -732,10 +733,8 @@ public class Clownfish {
                 PrintWriter outwriter = response.getWriter();
                 outwriter.println(cfResponse.get().getOutput());
             }
-        } catch (IOException | InterruptedException | ExecutionException ex) {
+        } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException ex) {
             LOGGER.error(ex.getMessage());
-        } catch (PageNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1212,7 +1211,7 @@ public class Clownfish {
                 templateUtil.setCurrentVersion(1);
                 templateUtil.writeVersion(template.getId(), templateUtil.getCurrentVersion(), output, 0);
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error(ex.getMessage());
             }
         }
     }

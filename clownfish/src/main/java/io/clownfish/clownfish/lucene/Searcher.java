@@ -121,7 +121,7 @@ public class Searcher {
             indexSearcher = new IndexSearcher(reader);
             queryParser = new MultiFieldQueryParser(new String[] {LuceneConstants.CONTENT_TEXT, LuceneConstants.CONTENT_STRING, LuceneConstants.ASSET_NAME, LuceneConstants.ASSET_TEXT, LuceneConstants.ASSET_DESCRIPTION}, new StandardAnalyzer());
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(Searcher.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error(ex.getMessage());
         }
     }
     
@@ -190,7 +190,7 @@ public class Searcher {
                             assetutil.getMetadata(asset, metamap);
                             foundAssetMetadata.put(asset.getName(), metamap);
                         } catch (IOException ex) {
-                            java.util.logging.Logger.getLogger(Searcher.class.getName()).log(Level.SEVERE, null, ex);
+                            LOGGER.error(ex.getMessage());
                         }
                     }
                 });
