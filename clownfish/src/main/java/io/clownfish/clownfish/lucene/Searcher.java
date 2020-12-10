@@ -214,22 +214,26 @@ public class Searcher {
     
     private void addClasscontentMap(long classcontentref, HashMap searchclasscontentmap) {
         // Search in classes and put it via template to the output
-        CfClasscontent findclasscontent = cfclasscontentservice.findById(classcontentref);
-        CfClass findclass = cfclassservice.findById(findclasscontent.getClassref().getId());
+        try {
+            CfClasscontent findclasscontent = cfclasscontentservice.findById(classcontentref);
+            CfClass findclass = cfclassservice.findById(findclasscontent.getClassref().getId());
 
-        if (findclass.isSearchrelevant()) {
-            Map attributmap = classutil.getattributmap(findclasscontent);
-            if (searchclasscontentmap.containsKey(findclass.getName())) {
-                ArrayList searchclassarray = (ArrayList) searchclasscontentmap.get(findclass.getName());
-                if (!searchclassarray.contains(attributmap)) {
+            if (findclass.isSearchrelevant()) {
+                Map attributmap = classutil.getattributmap(findclasscontent);
+                if (searchclasscontentmap.containsKey(findclass.getName())) {
+                    ArrayList searchclassarray = (ArrayList) searchclasscontentmap.get(findclass.getName());
+                    if (!searchclassarray.contains(attributmap)) {
+                        searchclassarray.add(attributmap);
+                        searchclasscontentmap.put(findclass.getName(), searchclassarray);
+                    }
+                } else {
+                    ArrayList searchclassarray = new ArrayList<>();
                     searchclassarray.add(attributmap);
                     searchclasscontentmap.put(findclass.getName(), searchclassarray);
                 }
-            } else {
-                ArrayList searchclassarray = new ArrayList<>();
-                searchclassarray.add(attributmap);
-                searchclasscontentmap.put(findclass.getName(), searchclassarray);
             }
+        } catch (Exception ex) {
+            LOGGER.warn("LUCENE SEARCHER CONTENT NOT FOUND: " + classcontentref);
         }
     }
 }

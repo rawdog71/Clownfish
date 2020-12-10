@@ -614,6 +614,11 @@ public class Clownfish {
             universalGet(search_site, request, response);
         } catch (IOException | ParseException ex) {
             LOGGER.error(ex.getMessage());
+            String search_site = propertyUtil.getPropertyValue("site_search");
+            if (null == search_site) {
+                search_site = "searchresult";
+            }
+            universalGet(search_site, request, response);
         }
     }
     
