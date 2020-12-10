@@ -264,6 +264,8 @@ public class Clownfish {
     /**
      * Call of the "root" site
      * Fetches the root site from the system property "site_root" and calls universalGet 
+     * @param request
+     * @param response
      */
     @RequestMapping("/")
     public void home(@Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -278,6 +280,8 @@ public class Clownfish {
     /**
      * Call of the "error" site
      * Fetches the error site from the system property "site_error" and calls universalGet 
+     * @param request
+     * @param response
      */
     @RequestMapping("/error")
     public void error(@Context HttpServletRequest request, @Context HttpServletResponse response) {
@@ -324,8 +328,8 @@ public class Clownfish {
                 } else {
                     LOGGER.error("application.properties file not found");
                 }
-              } catch (Exception e ) {
-                e.printStackTrace();
+              } catch (IOException ex) {
+                  LOGGER.error(ex.getMessage());
               }
         }
         
@@ -689,7 +693,9 @@ public class Clownfish {
             } catch (IOException ex) {
                 LOGGER.error(ex.getMessage());
             } finally {
-                outwriter.close();
+                if (null != outwriter) {
+                    outwriter.close();
+                }
             }
         }
     }
@@ -745,7 +751,7 @@ public class Clownfish {
      * @param postmap
      * @param makestatic
      * @return 
-     * @throws io.clownfish.clownfish.PageNotFoundException 
+     * @throws io.clownfish.clownfish.exceptions.PageNotFoundException 
      */
     @Async
     public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, boolean makestatic) throws PageNotFoundException {
@@ -1179,7 +1185,7 @@ public class Clownfish {
             try {
                 writer.write(content);
                 writer.close();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 throw new RuntimeException("Unable to create the destination file", e);
             }
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
@@ -1214,24 +1220,6 @@ public class Clownfish {
                 LOGGER.error(ex.getMessage());
             }
         }
-    }
-
-    private boolean checkConsistency() {
-        LOGGER.info("CHECK INCONSISTENCY");
-        boolean isConsistent = true;
-        List<CfAttributcontent> attributcontentlist;
-        attributcontentlist = cfattributcontentService.findAll();
-        for (CfAttributcontent attributcontent : attributcontentlist) {
-            try {
-                CfClasscontent classcontent = cfclasscontentService.findById(attributcontent.getClasscontentref().getId());
-            } catch (Exception ex) {
-                isConsistent = false;
-                LOGGER.info("INCONSISTENCY: " + attributcontent.getId());
-                LOGGER.info("INCONSISTENCY: " + attributcontent.getClasscontentref());
-                LOGGER.info("---------------");
-            }
-        }
-        return isConsistent;
     }
     
     private void updateSearchhistory(String[] searchexpressions) {

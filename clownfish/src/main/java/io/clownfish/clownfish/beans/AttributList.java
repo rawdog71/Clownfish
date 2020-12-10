@@ -40,8 +40,6 @@ public class AttributList {
     private @Getter @Setter CfAttribut selectedAttribut = null;
 
     public List<CfAttribut> init(CfClass cfclass) {
-        attributlist = cfattributService.findByClassref(cfclass);
-        
-        return attributlist;
+        return cfattributService.findByClassref(cfclass);
     }
 }

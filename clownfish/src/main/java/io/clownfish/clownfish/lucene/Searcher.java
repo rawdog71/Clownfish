@@ -163,7 +163,7 @@ public class Searcher {
                             foundAssetMetadata.put(asset.getName(), metamap);
                         }
                     }
-                } catch (Exception ex) {
+                } catch (IOException | NumberFormatException ex) {
                     LOGGER.warn(ex.getMessage());
                 }
             }

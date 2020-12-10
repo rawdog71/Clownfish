@@ -253,11 +253,7 @@ public class AssetList {
             keywords.getTarget().add(kw);
             keywords.getSource().remove(kw);
         }
-        if (selectedAsset.getMimetype().contains("jpeg")) {
-            isImage = true;
-        } else {
-            isImage = false;
-        }
+        isImage = selectedAsset.getMimetype().contains("jpeg");
     }
  
     /**

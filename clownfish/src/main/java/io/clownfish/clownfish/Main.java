@@ -232,7 +232,9 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             LOGGER.error(ex.getMessage());
         } finally {
             try {
-                is.close();
+                if (null != is) {
+                    is.close();
+                }
             } catch (IOException ex) {
                 LOGGER.error(ex.getMessage());
             }

@@ -87,12 +87,7 @@ public class PropertyList {
         propertykey = selectedProperty.getHashkey();
         propertyvalue = selectedProperty.getValue();
         newPropertyButtonDisabled = true;
-        if (selectedProperty.isNodelete()) {
-            deletePropertyButtonDisabled = true;
-        } else {
-            deletePropertyButtonDisabled = false;
-        }
-            
+        deletePropertyButtonDisabled = selectedProperty.isNodelete();
     }
     
     public void onCreateProperty(ActionEvent actionEvent) {
