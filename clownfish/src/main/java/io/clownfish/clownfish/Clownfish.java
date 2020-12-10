@@ -603,7 +603,7 @@ public class Clownfish {
             });
             searchclasscontentmap.clear();
             searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
-                searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key).toString());
+                searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
             });
             
             String search_site = propertyUtil.getPropertyValue("site_search");
