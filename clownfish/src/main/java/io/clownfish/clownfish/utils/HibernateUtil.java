@@ -125,7 +125,7 @@ public class HibernateUtil {
             elementproperty.addAttribute("not-null", "true");
             elementproperty.addAttribute("index", "idx_cf_contentref");
         }
-        System.out.println(xmldoc.asXML());
+        //System.out.println(xmldoc.asXML());
         ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
         SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
         Session session_tables = sessionFactory.openSession();
@@ -194,7 +194,7 @@ public class HibernateUtil {
             elementproperty.addAttribute("not-null", "true");
             elementproperty.addAttribute("index", "idx_cf_contentref");
         }
-        System.out.println(xmldoc.asXML());
+        //System.out.println(xmldoc.asXML());
         ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
         SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
         Session session_tables = sessionFactory.openSession();
@@ -396,7 +396,7 @@ public class HibernateUtil {
                 }
             }
         }
-        System.out.println(xmldoc.asXML());
+        //System.out.println(xmldoc.asXML());
         ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
         SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
         Session session_relations = sessionFactory.openSession();

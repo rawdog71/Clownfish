@@ -111,7 +111,7 @@ public class ReefBean implements Serializable {
                 }
                 FacesContext.getCurrentInstance().responseComplete();
             } catch (IOException ex) {
-                
+                LOGGER.error(ex.getMessage());
             }
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());

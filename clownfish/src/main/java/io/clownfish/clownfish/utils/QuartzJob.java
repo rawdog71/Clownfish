@@ -227,7 +227,7 @@ public class QuartzJob implements Job {
                 }
             }
         }
-        System.out.println(out);
+        LOGGER.info(out.toString());
     }
     
 }

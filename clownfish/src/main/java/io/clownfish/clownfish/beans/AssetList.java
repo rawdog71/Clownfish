@@ -276,7 +276,7 @@ public class AssetList {
                 cfassetkeywordService.create(assetkeyword);
             }
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

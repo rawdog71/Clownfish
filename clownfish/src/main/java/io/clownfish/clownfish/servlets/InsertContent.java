@@ -103,7 +103,7 @@ public class InsertContent extends HttpServlet {
             String apikey = icp.getApikey();
             if (apikeyutil.checkApiKey(apikey, "InsertContent")) {
                 CfClass clazz = cfclassService.findByName(icp.getClassname());
-                System.out.println(clazz.isSearchrelevant());
+                //System.out.println(clazz.isSearchrelevant());
 
                 try {
                     CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());

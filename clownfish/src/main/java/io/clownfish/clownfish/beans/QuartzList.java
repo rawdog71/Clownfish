@@ -291,7 +291,7 @@ public class QuartzList {
             clownfish.init();
             //fillPropertyMap();
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     
@@ -307,7 +307,7 @@ public class QuartzList {
                 clownfish.init();
             }
         } catch (ConstraintViolationException ex) {
-            System.out.println(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
     

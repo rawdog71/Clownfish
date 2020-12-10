@@ -68,7 +68,7 @@ public class RestDeleteContent {
             String apikey = ucp.getApikey();
             if (apikeyutil.checkApiKey(apikey, "UpdateContent")) {
                 CfClass clazz = cfclassService.findByName(ucp.getClassname());
-                System.out.println(clazz.isSearchrelevant());
+                //System.out.println(clazz.isSearchrelevant());
 
                 try {
                     CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname());
