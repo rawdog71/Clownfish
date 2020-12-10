@@ -19,3 +19,4 @@ Work in progress
 - Markdown content
 - Lucene search engine
 - Static site generation
+- WebDAV server
