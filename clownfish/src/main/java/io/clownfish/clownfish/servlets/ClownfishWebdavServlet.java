@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-import java.util.zip.GZIPOutputStream;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -195,13 +194,11 @@ public class ClownfishWebdavServlet extends DefaultServlet {
         }
 
         if (getServletConfig().getInitParameter("maxDepth") != null) {
-            this.maxDepth = Integer.parseInt(
-                    getServletConfig().getInitParameter("maxDepth"));
+            this.maxDepth = Integer.parseInt(getServletConfig().getInitParameter("maxDepth"));
         }
 
         if (getServletConfig().getInitParameter("allowSpecialPaths") != null) {
-            this.allowSpecialPaths = Boolean.parseBoolean(
-                    getServletConfig().getInitParameter("allowSpecialPaths"));
+            this.allowSpecialPaths = Boolean.parseBoolean(getServletConfig().getInitParameter("allowSpecialPaths"));
         }
     }
     
@@ -230,9 +227,9 @@ public class ClownfishWebdavServlet extends DefaultServlet {
 
         final String method = req.getMethod();
 
-        if (this.debug > 0) {
-            log("[" + method + "] " + path);
-        }
+        //if (this.debug > 0) {
+            LOGGER.info("[" + method + "] " + path);
+        //}
 
         switch (method) {
             case METHOD_PROPFIND:
@@ -357,32 +354,23 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                 
                 if (subpath.contains("/")) {
                     String assetname = subpath.substring(subpath.indexOf("/") + 1);
-                    System.out.println("ASSET: " + assetname);
-                    
-                    try {
-                        CfAsset asset = cfassetService.findByName(assetname);
+                    if (0 != assetname.compareToIgnoreCase("desktop.ini")) {
+                        System.out.println("ASSET: " + assetname);
+                        try {
+                            CfAsset asset = cfassetService.findByName(assetname);
 
-                        final XMLWriter generatedXML = new XMLWriter(resp.getWriter());
-                        generatedXML.writeXMLHeader();
-                        generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
-                        
-                        setAssetProps(generatedXML, asset, subpath);
-                        generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
+                            final XMLWriter generatedXML = new XMLWriter(resp.getWriter());
+                            generatedXML.writeXMLHeader();
+                            generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
 
-                        //System.out.println(generatedXML.toString());
-                        generatedXML.sendData();
-                    } catch (Exception ex) {
-                        
-                        // Create multistatus object
-                        final XMLWriter generatedXML = new XMLWriter(resp.getWriter());
-                        generatedXML.writeXMLHeader();
-                        generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
-                        setCollectionProps(generatedXML, "");
-                        generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
-                        //System.out.println(generatedXML.toString());
-                        generatedXML.sendData();
-                        
-                        LOGGER.error(ex.getMessage());
+                            setAssetProps(generatedXML, asset, subpath);
+                            generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
+
+                            //System.out.println(generatedXML.toString());
+                            generatedXML.sendData();
+                        } catch (Exception ex) {
+                            resp.sendError(WebdavStatus.SC_NOT_FOUND);
+                        }
                     }
                 } else {
                     // Create multistatus object
@@ -465,7 +453,6 @@ public class ClownfishWebdavServlet extends DefaultServlet {
             path = path.substring(0, path.length() - 1);
         }
         String subpath = path.substring(8);
-        //String keyword = subpath.substring(0, subpath.indexOf("/"));
         String filename = subpath.substring(subpath.indexOf("/") + 1);
         System.out.println("ASSET: " + filename);
         
@@ -490,8 +477,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                 LOGGER.error(ex.getMessage());
             }
             req.getInputStream().close();
-            
-            
+                
             //detecting the file type using detect method
             String fileextension = FilenameUtils.getExtension(folderUtil.getMedia_folder() + File.separator + filename);
             
@@ -562,22 +548,36 @@ public class ClownfishWebdavServlet extends DefaultServlet {
 
     private void doCopy(HttpServletRequest req, HttpServletResponse resp) {
         final String pathfrom = getRelativePath(req);
-        //final String pathto = getRelativePath(resp);
+        
+        String subpathfrom = pathfrom.substring(8);
+        String assetname = subpathfrom.substring(subpathfrom.indexOf("/") + 1);
+        
+        // Parsing destination header
+        final String pathto = req.getHeader("Destination");
+        String subpathto = pathto.substring(8);
+
         System.out.println(pathfrom);
     }
 
     private void doMove(HttpServletRequest req, HttpServletResponse resp) {
         final String pathfrom = getRelativePath(req);
-        //final String pathto = getRelativePath(resp);
+        
+        String subpathfrom = pathfrom.substring(8);
+        String assetname = subpathfrom.substring(subpathfrom.indexOf("/") + 1);
+        
+        // Parsing destination header
+        final String pathto = req.getHeader("Destination");
+        String subpathto = pathto.substring(8); 
+
         System.out.println(pathfrom);
     }
 
     private void doLock(HttpServletRequest req, HttpServletResponse resp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private void doUnlock(HttpServletRequest req, HttpServletResponse resp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     @Override
@@ -729,7 +729,6 @@ public class ClownfishWebdavServlet extends DefaultServlet {
         generatedXML.writeText(status);
         generatedXML.writeElement("D", "status", XMLWriter.CLOSING);
         generatedXML.writeElement("D", "propstat", XMLWriter.CLOSING);
-
 
         generatedXML.writeElement("D", "response", XMLWriter.CLOSING);
     }

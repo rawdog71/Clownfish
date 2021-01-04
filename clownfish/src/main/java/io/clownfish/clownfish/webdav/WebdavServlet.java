@@ -138,8 +138,7 @@ public class WebdavServlet extends DefaultServlet {
      * Each element of the Vector is the path associated with the lock-null
      * resource.
      */
-    private final Hashtable<String, Vector<String>> lockNullResources
-            = new Hashtable<>();
+    private final Hashtable<String, Vector<String>> lockNullResources = new Hashtable<>();
 
     // ----------------------------------------------------- Instance Variables
     /**
@@ -154,13 +153,13 @@ public class WebdavServlet extends DefaultServlet {
     /**
      * Secret information used to generate reasonably secure lock ids.
      */
-    private String secret = "catalina";
+    private String secret = "clownfish";
 
     /**
      * Default depth in spec is infinite. Limit depth to 3 by default as
      * infinite depth makes operations very expensive.
      */
-    private int maxDepth = 3;
+    private int maxDepth = 1;
 
     /**
      * Is access allowed via WebDAV to the special paths (/WEB-INF and
@@ -183,13 +182,11 @@ public class WebdavServlet extends DefaultServlet {
         }
 
         if (getServletConfig().getInitParameter("maxDepth") != null) {
-            this.maxDepth = Integer.parseInt(
-                    getServletConfig().getInitParameter("maxDepth"));
+            this.maxDepth = Integer.parseInt(getServletConfig().getInitParameter("maxDepth"));
         }
 
         if (getServletConfig().getInitParameter("allowSpecialPaths") != null) {
-            this.allowSpecialPaths = Boolean.parseBoolean(
-                    getServletConfig().getInitParameter("allowSpecialPaths"));
+            this.allowSpecialPaths = Boolean.parseBoolean(getServletConfig().getInitParameter("allowSpecialPaths"));
         }
     }
 
@@ -201,8 +198,7 @@ public class WebdavServlet extends DefaultServlet {
      * @throws ServletException document builder creation failed (wrapped
      * <code>ParserConfigurationException</code> exception)
      */
-    protected DocumentBuilder getDocumentBuilder()
-            throws ServletException {
+    protected DocumentBuilder getDocumentBuilder() throws ServletException {
         final DocumentBuilder documentBuilder;
         final DocumentBuilderFactory documentBuilderFactory;
         try {
@@ -210,8 +206,7 @@ public class WebdavServlet extends DefaultServlet {
             documentBuilderFactory.setNamespaceAware(true);
             documentBuilderFactory.setExpandEntityReferences(false);
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            documentBuilder.setEntityResolver(
-                    new WebdavResolver(this.getServletContext()));
+            documentBuilder.setEntityResolver(new WebdavResolver(this.getServletContext()));
         } catch (final ParserConfigurationException e) {
             throw new ServletException(sm.getString("webdavservlet.jaxpfailed"));
         }
@@ -222,9 +217,7 @@ public class WebdavServlet extends DefaultServlet {
      * Handles the special WebDAV methods.
      */
     @Override
-    protected void service(final HttpServletRequest req, final HttpServletResponse resp)
-            throws ServletException, IOException {
-
+    protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         final String path = getRelativePath(req);
 
         // Block access to special subdirectories.
