@@ -58,7 +58,7 @@ public class GetContentData extends HttpServlet {
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
         
-    final transient Logger LOGGER = LoggerFactory.getLogger(GetAsset.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetContentData.class);
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

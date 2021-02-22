@@ -39,7 +39,6 @@ import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +80,7 @@ public class GetDatalistHibernate extends HttpServlet {
     private static transient @Getter @Setter String name;
     private static transient @Getter @Setter String apikey;
     
-    final transient Logger LOGGER = LoggerFactory.getLogger(GetAsset.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetDatalistHibernate.class);
     
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -167,7 +166,7 @@ public class GetDatalistHibernate extends HttpServlet {
                 if (null != classcontent) {
                     classcontentList.add(classcontent);
                 } else {
-                    LOGGER.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
+                    LOGGER.warn("Classcontent does not exist: " + inst_name + " - "  + listcontent.getCfListcontentPK().getClasscontentref());
                 }
             }
             
@@ -255,7 +254,7 @@ public class GetDatalistHibernate extends HttpServlet {
                 if (null != classcontent) {
                     classcontentList.add(classcontent);
                 } else {
-                    LOGGER.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
+                    LOGGER.warn("Classcontent does not exist: " + inst_name + " - "  + listcontent.getCfListcontentPK().getClasscontentref());
                 }
             }
             

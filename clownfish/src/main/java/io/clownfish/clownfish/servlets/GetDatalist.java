@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.clownfish.clownfish.datamodels.ContentOutput;
 import io.clownfish.clownfish.datamodels.DatalistOutput;
 import io.clownfish.clownfish.datamodels.GetContentParameter;
@@ -38,9 +37,7 @@ import io.clownfish.clownfish.utils.ContentUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -77,7 +74,7 @@ public class GetDatalist extends HttpServlet {
     private static transient @Getter @Setter String name;
     private static transient @Getter @Setter String apikey;
     
-    final transient Logger LOGGER = LoggerFactory.getLogger(GetAsset.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetDatalist.class);
     
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -161,7 +158,7 @@ public class GetDatalist extends HttpServlet {
                 if (null != classcontent) {
                     classcontentList.add(classcontent);
                 } else {
-                    LOGGER.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
+                    LOGGER.warn("Classcontent does not exist: " + inst_name + " - " + listcontent.getCfListcontentPK().getClasscontentref());
                 }
             }
             
@@ -243,7 +240,7 @@ public class GetDatalist extends HttpServlet {
                 if (null != classcontent) {
                     classcontentList.add(classcontent);
                 } else {
-                    LOGGER.warn("Classcontent does not exist: " + listcontent.getCfListcontentPK().getClasscontentref());
+                    LOGGER.warn("Classcontent does not exist: " + inst_name + " - " + listcontent.getCfListcontentPK().getClasscontentref());
                 }
             }
             
