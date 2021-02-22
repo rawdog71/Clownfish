@@ -39,6 +39,7 @@ import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -125,7 +126,11 @@ public class GetDatalistHibernate extends HttpServlet {
         
         String json = gson.toJson(gcp);
         response.setContentType("application/json;charset=UTF-8");
-        response.getOutputStream().println(json);
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.println(json);
+        out.flush();
+        
     }
     
     /**

@@ -17,7 +17,6 @@ package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
-import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
@@ -40,10 +39,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.NoResultException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -207,38 +208,42 @@ public class GetContentHibernate extends HttpServlet {
                 query = session_tables.createQuery("FROM " + inst_klasse + " c ");
             }
             
-            List<Map> contentliste = (List<Map>) query.getResultList();
-            session_tables.close();
-            int listcounter = 0;
-            for (Map content : contentliste) {
-                CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
-                if (null != cfclasscontent) {
-                    if (!cfclasscontent.isScrapped()) {
+            try {
+                List<Map> contentliste = (List<Map>) query.getResultList();
+            
+                session_tables.close();
+                int listcounter = 0;
+                for (Map content : contentliste) {
+                    CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
+                    if (null != cfclasscontent) {
+                        if (!cfclasscontent.isScrapped()) {
 
-                        listcounter++;
-                        if (range_start > 0){
-                            if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
+                            listcounter++;
+                            if (range_start > 0){
+                                if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
+                                    ContentDataOutput contentdataoutput = new ContentDataOutput();
+                                    contentdataoutput.setContent(cfclasscontent);
+                                    contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
+                                    contentdataoutput.setKeyvals(getContentMap(content));
+                                    outputlist.add(contentdataoutput);
+                                }
+                            } else {
                                 ContentDataOutput contentdataoutput = new ContentDataOutput();
                                 contentdataoutput.setContent(cfclasscontent);
                                 contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
                                 contentdataoutput.setKeyvals(getContentMap(content));
                                 outputlist.add(contentdataoutput);
                             }
-                        } else {
-                            ContentDataOutput contentdataoutput = new ContentDataOutput();
-                            contentdataoutput.setContent(cfclasscontent);
-                            contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
-                            contentdataoutput.setKeyvals(getContentMap(content));
-                            outputlist.add(contentdataoutput);
                         }
                     }
                 }
-            }
-            boolean found = true;
-            
-            if (!found) {
+                outputmap.put("contentfound", "true");
+            } catch (NoResultException ex) {
+                session_tables.close();
                 outputmap.put("contentfound", "false");
             }
+            
+            
             Gson gson = new Gson(); 
             String json = gson.toJson(outputlist);
             response.setContentType("application/json;charset=UTF-8");
@@ -438,8 +443,8 @@ public class GetContentHibernate extends HttpServlet {
         String json = gson.toJson(gcp);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        OutputStream out = response.getOutputStream();
-        out.write(json.getBytes("UTF-8"));
+        PrintWriter out = response.getWriter();
+        out.println(json);
         out.flush();
     }
 

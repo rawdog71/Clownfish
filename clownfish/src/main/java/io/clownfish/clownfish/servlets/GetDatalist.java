@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.clownfish.clownfish.datamodels.ContentOutput;
 import io.clownfish.clownfish.datamodels.DatalistOutput;
 import io.clownfish.clownfish.datamodels.GetContentParameter;
@@ -37,6 +38,7 @@ import io.clownfish.clownfish.utils.ContentUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -120,7 +122,10 @@ public class GetDatalist extends HttpServlet {
         
         String json = gson.toJson(gcp);
         response.setContentType("application/json;charset=UTF-8");
-        response.getOutputStream().println(json);
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.println(json);
+        out.flush();
     }
     
     /**

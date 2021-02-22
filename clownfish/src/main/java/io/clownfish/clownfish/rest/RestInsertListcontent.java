@@ -70,8 +70,8 @@ public class RestInsertListcontent {
                     cflistcontentService.create(listcontent);
                     hibernateutil.updateRelation(list);
                     ilcp.setReturncode("OK");
-                } catch (javax.persistence.EntityExistsException ex) {
-                    ilcp.setReturncode("EntityExistsException");
+                } catch (Exception ex) {
+                    ilcp.setReturncode("Exception");
                 }
             } else {
                 ilcp.setReturncode("Wrong API KEY");

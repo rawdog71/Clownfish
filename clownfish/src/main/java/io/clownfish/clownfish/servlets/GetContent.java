@@ -494,8 +494,8 @@ public class GetContent extends HttpServlet {
         String json = gson.toJson(gcp);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        OutputStream out = response.getOutputStream();
-        out.write(json.getBytes("UTF-8"));
+        PrintWriter out = response.getWriter();
+        out.println(json);
         out.flush();
     }
 

@@ -33,6 +33,7 @@ import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -94,8 +95,11 @@ public class InsertContent extends HttpServlet {
         insertContent(icp, response);
         
         String json = gson.toJson(icp);
+        response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        response.getOutputStream().println(json);
+        PrintWriter out = response.getWriter();
+        out.println(json);
+        out.flush();
     }
     
     private InsertContentParameter insertContent(InsertContentParameter icp, HttpServletResponse response) {
