@@ -94,15 +94,17 @@ public class InsertContent extends HttpServlet {
         InsertContentParameter icp = gson.fromJson(jb.toString(), InsertContentParameter.class);
         insertContent(icp, response);
         
+        /*
         String json = gson.toJson(icp);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         out.println(json);
         out.flush();
+        */
     }
     
-    private InsertContentParameter insertContent(InsertContentParameter icp, HttpServletResponse response) {
+    private InsertContentParameter insertContent(InsertContentParameter icp, HttpServletResponse response) throws IOException {
         try {
             String apikey = icp.getApikey();
             if (apikeyutil.checkApiKey(apikey, "InsertContent")) {
@@ -112,6 +114,7 @@ public class InsertContent extends HttpServlet {
                 try {
                     CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());
                     response.getOutputStream().println("Duplicate Classcontent: " + icp.getContentname());
+                    icp.setReturncode("NOK");
                 } catch (javax.persistence.NoResultException ex) {
                     try {
                         CfClasscontent newclasscontent = new CfClasscontent();

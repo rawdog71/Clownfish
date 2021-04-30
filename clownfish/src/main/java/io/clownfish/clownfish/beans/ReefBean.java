@@ -123,7 +123,7 @@ public class ReefBean implements Serializable {
         //String filename = event.getFile().getFileName().toLowerCase();
         //LOGGER.info("FILE: " + filename);
         InputStream inputStream;
-        inputStream = event.getFile().getInputstream();
+        inputStream = event.getFile().getInputStream();
         StringBuilder json = new StringBuilder();
         try (Reader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
             int c = 0;

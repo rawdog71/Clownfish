@@ -39,6 +39,7 @@ import javax.persistence.NoResultException;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.event.SlideEndEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
@@ -63,6 +64,9 @@ public class JavascriptList {
     private @Getter @Setter String javascriptName = "";
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter CfJavascriptversion version = null;
+    private @Getter @Setter int javascriptversion = 0;
+    private @Getter @Setter int javascriptversionMin = 0;
+    private @Getter @Setter int javascriptversionMax = 0;
     private @Getter @Setter List<CfJavascriptversion> versionlist;
     private @Getter @Setter boolean difference;
     private @Getter @Setter long checkedoutby = 0;
@@ -115,6 +119,7 @@ public class JavascriptList {
             checkoutUtil.getCheckoutAccess(co, loginbean);
             checkedout = checkoutUtil.isCheckedout();
             access = checkoutUtil.isAccess();
+            javascriptversionMax = versionlist.size();
         } else {
             checkedout = false;
             access = false;
@@ -264,5 +269,12 @@ public class JavascriptList {
         if (null != selectedJavascript) {
             javascriptUtility.getVersion(version.getCfJavascriptversionPK().getJavascriptref(), version.getCfJavascriptversionPK().getVersion());
         }
+    }
+    
+    public void onSlideEnd(SlideEndEvent event) {
+        int version = (int) event.getValue();
+        String output = javascriptUtility.getVersion(selectedJavascript.getId(), version);
+        System.out.println(output);
+        javascriptUtility.setJavascriptContent(output);
     }
 }

@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.utils;
 
 import com.github.difflib.DiffUtils;
-import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
@@ -94,25 +93,21 @@ public class TemplateUtil implements Serializable {
     public boolean hasDifference(CfTemplate selectedTemplate) {
         boolean diff = false;
         try {
-            try {
-                currentVersion = (long) cftemplateversionService.findMaxVersion(selectedTemplate.getId());
-            } catch (NullPointerException ex) {
-                currentVersion = 0;
-            }
-            if (currentVersion > 0) {
-                templateContent = selectedTemplate.getContent();
-                String contentVersion = getVersion(selectedTemplate.getId(), currentVersion);
-                source = Arrays.asList(templateContent.split("\\r?\\n"));
-                target = Arrays.asList(contentVersion.split("\\r?\\n"));
-                patch = DiffUtils.diff(source, target);
-                if (!patch.getDeltas().isEmpty()) {
-                    diff = true;
-                }
-            } else {
+            currentVersion = (long) cftemplateversionService.findMaxVersion(selectedTemplate.getId());
+        } catch (NullPointerException ex) {
+            currentVersion = 0;
+        }
+        if (currentVersion > 0) {
+            templateContent = selectedTemplate.getContent();
+            String contentVersion = getVersion(selectedTemplate.getId(), currentVersion);
+            source = Arrays.asList(templateContent.split("\\r?\\n"));
+            target = Arrays.asList(contentVersion.split("\\r?\\n"));
+            patch = DiffUtils.diff(source, target);
+            if (!patch.getDeltas().isEmpty()) {
                 diff = true;
             }
-        } catch (DiffException ex) {
-            LOGGER.error(ex.getMessage());
+        } else {
+            diff = true;
         }
         return diff;
     }

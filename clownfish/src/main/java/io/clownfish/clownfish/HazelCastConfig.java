@@ -16,7 +16,6 @@
 package io.clownfish.clownfish;
 
 import com.hazelcast.config.Config;
-import com.hazelcast.config.EvictionPolicy;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.spring.cache.HazelcastCacheManager;
@@ -42,7 +41,6 @@ public class HazelCastConfig {
                 .setInstanceName("clownfish-instance")
                 .addMapConfig(new MapConfig()
                         .setName("clownfishCache")
-                        .setEvictionPolicy(EvictionPolicy.LRU)
                         .setStatisticsEnabled(true));
     }
 }

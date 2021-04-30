@@ -33,8 +33,6 @@ import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPM
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
 import io.clownfish.clownfish.datamodels.ClownfishResponse;
 import io.clownfish.clownfish.datamodels.HibernateInit;
-import io.clownfish.clownfish.dbentities.CfAttributcontent;
-import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfQuartz;
 import io.clownfish.clownfish.dbentities.CfSearchhistory;
@@ -112,6 +110,8 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.math.BigInteger;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -122,7 +122,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
@@ -721,25 +720,29 @@ public class Clownfish {
             userSession = request.getSession();
             this.request = request;
             this.response = response;
-            String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-
-            Gson gson = new Gson();
-            List<JsonFormParameter> map;
-            map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
-            addHeader(response, clownfishutil.getVersion());
-            Future<ClownfishResponse> cfResponse = makeResponse(name, map, false);
-            if (cfResponse.get().getErrorcode() == 0) {
-                response.setContentType(this.response.getContentType());
-                response.setCharacterEncoding(this.response.getCharacterEncoding());
-                PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfResponse.get().getOutput());
+            if (request.getContentType().startsWith("multipart/form-data")) {
+                LOGGER.info("MULTIPART");
             } else {
-                response.setContentType("text/html");
-                response.setCharacterEncoding("UTF-8");
-                PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfResponse.get().getOutput());
+                String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+
+                Gson gson = new Gson();
+                List<JsonFormParameter> map;
+                map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
+                addHeader(response, clownfishutil.getVersion());
+                Future<ClownfishResponse> cfResponse = makeResponse(name, map, false);
+                if (cfResponse.get().getErrorcode() == 0) {
+                    response.setContentType(this.response.getContentType());
+                    response.setCharacterEncoding(this.response.getCharacterEncoding());
+                    PrintWriter outwriter = response.getWriter();
+                    outwriter.println(cfResponse.get().getOutput());
+                } else {
+                    response.setContentType("text/html");
+                    response.setCharacterEncoding("UTF-8");
+                    PrintWriter outwriter = response.getWriter();
+                    outwriter.println(cfResponse.get().getOutput());
+                }
             }
-        } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException ex) {
+        } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException | IllegalStateException ex) {
             LOGGER.error(ex.getMessage());
         }
     }
@@ -1041,6 +1044,10 @@ public class Clownfish {
                                     velTemplate.merge(velContext, out);
                                 }
                             }
+                        }
+                        
+                        if (name.compareToIgnoreCase("fehlteilestatistik_csv") == 0) {
+                            response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(name, StandardCharsets.UTF_8.toString()));
                         }
                         if (htmlcompression.compareToIgnoreCase("on") == 0) {
                             htmlcompressor.setCompressCss(false);

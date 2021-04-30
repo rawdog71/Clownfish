@@ -129,7 +129,7 @@ public class AssetList {
             try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
                 byte[] buffer = new byte[64535];
                 int bulk;
-                inputStream = event.getFile().getInputstream();
+                inputStream = event.getFile().getInputStream();
                 while (true) {
                     bulk = inputStream.read(buffer);
                     if (bulk < 0) {

@@ -39,6 +39,7 @@ import javax.persistence.NoResultException;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.event.SlideEndEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,9 @@ public class TemplateList {
     private @Getter @Setter String templateName = "";
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter int templateScriptLanguage = 0;
+    private @Getter @Setter int templateversion = 0;
+    private @Getter @Setter int templateversionMin = 0;
+    private @Getter @Setter int templateversionMax = 0;
     private @Getter @Setter String selectedScriptlanguage = "";
     private @Getter @Setter CfTemplateversion version = null;
     private @Getter @Setter List<CfTemplateversion> versionlist;
@@ -123,6 +127,7 @@ public class TemplateList {
             checkoutUtil.getCheckoutAccess(co, loginbean);
             checkedout = checkoutUtil.isCheckedout();
             access = checkoutUtil.isAccess();
+            templateversionMax = versionlist.size();
         } else {
             checkedout = false;
             access = false;
@@ -273,4 +278,11 @@ public class TemplateList {
             templateUtility.getVersion(version.getCfTemplateversionPK().getTemplateref(), version.getCfTemplateversionPK().getVersion());
         }
     }
+    
+    public void onSlideEnd(SlideEndEvent event) {
+        int version = (int) event.getValue();
+        String output = templateUtility.getVersion(selectedTemplate.getId(), version);
+        System.out.println(output);
+        templateUtility.setTemplateContent(output);
+    } 
 }
