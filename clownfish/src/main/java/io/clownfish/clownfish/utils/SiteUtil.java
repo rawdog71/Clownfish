@@ -79,7 +79,7 @@ public class SiteUtil {
     @Autowired HibernateUtil hibernateutil;
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteUtil.class);
     
-    @Value("${hibernate.use}") int useHibernate;
+    @Value("${hibernate.use:0}") int useHibernate;
     
     public SiteUtil() {
     }

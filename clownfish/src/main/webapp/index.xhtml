@@ -340,7 +340,7 @@
                             <p:ajax event="slideEnd" listener="#{templateList.onSlideEnd}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
                         </p:slider>
 
-                        <p:overlayPanel id="difftemplatePanel" for="difftemplateBtn" hideEffect="fade" dynamic="false" style="width:600px" modal="true">
+                        <p:overlayPanel id="difftemplatePanel" for="difftemplateBtn" dynamic="false" style="width:600px" modal="true">
                             <p:dataTable var="diff" value="#{templateList.templateUtility.patch.deltas}" rows="#{templateList.templateUtility.patch.deltas.size()}" paginator="false">
                                 <p:column headerText="DiffTyp">
                                     <h:outputText value="#{diff.type}" />
@@ -386,7 +386,7 @@
                         <p:outputLabel> Version </p:outputLabel><p:outputLabel id="stylesheetversion">#{stylesheetList.stylesheetUtility.currentVersion}</p:outputLabel>
                         <p:commandButton id="diffstylesheetBtn" type="button" value="Diff" rendered="#{stylesheetList.difference}" />
                         
-                        <p:overlayPanel id="diffstylesheetPanel" for="diffstylesheetBtn" hideEffect="fade" dynamic="false" style="width:600px" modal="true">
+                        <p:overlayPanel id="diffstylesheetPanel" for="diffstylesheetBtn" dynamic="false" style="width:600px" modal="true">
                             <p:dataTable var="diff" value="#{stylesheetList.stylesheetUtility.patch.deltas}" rows="#{stylesheetList.stylesheetUtility.patch.deltas.size()}" paginator="false">
                                 <p:column headerText="DiffTyp">
                                     <h:outputText value="#{diff.type}" />
@@ -437,7 +437,7 @@
                             <p:ajax event="slideEnd" listener="#{javascriptList.onSlideEnd}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:diffjavascriptPanel" />
                         </p:slider>
                         
-                        <p:overlayPanel id="diffjavascriptPanel" for="diffjavascriptBtn" hideEffect="fade" dynamic="false" style="width:600px" modal="true">
+                        <p:overlayPanel id="diffjavascriptPanel" for="diffjavascriptBtn" dynamic="false" style="width:600px" modal="true">
                             <p:dataTable var="diff" value="#{javascriptList.javascriptUtility.patch.deltas}" rows="#{javascriptList.javascriptUtility.patch.deltas.size()}" paginator="false">
                                 <p:column headerText="DiffTyp">
                                     <h:outputText value="#{diff.type}" />

@@ -257,8 +257,8 @@ public class Clownfish {
     @Value("${app.datasource.password}") String dbpassword;
     @Value("${app.datasource.url}") String dburl;
     @Value("${app.datasource.driverClassName}") String dbclass;
-    @Value("${check.consistency}") int checkConsistency;
-    @Value("${hibernate.init}") int hibernateInit;
+    @Value("${check.consistency:0}") int checkConsistency;
+    @Value("${hibernate.init:0}") int hibernateInit;
 
     /**
      * Call of the "root" site
