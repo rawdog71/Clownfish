@@ -174,7 +174,7 @@ public class GetContentHibernate extends HttpServlet {
                 int counter = 0;
                 for (String key : keys) {
                     if ((counter > 0) && ((counter%2) == 0)) {
-                        searchmap.put(keys[counter-1], keys[counter]);
+                        searchmap.put(keys[counter-1] + "_" + counter, keys[counter]);
                     }
                     counter++;
                 }
@@ -197,8 +197,33 @@ public class GetContentHibernate extends HttpServlet {
             if (!searchmap.isEmpty()) {
                 String whereclause = " WHERE "; 
                 for (String searchcontent : searchmap.keySet()) {
+                    String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
                     String searchvalue = searchmap.get(searchcontent);
-                    whereclause += searchcontent + " = '" + searchvalue + "' AND ";
+                    SearchValues sv = getSearchValues(searchvalue);
+                    switch (sv.getComparartor()) {
+                        case "eq":
+                            whereclause += searchcontentval + " = '" + sv.getSearchvalue() + "' AND ";
+                            break;
+                        case "sw":
+                            whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue() + "%' AND ";
+                            break;
+                        case "ew":
+                            whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "' AND ";
+                            break;
+                        case "co":
+                            whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "%' AND ";
+                            break;
+                        case "gt":
+                            whereclause += searchcontentval + " > '" + sv.getSearchvalue() + "' AND ";
+                            break;
+                        case "lt":
+                            whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
+                            break;
+                        case "ne":
+                            whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
+                            break;
+                    }
+                    
                 }
                 whereclause = whereclause.substring(0, whereclause.length()-5);
                 query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
@@ -320,7 +345,7 @@ public class GetContentHibernate extends HttpServlet {
                 int counter = 0;
                 for (String key : keys) {
                     if ((counter > 0) && ((counter%2) == 0)) {
-                        searchmap.put(keys[counter-1], keys[counter]);
+                        searchmap.put(keys[counter-1] + "_" + counter, keys[counter]);
                     }
                     counter++;
                 }
@@ -345,8 +370,33 @@ public class GetContentHibernate extends HttpServlet {
             if (!searchmap.isEmpty()) {
                 String whereclause = " WHERE "; 
                 for (String searchcontent : searchmap.keySet()) {
+                    String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
                     String searchvalue = searchmap.get(searchcontent);
-                    whereclause += searchcontent + " = '" + searchvalue + "' AND ";
+                    SearchValues sv = getSearchValues(searchvalue);
+                    switch (sv.getComparartor()) {
+                        case "eq":
+                            whereclause += searchcontentval + " = '" + sv.getSearchvalue() + "' AND ";
+                            break;
+                        case "sw":
+                            whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue() + "%' AND ";
+                            break;
+                        case "ew":
+                            whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "' AND ";
+                            break;
+                        case "co":
+                            whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "%' AND ";
+                            break;
+                        case "gt":
+                            whereclause += searchcontentval + " > '" + sv.getSearchvalue() + "' AND ";
+                            break;
+                        case "lt":
+                            whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
+                            break;
+                        case "ne":
+                            whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
+                            break;
+                    }
+                    
                 }
                 whereclause = whereclause.substring(0, whereclause.length()-5);
                 query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
@@ -481,6 +531,16 @@ public class GetContentHibernate extends HttpServlet {
         // not equals
         if (searchvalue.startsWith(":ne:")) {
             comparator = "ne";
+            searchvalue = searchvalue.substring(4);
+        }
+        // greater than
+        if (searchvalue.startsWith(":gt:")) {
+            comparator = "gt";
+            searchvalue = searchvalue.substring(4);
+        }
+        // less than
+        if (searchvalue.startsWith(":lt:")) {
+            comparator = "lt";
             searchvalue = searchvalue.substring(4);
         }
         searchvalue = searchvalue.toLowerCase();

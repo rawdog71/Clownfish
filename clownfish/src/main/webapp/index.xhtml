@@ -193,7 +193,7 @@
                                             <p:row>
                                                 <p:column>    
                                                     <p:outputLabel for="contenttype" value="ContentType:" />
-                                                    <p:inputText id="contenttype" value="#{sitetree.contentType}" maxlength="16" />
+                                                    <p:inputText id="contenttype" value="#{sitetree.contentType}" maxlength="32" />
                                                 </p:column>
                                             </p:row>
                                             <p:row>
@@ -303,7 +303,7 @@
                 
                 <p:tab title="Templates" id="templatepanel" rendered="#{loginBean.login and loginBean.hasRights(2)}">
                     <p:selectOneMenu id="templatelist" value="#{templateList.selectedTemplate}" converter="#{templateConverterBean}">
-                        <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
+                        <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
                         <f:selectItems value="#{templateList.templateListe}" />
                     </p:selectOneMenu>
@@ -335,9 +335,11 @@
                         <p:commandButton id="difftemplateBtn" type="button" value="Diff" rendered="#{templateList.difference}" />
                         
                         <h5>Select Version</h5>           
-                        <p:inputText id="selectedtemplateversion" value="#{templateList.templateversion}"/>
-                        <p:slider for="selectedtemplateversion" minValue="#{templateList.templateversionMin}" maxValue="#{templateList.templateversionMax}">
-                            <p:ajax event="slideEnd" listener="#{templateList.onSlideEnd}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
+                        <p:inputText id="selectedtemplateversion" value="#{templateList.templateversion}">
+                            <p:ajax event="blur" listener="#{templateList.onVersionChanged}" />
+                        </p:inputText>
+                        <p:slider id="selectedtemplateversionslider" for="selectedtemplateversion" minValue="#{templateList.templateversionMin}" maxValue="#{templateList.templateversionMax}">
+                            <p:ajax event="slideEnd" listener="#{templateList.onSlideEnd}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
                         </p:slider>
 
                         <p:overlayPanel id="difftemplatePanel" for="difftemplateBtn" dynamic="false" style="width:600px" modal="true">

@@ -216,7 +216,7 @@
         <dependency>
             <groupId>io.github.java-diff-utils</groupId>
             <artifactId>java-diff-utils</artifactId>
-            <version>4.9</version>
+            <version>4.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -334,13 +334,15 @@
             <version>2.0.2</version>
             <type>jar</type>
         </dependency>
-        
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>false</fork>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.utils;
 
 import com.github.difflib.DiffUtils;
+import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfJavascriptversion;
@@ -72,21 +73,25 @@ public class JavascriptUtil implements Serializable {
     public boolean hasDifference(CfJavascript selectedJavascript) {
         boolean diff = false;
         try {
-            currentVersion = cfjavascriptversionService.findMaxVersion(selectedJavascript.getId());
-        } catch (NullPointerException ex) {
-            currentVersion = 0;
-        }
-        if (currentVersion > 0) {
-            javascriptContent = selectedJavascript.getContent();
-            String contentVersion = getVersion(selectedJavascript.getId(), currentVersion);
-            source = Arrays.asList(javascriptContent.split("\\r?\\n"));
-            target = Arrays.asList(contentVersion.split("\\r?\\n"));
-            patch = DiffUtils.diff(source, target);
-            if (!patch.getDeltas().isEmpty()) {
+            try {
+                currentVersion = cfjavascriptversionService.findMaxVersion(selectedJavascript.getId());
+            } catch (NullPointerException ex) {
+                currentVersion = 0;
+            }
+            if (currentVersion > 0) {
+                javascriptContent = selectedJavascript.getContent();
+                String contentVersion = getVersion(selectedJavascript.getId(), currentVersion);
+                source = Arrays.asList(javascriptContent.split("\\r?\\n"));
+                target = Arrays.asList(contentVersion.split("\\r?\\n"));
+                patch = DiffUtils.diff(source, target);
+                if (!patch.getDeltas().isEmpty()) {
+                    diff = true;
+                }
+            } else {
                 diff = true;
             }
-        } else {
-            diff = true;
+        } catch (DiffException ex) {
+            LOGGER.error(ex.getMessage());
         }
         return diff;
     }

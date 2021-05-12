@@ -67,6 +67,7 @@ public class TemplateList {
     private @Getter @Setter int templateversion = 0;
     private @Getter @Setter int templateversionMin = 0;
     private @Getter @Setter int templateversionMax = 0;
+    private @Getter @Setter int selectedtemplateversion = 0;
     private @Getter @Setter String selectedScriptlanguage = "";
     private @Getter @Setter CfTemplateversion version = null;
     private @Getter @Setter List<CfTemplateversion> versionlist;
@@ -83,8 +84,12 @@ public class TemplateList {
     
     public String getTemplateContent() {
         if (null != selectedTemplate) {
-            templateUtility.setTemplateContent(selectedTemplate.getContent());
-            return templateUtility.getTemplateContent();
+            if (selectedtemplateversion != templateversionMax) {
+                return templateUtility.getVersion(selectedTemplate.getId(), selectedtemplateversion);
+            } else {
+                templateUtility.setTemplateContent(selectedTemplate.getContent());
+                return templateUtility.getTemplateContent();
+            }
         } else {
             return "";
         }
@@ -128,6 +133,7 @@ public class TemplateList {
             checkedout = checkoutUtil.isCheckedout();
             access = checkoutUtil.isAccess();
             templateversionMax = versionlist.size();
+            selectedtemplateversion = templateversionMax;
         } else {
             checkedout = false;
             access = false;
@@ -280,9 +286,10 @@ public class TemplateList {
     }
     
     public void onSlideEnd(SlideEndEvent event) {
-        int version = (int) event.getValue();
-        String output = templateUtility.getVersion(selectedTemplate.getId(), version);
-        System.out.println(output);
-        templateUtility.setTemplateContent(output);
-    } 
+        selectedtemplateversion = (int) event.getValue();
+    }
+   
+    public void onVersionChanged() {
+        selectedtemplateversion = templateversion;
+    }
 }

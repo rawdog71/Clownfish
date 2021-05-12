@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
 import org.dom4j.Document;
@@ -590,22 +591,27 @@ public class HibernateUtil {
     }
     
     public Map getContent(String tablename, long contentid) {
+        Map contentmap = null;
         Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
         Query query = null;
         query = session_tables.createQuery("FROM " + tablename + " c WHERE cf_contentref = " + contentid);
-        Map contentmap = (Map) query.getSingleResult();
-        session_tables.close();
-        /* add keywords  */
-        List<CfClasscontentkeyword> contentkeywordlist;
-        contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(contentid);
-        if (contentkeywordlist.size() > 0) {
-            ArrayList listcontentmap = new ArrayList();
-            contentkeywordlist.stream().forEach((contentkeyword) -> {
-                listcontentmap.add(cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref()));
-            });
-            contentmap.put("keywords", listcontentmap);
+        try {
+            contentmap = (Map) query.getSingleResult();
+            session_tables.close();
+            /* add keywords  */
+            List<CfClasscontentkeyword> contentkeywordlist;
+            contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(contentid);
+            if (contentkeywordlist.size() > 0) {
+                ArrayList listcontentmap = new ArrayList();
+                contentkeywordlist.stream().forEach((contentkeyword) -> {
+                    listcontentmap.add(cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref()));
+                });
+                contentmap.put("keywords", listcontentmap);
+                return contentmap;
+            }
+        } catch (NoResultException ex) {
+            LOGGER.error("HIBERNATEUTIL: " + tablename + " is empty. Please use hibernate.init=1 in application.properties");
         }
-        
         return contentmap;
     }
 }

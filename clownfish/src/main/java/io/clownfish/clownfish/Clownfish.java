@@ -1064,6 +1064,7 @@ public class Clownfish {
                             return new AsyncResult<>(cfresponse);
                         }
                     } catch (NoResultException ex) {
+                        LOGGER.info("Exception: " + ex);
                         cfresponse.setErrorcode(1);
                         cfresponse.setOutput("No template");
                         //LOGGER.info("END makeResponse: " + name);

@@ -267,7 +267,7 @@ CREATE TABLE IF NOT EXISTS `cf_site` (
   `javascriptref` bigint(20) unsigned DEFAULT NULL,
   `htmlcompression` int(1) NOT NULL,
   `characterencoding` varchar(16) DEFAULT NULL,
-  `contenttype` varchar(16) DEFAULT NULL,
+  `contenttype` varchar(32) DEFAULT NULL,
   `locale` varchar(16) DEFAULT NULL,
   `aliaspath` varchar(255) DEFAULT NULL,
   `gzip` int(1) NOT NULL,
