@@ -626,6 +626,34 @@ public class Clownfish {
         }
     }
     
+    @GetMapping(path = "/{name}.css")
+    public void universalGetCSS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        CfStylesheet cfstylesheet = null;
+        try {
+            cfstylesheet = cfstylesheetService.findByName(name);
+            response.setContentType("text/css");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter outwriter = response.getWriter();
+            outwriter.println(cfstylesheet.getContent());
+        } catch (Exception ex) {
+            System.out.println("CSS NOT FOUND");
+        }
+    }
+    
+    @GetMapping(path = "/{name}.js")
+    public void universalGetJS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        CfJavascript cfjavascript = null;
+        try {
+            cfjavascript = cfjavascriptService.findByName(name);
+            response.setContentType("application/javascript");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter outwriter = response.getWriter();
+            outwriter.println(cfjavascript.getContent());
+        } catch (Exception ex) {
+            System.out.println("JS NOT FOUND");
+        }
+    }
+    
     /**
      * GET
      * 
