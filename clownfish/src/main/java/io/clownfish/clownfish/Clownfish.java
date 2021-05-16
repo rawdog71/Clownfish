@@ -628,7 +628,6 @@ public class Clownfish {
     
     @GetMapping(path = "/{name}.css")
     public void universalGetCSS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        System.out.println("CSS");
         CfStylesheet cfstylesheet = null;
         try {
             cfstylesheet = cfstylesheetService.findByName(name);
@@ -643,7 +642,6 @@ public class Clownfish {
     
     @GetMapping(path = "/{name}.js")
     public void universalGetJS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        System.out.println("JS");
         CfJavascript cfjavascript = null;
         try {
             cfjavascript = cfjavascriptService.findByName(name);
