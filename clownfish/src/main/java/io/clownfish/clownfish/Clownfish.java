@@ -640,6 +640,20 @@ public class Clownfish {
         }
     }
     
+    @GetMapping(path = "/{name}.tpl")
+    public void universalGetTemplate(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        CfTemplate cftemplate = null;
+        try {
+            cftemplate = cftemplateService.findByName(name);
+            response.setContentType("text/html");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter outwriter = response.getWriter();
+            outwriter.println(cftemplate.getContent());
+        } catch (Exception ex) {
+            System.out.println("Template NOT FOUND");
+        }
+    }
+    
     @GetMapping(path = "/{name}.js")
     public void universalGetJS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         CfJavascript cfjavascript = null;
