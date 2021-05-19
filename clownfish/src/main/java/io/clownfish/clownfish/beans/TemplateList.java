@@ -120,10 +120,16 @@ public class TemplateList {
             templateName = selectedTemplate.getName();
             templateUtility.setTemplateContent(selectedTemplate.getContent());
             templateScriptLanguage = selectedTemplate.getScriptlanguage();
-            if (0 == selectedTemplate.getScriptlanguage()) {
-                selectedScriptlanguage = "freemarker";
-            } else {
-                selectedScriptlanguage = "velocity";
+            switch (selectedTemplate.getScriptlanguage()) {
+                case 0:
+                    selectedScriptlanguage = "freemarker";
+                    break;
+                case 1:
+                    selectedScriptlanguage = "velocity";
+                    break;
+                case 2:
+                    selectedScriptlanguage = "html";
+                    break;
             }
             versionlist = cftemplateversionService.findByTemplateref(selectedTemplate.getId());
             difference = templateUtility.hasDifference(selectedTemplate);

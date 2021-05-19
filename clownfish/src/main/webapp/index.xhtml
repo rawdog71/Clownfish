@@ -319,6 +319,7 @@
                     <p:selectOneMenu id="templatelanguage" value="#{templateList.templateScriptLanguage}">
                         <f:selectItem itemValue="0" itemLabel="Freemarker" />
                         <f:selectItem itemValue="1" itemLabel="Velocity" />
+                        <f:selectItem itemValue="2" itemLabel="HTML" />
                     </p:selectOneMenu>
                     <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
 

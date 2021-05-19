@@ -95,6 +95,7 @@ public class QuartzJob implements Job {
     }
     
     private void callJob(long siteref) {
+        boolean canExecute = false;
         modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
         // read all System Properties of the property table
         propertymap = propertylist.fillPropertyMap();
@@ -122,112 +123,124 @@ public class QuartzJob implements Job {
 
         CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
         // fetch the dependend template 
-        if (0 == cftemplate.getScriptlanguage()) {  
-            try {
-                // Freemarker Template
-                fmRoot = new LinkedHashMap();
-
-                freemarkerCfg = new freemarker.template.Configuration();
-                freemarkerCfg.setDefaultEncoding("UTF-8");
-                freemarkerCfg.setTemplateLoader(freemarkerTemplateloader);
-                freemarkerCfg.setLocalizedLookup(false);
-                freemarkerCfg.setLocale(Locale.GERMANY);
-
-                fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
-            } catch (MalformedTemplateNameException ex) {
-                LOGGER.error(ex.getMessage());
-            } catch (ParseException ex) {
-                LOGGER.error(ex.getMessage());
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage());
-            }
-        } else {                                    
-            try {
-                // Velocity Template
-                velContext = new org.apache.velocity.VelocityContext();
-
-                velTemplate = new org.apache.velocity.Template();
-                org.apache.velocity.runtime.RuntimeServices runtimeServices = org.apache.velocity.runtime.RuntimeSingleton.getRuntimeServices();
-                String templateContent;
-                long currentTemplateVersion;
+        switch (cftemplate.getScriptlanguage()) {
+            case 0:
                 try {
-                    currentTemplateVersion = cftemplateversionService.findMaxVersion(cftemplate.getId());
-                } catch (NullPointerException ex) {
-                    currentTemplateVersion = 0;
-                }
-                templateContent = templateUtil.getVersion(cftemplate.getId(), currentTemplateVersion);
-                templateContent = templateUtil.fetchIncludes(templateContent, modus);
-                StringReader reader = new StringReader(templateContent);
-                velTemplate.setRuntimeServices(runtimeServices);
-                velTemplate.setData(runtimeServices.parse(reader, cftemplate.getName()));
-                velTemplate.initDocument();
-            } catch (org.apache.velocity.runtime.parser.ParseException ex) {
-                LOGGER.error(ex.getMessage());
-            }
-        }
+                    // Freemarker Template
+                    fmRoot = new LinkedHashMap();
 
-        // fetch the dependend datasources
-        sitedatasourcelist = new ArrayList<>();
-        sitedatasourcelist.addAll(cfsitedatasourceService.findBySiteref(cfsite.getId()));
-        
-        // write the output
-        Writer out = new StringWriter();
-        if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
-            EmailTemplateBean emailbean = new EmailTemplateBean();
-            emailbean.init(propertymap);
-            if (null != fmRoot) {
-                fmRoot.put("emailBean", emailbean);
+                    freemarkerCfg = new freemarker.template.Configuration();
+                    freemarkerCfg.setDefaultEncoding("UTF-8");
+                    freemarkerCfg.setTemplateLoader(freemarkerTemplateloader);
+                    freemarkerCfg.setLocalizedLookup(false);
+                    freemarkerCfg.setLocale(Locale.GERMANY);
 
-                if (sapSupport) {
-                    List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
-                    sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
-                    sapbean = new SAPTemplateBean();
-                    sapbean.init(sapc, sitesaprfclist, rpytableread, null);
-                    fmRoot.put("sapBean", sapbean);
-                }
-                
-                DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
-                databasebean.initjob(sitedatasourcelist, cfdatasourceService);
-                fmRoot.put("databaseBean", databasebean);
-                NetworkTemplateBean networkbean = new NetworkTemplateBean();
-                fmRoot.put("networkBean", networkbean);
-
-                fmRoot.put("property", propertymap);
-                try {
-                    if (null != fmTemplate) {
-                        freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
-                        env.process();
-                    }
-                } catch (freemarker.template.TemplateException ex) {
+                    fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
+                    canExecute = true;
+                } catch (MalformedTemplateNameException ex) {
+                    LOGGER.error(ex.getMessage());
+                } catch (ParseException ex) {
                     LOGGER.error(ex.getMessage());
                 } catch (IOException ex) {
                     LOGGER.error(ex.getMessage());
                 }
-            }
-        } else {                                    // Velocity template
-            EmailTemplateBean emailbean = new EmailTemplateBean();
-            emailbean.init(propertymap);
-            if (null != velContext) {
-                velContext.put("emailBean", emailbean);
-                if (sapSupport) {
-                    List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
-                    sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
-                    sapbean = new SAPTemplateBean();
-                    velContext.put("sapBean", sapbean);
-                }
-                DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
-                databasebean.initjob(sitedatasourcelist, cfdatasourceService);
-                velContext.put("databaseBean", databasebean);
-                NetworkTemplateBean networkbean = new NetworkTemplateBean();
-                velContext.put("networkBean", networkbean);
+                break;
+            case 1:
+                try {
+                    // Velocity Template
+                    velContext = new org.apache.velocity.VelocityContext();
 
-                velContext.put("property", propertymap);
-                if (null != velTemplate) {
-                    velTemplate.merge(velContext, out);
+                    velTemplate = new org.apache.velocity.Template();
+                    org.apache.velocity.runtime.RuntimeServices runtimeServices = org.apache.velocity.runtime.RuntimeSingleton.getRuntimeServices();
+                    String templateContent;
+                    long currentTemplateVersion;
+                    try {
+                        currentTemplateVersion = cftemplateversionService.findMaxVersion(cftemplate.getId());
+                    } catch (NullPointerException ex) {
+                        currentTemplateVersion = 0;
+                    }
+                    templateContent = templateUtil.getVersion(cftemplate.getId(), currentTemplateVersion);
+                    templateContent = templateUtil.fetchIncludes(templateContent, modus);
+                    StringReader reader = new StringReader(templateContent);
+                    velTemplate.setRuntimeServices(runtimeServices);
+                    velTemplate.setData(runtimeServices.parse(reader, cftemplate.getName()));
+                    velTemplate.initDocument();
+                    canExecute = true;
+                } catch (org.apache.velocity.runtime.parser.ParseException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+                break;
+            default:
+                canExecute = false;
+                break;
+        }
+
+        if (canExecute) {
+            // fetch the dependend datasources
+            sitedatasourcelist = new ArrayList<>();
+            sitedatasourcelist.addAll(cfsitedatasourceService.findBySiteref(cfsite.getId()));
+
+            // write the output
+            Writer out = new StringWriter();
+            if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
+                EmailTemplateBean emailbean = new EmailTemplateBean();
+                emailbean.init(propertymap);
+                if (null != fmRoot) {
+                    fmRoot.put("emailBean", emailbean);
+
+                    if (sapSupport) {
+                        List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
+                        sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                        sapbean = new SAPTemplateBean();
+                        sapbean.init(sapc, sitesaprfclist, rpytableread, null);
+                        fmRoot.put("sapBean", sapbean);
+                    }
+
+                    DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
+                    databasebean.initjob(sitedatasourcelist, cfdatasourceService);
+                    fmRoot.put("databaseBean", databasebean);
+                    NetworkTemplateBean networkbean = new NetworkTemplateBean();
+                    fmRoot.put("networkBean", networkbean);
+
+                    fmRoot.put("property", propertymap);
+                    try {
+                        if (null != fmTemplate) {
+                            freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
+                            env.process();
+                        }
+                    } catch (freemarker.template.TemplateException ex) {
+                        LOGGER.error(ex.getMessage());
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                }
+            } else {                                    // Velocity template
+                EmailTemplateBean emailbean = new EmailTemplateBean();
+                emailbean.init(propertymap);
+                if (null != velContext) {
+                    velContext.put("emailBean", emailbean);
+                    if (sapSupport) {
+                        List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
+                        sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                        sapbean = new SAPTemplateBean();
+                        velContext.put("sapBean", sapbean);
+                    }
+                    DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
+                    databasebean.initjob(sitedatasourcelist, cfdatasourceService);
+                    velContext.put("databaseBean", databasebean);
+                    NetworkTemplateBean networkbean = new NetworkTemplateBean();
+                    velContext.put("networkBean", networkbean);
+
+                    velContext.put("property", propertymap);
+                    if (null != velTemplate) {
+                        velTemplate.merge(velContext, out);
+                    }
                 }
             }
+            LOGGER.info(out.toString());
+        } else {
+            LOGGER.info("CANNOT EXECUTE HTML TEMPLATE");
         }
-        LOGGER.info(out.toString());
     }
     
 }

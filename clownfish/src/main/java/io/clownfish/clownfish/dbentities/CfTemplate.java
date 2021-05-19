@@ -152,10 +152,15 @@ public class CfTemplate implements Serializable {
     }
     
     public String getScriptLanguageTxt() {
-        if (0 == getScriptlanguage()) {
-            return "freemarker";
-        } else {
-            return "velocity";
+        switch (getScriptlanguage()) {
+            case 0:
+                return "freemarker";
+            case 1:
+                return "velocity";
+            case 2:
+                return "html";
+            default:
+                return "";
         }
     }
 }
