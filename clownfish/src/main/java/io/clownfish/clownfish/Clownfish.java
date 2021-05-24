@@ -81,6 +81,7 @@ import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.templatebeans.EmailTemplateBean;
 import io.clownfish.clownfish.templatebeans.NetworkTemplateBean;
 import io.clownfish.clownfish.templatebeans.SAPTemplateBean;
+import io.clownfish.clownfish.templatebeans.WebServiceTemplateBean;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.ConsistencyUtil;
@@ -221,6 +222,7 @@ public class Clownfish {
     EmailTemplateBean emailbean;
     SAPTemplateBean sapbean;
     NetworkTemplateBean networkbean;
+    WebServiceTemplateBean webservicebean;
 
     @Context protected HttpServletResponse response;
     @Context protected HttpServletRequest request;
@@ -995,6 +997,7 @@ public class Clownfish {
                         }
 
                         networkbean = new NetworkTemplateBean();
+                        webservicebean = new WebServiceTemplateBean();
                         // write the output
                         Writer out = new StringWriter();
                         switch (cftemplate.getScriptlanguage()) {
@@ -1023,6 +1026,8 @@ public class Clownfish {
                                     }
 
                                     fmRoot.put("networkBean", networkbean);
+                                    
+                                    fmRoot.put("webserviceBean", webservicebean);
 
                                     fmRoot.put("parameter", parametermap);
                                     fmRoot.put("property", propertyUtil.getPropertymap());
@@ -1076,6 +1081,8 @@ public class Clownfish {
                                     }
 
                                     velContext.put("networkBean", networkbean);
+                                    
+                                    velContext.put("webserviceBean", webservicebean);
 
                                     velContext.put("parameter", parametermap);
                                     velContext.put("property", propertyUtil.getPropertymap());

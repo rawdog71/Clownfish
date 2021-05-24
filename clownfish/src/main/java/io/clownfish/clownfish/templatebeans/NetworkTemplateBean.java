@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @Scope(value="request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class NetworkTemplateBean implements Serializable {
-    final transient Logger LOGGER = LoggerFactory.getLogger(SAPTemplateBean.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(NetworkTemplateBean.class);
 
     public NetworkTemplateBean() {
     }
