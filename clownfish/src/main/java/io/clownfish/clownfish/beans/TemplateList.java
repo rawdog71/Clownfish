@@ -148,6 +148,7 @@ public class TemplateList {
     
     public void onSave(ActionEvent actionEvent) {
         if (null != selectedTemplate) {
+            selectedTemplate.setScriptlanguage(templateScriptLanguage);
             selectedTemplate.setContent(getTemplateContent());
             cftemplateService.edit(selectedTemplate);
             difference = templateUtility.hasDifference(selectedTemplate);
