@@ -21,7 +21,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.clownfish.clownfish.datamodels.WebserviceCache;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,29 +43,31 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class WebServiceTemplateBean implements Serializable {
     private transient @Getter @Setter Map contentmap;
+    private transient @Getter @Setter List contentlist;
     private static @Getter @Setter Map contentCache;
     final transient Logger LOGGER = LoggerFactory.getLogger(WebServiceTemplateBean.class);
 
     public WebServiceTemplateBean() {
         contentmap = new HashMap<>();
+        contentlist = new ArrayList();
         if (null == contentCache) {
             contentCache = new HashMap<>();
         }
     }
     
-    public Map callService(String url, int seconds) {
+    public Map callServiceMap(String url, int seconds) {
         if (contentCache.containsKey(url)) {
             if (DateTime.now().isBefore(((WebserviceCache)contentCache.get(url)).getValiduntil())) {
                 return ((WebserviceCache)contentCache.get(url)).getContentmap();
             } else {
-                contentmap.putAll(getContent(url));
+                contentmap.putAll(getContentMap(url));
                 ((WebserviceCache)contentCache.get(url)).setContentmap(contentmap);
                 ((WebserviceCache)contentCache.get(url)).setValiduntil(DateTime.now().plusSeconds(seconds));
                 
                 return contentmap;
             }
         } else {
-            contentmap.putAll(getContent(url));
+            contentmap.putAll(getContentMap(url));
 
             WebserviceCache webservicecache = new WebserviceCache();
             webservicecache.setContentmap(contentmap);
@@ -74,14 +78,50 @@ public class WebServiceTemplateBean implements Serializable {
         }
     }
     
-    private Map getContent(String url) {
+    public List callServiceList(String url, int seconds) {
+        if (contentCache.containsKey(url)) {
+            if (DateTime.now().isBefore(((WebserviceCache)contentCache.get(url)).getValiduntil())) {
+                return ((WebserviceCache)contentCache.get(url)).getContentlist();
+            } else {
+                contentlist.addAll(getContentList(url));
+                ((WebserviceCache)contentCache.get(url)).setContentlist(contentlist);
+                ((WebserviceCache)contentCache.get(url)).setValiduntil(DateTime.now().plusSeconds(seconds));
+                
+                return contentlist;
+            }
+        } else {
+            contentlist.addAll(getContentList(url));
+
+            WebserviceCache webservicecache = new WebserviceCache();
+            webservicecache.setContentlist(contentlist);
+            webservicecache.setValiduntil(DateTime.now().plusSeconds(seconds));
+            contentCache.put(url, webservicecache);
+
+            return contentlist;
+        }
+    }
+    
+    private Map getContentMap(String url) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response.getBody());
             Map<String, Object> result = mapper.convertValue(root, new TypeReference<Map<String, Object>>(){});
-            
+            return result;
+        } catch (JsonProcessingException ex) {
+            LOGGER.error(ex.getMessage());
+            return null;
+        }
+    }
+    
+    private List getContentList(String url) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.getBody());
+            List<Map<String, Object>> result = mapper.convertValue(root, new TypeReference<List<Map<String, Object>>>(){});
             return result;
         } catch (JsonProcessingException ex) {
             LOGGER.error(ex.getMessage());

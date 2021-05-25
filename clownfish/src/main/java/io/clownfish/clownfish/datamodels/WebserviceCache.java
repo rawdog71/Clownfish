@@ -15,7 +15,9 @@
  */
 package io.clownfish.clownfish.datamodels;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,10 +29,12 @@ import org.joda.time.DateTime;
  */
 public class WebserviceCache {
     private @Getter @Setter Map contentmap;
+    private @Getter @Setter List contentlist;
     private @Getter @Setter DateTime validuntil;
 
     public WebserviceCache() {
         contentmap = new HashMap<>();
+        contentlist = new ArrayList<>();
         validuntil = new DateTime();
     }
 }
