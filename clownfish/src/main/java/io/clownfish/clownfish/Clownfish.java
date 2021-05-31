@@ -127,6 +127,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.persistence.NoResultException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -720,8 +721,8 @@ public class Clownfish {
                     response.setContentType("text/html");
                     response.setCharacterEncoding("UTF-8");
                 }
-                PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfResponse.get().getOutput());
+                ServletOutputStream out = response.getOutputStream();
+                out.write(cfResponse.get().getOutput().getBytes(this.response.getCharacterEncoding())); 
             } catch (IOException | InterruptedException | ExecutionException ex) {
                 LOGGER.error(ex.getMessage());
             } catch (PageNotFoundException ex) {
@@ -781,13 +782,13 @@ public class Clownfish {
                 if (cfResponse.get().getErrorcode() == 0) {
                     response.setContentType(this.response.getContentType());
                     response.setCharacterEncoding(this.response.getCharacterEncoding());
-                    PrintWriter outwriter = response.getWriter();
-                    outwriter.println(cfResponse.get().getOutput());
+                    ServletOutputStream out = response.getOutputStream();
+                    out.write(cfResponse.get().getOutput().getBytes(this.response.getCharacterEncoding())); 
                 } else {
                     response.setContentType("text/html");
                     response.setCharacterEncoding("UTF-8");
-                    PrintWriter outwriter = response.getWriter();
-                    outwriter.println(cfResponse.get().getOutput());
+                    ServletOutputStream out = response.getOutputStream();
+                    out.write(cfResponse.get().getOutput().getBytes(this.response.getCharacterEncoding())); 
                 }
             }
         } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException | IllegalStateException ex) {

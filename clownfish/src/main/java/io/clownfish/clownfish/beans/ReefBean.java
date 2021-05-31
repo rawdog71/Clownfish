@@ -36,8 +36,6 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
@@ -45,6 +43,7 @@ import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,8 +89,8 @@ public class ReefBean implements Serializable {
                     reef.getAttributlist().add(attribut);
                 }
             }
-            long checksum = getCRC32Checksum(reefcheck(reef).getBytes());
-            reef.setChecksum(String.valueOf(checksum));
+            String checksum = getMD5Checksum(reefcheck(reef));
+            reef.setChecksum(checksum);
             Gson gson = new Gson();
             String json = gson.toJson(reef);
             System.out.println(json);
@@ -134,8 +133,9 @@ public class ReefBean implements Serializable {
         //LOGGER.info("UPLOAD: " + json);
         Gson gson = new Gson();
         Reef newreef = gson.fromJson(json.toString(), Reef.class);
-        long checksum = getCRC32Checksum(reefcheck(newreef).getBytes());
-        if (0 == newreef.getChecksum().compareToIgnoreCase(String.valueOf(checksum))) {
+        String checksum_comp = newreef.getChecksum();
+        String checksum = getMD5Checksum(reefcheck(newreef));
+        if (0 == checksum_comp.compareToIgnoreCase(checksum)) {
             LOGGER.info("CHECKSUM OK");
             importReef(newreef);
         } else {
@@ -165,12 +165,10 @@ public class ReefBean implements Serializable {
         return reefchk;
     }
     
-    private static long getCRC32Checksum(byte[] bytes) {
-        Checksum crc32 = new CRC32();
-        crc32.update(bytes, 0, bytes.length);
-        return crc32.getValue();
+    private static String getMD5Checksum(String value) {
+        return DigestUtils.md5Hex(value);
     }
-    
+
     private void importReef(Reef importreef) {
         for (CfClass cfclass : importreef.getClasslist()) {
             try {
