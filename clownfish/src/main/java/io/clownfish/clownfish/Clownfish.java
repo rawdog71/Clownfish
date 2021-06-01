@@ -111,8 +111,6 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.math.BigInteger;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -225,8 +223,12 @@ public class Clownfish {
     NetworkTemplateBean networkbean;
     WebServiceTemplateBean webservicebean;
 
-    @Context protected HttpServletResponse response;
-    @Context protected HttpServletRequest request;
+    //@Context protected HttpServletResponse response;
+    //@Context protected HttpServletRequest request;
+    
+    private String contenttype;
+    private String characterencoding;
+    private String locale;
 
     private GzipSwitch gzipswitch;
     private freemarker.template.Configuration freemarkerCfg;
@@ -521,8 +523,8 @@ public class Clownfish {
     public void postsearch(@Context HttpServletRequest request, @Context HttpServletResponse response) throws ParseException {
         try {
             userSession = request.getSession();
-            this.request = request;
-            this.response = response;
+//            this.request = request;
+//            this.response = response;
             String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 
             Gson gson = new Gson();
@@ -697,8 +699,8 @@ public class Clownfish {
                 }
 
                 userSession = request.getSession();
-                this.request = request;
-                this.response = response;
+//                this.request = request;
+//                this.response = response;
                 Map<String, String[]> querymap = request.getParameterMap();
 
                 ArrayList queryParams = new ArrayList();
@@ -715,14 +717,14 @@ public class Clownfish {
                 addHeader(response, clownfishutil.getVersion());
                 Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams, false);
                 if (cfResponse.get().getErrorcode() == 0) {
-                    response.setContentType(this.response.getContentType());
-                    response.setCharacterEncoding(this.response.getCharacterEncoding());
+                    response.setContentType(this.contenttype);
+                    response.setCharacterEncoding(this.characterencoding);
                 } else {
                     response.setContentType("text/html");
                     response.setCharacterEncoding("UTF-8");
                 }
                 ServletOutputStream out = response.getOutputStream();
-                out.write(cfResponse.get().getOutput().getBytes(this.response.getCharacterEncoding())); 
+                out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
             } catch (IOException | InterruptedException | ExecutionException ex) {
                 LOGGER.error(ex.getMessage());
             } catch (PageNotFoundException ex) {
@@ -767,8 +769,8 @@ public class Clownfish {
             }
             
             userSession = request.getSession();
-            this.request = request;
-            this.response = response;
+//            this.request = request;
+//            this.response = response;
             if (request.getContentType().startsWith("multipart/form-data")) {
                 LOGGER.info("MULTIPART");
             } else {
@@ -780,15 +782,15 @@ public class Clownfish {
                 addHeader(response, clownfishutil.getVersion());
                 Future<ClownfishResponse> cfResponse = makeResponse(name, map, false);
                 if (cfResponse.get().getErrorcode() == 0) {
-                    response.setContentType(this.response.getContentType());
-                    response.setCharacterEncoding(this.response.getCharacterEncoding());
+                    response.setContentType(this.contenttype);
+                    response.setCharacterEncoding(this.characterencoding);
                     ServletOutputStream out = response.getOutputStream();
-                    out.write(cfResponse.get().getOutput().getBytes(this.response.getCharacterEncoding())); 
+                    out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
                 } else {
                     response.setContentType("text/html");
                     response.setCharacterEncoding("UTF-8");
                     ServletOutputStream out = response.getOutputStream();
-                    out.write(cfResponse.get().getOutput().getBytes(this.response.getCharacterEncoding())); 
+                    out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
                 }
             }
         } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException | IllegalStateException ex) {
@@ -848,8 +850,8 @@ public class Clownfish {
                 if ((cfsite.isStaticsite()) && (!makestatic)) {
                     cfresponse = getStaticSite(name);
                     if (0 == cfresponse.getErrorcode()) {
-                        response.setContentType(defaultUtil.getContentType());
-                        response.setCharacterEncoding(defaultUtil.getCharacterEncoding());
+//                        response.setContentType(defaultUtil.getContentType());
+//                        response.setCharacterEncoding(defaultUtil.getCharacterEncoding());
                         return new AsyncResult<>(cfresponse);
                     } else {
                         Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, true);
@@ -864,17 +866,20 @@ public class Clownfish {
                 } else {
                     if ((cfsite.getContenttype() != null)) {
                         if (!cfsite.getContenttype().isEmpty()) {
-                            this.response.setContentType(cfsite.getContenttype());
+                            //this.response.setContentType(cfsite.getContenttype());
+                            this.contenttype = cfsite.getContenttype();
                         }
                     }
                     if ((cfsite.getCharacterencoding() != null)) {
                         if (!cfsite.getCharacterencoding().isEmpty()) {
-                            this.response.setCharacterEncoding(cfsite.getCharacterencoding());
+                            //this.response.setCharacterEncoding(cfsite.getCharacterencoding());
+                            this.characterencoding = cfsite.getCharacterencoding();
                         }
                     }
                     if ((cfsite.getLocale() != null)) {
                         if (!cfsite.getLocale().isEmpty()) {
-                            this.response.setLocale(new Locale(cfsite.getLocale()));
+                            //this.response.setLocale(new Locale(cfsite.getLocale()));
+                            this.locale = cfsite.getLocale();
                         }
                     }
 
