@@ -32,9 +32,12 @@ import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.util.List;
+import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,8 +62,9 @@ public class RestUpdateContent {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestUpdateContent.class);
 
     @PostMapping("/updatecontent")
-    public UpdateContentParameter restUpdateContent(@RequestBody UpdateContentParameter ucp) {
-        return updateContent(ucp);
+    @Async
+    public Future<UpdateContentParameter> restUpdateContent(@RequestBody UpdateContentParameter ucp) {
+        return new AsyncResult<>(updateContent(ucp));
     }
     
     private UpdateContentParameter updateContent(UpdateContentParameter ucp) {
