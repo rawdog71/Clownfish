@@ -677,6 +677,20 @@ public class Clownfish {
         }
     }
     
+    @GetMapping(path = "/robots.txt")
+    public void universalGetRobots(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+        CfTemplate cftemplate = null;
+        try {
+            cftemplate = cftemplateService.findByName("robots");
+            response.setContentType("text/plain");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter outwriter = response.getWriter();
+            outwriter.println(cftemplate.getContent());
+        } catch (Exception ex) {
+            System.out.println("ROBOTS NOT FOUND");
+        }
+    }
+    
     /**
      * GET
      * 
