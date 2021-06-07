@@ -223,9 +223,6 @@ public class Clownfish {
     NetworkTemplateBean networkbean;
     WebServiceTemplateBean webservicebean;
 
-    //@Context protected HttpServletResponse response;
-    //@Context protected HttpServletRequest request;
-    
     private String contenttype;
     private String characterencoding;
     private String locale;
@@ -523,8 +520,6 @@ public class Clownfish {
     public void postsearch(@Context HttpServletRequest request, @Context HttpServletResponse response) throws ParseException {
         try {
             userSession = request.getSession();
-//            this.request = request;
-//            this.response = response;
             String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 
             Gson gson = new Gson();
@@ -682,12 +677,12 @@ public class Clownfish {
         CfTemplate cftemplate = null;
         try {
             cftemplate = cftemplateService.findByName("robots");
-            response.setContentType("text/plain");
+            response.setContentType("text/plain;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
             PrintWriter outwriter = response.getWriter();
-            outwriter.println(cftemplate.getContent());
+            outwriter.print(cftemplate.getContent());
         } catch (Exception ex) {
-            System.out.println("ROBOTS NOT FOUND");
+            System.out.print("ROBOTS NOT FOUND");
         }
     }
     
@@ -713,8 +708,6 @@ public class Clownfish {
                 }
 
                 userSession = request.getSession();
-//                this.request = request;
-//                this.response = response;
                 Map<String, String[]> querymap = request.getParameterMap();
 
                 ArrayList queryParams = new ArrayList();
@@ -783,8 +776,6 @@ public class Clownfish {
             }
             
             userSession = request.getSession();
-//            this.request = request;
-//            this.response = response;
             if (request.getContentType().startsWith("multipart/form-data")) {
                 LOGGER.info("MULTIPART");
             } else {
@@ -864,8 +855,6 @@ public class Clownfish {
                 if ((cfsite.isStaticsite()) && (!makestatic)) {
                     cfresponse = getStaticSite(name);
                     if (0 == cfresponse.getErrorcode()) {
-//                        response.setContentType(defaultUtil.getContentType());
-//                        response.setCharacterEncoding(defaultUtil.getCharacterEncoding());
                         return new AsyncResult<>(cfresponse);
                     } else {
                         Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, true);
@@ -880,19 +869,16 @@ public class Clownfish {
                 } else {
                     if ((cfsite.getContenttype() != null)) {
                         if (!cfsite.getContenttype().isEmpty()) {
-                            //this.response.setContentType(cfsite.getContenttype());
                             this.contenttype = cfsite.getContenttype();
                         }
                     }
                     if ((cfsite.getCharacterencoding() != null)) {
                         if (!cfsite.getCharacterencoding().isEmpty()) {
-                            //this.response.setCharacterEncoding(cfsite.getCharacterencoding());
                             this.characterencoding = cfsite.getCharacterencoding();
                         }
                     }
                     if ((cfsite.getLocale() != null)) {
                         if (!cfsite.getLocale().isEmpty()) {
-                            //this.response.setLocale(new Locale(cfsite.getLocale()));
                             this.locale = cfsite.getLocale();
                         }
                     }
