@@ -39,7 +39,7 @@ public class TomcatConfig implements WebServerFactoryCustomizer<TomcatServletWeb
     int serverPortHttps;
     @Value("${server.port:9000}")
     int serverPortHttp;
-    
+
     @Bean
     public ServletWebServerFactory servletContainer() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {

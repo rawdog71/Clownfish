@@ -33,6 +33,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
+import org.apache.catalina.Context;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.ansi;
 import org.fusesource.jansi.AnsiConsole;
