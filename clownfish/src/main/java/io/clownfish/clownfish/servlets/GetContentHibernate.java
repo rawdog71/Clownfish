@@ -116,7 +116,7 @@ public class GetContentHibernate extends HttpServlet {
         List<CfListcontent> listcontent = null;
         int range_start;
         int range_end;
-        
+
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
@@ -147,145 +147,155 @@ public class GetContentHibernate extends HttpServlet {
             inst_range = range;
             range_start = 0;
             range_end = 0;
-            if (!inst_range.isEmpty()) {
-                if (inst_range.contains("-")) {
-                    String[] ranges = inst_range.split("-");
-                    range_start = Integer.parseInt(ranges[0]);
-                    range_end = Integer.parseInt(ranges[1]);
-                    if (range_start > range_end) {
-                        int dummy = range_start;
-                        range_start = range_end;
-                        range_end = dummy;
+            if (!inst_klasse.isEmpty()) {
+                if (!inst_range.isEmpty()) {
+                    if (inst_range.contains("-")) {
+                        String[] ranges = inst_range.split("-");
+                        range_start = Integer.parseInt(ranges[0]);
+                        range_end = Integer.parseInt(ranges[1]);
+                        if (range_start > range_end) {
+                            int dummy = range_start;
+                            range_start = range_end;
+                            range_end = dummy;
+                        }
+                    } else {
+                        range_start = Integer.parseInt(inst_range);
+                        range_end = range_start;
                     }
-                } else {
-                    range_start = Integer.parseInt(inst_range);
-                    range_end = range_start;
                 }
-            }
-            
-            listcontent = null;
-            if (!inst_datalist.isEmpty()) {
-                CfList dataList = cflistService.findByName(inst_datalist);
-                listcontent = cflistcontentService.findByListref(dataList.getId());
-            }
-            searchmap = new HashMap<>();
-            parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("search$"))).forEach((paramname) -> {
-                String[] keys = paramname.split("\\$");
-                int counter = 0;
-                for (String key : keys) {
-                    if ((counter > 0) && ((counter%2) == 0)) {
-                        searchmap.put(keys[counter-1] + "_" + counter, keys[counter]);
-                    }
-                    counter++;
-                }
-            });
-            searchkeywords = new ArrayList<>();
-            parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("keywords"))).forEach((paramname) -> {
-                String[] keys = paramname.split("\\$");
-                int counter = 0;
-                for (String key : keys) {
-                    if (counter > 0) {
-                        searchkeywords.add(key);
-                    }
-                    counter++;
-                }
-            });
-            CfClass cfclass = cfclassService.findByName(inst_klasse);
-            Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
-            //Session session = hibernateUtil.getSession_tables();
-            Query query = null;
-            if (!searchmap.isEmpty()) {
-                String whereclause = " WHERE "; 
-                for (String searchcontent : searchmap.keySet()) {
-                    String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
-                    String searchvalue = searchmap.get(searchcontent);
-                    SearchValues sv = getSearchValues(searchvalue);
-                    switch (sv.getComparartor()) {
-                        case "eq":
-                            whereclause += searchcontentval + " = '" + sv.getSearchvalue() + "' AND ";
-                            break;
-                        case "sw":
-                            whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue() + "%' AND ";
-                            break;
-                        case "ew":
-                            whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "' AND ";
-                            break;
-                        case "co":
-                            whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "%' AND ";
-                            break;
-                        case "gt":
-                            whereclause += searchcontentval + " > '" + sv.getSearchvalue() + "' AND ";
-                            break;
-                        case "lt":
-                            whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
-                            break;
-                        case "ne":
-                            whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
-                            break;
-                    }
-                    
-                }
-                whereclause = whereclause.substring(0, whereclause.length()-5);
-                query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
-            } else {
-                query = session_tables.createQuery("FROM " + inst_klasse + " c ");
-            }
-            
-            try {
-                List<Map> contentliste = (List<Map>) query.getResultList();
-            
-                session_tables.close();
-                int listcounter = 0;
-                for (Map content : contentliste) {
-                    CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
-                    if (null != cfclasscontent) {
-                        if (!cfclasscontent.isScrapped()) {
 
-                            listcounter++;
-                            if (range_start > 0){
-                                if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
+                listcontent = null;
+                if (!inst_datalist.isEmpty()) {
+                    CfList dataList = cflistService.findByName(inst_datalist);
+                    listcontent = cflistcontentService.findByListref(dataList.getId());
+                }
+                searchmap = new HashMap<>();
+                parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("search$"))).forEach((paramname) -> {
+                    String[] keys = paramname.split("\\$");
+                    int counter = 0;
+                    for (String key : keys) {
+                        if ((counter > 0) && ((counter%2) == 0)) {
+                            searchmap.put(keys[counter-1] + "_" + counter, keys[counter]);
+                        }
+                        counter++;
+                    }
+                });
+                searchkeywords = new ArrayList<>();
+                parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("keywords"))).forEach((paramname) -> {
+                    String[] keys = paramname.split("\\$");
+                    int counter = 0;
+                    for (String key : keys) {
+                        if (counter > 0) {
+                            searchkeywords.add(key);
+                        }
+                        counter++;
+                    }
+                });
+                //CfClass cfclass = cfclassService.findByName(inst_klasse);
+                Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+                //Session session = hibernateUtil.getSession_tables();
+                Query query = null;
+                if (!searchmap.isEmpty()) {
+                    String whereclause = " WHERE "; 
+                    for (String searchcontent : searchmap.keySet()) {
+                        String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
+                        String searchvalue = searchmap.get(searchcontent);
+                        SearchValues sv = getSearchValues(searchvalue);
+                        switch (sv.getComparartor()) {
+                            case "eq":
+                                whereclause += searchcontentval + " = '" + sv.getSearchvalue() + "' AND ";
+                                break;
+                            case "sw":
+                                whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue() + "%' AND ";
+                                break;
+                            case "ew":
+                                whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "' AND ";
+                                break;
+                            case "co":
+                                whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "%' AND ";
+                                break;
+                            case "gt":
+                                whereclause += searchcontentval + " > '" + sv.getSearchvalue() + "' AND ";
+                                break;
+                            case "lt":
+                                whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
+                                break;
+                            case "ne":
+                                whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
+                                break;
+                        }
+
+                    }
+                    whereclause = whereclause.substring(0, whereclause.length()-5);
+                    query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
+                } else {
+                    query = session_tables.createQuery("FROM " + inst_klasse + " c ");
+                }
+
+                try {
+                    List<Map> contentliste = (List<Map>) query.getResultList();
+
+                    session_tables.close();
+                    int listcounter = 0;
+                    for (Map content : contentliste) {
+                        CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
+                        if (null != cfclasscontent) {
+                            if (!cfclasscontent.isScrapped()) {
+
+                                listcounter++;
+                                if (range_start > 0){
+                                    if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
+                                        ContentDataOutput contentdataoutput = new ContentDataOutput();
+                                        contentdataoutput.setContent(cfclasscontent);
+                                        contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
+                                        contentdataoutput.setKeyvals(getContentMap(content));
+                                        outputlist.add(contentdataoutput);
+                                    }
+                                } else {
                                     ContentDataOutput contentdataoutput = new ContentDataOutput();
                                     contentdataoutput.setContent(cfclasscontent);
                                     contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
                                     contentdataoutput.setKeyvals(getContentMap(content));
                                     outputlist.add(contentdataoutput);
                                 }
-                            } else {
-                                ContentDataOutput contentdataoutput = new ContentDataOutput();
-                                contentdataoutput.setContent(cfclasscontent);
-                                contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
-                                contentdataoutput.setKeyvals(getContentMap(content));
-                                outputlist.add(contentdataoutput);
                             }
                         }
                     }
+                    outputmap.put("contentfound", "true");
+                } catch (NoResultException ex) {
+                    session_tables.close();
+                    outputmap.put("contentfound", "false");
                 }
-                outputmap.put("contentfound", "true");
-            } catch (NoResultException ex) {
-                session_tables.close();
-                outputmap.put("contentfound", "false");
-            }
-            
-            
-            Gson gson = new Gson(); 
-            String json = gson.toJson(outputlist);
-            response.setContentType("application/json;charset=UTF-8");
-            try (PrintWriter out = response.getWriter()) {
-                out.print(json);
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage());
+
+                Gson gson = new Gson(); 
+                String json = gson.toJson(outputlist);
+                response.setContentType("application/json;charset=UTF-8");
+                try (PrintWriter out = response.getWriter()) {
+                    out.print(json);
+                } catch (IOException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+            } else {
+                Gson gson = new Gson(); 
+                String json = gson.toJson(outputlist);
+                response.setContentType("application/json;charset=UTF-8");
+                try (PrintWriter out = response.getWriter()) {
+                    out.print(json);
+                } catch (IOException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
             }
         } else {
             PrintWriter out = null;
             try {
-                out = response.getWriter();
+            out = response.getWriter();
                 out.print("Wrong API KEY");
             } catch (IOException ex) {
                 LOGGER.error(ex.getMessage());
             } finally {
                 out.close();
             }
-        }    
+        }
     }
     
     /**

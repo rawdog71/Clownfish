@@ -62,7 +62,8 @@ import org.joda.time.format.DateTimeFormatter;
     @NamedQuery(name = "CfAttributcontent.findByContentclassRef", query = "SELECT c FROM CfAttributcontent c WHERE c.classcontentlistref = :classcontentlistref"),
     @NamedQuery(name = "CfAttributcontent.findByContentAssetRef", query = "SELECT c FROM CfAttributcontent c WHERE c.assetcontentlistref = :assetcontentlistref"),
     @NamedQuery(name = "CfAttributcontent.findByAttributrefAndClasscontentref", query = "SELECT c FROM CfAttributcontent c WHERE c.attributref = :attributref AND c.classcontentref = :classcontentref"),
-    @NamedQuery(name = "CfAttributcontent.findByIndexed", query = "SELECT c FROM CfAttributcontent c WHERE c.indexed = :indexed")
+    @NamedQuery(name = "CfAttributcontent.findByIndexed", query = "SELECT c FROM CfAttributcontent c WHERE c.indexed = :indexed"),
+    @NamedQuery(name = "CfAttributcontent.findByIndexedAndSearchrelevant", query = "SELECT atc FROM CfAttributcontent atc INNER JOIN CfAttribut atr ON atc.attributref = atr.id INNER JOIN CfAttributetype att ON atr.attributetype = att.id WHERE att.searchrelevant = true AND atc.indexed = :indexed")
 })
 public class CfAttributcontent implements Serializable {
 

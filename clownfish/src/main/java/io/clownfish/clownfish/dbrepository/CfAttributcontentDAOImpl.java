@@ -94,7 +94,8 @@ public class CfAttributcontentDAOImpl implements CfAttributcontentDAO {
     @Override
     public List<CfAttributcontent> findByIndexed(boolean indexed) {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findByIndexed");
+        //TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findByIndexed");
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findByIndexedAndSearchrelevant");
         query.setParameter("indexed", indexed);
         List<CfAttributcontent> cfattributcontentlist = query.getResultList();
         return cfattributcontentlist;

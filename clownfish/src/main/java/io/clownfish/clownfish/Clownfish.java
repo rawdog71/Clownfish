@@ -301,7 +301,7 @@ public class Clownfish {
      * Initializes several variables and starts Quartz job triggers
      */
     @PostConstruct
-    @GetMapping(path = "/init") 
+    //@GetMapping(path = "/init") 
     public void init() {
         servicestatus.setMessage("Clownfish is initializing");
         servicestatus.setOnline(false);
