@@ -51,6 +51,7 @@ import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -69,6 +70,7 @@ public class HibernateUtil {
     private static @Getter @Setter HashMap<String, Session> classsessions = new HashMap<>();
     private static ServiceStatus serviceStatus;
     private static String datasourceURL;
+    @Autowired MarkdownUtil markdownUtil;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     
@@ -317,6 +319,13 @@ public class HibernateUtil {
             default:
                 return null;
         }
+    }
+    
+    private static String getClownfishType(String tablename, String fieldname) {
+        CfClass myclass = cfclassservice.findByName(tablename);
+        CfAttribut myattribute = cfattributservice.findByNameAndClassref(fieldname, myclass);
+        
+        return myattribute.getAttributetype().getName();
     }
     
     private static int hasIdentifier(List<CfAttribut> attributlist) {
@@ -592,11 +601,28 @@ public class HibernateUtil {
     
     public Map getContent(String tablename, long contentid) {
         Map contentmap = null;
+        Map outputmap = new HashMap();
         Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
         Query query = null;
         query = session_tables.createQuery("FROM " + tablename + " c WHERE cf_contentref = " + contentid);
         try {
             contentmap = (Map) query.getSingleResult();
+            contentmap.forEach(
+                    (k, v) -> 
+                        {
+                            if ((!k.toString().startsWith("cf_")) && (0 != k.toString().compareToIgnoreCase("$type$"))) {
+                                if (0 == getClownfishType(tablename, k.toString()).compareToIgnoreCase("markdown")) {
+                                    markdownUtil.initOptions();
+                                    if (null != v.toString()) {
+                                        v = markdownUtil.parseMarkdown(v.toString(), markdownUtil.getMarkdownOptions());
+                                    } else {
+                                        v = markdownUtil.parseMarkdown("", markdownUtil.getMarkdownOptions());
+                                    }
+                                }
+                            }
+                            outputmap.put(k, v);
+                        }
+            );
             session_tables.close();
             /* add keywords  */
             List<CfClasscontentkeyword> contentkeywordlist;
@@ -606,12 +632,12 @@ public class HibernateUtil {
                 contentkeywordlist.stream().forEach((contentkeyword) -> {
                     listcontentmap.add(cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref()));
                 });
-                contentmap.put("keywords", listcontentmap);
-                return contentmap;
+                outputmap.put("keywords", listcontentmap);
+                return outputmap;
             }
         } catch (NoResultException ex) {
             LOGGER.error("HIBERNATEUTIL: " + tablename + " is empty. Please use hibernate.init=1 in application.properties");
         }
-        return contentmap;
+        return outputmap;
     }
 }
