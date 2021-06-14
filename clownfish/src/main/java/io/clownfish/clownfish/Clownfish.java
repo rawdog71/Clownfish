@@ -853,6 +853,22 @@ public class Clownfish {
                 
                 // Site has static flag
                 if ((cfsite.isStaticsite()) && (!makestatic)) {
+                    if ((cfsite.getContenttype() != null)) {
+                        if (!cfsite.getContenttype().isEmpty()) {
+                            this.contenttype = cfsite.getContenttype();
+                        }
+                    }
+                    if ((cfsite.getCharacterencoding() != null)) {
+                        if (!cfsite.getCharacterencoding().isEmpty()) {
+                            this.characterencoding = cfsite.getCharacterencoding();
+                        }
+                    }
+                    if ((cfsite.getLocale() != null)) {
+                        if (!cfsite.getLocale().isEmpty()) {
+                            this.locale = cfsite.getLocale();
+                        }
+                    }
+                    
                     cfresponse = getStaticSite(name);
                     if (0 == cfresponse.getErrorcode()) {
                         return new AsyncResult<>(cfresponse);

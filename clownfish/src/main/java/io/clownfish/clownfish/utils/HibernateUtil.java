@@ -613,7 +613,7 @@ public class HibernateUtil {
                             if ((!k.toString().startsWith("cf_")) && (0 != k.toString().compareToIgnoreCase("$type$"))) {
                                 if (0 == getClownfishType(tablename, k.toString()).compareToIgnoreCase("markdown")) {
                                     markdownUtil.initOptions();
-                                    if (null != v.toString()) {
+                                    if (null != v) {
                                         v = markdownUtil.parseMarkdown(v.toString(), markdownUtil.getMarkdownOptions());
                                     } else {
                                         v = markdownUtil.parseMarkdown("", markdownUtil.getMarkdownOptions());
