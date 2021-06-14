@@ -128,7 +128,7 @@ public class TemplateList {
                     selectedScriptlanguage = "velocity";
                     break;
                 case 2:
-                    selectedScriptlanguage = "html";
+                    selectedScriptlanguage = "htmlmixed";
                     break;
             }
             versionlist = cftemplateversionService.findByTemplateref(selectedTemplate.getId());

@@ -158,7 +158,7 @@ public class CfTemplate implements Serializable {
             case 1:
                 return "velocity";
             case 2:
-                return "html";
+                return "htmlmixed";
             default:
                 return "";
         }
