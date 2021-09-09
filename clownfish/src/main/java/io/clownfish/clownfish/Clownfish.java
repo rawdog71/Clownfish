@@ -697,8 +697,21 @@ public class Clownfish {
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         if (servicestatus.isOnline()) {
             try {
+                ArrayList urlParams = new ArrayList();
                 if (0 != name.compareToIgnoreCase("searchresult")) {
                     String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+                    
+                    if (path.contains("/")) {
+                        String[] params = path.split("/");
+                        for (int i = 1; i < params.length; i++) {
+                            if (1 == i) {
+                                path = params[i];
+                            } else {
+                                urlParams.add(params[i]);
+                            }
+                        }
+                    }
+                    
                     if (name.compareToIgnoreCase(path) != 0) {
                         name = path.substring(1);
                         if (name.lastIndexOf("/")+1 == name.length()) {
@@ -722,7 +735,7 @@ public class Clownfish {
                 });
 
                 addHeader(response, clownfishutil.getVersion());
-                Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams, false);
+                Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams, urlParams, false);
                 if (cfResponse.get().getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
@@ -767,7 +780,18 @@ public class Clownfish {
     @PostMapping("/{name}/**")
     public void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         try {
+            ArrayList urlParams = new ArrayList();
             String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+            if (path.contains("/")) {
+                String[] params = path.split("/");
+                for (int i = 1; i < params.length; i++) {
+                    if (1 == i) {
+                        path = params[i];
+                    } else {
+                        urlParams.add(params[i]);
+                    }
+                }
+            }
             if (name.compareToIgnoreCase(path) != 0) {
                 name = path.substring(1);
                 if (name.lastIndexOf("/")+1 == name.length()) {
@@ -785,7 +809,7 @@ public class Clownfish {
                 List<JsonFormParameter> map;
                 map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
                 addHeader(response, clownfishutil.getVersion());
-                Future<ClownfishResponse> cfResponse = makeResponse(name, map, false);
+                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false);
                 if (cfResponse.get().getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
@@ -808,12 +832,13 @@ public class Clownfish {
      * 
      * @param name
      * @param postmap
+     * @param urlParams
      * @param makestatic
      * @return 
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException 
      */
     @Async
-    public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, boolean makestatic) throws PageNotFoundException {
+    public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, List urlParams, boolean makestatic) throws PageNotFoundException {
         ClownfishResponse cfresponse = new ClownfishResponse();
         
         try {
@@ -873,13 +898,13 @@ public class Clownfish {
                     if (0 == cfresponse.getErrorcode()) {
                         return new AsyncResult<>(cfresponse);
                     } else {
-                        Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, true);
+                        Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, urlParams, true);
                         try {
                             generateStaticSite(name, cfStaticResponse.get().getOutput());
-                            return makeResponse(name, postmap, false);
+                            return makeResponse(name, postmap, urlParams, false);
                         } catch (InterruptedException | ExecutionException ex) {
                             LOGGER.error(ex.getMessage());
-                            return makeResponse(name, postmap, false);
+                            return makeResponse(name, postmap, urlParams, false);
                         }
                     }
                 } else {
