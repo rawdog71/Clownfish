@@ -140,6 +140,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         }
     }
     
+    //Test
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
