@@ -77,25 +77,25 @@ public class GetContentHibernate extends HttpServlet {
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired HibernateUtil hibernateUtil;
-    
+
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter String identifier;
     private static transient @Getter @Setter String datalist;
     private static transient @Getter @Setter String apikey;
     private static transient @Getter @Setter String range;
-    
+
     final transient Logger LOGGER = LoggerFactory.getLogger(GetContentHibernate.class);
-    
+
     private class SearchValues {
         private @Getter @Setter String comparartor;
         private @Getter @Setter String searchvalue;
-        
+
         SearchValues(String comparator, String searchvalue) {
             this.comparartor = comparator;
             this.searchvalue = searchvalue;
         }
     }
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -196,7 +196,7 @@ public class GetContentHibernate extends HttpServlet {
                 //Session session = hibernateUtil.getSession_tables();
                 Query query = null;
                 if (!searchmap.isEmpty()) {
-                    String whereclause = " WHERE "; 
+                    String whereclause = " WHERE ";
                     for (String searchcontent : searchmap.keySet()) {
                         String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
                         String searchvalue = searchmap.get(searchcontent);
@@ -219,6 +219,12 @@ public class GetContentHibernate extends HttpServlet {
                                 break;
                             case "lt":
                                 whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
+                                break;
+                            case "gte":
+                                whereclause += searchcontentval + " >= '" + sv.getSearchvalue() + "' AND ";
+                                break;
+                            case "lte":
+                                whereclause += searchcontentval + " <= '" + sv.getSearchvalue() + "' AND ";
                                 break;
                             case "ne":
                                 whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
@@ -244,7 +250,7 @@ public class GetContentHibernate extends HttpServlet {
 
                                 listcounter++;
                                 if (range_start > 0){
-                                    if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
+                                    if ((listcounter >= range_start) && (listcounter <= range_end)) {
                                         ContentDataOutput contentdataoutput = new ContentDataOutput();
                                         contentdataoutput.setContent(cfclasscontent);
                                         contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
@@ -267,7 +273,7 @@ public class GetContentHibernate extends HttpServlet {
                     outputmap.put("contentfound", "false");
                 }
 
-                Gson gson = new Gson(); 
+                Gson gson = new Gson();
                 String json = gson.toJson(outputlist);
                 response.setContentType("application/json;charset=UTF-8");
                 try (PrintWriter out = response.getWriter()) {
@@ -276,7 +282,7 @@ public class GetContentHibernate extends HttpServlet {
                     LOGGER.error(ex.getMessage());
                 }
             } else {
-                Gson gson = new Gson(); 
+                Gson gson = new Gson();
                 String json = gson.toJson(outputlist);
                 response.setContentType("application/json;charset=UTF-8");
                 try (PrintWriter out = response.getWriter()) {
@@ -297,7 +303,7 @@ public class GetContentHibernate extends HttpServlet {
             }
         }
     }
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -378,7 +384,7 @@ public class GetContentHibernate extends HttpServlet {
             //Session session = hibernateUtil.getSession_tables();
             Query query = null;
             if (!searchmap.isEmpty()) {
-                String whereclause = " WHERE "; 
+                String whereclause = " WHERE ";
                 for (String searchcontent : searchmap.keySet()) {
                     String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
                     String searchvalue = searchmap.get(searchcontent);
@@ -402,18 +408,24 @@ public class GetContentHibernate extends HttpServlet {
                         case "lt":
                             whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
                             break;
+                        case "gte":
+                            whereclause += searchcontentval + " >= '" + sv.getSearchvalue() + "' AND ";
+                            break;
+                        case "lte":
+                            whereclause += searchcontentval + " <= '" + sv.getSearchvalue() + "' AND ";
+                            break;
                         case "ne":
                             whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
                             break;
                     }
-                    
+
                 }
                 whereclause = whereclause.substring(0, whereclause.length()-5);
                 query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
             } else {
                 query = session_tables.createQuery("FROM " + inst_klasse + " c ");
             }
-            
+
             List<Map> contentliste = (List<Map>) query.getResultList();
             session_tables.close();
             int listcounter = 0;
@@ -424,7 +436,7 @@ public class GetContentHibernate extends HttpServlet {
 
                         listcounter++;
                         if (range_start > 0){
-                            if ((listcounter >= range_start) && (listcounter <= range_end)) {                    
+                            if ((listcounter >= range_start) && (listcounter <= range_end)) {
                                 ContentDataOutput contentdataoutput = new ContentDataOutput();
                                 contentdataoutput.setContent(cfclasscontent);
                                 contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
@@ -454,7 +466,7 @@ public class GetContentHibernate extends HttpServlet {
             gcp.setReturncode("FALSE");
             gcp.setJson("[]");
             return gcp;
-        }    
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -491,13 +503,13 @@ public class GetContentHibernate extends HttpServlet {
                 jb.append(line);
             }
         } catch (Exception e) {
-            /*report an error*/ 
+            /*report an error*/
         }
 
         Gson gson = new Gson();
         GetContentParameter gcp = gson.fromJson(jb.toString(), GetContentParameter.class);
         processRequest(gcp, response);
-        
+
         String json = gson.toJson(gcp);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
@@ -515,7 +527,7 @@ public class GetContentHibernate extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-    
+
     private SearchValues getSearchValues(String searchvalue) {
         String comparator = "eq";
         // contains
@@ -553,22 +565,20 @@ public class GetContentHibernate extends HttpServlet {
             comparator = "lt";
             searchvalue = searchvalue.substring(4);
         }
+        // greater than or equal
+        if (searchvalue.startsWith(":gte:")) {
+            comparator = "gte";
+            searchvalue = searchvalue.substring(4);
+        }
+        // less than or equal
+        if (searchvalue.startsWith(":lte:")) {
+            comparator = "lte";
+            searchvalue = searchvalue.substring(4);
+        }
         searchvalue = searchvalue.toLowerCase();
         return new SearchValues(comparator, searchvalue);
     }
 
-    /*
-    private boolean inlist(ArrayList<ContentOutput> outputlist, ContentOutput co) {
-        boolean found = false;
-        for (ContentOutput content : outputlist) {
-            if (0 == content.getIdentifier().compareTo(co.getIdentifier())) {
-                found = true;
-            }
-        }
-        return found;
-    }
-    */
-    
     private ArrayList getContentKeywords(CfClasscontent content, boolean toLower) {
         ArrayList<String> keywords = new ArrayList<>();
         List<CfClasscontentkeyword> keywordlist = cfcontentkeywordService.findByClassContentRef(content.getId());
@@ -583,7 +593,8 @@ public class GetContentHibernate extends HttpServlet {
         }
         return keywords;
     }
-    
+
+    /*
     private boolean compareAttribut(ArrayList<HashMap> keyvals, SearchValues sv, String searchcontent) {
         boolean found = true;
         String searchvalue = sv.getSearchvalue().toLowerCase();
@@ -612,7 +623,8 @@ public class GetContentHibernate extends HttpServlet {
         }
         return found;
     }
-    
+    */
+
     private ArrayList getContentMap(Map content) {
         HashMap<String, String> contentMap = new HashMap<>(content);
         ArrayList contenList = new ArrayList<>();
