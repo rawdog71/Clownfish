@@ -20,3 +20,4 @@ Work in progress
 - Lucene search engine
 - Static site generation
 - WebDAV server
+- JasperReports JRXML template creation and PDF export
