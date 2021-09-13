@@ -130,6 +130,9 @@ public class TemplateList {
                 case 2:
                     selectedScriptlanguage = "htmlmixed";
                     break;
+                case 3:
+                    selectedScriptlanguage = "jrxml";
+                    break;
             }
             versionlist = cftemplateversionService.findByTemplateref(selectedTemplate.getId());
             difference = templateUtility.hasDifference(selectedTemplate);
