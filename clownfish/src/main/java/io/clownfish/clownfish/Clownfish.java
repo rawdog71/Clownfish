@@ -82,6 +82,7 @@ import io.clownfish.clownfish.templatebeans.EmailTemplateBean;
 import io.clownfish.clownfish.templatebeans.NetworkTemplateBean;
 import io.clownfish.clownfish.templatebeans.SAPTemplateBean;
 import io.clownfish.clownfish.templatebeans.WebServiceTemplateBean;
+import io.clownfish.clownfish.templatebeans.ImportTemplateBean;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.ConsistencyUtil;
@@ -222,6 +223,7 @@ public class Clownfish {
     SAPTemplateBean sapbean;
     NetworkTemplateBean networkbean;
     WebServiceTemplateBean webservicebean;
+    ImportTemplateBean importbean;
 
     private String contenttype;
     private String characterencoding;
@@ -1045,6 +1047,7 @@ public class Clownfish {
 
                         networkbean = new NetworkTemplateBean();
                         webservicebean = new WebServiceTemplateBean();
+                        importbean = new ImportTemplateBean();
                         // write the output
                         Writer out = new StringWriter();
                         switch (cftemplate.getScriptlanguage()) {
@@ -1071,6 +1074,8 @@ public class Clownfish {
                                         databasebean.init(sitedatasourcelist, cfdatasourceService);
                                         fmRoot.put("databaseBean", databasebean);
                                     }
+
+                                    fmRoot.put("importBean", importbean);
 
                                     fmRoot.put("networkBean", networkbean);
                                     
