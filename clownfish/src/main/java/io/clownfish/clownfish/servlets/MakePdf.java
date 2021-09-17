@@ -58,37 +58,40 @@ public class MakePdf extends HttpServlet
         String name = request.getParameter("site");
         String param = request.getParameter("param");
         
+        // Fetch site
+        CfSite site = cfSiteService.findByName(name);
+        
         HashMap<String, String> params = new HashMap<>();
+        // Put request params in HashMap
         if (param != null) {
             String[] arr = param.split("\\$");
             int counter = 0;
             for (String key : arr) {
                 if ((counter > 0) && ((counter % 2) != 0)) {
-                    params.put(arr[counter - 1], arr[counter]);
+                    params.put(arr[counter-1], arr[counter]);
                 }
                 counter++;
             }
         }
         
-        CfSite site = cfSiteService.findByName(name);
+        // Get the current template content
+        long currentTemplateVersion;
+        try {
+            cfTemplate = cfTemplateService.findById(site.getTemplateref().longValue());
+            currentTemplateVersion = cfTemplateversionService.findMaxVersion(cfTemplate.getId());
+        } catch (NullPointerException ex) {
+            currentTemplateVersion = 0;
+        }
+        String templateContent = templateUtil.getVersion(cfTemplate.getId(), currentTemplateVersion);
+        // Search and replace params key/values in template content
+        for(String key : params.keySet()) {
+            templateContent = templateContent.replaceAll("@" + key + "@", params.get(key));
+        }
 
+        // Fetch site datasources
         List<CfSitedatasource> sitedatasourcelist = cfSitedatasourceService.findBySiteref(site.getId());
-
         for (CfSitedatasource source : sitedatasourcelist)
         {
-            long currentTemplateVersion;
-            try {
-                cfTemplate = cfTemplateService.findById(site.getTemplateref().longValue());
-                currentTemplateVersion = cfTemplateversionService.findMaxVersion(cfTemplate.getId());
-            } catch (NullPointerException ex) {
-                currentTemplateVersion = 0;
-            }
-            String templateContent = templateUtil.getVersion(cfTemplate.getId(), currentTemplateVersion);      
-            
-            for(String key : params.keySet()) {
-                templateContent = templateContent.replaceAll("@" + key + "@", params.get(key));
-            }
-            
             CfDatasource datasource = cfDatasourceService.findById(source.getCfSitedatasourcePK().getDatasourceref());
             InputStream template = new ByteArrayInputStream(templateContent.getBytes(StandardCharsets.UTF_8));
             ServletOutputStream out = response.getOutputStream();
