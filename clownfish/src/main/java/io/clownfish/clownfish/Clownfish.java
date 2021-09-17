@@ -1047,7 +1047,6 @@ public class Clownfish {
 
                         networkbean = new NetworkTemplateBean();
                         webservicebean = new WebServiceTemplateBean();
-                        importbean = new ImportTemplateBean();
                         // write the output
                         Writer out = new StringWriter();
                         switch (cftemplate.getScriptlanguage()) {
@@ -1073,9 +1072,11 @@ public class Clownfish {
                                         databasebean = new DatabaseTemplateBean();
                                         databasebean.init(sitedatasourcelist, cfdatasourceService);
                                         fmRoot.put("databaseBean", databasebean);
-                                    }
 
-                                    fmRoot.put("importBean", importbean);
+                                        importbean = new ImportTemplateBean();
+                                        importbean.init(sitedatasourcelist, cfdatasourceService);
+                                        fmRoot.put("importBean", importbean);
+                                    }
 
                                     fmRoot.put("networkBean", networkbean);
                                     
