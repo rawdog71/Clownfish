@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 
 @WebServlet(name = "MakePdf", urlPatterns = {"/MakePdf"})
@@ -55,6 +56,20 @@ public class MakePdf extends HttpServlet
 
         //request.getParameter("apikey");
         String name = request.getParameter("site");
+        String param = request.getParameter("param");
+        
+        HashMap<String, String> params = new HashMap<>();
+        if (param != null) {
+            String[] arr = param.split("\\$");
+            int counter = 0;
+            for (String key : arr) {
+                if ((counter > 0) && ((counter % 2) != 0)) {
+                    params.put(arr[counter - 1], arr[counter]);
+                }
+                counter++;
+            }
+        }
+        
         CfSite site = cfSiteService.findByName(name);
 
         List<CfSitedatasource> sitedatasourcelist = cfSitedatasourceService.findBySiteref(site.getId());
@@ -68,7 +83,12 @@ public class MakePdf extends HttpServlet
             } catch (NullPointerException ex) {
                 currentTemplateVersion = 0;
             }
-            String templateContent = templateUtil.getVersion(cfTemplate.getId(), currentTemplateVersion);
+            String templateContent = templateUtil.getVersion(cfTemplate.getId(), currentTemplateVersion);      
+            
+            for(String key : params.keySet()) {
+                templateContent = templateContent.replaceAll("@" + key + "@", params.get(key));
+            }
+            
             CfDatasource datasource = cfDatasourceService.findById(source.getCfSitedatasourcePK().getDatasourceref());
             InputStream template = new ByteArrayInputStream(templateContent.getBytes(StandardCharsets.UTF_8));
             ServletOutputStream out = response.getOutputStream();

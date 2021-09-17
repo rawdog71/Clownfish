@@ -170,6 +170,9 @@ public class DatabaseTemplateBean implements Serializable {
                 String is_autoIncrment = "";
 
                 switch (colomuntype) {
+                    case -1:      // TEXT -> String
+                        tableFieldsList.add(new TableField(columnName, "STRING", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        break;
                     case 1:      // varchar -> String
                         tableFieldsList.add(new TableField(columnName, "STRING", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
