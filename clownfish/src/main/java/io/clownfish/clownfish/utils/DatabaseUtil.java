@@ -19,9 +19,7 @@ import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
 import io.clownfish.clownfish.jdbc.DatatableCondition;
 import io.clownfish.clownfish.jdbc.DatatableDeleteProperties;
-import io.clownfish.clownfish.jdbc.DatatableDeleteValue;
 import io.clownfish.clownfish.jdbc.DatatableNewProperties;
-import io.clownfish.clownfish.jdbc.DatatableNewValue;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
@@ -542,21 +540,17 @@ public class DatabaseUtil {
                 TableField tf;
                 switch (datatype) {
                     case "1":      // varchar -> String
+                    case "12":
+                    case "2005":    
                         tf = new TableField(columnName, "STRING", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;
                     case "2":       // int
+                    case "4":
+                    case "5":    
                         tf = new TableField(columnName, "INT", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;
-                    case "4":       // int
-                        tf = new TableField(columnName, "INT", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
-                        tableFieldsList.add(tf);
-                        break;
-                    case "5":       // smallint
-                        tf = new TableField(columnName, "INT", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
-                        tableFieldsList.add(tf);
-                        break;    
                     case "7":       // real
                         tf = new TableField(columnName, "REAL", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
@@ -565,10 +559,6 @@ public class DatabaseUtil {
                         tf = new TableField(columnName, "FLOAT", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;    
-                    case "12":      // varchar -> String
-                        tf = new TableField(columnName, "STRING", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
-                        tableFieldsList.add(tf);
-                        break;
                     case "-5":      // long
                         tf = new TableField(columnName, "LONG", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
@@ -577,10 +567,6 @@ public class DatabaseUtil {
                         tf = new TableField(columnName, "BOOLEAN", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;    
-                    case "2005":    // text -> String
-                        tf = new TableField(columnName, "STRING", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
-                        tableFieldsList.add(tf);
-                        break;
                     case "93":      // Date
                         tf = new TableField(columnName, "DATE", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
