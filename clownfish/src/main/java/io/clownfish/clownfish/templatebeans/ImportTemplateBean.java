@@ -87,7 +87,7 @@ public class ImportTemplateBean implements Serializable
         return strBuilder.toString();
     }
 
-    public void readCsvAndFillDatabase(String fileIn, String schemaName, String tblName, boolean bHeader)
+    public void readCsvAndFillDatabase(String fileIn, String schemaName, String tblName, boolean bHeader, boolean bTruncate)
     {
         File fileIn1 = new File(fileIn);
         boolean status;
@@ -150,6 +150,12 @@ public class ImportTemplateBean implements Serializable
                         int iLines = 0;
                         int iTotalRecords = 0;
                         final int iBatchSize = 10;
+
+                        if (bTruncate)
+                        {
+                            Statement truncate = connection.createStatement();
+                            truncate.executeQuery("TRUNCATE TABLE " + tblName + ";");
+                        }
 
                         PreparedStatement statement = connection.prepareStatement(generateSqlStatement(header, tblName));
 
