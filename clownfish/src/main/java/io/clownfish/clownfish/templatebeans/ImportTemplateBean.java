@@ -154,7 +154,7 @@ public class ImportTemplateBean implements Serializable
                         if (bTruncate)
                         {
                             Statement truncate = connection.createStatement();
-                            truncate.executeQuery("TRUNCATE TABLE " + tblName + ";");
+                            truncate.execute("TRUNCATE TABLE " + tblName + ";");
                         }
 
                         PreparedStatement statement = connection.prepareStatement(generateSqlStatement(header, tblName));
