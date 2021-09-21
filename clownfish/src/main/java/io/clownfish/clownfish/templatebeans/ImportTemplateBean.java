@@ -87,10 +87,11 @@ public class ImportTemplateBean implements Serializable
         return strBuilder.toString();
     }
 
-    public void readCsvAndFillDatabase(String fileIn, String schemaName, String tblName, boolean bHeader, boolean bTruncate)
+    public long readCsvAndFillDatabase(String fileIn, String schemaName, String tblName, boolean bHeader, boolean bTruncate)
     {
         File fileIn1 = new File(fileIn);
         boolean status;
+        long iTotalRecords = 0;
 
         for (CfSitedatasource sitedatasource : sitedatasourcelist)
         {
@@ -148,7 +149,6 @@ public class ImportTemplateBean implements Serializable
                         CSVReader csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).withSkipLines(1).build();
                         String[] nextLine;
                         int iLines = 0;
-                        int iTotalRecords = 0;
                         final int iBatchSize = 10;
 
                         if (bTruncate)
@@ -192,18 +192,22 @@ public class ImportTemplateBean implements Serializable
                         reader.close();
                     }
                     connection.close();
+                    return iTotalRecords;
                 }
                 else
                 {
                     status = false;
-                    LOGGER.warn("Connection to database not established");
+                    LOGGER.error("Connection to database not established");
+                    return -1;
                 }
             }
             catch (SQLException | IOException | CsvValidationException ex)
             {
                 LOGGER.error(ex.getMessage());
+                return -1;
             }
         }
+        return -1;
     }
 
     private int doExecute(PreparedStatement stmt)
