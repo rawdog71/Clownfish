@@ -33,7 +33,6 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
-import org.apache.catalina.Context;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.ansi;
 import org.fusesource.jansi.AnsiConsole;
@@ -65,6 +64,11 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  *
@@ -78,6 +82,7 @@ import org.springframework.context.annotation.PropertySources;
 @EnableCaching
 @ServletComponentScan
 @EnableWebMvc
+@EnableSwagger2
 @EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class})
 @PropertySources({
     @PropertySource("file:application.properties")
@@ -197,6 +202,15 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer.setUseTrailingSlashMatch(true);
+    }
+    
+    @Bean
+    public Docket productApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.any())              
+                .paths(PathSelectors.any())
+                .build();
     }
 
     /**
