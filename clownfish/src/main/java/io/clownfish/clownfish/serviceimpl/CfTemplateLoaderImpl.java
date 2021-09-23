@@ -33,6 +33,9 @@ public class CfTemplateLoaderImpl implements TemplateLoader {
     @Override
     public Object findTemplateSource(String name) throws IOException {
         try {
+            if ((name.endsWith(".ftl")) || (name.endsWith(".vm"))) {
+                name = name.substring(0, name.lastIndexOf("."));
+            }
             CfTemplate cftemplate = cftemplateService.findByName(name);
             return cftemplate;
         } catch (Exception ex) {

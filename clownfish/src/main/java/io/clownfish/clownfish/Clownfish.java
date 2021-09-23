@@ -660,6 +660,42 @@ public class Clownfish {
         }
     }
     
+    @GetMapping(path = "/{name}.ftl")
+    public void universalGetFreemarkerTemplate(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        CfTemplate cftemplate = null;
+        try {
+            cftemplate = cftemplateService.findByName(name);
+            if (0 == cftemplate.getScriptlanguage()) {
+                response.setContentType("text/html");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter outwriter = response.getWriter();
+                outwriter.println(cftemplate.getContent());
+            } else {
+                LOGGER.warn("ONLY Freemarker Templates");
+            }
+        } catch (Exception ex) {
+            LOGGER.warn("Template NOT FOUND");
+        }
+    }
+    
+    @GetMapping(path = "/{name}.vm")
+    public void universalGetVelocityTemplate(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        CfTemplate cftemplate = null;
+        try {
+            cftemplate = cftemplateService.findByName(name);
+            if (1 == cftemplate.getScriptlanguage()) {
+                response.setContentType("text/html");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter outwriter = response.getWriter();
+                outwriter.println(cftemplate.getContent());
+            } else {
+                LOGGER.warn("ONLY Velocity Templates");
+            }
+        } catch (Exception ex) {
+            LOGGER.warn("Template NOT FOUND");
+        }
+    }
+    
     @GetMapping(path = "/{name}.js")
     public void universalGetJS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         CfJavascript cfjavascript = null;
