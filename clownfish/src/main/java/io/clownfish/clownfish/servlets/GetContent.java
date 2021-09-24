@@ -211,7 +211,7 @@ public class GetContent extends HttpServlet {
                     boolean putToList = true;
                     List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
                     ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
-                    ArrayList<String> keywords = contentUtil.getContentOutputKeywords(classcontent, true);
+                        ArrayList<String> keywords = contentUtil.getContentOutputKeywords(classcontent, true);
                     if (!searchmap.isEmpty()) {
                         for (String searchcontent : searchmap.keySet()) {
                             String searchvalue = searchmap.get(searchcontent);
