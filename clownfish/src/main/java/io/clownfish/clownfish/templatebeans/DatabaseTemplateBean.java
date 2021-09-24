@@ -126,7 +126,19 @@ public class DatabaseTemplateBean implements Serializable {
                 JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
                 Connection con = jdbcutil.getConnection();
                 if (null != con) {
-                    if (con.getCatalog().compareToIgnoreCase(catalog) == 0) {
+                    String catalogName;
+
+                    if (cfdatasource.getDriverclass().contains("oracle"))
+                    {     // Oracle driver
+                        catalogName = con.getSchema();
+                    }
+                    else
+                    {                                                    // other drivers
+                        catalogName = con.getCatalog();
+                    }
+
+                    if (catalogName.compareToIgnoreCase(catalog) == 0)
+                    {
                         try (Statement stmt = con.createStatement()) {
                             int count = stmt.executeUpdate(sqlstatement);
                             if (count > 0 ) {
