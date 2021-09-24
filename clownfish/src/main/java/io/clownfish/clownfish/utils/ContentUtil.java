@@ -263,9 +263,9 @@ public class ContentUtil {
             CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
             long attributtypeid = knattribut.getAttributetype().getId();
             AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
-            //if (attributdef.getType().compareToIgnoreCase("hashstring") != 0) {
+            if (attributdef.getType().compareToIgnoreCase("hashstring") != 0) {
                 dummyoutputmap.put(knattribut.getName(), attributdef.getValue());
-            //}
+            }
         });
         output.add(dummyoutputmap);
         return output;
