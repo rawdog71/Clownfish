@@ -132,15 +132,15 @@ public class ImportTemplateBean implements Serializable
                         // ...otherwise, grab all the table's column names
                         else
                         {
-                            String query = "SELECT 1 FROM " + schemaName + "." + tblName + " LIMIT 1;";
+                            String query = "SELECT * FROM " + schemaName + "." + tblName + " LIMIT 1;";
                             Statement stmt = connection.createStatement();
                             ResultSet result = stmt.executeQuery(query);
                             ResultSetMetaData rmd = result.getMetaData();
                             //TableFieldStructure tfs = getTableFieldsList(rmd);
 
-                            for (int i = 0; i < rmd.getColumnCount(); i++)
+                            for (int i = 1; i <= rmd.getColumnCount(); i++)
                             {
-                                header.set(i, rmd.getColumnName(i));
+                                header.add(rmd.getColumnName(i));
                             }
                         }
 
@@ -167,7 +167,7 @@ public class ImportTemplateBean implements Serializable
                             // Add results to batch
                             for (int i = 0; i < header.size(); i++)
                             {
-                                statement.setString(i + 1, nextLine[i]);
+                                statement.setString(i + 1, nextLine[i].trim());
                             }
                             statement.addBatch();
 
@@ -181,6 +181,7 @@ public class ImportTemplateBean implements Serializable
                             // Finish up remaining rows
                             if (iLines >= 0)
                             {
+                                System.out.println(statement.toString());
                                 iTotalRecords += doExecute(statement);
                             }
                         }
