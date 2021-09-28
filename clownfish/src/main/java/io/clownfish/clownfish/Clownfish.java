@@ -263,7 +263,7 @@ public class Clownfish {
     @Value("${app.datasource.driverClassName}") String dbclass;
     @Value("${check.consistency:0}") int checkConsistency;
     @Value("${hibernate.init:0}") int hibernateInit;
-
+    
     /**
      * Call of the "root" site
      * Fetches the root site from the system property "site_root" and calls universalGet 
