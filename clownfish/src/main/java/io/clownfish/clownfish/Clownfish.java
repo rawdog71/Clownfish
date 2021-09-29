@@ -27,7 +27,7 @@ import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.beans.QuartzList;
 import io.clownfish.clownfish.beans.ServiceStatus;
-import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
+//import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
@@ -263,6 +263,7 @@ public class Clownfish {
     @Value("${app.datasource.driverClassName}") String dbclass;
     @Value("${check.consistency:0}") int checkConsistency;
     @Value("${hibernate.init:0}") int hibernateInit;
+    @Value("${sapconnection.file}") String SAPCONNECTION;
     
     /**
      * Call of the "root" site

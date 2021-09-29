@@ -88,6 +88,7 @@ import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 
 /**
@@ -97,7 +98,8 @@ import org.springframework.context.annotation.Scope;
 @Scope("session")
 @Named("sitetree")
 public class SiteTreeBean implements Serializable {
-    public static final String SAPCONNECTION = "sapconnection.props";
+    @Value("${sapconnection.file}") String SAPCONNECTION;
+    //public static final String SAPCONNECTION = "sapconnection.props";
     private static SAPConnection sapc = null;
     
     private transient @Getter @Setter TreeNode root;

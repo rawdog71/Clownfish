@@ -20,7 +20,7 @@ import freemarker.core.ParseException;
 import freemarker.template.MalformedTemplateNameException;
 import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.beans.QuartzList;
-import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
+//import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
 import io.clownfish.clownfish.dbentities.CfQuartz;
@@ -57,6 +57,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -82,6 +83,7 @@ public class QuartzJob implements Job {
     private RPY_TABLE_READ rpytableread = null;
     private ClownfishConst.ViewModus modus = STAGING;
     final transient Logger LOGGER = LoggerFactory.getLogger(QuartzJob.class);
+    @Value("${sapconnection.file}") String SAPCONNECTION;
 
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {

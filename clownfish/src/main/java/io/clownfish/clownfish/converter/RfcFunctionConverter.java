@@ -31,6 +31,7 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +51,8 @@ public class RfcFunctionConverter implements Converter, Serializable {
     private boolean sapSupport = false;
     @Autowired transient PropertyList propertylist;
     
-    public static final String SAPCONNECTION = "sapconnection.props";
+    @Value("${sapconnection.file}") String SAPCONNECTION;
+    //public static final String SAPCONNECTION = "sapconnection.props";
     private static SAPConnection sapc = null;
     
     @PostConstruct
