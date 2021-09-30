@@ -324,9 +324,14 @@ public class GetContentHibernate extends HttpServlet {
         List<CfListcontent> listcontent = null;
         int range_start = 0;
         int range_end = 0;
-        if (!gcp.getRange().isEmpty()) {
-            if (gcp.getRange().contains("-")) {
-                String[] ranges = gcp.getRange().split("-");
+
+        String range;
+
+        range = gcp.getRange() == null ? "" : gcp.getRange();
+
+        if (!range.isEmpty()) {
+            if (range.contains("-")) {
+                String[] ranges = range.split("-");
                 range_start = Integer.parseInt(ranges[0]);
                 range_end = Integer.parseInt(ranges[1]);
                 if (range_start > range_end) {
@@ -335,7 +340,7 @@ public class GetContentHibernate extends HttpServlet {
                     range_end = dummy;
                 }
             } else {
-                range_start = Integer.parseInt(gcp.getRange());
+                range_start = Integer.parseInt(range);
                 range_end = range_start;
             }
         }
@@ -358,9 +363,9 @@ public class GetContentHibernate extends HttpServlet {
             String searches = gcp.getSearches();
             if (null != searches) {
                 String[] keys = searches.split("\\$");
-                int counter = 0;
+                int counter = 1;
                 for (String key : keys) {
-                    if ((counter > 0) && ((counter%2) == 0)) {
+                    if ((counter > 0) && ((counter % 2) != 0)) {
                         searchmap.put(keys[counter-1] + "_" + counter, keys[counter]);
                     }
                     counter++;
