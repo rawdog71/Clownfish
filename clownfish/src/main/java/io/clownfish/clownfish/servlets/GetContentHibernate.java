@@ -17,7 +17,6 @@ package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
-import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
@@ -191,52 +190,9 @@ public class GetContentHibernate extends HttpServlet {
                         counter++;
                     }
                 });
-                //CfClass cfclass = cfclassService.findByName(inst_klasse);
-                Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
-                //Session session = hibernateUtil.getSession_tables();
-                Query query = null;
-                if (!searchmap.isEmpty()) {
-                    String whereclause = " WHERE ";
-                    for (String searchcontent : searchmap.keySet()) {
-                        String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
-                        String searchvalue = searchmap.get(searchcontent);
-                        SearchValues sv = getSearchValues(searchvalue);
-                        switch (sv.getComparartor()) {
-                            case "eq":
-                                whereclause += searchcontentval + " = '" + sv.getSearchvalue() + "' AND ";
-                                break;
-                            case "sw":
-                                whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue() + "%' AND ";
-                                break;
-                            case "ew":
-                                whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "' AND ";
-                                break;
-                            case "co":
-                                whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "%' AND ";
-                                break;
-                            case "gt":
-                                whereclause += searchcontentval + " > '" + sv.getSearchvalue() + "' AND ";
-                                break;
-                            case "lt":
-                                whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
-                                break;
-                            case "gte":
-                                whereclause += searchcontentval + " >= '" + sv.getSearchvalue() + "' AND ";
-                                break;
-                            case "lte":
-                                whereclause += searchcontentval + " <= '" + sv.getSearchvalue() + "' AND ";
-                                break;
-                            case "ne":
-                                whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
-                                break;
-                        }
 
-                    }
-                    whereclause = whereclause.substring(0, whereclause.length()-5);
-                    query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
-                } else {
-                    query = session_tables.createQuery("FROM " + inst_klasse + " c ");
-                }
+                Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+                Query query = getQuery(session_tables, searchmap, inst_klasse);
 
                 try {
                     List<Map> contentliste = (List<Map>) query.getResultList();
@@ -384,52 +340,8 @@ public class GetContentHibernate extends HttpServlet {
                 }
             }
 
-            CfClass cfclass = cfclassService.findByName(inst_klasse);
             Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
-            //Session session = hibernateUtil.getSession_tables();
-            Query query = null;
-            if (!searchmap.isEmpty()) {
-                String whereclause = " WHERE ";
-                for (String searchcontent : searchmap.keySet()) {
-                    String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
-                    String searchvalue = searchmap.get(searchcontent);
-                    SearchValues sv = getSearchValues(searchvalue);
-                    switch (sv.getComparartor()) {
-                        case "eq":
-                            whereclause += searchcontentval + " = '" + sv.getSearchvalue() + "' AND ";
-                            break;
-                        case "sw":
-                            whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue() + "%' AND ";
-                            break;
-                        case "ew":
-                            whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "' AND ";
-                            break;
-                        case "co":
-                            whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "%' AND ";
-                            break;
-                        case "gt":
-                            whereclause += searchcontentval + " > '" + sv.getSearchvalue() + "' AND ";
-                            break;
-                        case "lt":
-                            whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
-                            break;
-                        case "gte":
-                            whereclause += searchcontentval + " >= '" + sv.getSearchvalue() + "' AND ";
-                            break;
-                        case "lte":
-                            whereclause += searchcontentval + " <= '" + sv.getSearchvalue() + "' AND ";
-                            break;
-                        case "ne":
-                            whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
-                            break;
-                    }
-
-                }
-                whereclause = whereclause.substring(0, whereclause.length()-5);
-                query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
-            } else {
-                query = session_tables.createQuery("FROM " + inst_klasse + " c ");
-            }
+            Query query = getQuery(session_tables, searchmap, inst_klasse);
 
             List<Map> contentliste = (List<Map>) query.getResultList();
             session_tables.close();
@@ -599,41 +511,57 @@ public class GetContentHibernate extends HttpServlet {
         return keywords;
     }
 
-    /*
-    private boolean compareAttribut(ArrayList<HashMap> keyvals, SearchValues sv, String searchcontent) {
-        boolean found = true;
-        String searchvalue = sv.getSearchvalue().toLowerCase();
-        for (HashMap keyval : keyvals) {
-            if (null != keyval.get(searchcontent)) {
-                if ((sv.getComparartor().compareToIgnoreCase("co") == 0) && (!((String)(keyval.get(searchcontent))).toLowerCase().contains(searchvalue))) {
-                    found = false;
-                    break;
-                }
-                if ((sv.getComparartor().compareToIgnoreCase("sw") == 0) && (!((String)(keyval.get(searchcontent))).toLowerCase().startsWith(searchvalue))) {
-                    found = false;
-                    break;
-                }
-                if ((sv.getComparartor().compareToIgnoreCase("eq") == 0) && (((String)(keyval.get(searchcontent))).toLowerCase().compareToIgnoreCase(searchvalue) != 0)) {
-                    found = false;
-                    break;
-                }
-                if ((sv.getComparartor().compareToIgnoreCase("ew") == 0) && (!((String)(keyval.get(searchcontent))).toLowerCase().endsWith(searchvalue))) {
-                    found = false;
-                    break;
-                }
-            } else {
-                found = false;
-                break;
-            }
-        }
-        return found;
-    }
-    */
-
     private ArrayList getContentMap(Map content) {
         HashMap<String, String> contentMap = new HashMap<>(content);
         ArrayList contenList = new ArrayList<>();
         contenList.add(contentMap);
         return contenList;
+    }
+    
+    private Query getQuery(Session session_tables, HashMap<String, String> searchmap, String inst_klasse) {
+        Query query = null;
+        if (!searchmap.isEmpty()) {
+            String whereclause = " WHERE ";
+            for (String searchcontent : searchmap.keySet()) {
+                String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
+                String searchvalue = searchmap.get(searchcontent);
+                SearchValues sv = getSearchValues(searchvalue);
+                switch (sv.getComparartor()) {
+                    case "eq":
+                        whereclause += searchcontentval + " = '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "sw":
+                        whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue() + "%' AND ";
+                        break;
+                    case "ew":
+                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "co":
+                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "%' AND ";
+                        break;
+                    case "gt":
+                        whereclause += searchcontentval + " > '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "lt":
+                        whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "gte":
+                        whereclause += searchcontentval + " >= '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "lte":
+                        whereclause += searchcontentval + " <= '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "ne":
+                        whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                }
+
+            }
+            whereclause = whereclause.substring(0, whereclause.length()-5);
+            query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
+        } else {
+            query = session_tables.createQuery("FROM " + inst_klasse + " c ");
+        }
+        return query;
     }
 }
