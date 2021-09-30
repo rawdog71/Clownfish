@@ -113,6 +113,8 @@ public class ImportTemplateBean implements Serializable
                     {                                                    // other drivers
                         catalogName = connection.getCatalog();
                     }
+                    
+                    boolean bSkipFirstLine;
 
                     if (catalogName.compareToIgnoreCase(schemaName) == 0)
                     {
@@ -125,6 +127,7 @@ public class ImportTemplateBean implements Serializable
                             CSVParser prsr = new CSVParserBuilder().withSeparator(';').withIgnoreLeadingWhiteSpace(true).build();
                             CSVReader csvReadr = new CSVReaderBuilder(readr).withCSVParser(prsr).build();
                             Collections.addAll(header, csvReadr.readNext());
+                            bSkipFirstLine = true;
 
                             csvReadr.close();
                             readr.close();
@@ -142,11 +145,19 @@ public class ImportTemplateBean implements Serializable
                             {
                                 header.add(rmd.getColumnName(i));
                             }
+                            
+                            bSkipFirstLine = false;
                         }
 
                         Reader reader = new BufferedReader(new FileReader(fileIn1));
                         CSVParser parser = new CSVParserBuilder().withSeparator(';').withIgnoreLeadingWhiteSpace(true).build();
-                        CSVReader csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).withSkipLines(1).build();
+                        CSVReader csvReader;
+                        
+                        if (bSkipFirstLine)
+                            csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).withSkipLines(1).build();
+                        else
+                            csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).build();
+                            
                         String[] nextLine;
                         int iLines = 0;
                         final int iBatchSize = 10;
