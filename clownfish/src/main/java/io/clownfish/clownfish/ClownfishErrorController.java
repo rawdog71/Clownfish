@@ -25,7 +25,6 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ClownfishErrorController implements ErrorController {
 
-    @Override
     public String getErrorPath() {
         return "error";
     }
