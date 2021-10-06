@@ -190,7 +190,7 @@ public class GetAssetPreview extends HttpServlet {
                                 }
                             }
                         }    
-                        acontext.complete();
+                        //acontext.complete();
                     } else {
                         OutputStream outputStream = acontext.getResponse().getOutputStream();
                         outputStream.close();
