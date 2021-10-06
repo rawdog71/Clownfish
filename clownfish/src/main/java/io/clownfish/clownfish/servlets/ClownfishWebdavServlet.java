@@ -217,7 +217,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
         // and doesn't add any special path protection
         // WebdavServlet remounts the webapp under a new path, so this check is
         // necessary on all methods (including GET).
-        
+
         /*
         if (isSpecialPath(path)) {
             resp.sendError(WebdavStatus.SC_NOT_FOUND);
@@ -249,7 +249,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                 break;
             case METHOD_PUT:
                 doPut(req, resp);
-                break;    
+                break;
             case METHOD_LOCK:
                 doLock(req, resp);
                 break;
@@ -258,7 +258,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                 break;
             case METHOD_OPTIONS:
                 doOptions(req, resp);
-                break;    
+                break;
             default:
                 // DefaultServlet processing
                 super.service(req, resp);
