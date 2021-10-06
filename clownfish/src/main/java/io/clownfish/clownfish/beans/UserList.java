@@ -31,7 +31,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;

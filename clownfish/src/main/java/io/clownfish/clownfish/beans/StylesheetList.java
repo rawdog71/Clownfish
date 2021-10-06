@@ -36,7 +36,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;

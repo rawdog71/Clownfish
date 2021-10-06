@@ -74,22 +74,22 @@ public class StylesheetUtil implements Serializable {
         boolean diff = false;
         try {
             try {
-                currentVersion = cfstylesheetversionService.findMaxVersion(selectedStylesheet.getId());
-            } catch (NullPointerException ex) {
-                currentVersion = 0;
-            }
-            if (currentVersion > 0) {
-                styelsheetContent = selectedStylesheet.getContent();
-                String contentVersion = getVersion(selectedStylesheet.getId(), currentVersion);
-                source = Arrays.asList(styelsheetContent.split("\\r?\\n"));
-                target = Arrays.asList(contentVersion.split("\\r?\\n"));
-                patch = DiffUtils.diff(source, target);
-                if (!patch.getDeltas().isEmpty()) {
-                    diff = true;
-                }
-            } else {
+            currentVersion = cfstylesheetversionService.findMaxVersion(selectedStylesheet.getId());
+        } catch (NullPointerException ex) {
+            currentVersion = 0;
+        }
+        if (currentVersion > 0) {
+            styelsheetContent = selectedStylesheet.getContent();
+            String contentVersion = getVersion(selectedStylesheet.getId(), currentVersion);
+            source = Arrays.asList(styelsheetContent.split("\\r?\\n"));
+            target = Arrays.asList(contentVersion.split("\\r?\\n"));
+            patch = DiffUtils.diff(source, target);
+            if (!patch.getDeltas().isEmpty()) {
                 diff = true;
             }
+        } else {
+            diff = true;
+        }
         } catch (DiffException ex) {
             LOGGER.error(ex.getMessage());
         }
