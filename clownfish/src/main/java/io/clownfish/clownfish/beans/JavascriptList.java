@@ -40,6 +40,11 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SlideEndEvent;
+import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
+import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
+import org.primefaces.extensions.model.monacoeditor.ETheme;
+import org.primefaces.extensions.model.monacoeditor.EditorOptions;
+import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
@@ -72,6 +77,7 @@ public class JavascriptList {
     private @Getter @Setter long checkedoutby = 0;
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
+    private @Getter @Setter EditorOptions editorOptions;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(JavascriptList.class);
@@ -101,6 +107,10 @@ public class JavascriptList {
         javascriptUtility.setJavascriptContent("");
         checkedout = false;
         access = false;
+        editorOptions = new EditorOptions();
+        editorOptions.setLanguage("javascript");
+        editorOptions.setTheme(ETheme.VS_DARK);
+        editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
     }
     
     public void refresh() {

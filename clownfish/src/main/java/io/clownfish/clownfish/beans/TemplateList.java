@@ -40,6 +40,11 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SlideEndEvent;
+import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
+import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
+import org.primefaces.extensions.model.monacoeditor.ETheme;
+import org.primefaces.extensions.model.monacoeditor.EditorOptions;
+import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +80,7 @@ public class TemplateList {
     private @Getter @Setter long checkedoutby = 0;
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
+    private @Getter @Setter EditorOptions editorOptions;
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(TemplateList.class);
@@ -108,6 +114,10 @@ public class TemplateList {
         templateUtility.setTemplateContent("");
         checkedout = false;
         access = false;
+        editorOptions = new EditorOptions();
+        editorOptions.setLanguage("");
+        editorOptions.setTheme(ETheme.VS_DARK);
+        editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
     }
     
     public void refresh() {
@@ -123,15 +133,19 @@ public class TemplateList {
             switch (selectedTemplate.getScriptlanguage()) {
                 case 0:
                     selectedScriptlanguage = "freemarker";
+                    editorOptions.setLanguage("html");
                     break;
                 case 1:
                     selectedScriptlanguage = "velocity";
+                    editorOptions.setLanguage("html");
                     break;
                 case 2:
                     selectedScriptlanguage = "htmlmixed";
+                    editorOptions.setLanguage("html");
                     break;
                 case 3:
                     selectedScriptlanguage = "jrxml";
+                    editorOptions.setLanguage("xml");
                     break;
             }
             versionlist = cftemplateversionService.findByTemplateref(selectedTemplate.getId());

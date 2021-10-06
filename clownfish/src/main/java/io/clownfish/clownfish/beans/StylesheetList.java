@@ -39,6 +39,11 @@ import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
+import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
+import org.primefaces.extensions.model.monacoeditor.ETheme;
+import org.primefaces.extensions.model.monacoeditor.EditorOptions;
+import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +73,7 @@ public class StylesheetList {
     private @Getter @Setter long checkedoutby = 0;
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
+    private @Getter @Setter EditorOptions editorOptions;
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(StylesheetList.class);
@@ -97,6 +103,10 @@ public class StylesheetList {
         stylesheetUtility.setStyelsheetContent("");
         checkedout = false;
         access = false;
+        editorOptions = new EditorOptions();
+        editorOptions.setLanguage("css");
+        editorOptions.setTheme(ETheme.VS_DARK);
+        editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
     }
     
     public void refresh() {
