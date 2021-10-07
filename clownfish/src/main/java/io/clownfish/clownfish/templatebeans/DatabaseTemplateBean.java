@@ -160,6 +160,92 @@ public class DatabaseTemplateBean implements Serializable {
         LOGGER.info("END dbexecute");
         return ok;
     }
+
+    public Map dbexecute(String[] params)
+    {
+        Map map = new HashMap<>();
+        String catalog = params[0];
+        String sqlStatement = params[1];
+        LOGGER.info("START dbexecute:\n" + sqlStatement);
+
+        for (CfSitedatasource sitedatasource : sitedatasourcelist)
+        {
+            try
+            {
+                CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
+                JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
+                Connection con = jdbcutil.getConnection();
+                if (null != con)
+                {
+                    String catalogName;
+
+                    if (cfdatasource.getDriverclass().contains("oracle")) // Oracle driver
+                        catalogName = con.getSchema();
+                    else // other drivers
+                        catalogName = con.getCatalog();
+
+                    if (catalogName.compareToIgnoreCase(catalog) == 0)
+                    {
+                        try (Statement stmt = con.createStatement())
+                        {
+                            if (stmt.execute(sqlStatement)) // Statement has one or potentially multiple result sets
+                            {
+                                LOGGER.info("START dbexecute TRUE (Statement type: Result set");
+                                ResultSet resultSet = stmt.getResultSet();
+                                ResultSetMetaData rmd = resultSet.getMetaData();
+                                TableFieldStructure tfs = getTableFieldsList(rmd);
+                                ArrayList<HashMap> tablevalues = new ArrayList<>();
+                                int count = 0;
+
+                                while (resultSet.next()) {
+                                    count++;
+                                    tfs.getTableFieldsList().forEach((tf) ->
+                                    {
+                                        try
+                                        {
+                                            String value = resultSet.getString(tf.getName());
+                                            map.put(tf.getName(), value);
+                                        }
+                                        catch (java.sql.SQLException ex)
+                                        {
+                                            LOGGER.warn(ex.getMessage());
+                                        }
+                                    });
+                                }
+                                LOGGER.info("Results: " + count);
+                            }
+                            else // Statement only has an update count or does not return anything
+                            {
+                                if (stmt.getUpdateCount() > 0)
+                                {
+                                    LOGGER.info("START dbexecute TRUE (Statement type: Update count only");
+                                    int updateCount = stmt.getUpdateCount();
+
+                                    map.put("updatecount", updateCount);
+                                    LOGGER.info("Statement successfully executed! " + updateCount + " records added.");
+                                }
+                                else
+                                {
+                                    LOGGER.info("START dbexecute TRUE (Statement type: No return value)");
+                                    map.put("", "");
+                                    LOGGER.warn("No results for query");
+                                }
+                            }
+                        }
+                    }
+                    con.close();
+                }
+                else
+                    LOGGER.warn("Connection to database could not be established!");
+            }
+            catch (SQLException ex)
+            {
+                LOGGER.error(ex.getMessage());
+            }
+        }
+        LOGGER.info("END dbexecute");
+        return map;
+    }
     
     private TableFieldStructure getTableFieldsList(ResultSetMetaData dmd) {
         try {

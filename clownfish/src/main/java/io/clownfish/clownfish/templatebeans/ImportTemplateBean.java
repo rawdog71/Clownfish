@@ -198,7 +198,7 @@ public class ImportTemplateBean implements Serializable
                         }
 
                         status = true;
-                        System.out.println("Finished database import successfully! " + iTotalRecords + " records added.");
+                        LOGGER.info("Finished database import successfully! " + iTotalRecords + " records added.");
 
                         csvReader.close();
                         reader.close();
