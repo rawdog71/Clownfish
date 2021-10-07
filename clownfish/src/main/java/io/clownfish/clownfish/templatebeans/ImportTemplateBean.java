@@ -87,8 +87,9 @@ public class ImportTemplateBean implements Serializable
         return strBuilder.toString();
     }
 
-    public long readCsvAndFillDatabase(String fileIn, String schemaName, String tblName, boolean bHeader, boolean bTruncate)
+    public long readCsvAndFillDatabase(String fileIn, String schemaName, String tblName, boolean bHeader, boolean bTruncate, String encoding)
     {
+        encoding = encoding != null ? encoding : "UTF8"; // Default UTF-8 encoding
         File fileIn1 = new File(fileIn);
         boolean status;
         long iTotalRecords = 0;
@@ -123,7 +124,7 @@ public class ImportTemplateBean implements Serializable
                         // If our CSV has a header, use it
                         if (bHeader)
                         {
-                            Reader readr = new BufferedReader(new FileReader(fileIn1));
+                            Reader readr = new BufferedReader(new InputStreamReader(new FileInputStream(fileIn1), encoding));
                             CSVParser prsr = new CSVParserBuilder().withSeparator(';').withIgnoreLeadingWhiteSpace(true).build();
                             CSVReader csvReadr = new CSVReaderBuilder(readr).withCSVParser(prsr).build();
                             Collections.addAll(header, csvReadr.readNext());
@@ -149,7 +150,7 @@ public class ImportTemplateBean implements Serializable
                             bSkipFirstLine = false;
                         }
 
-                        Reader reader = new BufferedReader(new FileReader(fileIn1));
+                        Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileIn1), encoding));
                         CSVParser parser = new CSVParserBuilder().withSeparator(';').withIgnoreLeadingWhiteSpace(true).build();
                         CSVReader csvReader;
                         
