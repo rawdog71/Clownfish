@@ -37,7 +37,7 @@ public class MakePdf extends HttpServlet
     ApiKeyUtil apikeyutil;
     CfTemplate cfTemplate;
 
-    final transient Logger LOGGER = LoggerFactory.getLogger(GetAsset.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(MakePdf.class);
 
     public MakePdf() {
     }
