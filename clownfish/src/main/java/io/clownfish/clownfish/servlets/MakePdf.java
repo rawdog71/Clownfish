@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -94,6 +95,8 @@ public class MakePdf extends HttpServlet
         {
             CfDatasource datasource = cfDatasourceService.findById(source.getCfSitedatasourcePK().getDatasourceref());
             InputStream template = new ByteArrayInputStream(templateContent.getBytes(StandardCharsets.UTF_8));
+            response.setHeader("Content-disposition", "inline; filename=" + URLEncoder.encode(name, StandardCharsets.UTF_8.toString()));
+            response.setContentType("application/pdf");
             ServletOutputStream out = response.getOutputStream();
             ByteArrayOutputStream out1 = JasperReportCompiler.exportToPdf(datasource.getUser(), datasource.getPassword(), datasource.getUrl(), template, datasource.getDriverclass());
 

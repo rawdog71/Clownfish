@@ -17,10 +17,8 @@ package io.clownfish.clownfish;
 
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.ScriptRunner;
-import io.clownfish.clownfish.utils.HttpsUtil;
 import io.clownfish.clownfish.servlets.ClownfishWebdavServlet;
 import io.clownfish.clownfish.servlets.EmptyWebdavServlet;
-import io.clownfish.clownfish.webdav.WebdavServlet;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -125,6 +123,9 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     @Bean
     public ServletRegistrationBean webdavRegistratiton() {
         if (1 == webdavuse) {
+            System.out.println(ansi().fg(GREEN));
+            System.out.println("WEBDAV activated");
+            System.out.println(ansi().reset());
             ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
             final ClownfishWebdavServlet servlet = new ClownfishWebdavServlet();
             //final WebdavServlet servlet = new WebdavServlet();
@@ -145,7 +146,6 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         }
     }
     
-    //Test
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -153,26 +153,8 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/GetContent").allowedOrigins("http://localhost");
             }
-            /*
-            @Override
-            public void addInterceptors(InterceptorRegistry registry) {
-                HttpsUtil httpsUtil = new HttpsUtil();
-                httpsUtil.setServerPortHttp(serverPortHttp);
-                httpsUtil.setServerPortHttps(serverPortHttps);
-                registry.addInterceptor(httpsUtil);
-            }
-            */
         };
     }
-    
-    /*
-    @Bean
-    HttpManagerBuilder httpManagerBuilder() {
-        HttpManagerBuilder builder = new HttpManagerBuilder();
-        builder.setRootDir(new File("/webdav/"));
-        return builder;
-    }
-    */
     
     @Override
     public void setServletContext(ServletContext servletContext) {
@@ -192,9 +174,6 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
             .resourceChain(true)
             .addResolver(new PathResourceResolver());
-        
-        // Register resource handler for webdav
-        //registry.addResourceHandler("webdav/**").addResourceLocations("/WEB-INF/webdavtest/");
         
         registry.setOrder(-1);
     }

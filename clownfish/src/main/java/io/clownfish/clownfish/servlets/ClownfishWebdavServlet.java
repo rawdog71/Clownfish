@@ -166,7 +166,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
     /**
      * Secret information used to generate reasonably secure lock ids.
      */
-    private String secret = "catalina";
+    private String secret = "clownfish";
 
     /**
      * Default depth in spec is infinite. Limit depth to 3 by default as
