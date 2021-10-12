@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -76,39 +77,42 @@ public class DatabaseTemplateBean implements Serializable {
                 JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
                 Connection con = jdbcutil.getConnection();
                 if (null != con) {
-                    String catalogname;
-                    if (cfdatasource.getDriverclass().contains("oracle")) {     // Oracle driver 
-                        catalogname = con.getSchema();
-                    } else {                                                    // other drivers
-                        catalogname = con.getCatalog();
-                    }
-                    if (catalogname.compareToIgnoreCase(catalog) == 0) {
-                        Statement stmt = con.createStatement();
-                        ResultSet result = stmt.executeQuery(sqlstatement);
-                        ResultSetMetaData rmd = result.getMetaData();
-                        TableFieldStructure tfs = getTableFieldsList(rmd);
-                        ArrayList<HashMap> tablevalues = new ArrayList<>();
-                        while (result.next()) {
-                            HashMap<String, String> dbexportvalues = new HashMap<>();
-                            tfs.getTableFieldsList().stream().forEach((tf) -> {
-                                try {
-                                    String value = result.getString(tf.getName());
-                                    dbexportvalues.put(tf.getName(), value);
-                                } catch (java.sql.SQLException ex) {
-                                    LOGGER.warn(ex.getMessage());
-                                }
-                            });
-                            tablevalues.add(dbexportvalues);
+                    try {
+                        String catalogname;
+                        if (cfdatasource.getDriverclass().contains("oracle")) {     // Oracle driver 
+                            catalogname = con.getSchema();
+                        } else {                                                    // other drivers
+                            catalogname = con.getCatalog();
                         }
-                        dbtables.put(tablename, tablevalues);
+                        if (catalogname.compareToIgnoreCase(catalog) == 0) {
+                            Statement stmt = con.createStatement();
+                            ResultSet result = stmt.executeQuery(sqlstatement);
+                            ResultSetMetaData rmd = result.getMetaData();
+                            TableFieldStructure tfs = getTableFieldsList(rmd);
+                            ArrayList<HashMap> tablevalues = new ArrayList<>();
+                            while (result.next()) {
+                                HashMap<String, String> dbexportvalues = new HashMap<>();
+                                tfs.getTableFieldsList().stream().forEach((tf) -> {
+                                    try {
+                                        String value = result.getString(tf.getName());
+                                        dbexportvalues.put(tf.getName(), value);
+                                    } catch (java.sql.SQLException ex) {
+                                        LOGGER.warn(ex.getMessage());
+                                    }
+                                });
+                                tablevalues.add(dbexportvalues);
+                            }
+                            dbtables.put(tablename, tablevalues);
+                        }
+                        contentmap.put("db", dbtables);
+                        con.close();
+                    } catch (SQLException ex1) {
+                        LOGGER.error(ex1.getMessage());
+                        con.close();
                     }
-                    contentmap.put("db", dbtables);
-                    con.close();
                 } else {
                     LOGGER.warn("Connection to database not established");
                 }
-            } catch (SQLException ex) {
-                LOGGER.error(ex.getMessage());
             } catch (Exception ex) {
                 LOGGER.error(ex.getMessage());
             }
@@ -121,41 +125,47 @@ public class DatabaseTemplateBean implements Serializable {
         boolean ok = false;
         LOGGER.info("START dbexecute: " + sqlstatement);
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
-            try {
                 CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
                 JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
                 Connection con = jdbcutil.getConnection();
                 if (null != con) {
                     String catalogName;
+                    
+                    try {
 
-                    if (cfdatasource.getDriverclass().contains("oracle"))
-                    {     // Oracle driver
-                        catalogName = con.getSchema();
-                    }
-                    else
-                    {                                                    // other drivers
-                        catalogName = con.getCatalog();
-                    }
+                        if (cfdatasource.getDriverclass().contains("oracle"))
+                        {     // Oracle driver
+                            catalogName = con.getSchema();
+                        }
+                        else
+                        {                                                    // other drivers
+                            catalogName = con.getCatalog();
+                        }
 
-                    if (catalogName.compareToIgnoreCase(catalog) == 0)
-                    {
-                        try (Statement stmt = con.createStatement()) {
-                            int count = stmt.executeUpdate(sqlstatement);
-                            if (count > 0 ) {
-                                ok = true;
-                                LOGGER.info("START dbexecute TRUE");
-                            } else {
-                                LOGGER.info("START dbexecute FALSE");
+                        if (catalogName.compareToIgnoreCase(catalog) == 0)
+                        {
+                            try (Statement stmt = con.createStatement()) {
+                                int count = stmt.executeUpdate(sqlstatement);
+                                if (count > 0 ) {
+                                    ok = true;
+                                    LOGGER.info("START dbexecute TRUE");
+                                } else {
+                                    LOGGER.info("START dbexecute FALSE");
+                                }
                             }
                         }
+                        con.close();
+                    } catch (SQLException ex) {
+                        LOGGER.error(ex.getMessage());
+                        try {
+                            con.close();
+                        } catch (SQLException ex1) {
+                            LOGGER.error(ex1.getMessage());
+                        }
                     }
-                    con.close();
                 } else {
                     LOGGER.warn("Connection to database not established");
                 }
-            } catch (SQLException ex) {
-                LOGGER.error(ex.getMessage());
-            }
         };
         LOGGER.info("END dbexecute");
         return ok;
@@ -170,15 +180,15 @@ public class DatabaseTemplateBean implements Serializable {
 
         for (CfSitedatasource sitedatasource : sitedatasourcelist)
         {
-            try
+            CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
+            JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
+            Connection con = jdbcutil.getConnection();
+            if (null != con)
             {
-                CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
-                JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
-                Connection con = jdbcutil.getConnection();
-                if (null != con)
-                {
-                    String catalogName;
+                String catalogName;
 
+                try
+                {
                     if (cfdatasource.getDriverclass().contains("oracle")) // Oracle driver
                         catalogName = con.getSchema();
                     else // other drivers
@@ -234,14 +244,19 @@ public class DatabaseTemplateBean implements Serializable {
                         }
                     }
                     con.close();
+                } 
+                catch (SQLException ex)
+                {
+                    try {
+                        LOGGER.error(ex.getMessage());
+                        con.close();
+                    } catch (SQLException ex1) {
+                        LOGGER.error(ex1.getMessage());
+                    }
                 }
-                else
-                    LOGGER.warn("Connection to database could not be established!");
             }
-            catch (SQLException ex)
-            {
-                LOGGER.error(ex.getMessage());
-            }
+            else
+                LOGGER.warn("Connection to database could not be established!");
         }
         LOGGER.info("END dbexecute");
         return map;
