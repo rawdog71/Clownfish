@@ -36,10 +36,8 @@ import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
-import io.clownfish.clownfish.templatebeans.DatabaseTemplateBean;
-import io.clownfish.clownfish.templatebeans.EmailTemplateBean;
-import io.clownfish.clownfish.templatebeans.NetworkTemplateBean;
-import io.clownfish.clownfish.templatebeans.SAPTemplateBean;
+import io.clownfish.clownfish.templatebeans.*;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -203,6 +201,12 @@ public class QuartzJob implements Job {
                     fmRoot.put("databaseBean", databasebean);
                     NetworkTemplateBean networkbean = new NetworkTemplateBean();
                     fmRoot.put("networkBean", networkbean);
+                    ImportTemplateBean importBean = new ImportTemplateBean();
+                    importBean.initjob(sitedatasourcelist, cfdatasourceService);
+                    fmRoot.put("importBean", importBean);
+                    WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();
+                    fmRoot.put("webserviceBean", webServiceBean);
+
 
                     fmRoot.put("property", propertymap);
                     try {
@@ -232,6 +236,11 @@ public class QuartzJob implements Job {
                     velContext.put("databaseBean", databasebean);
                     NetworkTemplateBean networkbean = new NetworkTemplateBean();
                     velContext.put("networkBean", networkbean);
+                    ImportTemplateBean importBean = new ImportTemplateBean();
+                    importBean.initjob(sitedatasourcelist, cfdatasourceService);
+                    velContext.put("importBean", importBean);
+                    WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();
+                    velContext.put("webserviceBean", webServiceBean);
 
                     velContext.put("property", propertymap);
                     if (null != velTemplate) {
