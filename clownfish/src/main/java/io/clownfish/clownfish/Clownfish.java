@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish;
 
+import com.google.common.reflect.ClassPath;
 import io.clownfish.clownfish.exceptions.PageNotFoundException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -120,6 +121,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -247,13 +249,14 @@ public class Clownfish {
     private @Getter @Setter Map searchassetmetadatamap;
     private @Getter @Setter Map searchclasscontentmap;
     private @Getter @Setter Map searchmetadata;
-    private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     private @Getter @Setter MarkdownUtil markdownUtil;
     private @Getter @Setter ContentIndexer contentIndexer;
     private @Getter @Setter AssetIndexer assetIndexer;
     private @Getter @Setter int searchlimit;
     
     private @Getter @Setter Map<String, String> metainfomap;
+    
+    private Set<Class> templatebeans = null;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(Clownfish.class);
     @Value("${bootstrap}") int bootstrap;
@@ -308,6 +311,15 @@ public class Clownfish {
     public void init() {
         servicestatus.setMessage("Clownfish is initializing");
         servicestatus.setOnline(false);
+        try {
+            templatebeans = findAllClassesInPackage("io.clownfish.clownfish.templatebeans");
+            templatebeans.forEach(cl -> {
+                    System.out.println(cl.getCanonicalName());
+                }
+            );
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage());
+        }
         if (1 == bootstrap) {
             bootstrap = 0;
             try {
@@ -845,6 +857,7 @@ public class Clownfish {
         ClownfishResponse cfresponse = new ClownfishResponse();
         
         try {
+            List<CfSitedatasource> sitedatasourcelist;
             // Freemarker Template
             freemarker.template.Template fmTemplate = null;
             Map fmRoot = null;
@@ -1046,14 +1059,32 @@ public class Clownfish {
                             }
                         }
 
+                        // instantiate Template Beans
+                        
                         networkbean = new NetworkTemplateBean();
                         webservicebean = new WebServiceTemplateBean();
+                        
+                        emailbean = new EmailTemplateBean();
+                        emailbean.init(propertyUtil.getPropertymap());
+                        
+                        if (sapSupport) {
+                            List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
+                            sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                            sapbean = new SAPTemplateBean();
+                            sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
+                        }
+                        
+                        databasebean = new DatabaseTemplateBean();
+                        importbean = new ImportTemplateBean();
+                        if (!sitedatasourcelist.isEmpty()) {
+                            databasebean.init(sitedatasourcelist, cfdatasourceService);
+                            importbean.init(sitedatasourcelist, cfdatasourceService);
+                        }
+                        
                         // write the output
                         Writer out = new StringWriter();
                         switch (cftemplate.getScriptlanguage()) {
                             case 0:                                             // FREEMARKER
-                                emailbean = new EmailTemplateBean();
-                                emailbean.init(propertyUtil.getPropertymap());
                                 if (null != fmRoot) {
                                     fmRoot.put("emailBean", emailbean);
                                     fmRoot.put("css", cfstylesheet);
@@ -1062,25 +1093,11 @@ public class Clownfish {
                                     fmRoot.put("metainfo", metainfomap);
 
                                     if (sapSupport) {
-                                        List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
-                                        sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
-                                        sapbean = new SAPTemplateBean();
-                                        sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
                                         fmRoot.put("sapBean", sapbean);
                                     }
-
-                                    if (!sitedatasourcelist.isEmpty()) {
-                                        databasebean = new DatabaseTemplateBean();
-                                        databasebean.init(sitedatasourcelist, cfdatasourceService);
-                                        fmRoot.put("databaseBean", databasebean);
-
-                                        importbean = new ImportTemplateBean();
-                                        importbean.init(sitedatasourcelist, cfdatasourceService);
-                                        fmRoot.put("importBean", importbean);
-                                    }
-
+                                    fmRoot.put("databaseBean", databasebean);
+                                    fmRoot.put("importBean", importbean);
                                     fmRoot.put("networkBean", networkbean);
-                                    
                                     fmRoot.put("webserviceBean", webservicebean);
 
                                     fmRoot.put("parameter", parametermap);
@@ -1111,8 +1128,6 @@ public class Clownfish {
                                 }
                                 break;
                             case 1:                                             // VELOCITY
-                                emailbean = new EmailTemplateBean();
-                                emailbean.init(propertyUtil.getPropertymap());
                                 if (null != velContext) {
                                     velContext.put("emailBean", emailbean);
                                     velContext.put("css", cfstylesheet);
@@ -1121,21 +1136,11 @@ public class Clownfish {
                                     velContext.put("metainfo", metainfomap);
 
                                     if (sapSupport) {
-                                        List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
-                                        sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
-                                        sapbean = new SAPTemplateBean();
-                                        sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
                                         velContext.put("sapBean", sapbean);
                                     }
-
-                                    if (!sitedatasourcelist.isEmpty()) {
-                                        databasebean = new DatabaseTemplateBean();
-                                        databasebean.init(sitedatasourcelist, cfdatasourceService);
-                                        velContext.put("databaseBean", databasebean);
-                                    }
-
+                                    velContext.put("databaseBean", databasebean);
+                                    velContext.put("importBean", importbean);
                                     velContext.put("networkBean", networkbean);
-                                    
                                     velContext.put("webserviceBean", webservicebean);
 
                                     velContext.put("parameter", parametermap);
@@ -1359,5 +1364,15 @@ public class Clownfish {
                     }
                 }
             }
+    }
+    
+    private Set<Class> findAllClassesInPackage(String packageName) throws IOException {
+        return ClassPath.from(ClassLoader.getSystemClassLoader())
+                .getAllClasses()
+                .stream()
+                .filter(clazz -> clazz.getPackageName()
+                .equalsIgnoreCase(packageName))
+                .map(clazz -> clazz.load())
+                .collect(Collectors.toSet());
     }
 }

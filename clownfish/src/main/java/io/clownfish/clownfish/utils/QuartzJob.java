@@ -179,12 +179,28 @@ public class QuartzJob implements Job {
             // fetch the dependend datasources
             sitedatasourcelist = new ArrayList<>();
             sitedatasourcelist.addAll(cfsitedatasourceService.findBySiteref(cfsite.getId()));
+            
+            // Instantiate Template Beans
+            
+            EmailTemplateBean emailbean = new EmailTemplateBean();
+            emailbean.init(propertymap);
+            if (sapSupport) {
+                List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
+                sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
+                sapbean = new SAPTemplateBean();
+                sapbean.init(sapc, sitesaprfclist, rpytableread, null);
+            }
+            NetworkTemplateBean networkbean = new NetworkTemplateBean();
+            DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
+            databasebean.initjob(sitedatasourcelist, cfdatasourceService);
+            ImportTemplateBean importBean = new ImportTemplateBean();
+            importBean.initjob(sitedatasourcelist, cfdatasourceService);
+            WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();
+
 
             // write the output
             Writer out = new StringWriter();
             if (0 == cftemplate.getScriptlanguage()) {  // Freemarker template
-                EmailTemplateBean emailbean = new EmailTemplateBean();
-                emailbean.init(propertymap);
                 if (null != fmRoot) {
                     fmRoot.put("emailBean", emailbean);
 
@@ -196,18 +212,10 @@ public class QuartzJob implements Job {
                         fmRoot.put("sapBean", sapbean);
                     }
 
-                    DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
-                    databasebean.initjob(sitedatasourcelist, cfdatasourceService);
                     fmRoot.put("databaseBean", databasebean);
-                    NetworkTemplateBean networkbean = new NetworkTemplateBean();
                     fmRoot.put("networkBean", networkbean);
-                    ImportTemplateBean importBean = new ImportTemplateBean();
-                    importBean.initjob(sitedatasourcelist, cfdatasourceService);
                     fmRoot.put("importBean", importBean);
-                    WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();
                     fmRoot.put("webserviceBean", webServiceBean);
-
-
                     fmRoot.put("property", propertymap);
                     try {
                         if (null != fmTemplate) {
@@ -221,8 +229,6 @@ public class QuartzJob implements Job {
                     }
                 }
             } else {                                    // Velocity template
-                EmailTemplateBean emailbean = new EmailTemplateBean();
-                emailbean.init(propertymap);
                 if (null != velContext) {
                     velContext.put("emailBean", emailbean);
                     if (sapSupport) {
@@ -231,15 +237,9 @@ public class QuartzJob implements Job {
                         sapbean = new SAPTemplateBean();
                         velContext.put("sapBean", sapbean);
                     }
-                    DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
-                    databasebean.initjob(sitedatasourcelist, cfdatasourceService);
                     velContext.put("databaseBean", databasebean);
-                    NetworkTemplateBean networkbean = new NetworkTemplateBean();
                     velContext.put("networkBean", networkbean);
-                    ImportTemplateBean importBean = new ImportTemplateBean();
-                    importBean.initjob(sitedatasourcelist, cfdatasourceService);
                     velContext.put("importBean", importBean);
-                    WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();
                     velContext.put("webserviceBean", webServiceBean);
 
                     velContext.put("property", propertymap);

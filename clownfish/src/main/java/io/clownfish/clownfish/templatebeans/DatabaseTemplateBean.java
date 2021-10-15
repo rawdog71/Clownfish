@@ -110,6 +110,14 @@ public class DatabaseTemplateBean implements Serializable {
                         LOGGER.error(ex1.getMessage());
                         con.close();
                     }
+                    finally {
+                        try {
+                            con.close();
+                        }
+                        catch (SQLException e) {
+                            LOGGER.warn(e.getMessage());
+                        }
+                    }
                 } else {
                     LOGGER.warn("Connection to database not established");
                 }
