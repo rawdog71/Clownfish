@@ -273,11 +273,16 @@
                                 <p:panelGrid columns="1">    
                                     <p:row>
                                         <p:column>
-                                            <p:commandButton id="changeSiteButton" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs" />
-                                            <p:commandButton id="deleteSiteButton" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree">
+                                            <p:commandButton id="changeSiteButton" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref">
+                                                <f:actionListener binding="#{quartzlist.refresh()}" />
+                                            </p:commandButton>
+                                            <p:commandButton id="deleteSiteButton" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref">
+                                                <f:actionListener binding="#{quartzlist.refresh()}" />
                                                 <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
-                                            <p:commandButton id="newsite" process="form" value="New" actionListener="#{sitetree.onCreate}" update=":form:msgs :form:tabview:sitetree" disabled="#{sitetree.newButtonDisabled}" />
+                                            <p:commandButton id="newsite" process="form" value="New" actionListener="#{sitetree.onCreate}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref" disabled="#{sitetree.newButtonDisabled}">
+                                                <f:actionListener binding="#{quartzlist.refresh()}" />
+                                            </p:commandButton>
                                         </p:column>
                                     </p:row>
                                 </p:panelGrid>

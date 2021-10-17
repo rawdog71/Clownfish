@@ -269,6 +269,10 @@ public class QuartzList {
         this.clownfish = clownfish;
     }
     
+    public void refresh() {
+        sitelist = cfsiteService.findAll();
+    }
+    
     public void onSelect(SelectEvent event) {
         selectedQuartz = (CfQuartz) event.getObject();
         jobname = selectedQuartz.getName();
