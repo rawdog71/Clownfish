@@ -37,7 +37,7 @@ public class RFC_FUNCTION_SEARCH {
     public List<RfcFunction> getRfcFunctionsList(String groupname) {
         try {
             JCoFunction function = sapc.getDestination().getRepository().getFunction("RFC_FUNCTION_SEARCH");
-            function.getImportParameterList().setValue("FUNCNAME", "z*");
+            function.getImportParameterList().setValue("FUNCNAME", "*");
             function.getImportParameterList().setValue("GROUPNAME", groupname);
             function.getImportParameterList().setValue("LANGUAGE", "DE");
             function.execute(sapc.getDestination());

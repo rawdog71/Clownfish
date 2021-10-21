@@ -111,6 +111,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -253,6 +254,7 @@ public class Clownfish {
     private @Getter @Setter Map<String, String> metainfomap;
     
     private Set<Class> templatebeans = null;
+    private ArrayList<Class> loadabletemplatebeans = new ArrayList<>();
     
     final transient Logger LOGGER = LoggerFactory.getLogger(Clownfish.class);
     @Value("${bootstrap}") int bootstrap;
@@ -309,7 +311,15 @@ public class Clownfish {
         try {
             templatebeans = findAllClassesInPackage("io.clownfish.clownfish.templatebeans");
             templatebeans.forEach(cl -> {
-                    System.out.println(cl.getCanonicalName());
+                    if (null != cl.getCanonicalName()) {
+                        System.out.println(cl.getCanonicalName());
+                        loadabletemplatebeans.add(cl);
+                        /*
+                        for (Method method : cl.getMethods()) {
+                            System.out.println(method.getName());
+                        }
+                        */
+                    }
                 }
             );
         } catch (IOException ex) {
@@ -1079,12 +1089,12 @@ public class Clownfish {
                         switch (cftemplate.getScriptlanguage()) {
                             case 0:                                             // FREEMARKER
                                 if (null != fmRoot) {
-                                    fmRoot.put("emailBean", emailbean);
                                     fmRoot.put("css", cfstylesheet);
                                     fmRoot.put("js", cfjavascript);
                                     fmRoot.put("sitecontent", sitecontentmap);
                                     fmRoot.put("metainfo", metainfomap);
 
+                                    fmRoot.put("emailBean", emailbean);
                                     if (sapSupport) {
                                         fmRoot.put("sapBean", sapbean);
                                     }
@@ -1122,12 +1132,12 @@ public class Clownfish {
                                 break;
                             case 1:                                             // VELOCITY
                                 if (null != velContext) {
-                                    velContext.put("emailBean", emailbean);
                                     velContext.put("css", cfstylesheet);
                                     velContext.put("js", cfjavascript);
                                     velContext.put("sitecontent", sitecontentmap);
                                     velContext.put("metainfo", metainfomap);
 
+                                    velContext.put("emailBean", emailbean);
                                     if (sapSupport) {
                                         velContext.put("sapBean", sapbean);
                                     }
@@ -1342,21 +1352,25 @@ public class Clownfish {
         }
     }
     
+    /**
+     * updateSearchhistory
+     * 
+     */
     private void updateSearchhistory(String[] searchexpressions) {
         for (String expression : searchexpressions) {
-                if ((expression.length() >= 3) && (!expression.endsWith("*"))) {
-                    try {
-                        CfSearchhistory searchhistory = cfsearchhistoryService.findByExpression(expression.toLowerCase());
-                        searchhistory.setCounter(searchhistory.getCounter()+1);
-                        cfsearchhistoryService.edit(searchhistory);
-                    } catch (NoResultException ex) {
-                        CfSearchhistory newsearchhistory = new CfSearchhistory();
-                        newsearchhistory.setExpression(expression.toLowerCase());
-                        newsearchhistory.setCounter(1);
-                        cfsearchhistoryService.create(newsearchhistory);
-                    }
+            if ((expression.length() >= 3) && (!expression.endsWith("*"))) {
+                try {
+                    CfSearchhistory searchhistory = cfsearchhistoryService.findByExpression(expression.toLowerCase());
+                    searchhistory.setCounter(searchhistory.getCounter()+1);
+                    cfsearchhistoryService.edit(searchhistory);
+                } catch (NoResultException ex) {
+                    CfSearchhistory newsearchhistory = new CfSearchhistory();
+                    newsearchhistory.setExpression(expression.toLowerCase());
+                    newsearchhistory.setCounter(1);
+                    cfsearchhistoryService.create(newsearchhistory);
                 }
             }
+        }
     }
     
     private Set<Class> findAllClassesInPackage(String packageName) throws IOException {
