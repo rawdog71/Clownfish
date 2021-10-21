@@ -99,7 +99,6 @@ import org.springframework.context.annotation.Scope;
 @Named("sitetree")
 public class SiteTreeBean implements Serializable {
     @Value("${sapconnection.file}") String SAPCONNECTION;
-    //public static final String SAPCONNECTION = "sapconnection.props";
     private static SAPConnection sapc = null;
     
     private transient @Getter @Setter TreeNode root;
@@ -117,6 +116,7 @@ public class SiteTreeBean implements Serializable {
     private transient @Getter @Setter List<CfSitesaprfc> saprfclist = null;
     private @Getter @Setter CfSitesaprfc selectedrfc = null;
     private @Getter @Setter List<RfcGroup> rfcgrouplist;
+    private @Getter @Setter String rfcgroup;
     private @Getter @Setter RfcGroup selectedrfcgroup = null;
     private @Getter @Setter List<RfcFunction> rfcfunctionlist;
     private @Getter @Setter RfcFunction selectedrfcfunction = null;
@@ -635,8 +635,16 @@ public class SiteTreeBean implements Serializable {
         }
     }
     
+    public void onChangeRfCGroupInput() {
+        if (!rfcgroup.isEmpty()) {
+            selectedrfcgroup = null;
+            rfcfunctionlist = new RFC_FUNCTION_SEARCH(sapc).getRfcFunctionsList(rfcgroup);
+        }
+    }
+    
     public void onChangeRfcGroup() {
         if (null != selectedrfcgroup) {
+            rfcgroup = selectedrfcgroup.getName();
             rfcfunctionlist = new RFC_FUNCTION_SEARCH(sapc).getRfcFunctionsList(selectedrfcgroup.getName());
         }
     }

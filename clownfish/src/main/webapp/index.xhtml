@@ -251,8 +251,11 @@
                                                         <h:outputText value="#{rfclist.cfSitesaprfcPK.rfcfunction}" />
                                                     </p:column>
                                                 </p:dataTable>
+                                                <p:inputText id="siterfcgroupvalue" value="#{sitetree.rfcgroup}">
+                                                    <p:ajax listener="#{sitetree.onChangeRfCGroupInput()}" update=":form:tabview:tabsiteview:siterfcfunction :form:tabview:tabsiteview:siterfcgroup" />
+                                                </p:inputText>
                                                 <p:selectOneMenu id="siterfcgroup" value="#{sitetree.selectedrfcgroup}" required="false" label="RFCGROUP" converter="#{rfcGroupConverterBean}">
-                                                    <p:ajax listener="#{sitetree.onChangeRfcGroup}" update=":form:tabview:tabsiteview:siterfcfunction" />
+                                                    <p:ajax listener="#{sitetree.onChangeRfcGroup}" update=":form:tabview:tabsiteview:siterfcfunction :form:tabview:tabsiteview:siterfcgroupvalue" />
                                                     <f:selectItem itemValue="#{null}" itemLabel="--select--" />
                                                     <f:selectItems value="#{sitetree.rfcgrouplist}" var="rfcgroup" itemLabel="#{rfcgroup.name}" itemValue="#{rfcgroup}" />
                                                 </p:selectOneMenu>
