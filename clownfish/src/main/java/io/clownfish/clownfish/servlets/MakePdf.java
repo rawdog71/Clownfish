@@ -4,6 +4,7 @@ import io.clownfish.clownfish.dbentities.*;
 import io.clownfish.clownfish.jasperreports.JasperReportCompiler;
 import io.clownfish.clownfish.serviceinterface.*;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
+import io.clownfish.clownfish.utils.PDFUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
 import org.slf4j.Logger;
@@ -54,57 +55,17 @@ public class MakePdf extends HttpServlet
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String url = request.getRequestURL().toString();
         LOGGER.info(url);
-
-        //request.getParameter("apikey");
         String name = request.getParameter("site");
         String param = request.getParameter("param");
-        
-        // Fetch site
-        CfSite site = cfSiteService.findByName(name);
-        
-        HashMap<String, String> params = new HashMap<>();
-        // Put request params in HashMap
-        if (param != null) {
-            String[] arr = param.split("\\$");
-            int counter = 0;
-            for (String key : arr) {
-                if ((counter > 0) && ((counter % 2) != 0)) {
-                    params.put(arr[counter-1], arr[counter]);
-                }
-                counter++;
-            }
-        }
-        
-        // Get the current template content
-        long currentTemplateVersion;
-        try {
-            cfTemplate = cfTemplateService.findById(site.getTemplateref().longValue());
-            currentTemplateVersion = cfTemplateversionService.findMaxVersion(cfTemplate.getId());
-        } catch (NullPointerException ex) {
-            currentTemplateVersion = 0;
-        }
-        String templateContent = templateUtil.getVersion(cfTemplate.getId(), currentTemplateVersion);
-        // Search and replace params key/values in template content
-        for(String key : params.keySet()) {
-            templateContent = templateContent.replaceAll("@" + key + "@", params.get(key));
-        }
-
-        // Fetch site datasources
-        List<CfSitedatasource> sitedatasourcelist = cfSitedatasourceService.findBySiteref(site.getId());
-        for (CfSitedatasource source : sitedatasourcelist)
-        {
-            CfDatasource datasource = cfDatasourceService.findById(source.getCfSitedatasourcePK().getDatasourceref());
-            InputStream template = new ByteArrayInputStream(templateContent.getBytes(StandardCharsets.UTF_8));
-            response.setHeader("Content-disposition", "inline; filename=" + URLEncoder.encode(name, StandardCharsets.UTF_8.toString()));
-            response.setContentType("application/pdf");
-            ServletOutputStream out = response.getOutputStream();
-            ByteArrayOutputStream out1 = JasperReportCompiler.exportToPdf(datasource.getUser(), datasource.getPassword(), datasource.getUrl(), template, datasource.getDriverclass());
-
-            byte[] bytes = out1.toByteArray();
-            out.write(bytes, 0, bytes.length);
-            out.flush();
-            out.close();
-        }
+        PDFUtil pdfutil = new PDFUtil();
+        response.setHeader("Content-disposition", "inline; filename=" + URLEncoder.encode(name, StandardCharsets.UTF_8.toString()));
+        response.setContentType("application/pdf");
+        ServletOutputStream out = response.getOutputStream();
+        ByteArrayOutputStream out1 = pdfutil.createPDF(name, param);
+        byte[] bytes = out1.toByteArray();
+        out.write(bytes, 0, bytes.length);
+        out.flush();
+        out.close();
     }
 
     /**
