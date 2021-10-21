@@ -28,7 +28,6 @@ import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.beans.QuartzList;
 import io.clownfish.clownfish.beans.ServiceStatus;
-//import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
@@ -168,7 +167,6 @@ import org.springframework.context.annotation.PropertySources;
 import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.web.servlet.HandlerMapping;
 
-
 /**
  *
  * @author sulzbachr
@@ -216,7 +214,7 @@ public class Clownfish {
     @Autowired private Scheduler scheduler;
     @Autowired private FolderUtil folderUtil;
     @Autowired Searcher searcher;
-    @Autowired ConsistencyUtil consistenyUtil;
+    @Autowired ConsistencyUtil consistencyUtil;
     @Autowired HibernateUtil hibernateUtil;
     @Autowired ServiceStatus servicestatus;
     
@@ -233,7 +231,6 @@ public class Clownfish {
 
     private GzipSwitch gzipswitch;
     private freemarker.template.Configuration freemarkerCfg;
-    //private RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
     private RPY_TABLE_READ rpytableread = null;
     private static SAPConnection sapc = null;
     private boolean sapSupport = false;
@@ -253,7 +250,6 @@ public class Clownfish {
     private @Getter @Setter ContentIndexer contentIndexer;
     private @Getter @Setter AssetIndexer assetIndexer;
     private @Getter @Setter int searchlimit;
-    
     private @Getter @Setter Map<String, String> metainfomap;
     
     private Set<Class> templatebeans = null;
@@ -307,7 +303,6 @@ public class Clownfish {
      * Initializes several variables and starts Quartz job triggers
      */
     @PostConstruct
-    //@GetMapping(path = "/init") 
     public void init() {
         servicestatus.setMessage("Clownfish is initializing");
         servicestatus.setOnline(false);
@@ -404,7 +399,7 @@ public class Clownfish {
             
             // Check Consistence
             if (checkConsistency > 0) {
-                consistenyUtil.checkConsistency();
+                consistencyUtil.checkConsistency();
             }
             
             // Generate Hibernate DOM Mapping
@@ -425,7 +420,7 @@ public class Clownfish {
             
             // Set default values
             modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
-            // 0 = Development mode (fetch sourcecode from database)
+                                // 0 = Development mode (fetch sourcecode from database)
             defaultUtil.setCharacterEncoding("UTF-8")
                        .setContentType("text/html")
                        .setLocale(new Locale("de"));
@@ -868,7 +863,7 @@ public class Clownfish {
 
             // fetch parameter list
             Map parametermap = clownfishutil.getParametermap(postmap);
-            if (parametermap.containsKey("modus")) {    // check mode for display (stageing or dev)
+            if (parametermap.containsKey("modus")) {    // check mode for display (staging or dev)
                 if (parametermap.get("modus").toString().compareToIgnoreCase("dev") == 0) {
                     modus = DEVELOPMENT;
                 }
@@ -945,7 +940,6 @@ public class Clownfish {
                         // fetch the dependend template 
                         switch (cftemplate.getScriptlanguage()) {
                             case 0:
-                        
                                 fmRoot = new LinkedHashMap();
                                 freemarkerTemplateloader.setModus(modus);
 
@@ -992,7 +986,7 @@ public class Clownfish {
                         HtmlCompressor htmlcompressor = new HtmlCompressor();
                         htmlcompressor.setRemoveSurroundingSpaces(HtmlCompressor.BLOCK_TAGS_MAX);
                         htmlcompressor.setPreserveLineBreaks(false);
-                        // fetch the dependend styleshett, if available
+                        // fetch the dependend stylesheet, if available
                         String cfstylesheet = "";
                         if (cfsite.getStylesheetref() != null) {
                             cfstylesheet = ((CfStylesheet) cfstylesheetService.findById(cfsite.getStylesheetref().longValue())).getContent();
@@ -1060,7 +1054,6 @@ public class Clownfish {
                         }
 
                         // instantiate Template Beans
-                        
                         networkbean = new NetworkTemplateBean();
                         webservicebean = new WebServiceTemplateBean();
                         
