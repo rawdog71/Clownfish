@@ -20,12 +20,15 @@ import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfJavascriptversion;
+import io.clownfish.clownfish.dbentities.CfJavascriptversionPK;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +71,19 @@ public class JavascriptUtil implements Serializable {
             LOGGER.error(ex.getMessage());
             return null;
         }
+    }
+    
+    public void writeVersion(long javascriptref, long version, byte[] content, long currentuserid) {
+        CfJavascriptversionPK javascriptversionpk = new CfJavascriptversionPK();
+        javascriptversionpk.setJavascriptref(javascriptref);
+        javascriptversionpk.setVersion(version);
+
+        CfJavascriptversion cfjavascriptversion = new CfJavascriptversion();
+        cfjavascriptversion.setCfJavascriptversionPK(javascriptversionpk);
+        cfjavascriptversion.setContent(content);
+        cfjavascriptversion.setTstamp(new Date());
+        cfjavascriptversion.setCommitedby(BigInteger.valueOf(currentuserid));
+        cfjavascriptversionService.create(cfjavascriptversion);
     }
     
     public boolean hasDifference(CfJavascript selectedJavascript) {

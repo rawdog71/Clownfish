@@ -1466,12 +1466,11 @@
                     <p:commandButton id="newwebserviceauth" process="form" value="New" actionListener="#{webserviceauthlist.onCreateWebserviceAuth}" update=":form:msgs :form:tabview:webserviceauthlist" disabled="#{webserviceauthlist.newAuthButtonDisabled}" />
                 </p:tab>
                 
-                
                 <p:tab title="Reef" id="reef" rendered="#{loginBean.login}">
                     
                     <h:form enctype="multipart/form-data">
                         <p:fileUpload listener="#{reefbean.handleFileUpload}" mode="advanced" dragDropSupport="true" 
-                                              update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(json)$/i" >
+                                              update="messages :form:tabview:templatelist :form:tabview:stylesheetlist :form:tabview:javascriptlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(json)$/i" >
                         </p:fileUpload>
                         <p:growl id="messages" showDetail="true" />
                     </h:form>

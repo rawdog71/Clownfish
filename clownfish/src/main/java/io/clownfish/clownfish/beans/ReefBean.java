@@ -27,6 +27,10 @@ import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import io.clownfish.clownfish.utils.CompressionUtils;
+import io.clownfish.clownfish.utils.JavascriptUtil;
+import io.clownfish.clownfish.utils.StylesheetUtil;
+import io.clownfish.clownfish.utils.TemplateUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,8 +38,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
@@ -69,6 +75,13 @@ public class ReefBean implements Serializable {
     @Autowired transient CfStylesheetService cfstylesheetService;
     @Autowired transient CfJavascriptService cfjavascriptService;
     @Autowired transient CfAttributService cfattributService;
+    @Autowired transient TemplateList tl;
+    @Autowired transient JavascriptList jl;
+    @Autowired transient StylesheetList sl;
+    
+    @Autowired TemplateUtil templateUtil;
+    @Autowired StylesheetUtil stylesheetUtil;
+    @Autowired JavascriptUtil javascriptUtil;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ReefBean.class);
     
@@ -188,27 +201,75 @@ public class ReefBean implements Serializable {
                 LOGGER.error("TEMPLATE {} already exists.", cftemplate.getName());
             } catch (NoResultException ex) {
                 cftemplate.setId(null);
-                cftemplateService.create(cftemplate);
+                cftemplate = cftemplateService.create(cftemplate);
+                
+                templateUtil.setTemplateContent(cftemplate.getContent());
+
+                String content = templateUtil.getTemplateContent();
+                byte[] output = null;
+                try {
+                    output = CompressionUtils.compress(content.getBytes("UTF-8"));
+                } catch (UnsupportedEncodingException ex1) {
+                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                } catch (IOException ex1) {
+                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+
+                templateUtil.setCurrentVersion(1);
+                templateUtil.writeVersion(cftemplate.getId(), templateUtil.getCurrentVersion(), output, 0);
             }
         }
+        tl.refresh();
         for (CfJavascript cfjavascript : importreef.getJavascriptlist()) {
             try {
                 CfJavascript checkjavascript = cfjavascriptService.findByName(cfjavascript.getName());
                 LOGGER.error("JAVASCRIPT {} already exists.", cfjavascript.getName());
             } catch (NoResultException ex) {
                 cfjavascript.setId(null);
-                cfjavascriptService.create(cfjavascript);
+                cfjavascript = cfjavascriptService.create(cfjavascript);
+                
+                javascriptUtil.setJavascriptContent(cfjavascript.getContent());
+
+                String content = javascriptUtil.getJavascriptContent();
+                byte[] output = null;
+                try {
+                    output = CompressionUtils.compress(content.getBytes("UTF-8"));
+                } catch (UnsupportedEncodingException ex1) {
+                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                } catch (IOException ex1) {
+                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+
+                javascriptUtil.setCurrentVersion(1);
+                javascriptUtil.writeVersion(cfjavascript.getId(), javascriptUtil.getCurrentVersion(), output, 0);
             }
         }
+        jl.refresh();
         for (CfStylesheet cfstylesheet : importreef.getStylesheetlist()) {
             try {
                 CfStylesheet checkstylesheet = cfstylesheetService.findByName(cfstylesheet.getName());
                 LOGGER.error("STYLESHEET {} already exists.", cfstylesheet.getName());
             } catch (NoResultException ex) {
                 cfstylesheet.setId(null);
-                cfstylesheetService.create(cfstylesheet);
+                cfstylesheet = cfstylesheetService.create(cfstylesheet);
+                
+                stylesheetUtil.setStyelsheetContent(cfstylesheet.getContent());
+
+                String content = stylesheetUtil.getStyelsheetContent();
+                byte[] output = null;
+                try {
+                    output = CompressionUtils.compress(content.getBytes("UTF-8"));
+                } catch (UnsupportedEncodingException ex1) {
+                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                } catch (IOException ex1) {
+                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+
+                stylesheetUtil.setCurrentVersion(1);
+                stylesheetUtil.writeVersion(cfstylesheet.getId(), stylesheetUtil.getCurrentVersion(), output, 0);
             }
         }
+        sl.refresh();
     }
 
     private void reorgAttributs(Reef importreef, Long oldid, CfClass newclass) {

@@ -20,12 +20,15 @@ import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfStylesheetversion;
+import io.clownfish.clownfish.dbentities.CfStylesheetversionPK;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +71,19 @@ public class StylesheetUtil implements Serializable {
             LOGGER.error(ex.getMessage());
             return null;
         }
+    }
+    
+    public void writeVersion(long stylesheetref, long version, byte[] content, long currentuserid) {
+        CfStylesheetversionPK stylesheetversionpk = new CfStylesheetversionPK();
+        stylesheetversionpk.setStylesheetref(stylesheetref);
+        stylesheetversionpk.setVersion(version);
+
+        CfStylesheetversion cfstylesheetversion = new CfStylesheetversion();
+        cfstylesheetversion.setCfStylesheetversionPK(stylesheetversionpk);
+        cfstylesheetversion.setContent(content);
+        cfstylesheetversion.setTstamp(new Date());
+        cfstylesheetversion.setCommitedby(BigInteger.valueOf(currentuserid));
+        cfstylesheetversionService.create(cfstylesheetversion);
     }
     
     public boolean hasDifference(CfStylesheet selectedStylesheet) {
