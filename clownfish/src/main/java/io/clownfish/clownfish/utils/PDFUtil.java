@@ -32,20 +32,24 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import javax.faces.bean.ViewScoped;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author raine
  */
+@ViewScoped
+@Component
 public class PDFUtil {
-    @Autowired transient CfTemplateService cfTemplateService;
-    @Autowired transient CfTemplateversionService cfTemplateversionService;
-    @Autowired transient CfSitedatasourceService cfSitedatasourceService;
-    @Autowired transient CfDatasourceService cfDatasourceService;
-    @Autowired transient CfSiteService cfSiteService;
-    @Autowired transient PropertyUtil propertyUtil;
-    @Autowired transient TemplateUtil templateUtil;
+    @Autowired CfTemplateService cfTemplateService;
+    @Autowired CfTemplateversionService cfTemplateversionService;
+    @Autowired CfSitedatasourceService cfSitedatasourceService;
+    @Autowired CfDatasourceService cfDatasourceService;
+    @Autowired CfSiteService cfSiteService;
+    @Autowired PropertyUtil propertyUtil;
+    @Autowired TemplateUtil templateUtil;
     
     CfTemplate cfTemplate;
     
