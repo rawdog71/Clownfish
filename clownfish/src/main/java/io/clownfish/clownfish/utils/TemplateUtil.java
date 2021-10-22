@@ -52,7 +52,7 @@ import org.springframework.stereotype.Component;
 @ViewScoped
 @Component
 @Accessors(chain = true)
-public class TemplateUtil implements Serializable {
+public class TemplateUtil implements IVersioningInterface, Serializable {
     @Autowired transient CfTemplateService cftemplateService;
     @Autowired transient CfTemplateversionService cftemplateversionService;
     
@@ -67,6 +67,7 @@ public class TemplateUtil implements Serializable {
     public TemplateUtil() {
     }
 
+    @Override
     public String getVersion(long templateref, long version) {
         try {
             CfTemplateversion template = cftemplateversionService.findByPK(templateref, version);
@@ -78,6 +79,7 @@ public class TemplateUtil implements Serializable {
         }
     }
     
+    @Override
     public void writeVersion(long templateref, long version, byte[] content, long currentuserid) {
         CfTemplateversionPK templateversionpk = new CfTemplateversionPK();
         templateversionpk.setTemplateref(templateref);
@@ -91,17 +93,18 @@ public class TemplateUtil implements Serializable {
         cftemplateversionService.create(cftemplateversion);
     }
     
-    public boolean hasDifference(CfTemplate selectedTemplate) {
+    @Override
+    public boolean hasDifference(Object object) {
         boolean diff = false;
         try {
             try {
-                currentVersion = (long) cftemplateversionService.findMaxVersion(selectedTemplate.getId());
+                currentVersion = (long) cftemplateversionService.findMaxVersion(((CfTemplate)object).getId());
             } catch (NullPointerException ex) {
                 currentVersion = 0;
             }
             if (currentVersion > 0) {
-                templateContent = selectedTemplate.getContent();
-                String contentVersion = getVersion(selectedTemplate.getId(), currentVersion);
+                templateContent = ((CfTemplate)object).getContent();
+                String contentVersion = getVersion(((CfTemplate)object).getId(), currentVersion);
                 source = Arrays.asList(templateContent.split("\\r?\\n"));
                 target = Arrays.asList(contentVersion.split("\\r?\\n"));
                 patch = DiffUtils.diff(source, target);
@@ -144,5 +147,4 @@ public class TemplateUtil implements Serializable {
         }
         return content;
     }
-    
 }

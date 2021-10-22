@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 @ViewScoped
 @Component
 @Accessors(chain = true)
-public class JavascriptUtil implements Serializable {
+public class JavascriptUtil implements IVersioningInterface, Serializable {
     @Autowired transient CfJavascriptService cfjavascriptService;
     @Autowired transient CfJavascriptversionService cfjavascriptversionService;
     
@@ -62,6 +62,7 @@ public class JavascriptUtil implements Serializable {
     public JavascriptUtil() {
     }
 
+    @Override
     public String getVersion(long javascriptref, long version) {
         try {
             CfJavascriptversion javascript = cfjavascriptversionService.findByPK(javascriptref, version);
@@ -73,6 +74,7 @@ public class JavascriptUtil implements Serializable {
         }
     }
     
+    @Override
     public void writeVersion(long javascriptref, long version, byte[] content, long currentuserid) {
         CfJavascriptversionPK javascriptversionpk = new CfJavascriptversionPK();
         javascriptversionpk.setJavascriptref(javascriptref);
@@ -86,17 +88,18 @@ public class JavascriptUtil implements Serializable {
         cfjavascriptversionService.create(cfjavascriptversion);
     }
     
-    public boolean hasDifference(CfJavascript selectedJavascript) {
+    @Override
+    public boolean hasDifference(Object object) {
         boolean diff = false;
         try {
             try {
-            currentVersion = cfjavascriptversionService.findMaxVersion(selectedJavascript.getId());
+            currentVersion = cfjavascriptversionService.findMaxVersion(((CfJavascript)object).getId());
         } catch (NullPointerException ex) {
             currentVersion = 0;
         }
         if (currentVersion > 0) {
-            javascriptContent = selectedJavascript.getContent();
-            String contentVersion = getVersion(selectedJavascript.getId(), currentVersion);
+            javascriptContent = ((CfJavascript)object).getContent();
+            String contentVersion = getVersion(((CfJavascript)object).getId(), currentVersion);
             source = Arrays.asList(javascriptContent.split("\\r?\\n"));
             target = Arrays.asList(contentVersion.split("\\r?\\n"));
             patch = DiffUtils.diff(source, target);

@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 @ViewScoped
 @Component
 @Accessors(chain = true)
-public class StylesheetUtil implements Serializable {
+public class StylesheetUtil implements IVersioningInterface, Serializable {
     @Autowired transient CfStylesheetService cfstylesheetService;
     @Autowired transient CfStylesheetversionService cfstylesheetversionService;
     
@@ -62,6 +62,7 @@ public class StylesheetUtil implements Serializable {
     public StylesheetUtil() {
     }
 
+    @Override
     public String getVersion(long stylesheetref, long version) {
         try {
             CfStylesheetversion stylesheet = cfstylesheetversionService.findByPK(stylesheetref, version);
@@ -73,6 +74,7 @@ public class StylesheetUtil implements Serializable {
         }
     }
     
+    @Override
     public void writeVersion(long stylesheetref, long version, byte[] content, long currentuserid) {
         CfStylesheetversionPK stylesheetversionpk = new CfStylesheetversionPK();
         stylesheetversionpk.setStylesheetref(stylesheetref);
@@ -86,17 +88,18 @@ public class StylesheetUtil implements Serializable {
         cfstylesheetversionService.create(cfstylesheetversion);
     }
     
-    public boolean hasDifference(CfStylesheet selectedStylesheet) {
+    @Override
+    public boolean hasDifference(Object object) {
         boolean diff = false;
         try {
             try {
-            currentVersion = cfstylesheetversionService.findMaxVersion(selectedStylesheet.getId());
+            currentVersion = cfstylesheetversionService.findMaxVersion(((CfStylesheet)object).getId());
         } catch (NullPointerException ex) {
             currentVersion = 0;
         }
         if (currentVersion > 0) {
-            styelsheetContent = selectedStylesheet.getContent();
-            String contentVersion = getVersion(selectedStylesheet.getId(), currentVersion);
+            styelsheetContent = ((CfStylesheet)object).getContent();
+            String contentVersion = getVersion(((CfStylesheet)object).getId(), currentVersion);
             source = Arrays.asList(styelsheetContent.split("\\r?\\n"));
             target = Arrays.asList(contentVersion.split("\\r?\\n"));
             patch = DiffUtils.diff(source, target);
