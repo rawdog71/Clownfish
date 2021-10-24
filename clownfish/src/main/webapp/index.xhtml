@@ -339,7 +339,7 @@
                     <!--
                     <pe:codeMirror id="edittemplate" mode="#{templateList.selectedScriptlanguage}" readonly="#{!templateList.checkedout}" theme="ambiance" value="#{templateList.templateContent}" lineNumbers="true" matchBrackets="true" class="template" />
                     -->
-                    <pe:monacoEditor id="edittemplate" disabled="false" readonly="#{!templateList.checkedout}" editorOptions="#{templateList.editorOptions}" value="#{templateList.templateContent}" locale="de" width="100%" height="600px" autoResize="true" />
+                    <pe:monacoEditor id="edittemplate" disabled="false" widgetVar="monacotemplate" readonly="#{!templateList.checkedout}" editorOptions="#{templateList.editorOptions}" value="#{templateList.templateContent}" locale="de" width="100%" height="600px" autoResize="true" />
                     <h:panelGroup id="difftemplateBtnGroup">
                         <p:commandButton id="savetemplate" process="form" value="Save" rendered="#{templateList.checkedout}" actionListener="#{templateList.onSave}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
                         <p:commandButton id="checkintemplate" process="form" value="CheckIn" rendered="#{templateList.checkedout}" actionListener="#{templateList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
@@ -352,9 +352,7 @@
                         <p:commandButton id="difftemplateBtn" type="button" value="Diff" rendered="#{templateList.difference}" />
                         
                         <h5>Select Version</h5>           
-                        <p:inputText id="selectedtemplateversion" value="#{templateList.templateversion}">
-                            <p:ajax event="blur" listener="#{templateList.onVersionChanged}" />
-                        </p:inputText>
+                        <p:inputText id="selectedtemplateversion" value="#{templateList.selectedtemplateversion}" disabled="true" />
                         <p:slider id="selectedtemplateversionslider" for="selectedtemplateversion" minValue="#{templateList.templateversionMin}" maxValue="#{templateList.templateversionMax}">
                             <p:ajax event="slideEnd" listener="#{templateList.onSlideEnd}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
                         </p:slider>
@@ -395,7 +393,7 @@
                     <!--
                     <pe:codeMirror id="editstylesheet" mode="css" theme="ambiance" readonly="#{!stylesheetList.checkedout}" value="#{stylesheetList.stylesheetContent}" lineNumbers="true" matchBrackets="true" />
                     -->
-                    <pe:monacoEditor id="editstylesheet" disabled="false" readonly="#{!stylesheetList.checkedout}" editorOptions="#{stylesheetList.editorOptions}" value="#{stylesheetList.stylesheetContent}" locale="de" width="100%" height="600px" autoResize="true" />
+                    <pe:monacoEditor id="editstylesheet" disabled="false" widgetVar="monacostylesheet" readonly="#{!stylesheetList.checkedout}" editorOptions="#{stylesheetList.editorOptions}" value="#{stylesheetList.stylesheetContent}" locale="de" width="100%" height="600px" autoResize="true" />
                     <h:panelGroup id="diffstylesheetBtnGroup">
                             
                         <p:commandButton id="savestylesheet" process="form" value="Save" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onSave}" update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:templateversion :form:tabview:diffstylesheetBtnGroup" />
@@ -407,6 +405,12 @@
                             
                         <p:outputLabel> Version </p:outputLabel><p:outputLabel id="stylesheetversion">#{stylesheetList.stylesheetUtility.currentVersion}</p:outputLabel>
                         <p:commandButton id="diffstylesheetBtn" type="button" value="Diff" rendered="#{stylesheetList.difference}" />
+                        
+                        <h5>Select Version</h5>           
+                        <p:inputText id="selectedstylesheetversion" value="#{stylesheetList.selectedstylesheetversion}" disabled="true" />
+                        <p:slider id="selectedstylesheetversionslider" for="selectedstylesheetversion" minValue="#{stylesheetList.stylesheetversionMin}" maxValue="#{stylesheetList.stylesheetversionMax}">
+                            <p:ajax event="slideEnd" listener="#{stylesheetList.onSlideEnd}" update=":form:msgs :form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:selectedstylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:diffstylesheetPanel" />
+                        </p:slider>
                         
                         <p:overlayPanel id="diffstylesheetPanel" for="diffstylesheetBtn" dynamic="false" style="width:600px" modal="true">
                             <p:dataTable var="diff" value="#{stylesheetList.stylesheetUtility.patch.deltas}" rows="#{stylesheetList.stylesheetUtility.patch.deltas.size()}" paginator="false">
@@ -444,7 +448,7 @@
                     <!--
                     <pe:codeMirror id="editjavascript" mode="javascript" theme="ambiance" readonly="#{!javascriptList.checkedout}" value="#{javascriptList.javascriptContent}" lineNumbers="true" matchBrackets="true" />
                     -->
-                    <pe:monacoEditor id="editjavascript" disabled="false" readonly="#{!javascriptList.checkedout}" editorOptions="#{javascriptList.editorOptions}" value="#{javascriptList.javascriptContent}" locale="de" width="100%" height="600px" autoResize="true" />
+                    <pe:monacoEditor id="editjavascript" disabled="false" widgetVar="monacojavascript" readonly="#{!javascriptList.checkedout}" editorOptions="#{javascriptList.editorOptions}" value="#{javascriptList.javascriptContent}" locale="de" width="100%" height="600px" autoResize="true" />
                     <h:panelGroup id="diffjavascriptBtnGroup">
                         <p:commandButton id="savejavascript" process="form" value="Save" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onSave}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup" />
                         <p:commandButton id="checkinjavascript" process="form" value="CheckIn" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
@@ -457,9 +461,9 @@
                         <p:commandButton id="diffjavascriptBtn" type="button" value="Diff" rendered="#{javascriptList.difference}" />
                         
                         <h5>Select Version</h5>           
-                        <p:inputText id="selectedjavascriptversion" value="#{javascriptList.javascriptversion}"/>
-                        <p:slider for="selectedtemplateversion" minValue="#{javascriptList.javascriptversionMin}" maxValue="#{javascriptList.javascriptversionMax}">
-                            <p:ajax event="slideEnd" listener="#{javascriptList.onSlideEnd}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:diffjavascriptPanel" />
+                        <p:inputText id="selectedjavascriptversion" value="#{javascriptList.selectedjavascriptversion}" disabled="true"/>
+                        <p:slider for="selectedjavascriptversion" minValue="#{javascriptList.javascriptversionMin}" maxValue="#{javascriptList.javascriptversionMax}">
+                            <p:ajax event="slideEnd" listener="#{javascriptList.onSlideEnd}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:selectedjavascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:diffjavascriptPanel" />
                         </p:slider>
                         
                         <p:overlayPanel id="diffjavascriptPanel" for="diffjavascriptBtn" dynamic="false" style="width:600px" modal="true">

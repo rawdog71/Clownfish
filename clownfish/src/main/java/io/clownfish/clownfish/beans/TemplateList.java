@@ -155,6 +155,7 @@ public class TemplateList {
             checkoutUtil.getCheckoutAccess(co, loginbean);
             checkedout = checkoutUtil.isCheckedout();
             access = checkoutUtil.isAccess();
+            templateversionMin = 1;
             templateversionMax = versionlist.size();
             selectedtemplateversion = templateversionMax;
         } else {
@@ -311,9 +312,21 @@ public class TemplateList {
     
     public void onSlideEnd(SlideEndEvent event) {
         selectedtemplateversion = (int) event.getValue();
+        if (selectedtemplateversion <= templateversionMin) {
+            selectedtemplateversion = templateversionMin;
+        }
+        if (selectedtemplateversion >= templateversionMax) {
+            selectedtemplateversion = templateversionMax;
+        }
     }
    
     public void onVersionChanged() {
+        if (templateversion <= templateversionMin) {
+            templateversion = templateversionMin;
+        }
+        if (templateversion >= templateversionMax) {
+            templateversion = templateversionMax;
+        }
         selectedtemplateversion = templateversion;
     }
 }

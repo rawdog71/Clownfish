@@ -72,6 +72,7 @@ public class JavascriptList {
     private @Getter @Setter int javascriptversion = 0;
     private @Getter @Setter int javascriptversionMin = 0;
     private @Getter @Setter int javascriptversionMax = 0;
+    private @Getter @Setter int selectedjavascriptversion = 0;
     private @Getter @Setter List<CfJavascriptversion> versionlist;
     private @Getter @Setter boolean difference;
     private @Getter @Setter long checkedoutby = 0;
@@ -87,8 +88,12 @@ public class JavascriptList {
 
     public String getJavascriptContent() {
         if (null != selectedJavascript) {
-            javascriptUtility.setJavascriptContent(selectedJavascript.getContent());
-            return javascriptUtility.getJavascriptContent();
+            if (selectedjavascriptversion != javascriptversionMax) {
+                return javascriptUtility.getVersion(selectedJavascript.getId(), selectedjavascriptversion);
+            } else {
+                javascriptUtility.setJavascriptContent(selectedJavascript.getContent());
+                return javascriptUtility.getJavascriptContent();
+            }
         } else {
             return "";
         }
@@ -127,9 +132,11 @@ public class JavascriptList {
             BigInteger co = selectedJavascript.getCheckedoutby();
             CheckoutUtil checkoutUtil = new CheckoutUtil();
             checkoutUtil.getCheckoutAccess(co, loginbean);
+            javascriptversionMin = 1;
             checkedout = checkoutUtil.isCheckedout();
             access = checkoutUtil.isAccess();
             javascriptversionMax = versionlist.size();
+            selectedjavascriptversion = javascriptversionMax;
         } else {
             checkedout = false;
             access = false;
@@ -281,10 +288,32 @@ public class JavascriptList {
         }
     }
     
+    /*
     public void onSlideEnd(SlideEndEvent event) {
         int version = (int) event.getValue();
         String output = javascriptUtility.getVersion(selectedJavascript.getId(), version);
         System.out.println(output);
         javascriptUtility.setJavascriptContent(output);
+    }
+    */
+
+    public void onSlideEnd(SlideEndEvent event) {
+        selectedjavascriptversion = (int) event.getValue();
+        if (selectedjavascriptversion <= javascriptversionMin) {
+            selectedjavascriptversion = javascriptversionMin;
+        }
+        if (selectedjavascriptversion >= javascriptversionMax) {
+            selectedjavascriptversion = javascriptversionMax;
+        }
+    }
+   
+    public void onVersionChanged() {
+        if (javascriptversion <= javascriptversionMin) {
+            javascriptversion = javascriptversionMin;
+        }
+        if (javascriptversion >= javascriptversionMax) {
+            javascriptversion = javascriptversionMax;
+        }
+        selectedjavascriptversion = javascriptversion;
     }
 }

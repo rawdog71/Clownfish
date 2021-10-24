@@ -39,6 +39,7 @@ import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.event.SlideEndEvent;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
 import org.primefaces.extensions.model.monacoeditor.ETheme;
@@ -69,6 +70,10 @@ public class StylesheetList {
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter CfStylesheetversion version = null;
     private @Getter @Setter List<CfStylesheetversion> versionlist;
+    private @Getter @Setter int stylesheetversion = 0;
+    private @Getter @Setter int stylesheetversionMin = 0;
+    private @Getter @Setter int stylesheetversionMax = 0;
+    private @Getter @Setter int selectedstylesheetversion = 0;
     private @Getter @Setter boolean difference;
     private @Getter @Setter long checkedoutby = 0;
     private @Getter @Setter boolean checkedout;
@@ -83,8 +88,12 @@ public class StylesheetList {
    
     public String getStylesheetContent() {
         if (null != selectedStylesheet) {
-            stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
-            return stylesheetUtility.getStyelsheetContent();
+            if (selectedstylesheetversion != stylesheetversionMax) {
+                return stylesheetUtility.getVersion(selectedStylesheet.getId(), selectedstylesheetversion);
+            } else {
+                stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
+                return stylesheetUtility.getStyelsheetContent();
+            }
         } else {
             return "";
         }
@@ -125,6 +134,9 @@ public class StylesheetList {
             checkoutUtil.getCheckoutAccess(co, loginbean);
             checkedout = checkoutUtil.isCheckedout();
             access = checkoutUtil.isAccess();
+            stylesheetversionMin = 1;
+            stylesheetversionMax = versionlist.size();
+            selectedstylesheetversion = stylesheetversionMax;
         } else {
             checkedout = false;
             access = false;
@@ -273,5 +285,25 @@ public class StylesheetList {
         if (null != selectedStylesheet) {
             stylesheetUtility.getVersion(version.getCfStylesheetversionPK().getStylesheetref(), version.getCfStylesheetversionPK().getVersion());
         }
+    }
+    
+    public void onSlideEnd(SlideEndEvent event) {
+        selectedstylesheetversion = (int) event.getValue();
+        if (selectedstylesheetversion <= stylesheetversionMin) {
+            selectedstylesheetversion = stylesheetversionMin;
+        }
+        if (selectedstylesheetversion >= stylesheetversionMax) {
+            selectedstylesheetversion = stylesheetversionMax;
+        }
+    }
+   
+    public void onVersionChanged() {
+        if (stylesheetversion <= stylesheetversionMin) {
+            stylesheetversion = stylesheetversionMin;
+        }
+        if (stylesheetversion >= stylesheetversionMax) {
+            stylesheetversion = stylesheetversionMax;
+        }
+        selectedstylesheetversion = stylesheetversion;
     }
 }
