@@ -58,7 +58,7 @@ import org.springframework.stereotype.Component;
 @Named("stylesheetList")
 @Scope("singleton")
 @Component
-public class StylesheetList {
+public class StylesheetList implements ISourceContentInterface {
     @Inject
     LoginBean loginbean;
     @Autowired CfStylesheetService cfstylesheetService;
@@ -86,7 +86,8 @@ public class StylesheetList {
     public StylesheetList() {
     }
    
-    public String getStylesheetContent() {
+    @Override
+    public String getContent() {
         if (null != selectedStylesheet) {
             if (selectedstylesheetversion != stylesheetversionMax) {
                 return stylesheetUtility.getVersion(selectedStylesheet.getId(), selectedstylesheetversion);
@@ -99,13 +100,15 @@ public class StylesheetList {
         }
     }
     
-    public void setStylesheetContent(String content) {
+    @Override
+    public void setContent(String content) {
         if (null != selectedStylesheet) {
             selectedStylesheet.setContent(content);
         }
     }
 
     @PostConstruct
+    @Override
     public void init() {
         stylesheetName = "";
         stylesheetListe = cfstylesheetService.findAll();
@@ -118,10 +121,12 @@ public class StylesheetList {
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
     }
     
+    @Override
     public void refresh() {
         stylesheetListe = cfstylesheetService.findAll();
     }
     
+    @Override
     public void onSelect(AjaxBehaviorEvent event) {
         difference = false;
         if (null != selectedStylesheet) {
@@ -143,9 +148,10 @@ public class StylesheetList {
         }
     }
     
+    @Override
     public void onSave(ActionEvent actionEvent) {
         if (null != selectedStylesheet) {
-            selectedStylesheet.setContent(getStylesheetContent());
+            selectedStylesheet.setContent(getContent());
             cfstylesheetService.edit(selectedStylesheet);
             difference = stylesheetUtility.hasDifference(selectedStylesheet);
             
@@ -154,6 +160,7 @@ public class StylesheetList {
         }
     }
     
+    @Override
     public void onCommit(ActionEvent actionEvent) {
         if (null != selectedStylesheet) {
             boolean canCommit = false;
@@ -162,7 +169,7 @@ public class StylesheetList {
             }
             if (canCommit) {
                 try {
-                    String content = getStylesheetContent();
+                    String content = getContent();
                     byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
                     try {
                         long maxversion = cfstylesheetversionService.findMaxVersion(selectedStylesheet.getId());
@@ -193,10 +200,11 @@ public class StylesheetList {
         }
     }
     
+    @Override
     public void onCheckIn(ActionEvent actionEvent) {
         if (null != selectedStylesheet) {
             selectedStylesheet.setCheckedoutby(BigInteger.valueOf(0));
-            selectedStylesheet.setContent(getStylesheetContent());
+            selectedStylesheet.setContent(getContent());
             cfstylesheetService.edit(selectedStylesheet);
             
             difference = stylesheetUtility.hasDifference(selectedStylesheet);
@@ -207,6 +215,7 @@ public class StylesheetList {
         }
     }
     
+    @Override
     public void onCheckOut(ActionEvent actionEvent) {
         if (null != selectedStylesheet) {
             boolean canCheckout = false;
@@ -222,7 +231,7 @@ public class StylesheetList {
                     
             if (canCheckout) {
                 selectedStylesheet.setCheckedoutby(BigInteger.valueOf(loginbean.getCfuser().getId()));
-                selectedStylesheet.setContent(getStylesheetContent());
+                selectedStylesheet.setContent(getContent());
                 cfstylesheetService.edit(checkstylesheet);
                 
                 difference = stylesheetUtility.hasDifference(selectedStylesheet);
@@ -238,6 +247,7 @@ public class StylesheetList {
         }
     }
     
+    @Override
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
             cfstylesheetService.findByName(stylesheetName);
@@ -247,6 +257,7 @@ public class StylesheetList {
         }
     }
     
+    @Override
     public void onCreate(ActionEvent actionEvent) {
         try {
             CfStylesheet newstylesheet = new CfStylesheet();
@@ -260,6 +271,7 @@ public class StylesheetList {
         }
     }
     
+    @Override
     public void onDelete(ActionEvent actionEvent) {
         if (null != selectedStylesheet) {
             cfstylesheetService.delete(selectedStylesheet);
@@ -269,7 +281,8 @@ public class StylesheetList {
         }
     }
     
-    private void writeVersion(long stylesheetref, long version, byte[] content) {
+    @Override
+    public void writeVersion(long stylesheetref, long version, byte[] content) {
         CfStylesheetversionPK stylesheetversionpk = new CfStylesheetversionPK();
         stylesheetversionpk.setStylesheetref(stylesheetref);
         stylesheetversionpk.setVersion(version);
@@ -281,12 +294,14 @@ public class StylesheetList {
         cfstylesheetversionService.create(cfstylesheetversion);
     }
     
+    @Override
     public void onVersionSelect(ActionEvent actionEvent) {
         if (null != selectedStylesheet) {
             stylesheetUtility.getVersion(version.getCfStylesheetversionPK().getStylesheetref(), version.getCfStylesheetversionPK().getVersion());
         }
     }
     
+    @Override
     public void onSlideEnd(SlideEndEvent event) {
         selectedstylesheetversion = (int) event.getValue();
         if (selectedstylesheetversion <= stylesheetversionMin) {
@@ -297,6 +312,7 @@ public class StylesheetList {
         }
     }
    
+    @Override
     public void onVersionChanged() {
         if (stylesheetversion <= stylesheetversionMin) {
             stylesheetversion = stylesheetversionMin;

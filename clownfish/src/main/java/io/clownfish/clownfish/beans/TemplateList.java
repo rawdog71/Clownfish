@@ -58,7 +58,7 @@ import org.springframework.stereotype.Component;
 @Named("templateList")
 @Scope("singleton")
 @Component
-public class TemplateList {
+public class TemplateList implements ISourceContentInterface {
     @Inject
     LoginBean loginbean;
     @Autowired CfTemplateService cftemplateService;
@@ -88,7 +88,8 @@ public class TemplateList {
     public TemplateList() {
     }
     
-    public String getTemplateContent() {
+    @Override
+    public String getContent() {
         if (null != selectedTemplate) {
             if (selectedtemplateversion != templateversionMax) {
                 return templateUtility.getVersion(selectedTemplate.getId(), selectedtemplateversion);
@@ -101,13 +102,15 @@ public class TemplateList {
         }
     }
     
-    public void setTemplateContent(String content) {
+    @Override
+    public void setContent(String content) {
         if (null != selectedTemplate) {
             selectedTemplate.setContent(content);
         }
     }
 
     @PostConstruct
+    @Override
     public void init() {
         templateName = "";
         templateListe = cftemplateService.findAll();
@@ -120,10 +123,12 @@ public class TemplateList {
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
     }
     
+    @Override
     public void refresh() {
         templateListe = cftemplateService.findAll();
     }
     
+    @Override
     public void onSelect(AjaxBehaviorEvent event) {
         difference = false;
         if (null != selectedTemplate) {
@@ -164,10 +169,11 @@ public class TemplateList {
         }
     }
     
+    @Override
     public void onSave(ActionEvent actionEvent) {
         if (null != selectedTemplate) {
             selectedTemplate.setScriptlanguage(templateScriptLanguage);
-            selectedTemplate.setContent(getTemplateContent());
+            selectedTemplate.setContent(getContent());
             cftemplateService.edit(selectedTemplate);
             difference = templateUtility.hasDifference(selectedTemplate);
             
@@ -176,6 +182,7 @@ public class TemplateList {
         }
     }
     
+    @Override
     public void onCommit(ActionEvent actionEvent) {
         if (null != selectedTemplate) {
             boolean canCommit = false;
@@ -184,7 +191,7 @@ public class TemplateList {
             }
             if (canCommit) {
                 try {
-                    String content = getTemplateContent();
+                    String content = getContent();
                     byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
                     try {
                         long maxversion = cftemplateversionService.findMaxVersion(selectedTemplate.getId());
@@ -215,6 +222,7 @@ public class TemplateList {
         }
     }
     
+    @Override
     public void onCheckOut(ActionEvent actionEvent) {
         if (null != selectedTemplate) {
             boolean canCheckout = false;
@@ -230,7 +238,7 @@ public class TemplateList {
                     
             if (canCheckout) {
                 selectedTemplate.setCheckedoutby(BigInteger.valueOf(loginbean.getCfuser().getId()));
-                selectedTemplate.setContent(getTemplateContent());
+                selectedTemplate.setContent(getContent());
                 cftemplateService.edit(selectedTemplate);
                 difference = templateUtility.hasDifference(selectedTemplate);
                 checkedout = true;
@@ -245,10 +253,11 @@ public class TemplateList {
         }
     }
     
+    @Override
     public void onCheckIn(ActionEvent actionEvent) {
         if (null != selectedTemplate) {
             selectedTemplate.setCheckedoutby(BigInteger.valueOf(0));
-            selectedTemplate.setContent(getTemplateContent());
+            selectedTemplate.setContent(getContent());
             cftemplateService.edit(selectedTemplate);
             difference = templateUtility.hasDifference(selectedTemplate);
             checkedout = false;
@@ -258,6 +267,7 @@ public class TemplateList {
         }
     }
     
+    @Override
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
             cftemplateService.findByName(templateName);
@@ -267,6 +277,7 @@ public class TemplateList {
         }
     }
     
+    @Override
     public void onCreate(ActionEvent actionEvent) {
         try {
             CfTemplate newtemplate = new CfTemplate();
@@ -281,6 +292,7 @@ public class TemplateList {
         }
     }
     
+    @Override
     public void onDelete(ActionEvent actionEvent) {
         if (null != selectedTemplate) {
             cftemplateService.delete(selectedTemplate);
@@ -291,7 +303,8 @@ public class TemplateList {
         }
     }
     
-    private void writeVersion(long templateref, long version, byte[] content) {
+    @Override
+    public void writeVersion(long templateref, long version, byte[] content) {
         CfTemplateversionPK templateversionpk = new CfTemplateversionPK();
         templateversionpk.setTemplateref(templateref);
         templateversionpk.setVersion(version);
@@ -304,12 +317,14 @@ public class TemplateList {
         cftemplateversionService.create(cftemplateversion);
     }
     
+    @Override
     public void onVersionSelect(ActionEvent actionEvent) {
         if (null != selectedTemplate) {
             templateUtility.getVersion(version.getCfTemplateversionPK().getTemplateref(), version.getCfTemplateversionPK().getVersion());
         }
     }
     
+    @Override
     public void onSlideEnd(SlideEndEvent event) {
         selectedtemplateversion = (int) event.getValue();
         if (selectedtemplateversion <= templateversionMin) {
@@ -320,6 +335,7 @@ public class TemplateList {
         }
     }
    
+    @Override
     public void onVersionChanged() {
         if (templateversion <= templateversionMin) {
             templateversion = templateversionMin;

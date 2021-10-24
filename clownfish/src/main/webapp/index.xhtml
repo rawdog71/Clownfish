@@ -337,9 +337,9 @@
                     <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
 
                     <!--
-                    <pe:codeMirror id="edittemplate" mode="#{templateList.selectedScriptlanguage}" readonly="#{!templateList.checkedout}" theme="ambiance" value="#{templateList.templateContent}" lineNumbers="true" matchBrackets="true" class="template" />
+                    <pe:codeMirror id="edittemplate" mode="#{templateList.selectedScriptlanguage}" readonly="#{!templateList.checkedout}" theme="ambiance" value="#{templateList.content}" lineNumbers="true" matchBrackets="true" class="template" />
                     -->
-                    <pe:monacoEditor id="edittemplate" disabled="false" widgetVar="monacotemplate" readonly="#{!templateList.checkedout}" editorOptions="#{templateList.editorOptions}" value="#{templateList.templateContent}" locale="de" width="100%" height="600px" autoResize="true" />
+                    <pe:monacoEditor id="edittemplate" disabled="false" widgetVar="monacotemplate" readonly="#{!templateList.checkedout}" editorOptions="#{templateList.editorOptions}" value="#{templateList.content}" locale="de" width="100%" height="600px" autoResize="true" />
                     <h:panelGroup id="difftemplateBtnGroup">
                         <p:commandButton id="savetemplate" process="form" value="Save" rendered="#{templateList.checkedout}" actionListener="#{templateList.onSave}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
                         <p:commandButton id="checkintemplate" process="form" value="CheckIn" rendered="#{templateList.checkedout}" actionListener="#{templateList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
@@ -391,9 +391,9 @@
                     <p:commandButton id="newstylesheet" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
 
                     <!--
-                    <pe:codeMirror id="editstylesheet" mode="css" theme="ambiance" readonly="#{!stylesheetList.checkedout}" value="#{stylesheetList.stylesheetContent}" lineNumbers="true" matchBrackets="true" />
+                    <pe:codeMirror id="editstylesheet" mode="css" theme="ambiance" readonly="#{!stylesheetList.checkedout}" value="#{stylesheetList.content}" lineNumbers="true" matchBrackets="true" />
                     -->
-                    <pe:monacoEditor id="editstylesheet" disabled="false" widgetVar="monacostylesheet" readonly="#{!stylesheetList.checkedout}" editorOptions="#{stylesheetList.editorOptions}" value="#{stylesheetList.stylesheetContent}" locale="de" width="100%" height="600px" autoResize="true" />
+                    <pe:monacoEditor id="editstylesheet" disabled="false" widgetVar="monacostylesheet" readonly="#{!stylesheetList.checkedout}" editorOptions="#{stylesheetList.editorOptions}" value="#{stylesheetList.content}" locale="de" width="100%" height="600px" autoResize="true" />
                     <h:panelGroup id="diffstylesheetBtnGroup">
                             
                         <p:commandButton id="savestylesheet" process="form" value="Save" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onSave}" update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:templateversion :form:tabview:diffstylesheetBtnGroup" />
@@ -446,9 +446,9 @@
                     <p:commandButton id="newjavascript" process="form" value="New" actionListener="#{javascriptList.onCreate}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
                     
                     <!--
-                    <pe:codeMirror id="editjavascript" mode="javascript" theme="ambiance" readonly="#{!javascriptList.checkedout}" value="#{javascriptList.javascriptContent}" lineNumbers="true" matchBrackets="true" />
+                    <pe:codeMirror id="editjavascript" mode="javascript" theme="ambiance" readonly="#{!javascriptList.checkedout}" value="#{javascriptList.content}" lineNumbers="true" matchBrackets="true" />
                     -->
-                    <pe:monacoEditor id="editjavascript" disabled="false" widgetVar="monacojavascript" readonly="#{!javascriptList.checkedout}" editorOptions="#{javascriptList.editorOptions}" value="#{javascriptList.javascriptContent}" locale="de" width="100%" height="600px" autoResize="true" />
+                    <pe:monacoEditor id="editjavascript" disabled="false" widgetVar="monacojavascript" readonly="#{!javascriptList.checkedout}" editorOptions="#{javascriptList.editorOptions}" value="#{javascriptList.content}" locale="de" width="100%" height="600px" autoResize="true" />
                     <h:panelGroup id="diffjavascriptBtnGroup">
                         <p:commandButton id="savejavascript" process="form" value="Save" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onSave}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup" />
                         <p:commandButton id="checkinjavascript" process="form" value="CheckIn" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />

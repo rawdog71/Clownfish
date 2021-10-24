@@ -58,7 +58,7 @@ import org.springframework.context.annotation.Scope;
 @Named("javascriptList")
 @Scope("singleton")
 @Component
-public class JavascriptList {
+public class JavascriptList implements ISourceContentInterface {
     @Inject
     LoginBean loginbean;
     @Autowired CfJavascriptService cfjavascriptService;
@@ -86,7 +86,8 @@ public class JavascriptList {
     public JavascriptList() {
     }
 
-    public String getJavascriptContent() {
+    @Override
+    public String getContent() {
         if (null != selectedJavascript) {
             if (selectedjavascriptversion != javascriptversionMax) {
                 return javascriptUtility.getVersion(selectedJavascript.getId(), selectedjavascriptversion);
@@ -99,13 +100,15 @@ public class JavascriptList {
         }
     }
 
-    public void setJavascriptContent(String content) {
+    @Override
+    public void setContent(String content) {
         if (null != selectedJavascript) {
             selectedJavascript.setContent(content);
         }
     }
 
     @PostConstruct
+    @Override
     public void init() {
         javascriptName = "";
         javascriptListe = cfjavascriptService.findAll();
@@ -118,10 +121,12 @@ public class JavascriptList {
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
     }
     
+    @Override
     public void refresh() {
         javascriptListe = cfjavascriptService.findAll();
     }
     
+    @Override
     public void onSelect(AjaxBehaviorEvent event) {
         difference = false;
         if (null != selectedJavascript) {
@@ -143,9 +148,10 @@ public class JavascriptList {
         }
     }
     
+    @Override
     public void onSave(ActionEvent actionEvent) {
         if (null != selectedJavascript) {
-            selectedJavascript.setContent(getJavascriptContent());
+            selectedJavascript.setContent(getContent());
             cfjavascriptService.edit(selectedJavascript);
             difference = javascriptUtility.hasDifference(selectedJavascript);
             
@@ -154,6 +160,7 @@ public class JavascriptList {
         }
     }
     
+    @Override
     public void onCommit(ActionEvent actionEvent) {
         if (null != selectedJavascript) {
             boolean canCommit = false;
@@ -162,7 +169,7 @@ public class JavascriptList {
             }
             if (canCommit) {
                 try {
-                    String content = getJavascriptContent();
+                    String content = getContent();
                     byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
                     try {
                         long maxversion = cfjavascriptversionService.findMaxVersion(selectedJavascript.getId());
@@ -193,10 +200,11 @@ public class JavascriptList {
         }
     }
     
+    @Override
     public void onCheckIn(ActionEvent actionEvent) {
         if (null != selectedJavascript) {
             selectedJavascript.setCheckedoutby(BigInteger.valueOf(0));
-            selectedJavascript.setContent(getJavascriptContent());
+            selectedJavascript.setContent(getContent());
             cfjavascriptService.edit(selectedJavascript);
             
             difference = javascriptUtility.hasDifference(selectedJavascript);
@@ -207,6 +215,7 @@ public class JavascriptList {
         }
     }
     
+    @Override
     public void onCheckOut(ActionEvent actionEvent) {
         if (null != selectedJavascript) {
             boolean canCheckout = false;
@@ -222,7 +231,7 @@ public class JavascriptList {
                     
             if (canCheckout) {
                 selectedJavascript.setCheckedoutby(BigInteger.valueOf(loginbean.getCfuser().getId()));
-                selectedJavascript.setContent(getJavascriptContent());
+                selectedJavascript.setContent(getContent());
                 cfjavascriptService.edit(selectedJavascript);
                 difference = javascriptUtility.hasDifference(selectedJavascript);
                 checkedout = true;
@@ -237,6 +246,7 @@ public class JavascriptList {
         }
     }
     
+    @Override
     public void onChangeName(ValueChangeEvent changeEvent) {
         try {
             cfjavascriptService.findByName(javascriptName);
@@ -246,6 +256,7 @@ public class JavascriptList {
         }
     }
     
+    @Override
     public void onCreate(ActionEvent actionEvent) {
         try {
             CfJavascript newjavascript = new CfJavascript();
@@ -260,6 +271,7 @@ public class JavascriptList {
         }
     }
     
+    @Override
     public void onDelete(ActionEvent actionEvent) {
         if (null != selectedJavascript) {
             cfjavascriptService.delete(selectedJavascript);
@@ -270,7 +282,8 @@ public class JavascriptList {
         }
     }
     
-    private void writeVersion(long javascriptref, long version, byte[] content) {
+    @Override
+    public void writeVersion(long javascriptref, long version, byte[] content) {
         CfJavascriptversionPK javascriptversionpk = new CfJavascriptversionPK();
         javascriptversionpk.setJavascriptref(javascriptref);
         javascriptversionpk.setVersion(version);
@@ -282,21 +295,14 @@ public class JavascriptList {
         cfjavascriptversionService.create(cfjavascriptversion);
     }
     
+    @Override
     public void onVersionSelect(ActionEvent actionEvent) {
         if (null != selectedJavascript) {
             javascriptUtility.getVersion(version.getCfJavascriptversionPK().getJavascriptref(), version.getCfJavascriptversionPK().getVersion());
         }
     }
-    
-    /*
-    public void onSlideEnd(SlideEndEvent event) {
-        int version = (int) event.getValue();
-        String output = javascriptUtility.getVersion(selectedJavascript.getId(), version);
-        System.out.println(output);
-        javascriptUtility.setJavascriptContent(output);
-    }
-    */
 
+    @Override
     public void onSlideEnd(SlideEndEvent event) {
         selectedjavascriptversion = (int) event.getValue();
         if (selectedjavascriptversion <= javascriptversionMin) {
@@ -307,6 +313,7 @@ public class JavascriptList {
         }
     }
    
+    @Override
     public void onVersionChanged() {
         if (javascriptversion <= javascriptversionMin) {
             javascriptversion = javascriptversionMin;
