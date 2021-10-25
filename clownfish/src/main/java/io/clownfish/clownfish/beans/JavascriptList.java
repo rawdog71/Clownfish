@@ -69,10 +69,10 @@ public class JavascriptList implements ISourceContentInterface {
     private @Getter @Setter String javascriptName = "";
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter CfJavascriptversion version = null;
-    private @Getter @Setter int javascriptversion = 0;
-    private @Getter @Setter int javascriptversionMin = 0;
-    private @Getter @Setter int javascriptversionMax = 0;
-    private @Getter @Setter int selectedjavascriptversion = 0;
+    private @Getter @Setter long javascriptversion = 0;
+    private @Getter @Setter long javascriptversionMin = 0;
+    private @Getter @Setter long javascriptversionMax = 0;
+    private @Getter @Setter long selectedjavascriptversion = 0;
     private @Getter @Setter List<CfJavascriptversion> versionlist;
     private @Getter @Setter boolean difference;
     private @Getter @Setter long checkedoutby = 0;
@@ -176,6 +176,8 @@ public class JavascriptList implements ISourceContentInterface {
                         javascriptUtility.setCurrentVersion(maxversion + 1);
                         writeVersion(selectedJavascript.getId(), javascriptUtility.getCurrentVersion(), output);
                         difference = javascriptUtility.hasDifference(selectedJavascript);
+                        this.javascriptversionMax = javascriptUtility.getCurrentVersion();
+                        this.selectedjavascriptversion = this.javascriptversionMax;
 
                         FacesMessage message = new FacesMessage("Commited " + selectedJavascript.getName() + " Version: " + (maxversion + 1));
                         FacesContext.getCurrentInstance().addMessage(null, message);

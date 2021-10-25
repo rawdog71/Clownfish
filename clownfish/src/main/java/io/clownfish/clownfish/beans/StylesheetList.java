@@ -70,10 +70,10 @@ public class StylesheetList implements ISourceContentInterface {
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter CfStylesheetversion version = null;
     private @Getter @Setter List<CfStylesheetversion> versionlist;
-    private @Getter @Setter int stylesheetversion = 0;
-    private @Getter @Setter int stylesheetversionMin = 0;
-    private @Getter @Setter int stylesheetversionMax = 0;
-    private @Getter @Setter int selectedstylesheetversion = 0;
+    private @Getter @Setter long stylesheetversion = 0;
+    private @Getter @Setter long stylesheetversionMin = 0;
+    private @Getter @Setter long stylesheetversionMax = 0;
+    private @Getter @Setter long selectedstylesheetversion = 0;
     private @Getter @Setter boolean difference;
     private @Getter @Setter long checkedoutby = 0;
     private @Getter @Setter boolean checkedout;
@@ -176,6 +176,8 @@ public class StylesheetList implements ISourceContentInterface {
                         stylesheetUtility.setCurrentVersion(maxversion + 1);
                         writeVersion(selectedStylesheet.getId(), stylesheetUtility.getCurrentVersion(), output);
                         difference = stylesheetUtility.hasDifference(selectedStylesheet);
+                        this.stylesheetversionMax = stylesheetUtility.getCurrentVersion();
+                        this.selectedstylesheetversion = this.stylesheetversionMax;
 
                         FacesMessage message = new FacesMessage("Commited " + selectedStylesheet.getName() + " Version: " + (maxversion + 1));
                         FacesContext.getCurrentInstance().addMessage(null, message);

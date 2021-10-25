@@ -69,10 +69,10 @@ public class TemplateList implements ISourceContentInterface {
     private @Getter @Setter String templateName = "";
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter int templateScriptLanguage = 0;
-    private @Getter @Setter int templateversion = 0;
-    private @Getter @Setter int templateversionMin = 0;
-    private @Getter @Setter int templateversionMax = 0;
-    private @Getter @Setter int selectedtemplateversion = 0;
+    private @Getter @Setter long templateversion = 0;
+    private @Getter @Setter long templateversionMin = 0;
+    private @Getter @Setter long templateversionMax = 0;
+    private @Getter @Setter long selectedtemplateversion = 0;
     private @Getter @Setter String selectedScriptlanguage = "";
     private @Getter @Setter CfTemplateversion version = null;
     private @Getter @Setter List<CfTemplateversion> versionlist;
@@ -198,6 +198,8 @@ public class TemplateList implements ISourceContentInterface {
                         templateUtility.setCurrentVersion(maxversion + 1);
                         writeVersion(selectedTemplate.getId(), templateUtility.getCurrentVersion(), output);
                         difference = templateUtility.hasDifference(selectedTemplate);
+                        this.templateversionMax = templateUtility.getCurrentVersion();
+                        this.selectedtemplateversion = this.templateversionMax;
 
                         FacesMessage message = new FacesMessage("Commited " + selectedTemplate.getName() + " Version: " + (maxversion + 1));
                         FacesContext.getCurrentInstance().addMessage(null, message);
