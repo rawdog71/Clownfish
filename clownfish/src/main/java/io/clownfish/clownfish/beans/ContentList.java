@@ -316,7 +316,11 @@ public class ContentList implements Serializable {
         if (selectedContent != null) {            
             selectedContent.setScrapped(true);
             cfclasscontentService.edit(selectedContent);
-            hibernateUtil.updateContent(selectedContent);
+            try {
+                hibernateUtil.updateContent(selectedContent);
+            } catch (javax.persistence.NoResultException ex) {
+                LOGGER.warn(ex.getMessage());
+            }
             cacheManager.getCache("classcontent").clear();                      // Hazelcast Cache clearing
             classcontentlist = cfclasscontentService.findAll();
             FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been scrapped.");
@@ -331,7 +335,11 @@ public class ContentList implements Serializable {
     public void onRecycle() {
         selectedContent.setScrapped(true);
         cfclasscontentService.edit(selectedContent);
-        hibernateUtil.updateContent(selectedContent);
+        try {
+            hibernateUtil.updateContent(selectedContent);
+        } catch (javax.persistence.NoResultException ex) {
+            LOGGER.warn(ex.getMessage());
+        }
         classcontentlist = cfclasscontentService.findAll();
         FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been recycled.");
         FacesContext.getCurrentInstance().addMessage(null, message);
@@ -364,7 +372,11 @@ public class ContentList implements Serializable {
             }
             
             cfclasscontentService.delete(selectedContent);
-            hibernateUtil.deleteContent(selectedContent);
+            try {
+                hibernateUtil.deleteContent(selectedContent);
+            } catch (javax.persistence.NoResultException ex) {
+                LOGGER.warn(ex.getMessage());
+            }
             classcontentlist = cfclasscontentService.findAll();
         }
     }
