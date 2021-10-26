@@ -55,6 +55,8 @@ public class MailUtil {
     
     final transient Logger LOGGER = LoggerFactory.getLogger(MailUtil.class);
 
+    public MailUtil() { props = System.getProperties(); }
+
     public MailUtil(String mailsmtphost, String mailtransportprotocol, String mailuser, String mailpassword, String sendfrom) {
         props = System.getProperties();
         
