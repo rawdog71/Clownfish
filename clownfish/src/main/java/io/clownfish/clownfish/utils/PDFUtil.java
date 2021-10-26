@@ -97,9 +97,9 @@ public class PDFUtil {
             FileOutputStream fileOut;
 
             if (!params.get("werk").isEmpty())
-                fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_media") + File.separator + name + "-" + params.get("werk") + "-" + params.get("datum") + ".pdf");
+                fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_pdf") + File.separator + name + "-" + params.get("werk") + "-" + params.get("datum") + ".pdf");
             else
-                fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_media") + File.separator + name + "-" + params.get("datum") + ".pdf");
+                fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_pdf") + File.separator + name + "-" + params.get("datum") + ".pdf");
 
             fileOut.write(bytes);
             fileOut.close();

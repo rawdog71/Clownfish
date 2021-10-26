@@ -32,12 +32,15 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
 @Accessors(chain = true)
+@Component
 public class MailUtil {
     private @Getter @Setter String mailsmtphost;
     private @Getter @Setter String mailtransportprotocol;
@@ -46,6 +49,7 @@ public class MailUtil {
     private @Getter @Setter String sendfrom;
     private final Properties props;
     private final String encodingOptions = "text/html; charset=UTF-8";
+    @Autowired PropertyUtil propertyUtil;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(MailUtil.class);
 
@@ -93,7 +97,7 @@ public class MailUtil {
         }
     }
 
-    public boolean sendRespondMailWithAttachment(String mailto, String subject, String mailbody, String[] attachments, String filePath) throws Exception {
+    public boolean sendRespondMailWithAttachment(String mailto, String subject, String mailbody, String[] attachments) throws Exception {
         Session session = Session.getInstance(props, null);
 
         // Define message
@@ -109,7 +113,7 @@ public class MailUtil {
 
         for (String fileName : attachments)
         {
-            File file = new File(filePath + File.separator + fileName);
+            File file = new File( propertyUtil.getPropertyValue("folder_attachments") + File.separator + fileName);
             attachmentBodies.add(new MimeBodyPart());
             attachmentBodies.get(count).attachFile(file);
             multiPart.addBodyPart(attachmentBodies.get(count));

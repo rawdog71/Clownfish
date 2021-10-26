@@ -45,8 +45,8 @@ public class EmailTemplateBean implements Serializable {
         return mailutil.sendRespondMail(mailto, subject, mailbody);
     }
 
-    public boolean sendRespondMailWithAttachment(String mailto, String subject, String mailbody, String[] attachments, String filePath) throws Exception {
+    public boolean sendRespondMailWithAttachment(String mailto, String subject, String mailbody, String[] attachments) throws Exception {
         MailUtil mailutil = new MailUtil(propertymap.get("mail_smtp_host"), propertymap.get("mail_transport_protocol"), propertymap.get("mail_user"), propertymap.get("mail_password"), propertymap.get("mail_sendfrom"));
-        return mailutil.sendRespondMailWithAttachment(mailto, subject, mailbody, attachments, filePath);
+        return mailutil.sendRespondMailWithAttachment(mailto, subject, mailbody, attachments);
     }
 }
