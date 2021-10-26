@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Properties;
 import javax.activation.DataHandler;
@@ -92,7 +93,7 @@ public class MailUtil {
         }
     }
 
-    public boolean sendRespondMailWithAttachment(String mailto, String subject, String mailbody, String[] attachments) throws Exception {
+    public boolean sendRespondMailWithAttachment(String mailto, String subject, String mailbody, String[] attachments, String filePath) throws Exception {
         Session session = Session.getInstance(props, null);
 
         // Define message
@@ -108,8 +109,9 @@ public class MailUtil {
 
         for (String fileName : attachments)
         {
+            File file = new File(filePath + File.separator + fileName);
             attachmentBodies.add(new MimeBodyPart());
-            attachmentBodies.get(count).attachFile(fileName);
+            attachmentBodies.get(count).attachFile(file);
             multiPart.addBodyPart(attachmentBodies.get(count));
             count++;
         }

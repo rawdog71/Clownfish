@@ -25,10 +25,8 @@ import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -95,6 +93,17 @@ public class PDFUtil {
             out = JasperReportCompiler.exportToPdf(datasource.getUser(), datasource.getPassword(), datasource.getUrl(), template, datasource.getDriverclass());
 
             byte[] bytes = out.toByteArray();
+
+            FileOutputStream fileOut;
+
+            if (!params.get("werk").isEmpty())
+                fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_media") + File.separator + name + "-" + params.get("werk") + "-" + params.get("datum") + ".pdf");
+            else
+                fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_media") + File.separator + name + "-" + params.get("datum") + ".pdf");
+
+            fileOut.write(bytes);
+            fileOut.close();
+
             out.write(bytes, 0, bytes.length);
             out.flush();
             out.close();
