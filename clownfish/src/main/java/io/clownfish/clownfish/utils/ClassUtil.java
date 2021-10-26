@@ -32,6 +32,7 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,7 +47,7 @@ import org.springframework.stereotype.Component;
  */
 @ViewScoped
 @Component
-public class ClassUtil {
+public class ClassUtil implements Serializable {
     @Autowired CfAttributService cfattributService;
     @Autowired CfAttributetypeService cfattributetypeService;
     @Autowired CfAttributcontentService cfattributcontentService;

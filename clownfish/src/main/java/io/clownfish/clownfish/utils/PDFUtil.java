@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
  */
 @ViewScoped
 @Component
-public class PDFUtil {
+public class PDFUtil implements Serializable {
     @Autowired CfTemplateService cfTemplateService;
     @Autowired CfTemplateversionService cfTemplateversionService;
     @Autowired CfSitedatasourceService cfSitedatasourceService;

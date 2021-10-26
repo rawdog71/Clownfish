@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.utils;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Properties;
 import javax.activation.DataHandler;
@@ -43,7 +44,7 @@ import org.springframework.stereotype.Component;
 @Accessors(chain = true)
 @Component
 @ViewScoped
-public class MailUtil {
+public class MailUtil implements Serializable {
     private @Getter @Setter String mailsmtphost;
     private @Getter @Setter String mailtransportprotocol;
     private @Getter @Setter String mailuser;

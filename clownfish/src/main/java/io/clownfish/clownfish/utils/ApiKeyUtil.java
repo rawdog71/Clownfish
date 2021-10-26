@@ -17,6 +17,7 @@ package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.dbentities.CfWebserviceauth;
 import io.clownfish.clownfish.serviceinterface.CfWebserviceauthService;
+import java.io.Serializable;
 import javax.faces.view.ViewScoped;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Component;
  */
 @ViewScoped
 @Component
-public class ApiKeyUtil {
+public class ApiKeyUtil implements Serializable {
     @Autowired CfWebserviceauthService cfwebserviceauthService;
 
     public ApiKeyUtil() {

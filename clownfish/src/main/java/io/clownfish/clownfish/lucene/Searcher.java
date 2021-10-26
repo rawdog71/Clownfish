@@ -41,6 +41,7 @@ import io.clownfish.clownfish.utils.AssetUtil;
 import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,7 +72,7 @@ import org.springframework.stereotype.Component;
  */
 @ViewScoped
 @Component
-public class Searcher {
+public class Searcher implements Serializable {
     IndexSearcher indexSearcher;
     MultiFieldQueryParser queryParser;
     Query query;
