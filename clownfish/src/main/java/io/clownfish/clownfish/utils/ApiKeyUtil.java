@@ -17,7 +17,7 @@ package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.dbentities.CfWebserviceauth;
 import io.clownfish.clownfish.serviceinterface.CfWebserviceauthService;
-import javax.faces.bean.ViewScoped;
+import javax.faces.view.ViewScoped;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

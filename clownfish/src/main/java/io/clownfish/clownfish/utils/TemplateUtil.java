@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
-import javax.faces.bean.ViewScoped;
+import javax.faces.view.ViewScoped;
 import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;

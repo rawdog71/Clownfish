@@ -21,6 +21,7 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.faces.view.ViewScoped;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -41,6 +42,7 @@ import org.springframework.stereotype.Component;
  */
 @Accessors(chain = true)
 @Component
+@ViewScoped
 public class MailUtil {
     private @Getter @Setter String mailsmtphost;
     private @Getter @Setter String mailtransportprotocol;
