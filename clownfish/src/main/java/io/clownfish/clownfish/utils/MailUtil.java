@@ -15,12 +15,17 @@
  */
 package io.clownfish.clownfish.utils;
 
+import java.util.ArrayList;
 import java.util.Properties;
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -83,6 +88,61 @@ public class MailUtil {
                 return false;
             }
         } else {
+            return false;
+        }
+    }
+
+    public boolean sendRespondMailWithAttachment(String mailto, String subject, String mailbody, String[] attachments) throws Exception {
+        Session session = Session.getInstance(props, null);
+
+        // Define message
+        MimeMessage message = new MimeMessage(session);
+        Multipart multiPart = new MimeMultipart();
+        MimeBodyPart messageBodyPart = new MimeBodyPart();
+
+        messageBodyPart.setText(mailbody);
+        multiPart.addBodyPart(messageBodyPart);
+
+        ArrayList<MimeBodyPart> attachmentBodies = new ArrayList<>();
+        int count = 0;
+
+        for (String fileName : attachments)
+        {
+            attachmentBodies.add(new MimeBodyPart());
+            attachmentBodies.get(count).attachFile(fileName);
+            multiPart.addBodyPart(attachmentBodies.get(count));
+            count++;
+        }
+
+        message.setHeader("Content-Type", encodingOptions);
+        message.setFrom(new InternetAddress(sendfrom));
+        if (mailto.indexOf(',') > 0)
+        {
+            message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(mailto));
+        }
+        else
+        {
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(mailto));
+        }
+        message.setSubject(subject);
+        message.setContent(multiPart, encodingOptions);
+
+        if (mailto.compareToIgnoreCase("noreply@clownfish.io") != 0)
+        {
+            // Send the message
+            try
+            {
+                Transport.send( message );
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LOGGER.error(ex.getMessage());
+                return false;
+            }
+        }
+        else
+        {
             return false;
         }
     }
