@@ -239,6 +239,7 @@ public class Clownfish {
     private ClownfishConst.ViewModus modus = STAGING;
     private ClownfishUtil clownfishutil;
     private PropertyUtil propertyUtil;
+    private MailUtil mailUtil;
     private DefaultUtil defaultUtil;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map searchcontentmap;
@@ -426,6 +427,9 @@ public class Clownfish {
             if (null == defaultUtil) {
                 defaultUtil = new DefaultUtil();
             }
+
+            if (mailUtil == null)
+                mailUtil = new MailUtil(propertyUtil.getPropertyValue("mail_smtp_host"), propertyUtil.getPropertyValue("mail_transport_protocol"), propertyUtil.getPropertyValue("mail_user"), propertyUtil.getPropertyValue("mail_password"), propertyUtil.getPropertyValue("mail_sendfrom"), propertyUtil);
             
             // Set default values
             modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
@@ -1067,7 +1071,7 @@ public class Clownfish {
                         webservicebean = new WebServiceTemplateBean();
                         
                         emailbean = new EmailTemplateBean();
-                        emailbean.init(propertyUtil.getPropertymap());
+                        emailbean.init(propertyUtil.getPropertymap(), mailUtil, propertyUtil);
                         
                         if (sapSupport) {
                             List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
@@ -1092,6 +1096,7 @@ public class Clownfish {
                                     fmRoot.put("js", cfjavascript);
                                     fmRoot.put("sitecontent", sitecontentmap);
                                     fmRoot.put("metainfo", metainfomap);
+                                    fmRoot.put("property", propertyUtil.getPropertymap());
 
                                     fmRoot.put("emailBean", emailbean);
                                     if (sapSupport) {
@@ -1103,7 +1108,6 @@ public class Clownfish {
                                     fmRoot.put("webserviceBean", webservicebean);
 
                                     fmRoot.put("parameter", parametermap);
-                                    fmRoot.put("property", propertyUtil.getPropertymap());
                                     if (!searchmetadata.isEmpty()) {
                                         fmRoot.put("searchmetadata", searchmetadata);
                                     }
@@ -1210,7 +1214,7 @@ public class Clownfish {
      * 
      */
     private void sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
-        MailUtil mailutil = new MailUtil(propertyUtil.getPropertyValue("mail_smtp_host"), propertyUtil.getPropertyValue("mail_transport_protocol"), propertyUtil.getPropertyValue("mail_user"), propertyUtil.getPropertyValue("mail_password"), propertyUtil.getPropertyValue("mail_sendfrom"));
+        MailUtil mailutil = new MailUtil(propertyUtil.getPropertyValue("mail_smtp_host"), propertyUtil.getPropertyValue("mail_transport_protocol"), propertyUtil.getPropertyValue("mail_user"), propertyUtil.getPropertyValue("mail_password"), propertyUtil.getPropertyValue("mail_sendfrom"), propertyUtil);
         mailutil.sendRespondMail(mailto, subject, mailbody);
     }
 

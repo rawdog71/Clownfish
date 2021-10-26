@@ -18,8 +18,11 @@ package io.clownfish.clownfish.templatebeans;
 import io.clownfish.clownfish.utils.MailUtil;
 import java.io.Serializable;
 import java.util.Map;
+
+import io.clownfish.clownfish.utils.PropertyUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
@@ -32,21 +35,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmailTemplateBean implements Serializable {
     private transient @Getter @Setter Map<String, String> propertymap = null;
-    private MailUtil mailutil;
+    @Autowired MailUtil mailUtil;
+    @Autowired PropertyUtil propertyUtil;
 
     public EmailTemplateBean() {
     }
     
-    public void init(Map<String, String> propertymap) {
+    public void init(Map<String, String> propertymap, MailUtil mailUtil, PropertyUtil propertyUtil) {
         this.propertymap = propertymap;
-        this.mailutil = new MailUtil(propertymap.get("mail_smtp_host"), propertymap.get("mail_transport_protocol"), propertymap.get("mail_user"), propertymap.get("mail_password"), propertymap.get("mail_sendfrom"));
+        this.mailUtil = mailUtil;
+        this.propertyUtil = propertyUtil;
     }
     
     public boolean sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
-        return mailutil.sendRespondMail(mailto, subject, mailbody);
+        return mailUtil.sendRespondMail(mailto, subject, mailbody);
     }
 
     public boolean sendRespondMailWithAttachment(String mailto, String subject, String mailbody, String[] attachments) throws Exception {
-        return mailutil.sendRespondMailWithAttachment(mailto, subject, mailbody, attachments);
+        return mailUtil.sendRespondMailWithAttachment(mailto, subject, mailbody, attachments);
     }
 }

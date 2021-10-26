@@ -19,10 +19,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Properties;
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.faces.view.ViewScoped;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -31,20 +27,20 @@ import javax.mail.internet.MimeMultipart;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
-@Accessors(chain = true)
 @Component
-@ViewScoped
+@Scope("singleton")
 public class MailUtil implements Serializable {
+    @Autowired PropertyUtil propertyUtil;
     private @Getter @Setter String mailsmtphost;
     private @Getter @Setter String mailtransportprotocol;
     private @Getter @Setter String mailuser;
@@ -52,13 +48,12 @@ public class MailUtil implements Serializable {
     private @Getter @Setter String sendfrom;
     private final Properties props;
     private final String encodingOptions = "text/html; charset=UTF-8";
-    @Autowired PropertyUtil propertyUtil;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(MailUtil.class);
 
     public MailUtil() { props = System.getProperties(); }
 
-    public MailUtil(String mailsmtphost, String mailtransportprotocol, String mailuser, String mailpassword, String sendfrom) {
+    public MailUtil(String mailsmtphost, String mailtransportprotocol, String mailuser, String mailpassword, String sendfrom, PropertyUtil propertyUtil) {
         props = System.getProperties();
         
         this.mailsmtphost = mailsmtphost;
@@ -66,6 +61,7 @@ public class MailUtil implements Serializable {
         this.mailuser = mailuser;
         this.mailpassword = mailpassword;
         this.sendfrom = sendfrom;
+        this.propertyUtil = propertyUtil;
         
         props.put("mail.smtp.host", mailsmtphost);
         props.put("mail.transport.protocol", mailtransportprotocol);

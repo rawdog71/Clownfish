@@ -72,6 +72,8 @@ public class QuartzJob implements Job {
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired PropertyList propertylist;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
+    @Autowired PropertyUtil propertyUtil;
+    @Autowired MailUtil mailUtil;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     private @Getter @Setter Map<String, String> propertymap = null;
     private boolean sapSupport = false;
@@ -183,7 +185,7 @@ public class QuartzJob implements Job {
             // Instantiate Template Beans
             
             EmailTemplateBean emailbean = new EmailTemplateBean();
-            emailbean.init(propertymap);
+            emailbean.init(propertymap, mailUtil, propertyUtil);
             if (sapSupport) {
                 List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                 sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
