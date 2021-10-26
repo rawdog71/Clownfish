@@ -32,21 +32,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmailTemplateBean implements Serializable {
     private transient @Getter @Setter Map<String, String> propertymap = null;
+    private MailUtil mailutil;
 
     public EmailTemplateBean() {
     }
     
     public void init(Map<String, String> propertymap) {
         this.propertymap = propertymap;
+        this.mailutil = new MailUtil(propertymap.get("mail_smtp_host"), propertymap.get("mail_transport_protocol"), propertymap.get("mail_user"), propertymap.get("mail_password"), propertymap.get("mail_sendfrom"));
     }
     
     public boolean sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
-        MailUtil mailutil = new MailUtil(propertymap.get("mail_smtp_host"), propertymap.get("mail_transport_protocol"), propertymap.get("mail_user"), propertymap.get("mail_password"), propertymap.get("mail_sendfrom"));
         return mailutil.sendRespondMail(mailto, subject, mailbody);
     }
 
     public boolean sendRespondMailWithAttachment(String mailto, String subject, String mailbody, String[] attachments) throws Exception {
-        MailUtil mailutil = new MailUtil(propertymap.get("mail_smtp_host"), propertymap.get("mail_transport_protocol"), propertymap.get("mail_user"), propertymap.get("mail_password"), propertymap.get("mail_sendfrom"));
         return mailutil.sendRespondMailWithAttachment(mailto, subject, mailbody, attachments);
     }
 }

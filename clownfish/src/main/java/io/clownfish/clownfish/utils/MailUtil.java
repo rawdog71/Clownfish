@@ -117,7 +117,7 @@ public class MailUtil {
 
         for (String fileName : attachments)
         {
-            File file = new File( propertyUtil.getPropertyValue("folder_attachments") + File.separator + fileName);
+            File file = new File(propertyUtil.getPropertyValue("folder_attachments") + File.separator + fileName);
             attachmentBodies.add(new MimeBodyPart());
             attachmentBodies.get(count).attachFile(file);
             multiPart.addBodyPart(attachmentBodies.get(count));
