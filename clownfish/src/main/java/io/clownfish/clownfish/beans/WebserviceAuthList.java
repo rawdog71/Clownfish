@@ -63,8 +63,10 @@ public class WebserviceAuthList {
 
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT WEBSERVICEAUTH START");
         webservicelist = cfwebserviceService.findAll();
         newAuthButtonDisabled = false;
+        LOGGER.info("INIT WEBSERVICEAUTH END");
     }
     
     public void setUser(CfUser user) {

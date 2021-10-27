@@ -78,7 +78,6 @@ public class ScrapyardList implements Serializable {
     @Autowired CfKeywordService cfkeywordService;
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
-    @Autowired FolderUtil folderUtil;
     @Autowired HibernateUtil hibernateUtil;
     
     @Autowired private HazelcastCacheManager cacheManager;
@@ -138,12 +137,14 @@ public class ScrapyardList implements Serializable {
     
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT SCRAPYARDLIST START");
         memoryeditDatalist = null;
         classcontentlist = cfclasscontentService.findByScrapped(true);
         classlist = cfclassService.findAll();
         assetlist = cfassetService.findAll();
         selectedAssetList = cfassetlistService.findAll();
         editContent = "";
+        LOGGER.info("INIT SCRAPYARDLIST END");
     }
     
     public void initAssetlist() {
@@ -158,24 +159,7 @@ public class ScrapyardList implements Serializable {
         selectedClass = selectedContent.getClassref();
         newContentButtonDisabled = true;
     }
-    
-    /**
-     * Handles the content scrapping
-     * Sets the scrapped flag to indicate the content is on the scrapyard
-     * @param actionEvent
-     */
-    public void onScrappContent(ActionEvent actionEvent) {
-        if (selectedContent != null) {            
-            selectedContent.setScrapped(true);
-            cfclasscontentService.edit(selectedContent);
-            hibernateUtil.updateContent(selectedContent);
-            cacheManager.getCache("classcontent").clear();                      // Hazelcast Cache clearing
-            classcontentlist = cfclasscontentService.findByScrapped(true);
-            FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been scrapped.");
-            FacesContext.getCurrentInstance().addMessage(null, message);
-        }
-    }
-    
+        
     /**
      * Handles the content recycling
      * Sets the scrapped flag to indicate the content is recycled from the scrapyard

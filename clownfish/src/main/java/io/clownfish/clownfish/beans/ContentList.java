@@ -154,6 +154,7 @@ public class ContentList implements Serializable {
     
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT CONTENTLIST START");
         memoryeditDatalist = null;
         classcontentlist = cfclasscontentService.findAll();
         classlist = cfclassService.findAll();
@@ -165,6 +166,7 @@ public class ContentList implements Serializable {
         keywordTarget = new ArrayList<>();
         
         keywords = new DualListModel<>(keywordSource, keywordTarget);
+        LOGGER.info("INIT CONTENTLIST END");
     }
     
     public void initAssetlist() {
@@ -343,42 +345,6 @@ public class ContentList implements Serializable {
         classcontentlist = cfclasscontentService.findAll();
         FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been recycled.");
         FacesContext.getCurrentInstance().addMessage(null, message);
-    }
-    
-    public void onDeleteContent(ActionEvent actionEvent) {
-        if (selectedContent != null) {
-            // Delete corresponding attributcontent entries
-            List<CfAttributcontent> attributcontentlistdummy = cfattributcontentService.findByClasscontentref(selectedContent);
-            for (CfAttributcontent attributcontent : attributcontentlistdummy) {
-                cfattributcontentService.delete(attributcontent);
-            }
-            
-            // Delete corresponding listcontent entries
-            List<CfListcontent> selectedcontent = cflistcontentService.findByClasscontentref(selectedContent.getId());
-            for (CfListcontent listcontent : selectedcontent) {
-                cflistcontentService.delete(listcontent);
-            }
-            
-            // Delete corresponding keywordcontent entries
-            List<CfClasscontentkeyword> keywordcontentdummy = cfclasscontentkeywordService.findByClassContentRef(selectedContent.getId());
-            for (CfClasscontentkeyword keywordcontent : keywordcontentdummy) {
-                cfclasscontentkeywordService.delete(keywordcontent);
-            }
-            
-            // Delete corresponding sitecontent entries
-            List<CfSitecontent> sitecontentdummy = cfsitecontentService.findByClasscontentref(selectedContent.getId());
-            for (CfSitecontent sitecontent : sitecontentdummy) {
-                cfsitecontentService.delete(sitecontent);
-            }
-            
-            cfclasscontentService.delete(selectedContent);
-            try {
-                hibernateUtil.deleteContent(selectedContent);
-            } catch (javax.persistence.NoResultException ex) {
-                LOGGER.warn(ex.getMessage());
-            }
-            classcontentlist = cfclasscontentService.findAll();
-        }
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {

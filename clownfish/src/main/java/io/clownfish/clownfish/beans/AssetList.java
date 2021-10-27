@@ -95,6 +95,7 @@ public class AssetList {
      */
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT ASSETLIST START");
         renderDetail = false;
         assetName = "";
         assetlist = cfassetService.findAll();
@@ -103,6 +104,7 @@ public class AssetList {
         keywordTarget = new ArrayList<>();
         
         keywords = new DualListModel<>(keywordSource, keywordTarget);
+        LOGGER.info("INIT ASSETLIST END");
     }
     
     public void onRefreshAll() {

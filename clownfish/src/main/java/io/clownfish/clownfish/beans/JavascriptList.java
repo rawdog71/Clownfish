@@ -110,6 +110,7 @@ public class JavascriptList implements ISourceContentInterface {
     @PostConstruct
     @Override
     public void init() {
+        LOGGER.info("INIT JAVASCRIPT START");
         javascriptName = "";
         javascriptListe = cfjavascriptService.findAll();
         javascriptUtility.setJavascriptContent("");
@@ -119,6 +120,7 @@ public class JavascriptList implements ISourceContentInterface {
         editorOptions.setLanguage("javascript");
         editorOptions.setTheme(ETheme.VS_DARK);
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
+        LOGGER.info("INIT JAVASCRIPT END");
     }
     
     @Override

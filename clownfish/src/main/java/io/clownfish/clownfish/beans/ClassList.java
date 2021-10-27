@@ -83,10 +83,12 @@ public class ClassList implements Serializable {
 
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT CLASSLIST START");
         classListe = cfclassService.findAll();
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
         renderClass = false;
+        LOGGER.info("INIT CLASSLIST END");
     }
     
     public void onRefreshAll() {

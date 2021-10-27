@@ -57,12 +57,14 @@ public class KeywordList {
     
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT KEYWORDLIST START");
         keywordlist = cfkeywordService.findAll();
         
         if (propertymap == null) {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
         }
+        LOGGER.info("INIT KEYWORDLIST END");
     }
     
     public void onRefreshAll() {

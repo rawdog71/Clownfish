@@ -110,6 +110,7 @@ public class StylesheetList implements ISourceContentInterface {
     @PostConstruct
     @Override
     public void init() {
+        LOGGER.info("INIT STYLESHEET START");
         stylesheetName = "";
         stylesheetListe = cfstylesheetService.findAll();
         stylesheetUtility.setStyelsheetContent("");
@@ -119,6 +120,7 @@ public class StylesheetList implements ISourceContentInterface {
         editorOptions.setLanguage("css");
         editorOptions.setTheme(ETheme.VS_DARK);
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
+        LOGGER.info("INIT STYLESHEET END");
     }
     
     @Override

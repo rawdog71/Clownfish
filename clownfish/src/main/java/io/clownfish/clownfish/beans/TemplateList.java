@@ -112,6 +112,7 @@ public class TemplateList implements ISourceContentInterface {
     @PostConstruct
     @Override
     public void init() {
+        LOGGER.info("INIT TEMPLATE START");
         templateName = "";
         templateListe = cftemplateService.findAll();
         templateUtility.setTemplateContent("");
@@ -121,6 +122,7 @@ public class TemplateList implements ISourceContentInterface {
         editorOptions.setLanguage("");
         editorOptions.setTheme(ETheme.VS_DARK);
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
+        LOGGER.info("INIT TEMPLATE END");
     }
     
     @Override

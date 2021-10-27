@@ -84,6 +84,10 @@ import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.FilterMeta;
+import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortMeta;
+import org.primefaces.model.SortOrder;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,6 +115,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter List<CfDatasource> datasources;
     private @Getter @Setter List<CfDatasource> selectedDatasources;
+    private LazyDataModel<CfDatasource> lazyDatasources;
     private @Getter @Setter List<CfList> contentlist;
     private @Getter @Setter List<CfList> selectedContentlist;
     private transient @Getter @Setter List<CfSitesaprfc> saprfclist = null;
@@ -169,6 +174,7 @@ public class SiteTreeBean implements Serializable {
     
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT SITETREE START");
         propertymap = propertylist.fillPropertyMap();
         String sapSupportProp = propertymap.get("sap_support");
         if (sapSupportProp == null) {
@@ -198,6 +204,7 @@ public class SiteTreeBean implements Serializable {
         locale = propertymap.get("response_locale");
         contentType = propertymap.get("response_contenttype");
         characterEncoding = propertymap.get("response_characterencoding");
+        LOGGER.info("INIT SITETREE END");
     }
     
     public void initDatasources() {
@@ -710,4 +717,28 @@ public class SiteTreeBean implements Serializable {
             return null;
         }
     }
+    
+    /*
+    public LazyDataModel<CfDatasource> getLazyDatasources() {
+        if (null == lazyDatasources) {
+            lazyDatasources = new LazyDataModel<CfDatasource>() {
+                @Override
+                public List<CfDatasource> load(int first, int pageSize, Map<String, SortMeta> sortmap, Map<String, FilterMeta> filtermap) {
+                    int start = first;
+                    int end = first + pageSize;
+
+
+                    //CNCProgramme2QueryData qData = new CNCProgramme2QueryData(start, end, sortField, order, filters);
+                    //getClassicModelsService().findCncProgramme2(qData);
+                    List<CfDatasource> dsList = cfdatasourceService.findAll();
+                    int count = dsList.size();
+                    this.setRowCount(count);
+
+                    return dsList;
+                }
+            };
+        } 
+        return lazyDatasources;
+    }
+    */
 }

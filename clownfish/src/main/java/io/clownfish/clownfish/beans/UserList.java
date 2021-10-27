@@ -68,10 +68,12 @@ public class UserList {
 
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT USER START");
         userlist = cfuserService.findAll();
         newUserButtonDisabled = false;
         backendListcontent = cfbackendService.findAll();
         selectedbackendListcontent = new ArrayList<>();
+        LOGGER.info("INIT USER END");
     }
     
     public void onSelect(SelectEvent event) {

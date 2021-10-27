@@ -67,8 +67,10 @@ public class DatasourceList implements Serializable {
 
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT DATASOURCELIST START");
         datasourcelist = cfdatasourceService.findAll();
         newContentButtonDisabled = false;
+        LOGGER.info("INIT DATASOURCELIST END");
     }
     
     public void onRefreshAll() {

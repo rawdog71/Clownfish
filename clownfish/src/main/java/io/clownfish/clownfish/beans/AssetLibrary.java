@@ -68,10 +68,12 @@ public class AssetLibrary {
      */
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT ASSETLIBRARY START");
         assetlist = cfassetlistService.findAll();
         assets = cfassetService.findAll();
         
         selectedAssetcontent = new ArrayList<>();
+        LOGGER.info("INIT ASSETLIBRARY END");
     }
     
     public void onRefreshAll() {

@@ -64,9 +64,11 @@ public class PropertyList {
     
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT PROPERTYLIST START");
         propertylist = cfpropertyService.findAll();
         newPropertyButtonDisabled = false;
         deletePropertyButtonDisabled = true;
+        LOGGER.info("INIT PROPERTYLIST END");
     }
     
     public void setClownfish(Clownfish clownfish) {

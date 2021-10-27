@@ -30,6 +30,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -48,6 +49,8 @@ public class IndexService {
     private @Getter @Setter IndexWriterConfig iwc;
     private static Map<String, String> propertymap = null;
     
+    final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(IndexService.class);
+    
     @PostConstruct
     public void init() {
         if (propertymap == null) {
@@ -64,7 +67,7 @@ public class IndexService {
             writer = new IndexWriter(indexDirectory, iwc);
             writer.forceMerge(10);
         } catch (IOException ex) {
-            Logger.getLogger(IndexService.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error(ex.getMessage());
         }
     }
     

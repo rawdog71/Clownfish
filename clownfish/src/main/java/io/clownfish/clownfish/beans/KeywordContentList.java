@@ -63,10 +63,12 @@ public class KeywordContentList {
     
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT KEYWORDCONTENTLIST START");
         keywordlist = cfkeywordlistService.findAll();
         keywords = cfkeywordService.findAll();
         
         selectedKeywordcontent = new ArrayList<>();
+        LOGGER.info("INIT KEYWORDCONTENTLIST END");
     }
 
     public void onCreate(ActionEvent actionEvent) {

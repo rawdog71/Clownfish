@@ -144,6 +144,7 @@ public class QuartzList {
     
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT QUARTZLIST START");
         monthlist = new LinkedHashMap<>();
         monthlist.put("JAN", 1);
         monthlist.put("FEB", 2);
@@ -263,6 +264,7 @@ public class QuartzList {
         endingatyear = currentYear;
         
         jobPreview = combine();
+        LOGGER.info("INIT QUARTZLIST END");
     }
     
     public void setClownfish(Clownfish clownfish) {

@@ -74,10 +74,12 @@ public class DataList implements Serializable {
 
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT DATACONTENTLIST START");
         datacontentlist = cflistService.findAll();
         classlist = cfclassService.findAll();
         
         selectedListcontent = new ArrayList<>();
+        LOGGER.info("INIT DATACONTENTLIST END");
     }
     
     public void onRefreshAll() {

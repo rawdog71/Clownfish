@@ -306,6 +306,7 @@ public class Clownfish {
      */
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT CLOWNFISH START");
         servicestatus.setMessage("Clownfish is initializing");
         servicestatus.setOnline(false);
         try {
@@ -532,8 +533,10 @@ public class Clownfish {
         } catch (SchedulerException | IOException ex) {
             LOGGER.error(ex.getMessage());
         }
+        folderUtil.init();
         servicestatus.setMessage("Clownfish is online");
         servicestatus.setOnline(true);
+        LOGGER.info("INIT CLOWNFISH END");
     }
 
     public Clownfish() {

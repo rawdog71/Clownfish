@@ -87,10 +87,12 @@ public class ReefBean implements Serializable {
     
     @PostConstruct
     public void init() {
+        LOGGER.info("INIT REEF START");
         classlist = cfclassService.findAll();
         templatelist = cftemplateService.findAll();
         stylesheetlist = cfstylesheetService.findAll();
         javascriptlist = cfjavascriptService.findAll();
+        LOGGER.info("INIT REEF END");
     }
     
     public void onExport() {

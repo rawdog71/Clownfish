@@ -35,15 +35,19 @@ public class FolderUtil {
     private @Getter @Setter String static_folder;
     private @Getter @Setter String index_folder;
     private @Getter @Setter String media_folder;
+    private @Getter @Setter String pdf_folder;
+    private @Getter @Setter String attachments_folder;
     
     @Autowired private PropertyUtil propertyUtil;
 
-    @PostConstruct
+    //@PostConstruct
     public void init() {
         setCache_folder(propertyUtil.getPropertyValue("folder_cache"));
         setStatic_folder(propertyUtil.getPropertyValue("folder_static"));
         setIndex_folder(propertyUtil.getPropertyValue("folder_index"));
         setMedia_folder(propertyUtil.getPropertyValue("folder_media"));
+        setPdf_folder(propertyUtil.getPropertyValue("folder_pdf"));
+        setAttachments_folder(propertyUtil.getPropertyValue("folder_attachments"));
     }
     
     public FolderUtil() {
