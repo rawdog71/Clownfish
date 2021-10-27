@@ -429,7 +429,7 @@ public class Clownfish {
             }
 
             if (mailUtil == null)
-                mailUtil = new MailUtil(propertyUtil.getPropertyValue("mail_smtp_host"), propertyUtil.getPropertyValue("mail_transport_protocol"), propertyUtil.getPropertyValue("mail_user"), propertyUtil.getPropertyValue("mail_password"), propertyUtil.getPropertyValue("mail_sendfrom"), propertyUtil);
+                mailUtil = new MailUtil(propertyUtil);
             
             // Set default values
             modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
@@ -1214,7 +1214,7 @@ public class Clownfish {
      * 
      */
     private void sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
-        MailUtil mailutil = new MailUtil(propertyUtil.getPropertyValue("mail_smtp_host"), propertyUtil.getPropertyValue("mail_transport_protocol"), propertyUtil.getPropertyValue("mail_user"), propertyUtil.getPropertyValue("mail_password"), propertyUtil.getPropertyValue("mail_sendfrom"), propertyUtil);
+        MailUtil mailutil = new MailUtil(propertyUtil);
         mailutil.sendRespondMail(mailto, subject, mailbody);
     }
 

@@ -29,7 +29,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +39,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("singleton")
 public class MailUtil implements Serializable {
-    @Autowired PropertyUtil propertyUtil;
+    private @Getter @Setter PropertyUtil propertyUtil;
     private @Getter @Setter String mailsmtphost;
     private @Getter @Setter String mailtransportprotocol;
     private @Getter @Setter String mailuser;
@@ -53,20 +52,13 @@ public class MailUtil implements Serializable {
 
     public MailUtil() { props = System.getProperties(); }
 
-    public MailUtil(String mailsmtphost, String mailtransportprotocol, String mailuser, String mailpassword, String sendfrom, PropertyUtil propertyUtil) {
-        props = System.getProperties();
-        
-        this.mailsmtphost = mailsmtphost;
-        this.mailtransportprotocol = mailtransportprotocol;
-        this.mailuser = mailuser;
-        this.mailpassword = mailpassword;
-        this.sendfrom = sendfrom;
+    public MailUtil(PropertyUtil propertyUtil) {
         this.propertyUtil = propertyUtil;
-        
-        props.put("mail.smtp.host", mailsmtphost);
-        props.put("mail.transport.protocol", mailtransportprotocol);
-        props.put("mail.user", mailuser);
-        props.put("mail.password", mailpassword);
+        props = System.getProperties();
+        props.put("mail.smtp.host", propertyUtil.getPropertyValue("mail_smtp_host"));
+        props.put("mail.transport.protocol", propertyUtil.getPropertyValue("mail_transport_protocol"));
+        props.put("mail.user", propertyUtil.getPropertyValue("mail_user"));
+        props.put("mail.password", propertyUtil.getPropertyValue("mail_password"));
     }
 
     public boolean sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
