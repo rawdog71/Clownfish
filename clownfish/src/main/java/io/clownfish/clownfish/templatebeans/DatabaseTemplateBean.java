@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,7 +115,7 @@ public class DatabaseTemplateBean implements Serializable {
                             con.close();
                         }
                         catch (SQLException e) {
-                            LOGGER.warn(e.getMessage());
+                            LOGGER.error(e.getMessage());
                         }
                     }
                 } else {
@@ -130,51 +131,55 @@ public class DatabaseTemplateBean implements Serializable {
     
     public boolean dbexecute(String catalog, String sqlstatement) {
         boolean ok = false;
-        LOGGER.info("START dbexecute: " + sqlstatement);
+        //LOGGER.info("START dbexecute: " + sqlstatement);
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
-                CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
-                JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
-                Connection con = jdbcutil.getConnection();
-                if (null != con) {
-                    String catalogName;
-                    
-                    try {
+            CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
+            JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
+            Connection con = jdbcutil.getConnection();
+            if (null != con) {
+                String catalogName;
 
-                        if (cfdatasource.getDriverclass().contains("oracle"))
-                        {     // Oracle driver
-                            catalogName = con.getSchema();
-                        }
-                        else
-                        {                                                    // other drivers
-                            catalogName = con.getCatalog();
-                        }
+                try {
+                    if (cfdatasource.getDriverclass().contains("oracle"))
+                    {     // Oracle driver
+                        catalogName = con.getSchema();
+                    }
+                    else
+                    {                                                    // other drivers
+                        catalogName = con.getCatalog();
+                    }
 
-                        if (catalogName.compareToIgnoreCase(catalog) == 0)
-                        {
-                            try (Statement stmt = con.createStatement()) {
-                                int count = stmt.executeUpdate(sqlstatement);
-                                if (count > 0 ) {
-                                    ok = true;
-                                    LOGGER.info("START dbexecute TRUE");
-                                } else {
-                                    LOGGER.info("START dbexecute FALSE");
-                                }
+                    if (catalogName.compareToIgnoreCase(catalog) == 0)
+                    {
+                        try (Statement stmt = con.createStatement()) {
+                            int count = stmt.executeUpdate(sqlstatement);
+                            if (count > 0 ) {
+                                ok = true;
+                                LOGGER.info("START dbexecute TRUE");
+                            } else {
+                                LOGGER.info("START dbexecute FALSE");
                             }
                         }
+                    }
+                    con.close();
+                } catch (SQLIntegrityConstraintViolationException e) {
+                    LOGGER.error(e.getMessage());
+                    ok = true;
+                }
+                catch (SQLException ex) {
+                    LOGGER.error(ex.getMessage());
+                } finally {
+                    try {
                         con.close();
                     } catch (SQLException ex) {
                         LOGGER.error(ex.getMessage());
-                        try {
-                            con.close();
-                        } catch (SQLException ex1) {
-                            LOGGER.error(ex1.getMessage());
-                        }
                     }
-                } else {
-                    LOGGER.warn("Connection to database not established");
                 }
+            } else {
+                LOGGER.warn("Connection to database not established");
+            }
         };
-        LOGGER.info("END dbexecute");
+        //LOGGER.info("END dbexecute");
         return ok;
     }
 
@@ -183,7 +188,7 @@ public class DatabaseTemplateBean implements Serializable {
         Map map = new HashMap<>();
         String catalog = params[0];
         String sqlStatement = params[1];
-        LOGGER.info("START dbexecute:\n" + sqlStatement);
+        //LOGGER.info("START dbexecute:\n" + sqlStatement);
 
         for (CfSitedatasource sitedatasource : sitedatasourcelist)
         {
@@ -193,9 +198,8 @@ public class DatabaseTemplateBean implements Serializable {
             if (null != con)
             {
                 String catalogName;
+                try {
 
-                try
-                {
                     if (cfdatasource.getDriverclass().contains("oracle")) // Oracle driver
                         catalogName = con.getSchema();
                     else // other drivers
@@ -225,7 +229,7 @@ public class DatabaseTemplateBean implements Serializable {
                                         }
                                         catch (java.sql.SQLException ex)
                                         {
-                                            LOGGER.warn(ex.getMessage());
+                                            LOGGER.error(ex.getMessage());
                                         }
                                     });
                                 }
@@ -251,21 +255,20 @@ public class DatabaseTemplateBean implements Serializable {
                         }
                     }
                     con.close();
-                } 
-                catch (SQLException ex)
+                } catch (SQLException ex)
                 {
+                    LOGGER.error(ex.getMessage());
                     try {
-                        LOGGER.error(ex.getMessage());
                         con.close();
                     } catch (SQLException ex1) {
-                        LOGGER.error(ex1.getMessage());
+                        LOGGER.error(ex.getMessage());
                     }
                 }
             }
             else
                 LOGGER.warn("Connection to database could not be established!");
         }
-        LOGGER.info("END dbexecute");
+        //LOGGER.info("END dbexecute");
         return map;
     }
     
