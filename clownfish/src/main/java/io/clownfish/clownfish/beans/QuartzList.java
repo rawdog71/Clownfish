@@ -142,7 +142,6 @@ public class QuartzList {
     public QuartzList() {
     }
     
-    @PostConstruct
     public void init() {
         LOGGER.info("INIT QUARTZLIST START");
         monthlist = new LinkedHashMap<>();
