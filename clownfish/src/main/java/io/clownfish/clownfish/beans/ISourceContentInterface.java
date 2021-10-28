@@ -37,6 +37,7 @@ public interface ISourceContentInterface {
     public void onChangeName(ValueChangeEvent changeEvent);
     public void onCreate(ActionEvent actionEvent);
     public void onDelete(ActionEvent actionEvent);
+    public void onChange(ActionEvent actionEvent);
     public void onVersionSelect(ActionEvent actionEvent);
     public void onSlideEnd(SlideEndEvent event);
     public void onVersionChanged();

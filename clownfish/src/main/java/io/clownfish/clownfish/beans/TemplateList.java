@@ -67,7 +67,7 @@ public class TemplateList implements ISourceContentInterface {
     private @Getter @Setter List<CfTemplate> templateListe;
     private @Getter @Setter CfTemplate selectedTemplate = null;
     private @Getter @Setter String templateName = "";
-    private @Getter @Setter boolean newButtonDisabled = false;
+    private @Getter @Setter boolean newButtonDisabled = true;
     private @Getter @Setter int templateScriptLanguage = 0;
     private @Getter @Setter long templateversion = 0;
     private @Getter @Setter long templateversionMin = 0;
@@ -273,11 +273,15 @@ public class TemplateList implements ISourceContentInterface {
     
     @Override
     public void onChangeName(ValueChangeEvent changeEvent) {
-        try {
-            cftemplateService.findByName(templateName);
+        if (!templateName.isBlank()) {
+            try {
+                cftemplateService.findByName(templateName);
+                newButtonDisabled = true;
+            } catch (NoResultException ex) {
+                newButtonDisabled = templateName.isEmpty();
+            }
+        } else {
             newButtonDisabled = true;
-        } catch (NoResultException ex) {
-            newButtonDisabled = templateName.isEmpty();
         }
     }
     
@@ -348,5 +352,19 @@ public class TemplateList implements ISourceContentInterface {
             templateversion = templateversionMax;
         }
         selectedtemplateversion = templateversion;
+    }
+
+    @Override
+    public void onChange(ActionEvent actionEvent) {
+        if (null != selectedTemplate) {
+            selectedTemplate.setScriptlanguage(templateScriptLanguage);
+            selectedTemplate.setName(templateName);
+            cftemplateService.edit(selectedTemplate);
+            difference = templateUtility.hasDifference(selectedTemplate);
+            refresh();
+            
+            FacesMessage message = new FacesMessage("Changed " + selectedTemplate.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
     }
 }

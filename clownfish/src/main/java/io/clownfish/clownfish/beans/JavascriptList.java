@@ -67,7 +67,7 @@ public class JavascriptList implements ISourceContentInterface {
     private @Getter @Setter List<CfJavascript> javascriptListe;
     private @Getter @Setter CfJavascript selectedJavascript = null;
     private @Getter @Setter String javascriptName = "";
-    private @Getter @Setter boolean newButtonDisabled = false;
+    private @Getter @Setter boolean newButtonDisabled = true;
     private @Getter @Setter CfJavascriptversion version = null;
     private @Getter @Setter long javascriptversion = 0;
     private @Getter @Setter long javascriptversionMin = 0;
@@ -252,11 +252,15 @@ public class JavascriptList implements ISourceContentInterface {
     
     @Override
     public void onChangeName(ValueChangeEvent changeEvent) {
-        try {
-            cfjavascriptService.findByName(javascriptName);
+        if (!javascriptName.isBlank()) {
+            try {
+                cfjavascriptService.findByName(javascriptName);
+                newButtonDisabled = true;
+            } catch (NoResultException ex) {
+                newButtonDisabled = javascriptName.isEmpty();
+            }
+        } else {
             newButtonDisabled = true;
-        } catch (NoResultException ex) {
-            newButtonDisabled = javascriptName.isEmpty();
         }
     }
     
@@ -326,5 +330,18 @@ public class JavascriptList implements ISourceContentInterface {
             javascriptversion = javascriptversionMax;
         }
         selectedjavascriptversion = javascriptversion;
+    }
+
+    @Override
+    public void onChange(ActionEvent actionEvent) {
+        if (null != selectedJavascript) {
+            selectedJavascript.setName(javascriptName);
+            cfjavascriptService.edit(selectedJavascript);
+            difference = javascriptUtility.hasDifference(selectedJavascript);
+            refresh();
+            
+            FacesMessage message = new FacesMessage("Changed " + selectedJavascript.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
     }
 }

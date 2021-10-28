@@ -67,7 +67,7 @@ public class StylesheetList implements ISourceContentInterface {
     private @Getter @Setter List<CfStylesheet> stylesheetListe;
     private @Getter @Setter CfStylesheet selectedStylesheet = null;
     private @Getter @Setter String stylesheetName = "";
-    private @Getter @Setter boolean newButtonDisabled = false;
+    private @Getter @Setter boolean newButtonDisabled = true;
     private @Getter @Setter CfStylesheetversion version = null;
     private @Getter @Setter List<CfStylesheetversion> versionlist;
     private @Getter @Setter long stylesheetversion = 0;
@@ -253,11 +253,15 @@ public class StylesheetList implements ISourceContentInterface {
     
     @Override
     public void onChangeName(ValueChangeEvent changeEvent) {
-        try {
-            cfstylesheetService.findByName(stylesheetName);
+        if (!stylesheetName.isBlank()) {
+            try {
+                cfstylesheetService.findByName(stylesheetName);
+                newButtonDisabled = true;
+            } catch (NoResultException ex) {
+                newButtonDisabled = stylesheetName.isEmpty();
+            }
+        } else {
             newButtonDisabled = true;
-        } catch (NoResultException ex) {
-            newButtonDisabled = stylesheetName.isEmpty();
         }
     }
     
@@ -325,5 +329,18 @@ public class StylesheetList implements ISourceContentInterface {
             stylesheetversion = stylesheetversionMax;
         }
         selectedstylesheetversion = stylesheetversion;
+    }
+
+    @Override
+    public void onChange(ActionEvent actionEvent) {
+        if (null != selectedStylesheet) {
+            selectedStylesheet.setName(stylesheetName);
+            cfstylesheetService.edit(selectedStylesheet);
+            difference = stylesheetUtility.hasDifference(selectedStylesheet);
+            refresh();
+            
+            FacesMessage message = new FacesMessage("Changed " + selectedStylesheet.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
     }
 }

@@ -326,7 +326,7 @@
 
                     <p:outputLabel for="templatename">Name</p:outputLabel>
                     <p:inputText id="templatename" value="#{templateList.templateName}" >
-                        <p:ajax event="keyup" listener="#{templateList.onChangeName(changeEvent)}" update=":form:tabview:newtemplate" />
+                        <p:ajax event="keyup" listener="#{templateList.onChangeName(changeEvent)}" update=":form:tabview:newtemplate :form:tabview:changetemplate" />
                     </p:inputText>
                     <p:selectOneMenu id="templatelanguage" value="#{templateList.templateScriptLanguage}">
                         <f:selectItem itemValue="0" itemLabel="Freemarker" />
@@ -335,6 +335,7 @@
                         <f:selectItem itemValue="3" itemLabel="JRXML" />
                     </p:selectOneMenu>
                     <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
+                    <p:commandButton id="changetemplate" process="form" value="Change" actionListener="#{templateList.onChange}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
 
                     <pe:monacoEditor id="edittemplate" disabled="false" widgetVar="monacotemplate" readonly="#{!templateList.checkedout}" editorOptions="#{templateList.editorOptions}" value="#{templateList.content}" locale="de" width="100%" height="600px" autoResize="true" />
                     <h:panelGroup id="difftemplateBtnGroup">
@@ -383,9 +384,10 @@
 
                     <p:outputLabel for="stylesheetname">Name</p:outputLabel>
                     <p:inputText id="stylesheetname" value="#{stylesheetList.stylesheetName}" >
-                        <p:ajax event="keyup" listener="#{stylesheetList.onChangeName(changeEvent)}" update=":form:tabview:newstylesheet" />
+                        <p:ajax event="keyup" listener="#{stylesheetList.onChangeName(changeEvent)}" update=":form:tabview:newstylesheet :form:tabview:changestylesheet" />
                     </p:inputText>
                     <p:commandButton id="newstylesheet" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
+                    <p:commandButton id="changestylesheet" process="form" value="Change" actionListener="#{stylesheetList.onChange}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
 
                     <pe:monacoEditor id="editstylesheet" disabled="false" widgetVar="monacostylesheet" readonly="#{!stylesheetList.checkedout}" editorOptions="#{stylesheetList.editorOptions}" value="#{stylesheetList.content}" locale="de" width="100%" height="600px" autoResize="true" />
                     <h:panelGroup id="diffstylesheetBtnGroup">
@@ -435,9 +437,10 @@
 
                     <p:outputLabel for="javascriptname">Name</p:outputLabel>
                     <p:inputText id="javascriptname" value="#{javascriptList.javascriptName}" >
-                        <p:ajax event="keyup" listener="#{javascriptList.onChangeName(changeEvent)}" update=":form:tabview:newjavascript" />
+                        <p:ajax event="keyup" listener="#{javascriptList.onChangeName(changeEvent)}" update=":form:tabview:newjavascript :form:tabview:changejavascript" />
                     </p:inputText>
                     <p:commandButton id="newjavascript" process="form" value="New" actionListener="#{javascriptList.onCreate}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
+                    <p:commandButton id="changejavascript" process="form" value="Change" actionListener="#{javascriptList.onChange}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
                     
                     <pe:monacoEditor id="editjavascript" disabled="false" widgetVar="monacojavascript" readonly="#{!javascriptList.checkedout}" editorOptions="#{javascriptList.editorOptions}" value="#{javascriptList.content}" locale="de" width="100%" height="600px" autoResize="true" />
                     <h:panelGroup id="diffjavascriptBtnGroup">
