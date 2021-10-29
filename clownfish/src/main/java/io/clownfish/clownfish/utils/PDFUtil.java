@@ -97,19 +97,21 @@ public class PDFUtil implements Serializable {
 
             FileOutputStream fileOut;
             StringBuilder stringBuilder = new StringBuilder();
-
             AtomicInteger count = new AtomicInteger();
 
             params.forEach((k, v) ->
             {
-                count.getAndIncrement();
-                if (count.get() < params.size())
-                    stringBuilder.append(v).append("-");
+                stringBuilder.append("-");
+
+                if (count.get() < params.size() && params.size() > 1)
+                    stringBuilder.append(v);
                 else
                     stringBuilder.append(v);
+                
+                count.getAndIncrement();
             });
 
-            fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_pdf") + File.separator + name + "-" + stringBuilder + ".pdf");
+            fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_pdf") + File.separator + name + stringBuilder + ".pdf");
 
             fileOut.write(bytes);
             fileOut.close();
