@@ -145,6 +145,7 @@ public class JavascriptList implements ISourceContentInterface {
             javascriptversionMax = versionlist.size();
             selectedjavascriptversion = javascriptversionMax;
         } else {
+            javascriptName = "";
             checkedout = false;
             access = false;
         }
@@ -341,6 +342,9 @@ public class JavascriptList implements ISourceContentInterface {
             refresh();
             
             FacesMessage message = new FacesMessage("Changed " + selectedJavascript.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }  else {
+            FacesMessage message = new FacesMessage("No javascript selected. Nothing changed.");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }

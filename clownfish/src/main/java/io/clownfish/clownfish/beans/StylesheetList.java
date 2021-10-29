@@ -145,6 +145,7 @@ public class StylesheetList implements ISourceContentInterface {
             stylesheetversionMax = versionlist.size();
             selectedstylesheetversion = stylesheetversionMax;
         } else {
+            stylesheetName = "";
             checkedout = false;
             access = false;
         }
@@ -340,6 +341,9 @@ public class StylesheetList implements ISourceContentInterface {
             refresh();
             
             FacesMessage message = new FacesMessage("Changed " + selectedStylesheet.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }  else {
+            FacesMessage message = new FacesMessage("No stylesheet selected. Nothing changed.");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }

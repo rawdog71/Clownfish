@@ -166,6 +166,7 @@ public class TemplateList implements ISourceContentInterface {
             templateversionMax = versionlist.size();
             selectedtemplateversion = templateversionMax;
         } else {
+            templateName = "";
             checkedout = false;
             access = false;
         }
@@ -364,6 +365,9 @@ public class TemplateList implements ISourceContentInterface {
             refresh();
             
             FacesMessage message = new FacesMessage("Changed " + selectedTemplate.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        } else {
+            FacesMessage message = new FacesMessage("No template selected. Nothing changed.");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }

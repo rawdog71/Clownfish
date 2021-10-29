@@ -87,5 +87,6 @@ public class WebserviceAuthList {
         String hash = PasswordUtil.generateSecurePassword(currentUser.getEmail()+selectedWebservice.getName(), currentUser.getEmail()+selectedWebservice.getName());
         webserviceauth.setHash(hash);
         cfwebserviceauthService.create(webserviceauth);
+        webserviceauthlist = cfwebserviceauthService.findByUserRef(currentUser);
     }
 }
