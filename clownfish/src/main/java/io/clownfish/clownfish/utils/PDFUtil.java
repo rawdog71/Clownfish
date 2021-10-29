@@ -95,11 +95,11 @@ public class PDFUtil implements Serializable {
             byte[] bytes = out.toByteArray();
 
             FileOutputStream fileOut;
+            StringBuilder stringBuilder = new StringBuilder();
 
-            if (!params.get("werk").isEmpty() || params.get("werk") != null)
-                fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_pdf") + File.separator + name + "-" + params.get("werk") + "-" + params.get("datum") + ".pdf");
-            else
-                fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_pdf") + File.separator + name + "-" + params.get("datum") + ".pdf");
+            params.forEach((k, v) -> stringBuilder.append(v).append("-"));
+
+            fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_pdf") + File.separator + name + "-" + stringBuilder + ".pdf");
 
             fileOut.write(bytes);
             fileOut.close();
