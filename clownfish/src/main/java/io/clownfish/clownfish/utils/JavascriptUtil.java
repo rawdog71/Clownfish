@@ -16,7 +16,7 @@
 package io.clownfish.clownfish.utils;
 
 import com.github.difflib.DiffUtils;
-import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.patch.DiffException;
 import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfJavascriptversion;
@@ -92,7 +92,6 @@ public class JavascriptUtil implements IVersioningInterface, Serializable {
     public boolean hasDifference(Object object) {
         boolean diff = false;
         try {
-            try {
             currentVersion = cfjavascriptversionService.findMaxVersion(((CfJavascript)object).getId());
         } catch (NullPointerException ex) {
             currentVersion = 0;
@@ -108,9 +107,6 @@ public class JavascriptUtil implements IVersioningInterface, Serializable {
             }
         } else {
             diff = true;
-        }
-        } catch (DiffException ex) {
-            LOGGER.error(ex.getMessage());
         }
         return diff;
     }

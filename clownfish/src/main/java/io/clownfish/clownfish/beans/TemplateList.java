@@ -289,13 +289,18 @@ public class TemplateList implements ISourceContentInterface {
     @Override
     public void onCreate(ActionEvent actionEvent) {
         try {
-            CfTemplate newtemplate = new CfTemplate();
-            newtemplate.setName(templateName);
-            newtemplate.setContent("//"+templateName);
-            newtemplate.setScriptlanguage(templateScriptLanguage);
-            cftemplateService.create(newtemplate);
-            templateListe = cftemplateService.findAll();
-            templateName = "";
+            if (!templateName.isBlank()) {
+                CfTemplate newtemplate = new CfTemplate();
+                newtemplate.setName(templateName);
+                newtemplate.setContent("//"+templateName);
+                newtemplate.setScriptlanguage(templateScriptLanguage);
+                cftemplateService.create(newtemplate);
+                templateListe = cftemplateService.findAll();
+                templateName = "";
+            } else {
+                FacesMessage message = new FacesMessage("Please enter template name");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }

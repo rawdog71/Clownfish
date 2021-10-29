@@ -268,13 +268,17 @@ public class JavascriptList implements ISourceContentInterface {
     @Override
     public void onCreate(ActionEvent actionEvent) {
         try {
-            CfJavascript newjavascript = new CfJavascript();
-            newjavascript.setName(javascriptName);
-            newjavascript.setContent("//"+javascriptName);
-            cfjavascriptService.create(newjavascript);
-            javascriptListe = cfjavascriptService.findAll();
-            
-            javascriptName = "";
+            if (!javascriptName.isBlank()) {
+                CfJavascript newjavascript = new CfJavascript();
+                newjavascript.setName(javascriptName);
+                newjavascript.setContent("//"+javascriptName);
+                cfjavascriptService.create(newjavascript);
+                javascriptListe = cfjavascriptService.findAll();
+                javascriptName = "";
+            } else {
+                FacesMessage message = new FacesMessage("Please enter javascript name");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }

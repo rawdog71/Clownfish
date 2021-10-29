@@ -269,12 +269,17 @@ public class StylesheetList implements ISourceContentInterface {
     @Override
     public void onCreate(ActionEvent actionEvent) {
         try {
-            CfStylesheet newstylesheet = new CfStylesheet();
-            newstylesheet.setName(stylesheetName);
-            newstylesheet.setContent("//"+stylesheetName);
-            cfstylesheetService.create(newstylesheet);
-            stylesheetListe = cfstylesheetService.findAll();
-            stylesheetName = "";
+            if (!stylesheetName.isBlank()) {
+                CfStylesheet newstylesheet = new CfStylesheet();
+                newstylesheet.setName(stylesheetName);
+                newstylesheet.setContent("//"+stylesheetName);
+                cfstylesheetService.create(newstylesheet);
+                stylesheetListe = cfstylesheetService.findAll();
+                stylesheetName = "";
+            } else {
+                FacesMessage message = new FacesMessage("Please enter stylesheet name");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
