@@ -30,6 +30,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.faces.view.ViewScoped;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -97,7 +98,16 @@ public class PDFUtil implements Serializable {
             FileOutputStream fileOut;
             StringBuilder stringBuilder = new StringBuilder();
 
-            params.forEach((k, v) -> stringBuilder.append(v).append("-"));
+            AtomicInteger count = new AtomicInteger();
+
+            params.forEach((k, v) ->
+            {
+                count.getAndIncrement();
+                if (count.get() < params.size())
+                    stringBuilder.append(v).append("-");
+                else
+                    stringBuilder.append(v);
+            });
 
             fileOut = new FileOutputStream(propertyUtil.getPropertyValue("folder_pdf") + File.separator + name + "-" + stringBuilder + ".pdf");
 
