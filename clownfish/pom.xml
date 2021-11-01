@@ -4,7 +4,7 @@
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
     <version>0.4.7-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.el</artifactId>
-            <version>4.0.2</version>
+            <version>3.0.4</version>
         </dependency>
 
         <!-- JSF + PRIMEFACES -->
