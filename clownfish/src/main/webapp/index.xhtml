@@ -26,6 +26,7 @@
             <p:growl id="msgs" showDetail="true" />
             <p:graphicImage value="images/clownfish-48.png" />
             <p:outputLabel value="Clownfish CMS " />
+            <p:outputLabel value="#{versionBean.clownfishUtil.version}" />
             
             <p:commandButton id="userButton" value="User" type="button" icon="fa fa-home" rendered="#{loginBean.login}" />
             <p:menu overlay="true" trigger="userButton" my="left top" at="left bottom">

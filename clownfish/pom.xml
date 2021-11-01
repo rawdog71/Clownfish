@@ -4,7 +4,7 @@
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
     <version>0.4.7-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
@@ -377,6 +377,13 @@
             <version>3.0.0</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>3.3.9</version>
+            <type>jar</type>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

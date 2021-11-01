@@ -101,6 +101,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -136,6 +137,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 import org.fusesource.jansi.AnsiConsole;
@@ -369,9 +373,22 @@ public class Clownfish {
         if (null == clownfishutil) {
             clownfishutil = new ClownfishUtil();
         }
-        clownfishutil.setVersion(getClass().getPackage().getImplementationVersion()).setVersionMojarra(p.getImplementationVersion()).setVersionTomcat(ServerInfo.getServerNumber());
-        if (null == clownfishutil.getVersion()) {
-            clownfishutil.setVersion("DEBUG");
+        
+        MavenXpp3Reader reader = new MavenXpp3Reader();
+        Model model = null;
+        if ((new File("pom.xml")).exists()) {
+            try {
+                model = reader.read(new FileReader("pom.xml"));
+            } catch (FileNotFoundException ex) {
+                LOGGER.error(ex.getMessage());
+            } catch (IOException | XmlPullParserException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }
+        if (null != model) {
+            clownfishutil.setVersion(model.getVersion()).setVersionMojarra(p.getImplementationVersion()).setVersionTomcat(ServerInfo.getServerNumber());
+        } else {
+            clownfishutil.setVersion(getClass().getPackage().getImplementationVersion()).setVersionMojarra(p.getImplementationVersion()).setVersionTomcat(ServerInfo.getServerNumber());
         }
         try {
             AnsiConsole.systemInstall();

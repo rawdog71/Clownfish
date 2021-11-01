@@ -34,11 +34,13 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
+@Component
 @Accessors(chain = true)
 public class ClownfishUtil {
     private @Getter @Setter String version;

@@ -57,6 +57,7 @@ import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.JavascriptUtil;
 import io.clownfish.clownfish.utils.StylesheetUtil;
@@ -84,10 +85,7 @@ import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TreeDragDropEvent;
 import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.SortMeta;
-import org.primefaces.model.SortOrder;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,6 +180,7 @@ public class SiteTreeBean implements Serializable {
         } else {
             if (sapSupportProp.compareToIgnoreCase("TRUE") == 0) {
                 sapSupport = true;
+                LOGGER.info("SAP SUPPORT");
             }
             if (sapSupport) {
                 sapc = new SAPConnection(SAPCONNECTION, "Clownfish4");

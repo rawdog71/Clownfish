@@ -21,6 +21,7 @@ import io.clownfish.clownfish.dbentities.CfUserbackend;
 import io.clownfish.clownfish.serviceinterface.CfBackendService;
 import io.clownfish.clownfish.serviceinterface.CfUserBackendService;
 import io.clownfish.clownfish.serviceinterface.CfUserService;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
