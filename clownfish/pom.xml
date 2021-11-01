@@ -3,19 +3,19 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
-    <version>0.4.6-SNAPSHOT</version>
+    <version>0.4.7-SNAPSHOT</version>
     <packaging>jar</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
         <developerConnection>scm:git:https://github.com/rawdog71/Clownfish.git</developerConnection>
-        <tag>v0.4.6</tag>
+        <tag>v0.4.7</tag>
     </scm>
     
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.4</version>
+        <version>2.5.5</version>
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
-            <version>2.5.4</version>
+            <version>2.5.5</version>
             <scope>provided</scope>
             <type>jar</type>
         </dependency>
@@ -75,8 +75,8 @@
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
-            <version>3.0.0</version>
+            <artifactId>jakarta.el</artifactId>
+            <version>4.0.2</version>
         </dependency>
 
         <!-- JSF + PRIMEFACES -->
@@ -144,7 +144,7 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <type>jar</type>
-            <version>5.4.30.Final</version>
+            <version>5.4.32.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
@@ -155,7 +155,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-c3p0</artifactId>
-            <version>5.4.30.Final</version>
+            <version>5.4.32.Final</version>
         </dependency>
         <dependency>
             <groupId>com.mchange</groupId>
@@ -343,12 +343,6 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>3.0.0</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.15</version>
@@ -370,6 +364,18 @@
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>resources-monacoeditor</artifactId>
             <version>10.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.0.0</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
