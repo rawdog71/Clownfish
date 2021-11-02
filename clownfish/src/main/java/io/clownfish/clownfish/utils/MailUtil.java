@@ -54,6 +54,13 @@ public class MailUtil implements Serializable {
 
     public MailUtil(PropertyUtil propertyUtil) {
         this.propertyUtil = propertyUtil;
+        
+        this.mailsmtphost = propertyUtil.getPropertyValue("mail_smtp_host");
+        this.mailtransportprotocol = propertyUtil.getPropertyValue("mail_transport_protocol");
+        this.mailuser = propertyUtil.getPropertyValue("mail_user");
+        this.mailpassword = propertyUtil.getPropertyValue("mail_password");
+        this.sendfrom = propertyUtil.getPropertyValue("mail_sendfrom");
+        
         props = System.getProperties();
         props.put("mail.smtp.host", propertyUtil.getPropertyValue("mail_smtp_host"));
         props.put("mail.transport.protocol", propertyUtil.getPropertyValue("mail_transport_protocol"));
