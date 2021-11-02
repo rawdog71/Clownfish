@@ -19,7 +19,6 @@ import io.clownfish.clownfish.datamodels.InsertListcontentParameter;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
-import io.clownfish.clownfish.dbentities.CfListcontentPK;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;

@@ -645,7 +645,9 @@ INSERT INTO `cf_webservice` (`id`, `name`) VALUES
 (11, 'InsertDatalist'),
 (12, 'InsertListcontent'),
 (13, 'GetDatalist'),
-(14, 'UpdateContent');
+(14, 'UpdateContent'),
+(15, 'DeleteContent'),
+(16, 'DestroyContent');
 
 INSERT INTO `cf_user` (`id`, `vorname`, `nachname`, `email`, `passwort`, `salt`) VALUES
 (1, 'Admin', 'Istrator', 'admin', 'Ll66CGHeusR7eoQPejg8t3CKkpVdpm2IlN/dZif4aGE=', 'zm85UW0YCIyBCxOXTagQQYcezjLzIQ');
@@ -684,6 +686,8 @@ INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,1
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,12,'vv9qPoZ8STG0huRrX+TsbDlDH+vu6NGEdpXKuNE1aA4=');
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,13,'v/Mz0ukm1Ru2diFZyk8pbdC9WFsE8FGxyzO2eZd1RYQ=');
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,14,'d+CfnbsuiGC8ofxczlWf1EfA1ZxphlxlemcKSwRqngo=');
+INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,15,'HhR1Z6l9vM38pNDQSzvl93vNKV4JxdOloaSv/ezec3g=');
+INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,16,'i8NGNs1PBDNXSh/8XVamJd0Zkc6EgCsLmIVrp5YsZik=');
 
 INSERT INTO `cf_site` (`id`, `name`, `templateref`, `parentref`, `stylesheetref`, `javascriptref`, `htmlcompression`, `characterencoding`, `contenttype`, `locale`, `aliaspath`, `gzip`, `title`, `job`, `description`, `staticsite`, `searchrelevant`) VALUES
 (1, 'root', 1, 0, NULL, NULL, 0, 'UTF-8', 'text/html', 'de', 'root', 0, 'Clownfish root', 0, 'Default root site', 0, 0),
