@@ -51,7 +51,18 @@ public class PDFUtil implements Serializable {
     @Autowired TemplateUtil templateUtil;
     
     CfTemplate cfTemplate;
-    
+
+    public PDFUtil(CfTemplateService cfTemplateService, CfTemplateversionService cfTemplateversionService, CfSitedatasourceService cfSitedatasourceService, CfDatasourceService cfDatasourceService, CfSiteService cfSiteService, PropertyUtil propertyUtil, TemplateUtil templateUtil)
+    {
+        this.cfTemplateService = cfTemplateService;
+        this.cfTemplateversionService = cfTemplateversionService;
+        this.cfSitedatasourceService = cfSitedatasourceService;
+        this.cfDatasourceService = cfDatasourceService;
+        this.cfSiteService = cfSiteService;
+        this.propertyUtil = propertyUtil;
+        this.templateUtil = templateUtil;
+    }
+
     public ByteArrayOutputStream createPDF(String name, String param) throws IOException {
         // Fetch site
         CfSite site = cfSiteService.findByName(name);

@@ -26,10 +26,14 @@ import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.TableField;
 import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
+import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.PDFUtil;
+import io.clownfish.clownfish.utils.PropertyUtil;
 import org.apache.tika.metadata.PDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -45,15 +49,26 @@ import java.util.*;
 @Component
 public class PDFTemplateBean implements Serializable
 {
-    final transient Logger LOGGER = LoggerFactory.getLogger(ImportTemplateBean.class);
+    @Autowired PDFUtil pdfUtil;
+
+    final transient Logger LOGGER = LoggerFactory.getLogger(PDFTemplateBean.class);
 
     public PDFTemplateBean()
     {
     }
 
+    public void init(PDFUtil pdfUtil)
+    {
+        this.pdfUtil = pdfUtil;
+    }
+
+    public void initjob(PDFUtil pdfUtil)
+    {
+        this.pdfUtil = pdfUtil;
+    }
+
     public void generatePDF(String siteName, String param) throws IOException
     {
-        PDFUtil pdfUtil = new PDFUtil();
         pdfUtil.createPDF(siteName, param);
     }
 }

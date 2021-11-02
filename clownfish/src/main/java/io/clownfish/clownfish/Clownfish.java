@@ -78,19 +78,8 @@ import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
-import io.clownfish.clownfish.utils.ClownfishUtil;
-import io.clownfish.clownfish.utils.CompressionUtils;
-import io.clownfish.clownfish.utils.ConsistencyUtil;
-import io.clownfish.clownfish.utils.DatabaseUtil;
-import io.clownfish.clownfish.utils.DefaultUtil;
-import io.clownfish.clownfish.utils.FolderUtil;
-import io.clownfish.clownfish.utils.HibernateUtil;
-import io.clownfish.clownfish.utils.MailUtil;
-import io.clownfish.clownfish.utils.MarkdownUtil;
-import io.clownfish.clownfish.utils.PropertyUtil;
-import io.clownfish.clownfish.utils.QuartzJob;
-import io.clownfish.clownfish.utils.SiteUtil;
-import io.clownfish.clownfish.utils.TemplateUtil;
+import io.clownfish.clownfish.utils.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -241,6 +230,7 @@ public class Clownfish {
     private PropertyUtil propertyUtil;
     private MailUtil mailUtil;
     private DefaultUtil defaultUtil;
+    private PDFUtil pdfUtil;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map searchcontentmap;
     private @Getter @Setter Map searchassetmap;
@@ -444,7 +434,10 @@ public class Clownfish {
 
             if (mailUtil == null)
                 mailUtil = new MailUtil(propertyUtil);
-            
+
+            if (pdfUtil == null)
+                pdfUtil = new PDFUtil(cftemplateService, cftemplateversionService, cfsitedatasourceService, cfdatasourceService, cfsiteService, propertyUtil, templateUtil);
+
             // Set default values
             modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
                                 // 0 = Development mode (fetch sourcecode from database)
@@ -1099,6 +1092,7 @@ public class Clownfish {
                         databasebean = new DatabaseTemplateBean();
                         importbean = new ImportTemplateBean();
                         pdfbean = new PDFTemplateBean();
+                        pdfbean.init(pdfUtil);
                         if (!sitedatasourcelist.isEmpty()) {
                             databasebean.init(sitedatasourcelist, cfdatasourceService);
                             importbean.init(sitedatasourcelist, cfdatasourceService);
