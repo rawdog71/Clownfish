@@ -23,7 +23,7 @@ import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.AssetList;
 import io.clownfish.clownfish.beans.AttributContentList;
-import io.clownfish.clownfish.templatebeans.DatabaseTemplateBean;
+import io.clownfish.clownfish.templatebeans.*;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.beans.QuartzList;
@@ -78,11 +78,6 @@ import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
-import io.clownfish.clownfish.templatebeans.EmailTemplateBean;
-import io.clownfish.clownfish.templatebeans.NetworkTemplateBean;
-import io.clownfish.clownfish.templatebeans.SAPTemplateBean;
-import io.clownfish.clownfish.templatebeans.WebServiceTemplateBean;
-import io.clownfish.clownfish.templatebeans.ImportTemplateBean;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.ConsistencyUtil;
@@ -228,6 +223,7 @@ public class Clownfish {
     NetworkTemplateBean networkbean;
     WebServiceTemplateBean webservicebean;
     ImportTemplateBean importbean;
+    PDFTemplateBean pdfbean;
 
     private String contenttype;
     private String characterencoding;
@@ -1102,6 +1098,7 @@ public class Clownfish {
                         
                         databasebean = new DatabaseTemplateBean();
                         importbean = new ImportTemplateBean();
+                        pdfbean = new PDFTemplateBean();
                         if (!sitedatasourcelist.isEmpty()) {
                             databasebean.init(sitedatasourcelist, cfdatasourceService);
                             importbean.init(sitedatasourcelist, cfdatasourceService);
@@ -1126,6 +1123,7 @@ public class Clownfish {
                                     fmRoot.put("importBean", importbean);
                                     fmRoot.put("networkBean", networkbean);
                                     fmRoot.put("webserviceBean", webservicebean);
+                                    fmRoot.put("pdfBean", pdfbean);
 
                                     fmRoot.put("parameter", parametermap);
                                     if (!searchmetadata.isEmpty()) {
@@ -1168,6 +1166,7 @@ public class Clownfish {
                                     velContext.put("importBean", importbean);
                                     velContext.put("networkBean", networkbean);
                                     velContext.put("webserviceBean", webservicebean);
+                                    velContext.put("pdfBean", pdfbean);
 
                                     velContext.put("parameter", parametermap);
                                     velContext.put("property", propertyUtil.getPropertymap());

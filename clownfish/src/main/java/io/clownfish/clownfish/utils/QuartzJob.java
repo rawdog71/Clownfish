@@ -198,7 +198,7 @@ public class QuartzJob implements Job {
             ImportTemplateBean importBean = new ImportTemplateBean();
             importBean.initjob(sitedatasourcelist, cfdatasourceService);
             WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();
-
+            PDFTemplateBean pdfBean = new PDFTemplateBean();
 
             // write the output
             Writer out = new StringWriter();
@@ -217,6 +217,7 @@ public class QuartzJob implements Job {
                     fmRoot.put("databaseBean", databasebean);
                     fmRoot.put("networkBean", networkbean);
                     fmRoot.put("importBean", importBean);
+                    fmRoot.put("pdfBean", pdfBean);
                     fmRoot.put("webserviceBean", webServiceBean);
                     fmRoot.put("property", propertymap);
                     try {
@@ -243,6 +244,7 @@ public class QuartzJob implements Job {
                     velContext.put("networkBean", networkbean);
                     velContext.put("importBean", importBean);
                     velContext.put("webserviceBean", webServiceBean);
+                    velContext.put("pdfBean", pdfBean);
 
                     velContext.put("property", propertymap);
                     if (null != velTemplate) {
