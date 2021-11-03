@@ -30,6 +30,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
@@ -46,7 +47,7 @@ import org.springframework.stereotype.Component;
 @Named("keywordContentList")
 @Scope("session")
 @Component
-public class KeywordContentList {
+public class KeywordContentList implements Serializable {
     @Autowired CfKeywordService cfkeywordService;
     @Autowired CfKeywordlistService cfkeywordlistService;
     @Autowired CfKeywordlistcontentService cfkeywordlistcontentService;

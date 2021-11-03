@@ -32,6 +32,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
@@ -48,7 +49,7 @@ import org.springframework.stereotype.Component;
 @Named("userlist")
 @Scope("session")
 @Component
-public class UserList {
+public class UserList implements Serializable {
     @Autowired CfUserService cfuserService;
     @Autowired CfBackendService cfbackendService;
     @Autowired CfUserBackendService cfuserbackendService;

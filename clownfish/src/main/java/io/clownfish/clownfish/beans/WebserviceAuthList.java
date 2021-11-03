@@ -24,6 +24,7 @@ import io.clownfish.clownfish.serviceinterface.CfUserService;
 import io.clownfish.clownfish.serviceinterface.CfWebserviceService;
 import io.clownfish.clownfish.serviceinterface.CfWebserviceauthService;
 import io.clownfish.clownfish.utils.PasswordUtil;
+import java.io.Serializable;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.event.ActionEvent;
@@ -45,7 +46,7 @@ import org.springframework.stereotype.Component;
 @Named("webserviceauthlist")
 @Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
-public class WebserviceAuthList {
+public class WebserviceAuthList implements Serializable {
     @Autowired CfUserService cfuserService;
     @Autowired CfWebserviceauthService cfwebserviceauthService;
     @Autowired CfWebserviceService cfwebserviceService;
