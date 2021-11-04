@@ -1469,7 +1469,7 @@
                     
                     <h:form enctype="multipart/form-data">
                         <p:fileUpload listener="#{reefbean.handleFileUpload}" mode="advanced" dragDropSupport="true" 
-                                              update="messages :form:tabview:templatelist :form:tabview:stylesheetlist :form:tabview:javascriptlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(json)$/i" >
+                                              update="messages :form:tabview:tabsiteview:selecttemplate :form:tabview:tabsiteview:selectjavascript :form:tabview:tabsiteview:selectstylesheet :form:tabview:templatelist :form:tabview:stylesheetlist :form:tabview:javascriptlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(json)$/i" >
                         </p:fileUpload>
                         <p:growl id="messages" showDetail="true" />
                     </h:form>
