@@ -15,22 +15,7 @@
  */
 package io.clownfish.clownfish.templatebeans;
 
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import com.opencsv.exceptions.CsvValidationException;
-import io.clownfish.clownfish.dbentities.CfDatasource;
-import io.clownfish.clownfish.dbentities.CfSitedatasource;
-import io.clownfish.clownfish.jdbc.JDBCUtil;
-import io.clownfish.clownfish.jdbc.TableField;
-import io.clownfish.clownfish.jdbc.TableFieldStructure;
-import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
-import io.clownfish.clownfish.serviceinterface.CfSiteService;
-import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.PDFUtil;
-import io.clownfish.clownfish.utils.PropertyUtil;
-import org.apache.tika.metadata.PDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +23,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.sql.*;
-import java.util.*;
 
 /**
  *
  * @author philip, sulzbachr
  */
-@Scope("prototype")
+@Scope("request")
 @Component
 public class PDFTemplateBean implements Serializable
 {

@@ -39,7 +39,7 @@ import java.util.*;
  *
  * @author philip, sulzbachr
  */
-@Scope("prototype")
+@Scope("request")
 @Component
 public class ImportTemplateBean implements Serializable
 {
