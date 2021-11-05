@@ -74,6 +74,7 @@ public class QuartzJob implements Job {
     @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired PropertyUtil propertyUtil;
     @Autowired MailUtil mailUtil;
+    @Autowired PDFUtil pdfUtil;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     private @Getter @Setter Map<String, String> propertymap = null;
     private boolean sapSupport = false;
@@ -199,6 +200,7 @@ public class QuartzJob implements Job {
             importBean.initjob(sitedatasourcelist, cfdatasourceService);
             WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();
             PDFTemplateBean pdfBean = new PDFTemplateBean();
+            pdfBean.initjob(pdfUtil);
 
             // write the output
             Writer out = new StringWriter();
