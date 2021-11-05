@@ -495,6 +495,7 @@
                     <p:selectBooleanCheckbox id="classsearchrelevant" value="#{classList.classSearchrelevant}" />
                     <p:commandButton id="newclass" process="form" value="New" actionListener="#{classList.onCreate}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" disabled="#{classlist.newButtonDisabled}" />
                     <p:commandButton id="updateclass" process="form" value="Edit" actionListener="#{classList.onEdit}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" />
+                    <p:commandButton id="recreatetable" process="form" value="Recreate Datatable" actionListener="#{classList.onRecreateDatamodel(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" />
 
                     <p:dataTable id="attributlist" var="attribut" value="#{classList.selectedAttributList}" selectionMode="single" selection="#{classList.selectedAttribut}" rowKey="#{attribut.id}">
                         <p:ajax event="rowSelect" listener="#{classList.onSelectAttribute}" update=":form:msgs :form:tabview:attributname :form:tabview:attributtype :form:tabview:classeditor" />
