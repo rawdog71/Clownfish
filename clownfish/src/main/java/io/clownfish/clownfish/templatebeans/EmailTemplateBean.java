@@ -35,15 +35,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmailTemplateBean implements Serializable {
     private transient @Getter @Setter Map<String, String> propertymap = null;
-    @Autowired MailUtil mailUtil;
-    @Autowired PropertyUtil propertyUtil;
+    private transient @Getter @Setter MailUtil mailUtil;
+    private transient @Getter @Setter PropertyUtil propertyUtil;
 
     public EmailTemplateBean() {
     }
     
     public void init(Map<String, String> propertymap, MailUtil mailUtil, PropertyUtil propertyUtil) {
         this.propertymap = propertymap;
-        this.mailUtil = mailUtil;
+        this.mailUtil = new MailUtil(propertyUtil);
         this.propertyUtil = propertyUtil;
     }
     

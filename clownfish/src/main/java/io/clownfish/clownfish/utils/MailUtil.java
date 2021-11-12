@@ -50,7 +50,9 @@ public class MailUtil implements Serializable {
     
     final transient Logger LOGGER = LoggerFactory.getLogger(MailUtil.class);
 
-    public MailUtil() { props = System.getProperties(); }
+    public MailUtil() { 
+        props = System.getProperties(); 
+    }
 
     public MailUtil(PropertyUtil propertyUtil) {
         this.propertyUtil = propertyUtil;
