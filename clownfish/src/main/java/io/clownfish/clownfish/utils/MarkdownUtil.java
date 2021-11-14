@@ -15,14 +15,27 @@
  */
 package io.clownfish.clownfish.utils;
 
-import com.vladsch.flexmark.ext.abbreviation.AbbreviationExtension;
-import com.vladsch.flexmark.ext.admonition.AdmonitionExtension;
-import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension;
-import com.vladsch.flexmark.ext.aside.AsideExtension;
-import com.vladsch.flexmark.ext.attributes.AttributesExtension;
-import com.vladsch.flexmark.ext.jekyll.tag.JekyllTagExtension;
-import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
-import com.vladsch.flexmark.ext.tables.TablesExtension;
+import com.vladsch.flexmark.ext.abbreviation.*;
+import com.vladsch.flexmark.ext.admonition.*;
+import com.vladsch.flexmark.ext.anchorlink.*;
+import com.vladsch.flexmark.ext.aside.*;
+import com.vladsch.flexmark.ext.attributes.*;
+import com.vladsch.flexmark.ext.autolink.*;
+import com.vladsch.flexmark.ext.definition.*;
+import com.vladsch.flexmark.ext.emoji.*;
+import com.vladsch.flexmark.ext.footnotes.*;
+import com.vladsch.flexmark.ext.gitlab.*;
+import com.vladsch.flexmark.ext.ins.*;
+import com.vladsch.flexmark.ext.jekyll.tag.*;
+import com.vladsch.flexmark.ext.macros.*;
+import com.vladsch.flexmark.ext.media.tags.*;
+import com.vladsch.flexmark.ext.superscript.*;
+import com.vladsch.flexmark.ext.tables.*;
+import com.vladsch.flexmark.ext.toc.*;
+import com.vladsch.flexmark.ext.typographic.*;
+import com.vladsch.flexmark.ext.wikilink.*;
+import com.vladsch.flexmark.ext.youtube.embedded.*;
+import com.vladsch.flexmark.ext.gfm.strikethrough.*;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
@@ -57,7 +70,8 @@ public class MarkdownUtil {
 
     final transient Logger LOGGER = LoggerFactory.getLogger(MarkdownUtil.class);
     
-    public MarkdownUtil() {
+    public MarkdownUtil(PropertyList proplist) {
+        this.proplist = proplist;
     }
     
     public void initOptions() {
@@ -102,8 +116,47 @@ public class MarkdownUtil {
                 case "markdown_TablesExtension":
                     extensionList.add(TablesExtension.create());
                     break;
-                case "markdown_JekyllTagExtension":    
+                case "markdown_JekyllTagExtension":
                     extensionList.add(JekyllTagExtension.create());
+                    break;
+                case "markdown_EmojiExtension":
+                    extensionList.add(EmojiExtension.create());
+                    break;
+                case "markdown_AutolinkExtension":
+                    extensionList.add(AutolinkExtension.create());
+                    break;
+                case "markdown_DefinitionExtension":
+                    extensionList.add(DefinitionExtension.create());
+                    break;
+                case "markdown_FootnoteExtension":
+                    extensionList.add(FootnoteExtension.create());
+                    break;
+                case "markdown_GitLabExtension":
+                    extensionList.add(GitLabExtension.create());
+                    break;
+                case "markdown_InsExtension":
+                    extensionList.add(InsExtension.create());
+                    break;
+                case "markdown_MacrosExtension":
+                    extensionList.add(MacrosExtension.create());
+                    break;
+                case "markdown_MediaTagsExtension":
+                    extensionList.add(MediaTagsExtension.create());
+                    break;
+                case "markdown_SuperscriptExtension":
+                    extensionList.add(SuperscriptExtension.create());
+                    break;
+                case "markdown_TocExtension":
+                    extensionList.add(TocExtension.create());
+                    break;
+                case "markdown_TypographicExtension":
+                    extensionList.add(TypographicExtension.create());
+                    break;
+                case "markdown_WikiLinkExtension":
+                    extensionList.add(WikiLinkExtension.create());
+                    break;
+                case "markdown_YouTubeLinkExtension":
+                    extensionList.add(YouTubeLinkExtension.create());
                     break;
             }
         } catch (SecurityException  ex) {

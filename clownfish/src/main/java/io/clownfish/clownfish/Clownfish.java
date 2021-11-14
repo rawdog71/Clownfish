@@ -470,7 +470,10 @@ public class Clownfish {
             }
             
             if (null == markdownUtil) {
-                markdownUtil = new MarkdownUtil();
+                markdownUtil = new MarkdownUtil(propertylist);
+                markdownUtil.initOptions();
+            } else {
+                markdownUtil.initOptions();
             }
             if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getIndex_folder().isEmpty())) {
                 // Call a parallel thread to index the content in Lucene
