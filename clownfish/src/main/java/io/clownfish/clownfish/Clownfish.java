@@ -97,6 +97,8 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.math.BigInteger;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -255,6 +257,7 @@ public class Clownfish {
     @Value("${check.consistency:0}") int checkConsistency;
     @Value("${hibernate.init:0}") int hibernateInit;
     @Value("${sapconnection.file}") String SAPCONNECTION;
+    @Value("${loader.path}") String libloaderpath;
     
     /**
      * Call of the "root" site
@@ -300,7 +303,9 @@ public class Clownfish {
         servicestatus.setMessage("Clownfish is initializing");
         servicestatus.setOnline(false);
         try {
-            templatebeans = findAllClassesInPackage("io.clownfish.clownfish.templatebeans");
+            //templatebeans = findAllClassesInPackage("io.clownfish.clownfish.templatebeans");
+            //templatebeans = findAllClassesInPackage("de.destrukt.testlib");
+            templatebeans = findAllClassesInLibfolder(libloaderpath);
             templatebeans.forEach(cl -> {
                     if (null != cl.getCanonicalName()) {
                         System.out.println(cl.getCanonicalName());
@@ -1398,6 +1403,29 @@ public class Clownfish {
                 .stream()
                 .filter(clazz -> clazz.getPackageName()
                 .equalsIgnoreCase(packageName))
+                .map(clazz -> clazz.load())
+                .collect(Collectors.toSet());
+    }
+    
+    private Set<Class> findAllClassesInLibfolder(String libdir) throws IOException {
+        File dependencyDirectory = new File(libdir);
+        File[] files = dependencyDirectory.listFiles();
+        ArrayList<URL> urls = new ArrayList();
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].getName().endsWith(".jar")) {
+                urls.add(files[i].toURI().toURL());
+            }
+        }
+        
+        URL[] urlArr = new URL[urls.size()];
+        urlArr = urls.toArray(urlArr);
+        
+        URLClassLoader cl = new URLClassLoader(urlArr);
+        return ClassPath.from(cl)
+                .getTopLevelClasses()
+                .stream()
+                .filter(clazz -> clazz.getPackageName()
+                .equalsIgnoreCase("de.destrukt.testlib"))
                 .map(clazz -> clazz.load())
                 .collect(Collectors.toSet());
     }
