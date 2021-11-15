@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.utils;
 
 import com.github.difflib.DiffUtils;
-import com.github.difflib.patch.DiffException;
 import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfJavascriptversion;
@@ -109,5 +108,11 @@ public class JavascriptUtil implements IVersioningInterface, Serializable {
             diff = true;
         }
         return diff;
+    }
+
+    @Override
+    public long getCurrentVersionNumber(String name) {
+        CfJavascript cfjavascript = cfjavascriptService.findByName(name);
+        return cfjavascriptversionService.findMaxVersion((cfjavascript).getId());
     }
 }

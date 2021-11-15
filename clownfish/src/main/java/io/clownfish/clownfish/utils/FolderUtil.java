@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.utils;
 
-import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

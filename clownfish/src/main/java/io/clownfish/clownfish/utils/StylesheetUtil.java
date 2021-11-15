@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.utils;
 
 import com.github.difflib.DiffUtils;
-import com.github.difflib.patch.DiffException;
 import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfStylesheetversion;
@@ -109,5 +108,11 @@ public class StylesheetUtil implements IVersioningInterface, Serializable {
             diff = true;
         }
         return diff;
+    }
+
+    @Override
+    public long getCurrentVersionNumber(String name) {
+        CfStylesheet cfstylesheet = cfstylesheetService.findByName(name);
+        return cfstylesheetversionService.findMaxVersion((cfstylesheet).getId());
     }
 }

@@ -23,4 +23,5 @@ public interface IVersioningInterface<T> {
     public String getVersion(long ref, long version);
     public void writeVersion(long ref, long version, byte[] content, long userid);
     public boolean hasDifference(T object);
+    public long getCurrentVersionNumber(String name);
 }

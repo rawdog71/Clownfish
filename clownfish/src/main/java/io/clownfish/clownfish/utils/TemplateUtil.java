@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.utils;
 
 import com.github.difflib.DiffUtils;
-import com.github.difflib.patch.DiffException;
 import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
@@ -142,5 +141,11 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             }                 
         }
         return content;
+    }
+
+    @Override
+    public long getCurrentVersionNumber(String name) {
+        CfTemplate cftemplate = cftemplateService.findByName(name);
+        return cftemplateversionService.findMaxVersion((cftemplate).getId());
     }
 }
