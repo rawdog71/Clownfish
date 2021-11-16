@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish;
 
-import com.google.common.reflect.ClassPath;
 import io.clownfish.clownfish.exceptions.PageNotFoundException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -99,8 +98,6 @@ import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -109,7 +106,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -236,6 +232,7 @@ public class Clownfish {
     private MailUtil mailUtil;
     private DefaultUtil defaultUtil;
     private PDFUtil pdfUtil;
+    private BeanUtil beanUtil;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map searchcontentmap;
     private @Getter @Setter Map searchassetmap;
@@ -248,8 +245,8 @@ public class Clownfish {
     private @Getter @Setter int searchlimit;
     private @Getter @Setter Map<String, String> metainfomap;
     
-    private Set<Class> templatebeans = null;
-    private ArrayList<Class> loadabletemplatebeans = new ArrayList<>();
+    //private Set<Class> templatebeans = null;
+    //private ArrayList<Class> loadabletemplatebeans = new ArrayList<>();
     
     final transient Logger LOGGER = LoggerFactory.getLogger(Clownfish.class);
     @Value("${bootstrap}") int bootstrap;
@@ -305,6 +302,12 @@ public class Clownfish {
         LOGGER.info("INIT CLOWNFISH START");
         servicestatus.setMessage("Clownfish is initializing");
         servicestatus.setOnline(false);
+        
+        if (beanUtil == null)
+            beanUtil = new BeanUtil();
+        beanUtil.init(libloaderpath);
+        
+        /*
         try {
             templatebeans = findAllClassesInLibfolder(libloaderpath);
             templatebeans.forEach(cl -> {
@@ -317,6 +320,7 @@ public class Clownfish {
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
         }
+        */
         if (1 == bootstrap) {
             bootstrap = 0;
             try {
@@ -1140,7 +1144,7 @@ public class Clownfish {
                                         fmRoot.put("searchclasscontentlist", searchclasscontentmap);
                                     }
                                     
-                                    for (Class tpbc : loadabletemplatebeans) {
+                                    for (Class tpbc : beanUtil.getLoadabletemplatebeans()) {
                                         Constructor<?> ctor;
                                         try {
                                             ctor = tpbc.getConstructor();
@@ -1195,6 +1199,18 @@ public class Clownfish {
                                     if (!searchclasscontentmap.isEmpty()) {
                                         velContext.put("searchclasscontentlist", searchclasscontentmap);
                                     }
+                                    
+                                    for (Class tpbc : beanUtil.getLoadabletemplatebeans()) {
+                                        Constructor<?> ctor;
+                                        try {
+                                            ctor = tpbc.getConstructor();
+                                            Object object = ctor.newInstance(new Object[] { });
+                                            velContext.put(tpbc.getName().replaceAll("\\.", "_"), object);
+                                        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
+                                    
                                     if (null != velTemplate) {
                                         velTemplate.merge(velContext, out);
                                     }
@@ -1405,6 +1421,7 @@ public class Clownfish {
         }
     }
     
+    /*
     private Set<Class> findAllClassesInPackage(String packageName) throws IOException {
         return ClassPath.from(ClassLoader.getSystemClassLoader())
                 .getAllClasses()
@@ -1437,4 +1454,5 @@ public class Clownfish {
                 .map(clazz -> clazz.load())
                 .collect(Collectors.toSet());
     }
+    */
 }

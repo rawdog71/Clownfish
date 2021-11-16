@@ -42,11 +42,14 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import org.quartz.Job;
@@ -75,6 +78,7 @@ public class QuartzJob implements Job {
     @Autowired PropertyUtil propertyUtil;
     @Autowired MailUtil mailUtil;
     @Autowired PDFUtil pdfUtil;
+    private @Getter @Setter BeanUtil beanUtil;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     private @Getter @Setter Map<String, String> propertymap = null;
     private boolean sapSupport = false;
@@ -85,6 +89,15 @@ public class QuartzJob implements Job {
     private ClownfishConst.ViewModus modus = STAGING;
     final transient Logger LOGGER = LoggerFactory.getLogger(QuartzJob.class);
     @Value("${sapconnection.file}") String SAPCONNECTION;
+    @Value("${loader.path}") String libloaderpath;
+    
+    @PostConstruct
+    public void init() {
+        if (beanUtil == null) {
+            beanUtil = new BeanUtil();
+            beanUtil.init(libloaderpath);
+        }
+    }
 
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
@@ -222,6 +235,18 @@ public class QuartzJob implements Job {
                     fmRoot.put("pdfBean", pdfBean);
                     fmRoot.put("webserviceBean", webServiceBean);
                     fmRoot.put("property", propertymap);
+                    
+                    for (Class tpbc : beanUtil.getLoadabletemplatebeans()) {
+                        Constructor<?> ctor;
+                        try {
+                            ctor = tpbc.getConstructor();
+                            Object object = ctor.newInstance(new Object[] { });
+                            fmRoot.put(tpbc.getName().replaceAll("\\.", "_"), object);
+                        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                            LOGGER.error(ex.getMessage());
+                        }
+                    }
+                    
                     try {
                         if (null != fmTemplate) {
                             freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
@@ -247,6 +272,17 @@ public class QuartzJob implements Job {
                     velContext.put("importBean", importBean);
                     velContext.put("webserviceBean", webServiceBean);
                     velContext.put("pdfBean", pdfBean);
+                    
+                    for (Class tpbc : beanUtil.getLoadabletemplatebeans()) {
+                        Constructor<?> ctor;
+                        try {
+                            ctor = tpbc.getConstructor();
+                            Object object = ctor.newInstance(new Object[] { });
+                            velContext.put(tpbc.getName().replaceAll("\\.", "_"), object);
+                        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                            LOGGER.error(ex.getMessage());
+                        }
+                    }
 
                     velContext.put("property", propertymap);
                     if (null != velTemplate) {
