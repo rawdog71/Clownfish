@@ -96,6 +96,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -110,6 +112,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
@@ -303,18 +306,11 @@ public class Clownfish {
         servicestatus.setMessage("Clownfish is initializing");
         servicestatus.setOnline(false);
         try {
-            //templatebeans = findAllClassesInPackage("io.clownfish.clownfish.templatebeans");
-            //templatebeans = findAllClassesInPackage("de.destrukt.testlib");
             templatebeans = findAllClassesInLibfolder(libloaderpath);
             templatebeans.forEach(cl -> {
                     if (null != cl.getCanonicalName()) {
-                        System.out.println(cl.getCanonicalName());
+                        LOGGER.info("EXTERNAL CLASS -> " + cl.getCanonicalName());
                         loadabletemplatebeans.add(cl);
-                        /*
-                        for (Method method : cl.getMethods()) {
-                            System.out.println(method.getName());
-                        }
-                        */
                     }
                 }
             );
@@ -1143,6 +1139,18 @@ public class Clownfish {
                                     if (!searchclasscontentmap.isEmpty()) {
                                         fmRoot.put("searchclasscontentlist", searchclasscontentmap);
                                     }
+                                    
+                                    for (Class tpbc : loadabletemplatebeans) {
+                                        Constructor<?> ctor;
+                                        try {
+                                            ctor = tpbc.getConstructor();
+                                            Object object = ctor.newInstance(new Object[] { });
+                                            fmRoot.put(tpbc.getName().replaceAll("\\.", "_"), object);
+                                        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
+                                    
                                     try {
                                         if (null != fmTemplate) {
                                             freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
@@ -1425,7 +1433,7 @@ public class Clownfish {
                 .getTopLevelClasses()
                 .stream()
                 .filter(clazz -> clazz.getPackageName()
-                .equalsIgnoreCase("de.destrukt.testlib"))
+                .startsWith("io.clownfish.ext"))
                 .map(clazz -> clazz.load())
                 .collect(Collectors.toSet());
     }
