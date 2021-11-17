@@ -19,8 +19,6 @@ import io.clownfish.clownfish.beans.PropertyList;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Named;
 import lombok.Getter;
