@@ -45,6 +45,7 @@ import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
+import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfPropertyService;
@@ -56,8 +57,9 @@ import io.clownfish.clownfish.serviceinterface.CfSitekeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
+import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
-import io.clownfish.clownfish.utils.ClownfishUtil;
+import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.JavascriptUtil;
 import io.clownfish.clownfish.utils.StylesheetUtil;
@@ -144,8 +146,11 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter boolean sapSupport = false;
     
     @Autowired transient CfTemplateService cftemplateService;
+    @Autowired transient CfTemplateversionService cftemplateversionService;
     @Autowired transient CfStylesheetService cfstylesheetService;
+    @Autowired transient CfStylesheetversionService cfstylesheetversionService;
     @Autowired transient CfJavascriptService cfjavascriptService;
+    @Autowired transient CfJavascriptversionService cfjavascriptversionService;
     @Autowired transient CfSiteService cfsiteService;
     @Autowired transient CfDatasourceService cfdatasourceService;
     @Autowired transient CfSitedatasourceService cfsitedatasourceService;
@@ -254,54 +259,24 @@ public class SiteTreeBean implements Serializable {
     }
  
     public String getTemplate() {
-        if (null != selectedSite) {
-            if (null != selectedTemplate) {
-                templateUtility.setTemplateContent(selectedTemplate.getContent());
-                return templateUtility.getTemplateContent();
-            } else {
-                try {
-                    CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().longValue());
-                    return template.getContent();
-                } catch (Exception ex) {
-                    return "";
-                }    
-            }
+        if (null != selectedTemplate) {
+            return templateUtility.getVersion(selectedTemplate.getId(), cftemplateversionService.findMaxVersion(selectedTemplate.getId()));
         } else {
             return "";
         }
     }
     
     public String getStylesheet() {
-        if (null != selectedSite) {
-            if (null != selectedStylesheet) {
-                stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
-                return stylesheetUtility.getStyelsheetContent();
-            } else {
-                try {
-                    CfStylesheet stylesheet = cfstylesheetService.findById(selectedSite.getStylesheetref().longValue());
-                    return stylesheet.getContent();
-                } catch (Exception ex) {
-                    return "";
-                }
-            }
+        if (null != selectedStylesheet) {
+            return stylesheetUtility.getVersion(selectedStylesheet.getId(), cfstylesheetversionService.findMaxVersion(selectedStylesheet.getId()));
         } else {
             return "";
         }
     }
     
     public String getJavascript() {
-        if (null != selectedSite) {
-            if (null != selectedJavascript) {
-                javascriptUtility.setJavascriptContent(selectedJavascript.getContent());
-                return javascriptUtility.getJavascriptContent();
-            } else {
-                try {
-                    CfJavascript javascript = cfjavascriptService.findById(selectedSite.getJavascriptref().longValue());
-                    return javascript.getContent();
-                } catch (Exception ex) {
-                    return "";
-                }
-            }
+        if (null != selectedJavascript) {
+            return javascriptUtility.getVersion(selectedJavascript.getId(), cfjavascriptversionService.findMaxVersion(selectedJavascript.getId()));
         } else {
             return "";
         }
