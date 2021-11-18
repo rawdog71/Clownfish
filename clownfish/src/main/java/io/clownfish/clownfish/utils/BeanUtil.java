@@ -89,7 +89,18 @@ public class BeanUtil implements Serializable {
                 .stream()
                 .filter(clazz -> clazz.getPackageName()
                 .startsWith("io.clownfish.ext"))
+                .filter(clazz -> isClassLoadable(clazz))
                 .map(clazz -> clazz.load())
                 .collect(Collectors.toSet());
+    }
+    
+    private boolean isClassLoadable(ClassPath.ClassInfo clazz)
+    {
+        try {
+            clazz.load();
+        } catch (UnsupportedClassVersionError ex) {
+            return false;
+        }
+        return true;
     }
 }

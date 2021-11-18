@@ -257,7 +257,7 @@ public class Clownfish {
     @Value("${check.consistency:0}") int checkConsistency;
     @Value("${hibernate.init:0}") int hibernateInit;
     @Value("${sapconnection.file}") String SAPCONNECTION;
-    @Value("${loader.path}") String libloaderpath;
+    String libloaderpath;
     
     /**
      * Call of the "root" site
@@ -303,24 +303,18 @@ public class Clownfish {
         servicestatus.setMessage("Clownfish is initializing");
         servicestatus.setOnline(false);
         
+        // read all System Properties of the property table
+        if (null == propertyUtil) {
+            propertyUtil = new PropertyUtil(propertylist);
+        }
+        
+        libloaderpath = propertyUtil.getPropertyValue("folder_libs");
+        
         if (beanUtil == null)
             beanUtil = new BeanUtil();
-        beanUtil.init(libloaderpath);
+        if ((!libloaderpath.isBlank()) && (null != libloaderpath)) 
+            beanUtil.init(libloaderpath);
         
-        /*
-        try {
-            templatebeans = findAllClassesInLibfolder(libloaderpath);
-            templatebeans.forEach(cl -> {
-                    if (null != cl.getCanonicalName()) {
-                        LOGGER.info("EXTERNAL CLASS -> " + cl.getCanonicalName());
-                        loadabletemplatebeans.add(cl);
-                    }
-                }
-            );
-        } catch (IOException ex) {
-            LOGGER.error(ex.getMessage());
-        }
-        */
         if (1 == bootstrap) {
             bootstrap = 0;
             try {
@@ -428,10 +422,6 @@ public class Clownfish {
             // generate Relation Tables
             hibernateUtil.generateRelationsDatamodel(hibernateInit);
             
-            // read all System Properties of the property table
-            if (null == propertyUtil) {
-                propertyUtil = new PropertyUtil(propertylist);
-            }
             propertylist.setClownfish(this);
             if (null == defaultUtil) {
                 defaultUtil = new DefaultUtil();

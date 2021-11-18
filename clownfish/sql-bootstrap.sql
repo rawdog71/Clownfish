@@ -591,6 +591,7 @@ INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
 ('folder_index', '', 1),
 ('folder_icon', '', 1),
 ('folder_pdf', '', 1),
+('folder_libs', '', 1),
 ('folder_attachments', '', 1),
 ('job_support', 'true', 1),
 ('lucene_searchlimit', '25', 1),

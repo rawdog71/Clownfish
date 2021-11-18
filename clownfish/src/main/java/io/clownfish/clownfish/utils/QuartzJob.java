@@ -89,13 +89,14 @@ public class QuartzJob implements Job {
     private ClownfishConst.ViewModus modus = STAGING;
     final transient Logger LOGGER = LoggerFactory.getLogger(QuartzJob.class);
     @Value("${sapconnection.file}") String SAPCONNECTION;
-    @Value("${loader.path}") String libloaderpath;
     
     @PostConstruct
     public void init() {
+        String libloaderpath = propertyUtil.getPropertyValue("folder_libs");
         if (beanUtil == null) {
             beanUtil = new BeanUtil();
-            beanUtil.init(libloaderpath);
+            if ((!libloaderpath.isBlank()) && (null != libloaderpath)) 
+                beanUtil.init(libloaderpath);
         }
     }
 
