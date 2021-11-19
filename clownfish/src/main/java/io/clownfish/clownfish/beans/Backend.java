@@ -39,6 +39,7 @@ public class Backend implements Serializable  {
     @Autowired transient TemplateList templatelist;
     @Autowired transient StylesheetList stylesheetlist;
     @Autowired transient JavascriptList javascriptlist;
+    @Autowired transient JavaList javalist;
 
     public Backend() {
     }
@@ -54,5 +55,6 @@ public class Backend implements Serializable  {
         templatelist.refresh();
         stylesheetlist.refresh();
         javascriptlist.refresh();
+        javalist.refresh();
     }
 }

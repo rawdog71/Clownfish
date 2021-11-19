@@ -17,20 +17,10 @@ package io.clownfish.clownfish.beans;
 
 import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.Reef;
-import io.clownfish.clownfish.dbentities.CfAttribut;
-import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.dbentities.CfJavascript;
-import io.clownfish.clownfish.dbentities.CfStylesheet;
-import io.clownfish.clownfish.dbentities.CfTemplate;
-import io.clownfish.clownfish.serviceinterface.CfAttributService;
-import io.clownfish.clownfish.serviceinterface.CfClassService;
-import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
-import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
-import io.clownfish.clownfish.serviceinterface.CfTemplateService;
-import io.clownfish.clownfish.utils.CompressionUtils;
-import io.clownfish.clownfish.utils.JavascriptUtil;
-import io.clownfish.clownfish.utils.StylesheetUtil;
-import io.clownfish.clownfish.utils.TemplateUtil;
+import io.clownfish.clownfish.dbentities.*;
+import io.clownfish.clownfish.serviceinterface.*;
+import io.clownfish.clownfish.utils.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +30,7 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.logging.Level;
 import javax.annotation.PostConstruct;
@@ -69,19 +60,23 @@ public class ReefBean implements Serializable {
     private @Getter @Setter List<CfTemplate> templatelist;
     private @Getter @Setter List<CfStylesheet> stylesheetlist;
     private @Getter @Setter List<CfJavascript> javascriptlist;
+    private @Getter @Setter List<CfJava> javalist;
     
     @Autowired transient CfClassService cfclassService;
     @Autowired transient CfTemplateService cftemplateService;
     @Autowired transient CfStylesheetService cfstylesheetService;
     @Autowired transient CfJavascriptService cfjavascriptService;
+    @Autowired transient CfJavaService cfjavaService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient TemplateList tl;
     @Autowired transient JavascriptList jl;
     @Autowired transient StylesheetList sl;
+    @Autowired transient JavaList javaList;
     
     @Autowired TemplateUtil templateUtil;
     @Autowired StylesheetUtil stylesheetUtil;
     @Autowired JavascriptUtil javascriptUtil;
+    @Autowired JavaUtil javaUtil;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ReefBean.class);
     
@@ -92,6 +87,7 @@ public class ReefBean implements Serializable {
         templatelist = cftemplateService.findAll();
         stylesheetlist = cfstylesheetService.findAll();
         javascriptlist = cfjavascriptService.findAll();
+        javalist = cfjavaService.findAll();
         LOGGER.info("INIT REEF END");
     }
     
@@ -174,6 +170,9 @@ public class ReefBean implements Serializable {
         for (CfJavascript cfjavascript : chkreef.getJavascriptlist()) {
             reefchk += cfjavascript.getName()+cfjavascript.getContent();
         }
+        for (CfJava cfjava : chkreef.getJavalist()) {
+            reefchk += cfjava.getName()+cfjava.getContent();
+        }
         for (CfStylesheet cfstylesheet : chkreef.getStylesheetlist()) {
             reefchk += cfstylesheet.getName()+cfstylesheet.getContent();
         }
@@ -247,6 +246,38 @@ public class ReefBean implements Serializable {
             }
         }
         jl.refresh();
+
+        for (CfJava cfjava : importreef.getJavalist())
+        {
+            try
+            {
+                CfJava checkjava = cfjavaService.findByName(cfjava.getName());
+                LOGGER.error("JAVA {} already exists.", cfjava.getName());
+            }
+            catch (NoResultException ex)
+            {
+                cfjava.setId(null);
+                cfjava = cfjavaService.create(cfjava);
+
+                javaUtil.setJavaContent(cfjava.getContent());
+
+                String content = javaUtil.getJavaContent();
+                byte[] output = null;
+                try
+                {
+                    output = CompressionUtils.compress(content.getBytes(StandardCharsets.UTF_8));
+                }
+                catch (IOException ex1)
+                {
+                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+
+                javaUtil.setCurrentVersion(1);
+                javaUtil.writeVersion(cfjava.getId(), javaUtil.getCurrentVersion(), output, 0);
+            }
+        }
+        javaList.refresh();
+
         for (CfStylesheet cfstylesheet : importreef.getStylesheetlist()) {
             try {
                 CfStylesheet checkstylesheet = cfstylesheetService.findByName(cfstylesheet.getName());

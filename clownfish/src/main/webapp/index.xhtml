@@ -476,6 +476,58 @@
                         </p:overlayPanel>
                     </h:panelGroup>
                 </p:tab>
+
+                <p:tab title="Java" id="javapanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
+                    <p:selectOneMenu id="javalist" value="#{javaList.selectedJava}" converter="#{javaConverterBean}">
+                        <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:editjava :form:tabview:javaname :form:tabview:newjava :form:tabview:javaversion :form:tabview:diffjavaBtnGroup :form:tabview:diffjavaPanel" />
+                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                        <f:selectItems value="#{javaList.javaListe}" />
+                    </p:selectOneMenu>
+
+                    <p:commandButton id="deletejavaButton" value="Delete" actionListener="#{javaList.onDelete}" update=":form:msgs :form:tabview:javalist">
+                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                    </p:commandButton>
+
+                    <p:outputLabel for="javaname">Name</p:outputLabel>
+                    <p:inputText id="javaname" value="#{javaList.javaName}" >
+                        <p:ajax event="keyup" listener="#{javaList.onChangeName(changeEvent)}" update=":form:tabview:newjava :form:tabview:changejava" />
+                    </p:inputText>
+                    <p:commandButton id="newjava" process="form" value="New" actionListener="#{javaList.onCreate}" update=":form:msgs :form:tabview:javalist :form:tabview:javaname" disabled="#{javaList.newButtonDisabled}" />
+                    <p:commandButton id="changejava" process="form" value="Change" actionListener="#{javaList.onChange}" update=":form:msgs :form:tabview:javalist :form:tabview:javaname" disabled="#{javaList.newButtonDisabled}" />
+
+                    <pe:monacoEditor id="editjava" disabled="false" widgetVar="monacojava" readonly="#{!javaList.checkedout}" editorOptions="#{javaList.editorOptions}" value="#{javaList.content}" locale="de" width="100%" height="600px" autoResize="true" />
+                    <h:panelGroup id="diffjavaBtnGroup">
+                        <p:commandButton id="savejava" process="form" value="Save" rendered="#{javaList.checkedout}" actionListener="#{javaList.onSave}" update=":form:msgs :form:tabview:javaversion :form:tabview:diffjavaBtnGroup" />
+                        <p:commandButton id="checkinjava" process="form" value="CheckIn" rendered="#{javaList.checkedout}" actionListener="#{javaList.onCheckIn}"  update=":form:msgs :form:tabview:javaversion :form:tabview:diffjavaBtnGroup :form:tabview:editjava" />
+                        <p:commandButton id="checkoutjava" process="form" value="CheckOut" rendered="#{!javaList.checkedout and javaList.access}" actionListener="#{javaList.onCheckOut}" update=":form:msgs :form:tabview:javaversion :form:tabview:diffjavaBtnGroup :form:tabview:editjava" />
+                        <p:commandButton id="commitjava" process="form" value="Commit" rendered="#{javaList.difference and !javaList.checkedout and javaList.access}" actionListener="#{javaList.onCommit}" update=":form:msgs :form:tabview:javaversion :form:tabview:diffjavaBtnGroup :form:tabview:selectedjavaversion">
+                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                        </p:commandButton>
+
+                        <p:outputLabel> Version </p:outputLabel><p:outputLabel id="javaversion">#{javaList.javaUtility.currentVersion}</p:outputLabel>
+                        <p:commandButton id="diffjavaBtn" type="button" value="Diff" rendered="#{javaList.difference}" />
+
+                        <h5>Select Version</h5>
+                        <p:inputText id="selectedjavaversion" value="#{javaList.selectedjavaversion}" disabled="true"/>
+                        <p:slider for="selectedjavaversion" minValue="#{javaList.javaversionMin}" maxValue="#{javaList.javaversionMax}">
+                            <p:ajax event="slideEnd" listener="#{javaList.onSlideEnd}" update=":form:tabview:editjava :form:tabview:javaname :form:tabview:newjava :form:tabview:selectedjavaversion :form:tabview:diffjavaBtnGroup :form:tabview:diffjavaPanel" />
+                        </p:slider>
+
+                        <p:overlayPanel id="diffjavaPanel" for="diffjavaBtn" dynamic="false" style="width:600px" modal="true">
+                            <p:dataTable var="diff" value="#{javaList.javaUtility.patch.deltas}" rows="#{javaList.javaUtility.patch.deltas.size()}" paginator="false">
+                                <p:column headerText="DiffTyp">
+                                    <h:outputText value="#{diff.type}" />
+                                </p:column>
+                                <p:column headerText="Local">
+                                    <h:outputText value="#{diff.source}" />
+                                </p:column>
+                                <p:column headerText="Repository">
+                                    <h:outputText value="#{diff.target}" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                </p:tab>
                 
                 <p:tab title="Classes" id="classpanel" rendered="#{loginBean.login and loginBean.hasRights(5)}">
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
