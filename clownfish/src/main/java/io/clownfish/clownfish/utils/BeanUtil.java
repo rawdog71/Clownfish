@@ -99,6 +99,7 @@ public class BeanUtil implements Serializable {
         try {
             clazz.load();
         } catch (UnsupportedClassVersionError ex) {
+            LOGGER.error("Version conflict -> " + clazz.getName());
             return false;
         }
         return true;

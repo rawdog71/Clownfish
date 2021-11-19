@@ -20,12 +20,17 @@ import io.clownfish.clownfish.jdbc.ScriptRunner;
 import io.clownfish.clownfish.servlets.ClownfishWebdavServlet;
 import io.clownfish.clownfish.servlets.EmptyWebdavServlet;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +67,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.util.DefaultPropertiesPersister;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -99,6 +105,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     
     public static void main(String[] args) {
         bootstrap();
+        bootstrap_update();
         SpringApplication.run(Main.class, args);
     }
 
@@ -234,5 +241,85 @@ public class Main extends SpringBootServletInitializer implements ServletContext
                 LOGGER.error(ex.getMessage());
             }
         }
+    }
+    
+    /**
+     * Checks the applications.properties file and runs the bootstrap routine when the bootstrap parameter is set to 1
+     * Fetches the database (MySQL) parameters from applications.properties and runs the sql-bootstrap.sql script
+     * The script creates the database user for reading/writing (user=clownfish), creates all tables and initializes some tables with data
+     */
+    public static void bootstrap_update() {
+        InputStream fis = null;
+        try {
+            Properties props = new Properties();
+            String propsfile = "application.properties";
+            fis = new FileInputStream(propsfile);
+            if (null != fis) {
+                props.load(fis);
+            }
+            String dbclass = props.getProperty("app.datasource.driverClassName");
+            String dburl = props.getProperty("app.datasource.url");
+            String dbuser = props.getProperty("app.datasource.username");
+            String dbpassword = props.getProperty("app.datasource.password");
+        
+            String path = new File(".").getCanonicalPath();
+            File bootstrapDirectory = new File(path);
+            
+            File[] files = bootstrapDirectory.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].getName().startsWith("bootstrap_")) {
+                    InputStream is = null;
+                    try {
+                        Properties boot_props = new Properties();
+                        is = new FileInputStream(files[i]);
+                        if (null != is) {
+                            boot_props.load(is);
+                        }
+                        int bootstrap = Integer.parseInt(boot_props.getProperty("bootstrap"));
+                        String version = boot_props.getProperty("version");
+                        String bootstrapfile = boot_props.getProperty("bootstrapfile");
+                        if (1 == bootstrap) {
+                            AnsiConsole.systemInstall();
+                            System.out.println(ansi().fg(GREEN));
+                            System.out.println("BOOTSTRAPPING UPDATE VERSION " + version);
+                            System.out.println(ansi().reset());
+                            JDBCUtil jdbcutil = new JDBCUtil(dbclass, dburl, dbuser, dbpassword);
+                            
+                            ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), false, false);
+                            runner.runScript(new BufferedReader(new FileReader(bootstrapfile)));
+
+                            File f = new File(files[i].getName());
+                            OutputStream out = new FileOutputStream(f);
+                            DefaultPropertiesPersister p = new DefaultPropertiesPersister();
+                            p.store(props, out, "Bootstrap properties");
+                        }
+                    } catch (FileNotFoundException ex) {
+                        LOGGER.error(ex.getMessage());
+                    } catch (IOException | SQLException  ex) {
+                        LOGGER.error(ex.getMessage());
+                    } finally {
+                        try {
+                            if (null != is) {
+                                is.close();
+                            }
+                        } catch (IOException ex) {
+                            LOGGER.error(ex.getMessage());
+                        }
+                    }
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            LOGGER.error(ex.getMessage());
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage());
+        } finally {
+            try {
+                if (null != fis) {
+                    fis.close();
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }    
     }
 }

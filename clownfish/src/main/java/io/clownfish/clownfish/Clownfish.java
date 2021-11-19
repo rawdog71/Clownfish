@@ -1410,39 +1410,4 @@ public class Clownfish {
             }
         }
     }
-    
-    /*
-    private Set<Class> findAllClassesInPackage(String packageName) throws IOException {
-        return ClassPath.from(ClassLoader.getSystemClassLoader())
-                .getAllClasses()
-                .stream()
-                .filter(clazz -> clazz.getPackageName()
-                .equalsIgnoreCase(packageName))
-                .map(clazz -> clazz.load())
-                .collect(Collectors.toSet());
-    }
-    
-    private Set<Class> findAllClassesInLibfolder(String libdir) throws IOException {
-        File dependencyDirectory = new File(libdir);
-        File[] files = dependencyDirectory.listFiles();
-        ArrayList<URL> urls = new ArrayList();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].getName().endsWith(".jar")) {
-                urls.add(files[i].toURI().toURL());
-            }
-        }
-        
-        URL[] urlArr = new URL[urls.size()];
-        urlArr = urls.toArray(urlArr);
-        
-        URLClassLoader cl = new URLClassLoader(urlArr);
-        return ClassPath.from(cl)
-                .getTopLevelClasses()
-                .stream()
-                .filter(clazz -> clazz.getPackageName()
-                .startsWith("io.clownfish.ext"))
-                .map(clazz -> clazz.load())
-                .collect(Collectors.toSet());
-    }
-    */
 }
