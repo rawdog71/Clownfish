@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfTemplate;
+import io.clownfish.clownfish.dbentities.CfJava;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -38,6 +39,7 @@ public class Reef {
     private @Getter @Setter List<CfTemplate> templatelist;
     private @Getter @Setter List<CfStylesheet> stylesheetlist;
     private @Getter @Setter List<CfJavascript> javascriptlist;
+    private @Getter @Setter List<CfJava> javalist;
     private @Getter @Setter String checksum;
     
     public Reef() {

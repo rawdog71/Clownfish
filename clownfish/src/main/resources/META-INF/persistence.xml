@@ -18,6 +18,8 @@
     <class>io.clownfish.clownfish.dbentities.CfDatasource</class>
     <class>io.clownfish.clownfish.dbentities.CfJavascript</class>
     <class>io.clownfish.clownfish.dbentities.CfJavascriptversion</class>
+    <class>io.clownfish.clownfish.dbentities.CfJava</class>
+    <class>io.clownfish.clownfish.dbentities.CfJavaversion</class>
     <class>io.clownfish.clownfish.dbentities.CfKeyword</class>
     <class>io.clownfish.clownfish.dbentities.CfList</class>
     <class>io.clownfish.clownfish.dbentities.CfListcontent</class>

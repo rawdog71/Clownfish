@@ -33,6 +33,7 @@ import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
 import io.clownfish.clownfish.datamodels.ClownfishResponse;
 import io.clownfish.clownfish.datamodels.HibernateInit;
 import io.clownfish.clownfish.dbentities.CfJavascript;
+import io.clownfish.clownfish.dbentities.CfJava;
 import io.clownfish.clownfish.dbentities.CfQuartz;
 import io.clownfish.clownfish.dbentities.CfSearchhistory;
 import io.clownfish.clownfish.dbentities.CfSite;
@@ -64,6 +65,8 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
+import io.clownfish.clownfish.serviceinterface.CfJavaService;
+import io.clownfish.clownfish.serviceinterface.CfJavaversionService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
@@ -183,6 +186,8 @@ public class Clownfish {
     @Autowired CfStylesheetversionService cfstylesheetversionService;
     @Autowired CfJavascriptService cfjavascriptService;
     @Autowired CfJavascriptversionService cfjavascriptversionService;
+    @Autowired CfJavaService cfjavaService;
+    @Autowired CfJavaversionService cfjavaversionService;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired TemplateUtil templateUtil;
     @Autowired PropertyList propertylist;
@@ -705,6 +710,20 @@ public class Clownfish {
             outwriter.println(cfjavascript.getContent());
         } catch (Exception ex) {
             System.out.println("JS NOT FOUND");
+        }
+    }
+
+    @GetMapping(path = "/{name}.java")
+    public void universalGetJava(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        CfJava cfjava = null;
+        try {
+            cfjava = cfjavaService.findByName(name);
+            response.setContentType("text/x-java-source");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter outwriter = response.getWriter();
+            outwriter.println(cfjava.getContent());
+        } catch (Exception ex) {
+            System.out.println("Java NOT FOUND");
         }
     }
     
