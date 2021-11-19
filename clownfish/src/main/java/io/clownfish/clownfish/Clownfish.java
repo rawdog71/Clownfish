@@ -183,6 +183,8 @@ public class Clownfish {
     @Autowired CfStylesheetversionService cfstylesheetversionService;
     @Autowired CfJavascriptService cfjavascriptService;
     @Autowired CfJavascriptversionService cfjavascriptversionService;
+    @Autowired CfJavaService cfjavaService;
+    @Autowired CfJavaversionService cfjavaversionService;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired TemplateUtil templateUtil;
     @Autowired PropertyList propertylist;
@@ -699,6 +701,20 @@ public class Clownfish {
             outwriter.println(cfjavascript.getContent());
         } catch (Exception ex) {
             System.out.println("JS NOT FOUND");
+        }
+    }
+
+    @GetMapping(path = "/{name}.java")
+    public void universalGetJava(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        CfJava cfjava = null;
+        try {
+            cfjava = cfjavaService.findByName(name);
+            response.setContentType("text/x-java-source");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter outwriter = response.getWriter();
+            outwriter.println(cfjava.getContent());
+        } catch (Exception ex) {
+            System.out.println("Java NOT FOUND");
         }
     }
     

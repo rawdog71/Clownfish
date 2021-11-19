@@ -15,9 +15,11 @@
  */
 package io.clownfish.clownfish.lucene;
 
+import io.clownfish.clownfish.dbentities.CfJava;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfTemplate;
+import io.clownfish.clownfish.serviceinterface.CfJavaService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
@@ -47,17 +49,20 @@ public class SourceIndexer implements Runnable {
     List<CfTemplate> templatelist;
     List<CfStylesheet> stylesheetlist;
     List<CfJavascript> javascriptlist;
+    List<CfJava> javalist;
     private final CfTemplateService cftemplateService;
     private final CfStylesheetService cfstylesheetService;
     private final CfJavascriptService cfjavascriptService;
+    private final CfJavaService cfjavaService;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SourceIndexer.class);
     
-    public SourceIndexer(CfTemplateService cftemplateService, CfStylesheetService cfstylesheetService, CfJavascriptService cfjavascriptService, IndexService indexService) throws IOException {
+    public SourceIndexer(CfTemplateService cftemplateService, CfStylesheetService cfstylesheetService, CfJavascriptService cfjavascriptService, CfJavaService cfjavaService, IndexService indexService) throws IOException {
         writer = indexService.getWriter();
         this.cftemplateService = cftemplateService;
         this.cfstylesheetService = cfstylesheetService;
         this.cfjavascriptService = cfjavascriptService;
+        this.cfjavaService = cfjavaService;
     }
 
     public void close() throws CorruptIndexException, IOException {
@@ -101,6 +106,16 @@ public class SourceIndexer implements Runnable {
         return document;
     }
 
+    private Document getDocumentJava(CfJava java) throws IOException {
+        Document document = new Document();
+        document.add(new StoredField(LuceneConstants.CONTENT_TYPE, "Clownfish/Java"));
+        document.add(new StoredField(LuceneConstants.ID, java.getId()));
+        if (null != java.getContent()) {
+            document.add(new TextField(LuceneConstants.CONTENT_STRING, java.getContent(), Field.Store.YES));
+        }
+        return document;
+    }
+
     private void indexTemplate(CfTemplate template) throws IOException {
         Document document = getDocumentTemplate(template);
         if (null != document) {
@@ -122,6 +137,13 @@ public class SourceIndexer implements Runnable {
         }
     }
 
+    private void indexJava(CfJava java) throws IOException {
+        Document document = getDocumentJava(java);
+        if (null != document) {
+            writer.addDocument(document);
+        }
+    }
+
     public long createIndex() throws IOException {
         for (CfTemplate template : templatelist) {
             indexTemplate(template);
@@ -132,6 +154,9 @@ public class SourceIndexer implements Runnable {
         for (CfJavascript javascript : javascriptlist) {
             indexJavascript(javascript);
         }
+        for (CfJava java : javalist) {
+            indexJava(java);
+        }
         return writer.numRamDocs();
     }
 
@@ -141,6 +166,7 @@ public class SourceIndexer implements Runnable {
             templatelist = cftemplateService.findAll();
             stylesheetlist = cfstylesheetService.findAll();
             javascriptlist = cfjavascriptService.findAll();
+            javalist = cfjavaService.findAll();
             createIndex();
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
