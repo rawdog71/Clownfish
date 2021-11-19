@@ -42,9 +42,7 @@ public class JavaList implements ISourceContentInterface {
     @Autowired CfJavaService cfjavaService;
     @Autowired CfJavaversionService cfjavaversionService;
 
-    private @Getter
-    @Setter
-    List<CfJava> javaListe;
+    private @Getter @Setter List<CfJava> javaListe;
     private @Getter @Setter CfJava selectedJava = null;
     private @Getter @Setter String javaName = "";
     private @Getter @Setter boolean newButtonDisabled = true;
