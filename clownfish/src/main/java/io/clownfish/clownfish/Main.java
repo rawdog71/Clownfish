@@ -279,6 +279,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
                         String version = boot_props.getProperty("version");
                         String bootstrapfile = boot_props.getProperty("bootstrapfile");
                         if (1 == bootstrap) {
+                            bootstrap = 0;
                             AnsiConsole.systemInstall();
                             System.out.println(ansi().fg(GREEN));
                             System.out.println("BOOTSTRAPPING UPDATE VERSION " + version);
@@ -290,8 +291,9 @@ public class Main extends SpringBootServletInitializer implements ServletContext
 
                             File f = new File(files[i].getName());
                             OutputStream out = new FileOutputStream(f);
+                            boot_props.setProperty("bootstrap", String.valueOf(bootstrap));
                             DefaultPropertiesPersister p = new DefaultPropertiesPersister();
-                            p.store(props, out, "Bootstrap properties");
+                            p.store(boot_props, out, "Bootstrap properties");
                         }
                     } catch (FileNotFoundException ex) {
                         LOGGER.error(ex.getMessage());
