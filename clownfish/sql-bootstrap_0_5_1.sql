@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS `cf_java` (
 --
 
 CREATE TABLE IF NOT EXISTS `cf_javaversion` (
-  `java` bigint(20) unsigned NOT NULL,
+  `javaref` bigint(20) unsigned NOT NULL,
   `version` bigint(20) NOT NULL,
   `content` blob,
   `tstamp` datetime NOT NULL,
   `commitedby` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`java`,`version`)
+  PRIMARY KEY (`javaref`,`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
