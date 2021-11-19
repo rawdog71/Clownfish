@@ -258,6 +258,7 @@ public class Clownfish {
     @Value("${hibernate.init:0}") int hibernateInit;
     @Value("${sapconnection.file}") String SAPCONNECTION;
     String libloaderpath;
+    String mavenpath;
     
     /**
      * Call of the "root" site
@@ -314,6 +315,11 @@ public class Clownfish {
             beanUtil = new BeanUtil();
         if ((!libloaderpath.isBlank()) && (null != libloaderpath)) 
             beanUtil.init(libloaderpath);
+        
+        mavenpath = propertyUtil.getPropertyValue("folder_maven");
+        
+        if ((!mavenpath.isBlank()) && (null != mavenpath)) 
+            ClassPathUtil.addPath(mavenpath);
         
         if (1 == bootstrap) {
             bootstrap = 0;
