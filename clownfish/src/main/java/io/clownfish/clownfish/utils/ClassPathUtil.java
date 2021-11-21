@@ -15,14 +15,20 @@
  */
 package io.clownfish.clownfish.utils;
 
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import lombok.Getter;
 
 /**
  *
@@ -31,8 +37,9 @@ import java.util.logging.Logger;
 
 public class ClassPathUtil {
     private static final Class[] parameters = new Class[] { URL.class };
+    private @Getter HashSet<Class> class_set = new HashSet<>();
   
-    public static void addPath(String libpath) {
+    public void addPath(String libpath) {
         File dependencyDirectory = new File(libpath);
         File[] files = dependencyDirectory.listFiles();
         for (int i = 0; i < files.length; i++) {
@@ -46,30 +53,32 @@ public class ClassPathUtil {
         }
     }
     
-    public static void addFile(String aFileName) throws IOException
+    public void addFile(String aFileName) throws IOException
     {
         File f = new File(aFileName);
         addFile(f);
     }
   
-    public static void addFile(File aFile) throws IOException
+    public void addFile(File aFile) throws IOException
     {
         addURL(aFile.toURI().toURL());
     }
   
-    public static void addURL(URL aURL) throws IOException
+    public void addURL(URL aURL) throws IOException
     {
         ArrayList<URL> urlarray = new ArrayList<>();
         urlarray.add(aURL);
         URL[] urllist = new URL[urlarray.size()];
         urllist = urlarray.toArray(urllist);
         URLClassLoader sysloader = new URLClassLoader(urllist);
+        //List<ClassInfo> cilist = ClassPath.from(sysloader).getTopLevelClasses("org.joda.time").asList();
         Class sysclass = URLClassLoader.class;
         try
         {
             Method method = sysclass.getDeclaredMethod("addURL", parameters);
             method.setAccessible(true);
             method.invoke(sysloader, new Object[] { aURL });
+            class_set.add(ClassPath.from(sysloader).getAllClasses().stream().map(clazz -> clazz.load()).getClass());
         }
         catch (Throwable t)
         {

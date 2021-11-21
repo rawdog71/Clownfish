@@ -101,6 +101,8 @@ import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -124,6 +126,7 @@ import javax.ws.rs.core.Context;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.commons.io.FileUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -238,6 +241,7 @@ public class Clownfish {
     private DefaultUtil defaultUtil;
     private PDFUtil pdfUtil;
     private BeanUtil beanUtil;
+    private ClassPathUtil classpathUtil;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map searchcontentmap;
     private @Getter @Setter Map searchassetmap;
@@ -323,8 +327,12 @@ public class Clownfish {
         
         mavenpath = propertyUtil.getPropertyValue("folder_maven");
         
-        if ((!mavenpath.isBlank()) && (null != mavenpath)) 
-            ClassPathUtil.addPath(mavenpath);
+        if ((!mavenpath.isBlank()) && (null != mavenpath)) {
+            if (classpathUtil == null) {
+                classpathUtil = new ClassPathUtil();
+            }
+            classpathUtil.addPath(mavenpath);
+        }
         
         if (1 == bootstrap) {
             bootstrap = 0;
@@ -740,6 +748,25 @@ public class Clownfish {
             System.out.print("ROBOTS NOT FOUND");
         }
     }
+    
+    /*
+    @GetMapping(path = "/maven")
+    public void universalGetMaven(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+        try {
+            FileUtils.copyURLToFile(
+                    new URL("https://search.maven.org/remotecontent?filepath=joda-time/joda-time/2.10.13/joda-time-2.10.13.jar"),
+                    new File("D:\\server\\clownfish\\maven\\joda-time-2.10.13.jar"),
+                    6000,
+                    6000);
+            init();
+        } catch (MalformedURLException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    */
+    
     
     /**
      * GET
