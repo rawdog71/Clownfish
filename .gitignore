@@ -7,3 +7,4 @@ target/
 *.jcoDestination
 clownfish/sapconnection.props
 clownfish/sapconnection_ekn.props
+*.log
