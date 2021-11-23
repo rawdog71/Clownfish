@@ -36,9 +36,9 @@ import java.util.List;
 @Named("javaList")
 @Scope("singleton")
 @Component
-public class JavaList implements ISourceContentInterface {
-    @Inject
-    LoginBean loginbean;
+public class JavaList implements ISourceContentInterface
+{
+    @Inject LoginBean loginbean;
     @Autowired CfJavaService cfjavaService;
     @Autowired CfJavaversionService cfjavaversionService;
 

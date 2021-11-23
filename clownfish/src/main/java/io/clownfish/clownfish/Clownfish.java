@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish;
 
+import io.clownfish.clownfish.compiler.CfClassCompiler;
 import io.clownfish.clownfish.exceptions.PageNotFoundException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -190,6 +191,7 @@ public class Clownfish {
     @Autowired CfJavascriptService cfjavascriptService;
     @Autowired CfJavascriptversionService cfjavascriptversionService;
     @Autowired CfJavaService cfjavaService;
+    @Autowired CfClassCompiler cfclassCompiler;
     @Autowired CfJavaversionService cfjavaversionService;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired TemplateUtil templateUtil;
@@ -333,6 +335,9 @@ public class Clownfish {
             }
             classpathUtil.addPath(mavenpath);
         }
+
+        if (cfclassCompiler == null)
+            cfclassCompiler = new CfClassCompiler();
         
         if (1 == bootstrap) {
             bootstrap = 0;
