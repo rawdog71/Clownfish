@@ -15,107 +15,54 @@
  */
 package io.clownfish.clownfish;
 
-import io.clownfish.clownfish.compiler.CfClassCompiler;
-import io.clownfish.clownfish.exceptions.PageNotFoundException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import de.destrukt.sapconnection.SAPConnection;
-import io.clownfish.clownfish.beans.AssetList;
-import io.clownfish.clownfish.beans.AttributContentList;
-import io.clownfish.clownfish.templatebeans.*;
-import io.clownfish.clownfish.beans.JsonFormParameter;
-import io.clownfish.clownfish.beans.PropertyList;
-import io.clownfish.clownfish.beans.QuartzList;
-import io.clownfish.clownfish.beans.ServiceStatus;
+import io.clownfish.clownfish.beans.*;
+import io.clownfish.clownfish.compiler.CfClassCompiler;
 import io.clownfish.clownfish.constants.ClownfishConst;
-import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
-import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
 import io.clownfish.clownfish.datamodels.ClownfishResponse;
 import io.clownfish.clownfish.datamodels.HibernateInit;
-import io.clownfish.clownfish.dbentities.CfJavascript;
-import io.clownfish.clownfish.dbentities.CfJava;
-import io.clownfish.clownfish.dbentities.CfQuartz;
-import io.clownfish.clownfish.dbentities.CfSearchhistory;
-import io.clownfish.clownfish.dbentities.CfSite;
-import io.clownfish.clownfish.dbentities.CfSitecontent;
-import io.clownfish.clownfish.dbentities.CfSitedatasource;
-import io.clownfish.clownfish.dbentities.CfSitesaprfc;
-import io.clownfish.clownfish.dbentities.CfStylesheet;
-import io.clownfish.clownfish.dbentities.CfTemplate;
+import io.clownfish.clownfish.dbentities.*;
+import io.clownfish.clownfish.exceptions.PageNotFoundException;
 import io.clownfish.clownfish.interceptor.GzipSwitch;
 import io.clownfish.clownfish.jdbc.DatatableDeleteProperties;
 import io.clownfish.clownfish.jdbc.DatatableNewProperties;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
-import io.clownfish.clownfish.lucene.AssetIndexer;
-import io.clownfish.clownfish.lucene.ContentIndexer;
-import io.clownfish.clownfish.lucene.IndexService;
-import io.clownfish.clownfish.lucene.LuceneConstants;
-import io.clownfish.clownfish.lucene.SearchResult;
-import io.clownfish.clownfish.lucene.Searcher;
+import io.clownfish.clownfish.lucene.*;
 import io.clownfish.clownfish.mail.EmailProperties;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
-import io.clownfish.clownfish.serviceinterface.CfAssetService;
-import io.clownfish.clownfish.serviceinterface.CfAttributService;
-import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
-import io.clownfish.clownfish.serviceinterface.CfClassService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
-import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
-import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
-import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
-import io.clownfish.clownfish.serviceinterface.CfJavaService;
-import io.clownfish.clownfish.serviceinterface.CfJavaversionService;
-import io.clownfish.clownfish.serviceinterface.CfKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfListService;
-import io.clownfish.clownfish.serviceinterface.CfListcontentService;
-import io.clownfish.clownfish.serviceinterface.CfSearchhistoryService;
-import io.clownfish.clownfish.serviceinterface.CfSiteService;
-import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
-import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
-import io.clownfish.clownfish.serviceinterface.CfSitelistService;
-import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
-import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
-import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
-import io.clownfish.clownfish.serviceinterface.CfTemplateService;
-import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
+import io.clownfish.clownfish.serviceinterface.*;
+import io.clownfish.clownfish.templatebeans.*;
 import io.clownfish.clownfish.utils.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.catalina.util.ServerInfo;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.fusesource.jansi.AnsiConsole;
+import org.quartz.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.stereotype.Component;
+import org.springframework.util.DefaultPropertiesPersister;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.HandlerMapping;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.persistence.NoResultException;
@@ -124,44 +71,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.catalina.util.ServerInfo;
-import org.apache.commons.io.FileUtils;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import static org.fusesource.jansi.Ansi.Color.*;
+import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
+
+import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
+import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.ansi;
-import org.fusesource.jansi.AnsiConsole;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
-import org.quartz.CronTrigger;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
-import org.springframework.util.DefaultPropertiesPersister;
-import org.springframework.web.servlet.HandlerMapping;
 
 /**
  *
@@ -1198,6 +1123,21 @@ public class Clownfish {
                                             Object object = ctor.newInstance(new Object[] { });
                                             fmRoot.put(tpbc.getName().replaceAll("\\.", "_"), object);
                                         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
+
+                                    for (Class<?> clazz : cfclassCompiler.getLoadedClasses())
+                                    {
+                                        Constructor<?> ctor;
+                                        try
+                                        {
+                                            ctor = clazz.getConstructor();
+                                            Object object = ctor.newInstance();
+                                            fmRoot.put(clazz.getName().replaceAll("\\.", "_"), object);
+                                        }
+                                        catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex)
+                                        {
                                             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
                                         }
                                     }

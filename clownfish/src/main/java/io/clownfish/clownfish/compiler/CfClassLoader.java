@@ -1,52 +1,57 @@
 package io.clownfish.clownfish.compiler;
 
-import io.clownfish.clownfish.serviceinterface.CfJavaService;
+import net.openhft.compiler.CompilerUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class CfClassLoader extends ClassLoader
 {
-    @Autowired transient CfJavaService cfJavaService;
-    @Autowired transient CfClassCompiler cfClassCompiler;
-    private final String className;
-    private final byte[] byteCode;
-
-    public CfClassLoader(String className, byte[] byteCode)
-    {
-        super(CfClassLoader.class.getClassLoader());
-
-        this.className = className;
-        this.byteCode = byteCode;
-    }
+    private final String JAVA_SRC;
 
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CfClassLoader.class);
 
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException
+    public CfClassLoader(String src)
     {
-        if (name.equals(className))
-        {
-            byte[] bytes = new byte[0];
-
-            try
-            {
-                bytes = loadClassFromContent(name);
-            }
-            catch (IOException e)
-            {
-                LOGGER.error(e.getMessage());
-            }
-
-            return defineClass(name, bytes, 0, bytes.length);
-        }
-
-        return super.findClass(name);
+        super(CfClassLoader.class.getClassLoader());
+        JAVA_SRC = src;
     }
 
-    private byte[] loadClassFromContent(String name) throws ClassNotFoundException, IOException
+    @Override
+    public Class<?> loadClass(String name)
     {
-        return cfClassCompiler.compileClass(/*this,*/ name, cfJavaService.findByName(name).getContent()).getResourceAsStream(name).readAllBytes();
+        return findClass(name);
+    }
+
+    private byte[] loadByteCode(String name, String src) throws ClassNotFoundException, IOException
+    {
+        return Objects.requireNonNull(CompilerUtils.CACHED_COMPILER.loadFromJava(name, src).getResourceAsStream(name)).readAllBytes();
+    }
+
+    @Override
+    protected Class<?> findClass(String name)
+    {
+        Class<?> clazz = null;
+
+        try
+        {
+            if (super.findLoadedClass(name) == null)
+            {
+                clazz = CompilerUtils.CACHED_COMPILER.loadFromJava(this, name, JAVA_SRC);
+            }
+            else
+            {
+                super.findClass(name);
+            }
+
+            // clazz = CompilerUtils.CACHED_COMPILER.loadFromJava(this, name, JAVA_SRC);
+        }
+        catch (ClassNotFoundException e)
+        {
+            LOGGER.error(e.getMessage());
+        }
+
+        return clazz;
     }
 }
