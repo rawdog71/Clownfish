@@ -43,6 +43,7 @@
     <class>io.clownfish.clownfish.dbentities.CfSitekeywordlist</class>
     <class>io.clownfish.clownfish.dbentities.CfWebservice</class>
     <class>io.clownfish.clownfish.dbentities.CfWebserviceauth</class>
+    <class>io.clownfish.clownfish.dbentities.CfMaven</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/clownfish?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.user" value="clownfish"/>

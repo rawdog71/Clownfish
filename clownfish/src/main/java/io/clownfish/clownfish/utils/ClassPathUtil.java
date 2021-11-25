@@ -16,26 +16,27 @@
 package io.clownfish.clownfish.utils;
 
 import com.google.common.reflect.ClassPath;
-import com.google.common.reflect.ClassPath.ClassInfo;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+import javax.faces.view.ViewScoped;
 import lombok.Getter;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author raine
  */
-
-public class ClassPathUtil {
+@ViewScoped
+@Component
+public class ClassPathUtil implements Serializable {
     private static final Class[] parameters = new Class[] { URL.class };
     private @Getter HashSet<Class> class_set = new HashSet<>();
   
