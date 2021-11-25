@@ -1638,6 +1638,15 @@
                             </p:column>
                         </p:row>
                         
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="reefjava" value="Java" />
+                                <p:selectCheckboxMenu id="reefjava" value="#{reefbean.reef.javalist}" required="false" label="Java" converter="#{javaConverterBean}" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItems value="#{reefbean.javalist}" var="reefjava" itemLabel="#{reefjava.name}" itemValue="#{reefjava}" />
+                                </p:selectCheckboxMenu>
+                            </p:column>
+                        </p:row>
+                        
                     </p:panelGrid>
                     
                     <p:panelGrid columns="1">    
