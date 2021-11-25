@@ -18,6 +18,8 @@ package io.clownfish.clownfish.beans;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfStylesheetversion;
 import io.clownfish.clownfish.dbentities.CfStylesheetversionPK;
+import io.clownfish.clownfish.lucene.IndexService;
+import io.clownfish.clownfish.lucene.SourceIndexer;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
@@ -80,6 +82,8 @@ public class StylesheetList implements ISourceContentInterface {
     private @Getter @Setter boolean access;
     private @Getter @Setter EditorOptions editorOptions;
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
+    @Autowired @Getter @Setter IndexService indexService;
+    @Autowired @Getter @Setter SourceIndexer sourceindexer;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(StylesheetList.class);
 
@@ -111,6 +115,11 @@ public class StylesheetList implements ISourceContentInterface {
     @Override
     public void init() {
         LOGGER.info("INIT STYLESHEET START");
+        try {
+            sourceindexer.initStylesheet(cfstylesheetService, indexService);
+        } catch (IOException ex) {
+            
+        }
         stylesheetName = "";
         stylesheetListe = cfstylesheetService.findAll();
         stylesheetUtility.setStyelsheetContent("");
@@ -192,6 +201,7 @@ public class StylesheetList implements ISourceContentInterface {
                         FacesMessage message = new FacesMessage("Commited " + selectedStylesheet.getName() + " Version: " + 1);
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
+                    sourceindexer.indexStylesheet(selectedStylesheet);
                 } catch (IOException ex) {
                     LOGGER.error(ex.getMessage());
                 }

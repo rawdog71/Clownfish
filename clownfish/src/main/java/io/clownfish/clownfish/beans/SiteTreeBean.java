@@ -37,6 +37,7 @@ import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.dbentities.CfSitesaprfcPK;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfTemplate;
+import io.clownfish.clownfish.lucene.SourceIndexer;
 import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
 import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
 import io.clownfish.clownfish.sap.models.RfcFunction;
@@ -172,12 +173,16 @@ public class SiteTreeBean implements Serializable {
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
     @Autowired transient FolderUtil folderUtil;
+    private SourceIndexer sourceindexer;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
     @PostConstruct
     public void init() {
         LOGGER.info("INIT SITETREE START");
+        if (null == sourceindexer) {
+            sourceindexer = new SourceIndexer();
+        }
         propertymap = propertylist.fillPropertyMap();
         String sapSupportProp = propertymap.get("sap_support");
         if (sapSupportProp == null) {

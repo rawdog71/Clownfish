@@ -3,6 +3,8 @@ package io.clownfish.clownfish.beans;
 import io.clownfish.clownfish.dbentities.CfJava;
 import io.clownfish.clownfish.dbentities.CfJavaversion;
 import io.clownfish.clownfish.dbentities.CfJavaversionPK;
+import io.clownfish.clownfish.lucene.IndexService;
+import io.clownfish.clownfish.lucene.SourceIndexer;
 import io.clownfish.clownfish.serviceinterface.CfJavaService;
 import io.clownfish.clownfish.serviceinterface.CfJavaversionService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
@@ -58,6 +60,8 @@ public class JavaList implements ISourceContentInterface {
     private @Getter @Setter boolean access;
     private @Getter @Setter EditorOptions editorOptions;
     @Autowired private @Getter @Setter JavaUtil javaUtility;
+    @Autowired @Getter @Setter IndexService indexService;
+    @Autowired @Getter @Setter SourceIndexer sourceindexer;
 
     final transient Logger LOGGER = LoggerFactory.getLogger(JavaList.class);
 
@@ -98,6 +102,11 @@ public class JavaList implements ISourceContentInterface {
     public void init()
     {
         LOGGER.info("INIT JAVA START");
+        try {
+            sourceindexer.initJava(cfjavaService, indexService);
+        } catch (IOException ex) {
+            
+        }
         javaName = "";
         javaListe = cfjavaService.findAll();
         javaUtility.setJavaContent("");
@@ -194,6 +203,7 @@ public class JavaList implements ISourceContentInterface {
                         FacesMessage message = new FacesMessage("Commited " + selectedJava.getName() + " Version: " + 1);
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
+                    sourceindexer.indexJava(selectedJava);
                 }
                 catch (IOException ex)
                 {

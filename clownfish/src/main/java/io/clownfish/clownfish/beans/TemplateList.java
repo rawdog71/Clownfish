@@ -18,6 +18,8 @@ package io.clownfish.clownfish.beans;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.dbentities.CfTemplateversion;
 import io.clownfish.clownfish.dbentities.CfTemplateversionPK;
+import io.clownfish.clownfish.lucene.IndexService;
+import io.clownfish.clownfish.lucene.SourceIndexer;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
@@ -82,6 +84,8 @@ public class TemplateList implements ISourceContentInterface {
     private @Getter @Setter boolean access;
     private @Getter @Setter EditorOptions editorOptions;
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
+    @Autowired @Getter @Setter IndexService indexService;
+    @Autowired @Getter @Setter SourceIndexer sourceindexer;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(TemplateList.class);
 
@@ -113,6 +117,11 @@ public class TemplateList implements ISourceContentInterface {
     @Override
     public void init() {
         LOGGER.info("INIT TEMPLATE START");
+        try {
+            sourceindexer.initTemplate(cftemplateService, indexService);
+        } catch (IOException ex) {
+            
+        }
         templateName = "";
         templateListe = cftemplateService.findAll();
         templateUtility.setTemplateContent("");
@@ -214,6 +223,7 @@ public class TemplateList implements ISourceContentInterface {
                         FacesMessage message = new FacesMessage("Commited " + selectedTemplate.getName() + " Version: " + 1);
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
+                    sourceindexer.indexTemplate(selectedTemplate);
                 } catch (IOException ex) {
                     LOGGER.error(ex.getMessage());
                 }

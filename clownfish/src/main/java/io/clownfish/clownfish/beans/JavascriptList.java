@@ -18,6 +18,8 @@ package io.clownfish.clownfish.beans;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfJavascriptversion;
 import io.clownfish.clownfish.dbentities.CfJavascriptversionPK;
+import io.clownfish.clownfish.lucene.IndexService;
+import io.clownfish.clownfish.lucene.SourceIndexer;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
@@ -80,6 +82,8 @@ public class JavascriptList implements ISourceContentInterface {
     private @Getter @Setter boolean access;
     private @Getter @Setter EditorOptions editorOptions;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
+    @Autowired @Getter @Setter IndexService indexService;
+    @Autowired @Getter @Setter SourceIndexer sourceindexer;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(JavascriptList.class);
 
@@ -111,6 +115,11 @@ public class JavascriptList implements ISourceContentInterface {
     @Override
     public void init() {
         LOGGER.info("INIT JAVASCRIPT START");
+        try {
+            sourceindexer.initJavascript(cfjavascriptService, indexService);
+        } catch (IOException ex) {
+            
+        }
         javascriptName = "";
         javascriptListe = cfjavascriptService.findAll();
         javascriptUtility.setJavascriptContent("");
@@ -192,6 +201,7 @@ public class JavascriptList implements ISourceContentInterface {
                         FacesMessage message = new FacesMessage("Commited " + selectedJavascript.getName() + " Version: " + 1);
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
+                    sourceindexer.indexJavascript(selectedJavascript);
                 } catch (IOException ex) {
                     LOGGER.error(ex.getMessage());
                 }

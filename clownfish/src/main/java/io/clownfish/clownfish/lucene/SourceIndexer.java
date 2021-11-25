@@ -45,23 +45,46 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 @Component
 public class SourceIndexer implements Runnable {
-    private final IndexWriter writer;
+    private IndexWriter writer;
     List<CfTemplate> templatelist;
     List<CfStylesheet> stylesheetlist;
     List<CfJavascript> javascriptlist;
     List<CfJava> javalist;
-    private final CfTemplateService cftemplateService;
-    private final CfStylesheetService cfstylesheetService;
-    private final CfJavascriptService cfjavascriptService;
-    private final CfJavaService cfjavaService;
+    private CfTemplateService cftemplateService = null;
+    private CfStylesheetService cfstylesheetService = null;
+    private CfJavascriptService cfjavascriptService = null;
+    private CfJavaService cfjavaService = null;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SourceIndexer.class);
+
+    public SourceIndexer() {
+    }
     
     public SourceIndexer(CfTemplateService cftemplateService, CfStylesheetService cfstylesheetService, CfJavascriptService cfjavascriptService, CfJavaService cfjavaService, IndexService indexService) throws IOException {
         writer = indexService.getWriter();
         this.cftemplateService = cftemplateService;
         this.cfstylesheetService = cfstylesheetService;
         this.cfjavascriptService = cfjavascriptService;
+        this.cfjavaService = cfjavaService;
+    }
+    
+    public void initTemplate(CfTemplateService cftemplateService, IndexService indexService) throws IOException {
+        writer = indexService.getWriter();
+        this.cftemplateService = cftemplateService;
+    }
+    
+    public void initStylesheet(CfStylesheetService cfstylesheetService, IndexService indexService) throws IOException {
+        writer = indexService.getWriter();
+        this.cfstylesheetService = cfstylesheetService;
+    }
+    
+    public void initJavascript(CfJavascriptService cfjavascriptService, IndexService indexService) throws IOException {
+        writer = indexService.getWriter();
+        this.cfjavascriptService = cfjavascriptService;
+    }
+    
+    public void initJava(CfJavaService cfjavaService, IndexService indexService) throws IOException {
+        writer = indexService.getWriter();
         this.cfjavaService = cfjavaService;
     }
 
@@ -116,28 +139,28 @@ public class SourceIndexer implements Runnable {
         return document;
     }
 
-    private void indexTemplate(CfTemplate template) throws IOException {
+    public void indexTemplate(CfTemplate template) throws IOException {
         Document document = getDocumentTemplate(template);
         if (null != document) {
             writer.addDocument(document);
         }
     }
     
-    private void indexStylesheet(CfStylesheet stylesheet) throws IOException {
+    public void indexStylesheet(CfStylesheet stylesheet) throws IOException {
         Document document = getDocumentCSS(stylesheet);
         if (null != document) {
             writer.addDocument(document);
         }
     }
     
-    private void indexJavascript(CfJavascript javascript) throws IOException {
+    public void indexJavascript(CfJavascript javascript) throws IOException {
         Document document = getDocumentJS(javascript);
         if (null != document) {
             writer.addDocument(document);
         }
     }
 
-    private void indexJava(CfJava java) throws IOException {
+    public void indexJava(CfJava java) throws IOException {
         Document document = getDocumentJava(java);
         if (null != document) {
             writer.addDocument(document);
