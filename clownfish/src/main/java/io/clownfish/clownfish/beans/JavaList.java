@@ -32,15 +32,16 @@ import javax.inject.Named;
 import javax.persistence.NoResultException;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
 @Named("javaList")
 @Scope("singleton")
 @Component
-public class JavaList implements ISourceContentInterface {
-    @Inject
-    LoginBean loginbean;
+public class JavaList implements ISourceContentInterface
+{
+    @Inject LoginBean loginbean;
     @Autowired CfJavaService cfjavaService;
     @Autowired CfJavaversionService cfjavaversionService;
 
@@ -181,7 +182,7 @@ public class JavaList implements ISourceContentInterface {
                 try
                 {
                     String content = getContent();
-                    byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
+                    byte[] output = CompressionUtils.compress(content.getBytes(StandardCharsets.UTF_8));
                     try
                     {
                         long maxversion = cfjavaversionService.findMaxVersion(selectedJava.getId());
@@ -191,7 +192,7 @@ public class JavaList implements ISourceContentInterface {
                         this.javaversionMax = javaUtility.getCurrentVersion();
                         this.selectedjavaversion = this.javaversionMax;
 
-                        FacesMessage message = new FacesMessage("Commited " + selectedJava.getName() + " Version: " + (maxversion + 1));
+                        FacesMessage message = new FacesMessage("Committed " + selectedJava.getName() + " version: " + (maxversion + 1));
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
                     catch (NullPointerException nullptr)
@@ -200,7 +201,7 @@ public class JavaList implements ISourceContentInterface {
                         javaUtility.setCurrentVersion(1);
                         difference = javaUtility.hasDifference(selectedJava);
 
-                        FacesMessage message = new FacesMessage("Commited " + selectedJava.getName() + " Version: " + 1);
+                        FacesMessage message = new FacesMessage("Committed " + selectedJava.getName() + " version: " + 1);
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
                     sourceindexer.indexJava(selectedJava);
@@ -215,7 +216,7 @@ public class JavaList implements ISourceContentInterface {
                 difference = javaUtility.hasDifference(selectedJava);
                 access = true;
 
-                FacesMessage message = new FacesMessage("Could not commit " + selectedJava.getName() + " Version: " + 1);
+                FacesMessage message = new FacesMessage("Could not commit " + selectedJava.getName() + " version: " + 1);
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }
         }
@@ -308,7 +309,8 @@ public class JavaList implements ISourceContentInterface {
             {
                 CfJava newjava = new CfJava();
                 newjava.setName(javaName);
-                newjava.setContent("//"+javaName);
+                newjava.setContent("package io.clownfish.internal;\n\n" +
+                        "public class " + javaName + "\n{\n\n}");
                 cfjavaService.create(newjava);
                 javaListe = cfjavaService.findAll();
                 javaName = "";
