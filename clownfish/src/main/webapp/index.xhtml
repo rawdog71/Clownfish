@@ -40,6 +40,12 @@
             </p:commandButton>
             
             <p:tabView id="tabview">
+				<style>
+					.tabview {
+						padding: 0 15px 0 0;
+					}
+				</style>
+				
                 <p:tab title="Login" id="loginpanel" rendered="#{!loginBean.login}">
                     <h:panelGrid columns="2" columnClasses="label, value">
                         <h:outputText value="E-Mail: *" />
@@ -527,6 +533,18 @@
                             </p:dataTable>
                         </p:overlayPanel>
                     </h:panelGroup>
+                </p:tab>
+				
+				<p:tab title="Compile" id="compilepanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
+					<p:row>
+                        <p:column>
+						    <p:selectCheckboxMenu id="compilejavalist" value="#{javaCompiler.javaListSelected}" label="Java" required="false" update=":form:tabview:editjava :form:tabview:newjava" converter="#{javaConverterBean}" filter="true" filterMatchMode="startsWith">
+                                <f:selectItems value="#{javaList.javaListe}" var="compilejavalist" itemLabel="#{compilejavalist.name}" itemValue="#{compilejavalist}" />
+						    </p:selectCheckboxMenu>
+                        </p:column>
+                    </p:row>
+					<p:commandButton id="compileselected" process="form" value="Compile selected" actionListener="#{javaCompiler.onCompileSelected}" update=":form:msgs :form:tabview:compilejavalist" />
+					<p:commandButton id="compileall" process="form" value="Compile all" actionListener="#{javaCompiler.onCompileAll}" update=":form:msgs" />
                 </p:tab>
                 
                 <p:tab title="Maven" id="mavenpanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
@@ -1634,6 +1652,15 @@
                                 <p:outputLabel for="reefjavascripts" value="Javascripts" />
                                 <p:selectCheckboxMenu id="reefjavascripts" value="#{reefbean.reef.javascriptlist}" required="false" label="Javascripts" converter="#{javascriptConverterBean}" filter="true" filterMatchMode="startsWith">
                                     <f:selectItems value="#{reefbean.javascriptlist}" var="reefjavascript" itemLabel="#{reefjavascript.name}" itemValue="#{reefjavascript}" />
+                                </p:selectCheckboxMenu>
+                            </p:column>
+                        </p:row>
+						
+						<p:row>
+                            <p:column>
+                                <p:outputLabel for="reefjava" value="Java" />
+                                <p:selectCheckboxMenu id="reefjava" value="#{reefbean.reef.javalist}" required="false" label="Java" converter="#{javaConverterBean}" filter="true" filterMatchMode="startsWith">
+                                    <f:selectItems value="#{reefbean.javalist}" var="reefjava" itemLabel="#{reefjava.name}" itemValue="#{reefjava}" />
                                 </p:selectCheckboxMenu>
                             </p:column>
                         </p:row>
