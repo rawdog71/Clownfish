@@ -74,6 +74,7 @@ import javax.ws.rs.core.Context;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -1116,13 +1117,30 @@ public class Clownfish {
                                         fmRoot.put("searchclasscontentlist", searchclasscontentmap);
                                     }
                                     
-                                    for (Class tpbc : beanUtil.getLoadabletemplatebeans()) {
+                                    for (Class<?> tpbc : beanUtil.getLoadabletemplatebeans()) {
                                         Constructor<?> ctor;
                                         try {
                                             ctor = tpbc.getConstructor();
-                                            Object object = ctor.newInstance(new Object[] { });
+                                            Object object = ctor.newInstance();
                                             fmRoot.put(tpbc.getName().replaceAll("\\.", "_"), object);
                                         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
+
+                                    for (Class<?> c : classpathUtil.getClass_set()) {
+                                        Constructor<?> ctor;
+                                        try {
+                                            if (!Modifier.isInterface(c.getModifiers()) && !Modifier.isAbstract(c.getModifiers()) && !Modifier.isFinal(c.getModifiers()))
+                                            {
+                                                ctor = c.getConstructor();
+                                                Object object = ctor.newInstance();
+                                                fmRoot.put(c.getName().replaceAll("\\.", "_"), object);
+                                            }
+                                        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                            if (ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException)
+                                                continue;
+
                                             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
                                         }
                                     }

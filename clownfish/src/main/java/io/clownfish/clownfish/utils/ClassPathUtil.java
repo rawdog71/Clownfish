@@ -15,20 +15,22 @@
  */
 package io.clownfish.clownfish.utils;
 
-import com.google.common.reflect.ClassPath;
+import lombok.Getter;
+import org.apache.commons.lang.ArrayUtils;
+import org.springframework.stereotype.Component;
+
+import javax.faces.view.ViewScoped;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.view.ViewScoped;
-import lombok.Getter;
-import org.springframework.stereotype.Component;
 
 /**
  *
@@ -37,54 +39,71 @@ import org.springframework.stereotype.Component;
 @ViewScoped
 @Component
 public class ClassPathUtil implements Serializable {
-    private static final Class[] parameters = new Class[] { URL.class };
-    private @Getter HashSet<Class> class_set = new HashSet<>();
+    private @Getter HashSet<Class<?>> class_set = new HashSet<>();
   
     public void addPath(String libpath) {
         File dependencyDirectory = new File(libpath);
         File[] files = dependencyDirectory.listFiles();
+
         for (int i = 0; i < files.length; i++) {
-            if (files[i].getName().endsWith(".jar")) {
-                try {
-                    addFile(files[i]);
-                } catch (IOException ex) {
-                    Logger.getLogger(ClassPathUtil.class.getName()).log(Level.SEVERE, null, ex);
+            if (!files[i].getName().endsWith(".jar")) {
+                ArrayUtils.remove(files, i);
+            }
+        }
+        try {
+            addURL(files);
+        } catch (IOException e) {
+            Logger.getLogger(ClassPathUtil.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }
+  
+    public void addURL(File[] files) throws IOException
+    {
+        //List<ClassInfo> cilist = ClassPath.from(sysloader).getTopLevelClasses("org.joda.time").asList();
+        ClassLoader sysloader = ClassLoader.getSystemClassLoader();
+        // Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+        // method.setAccessible(true);
+
+        JarFile[] jarFiles = new JarFile[files.length];
+        URL[] urls = new URL[jarFiles.length];
+
+        for (int i = 0; i < jarFiles.length; i++)
+        {
+            jarFiles[i] = new JarFile(files[i]);
+            urls[i] = new URL("jar:file:" + files[i].toString() + "!/");
+        }
+
+        URLClassLoader urlClassLoader = URLClassLoader.newInstance(urls);
+
+        for (JarFile jar : jarFiles)
+        {
+            int count = 0;
+            Enumeration<JarEntry> jarEntries = jar.entries();
+            while (jarEntries.hasMoreElements())
+            {
+                count++;
+                JarEntry je = jarEntries.nextElement();
+                System.out.println("Element " + count + ": " + je.getName());
+
+                if (je.isDirectory() || !je.getName().endsWith(".class"))
+                    continue;
+
+                // -6 because of .class
+                String className = je.getName().substring(0, je.getName().length() - 6);
+                className = className.replace('/', '.');
+                try
+                {
+                    Class<?> c = urlClassLoader.loadClass(className);
+                    class_set.add(c);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    Logger.getLogger(ClassPathUtil.class.getName()).log(Level.SEVERE, null, e);
                 }
             }
         }
-    }
-    
-    public void addFile(String aFileName) throws IOException
-    {
-        File f = new File(aFileName);
-        addFile(f);
-    }
-  
-    public void addFile(File aFile) throws IOException
-    {
-        addURL(aFile.toURI().toURL());
-    }
-  
-    public void addURL(URL aURL) throws IOException
-    {
-        ArrayList<URL> urlarray = new ArrayList<>();
-        urlarray.add(aURL);
-        URL[] urllist = new URL[urlarray.size()];
-        urllist = urlarray.toArray(urllist);
-        URLClassLoader sysloader = new URLClassLoader(urllist);
-        //List<ClassInfo> cilist = ClassPath.from(sysloader).getTopLevelClasses("org.joda.time").asList();
-        Class sysclass = URLClassLoader.class;
-        try
-        {
-            Method method = sysclass.getDeclaredMethod("addURL", parameters);
-            method.setAccessible(true);
-            method.invoke(sysloader, new Object[] { aURL });
-            class_set.add(ClassPath.from(sysloader).getAllClasses().stream().map(clazz -> clazz.load()).getClass());
-        }
-        catch (Throwable t)
-        {
-            t.printStackTrace();
-            throw new IOException("Error adding " + aURL + " to system classloader");
-        }
+
+        // method.invoke(urlClassLoader, url);
+        // class_set.add(ClassPath.from(urlClassLoader).getAllClasses().stream().map(clazz -> clazz.load()).getClass());
     }
 }
