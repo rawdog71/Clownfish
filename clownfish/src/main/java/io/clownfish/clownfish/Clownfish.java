@@ -1127,20 +1127,21 @@ public class Clownfish {
                                         }
                                     }
 
-                                    for (Class<?> clazz : cfclassCompiler.getLoadedClasses())
+                                    Map finalFmRoot = fmRoot;
+                                    cfclassCompiler.getClassMethodMap().forEach((k, v) ->
                                     {
                                         Constructor<?> ctor;
                                         try
                                         {
-                                            ctor = clazz.getConstructor();
+                                            ctor = k.getConstructor();
                                             Object object = ctor.newInstance();
-                                            fmRoot.put(clazz.getName().replaceAll("\\.", "_"), object);
+                                            finalFmRoot.put(k.getName().replaceAll("\\.", "_"), object);
                                         }
                                         catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex)
                                         {
                                             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
                                         }
-                                    }
+                                    });
                                     
                                     try {
                                         if (null != fmTemplate) {

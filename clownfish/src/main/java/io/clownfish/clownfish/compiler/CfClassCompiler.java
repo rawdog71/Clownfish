@@ -16,9 +16,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.lang.reflect.Method;
+import java.util.*;
 
 @Named("javaCompiler")
 @Scope("singleton")
@@ -28,7 +27,7 @@ public class CfClassCompiler
     @Inject LoginBean loginbean;
     @Autowired CfJavaService cfjavaService;
     private @Getter @Setter List<CfJava> javaListSelected;
-    private @Getter @Setter Set<Class<?>> loadedClasses = new HashSet<>();
+    private @Getter @Setter Map<Class<?>, List<Method>> classMethodMap = new HashMap<>();
 
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CfClassCompiler.class);
 
@@ -47,12 +46,15 @@ public class CfClassCompiler
         try
         {
             newClass = CompilerUtils.CACHED_COMPILER.loadFromJava("io.clownfish.internal." + java.getName(), java.getContent());
-            loadedClasses.add(newClass);
+
+            classMethodMap.put(newClass, new ArrayList<>(Arrays.asList(newClass.getDeclaredMethods())));
 
             LOGGER.info("Successfully compiled " + java.getName());
             LOGGER.info("Class name: " + newClass.getCanonicalName());
             LOGGER.info("Class package name: " + newClass.getPackageName());
             LOGGER.info("Class loader: " + newClass.getClassLoader());
+
+            classMethodMap.forEach((k, v) -> v.forEach(method -> LOGGER.info(k.getSimpleName() + ": " + method.getName())));
             // LOGGER.info("Class path: " + newClass.getResource(newClass.getSimpleName() + ".class").getURI());
             // LOGGER.info("Main method invocation:");
             // newClass.getMethod("main", String[].class).invoke(null, (Object) null);

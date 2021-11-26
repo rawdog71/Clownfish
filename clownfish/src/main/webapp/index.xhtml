@@ -538,7 +538,7 @@
 				<p:tab title="Compile" id="compilepanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
 					<p:row>
                         <p:column>
-						    <p:selectCheckboxMenu id="compilejavalist" value="#{javaCompiler.javaListSelected}" label="Java" required="true" update=":form:tabview:editjava :form:tabview:newjava" converter="#{javaConverterBean}" filter="true" filterMatchMode="startsWith">
+						    <p:selectCheckboxMenu id="compilejavalist" value="#{javaCompiler.javaListSelected}" label="Java" required="false" update=":form:tabview:editjava :form:tabview:newjava" converter="#{javaConverterBean}" filter="true" filterMatchMode="startsWith">
                                 <f:selectItems value="#{javaList.javaListe}" var="compilejavalist" itemLabel="#{compilejavalist.name}" itemValue="#{compilejavalist}" />
 						    </p:selectCheckboxMenu>
                         </p:column>
