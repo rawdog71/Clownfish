@@ -36,19 +36,19 @@ import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
-import javax.faces.view.ViewScoped;
 import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
-@ViewScoped
+@Scope("singleton")
 @Component
 @Accessors(chain = true)
 public class TemplateUtil implements IVersioningInterface, Serializable {

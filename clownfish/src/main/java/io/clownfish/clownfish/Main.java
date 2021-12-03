@@ -28,9 +28,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -93,8 +91,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 })
 public class Main extends SpringBootServletInitializer implements ServletContextAware, WebMvcConfigurer {
     final static transient Logger LOGGER = LoggerFactory.getLogger(Main.class);
-    @Value("${server.port.https:9090}")
-    int serverPortHttps;
     @Value("${server.port:9000}")
     int serverPortHttp;
     @Value("${webdav.use:0}")

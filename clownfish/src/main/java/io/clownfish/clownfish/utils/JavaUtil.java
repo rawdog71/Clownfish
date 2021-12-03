@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.faces.view.ViewScoped;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -24,8 +23,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.DataFormatException;
+import org.springframework.context.annotation.Scope;
 
-@ViewScoped
+@Scope("singleton")
 @Component
 @Accessors(chain = true)
 public class JavaUtil implements IVersioningInterface<CfJava>, Serializable {

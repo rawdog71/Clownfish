@@ -28,13 +28,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import javax.faces.view.ViewScoped;
+import org.springframework.context.annotation.Scope;
 
 /**
  *
  * @author SulzbachR
  */
-@ViewScoped
+@Scope("singleton")
 @Component
 public class BeanUtil implements Serializable {
     private Set<Class> templatebeans = null;

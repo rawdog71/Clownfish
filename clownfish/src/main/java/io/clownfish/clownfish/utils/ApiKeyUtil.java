@@ -18,15 +18,15 @@ package io.clownfish.clownfish.utils;
 import io.clownfish.clownfish.dbentities.CfWebserviceauth;
 import io.clownfish.clownfish.serviceinterface.CfWebserviceauthService;
 import java.io.Serializable;
-import javax.faces.view.ViewScoped;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author SulzbachR
  */
-@ViewScoped
+@Scope("singleton")
 @Component
 public class ApiKeyUtil implements Serializable {
     @Autowired CfWebserviceauthService cfwebserviceauthService;

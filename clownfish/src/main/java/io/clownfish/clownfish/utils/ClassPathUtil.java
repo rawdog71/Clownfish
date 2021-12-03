@@ -19,7 +19,6 @@ import lombok.Getter;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.stereotype.Component;
 
-import javax.faces.view.ViewScoped;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -31,12 +30,13 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.context.annotation.Scope;
 
 /**
  *
  * @author raine
  */
-@ViewScoped
+@Scope("singleton")
 @Component
 public class ClassPathUtil implements Serializable {
     private @Getter HashSet<Class<?>> class_set = new HashSet<>();
