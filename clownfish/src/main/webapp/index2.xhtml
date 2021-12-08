@@ -23,62 +23,29 @@
             .tabview {
                 padding: 0 15px 0 0;
             }
-            /** tabs **/
-            .ui-tabs.ui-tabs-left > .ui-tabs-nav {
-               width: 10% !important;
-            }
-            /** panels **/
-            .ui-tabs.ui-tabs-left > .ui-tabs-panels {
-               width: 90% !important;
-            }
-            body .ui-tabs .ui-tabs-nav li.ui-tabs-header {
-                padding: 0.5rem !important;
-            }
         </style>
     </h:head>
     <h:body>
         <h:form id="form" enctype="multipart/form-data">
-            
-            
-            <div class="card">
-                <p:toolbar id="tb">
-                    <f:facet name="left">
-                        <p:graphicImage value="images/clownfish-48.png" />
-                        <p:outputLabel value="&nbsp;" />
-                        <p:outputLabel value="Clownfish CMS" />
-                        <p:outputLabel value="&nbsp;" />
-                        <p:outputLabel value="#{versionBean.clownfishUtil.version}" />
-                    </f:facet>
-
-                    <f:facet name="right">
-                        <p:commandButton id="userButton" value="User" type="button" icon="fa fa-home" rendered="#{loginBean.login}" />
-                        <p:outputLabel value="&nbsp;" />
-                        <p:menu overlay="true" trigger="userButton" my="left top" at="left bottom">
-                            <p:menuitem value="Profil" update="msgs" icon="fa fa-user"/>
-                            <p:menuitem value="Logout" actionListener="#{loginBean.onLogout}" update=":form" icon="fa fa-times"/>
-                        </p:menu>
-
-                        <p:outputLabel rendered="#{loginBean.login}" value="#{loginBean.cfuser.vorname}" />
-                        <p:outputLabel value="&nbsp;" />
-                        <p:outputLabel rendered="#{loginBean.login}" value="#{loginBean.cfuser.nachname}" />
-                        <p:outputLabel value="&nbsp;" />
-                        <p:commandButton id="refreshcontentall" process="form" value="Refresh" actionListener="#{backendBean.onRefreshAll()}" update=":form:msgs :form:tabview" rendered="#{loginBean.login}">
-                            <f:actionListener binding="#{sitetree.onRefreshAll()}" />
-                        </p:commandButton>
-                    </f:facet>
-                </p:toolbar>
-
-                <p:sticky target="tb"/>
-            </div>
-            
             <p:growl id="msgs" showDetail="true" />
-            <p:tabView id="tabview" orientation="left" dynamic="true">
+            <p:graphicImage value="images/clownfish-48.png" />
+            <p:outputLabel value="Clownfish CMS " />
+            <p:outputLabel value="#{versionBean.clownfishUtil.version}" />
+            
+            <p:commandButton id="userButton" value="User" type="button" icon="fa fa-home" rendered="#{loginBean.login}" />
+            <p:menu overlay="true" trigger="userButton" my="left top" at="left bottom">
+                <p:menuitem value="Profil" update="msgs" icon="fa fa-user"/>
+                <p:menuitem value="Logout" actionListener="#{loginBean.onLogout}" update=":form" icon="fa fa-times"/>
+            </p:menu>
+            
+            <p:outputLabel rendered="#{loginBean.login}" value="#{loginBean.cfuser.vorname}" /> <p:outputLabel rendered="#{loginBean.login}" value="#{loginBean.cfuser.nachname}" />
+            <p:commandButton id="refreshcontentall" process="form" value="Refresh" actionListener="#{backendBean.onRefreshAll()}" update=":form:msgs :form:tabview" rendered="#{loginBean.login}">
+                <f:actionListener binding="#{sitetree.onRefreshAll()}" />
+            </p:commandButton>
+            
+            <p:tabView id="tabview">
+				
                 <p:tab title="Login" id="loginpanel" rendered="#{!loginBean.login}">
-                    <f:facet name="title">
-                        <i class="pi pi-user"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Login"/>
-                    </f:facet>
-                    
                     <h:panelGrid columns="2" columnClasses="label, value">
                         <h:outputText value="E-Mail: *" />
                         <p:inputText value="#{loginBean.email}" required="true" requiredMessage="Bitte E-Mail eingeben" />
@@ -90,16 +57,9 @@
                             <f:actionListener binding="#{webserviceauthlist.setUser(loginBean.cfuser)}" />
                         </p:commandButton>
                     </h:panelGrid>
-                    
                 </p:tab>
-
+                
                 <p:tab title="Siteoverview" id="sitetreepanel" rendered="#{loginBean.login and loginBean.hasRights(1)}">
-                    <f:facet name="title">
-                        <i class="pi pi-sitemap"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Siteoverview"/>
-                    </f:facet>
-                    
-                    
                     <p:panelGrid>
                         <p:row>
                             <p:column colspan="12" style="vertical-align: top;">
@@ -357,15 +317,9 @@
                             </p:column>
                         </p:row>
                     </p:panelGrid>
-                    
                 </p:tab>
-
+                
                 <p:tab title="Templates" id="templatepanel" rendered="#{loginBean.login and loginBean.hasRights(2)}">
-                    <f:facet name="title">
-                        <i class="fa fa-file-code-o"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Templates"/>
-                    </f:facet>
-                    
                     <p:selectOneMenu id="templatelist" value="#{templateList.selectedTemplate}" converter="#{templateConverterBean}">
                         <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
@@ -422,13 +376,8 @@
                         </p:overlayPanel>
                     </h:panelGroup>
                 </p:tab>
-
+                
                 <p:tab title="Stylesheets" id="stylesheetpanel" rendered="#{loginBean.login and loginBean.hasRights(3)}">
-                    <f:facet name="title">
-                        <i class="fa fa-file-code-o"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Stylesheets"/>
-                    </f:facet>
-                    
                     <p:selectOneMenu id="stylesheetlist" value="#{stylesheetList.selectedStylesheet}" converter="#{stylesheetConverterBean}">
                         <p:ajax listener="#{stylesheetList.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:diffstylesheetPanel" />
                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
@@ -479,15 +428,9 @@
                             </p:dataTable>
                         </p:overlayPanel>
                     </h:panelGroup>
-                    
                 </p:tab>
-
+                
                 <p:tab title="Javascripts" id="javascriptpanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
-                    <f:facet name="title">
-                        <i class="fa fa-file-code-o"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Javascripts"/>
-                    </f:facet>
-                    
                     <p:selectOneMenu id="javascriptlist" value="#{javascriptList.selectedJavascript}" converter="#{javascriptConverterBean}">
                         <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:diffjavascriptPanel" />
                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
@@ -537,15 +480,9 @@
                             </p:dataTable>
                         </p:overlayPanel>
                     </h:panelGroup>
-                    
                 </p:tab>
 
                 <p:tab title="Java" id="javapanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
-                    <f:facet name="title">
-                        <i class="fa fa-file-code-o"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Java"/>
-                    </f:facet>
-                    
                     <p:selectOneMenu id="javalist" value="#{javaList.selectedJava}" converter="#{javaConverterBean}">
                         <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:editjava :form:tabview:javaname :form:tabview:newjava :form:tabview:javaversion :form:tabview:diffjavaBtnGroup :form:tabview:diffjavaPanel" />
                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
@@ -595,12 +532,9 @@
                             </p:dataTable>
                         </p:overlayPanel>
                     </h:panelGroup>
-                    
                 </p:tab>
-
+				
                 <p:tab title="Compile" id="compilepanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
-                    
-                    
                     <p:row>
                         <p:column>
                             <p:selectCheckboxMenu id="compilejavalist" value="#{javaCompiler.javaListSelected}" label="Java" required="false" converter="#{javaConverterBean}" filter="true" filterMatchMode="startsWith">
@@ -610,12 +544,9 @@
                     </p:row>
                     <p:commandButton id="compileselected" process="form" value="Compile selected" actionListener="#{javaCompiler.onCompileSelected}" update=":form:msgs :form:tabview:compilejavalist" />
                     <p:commandButton id="compileall" process="form" value="Compile all" actionListener="#{javaCompiler.onCompileAll}" update=":form:msgs" />
-                    
                 </p:tab>
-
+                
                 <p:tab title="Maven" id="mavenpanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
-                    
-                    
                     <p:panelGrid columns="2">
                         <p:outputLabel for="mavengroup">Group</p:outputLabel>
                         <p:inputText id="mavengroup" value="#{mavenList.group}" ></p:inputText>
@@ -681,16 +612,10 @@
                     </p:panelGrid>
                     
                 </p:tab>
-
+                
                 <p:tab title="Classes" id="classpanel" rendered="#{loginBean.login and loginBean.hasRights(5)}">
-                    <f:facet name="title">
-                        <i class="pi pi-table"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Classes"/>
-                    </f:facet>
-                    
-                    
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="classlist" stickyHeader="true" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
+                        <p:dataTable id="classlist" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
                             <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:newclass" />
                             <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains">
                                 <h:outputText value="#{clazz.name}" />
@@ -759,17 +684,11 @@
                         <p:commandButton id="newattribut" process="form" value="New" actionListener="#{classList.onCreateAttribut}" update=":form:msgs :form:tabview:attributlist :form:tabview:classname" disabled="#{classlist.newAttributButtonDisabled}" />
                         <p:commandButton id="changeattribut" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" />
                     </p:panel>
-                    
                 </p:tab>
-
+                
                 <p:tab title="Content" id="contentlistpanel" rendered="#{loginBean.login and loginBean.hasRights(6)}">
-                    <f:facet name="title">
-                        <i class="pi pi-th-large"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Content"/>
-                    </f:facet>
-                    
                     <p:scrollPanel id="contentpanel" style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="classcontentlist" stickyHeader="true" var="classcontent" value="#{classcontentList.classcontentlist}" 
+                        <p:dataTable id="classcontentlist" var="classcontent" value="#{classcontentList.classcontentlist}" 
                                      paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                                      rowsPerPageTemplate="10,50,100"
                                      selectionMode="single" selection="#{classcontentList.selectedContent}" rowKey="#{classcontent.id}"
@@ -876,18 +795,13 @@
                         </p:commandButton>
                         <p:commandButton id="generateJsonContent" value="Json Export" actionListener="#{classcontentList.jsonExport}" update=":form:tabview:contentJson">
                         </p:commandButton>
-                    </p:panel>  
+                    </p:panel>    
                     
                 </p:tab>
-
+                
                 <p:tab title="Datalists" id="datalistpanel" rendered="#{loginBean.login and loginBean.hasRights(7)}">
-                    <f:facet name="title">
-                        <i class="pi pi-list"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Datalists"/>
-                    </f:facet>
-                    
                     <p:scrollPanel id="datapanel" style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="datalistcontent" stickyHeader="true" var="datalist" value="#{datacontentList.datacontentlist}" 
+                        <p:dataTable id="datalistcontent" var="datalist" value="#{datacontentList.datacontentlist}" 
                                      paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                                      rowsPerPageTemplate="10,50,100"
                                      selectionMode="single" selection="#{datacontentList.selectedList}" rowKey="#{datalist.id}" widgetVar="datalistcontent">
@@ -929,17 +843,11 @@
                         <f:selectItems value="#{datacontentList.filteredclasscontentlist}" var="content" itemLabel="#{content.name}" itemValue="#{content}" />
                         <p:ajax listener="#{datacontentList.onChangeContent}" />
                     </p:selectManyCheckbox>
-                    
                 </p:tab>
-
+                
                 <p:tab title="Datasources" id="datasourcepanel" rendered="#{loginBean.login and loginBean.hasRights(8)}">
-                    <f:facet name="title">
-                        <i class="fa fa-database"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Datasources"/>
-                    </f:facet>
-                    
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="datasourcelist" stickyHeader="true" var="datasource" value="#{datasourceList.datasourcelist}" selectionMode="single" selection="#{datasourceList.selectedDatasource}" rowKey="#{datasource.id}">
+                        <p:dataTable id="datasourcelist" var="datasource" value="#{datasourceList.datasourcelist}" selectionMode="single" selection="#{datasourceList.selectedDatasource}" rowKey="#{datasource.id}">
                             <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver" />
                             <p:column headerText="Name" filterBy="#{datasource.name}" filterMatchMode="contains">
                                 <h:outputText value="#{datasource.name}" />
@@ -986,16 +894,9 @@
                         </p:commandButton>
                         <p:commandButton id="checkdatasource" process="form" value="Check connection" actionListener="#{datasourceList.onConnectionCheck}" update=":form:msgs" />
                     </p:panelGrid>
-                    
                 </p:tab>
-
+                
                 <p:tab title="Assets" id="assetpanel" rendered="#{loginBean.login and loginBean.hasRights(9)}">
-                    <f:facet name="title">
-                        <i class="pi pi-image"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Assets"/>
-                    </f:facet>
-                    
-                    
                     <h:form enctype="multipart/form-data">
                         <p:fileUpload listener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true" 
                                               update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|svg|ppt|pptx|xls|xlsx|zip|jar|xml)$/i" >
@@ -1098,18 +999,11 @@
                         </p:outputPanel>
                         
                     </h:panelGrid>
-                    
                 </p:tab>
-
+                
                 <p:tab title="AssetLibraries" id="assetlistpanel" rendered="#{loginBean.login and loginBean.hasRights(10)}">
-                    <f:facet name="title">
-                        <i class="pi pi-images"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="AssetLibraries"/>
-                    </f:facet>
-                    
-                    
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="assetlistcontent" stickyHeader="true" var="assetlistcontent" value="#{assetLibrary.assetlist}" 
+                        <p:dataTable id="assetlistcontent" var="assetlistcontent" value="#{assetLibrary.assetlist}" 
                                      selectionMode="single" selection="#{assetLibrary.selectedAssetlist}" rowKey="#{assetlistcontent.id}"
                                      emptyMessage="No content available" filteredValue="#{assetLibrary.filteredAssetlist}" widgetVar="assetcontentlist">
                             <p:ajax event="rowSelect" listener="#{assetLibrary.onSelect}" update=":form:msgs :form:tabview:assetcontentlist :form:tabview:assetcontentlistbox" />
@@ -1132,18 +1026,11 @@
                         <f:selectItems value="#{assetLibrary.filteredAssetcontent}" var="asset" itemLabel="#{asset.name}" itemValue="#{asset}" />
                         <p:ajax listener="#{assetLibrary.onChangeContent}" />
                     </p:selectManyCheckbox>
-                    
-                </p:tab>                
-
+                </p:tab>
+                
                 <p:tab title="Keywords" id="keywordpanel" rendered="#{loginBean.login and loginBean.hasRights(11)}">
-                    <f:facet name="title">
-                        <i class="pi pi-tag"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Keywords"/>
-                    </f:facet>
-                    
-                    
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="keywordlist" stickyHeader="true" var="keywordcontent" value="#{keywordList.keywordlist}" 
+                        <p:dataTable id="keywordlist" var="keywordcontent" value="#{keywordList.keywordlist}" 
                                      selectionMode="single" selection="#{keywordList.selectedKeyword}" rowKey="#{keywordcontent.id}"
                                      emptyMessage="No content available" filteredValue="#{keywordList.filteredKeyword}" widgetVar="keywordlist">
                             <p:column headerText="Name" filterBy="#{keywordcontent.name}" filterMatchMode="contains">
@@ -1158,18 +1045,11 @@
                         
                         <p:commandButton id="newkeyword" process="form" value="New" actionListener="#{keywordList.onCreate}" update=":form:tabview:keywordlist :form:tabview:assetkeywordpicklist :form:tabview:contentkeywordpicklist" />
                     </h:panelGrid>
-                    
                 </p:tab>
-
+                
                 <p:tab title="KeywordLists" id="keywordlistpanel" rendered="#{loginBean.login and loginBean.hasRights(12)}">
-                    <f:facet name="title">
-                        <i class="pi pi-tags"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="KeywordLists"/>
-                    </f:facet>
-                    
-                    
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="keywordlistcontent" stickyHeader="true" var="keywordlistcontent" value="#{keywordContentList.keywordlist}" 
+                        <p:dataTable id="keywordlistcontent" var="keywordlistcontent" value="#{keywordContentList.keywordlist}" 
                                      selectionMode="single" selection="#{keywordContentList.selectedKeywordlist}" rowKey="#{keywordlistcontent.id}"
                                      emptyMessage="No content available" filteredValue="#{keywordContentList.filteredKeywordlist}" widgetVar="keywordcontentlist">
                             <p:ajax event="rowSelect" listener="#{keywordContentList.onSelect}" update=":form:msgs :form:tabview:keywordcontentlist :form:tabview:keywordcontentlistbox" />
@@ -1192,18 +1072,11 @@
                         <f:selectItems value="#{keywordContentList.filteredKeywordcontent}" var="keyword" itemLabel="#{keyword.name}" itemValue="#{keyword}" />
                         <p:ajax listener="#{keywordContentList.onChangeContent}" />
                     </p:selectManyCheckbox>
-                    
                 </p:tab>
-
+                
                 <p:tab title="Properties" id="propertiespanel" rendered="#{loginBean.login and loginBean.hasRights(13)}">
-                    <f:facet name="title">
-                        <i class="pi pi-folder"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Properties"/>
-                    </f:facet>
-                    
-                    
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="propertylist" stickyHeader="true" var="propertycontent" value="#{propertylist.propertylist}" 
+                        <p:dataTable id="propertylist" var="propertycontent" value="#{propertylist.propertylist}" 
                                      selectionMode="single" selection="#{propertylist.selectedProperty}" rowKey="#{propertycontent.hashkey}"
                                      emptyMessage="No content available" filteredValue="#{propertylist.filteredProperty}" widgetVar="propertylist">
                             <p:ajax event="rowSelect" listener="#{propertylist.onSelect}" update=":form:tabview:propertypanel :form:tabview:propertybtnpanel" />
@@ -1233,18 +1106,11 @@
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                     </p:panelGrid>
-                    
                 </p:tab>
-
+                
                 <p:tab title="Jobs" id="jobspanel" rendered="#{loginBean.login and loginBean.hasRights(14)}">
-                    <f:facet name="title">
-                        <i class="pi pi-clock"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Jobs"/>
-                    </f:facet>
-                    
-                    
                     <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="joblist" stickyHeader="true" var="jobcontent" value="#{quartzlist.quartzlist}" 
+                        <p:dataTable id="joblist" var="jobcontent" value="#{quartzlist.quartzlist}" 
                                      selectionMode="single" selection="#{quartzlist.selectedQuartz}" rowKey="#{jobcontent.id}"
                                      emptyMessage="No content available" filteredValue="#{quartzlist.filteredQuartz}" widgetVar="quartzlist">
                             <p:ajax event="rowSelect" listener="#{quartzlist.onSelect}" update=":form:tabview:jobpanel :form:tabview:jobbtnpanel" />
@@ -1662,16 +1528,9 @@
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                     </p:panelGrid>
-                    
                 </p:tab>
-
+                
                 <p:tab title="User" id="userspanel" rendered="#{loginBean.login and loginBean.hasRights(15)}">
-                    <f:facet name="title">
-                        <i class="pi pi-users"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="User"/>
-                    </f:facet>
-                    
-                    
                     <p:dataTable id="userlist" var="user" value="#{userlist.userlist}" 
                                  selectionMode="single" selection="#{userlist.selectedUser}" rowKey="#{user.id}"
                                  emptyMessage="No content available">
@@ -1720,41 +1579,30 @@
                     </p:selectCheckboxMenu>
                     
                 </p:tab>
-
+                
                 <p:tab title="Webservice" id="webservice" rendered="#{loginBean.login}">
-                    <f:facet name="title">
-                        <i class="pi pi-cog"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Webservice"/>
-                    </f:facet>
-
-                    <p:scrollPanel style="height: 600px; border: none;" mode="native">
-                        <p:dataTable id="webserviceauthlist" stickyHeader="true" var="webserviceauth" value="#{webserviceauthlist.webserviceauthlist}" 
-                                    selectionMode="single" selection="#{webserviceauthlist.selectedWebserviceauth}" rowKey="#{webserviceauth.hash}"
-                                   emptyMessage="No content available">
-                           <p:ajax event="rowSelect" listener="#{webserviceauthlist.onSelect}" />
-                           <p:column headerText="Webservice" filterBy="#{webserviceauth.cfWebserviceauthPK.webserviceRef}" filterMatchMode="contains">
-                               <h:outputText value="#{webserviceauth.cfWebserviceauthPK.webserviceRef}" />
-                           </p:column>
-                           <p:column headerText="Hash">
-                               <h:outputText value="#{webserviceauth.hash}" />
-                           </p:column>
-                       </p:dataTable>
-
-                       <p:outputLabel for="webservicelist" value="Webservices" />
-                       <p:selectOneMenu id="webservicelist" value="#{webserviceauthlist.selectedWebservice}" required="false" converter="#{webserviceConverterBean}">
-                           <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                           <f:selectItems value="#{webserviceauthlist.webservicelist}" />
-                       </p:selectOneMenu>
-                       <p:commandButton id="newwebserviceauth" process="form" value="New" actionListener="#{webserviceauthlist.onCreateWebserviceAuth}" update=":form:msgs :form:tabview:webserviceauthlist" disabled="#{webserviceauthlist.newAuthButtonDisabled}" />
-                    </p:scrollPanel>
+                    
+                    <p:dataTable id="webserviceauthlist" var="webserviceauth" value="#{webserviceauthlist.webserviceauthlist}" 
+                                 selectionMode="single" selection="#{webserviceauthlist.selectedWebserviceauth}" rowKey="#{webserviceauth.hash}"
+                                emptyMessage="No content available">
+                        <p:ajax event="rowSelect" listener="#{webserviceauthlist.onSelect}" />
+                        <p:column headerText="Webservice" filterBy="#{webserviceauth.cfWebserviceauthPK.webserviceRef}" filterMatchMode="contains">
+                            <h:outputText value="#{webserviceauth.cfWebserviceauthPK.webserviceRef}" />
+                        </p:column>
+                        <p:column headerText="Hash">
+                            <h:outputText value="#{webserviceauth.hash}" />
+                        </p:column>
+                    </p:dataTable>
+                    
+                    <p:outputLabel for="webservicelist" value="Webservices" />
+                    <p:selectOneMenu id="webservicelist" value="#{webserviceauthlist.selectedWebservice}" required="false" converter="#{webserviceConverterBean}">
+                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                        <f:selectItems value="#{webserviceauthlist.webservicelist}" />
+                    </p:selectOneMenu>
+                    <p:commandButton id="newwebserviceauth" process="form" value="New" actionListener="#{webserviceauthlist.onCreateWebserviceAuth}" update=":form:msgs :form:tabview:webserviceauthlist" disabled="#{webserviceauthlist.newAuthButtonDisabled}" />
                 </p:tab>
-
+                
                 <p:tab title="Reef" id="reef" rendered="#{loginBean.login and loginBean.hasRights(17)}">
-                    <f:facet name="title">
-                        <i class="pi pi-shopping-cart"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Reef"/>
-                    </f:facet>
-
                     
                     <h:form enctype="multipart/form-data">
                         <p:fileUpload listener="#{reefbean.handleFileUpload}" mode="advanced" dragDropSupport="true" 
@@ -1827,14 +1675,8 @@
                     </p:panelGrid>
                     
                 </p:tab>
-
+                
                 <p:tab title="Scrapyard" id="scrapyardlistpanel" rendered="#{loginBean.login and loginBean.hasRights(18)}">
-                    <f:facet name="title">
-                        <i class="pi pi-trash"></i><h:outputText value="&nbsp;"/>
-                        <h:outputText value="Scrapyard"/>
-                    </f:facet>
-                    
-                    
                     <p:scrollPanel id="scrapyardpanel" style="height: 400px; border: none;" mode="native">
                         <p:dataTable id="scrapyardclasscontentlist" var="scrapyardclasscontent" value="#{scrapyardList.classcontentlist}" 
                                      paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
@@ -1883,17 +1725,14 @@
                             </p:column>
                         </p:dataTable>
                     </h:panelGrid>
-                    
-                    
                 </p:tab>
-
+                
             </p:tabView>
-            
             
             <p:confirmDialog global="true">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-times" />
             </p:confirmDialog>
         </h:form>
-    </h:body>          
+    </h:body>
 </html>
