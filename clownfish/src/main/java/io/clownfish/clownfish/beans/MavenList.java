@@ -165,7 +165,7 @@ public class MavenList implements Serializable {
             s_query.append("v:").append(version).append(" AND ");
         }
         s_url.append(s_query.substring(0, s_query.length()-5));
-        s_url.append("&rows=20&wt=json");
+        s_url.append("&rows=200&wt=json");
         
         try {
             RestTemplate restTemplate = new RestTemplate();

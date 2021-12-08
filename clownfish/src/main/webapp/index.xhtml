@@ -75,6 +75,7 @@
             </div>
             
             <p:growl id="msgs" showDetail="true" />
+            
             <p:tabView id="tabview" orientation="left" dynamic="true">
                 <p:tab title="Login" id="loginpanel" rendered="#{!loginBean.login}">
                     <f:facet name="title">
@@ -369,30 +370,49 @@
                         <h:outputText value="Templates"/>
                     </f:facet>
                     
-                    <p:selectOneMenu id="templatelist" value="#{templateList.selectedTemplate}" converter="#{templateConverterBean}">
-                        <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
-                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                        <f:selectItems value="#{templateList.templateListe}" />
-                    </p:selectOneMenu>
+                    <div class="flex flex-row pb-2">
+                        <div class="flex align-items-center pr-2">
+                            <p:selectOneMenu id="templatelist" value="#{templateList.selectedTemplate}" converter="#{templateConverterBean}">
+                                <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
+                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                <f:selectItems value="#{templateList.templateListe}" />
+                            </p:selectOneMenu>
+                        </div>  
+
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="deletetemplateButton" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:tabsiteview:selecttemplate">
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+
+                        <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="templatename">Name</p:outputLabel>
+                            <p:inputText id="templatename" value="#{templateList.templateName}" >
+                                <p:ajax event="keyup" listener="#{templateList.onChangeName(changeEvent)}" update=":form:tabview:newtemplate :form:tabview:changetemplate" />
+                            </p:inputText>
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:selectOneMenu id="templatelanguage" value="#{templateList.templateScriptLanguage}">
+                                <f:selectItem itemValue="0" itemLabel="Freemarker" />
+                                <f:selectItem itemValue="1" itemLabel="Velocity" />
+                                <f:selectItem itemValue="2" itemLabel="HTML" />
+                                <f:selectItem itemValue="3" itemLabel="JRXML" />
+                            </p:selectOneMenu>
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
+                        </div>
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="changetemplate" process="form" value="Change" actionListener="#{templateList.onChange}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
+                        </div>    
+                    </div>
+
+                    <div class="flex flex-row pb-2">
+                        <pe:monacoEditor id="edittemplate" disabled="false" widgetVar="monacotemplate" readonly="#{!templateList.checkedout}" editorOptions="#{templateList.editorOptions}" value="#{templateList.content}" locale="de" width="100%" height="600px" autoResize="true" />
+                    </div>
                     
-                    <p:commandButton id="deletetemplateButton" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:tabsiteview:selecttemplate">
-                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
-                    </p:commandButton>
-
-                    <p:outputLabel for="templatename">Name</p:outputLabel>
-                    <p:inputText id="templatename" value="#{templateList.templateName}" >
-                        <p:ajax event="keyup" listener="#{templateList.onChangeName(changeEvent)}" update=":form:tabview:newtemplate :form:tabview:changetemplate" />
-                    </p:inputText>
-                    <p:selectOneMenu id="templatelanguage" value="#{templateList.templateScriptLanguage}">
-                        <f:selectItem itemValue="0" itemLabel="Freemarker" />
-                        <f:selectItem itemValue="1" itemLabel="Velocity" />
-                        <f:selectItem itemValue="2" itemLabel="HTML" />
-                        <f:selectItem itemValue="3" itemLabel="JRXML" />
-                    </p:selectOneMenu>
-                    <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
-                    <p:commandButton id="changetemplate" process="form" value="Change" actionListener="#{templateList.onChange}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
-
-                    <pe:monacoEditor id="edittemplate" disabled="false" widgetVar="monacotemplate" readonly="#{!templateList.checkedout}" editorOptions="#{templateList.editorOptions}" value="#{templateList.content}" locale="de" width="100%" height="600px" autoResize="true" />
                     <h:panelGroup id="difftemplateBtnGroup">
                         <p:commandButton id="savetemplate" process="form" value="Save" rendered="#{templateList.checkedout}" actionListener="#{templateList.onSave}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
                         <p:commandButton id="checkintemplate" process="form" value="CheckIn" rendered="#{templateList.checkedout}" actionListener="#{templateList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
@@ -403,7 +423,7 @@
 
                         <p:outputLabel> Version </p:outputLabel><p:outputLabel id="templateversion">#{templateList.templateUtility.currentVersion}</p:outputLabel>
                         <p:commandButton id="difftemplateBtn" type="button" value="Diff" rendered="#{templateList.difference}" />
-                        
+
                         <h5>Select Version</h5>           
                         <p:inputText id="selectedtemplateversion" value="#{templateList.selectedtemplateversion}" disabled="true" />
                         <p:slider id="selectedtemplateversionslider" for="selectedtemplateversion" minValue="#{templateList.templateversionMin}" maxValue="#{templateList.templateversionMax}">
@@ -432,24 +452,41 @@
                         <h:outputText value="Stylesheets"/>
                     </f:facet>
                     
-                    <p:selectOneMenu id="stylesheetlist" value="#{stylesheetList.selectedStylesheet}" converter="#{stylesheetConverterBean}">
-                        <p:ajax listener="#{stylesheetList.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:diffstylesheetPanel" />
-                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                        <f:selectItems value="#{stylesheetList.stylesheetListe}" />
-                    </p:selectOneMenu>
+                    <div class="flex flex-row pb-2">
+                        <div class="flex align-items-center pr-2">
+                            <p:selectOneMenu id="stylesheetlist" value="#{stylesheetList.selectedStylesheet}" converter="#{stylesheetConverterBean}">
+                                <p:ajax listener="#{stylesheetList.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:diffstylesheetPanel" />
+                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                <f:selectItems value="#{stylesheetList.stylesheetListe}" />
+                            </p:selectOneMenu>
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="deletestylesheetButton" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:tabsiteview:selectstylesheet">
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+
+                        <div class="flex align-items-center pr-2">    
+                            <p:outputLabel for="stylesheetname">Name</p:outputLabel>
+                            <p:inputText id="stylesheetname" value="#{stylesheetList.stylesheetName}" >
+                                <p:ajax event="keyup" listener="#{stylesheetList.onChangeName(changeEvent)}" update=":form:tabview:newstylesheet :form:tabview:changestylesheet" />
+                            </p:inputText>
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">    
+                            <p:commandButton id="newstylesheet" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="changestylesheet" process="form" value="Change" actionListener="#{stylesheetList.onChange}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
+                        </div>
+                    </div>
                     
-                    <p:commandButton id="deletestylesheetButton" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:tabsiteview:selectstylesheet">
-                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
-                    </p:commandButton>
-
-                    <p:outputLabel for="stylesheetname">Name</p:outputLabel>
-                    <p:inputText id="stylesheetname" value="#{stylesheetList.stylesheetName}" >
-                        <p:ajax event="keyup" listener="#{stylesheetList.onChangeName(changeEvent)}" update=":form:tabview:newstylesheet :form:tabview:changestylesheet" />
-                    </p:inputText>
-                    <p:commandButton id="newstylesheet" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
-                    <p:commandButton id="changestylesheet" process="form" value="Change" actionListener="#{stylesheetList.onChange}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
-
-                    <pe:monacoEditor id="editstylesheet" disabled="false" widgetVar="monacostylesheet" readonly="#{!stylesheetList.checkedout}" editorOptions="#{stylesheetList.editorOptions}" value="#{stylesheetList.content}" locale="de" width="100%" height="600px" autoResize="true" />
+                    <div class="flex flex-row pb-2">
+                        <pe:monacoEditor id="editstylesheet" disabled="false" widgetVar="monacostylesheet" readonly="#{!stylesheetList.checkedout}" editorOptions="#{stylesheetList.editorOptions}" value="#{stylesheetList.content}" locale="de" width="100%" height="600px" autoResize="true" />
+                    </div>
+                    
                     <h:panelGroup id="diffstylesheetBtnGroup">
                             
                         <p:commandButton id="savestylesheet" process="form" value="Save" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onSave}" update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:templateversion :form:tabview:diffstylesheetBtnGroup" />
@@ -491,24 +528,41 @@
                         <h:outputText value="Javascripts"/>
                     </f:facet>
                     
-                    <p:selectOneMenu id="javascriptlist" value="#{javascriptList.selectedJavascript}" converter="#{javascriptConverterBean}">
-                        <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:diffjavascriptPanel" />
-                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                        <f:selectItems value="#{javascriptList.javascriptListe}" />
-                    </p:selectOneMenu>
-                    
-                    <p:commandButton id="deletejavascriptButton" value="Delete" actionListener="#{javascriptList.onDelete}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:tabsiteview:selectjavascript">
-                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
-                    </p:commandButton>
+                    <div class="flex flex-row pb-2">
+                        <div class="flex align-items-center pr-2">
+                            <p:selectOneMenu id="javascriptlist" value="#{javascriptList.selectedJavascript}" converter="#{javascriptConverterBean}">
+                                <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:diffjavascriptPanel" />
+                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                <f:selectItems value="#{javascriptList.javascriptListe}" />
+                            </p:selectOneMenu>
+                        </div>
 
-                    <p:outputLabel for="javascriptname">Name</p:outputLabel>
-                    <p:inputText id="javascriptname" value="#{javascriptList.javascriptName}" >
-                        <p:ajax event="keyup" listener="#{javascriptList.onChangeName(changeEvent)}" update=":form:tabview:newjavascript :form:tabview:changejavascript" />
-                    </p:inputText>
-                    <p:commandButton id="newjavascript" process="form" value="New" actionListener="#{javascriptList.onCreate}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
-                    <p:commandButton id="changejavascript" process="form" value="Change" actionListener="#{javascriptList.onChange}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
-                    
-                    <pe:monacoEditor id="editjavascript" disabled="false" widgetVar="monacojavascript" readonly="#{!javascriptList.checkedout}" editorOptions="#{javascriptList.editorOptions}" value="#{javascriptList.content}" locale="de" width="100%" height="600px" autoResize="true" />
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="deletejavascriptButton" value="Delete" actionListener="#{javascriptList.onDelete}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:tabsiteview:selectjavascript">
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+
+                        <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="javascriptname">Name</p:outputLabel>
+                            <p:inputText id="javascriptname" value="#{javascriptList.javascriptName}" >
+                                <p:ajax event="keyup" listener="#{javascriptList.onChangeName(changeEvent)}" update=":form:tabview:newjavascript :form:tabview:changejavascript" />
+                            </p:inputText>
+                        </div>
+
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="newjavascript" process="form" value="New" actionListener="#{javascriptList.onCreate}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
+                        </div>
+
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="changejavascript" process="form" value="Change" actionListener="#{javascriptList.onChange}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
+                        </div>
+                    </div>
+
+                    <div class="flex flex-row pb-2">
+                        <pe:monacoEditor id="editjavascript" disabled="false" widgetVar="monacojavascript" readonly="#{!javascriptList.checkedout}" editorOptions="#{javascriptList.editorOptions}" value="#{javascriptList.content}" locale="de" width="100%" height="600px" autoResize="true" />
+                    </div>
+                        
                     <h:panelGroup id="diffjavascriptBtnGroup">
                         <p:commandButton id="savejavascript" process="form" value="Save" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onSave}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup" />
                         <p:commandButton id="checkinjavascript" process="form" value="CheckIn" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
@@ -551,25 +605,41 @@
                     
                     <p:tabView id="javatabview">
                         <p:tab title="Java Source" id="javasourcepanel">
-                    
-                            <p:selectOneMenu id="javalist" value="#{javaList.selectedJava}" converter="#{javaConverterBean}">
-                                <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:javatabview:editjava :form:tabview:javatabview:javaname :form:tabview:javatabview:newjava :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:diffjavaPanel" />
-                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                <f:selectItems value="#{javaList.javaListe}" />
-                            </p:selectOneMenu>
+                            <div class="flex flex-row pb-2">
+                                <div class="flex align-items-center pr-2">
+                                    <p:selectOneMenu id="javalist" value="#{javaList.selectedJava}" converter="#{javaConverterBean}">
+                                        <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:javatabview:editjava :form:tabview:javatabview:javaname :form:tabview:javatabview:newjava :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:diffjavaPanel" />
+                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                        <f:selectItems value="#{javaList.javaListe}" />
+                                    </p:selectOneMenu>
+                                </div>
 
-                            <p:commandButton id="deletejavaButton" value="Delete" actionListener="#{javaList.onDelete}" update=":form:msgs :form:tabview:javatabview:javalist">
-                                <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
-                            </p:commandButton>
+                                <div class="flex align-items-center pr-2">
+                                    <p:commandButton id="deletejavaButton" value="Delete" actionListener="#{javaList.onDelete}" update=":form:msgs :form:tabview:javatabview:javalist">
+                                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                    </p:commandButton>
+                                </div>
 
-                            <p:outputLabel for="javaname">Name</p:outputLabel>
-                            <p:inputText id="javaname" value="#{javaList.javaName}" >
-                                <p:ajax event="keyup" listener="#{javaList.onChangeName(changeEvent)}" update=":form:tabview:javatabview:newjava :form:tabview:javatabview:changejava" />
-                            </p:inputText>
-                            <p:commandButton id="newjava" process="form" value="New" actionListener="#{javaList.onCreate}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname" disabled="#{javaList.newButtonDisabled}" />
-                            <p:commandButton id="changejava" process="form" value="Change" actionListener="#{javaList.onChange}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname" disabled="#{javaList.newButtonDisabled}" />
+                                <div class="flex align-items-center pr-2">
+                                    <p:outputLabel for="javaname">Name</p:outputLabel>
+                                    <p:inputText id="javaname" value="#{javaList.javaName}" >
+                                        <p:ajax event="keyup" listener="#{javaList.onChangeName(changeEvent)}" update=":form:tabview:javatabview:newjava :form:tabview:javatabview:changejava" />
+                                    </p:inputText>
+                                </div>
 
-                            <pe:monacoEditor id="editjava" disabled="false" widgetVar="monacojava" readonly="#{!javaList.checkedout}" editorOptions="#{javaList.editorOptions}" value="#{javaList.content}" locale="de" width="100%" height="600px" autoResize="true" />
+                                <div class="flex align-items-center pr-2">
+                                    <p:commandButton id="newjava" process="form" value="New" actionListener="#{javaList.onCreate}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname" disabled="#{javaList.newButtonDisabled}" />
+                                </div>
+
+                                <div class="flex align-items-center pr-2">
+                                    <p:commandButton id="changejava" process="form" value="Change" actionListener="#{javaList.onChange}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname" disabled="#{javaList.newButtonDisabled}" />
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-row pb-2">
+                                <pe:monacoEditor id="editjava" disabled="false" widgetVar="monacojava" readonly="#{!javaList.checkedout}" editorOptions="#{javaList.editorOptions}" value="#{javaList.content}" locale="de" width="100%" height="600px" autoResize="true" />
+                            </div>
+                            
                             <h:panelGroup id="diffjavaBtnGroup">
                                 <p:commandButton id="savejava" process="form" value="Save" rendered="#{javaList.checkedout}" actionListener="#{javaList.onSave}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup" />
                                 <p:commandButton id="checkinjava" process="form" value="CheckIn" rendered="#{javaList.checkedout}" actionListener="#{javaList.onCheckIn}"  update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjava" />
@@ -604,16 +674,19 @@
                         </p:tab>
                         
                         <p:tab title="Compile" id="compilepanel">
-                            <p:row>
-                                <p:column>
+                            <div class="flex flex-row pb-2">
+                                <div class="flex align-items-center pr-2">
                                     <p:selectCheckboxMenu id="compilejavalist" value="#{javaCompiler.javaListSelected}" label="Java" required="false" converter="#{javaConverterBean}" filter="true" filterMatchMode="startsWith">
                                         <f:selectItems value="#{javaList.javaListe}" var="compilejavalist" itemLabel="#{compilejavalist.name}" itemValue="#{compilejavalist}" />
                                     </p:selectCheckboxMenu>
-                                </p:column>
-                            </p:row>
-                            <p:commandButton id="compileselected" process="form" value="Compile selected" actionListener="#{javaCompiler.onCompileSelected}" update=":form:msgs :form:tabview:javatabview:compilejavalist" />
-                            <p:commandButton id="compileall" process="form" value="Compile all" actionListener="#{javaCompiler.onCompileAll}" update=":form:msgs" />
-
+                                </div>
+                                <div class="flex align-items-center pr-2">
+                                    <p:commandButton id="compileselected" process="form" value="Compile selected" actionListener="#{javaCompiler.onCompileSelected}" update=":form:msgs :form:tabview:javatabview:compilejavalist" />
+                                </div>
+                                <div class="flex align-items-center pr-2">
+                                    <p:commandButton id="compileall" process="form" value="Compile all" actionListener="#{javaCompiler.onCompileAll}" update=":form:msgs" />
+                                </div>
+                            </div>
                         </p:tab>
                         
                         <p:tab title="Maven" id="mavenpanel">
@@ -633,7 +706,7 @@
                                 </p:commandButton>
                             </p:panelGrid>
 
-                            <p:dataTable id="mavensearchlist" var="mvndoc" value="#{mavenList.mvnDocs}" selectionMode="single" selection="#{mavenList.selectedMavenDoc}" rowKey="#{mvndoc.id}">
+                            <p:dataTable id="mavensearchlist" stickyHeader="true" var="mvndoc" value="#{mavenList.mvnDocs}" selectionMode="single" selection="#{mavenList.selectedMavenDoc}" rowKey="#{mvndoc.id}">
                                 <p:ajax event="rowSelect" listener="#{mavenList.onSelectMavenDoc}" />
                                 <p:column headerText="ID">
                                     <h:outputText value="#{mvndoc.id}" />
@@ -693,25 +766,42 @@
                         <h:outputText value="Classes"/>
                     </f:facet>
                     
-                    
-                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="classlist" stickyHeader="true" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
-                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:newclass" />
-                            <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains">
-                                <h:outputText value="#{clazz.name}" />
-                            </p:column>
-                        </p:dataTable>
-                    </p:scrollPanel>
+                    <div class="flex flex-row pb-2">
+                        <p:scrollPanel style="height: 400px; border: none;" mode="native">
+                            <p:dataTable id="classlist" stickyHeader="true" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
+                                <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:newclass" />
+                                <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains">
+                                    <h:outputText value="#{clazz.name}" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:scrollPanel>
+                    </div>
 
-                    <p:outputLabel for="classname">Name: </p:outputLabel>
-                    <p:inputText id="classname" value="#{classList.className}" >
-                        <p:ajax event="keyup" listener="#{classList.onChangeName(changeEvent)}" update=":form:tabview:newclass" />
-                    </p:inputText>
-                    <p:outputLabel for="classsearchrelevant">Search engine relevant: </p:outputLabel>
-                    <p:selectBooleanCheckbox id="classsearchrelevant" value="#{classList.classSearchrelevant}" />
-                    <p:commandButton id="newclass" process="form" value="New" actionListener="#{classList.onCreate}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" disabled="#{classlist.newButtonDisabled}" />
-                    <p:commandButton id="updateclass" process="form" value="Edit" actionListener="#{classList.onEdit}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" />
-                    <p:commandButton id="recreatetable" process="form" value="Recreate Datatable" actionListener="#{classList.onRecreateDatamodel(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" />
+                    <div class="flex flex-row pb-2">
+                        <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="classname">Name: </p:outputLabel>
+                            <p:inputText id="classname" value="#{classList.className}" >
+                                <p:ajax event="keyup" listener="#{classList.onChangeName(changeEvent)}" update=":form:tabview:newclass" />
+                            </p:inputText>
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="classsearchrelevant">Search engine relevant: </p:outputLabel>
+                            <p:selectBooleanCheckbox id="classsearchrelevant" value="#{classList.classSearchrelevant}" />
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">    
+                            <p:commandButton id="newclass" process="form" value="New" actionListener="#{classList.onCreate}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" disabled="#{classlist.newButtonDisabled}" />
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="updateclass" process="form" value="Edit" actionListener="#{classList.onEdit}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" />
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="recreatetable" process="form" value="Recreate Datatable" actionListener="#{classList.onRecreateDatamodel(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" />
+                        </div>
+                    </div>
 
                     <p:dataTable id="attributlist" var="attribut" value="#{classList.selectedAttributList}" selectionMode="single" selection="#{classList.selectedAttribut}" rowKey="#{attribut.id}">
                         <p:ajax event="rowSelect" listener="#{classList.onSelectAttribute}" update=":form:msgs :form:tabview:attributname :form:tabview:attributtype :form:tabview:classeditor" />
@@ -736,33 +826,52 @@
                     </p:dataTable>
 
                     <p:panel id="classeditor">
-                        <p:outputLabel for="attributname">Name</p:outputLabel>
-                        <p:inputText id="attributname" value="#{classList.attributName}" >
-                            <p:ajax event="keyup" listener="#{classList.onChangeAttributName(changeEvent)}" update=":form:tabview:newattribut" />
-                        </p:inputText>
+                        <div class="flex flex-row pb-2">
+                            <div class="flex align-items-center pr-2">
+                                <p:outputLabel for="attributname">Name</p:outputLabel>
+                                <p:inputText id="attributname" value="#{classList.attributName}" >
+                                    <p:ajax event="keyup" listener="#{classList.onChangeAttributName(changeEvent)}" update=":form:tabview:newattribut" />
+                                </p:inputText>
+                            </div>
 
-                        <p:outputLabel for="attributtype" value="Typ:" />
-                        <p:selectOneMenu id="attributtype" value="#{classList.selectedAttributeType}" required="true" converter="#{attributetypeConverterBean}">
-                            <f:selectItems value="#{classList.attributetypelist}" />
-                        </p:selectOneMenu>
+                            <div class="flex align-items-center pr-2">
+                                <p:outputLabel for="attributtype" value="Typ:" />
+                                <p:selectOneMenu id="attributtype" value="#{classList.selectedAttributeType}" required="true" converter="#{attributetypeConverterBean}">
+                                    <f:selectItems value="#{classList.attributetypelist}" />
+                                </p:selectOneMenu>
+                            </div>
 
-                        <p:outputLabel for="attributidentity" value="Identity:" />
-                        <p:selectBooleanCheckbox id="attributidentity" value="#{classList.identity}" />
+                            <div class="flex align-items-center pr-2">
+                                <p:outputLabel for="attributidentity" value="Identity:" />
+                                <p:selectBooleanCheckbox id="attributidentity" value="#{classList.identity}" />
+                            </div>
 
-                        <p:outputLabel for="attributautoinc" value="Autoinc:" />
-                        <p:selectBooleanCheckbox id="attributautoinc" value="#{classList.autoinc}" />
-                        
-                        <p:outputLabel for="attributisindex" value="Index:" />
-                        <p:selectBooleanCheckbox id="attributisindex" value="#{classList.isindex}" />
+                            <div class="flex align-items-center pr-2">
+                                <p:outputLabel for="attributautoinc" value="Autoinc:" />
+                                <p:selectBooleanCheckbox id="attributautoinc" value="#{classList.autoinc}" />
+                            </div>
 
-                        <p:outputLabel for="relationclass" value="Class:" rendered="#{classList.renderClass}" />
-                        <p:selectOneMenu id="relationclass" value="#{classList.selectedClassRef}" required="false" converter="#{classConverterBean}" rendered="#{classList.renderClass}">
-                            <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                            <f:selectItems value="#{classList.classListeRef}" />
-                        </p:selectOneMenu>
-                        
-                        <p:commandButton id="newattribut" process="form" value="New" actionListener="#{classList.onCreateAttribut}" update=":form:msgs :form:tabview:attributlist :form:tabview:classname" disabled="#{classlist.newAttributButtonDisabled}" />
-                        <p:commandButton id="changeattribut" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" />
+                            <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="attributisindex" value="Index:" />
+                            <p:selectBooleanCheckbox id="attributisindex" value="#{classList.isindex}" />
+                            </div>
+
+                            <div class="flex align-items-center pr-2">
+                                <p:outputLabel for="relationclass" value="Class:" rendered="#{classList.renderClass}" />
+                                <p:selectOneMenu id="relationclass" value="#{classList.selectedClassRef}" required="false" converter="#{classConverterBean}" rendered="#{classList.renderClass}">
+                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                    <f:selectItems value="#{classList.classListeRef}" />
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div class="flex align-items-center pr-2">
+                                <p:commandButton id="newattribut" process="form" value="New" actionListener="#{classList.onCreateAttribut}" update=":form:msgs :form:tabview:attributlist :form:tabview:classname" disabled="#{classlist.newAttributButtonDisabled}" />
+                            </div>
+
+                            <div class="flex align-items-center pr-2">
+                                <p:commandButton id="changeattribut" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" />
+                            </div>
+                        </div>
                     </p:panel>
                     
                 </p:tab>
@@ -773,51 +882,66 @@
                         <h:outputText value="Content"/>
                     </f:facet>
                     
-                    <p:scrollPanel id="contentpanel" style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="classcontentlist" stickyHeader="true" var="classcontent" value="#{classcontentList.classcontentlist}" 
-                                     paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
-                                     rowsPerPageTemplate="10,50,100"
-                                     selectionMode="single" selection="#{classcontentList.selectedContent}" rowKey="#{classcontent.id}"
-                                     emptyMessage="No content available" filteredValue="#{classcontentList.filteredContent}" widgetVar="classcontentlist">
-                            <p:ajax event="rowSelect" listener="#{classcontentList.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:contentbtnpanel :form:tabview:contentkeywordpicklist" />
-                            <p:column headerText="Name" filterBy="#{classcontent.name}" filterMatchMode="contains">
-                                <h:outputText value="#{classcontent.name}" />
-                            </p:column>
-                            <p:column headerText="Klasse" filterBy="#{classcontent.classref}" filterMatchMode="exact">
-                                <f:facet name="filter">
-                                    <p:selectOneMenu onchange="PF('classcontentlist').filter()" styleClass="custom-filter">
-                                        <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true" />
-                                        <f:selectItems value="#{classcontentList.classlist}" />
-                                    </p:selectOneMenu>
-                                </f:facet>
-                                <h:outputText value="#{classcontent.classref}" />
-                            </p:column>
-                        </p:dataTable>
-                    </p:scrollPanel>
-                    
-                    <p:commandButton id="refreshcontent" process="form" value="Refresh" actionListener="#{classcontentList.onRefreshContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
-                    </p:commandButton>
-                    
-                    <p:outputLabel for="contentname">Name</p:outputLabel>
-                    <p:inputText id="contentname" value="#{classcontentList.contentName}" >
-                        <p:ajax event="keyup" listener="#{classcontentList.onChangeName(changeEvent)}" update="newcontent" />
-                    </p:inputText>
+                    <div class="flex flex-row pb-2">
+                        <p:scrollPanel id="contentpanel" style="height: 400px; border: none;" mode="native">
+                            <p:dataTable id="classcontentlist" stickyHeader="true" var="classcontent" value="#{classcontentList.classcontentlist}" 
+                                         paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                         rowsPerPageTemplate="10,50,100"
+                                         selectionMode="single" selection="#{classcontentList.selectedContent}" rowKey="#{classcontent.id}"
+                                         emptyMessage="No content available" filteredValue="#{classcontentList.filteredContent}" widgetVar="classcontentlist">
+                                <p:ajax event="rowSelect" listener="#{classcontentList.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:contentbtnpanel :form:tabview:contentkeywordpicklist" />
+                                <p:column headerText="Name" filterBy="#{classcontent.name}" filterMatchMode="contains">
+                                    <h:outputText value="#{classcontent.name}" />
+                                </p:column>
+                                <p:column headerText="Klasse" filterBy="#{classcontent.classref}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('classcontentlist').filter()" styleClass="custom-filter">
+                                            <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{classcontentList.classlist}" />
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{classcontent.classref}" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:scrollPanel>
+                    </div>
 
-                    <p:outputLabel for="contentclass" value="Class:" />
-                    <p:selectOneMenu id="contentclass" value="#{classcontentList.selectedClass}" required="false" converter="#{classConverterBean}">
-                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                        <f:selectItems value="#{classcontentList.classlist}" />
-                    </p:selectOneMenu>
-                    
-                    <p:panelGrid id="contentbtnpanel" columns="2">
-                        <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}">
-                            <f:actionListener binding="#{sitetree.initClassContentlist()}" />
-                        </p:commandButton>
-                        <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onScrappContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
-                            <f:actionListener binding="#{sitetree.initClassContentlist()}" />
-                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
-                        </p:commandButton>
-                    </p:panelGrid>
+                    <p:panel id="contentbtnpanel">
+                        <div class="flex flex-row pb-2">
+                            <div class="flex align-items-center pr-2">
+                                <p:commandButton id="refreshcontent" process="form" value="Refresh" actionListener="#{classcontentList.onRefreshContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
+                                </p:commandButton>
+                            </div>
+
+                            <div class="flex align-items-center pr-2">
+                                <p:outputLabel for="contentname">Name</p:outputLabel>
+                                <p:inputText id="contentname" value="#{classcontentList.contentName}" >
+                                    <p:ajax event="keyup" listener="#{classcontentList.onChangeName(changeEvent)}" update="newcontent" />
+                                </p:inputText>
+                            </div>
+
+                            <div class="flex align-items-center pr-2">
+                                <p:outputLabel for="contentclass" value="Class:" />
+                                <p:selectOneMenu id="contentclass" value="#{classcontentList.selectedClass}" required="false" converter="#{classConverterBean}">
+                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                    <f:selectItems value="#{classcontentList.classlist}" />
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div class="flex align-items-center pr-2">
+                                <p:commandButton id="newcontent" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}">
+                                    <f:actionListener binding="#{sitetree.initClassContentlist()}" />
+                                </p:commandButton>
+                            </div>
+
+                            <div class="flex align-items-center pr-2">
+                                <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onScrappContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
+                                    <f:actionListener binding="#{sitetree.initClassContentlist()}" />
+                                    <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:panel>
                     
                     <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
                         <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentList.selectedAttributContent}" rowKey="#{attributcontent.id}">
@@ -1893,7 +2017,7 @@
                 </p:tab>
 
             </p:tabView>
-            
+                        
             
             <p:confirmDialog global="true">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
