@@ -43,7 +43,7 @@ public class Initializer implements ServletContextInitializer {
         servletContext.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
         servletContext.setInitParameter("primefaces.UPLOADER", "commons");
         servletContext.setInitParameter("primefaces.FONT_AWESOME", "true");
-        //servletContext.setInitParameter("primefaces.THEME", "cupertino");
+        servletContext.setInitParameter("primefaces.THEME", "luna-blue");
     }
     
     /**
