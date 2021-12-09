@@ -8,4 +8,3 @@ target/
 clownfish/sapconnection.props
 clownfish/sapconnection_ekn.props
 *.log
-clownfish/bootstrap_*.properties
