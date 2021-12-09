@@ -75,9 +75,9 @@
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.el</artifactId>
-            <version>4.0.2</version>
+            <version>3.0.4</version>
         </dependency>
-
+        
         <!-- JSF + PRIMEFACES -->
         <dependency>
             <groupId>org.glassfish</groupId>
