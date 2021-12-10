@@ -36,6 +36,8 @@ public class CfJava implements Serializable {
     private String content;
     @Column(name = "checkedoutby")
     private BigInteger checkedoutby;
+    // @Column(name = "compilestatus")
+    // private boolean compileStatus;
 
     public CfJava() {}
 
@@ -80,6 +82,10 @@ public class CfJava implements Serializable {
     public void setCheckedoutby(BigInteger checkedoutby) {
         this.checkedoutby = checkedoutby;
     }
+
+    // public boolean getCompileStatus() { return compileStatus; }
+
+    // public void setCompileStatus(boolean status) { compileStatus = status; }
 
     @Override
     public int hashCode() {

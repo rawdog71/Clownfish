@@ -309,8 +309,9 @@ public class JavaList implements ISourceContentInterface
             {
                 CfJava newjava = new CfJava();
                 newjava.setName(javaName);
-                newjava.setContent("package io.clownfish.internal;\n\n" +
-                        "public class " + javaName + "\n{\n\n}");
+                newjava.setContent("package io.clownfish.internal;\n\n"
+                        + "import io.clownfish.clownfish.compiler.ICompiledClass;\n\n"
+                        + "public class " + javaName + "implements ICompiledClass" + "\n{\n\n}");
                 cfjavaService.create(newjava);
                 javaListe = cfjavaService.findAll();
                 javaName = "";

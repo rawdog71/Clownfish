@@ -1,57 +1,67 @@
 package io.clownfish.clownfish.compiler;
 
-import net.openhft.compiler.CompilerUtils;
-import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Named;
 import java.io.IOException;
-import java.util.Objects;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Paths;
 
-public class CfClassLoader extends ClassLoader
+@Named("javaClassLoader")
+@Scope("singleton")
+@Component
+public final class CfClassLoader extends URLClassLoader
 {
-    private final String JAVA_SRC;
-
-    final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CfClassLoader.class);
-
-    public CfClassLoader(String src)
+    static
     {
-        super(CfClassLoader.class.getClassLoader());
-        JAVA_SRC = src;
+        registerAsParallelCapable();
     }
 
-    @Override
-    public Class<?> loadClass(String name)
+    public CfClassLoader(String name, ClassLoader parent)
     {
-        return findClass(name);
+        super(name, new URL[0], parent);
     }
 
-    private byte[] loadByteCode(String name, String src) throws ClassNotFoundException, IOException
+    /*
+     * Required when this ClassLoader is used as the system ClassLoader
+     */
+    public CfClassLoader(ClassLoader parent)
     {
-        return Objects.requireNonNull(CompilerUtils.CACHED_COMPILER.loadFromJava(name, src).getResourceAsStream(name)).readAllBytes();
+        this("classpath", parent);
     }
 
-    @Override
-    protected Class<?> findClass(String name)
+    public CfClassLoader()
     {
-        Class<?> clazz = null;
+        this(Thread.currentThread().getContextClassLoader());
+    }
 
-        try
+    public void add(URL url)
+    {
+        addURL(url);
+    }
+
+    public static CfClassLoader findAncestor(ClassLoader cl)
+    {
+        do
         {
-            if (super.findLoadedClass(name) == null)
-            {
-                clazz = CompilerUtils.CACHED_COMPILER.loadFromJava(this, name, JAVA_SRC);
-            }
-            else
-            {
-                super.findClass(name);
-            }
+            if (cl instanceof CfClassLoader)
+                return (CfClassLoader) cl;
 
-            // clazz = CompilerUtils.CACHED_COMPILER.loadFromJava(this, name, JAVA_SRC);
+            cl = cl.getParent();
         }
-        catch (ClassNotFoundException e)
-        {
-            LOGGER.error(e.getMessage());
-        }
+        while (cl != null);
 
-        return clazz;
+        return null;
+    }
+
+    /*
+     *  Required for Java Agents when this ClassLoader is used as the system ClassLoader
+     */
+    @SuppressWarnings("unused")
+    private void appendToClassPathForInstrumentation(String jarfile) throws IOException
+    {
+        add(Paths.get(jarfile).toRealPath().toUri().toURL());
     }
 }

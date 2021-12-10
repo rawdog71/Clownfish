@@ -21,6 +21,7 @@ import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.*;
 import io.clownfish.clownfish.compiler.CfClassCompiler;
+import io.clownfish.clownfish.compiler.CfClassLoader;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import io.clownfish.clownfish.datamodels.ClownfishResponse;
 import io.clownfish.clownfish.datamodels.HibernateInit;
@@ -118,6 +119,7 @@ public class Clownfish {
     @Autowired CfJavascriptversionService cfjavascriptversionService;
     @Autowired CfJavaService cfjavaService;
     @Autowired CfClassCompiler cfclassCompiler;
+    @Autowired CfClassLoader cfclassLoader;
     @Autowired CfJavaversionService cfjavaversionService;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired TemplateUtil templateUtil;
@@ -245,6 +247,11 @@ public class Clownfish {
         if (null == propertyUtil) {
             propertyUtil = new PropertyUtil(propertylist);
         }
+
+        // if (cfclassCompiler == null)
+        //     cfclassCompiler = new CfClassCompiler();
+        // if (cfclassLoader == null)
+        //     cfclassLoader = new CfClassLoader(getClass().getClassLoader());
         
         libloaderpath = propertyUtil.getPropertyValue("folder_libs");
         
@@ -258,12 +265,10 @@ public class Clownfish {
         if ((!mavenpath.isBlank()) && (null != mavenpath)) {
             if (classpathUtil == null) {
                 classpathUtil = new ClassPathUtil();
+                classpathUtil.init(cfclassLoader);
             }
             classpathUtil.addPath(mavenpath);
         }
-
-        if (cfclassCompiler == null)
-            cfclassCompiler = new CfClassCompiler();
         
         if (1 == bootstrap) {
             bootstrap = 0;

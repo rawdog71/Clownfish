@@ -387,11 +387,6 @@
             <version>3.3.9</version>
             <type>jar</type>
         </dependency>
-        <dependency>
-            <groupId>net.openhft</groupId>
-            <artifactId>compiler</artifactId>
-            <version>2.21ea80</version>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
