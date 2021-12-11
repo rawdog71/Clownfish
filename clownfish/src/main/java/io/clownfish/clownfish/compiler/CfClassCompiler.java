@@ -178,42 +178,6 @@ public class CfClassCompiler
 
     public void onCompileAll(ActionEvent actionEvent)
     {
-        /*
-        if (getTmpdir() == null)
-        {
-            try
-            {
-                createTempDir();
-            }
-            catch (IOException e)
-            {
-                LOGGER.error(e.getMessage());
-            }
-        }
-
-        ArrayList<File> javas = new ArrayList<>();
-
-        for (CfJava java : cfjavaService.findAll())
-        {
-            if (tmpdir != null)
-            {
-                File src = new File(getTmpdir().toFile() + File.separator + java.getName() + ".java");
-
-                try (Writer srcWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(src), StandardCharsets.UTF_8)))
-                {
-                    srcWriter.write(java.getContent());
-                    javas.add(src);
-                }
-                catch (IOException e)
-                {
-                    LOGGER.error(e.getMessage());
-                }
-            }
-        }
-
-        compileClasses(javas);
-        */
-        
         compileAll(true);
 
         FacesMessage message = new FacesMessage("Compiled class(es) successfully");
