@@ -270,6 +270,8 @@ public class Clownfish {
             classpathUtil.addPath(mavenpath);
         }
         
+        cfclassCompiler.compileAll(false);
+        
         if (1 == bootstrap) {
             bootstrap = 0;
             try {
@@ -1221,6 +1223,39 @@ public class Clownfish {
                                             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
                                         }
                                     }
+                                    
+                                    for (Class<?> c : classpathUtil.getClass_set()) {
+                                        Constructor<?> ctor;
+                                        try {
+                                            if (!Modifier.isInterface(c.getModifiers()) && !Modifier.isAbstract(c.getModifiers()) && !Modifier.isFinal(c.getModifiers()))
+                                            {
+                                                ctor = c.getConstructor();
+                                                Object object = ctor.newInstance();
+                                                velContext.put(c.getName().replaceAll("\\.", "_"), object);
+                                            }
+                                        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                            if (ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException)
+                                                continue;
+
+                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
+
+                                    org.apache.velocity.VelocityContext finalvelContext = velContext;
+                                    cfclassCompiler.getClassMethodMap().forEach((k, v) ->
+                                    {
+                                        Constructor<?> ctor;
+                                        try
+                                        {
+                                            ctor = k.getConstructor();
+                                            Object object = ctor.newInstance();
+                                            finalvelContext.put(k.getName().replaceAll("\\.", "_"), object);
+                                        }
+                                        catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex)
+                                        {
+                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    });
                                     
                                     if (null != velTemplate) {
                                         velTemplate.merge(velContext, out);

@@ -50,7 +50,7 @@ public class CfClassCompiler
     //TODO: Custom ClassLoader with the ability to unload/reload already loaded classes at runtime to allow
     // changes to Java templates in Clownfish without a restart
 
-    public ArrayList<Class<?>> compileClasses(ArrayList<File> java)
+    public ArrayList<Class<?>> compileClasses(ArrayList<File> java, boolean withMessage)
     {
         CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
         // Map<String, byte[]> classBytes = new HashMap<>();
@@ -116,13 +116,19 @@ public class CfClassCompiler
                     // newClass.getMethod("main", String[].class).invoke(null, (Object) null);
                 }
 
-                FacesMessage message = new FacesMessage("Compiled class(es) successfully");
-                FacesContext.getCurrentInstance().addMessage(null, message);
+                if (withMessage)
+                {
+                    FacesMessage message = new FacesMessage("Compiled class(es) successfully");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                }
             }
             else
             {
-                FacesMessage message = new FacesMessage("Compilation failed! Check compile log.");
-                FacesContext.getCurrentInstance().addMessage(null, message);
+                if (withMessage)
+                {
+                    FacesMessage message = new FacesMessage("Compilation failed! Check compile log.");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                }
             }
         }
         catch (ClassNotFoundException | IOException /*| NoSuchMethodException | IllegalAccessException | InvocationTargetException*/ e)
@@ -172,6 +178,7 @@ public class CfClassCompiler
 
     public void onCompileAll(ActionEvent actionEvent)
     {
+        /*
         if (getTmpdir() == null)
         {
             try
@@ -205,9 +212,48 @@ public class CfClassCompiler
         }
 
         compileClasses(javas);
+        */
+        
+        compileAll(true);
 
         FacesMessage message = new FacesMessage("Compiled class(es) successfully");
         FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+    
+    public void compileAll(boolean withMessage) {
+        if (getTmpdir() == null)
+        {
+            try
+            {
+                createTempDir();
+            }
+            catch (IOException e)
+            {
+                LOGGER.error(e.getMessage());
+            }
+        }
+
+        ArrayList<File> javas = new ArrayList<>();
+
+        for (CfJava java : cfjavaService.findAll())
+        {
+            if (tmpdir != null)
+            {
+                File src = new File(getTmpdir().toFile() + File.separator + java.getName() + ".java");
+
+                try (Writer srcWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(src), StandardCharsets.UTF_8)))
+                {
+                    srcWriter.write(java.getContent());
+                    javas.add(src);
+                }
+                catch (IOException e)
+                {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+        }
+
+        compileClasses(javas, withMessage);
     }
 
     public void createTempDir() throws IOException

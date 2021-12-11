@@ -10,8 +10,11 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath io.clownfish.clownfish.Main --app.datasource.username=clownfish --app.datasource.password=clownfish</exec.args>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
+                <exec.appArgs>--app.datasource.username=clownfish --app.datasource.password=clownfish</exec.appArgs>
+                <exec.vmArgs>-Djava.system.class.loader=io.clownfish.clownfish.compiler.CfClassLoader</exec.vmArgs>
+                <exec.mainClass>io.clownfish.clownfish.Main</exec.mainClass>
             </properties>
         </action>
         <action>
@@ -27,9 +30,12 @@
                 
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath io.clownfish.clownfish.Main --app.datasource.username=clownfish --app.datasource.password=clownfish</exec.args>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
+                <exec.vmArgs>-Djava.system.class.loader=io.clownfish.clownfish.compiler.CfClassLoader -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+                <exec.appArgs>--app.datasource.username=clownfish --app.datasource.password=clownfish</exec.appArgs>
+                <exec.mainClass>io.clownfish.clownfish.Main</exec.mainClass>
                 
                 
                 
@@ -46,8 +52,11 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath io.clownfish.clownfish.Main --app.datasource.username=clownfish --app.datasource.password=clownfish</exec.args>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
+                <exec.appArgs>--app.datasource.username=clownfish --app.datasource.password=clownfish</exec.appArgs>
+                <exec.vmArgs>-Djava.system.class.loader=io.clownfish.clownfish.compiler.CfClassLoader</exec.vmArgs>
+                <exec.mainClass>io.clownfish.clownfish.Main</exec.mainClass>
             </properties>
         </action>
     </actions>
