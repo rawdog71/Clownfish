@@ -21,3 +21,4 @@ Work in progress
 - Static site generation
 - WebDAV server
 - JasperReports JRXML template creation and PDF export
+- Java class runtime compilation with Maven support
