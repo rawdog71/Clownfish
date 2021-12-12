@@ -65,7 +65,7 @@
                         <p:outputLabel value="&nbsp;" />
                         <p:outputLabel rendered="#{loginBean.login}" value="#{loginBean.cfuser.nachname}" />
                         <p:outputLabel value="&nbsp;" />
-                        <p:commandButton id="refreshcontentall" process="form" value="Refresh" actionListener="#{backendBean.onRefreshAll()}" update=":form:msgs :form:tabview" rendered="#{loginBean.login}">
+                        <p:commandButton id="refreshcontentall" icon="pi pi-refresh" process="form" value="Refresh" actionListener="#{backendBean.onRefreshAll()}" update=":form:msgs :form:tabview" rendered="#{loginBean.login}">
                             <f:actionListener binding="#{sitetree.onRefreshAll()}" />
                         </p:commandButton>
                     </f:facet>
@@ -414,15 +414,15 @@
                     </div>
                     
                     <h:panelGroup id="difftemplateBtnGroup">
-                        <p:commandButton id="savetemplate" process="form" value="Save" rendered="#{templateList.checkedout}" actionListener="#{templateList.onSave}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
-                        <p:commandButton id="checkintemplate" process="form" value="CheckIn" rendered="#{templateList.checkedout}" actionListener="#{templateList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
-                        <p:commandButton id="checkouttemplate" process="form" value="CheckOut" rendered="#{!templateList.checkedout and templateList.access}" actionListener="#{templateList.onCheckOut}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
-                        <p:commandButton id="committemplate" process="form" value="Commit" rendered="#{templateList.difference and !templateList.checkedout and templateList.access}" actionListener="#{templateList.onCommit}"  update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:selectedtemplateversion">
+                        <p:commandButton id="savetemplate" icon="pi pi-save" process="form" value="Save" rendered="#{templateList.checkedout}" actionListener="#{templateList.onSave}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
+                        <p:commandButton id="checkintemplate" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{templateList.checkedout}" actionListener="#{templateList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
+                        <p:commandButton id="checkouttemplate" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!templateList.checkedout and templateList.access}" actionListener="#{templateList.onCheckOut}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
+                        <p:commandButton id="committemplate" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{templateList.difference and !templateList.checkedout and templateList.access}" actionListener="#{templateList.onCommit}"  update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:selectedtemplateversion">
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
 
                         <p:outputLabel> Version </p:outputLabel><p:outputLabel id="templateversion">#{templateList.templateUtility.currentVersion}</p:outputLabel>
-                        <p:commandButton id="difftemplateBtn" type="button" value="Diff" rendered="#{templateList.difference}" />
+                        <p:commandButton id="difftemplateBtn" icon="pi pi-eye" type="button" value="Diff" rendered="#{templateList.difference}" />
 
                         <h5>Select Version</h5>           
                         <p:inputText id="selectedtemplateversion" value="#{templateList.selectedtemplateversion}" disabled="true" />
@@ -489,15 +489,15 @@
                     
                     <h:panelGroup id="diffstylesheetBtnGroup">
                             
-                        <p:commandButton id="savestylesheet" process="form" value="Save" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onSave}" update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:templateversion :form:tabview:diffstylesheetBtnGroup" />
-                        <p:commandButton id="checkinstylesheet" process="form" value="CheckIn" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
-                        <p:commandButton id="checkoutstylesheet" process="form" value="CheckOut" rendered="#{!stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCheckOut}" update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
-                        <p:commandButton id="commitstylesheet" process="form" value="Commit" rendered="#{stylesheetList.difference and !stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCommit}"  update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:selectedstylesheetversion">
+                        <p:commandButton id="savestylesheet" icon="pi pi-save" process="form" value="Save" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onSave}" update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:templateversion :form:tabview:diffstylesheetBtnGroup" />
+                        <p:commandButton id="checkinstylesheet" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
+                        <p:commandButton id="checkoutstylesheet" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCheckOut}" update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
+                        <p:commandButton id="commitstylesheet" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{stylesheetList.difference and !stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCommit}"  update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:selectedstylesheetversion">
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                             
                         <p:outputLabel> Version </p:outputLabel><p:outputLabel id="stylesheetversion">#{stylesheetList.stylesheetUtility.currentVersion}</p:outputLabel>
-                        <p:commandButton id="diffstylesheetBtn" type="button" value="Diff" rendered="#{stylesheetList.difference}" />
+                        <p:commandButton id="diffstylesheetBtn" icon="pi pi-eye" type="button" value="Diff" rendered="#{stylesheetList.difference}" />
                         
                         <h5>Select Version</h5>           
                         <p:inputText id="selectedstylesheetversion" value="#{stylesheetList.selectedstylesheetversion}" disabled="true" />
@@ -564,15 +564,15 @@
                     </div>
                         
                     <h:panelGroup id="diffjavascriptBtnGroup">
-                        <p:commandButton id="savejavascript" process="form" value="Save" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onSave}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup" />
-                        <p:commandButton id="checkinjavascript" process="form" value="CheckIn" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
-                        <p:commandButton id="checkoutjavascript" process="form" value="CheckOut" rendered="#{!javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCheckOut}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
-                        <p:commandButton id="commitjavascript" process="form" value="Commit" rendered="#{javascriptList.difference and !javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCommit}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:selectedjavascriptversion">
+                        <p:commandButton id="savejavascript" icon="pi pi-save" process="form" value="Save" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onSave}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup" />
+                        <p:commandButton id="checkinjavascript" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
+                        <p:commandButton id="checkoutjavascript" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCheckOut}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
+                        <p:commandButton id="commitjavascript" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{javascriptList.difference and !javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCommit}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:selectedjavascriptversion">
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                         
                         <p:outputLabel> Version </p:outputLabel><p:outputLabel id="javascriptversion">#{javascriptList.javascriptUtility.currentVersion}</p:outputLabel>
-                        <p:commandButton id="diffjavascriptBtn" type="button" value="Diff" rendered="#{javascriptList.difference}" />
+                        <p:commandButton id="diffjavascriptBtn" icon="pi pi-eye" type="button" value="Diff" rendered="#{javascriptList.difference}" />
                         
                         <h5>Select Version</h5>           
                         <p:inputText id="selectedjavascriptversion" value="#{javascriptList.selectedjavascriptversion}" disabled="true"/>
@@ -641,15 +641,15 @@
                             </div>
                             
                             <h:panelGroup id="diffjavaBtnGroup">
-                                <p:commandButton id="savejava" process="form" value="Save" rendered="#{javaList.checkedout}" actionListener="#{javaList.onSave}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup" />
-                                <p:commandButton id="checkinjava" process="form" value="CheckIn" rendered="#{javaList.checkedout}" actionListener="#{javaList.onCheckIn}"  update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjava" />
-                                <p:commandButton id="checkoutjava" process="form" value="CheckOut" rendered="#{!javaList.checkedout and javaList.access}" actionListener="#{javaList.onCheckOut}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjava" />
-                                <p:commandButton id="commitjava" process="form" value="Commit" rendered="#{javaList.difference and !javaList.checkedout and javaList.access}" actionListener="#{javaList.onCommit}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:selectedjavaversion">
+                                <p:commandButton id="savejava" icon="pi pi-save" process="form" value="Save" rendered="#{javaList.checkedout}" actionListener="#{javaList.onSave}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup" />
+                                <p:commandButton id="checkinjava" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{javaList.checkedout}" actionListener="#{javaList.onCheckIn}"  update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjava" />
+                                <p:commandButton id="checkoutjava" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!javaList.checkedout and javaList.access}" actionListener="#{javaList.onCheckOut}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjava" />
+                                <p:commandButton id="commitjava" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{javaList.difference and !javaList.checkedout and javaList.access}" actionListener="#{javaList.onCommit}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:selectedjavaversion">
                                     <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
 
                                 <p:outputLabel> Version </p:outputLabel><p:outputLabel id="javaversion">#{javaList.javaUtility.currentVersion}</p:outputLabel>
-                                <p:commandButton id="diffjavaBtn" type="button" value="Diff" rendered="#{javaList.difference}" />
+                                <p:commandButton id="diffjavaBtn" icon="pi pi-eye" type="button" value="Diff" rendered="#{javaList.difference}" />
 
                                 <h5>Select Version</h5>
                                 <p:inputText id="selectedjavaversion" value="#{javaList.selectedjavaversion}" disabled="true"/>
@@ -681,7 +681,7 @@
                                     </p:selectCheckboxMenu>
                                 </div>
                                 <div class="flex align-items-center pr-2">
-                                    <p:commandButton id="compileall" process="form" value="Compile all" actionListener="#{javaCompiler.onCompileAll}" update=":form:msgs" />
+                                    <p:commandButton id="compileall" icon="pi pi-cog" process="form" value="Compile all" actionListener="#{javaCompiler.onCompileAll}" update=":form:msgs" />
                                 </div>
 								<div class="flex align-items-center pr-2">
                                     <p:outputLabel for="compileverbose">Verbose compile output:</p:outputLabel>
@@ -916,7 +916,7 @@
                     <p:panel id="contentbtnpanel">
                         <div class="flex flex-row pb-2">
                             <div class="flex align-items-center pr-2">
-                                <p:commandButton id="refreshcontent" process="form" value="Refresh" actionListener="#{classcontentList.onRefreshContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
+                                <p:commandButton id="refreshcontent" icon="pi pi-refresh" process="form" value="Refresh" actionListener="#{classcontentList.onRefreshContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
                                 </p:commandButton>
                             </div>
 
@@ -1787,7 +1787,7 @@
                             <p:outputLabel for="jobpreview">Preview</p:outputLabel>
                             <p:inputText id="jobpreview" value="#{quartzlist.jobPreview}" disabled="true" />
                             
-                            <p:commandButton id="transferjob" process="form" value="Transfer to job" actionListener="#{quartzlist.onTransferJob}" update=":form:msgs :form:tabview:jobpanel" />
+                            <p:commandButton id="transferjob" icon="pi pi-arrow-circle-left" process="form" value="Transfer to job" actionListener="#{quartzlist.onTransferJob}" update=":form:msgs :form:tabview:jobpanel" />
                         </p:panelGrid>
                     </p:panelGrid>
                         
@@ -1957,7 +1957,7 @@
                     <p:panelGrid columns="1">    
                         <p:row>
                             <p:column>
-                                <p:commandButton id="exportButton" value="Export" ajax="false" actionListener="#{reefbean.onExport}" update=":form:msgs" />
+                                <p:commandButton id="exportButton" icon="pi pi-file" value="Export" ajax="false" actionListener="#{reefbean.onExport}" update=":form:msgs" />
                             </p:column>
                         </p:row>
                     </p:panelGrid>
@@ -1993,14 +1993,14 @@
                         </p:dataTable>
                     </p:scrollPanel>
                     
-                    <p:commandButton id="refreshscrapyardcontent" process="form" value="Refresh" actionListener="#{scrapyardList.onRefreshContent}" update=":form:msgs :form:tabview:scrapyardclasscontentlist">
+                    <p:commandButton id="refreshscrapyardcontent" icon="pi pi-refresh" process="form" value="Refresh" actionListener="#{scrapyardList.onRefreshContent}" update=":form:msgs :form:tabview:scrapyardclasscontentlist">
                     </p:commandButton>
                     
                     <p:panelGrid id="scrapyardcontentbtnpanel" columns="2">
-                        <p:commandButton id="recyclecontent" process="form" value="Recycle" actionListener="#{scrapyardList.onRecycle}" update=":form:msgs :form:tabview:scrapyardclasscontentlist" disabled="#{scrapyardlist.newContentButtonDisabled}">
+                        <p:commandButton id="recyclecontent" icon="pi pi-sync" process="form" value="Recycle" actionListener="#{scrapyardList.onRecycle}" update=":form:msgs :form:tabview:scrapyardclasscontentlist" disabled="#{scrapyardlist.newContentButtonDisabled}">
                             <f:actionListener binding="#{sitetree.initClassContentlist()}" />
                         </p:commandButton>
-                        <p:commandButton id="killcontent" process="form" value="Destroy" actionListener="#{scrapyardList.onDeleteContent}" update=":form:msgs :form:tabview:scrapyardclasscontentlist">
+                        <p:commandButton id="killcontent" icon="pi pi-trash" process="form" value="Destroy" actionListener="#{scrapyardList.onDeleteContent}" update=":form:msgs :form:tabview:scrapyardclasscontentlist">
                             <f:actionListener binding="#{sitetree.initClassContentlist()}" />
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
