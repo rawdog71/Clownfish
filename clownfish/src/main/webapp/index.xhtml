@@ -54,11 +54,11 @@
                     </f:facet>
 
                     <f:facet name="right">
-                        <p:commandButton id="userButton" value="User" type="button" icon="fa fa-home" rendered="#{loginBean.login}" />
+                        <p:commandButton id="userButton" value="User" type="button" icon="pi pi-user" rendered="#{loginBean.login}" />
                         <p:outputLabel value="&nbsp;" />
                         <p:menu overlay="true" trigger="userButton" my="left top" at="left bottom">
-                            <p:menuitem value="Profil" update="msgs" icon="fa fa-user"/>
-                            <p:menuitem value="Logout" actionListener="#{loginBean.onLogout}" update=":form" icon="fa fa-times"/>
+                            <p:menuitem value="Profil" update="msgs" icon="pi pi-user"/>
+                            <p:menuitem value="Logout" actionListener="#{loginBean.onLogout}" update=":form" icon="pi pi-times"/>
                         </p:menu>
 
                         <p:outputLabel rendered="#{loginBean.login}" value="#{loginBean.cfuser.vorname}" />
@@ -282,7 +282,7 @@
                                             </p:row>
                                             <p:row>
                                                 <p:column>    
-                                                    <p:commandButton id="deletestaticsite" process="form" value="Delete static site" actionListener="#{sitetree.onDeleteStaticSite}">
+                                                    <p:commandButton id="deletestaticsite" icon="pi pi-trash" process="form" value="Delete static site" actionListener="#{sitetree.onDeleteStaticSite}">
                                                         <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                     </p:commandButton>
                                                 </p:column>
@@ -315,7 +315,7 @@
                                                     <f:selectItems value="#{sitetree.rfcfunctionlist}" var="rfcfunction" itemLabel="#{rfcfunction.name}" itemValue="#{rfcfunction}" />
                                                 </p:selectOneMenu>
                                                 <p:commandButton id="newRfc" process="form" value="New" actionListener="#{sitetree.onNewRfc}" update=":form:tabview:tabsiteview:saprfclist" />
-                                                <p:commandButton id="deleteRfc" process="form" value="Delete" actionListener="#{sitetree.onDeleteRfc}" update=":form:tabview:tabsiteview:saprfclist">
+                                                <p:commandButton id="deleteRfc" process="form" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDeleteRfc}" update=":form:tabview:tabsiteview:saprfclist">
                                                     <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
                                             </p:column>
@@ -326,10 +326,10 @@
                                 <p:panelGrid columns="1">    
                                     <p:row>
                                         <p:column>
-                                            <p:commandButton id="changeSiteButton" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref">
+                                            <p:commandButton id="changeSiteButton" icon="pi pi-pencil" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref">
                                                 <f:actionListener binding="#{quartzlist.refresh()}" />
                                             </p:commandButton>
-                                            <p:commandButton id="deleteSiteButton" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref">
+                                            <p:commandButton id="deleteSiteButton" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref">
                                                 <f:actionListener binding="#{quartzlist.refresh()}" />
                                                 <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
@@ -366,7 +366,7 @@
 
                 <p:tab title="Templates" id="templatepanel" rendered="#{loginBean.login and loginBean.hasRights(2)}">
                     <f:facet name="title">
-                        <i class="fa fa-file-code-o"></i><h:outputText value="&nbsp;"/>
+                        <i class="pi pi-code"></i><h:outputText value="&nbsp;"/>
                         <h:outputText value="Templates"/>
                     </f:facet>
                     
@@ -380,7 +380,7 @@
                         </div>  
 
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="deletetemplateButton" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:tabsiteview:selecttemplate">
+                            <p:commandButton id="deletetemplateButton" icon="pi pi-trash" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:tabsiteview:selecttemplate">
                                 <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                         </div>
@@ -405,7 +405,7 @@
                             <p:commandButton id="newtemplate" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
                         </div>
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="changetemplate" process="form" value="Change" actionListener="#{templateList.onChange}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
+                            <p:commandButton id="changetemplate" icon="pi pi-pencil" process="form" value="Change" actionListener="#{templateList.onChange}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
                         </div>    
                     </div>
 
@@ -431,7 +431,7 @@
                         </p:slider>
 
                         <p:overlayPanel id="difftemplatePanel" for="difftemplateBtn" dynamic="false" style="width:600px" modal="true">
-                            <p:dataTable var="diff" value="#{templateList.templateUtility.patch.deltas}" rows="#{templateList.templateUtility.patch.deltas.size()}" paginator="false">
+                            <p:dataTable var="diff" lazy="false" value="#{templateList.templateUtility.patch.deltas}" rows="#{templateList.templateUtility.patch.deltas.size()}" paginator="false">
                                 <p:column headerText="DiffTyp">
                                     <h:outputText value="#{diff.type}" />
                                 </p:column>
@@ -448,7 +448,7 @@
 
                 <p:tab title="Stylesheets" id="stylesheetpanel" rendered="#{loginBean.login and loginBean.hasRights(3)}">
                     <f:facet name="title">
-                        <i class="fa fa-file-code-o"></i><h:outputText value="&nbsp;"/>
+                        <i class="pi pi-code"></i><h:outputText value="&nbsp;"/>
                         <h:outputText value="Stylesheets"/>
                     </f:facet>
                     
@@ -462,7 +462,7 @@
                         </div>
                         
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="deletestylesheetButton" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:tabsiteview:selectstylesheet">
+                            <p:commandButton id="deletestylesheetButton" icon="pi pi-trash" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:tabsiteview:selectstylesheet">
                                 <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                         </div>
@@ -479,7 +479,7 @@
                         </div>
                         
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="changestylesheet" process="form" value="Change" actionListener="#{stylesheetList.onChange}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
+                            <p:commandButton id="changestylesheet" icon="pi pi-pencil" process="form" value="Change" actionListener="#{stylesheetList.onChange}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
                         </div>
                     </div>
                     
@@ -506,7 +506,7 @@
                         </p:slider>
                         
                         <p:overlayPanel id="diffstylesheetPanel" for="diffstylesheetBtn" dynamic="false" style="width:600px" modal="true">
-                            <p:dataTable var="diff" value="#{stylesheetList.stylesheetUtility.patch.deltas}" rows="#{stylesheetList.stylesheetUtility.patch.deltas.size()}" paginator="false">
+                            <p:dataTable var="diff" lazy="false" value="#{stylesheetList.stylesheetUtility.patch.deltas}" rows="#{stylesheetList.stylesheetUtility.patch.deltas.size()}" paginator="false">
                                 <p:column headerText="DiffTyp">
                                     <h:outputText value="#{diff.type}" />
                                 </p:column>
@@ -524,7 +524,7 @@
 
                 <p:tab title="Javascripts" id="javascriptpanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
                     <f:facet name="title">
-                        <i class="fa fa-file-code-o"></i><h:outputText value="&nbsp;"/>
+                        <i class="pi pi-code"></i><h:outputText value="&nbsp;"/>
                         <h:outputText value="Javascripts"/>
                     </f:facet>
                     
@@ -538,7 +538,7 @@
                         </div>
 
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="deletejavascriptButton" value="Delete" actionListener="#{javascriptList.onDelete}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:tabsiteview:selectjavascript">
+                            <p:commandButton id="deletejavascriptButton" icon="pi pi-trash" value="Delete" actionListener="#{javascriptList.onDelete}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:tabsiteview:selectjavascript">
                                 <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                         </div>
@@ -555,7 +555,7 @@
                         </div>
 
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="changejavascript" process="form" value="Change" actionListener="#{javascriptList.onChange}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
+                            <p:commandButton id="changejavascript" icon="pi pi-pencil" process="form" value="Change" actionListener="#{javascriptList.onChange}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
                         </div>
                     </div>
 
@@ -581,7 +581,7 @@
                         </p:slider>
                         
                         <p:overlayPanel id="diffjavascriptPanel" for="diffjavascriptBtn" dynamic="false" style="width:600px" modal="true">
-                            <p:dataTable var="diff" value="#{javascriptList.javascriptUtility.patch.deltas}" rows="#{javascriptList.javascriptUtility.patch.deltas.size()}" paginator="false">
+                            <p:dataTable var="diff" lazy="false" value="#{javascriptList.javascriptUtility.patch.deltas}" rows="#{javascriptList.javascriptUtility.patch.deltas.size()}" paginator="false">
                                 <p:column headerText="DiffTyp">
                                     <h:outputText value="#{diff.type}" />
                                 </p:column>
@@ -599,7 +599,7 @@
 
                 <p:tab title="Java" id="javapanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
                     <f:facet name="title">
-                        <i class="fa fa-file-code-o"></i><h:outputText value="&nbsp;"/>
+                        <i class="pi pi-code"></i><h:outputText value="&nbsp;"/>
                         <h:outputText value="Java"/>
                     </f:facet>
                     
@@ -615,7 +615,7 @@
                                 </div>
 
                                 <div class="flex align-items-center pr-2">
-                                    <p:commandButton id="deletejavaButton" value="Delete" actionListener="#{javaList.onDelete}" update=":form:msgs :form:tabview:javatabview:javalist">
+                                    <p:commandButton id="deletejavaButton" icon="pi pi-trash" value="Delete" actionListener="#{javaList.onDelete}" update=":form:msgs :form:tabview:javatabview:javalist">
                                         <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
                                 </div>
@@ -632,7 +632,7 @@
                                 </div>
 
                                 <div class="flex align-items-center pr-2">
-                                    <p:commandButton id="changejava" process="form" value="Change" actionListener="#{javaList.onChange}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname" disabled="#{javaList.newButtonDisabled}" />
+                                    <p:commandButton id="changejava" icon="pi pi-pencil" process="form" value="Change" actionListener="#{javaList.onChange}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname" disabled="#{javaList.newButtonDisabled}" />
                                 </div>
                             </div>
                             
@@ -658,7 +658,7 @@
                                 </p:slider>
 
                                 <p:overlayPanel id="diffjavaPanel" for="diffjavaBtn" dynamic="false" style="width:600px" modal="true">
-                                    <p:dataTable var="diff" value="#{javaList.javaUtility.patch.deltas}" rows="#{javaList.javaUtility.patch.deltas.size()}" paginator="false">
+                                    <p:dataTable var="diff" lazy="false" value="#{javaList.javaUtility.patch.deltas}" rows="#{javaList.javaUtility.patch.deltas.size()}" paginator="false">
                                         <p:column headerText="DiffTyp">
                                             <h:outputText value="#{diff.type}" />
                                         </p:column>
@@ -709,7 +709,7 @@
                             </p:panelGrid>
 
                             <p:panelGrid columns="3">
-                                <p:commandButton id="mavensearch" process="form" value="Search" actionListener="#{mavenList.onSearch}" update=":form:tabview:javatabview:mavensearchlist">
+                                <p:commandButton id="mavensearch" icon="pi pi-search" process="form" value="Search" actionListener="#{mavenList.onSearch}" update=":form:tabview:javatabview:mavensearchlist">
                                 </p:commandButton>
                             </p:panelGrid>
 
@@ -736,7 +736,7 @@
                             </p:dataTable>
 
                             <p:panelGrid columns="1">
-                                <p:commandButton id="maveninstall" process="form" value="Install" actionListener="#{mavenList.onInstall}" update=":form:tabview:javatabview:maveninstalledlist">
+                                <p:commandButton id="maveninstall" icon="pi pi-download" process="form" value="Install" actionListener="#{mavenList.onInstall}" update=":form:tabview:javatabview:maveninstalledlist">
                                 </p:commandButton>
                             </p:panelGrid>
 
@@ -757,7 +757,7 @@
                             </p:dataTable>
 
                             <p:panelGrid columns="1">
-                                <p:commandButton id="mavendeinstall" process="form" value="Deinstall" actionListener="#{mavenList.onDeinstall}" update=":form:tabview:javatabview:maveninstalledlist">
+                                <p:commandButton id="mavendeinstall" icon="pi pi-times-circle" process="form" value="Deinstall" actionListener="#{mavenList.onDeinstall}" update=":form:tabview:javatabview:maveninstalledlist">
                                 </p:commandButton>
                             </p:panelGrid>
 
@@ -802,7 +802,7 @@
                         </div>
                         
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="updateclass" process="form" value="Edit" actionListener="#{classList.onEdit}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" />
+                            <p:commandButton id="updateclass" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{classList.onEdit}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" />
                         </div>
                         
                         <div class="flex align-items-center pr-2">
@@ -876,7 +876,7 @@
                             </div>
 
                             <div class="flex align-items-center pr-2">
-                                <p:commandButton id="changeattribut" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" />
+                                <p:commandButton id="changeattribut" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" />
                             </div>
                         </div>
                     </p:panel>
@@ -942,7 +942,7 @@
                             </div>
 
                             <div class="flex align-items-center pr-2">
-                                <p:commandButton id="deletecontent" process="form" value="Delete" actionListener="#{classcontentList.onScrappContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
+                                <p:commandButton id="deletecontent" icon="pi pi-trash" process="form" value="Delete" actionListener="#{classcontentList.onScrappContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
                                     <f:actionListener binding="#{sitetree.initClassContentlist()}" />
                                     <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
@@ -989,7 +989,7 @@
                                 </p:selectOneMenu>
 
                                 <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
-                                <p:commandButton id="editattribut" process="form" value="Edit" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" >
+                                <p:commandButton id="editattribut" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" >
                                     
                                 </p:commandButton>
                                 <p:focus for="attributvalueString" />
@@ -1056,7 +1056,7 @@
                     <p:commandButton id="newcontentlist" process="form" value="New" actionListener="#{datacontentList.onCreateContent}" update=":form:msgs :form:tabview:tabsiteview:sitelist :form:tabview:datalistcontent" disabled="#{datacontentlist.newContentButtonDisabled}">
                         <f:actionListener binding="#{sitetree.initContentlist()}" />
                     </p:commandButton>
-                    <p:commandButton id="deletecontentlist" process="form" value="Delete" actionListener="#{datacontentList.onDeleteContent}" update=":form:msgs :form:tabview:tabsiteview:sitelist :form:tabview:datalistcontent">
+                    <p:commandButton id="deletecontentlist" icon="pi pi-trash" process="form" value="Delete" actionListener="#{datacontentList.onDeleteContent}" update=":form:msgs :form:tabview:tabsiteview:sitelist :form:tabview:datalistcontent">
                         <f:actionListener binding="#{sitetree.initContentlist()}" />
                         <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                     </p:commandButton>
@@ -1070,7 +1070,7 @@
 
                 <p:tab title="Datasources" id="datasourcepanel" rendered="#{loginBean.login and loginBean.hasRights(8)}">
                     <f:facet name="title">
-                        <i class="fa fa-database"></i><h:outputText value="&nbsp;"/>
+                        <i class="pi pi-database"></i><h:outputText value="&nbsp;"/>
                         <h:outputText value="Datasources"/>
                     </f:facet>
                     
@@ -1115,8 +1115,8 @@
                         <p:commandButton id="newdatasource" process="form" value="New" actionListener="#{datasourceList.onCreateContent}" update=":form:msgs :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist" disabled="#{datasourceList.newContentButtonDisabled}">
                             <f:actionListener binding="#{sitetree.initDatasources()}" />
                         </p:commandButton>
-                        <p:commandButton id="editdatasource" process="form" value="Edit" actionListener="#{datasourceList.onEditContent}" update=":form:msgs :form:tabview:datalistcontent" />
-                        <p:commandButton id="deletedatasource" process="form" value="Delete" actionListener="#{datasourceList.onDeleteContent}" update=":form:msgs :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist">
+                        <p:commandButton id="editdatasource" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{datasourceList.onEditContent}" update=":form:msgs :form:tabview:datalistcontent" />
+                        <p:commandButton id="deletedatasource" icon="pi pi-trash" process="form" value="Delete" actionListener="#{datasourceList.onDeleteContent}" update=":form:msgs :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist">
                             <f:actionListener binding="#{sitetree.initDatasources()}" />
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
@@ -1143,7 +1143,7 @@
                         
                         <p:dataView id="assetlist" var="media" value="#{assetList.assetlist}" rows="10" paginator="true" rowsPerPageTemplate="10,50,100"
                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                gridIcon="fa fa-th-large" listIcon="fa fa-bars">
+                                gridIcon="pi pi-th-large" listIcon="pi pi-bars">
 
                             <p:dataViewGridItem>
                                 <p:panel header="#{media.id}" style="text-align:center">
@@ -1156,12 +1156,12 @@
                                             <h:panelGrid columns="2" cellpadding="5">
                                                 <p:panelGrid columns="3" layout="grid" styleClass="ui-noborder">
                                                     <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
-                                                    <p:commandButton icon="fa fa-trash" action="#{assetList.onScrapp}" update=":form:tabview:assetlist">
+                                                    <p:commandButton icon="pi pi-trash" action="#{assetList.onScrapp}" update=":form:tabview:assetlist">
                                                         <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                                         <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                     </p:commandButton>
 
-                                                    <p:commandButton update=":form:tabview:assetDetail" icon="fa fa-info" action="#{assetList.onDetail}">
+                                                    <p:commandButton update=":form:tabview:assetDetail" icon="pi pi-info" action="#{assetList.onDetail}">
                                                         <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                                     </p:commandButton>
                                                 </p:panelGrid>
@@ -1182,12 +1182,12 @@
 
                                             <p:panelGrid columns="3" layout="grid" styleClass="ui-noborder">
                                                 <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
-                                                <p:commandButton icon="fa fa-trash" action="#{assetList.onScrapp}" update=":form:tabview:assetlist">
+                                                <p:commandButton icon="pi pi-trash" action="#{assetList.onScrapp}" update=":form:tabview:assetlist">
                                                     <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                                     <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
 
-                                                <p:commandButton update=":form:tabview:assetDetail" icon="fa fa-info" action="#{assetList.onDetail}">
+                                                <p:commandButton update=":form:tabview:assetDetail" icon="pi pi-info" action="#{assetList.onDetail}">
                                                     <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                                 </p:commandButton>
                                             </p:panelGrid>
@@ -1220,7 +1220,7 @@
                                         <h:outputText value="Height:" rendered="#{assetList.image}" />
                                         <h:outputText value="#{assetList.selectedAsset.imageheight}" rendered="#{assetList.image}" style="font-weight: bold"/>
                                         
-                                        <p:commandButton id="editDescription" value="Edit" actionListener="#{assetList.editDescription}" />
+                                        <p:commandButton id="editDescription" icon="pi pi-pencil" value="Edit" actionListener="#{assetList.editDescription}" />
                                     </h:panelGrid>
                                 </p:outputPanel>
                             </h:panelGrid>
@@ -1364,8 +1364,8 @@
                     
                     <p:panelGrid id="propertybtnpanel" columns="3">
                         <p:commandButton id="newproperty" process="form" value="New" actionListener="#{propertylist.onCreateProperty}" update=":form:msgs :form:tabview:propertylist" disabled="#{propertylist.newPropertyButtonDisabled}" />
-                        <p:commandButton id="editproperty" process="form" value="Edit" actionListener="#{propertylist.onEditProperty}" update=":form:msgs :form:tabview:propertylist" />
-                        <p:commandButton id="deleteproperty" process="form" value="Delete" actionListener="#{propertylist.onDeleteProperty}" disabled="#{propertylist.deletePropertyButtonDisabled}" update=":form:msgs :form:tabview:propertylist">
+                        <p:commandButton id="editproperty" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{propertylist.onEditProperty}" update=":form:msgs :form:tabview:propertylist" />
+                        <p:commandButton id="deleteproperty" icon="pi pi-trash" process="form" value="Delete" actionListener="#{propertylist.onDeleteProperty}" disabled="#{propertylist.deletePropertyButtonDisabled}" update=":form:msgs :form:tabview:propertylist">
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                     </p:panelGrid>
@@ -1793,8 +1793,8 @@
                         
                     <p:panelGrid id="jobbtnpanel" columns="3">
                         <p:commandButton id="newjob" process="form" value="New" actionListener="#{quartzlist.onCreateJob}" update=":form:msgs :form:tabview:joblist" disabled="#{quartzlist.newJobButtonDisabled}" />
-                        <p:commandButton id="editjob" process="form" value="Edit" actionListener="#{quartzlist.onEditJob}" update=":form:msgs :form:tabview:joblist" />
-                        <p:commandButton id="deletejob" process="form" value="Delete" actionListener="#{quartzlist.onDeleteJob}" disabled="#{quartzlist.deleteJobButtonDisabled}" update=":form:msgs :form:tabview:joblist">
+                        <p:commandButton id="editjob" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{quartzlist.onEditJob}" update=":form:msgs :form:tabview:joblist" />
+                        <p:commandButton id="deletejob" icon="pi pi-trash" process="form" value="Delete" actionListener="#{quartzlist.onDeleteJob}" disabled="#{quartzlist.deleteJobButtonDisabled}" update=":form:msgs :form:tabview:joblist">
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                     </p:panelGrid>
@@ -1844,8 +1844,8 @@
                     
                     <p:panelGrid id="userbtnpanel" columns="3">
                         <p:commandButton id="newuser" process="form" value="New" actionListener="#{userlist.onCreateUser}" update=":form:msgs :form:tabview:userlist" disabled="#{userlist.newUserButtonDisabled}" />
-                        <p:commandButton id="edituser" process="form" value="Edit" actionListener="#{userlist.onEditUser}" update=":form:msgs :form:tabview:userlist" />
-                        <p:commandButton id="deleteuser" process="form" value="Delete" actionListener="#{userlist.onDeleteUser}" update=":form:msgs :form:tabview:userlist">
+                        <p:commandButton id="edituser" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{userlist.onEditUser}" update=":form:msgs :form:tabview:userlist" />
+                        <p:commandButton id="deleteuser" icon="pi pi-trash" process="form" value="Delete" actionListener="#{userlist.onDeleteUser}" update=":form:msgs :form:tabview:userlist">
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                     </p:panelGrid>
@@ -2027,8 +2027,8 @@
                         
             
             <p:confirmDialog global="true">
-                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-times" />
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
             </p:confirmDialog>
         </h:form>
     </h:body>          
