@@ -80,7 +80,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
@@ -183,9 +182,6 @@ public class Clownfish {
     private @Getter @Setter AssetIndexer assetIndexer;
     private @Getter @Setter int searchlimit;
     private @Getter @Setter Map<String, String> metainfomap;
-    
-    //private Set<Class> templatebeans = null;
-    //private ArrayList<Class> loadabletemplatebeans = new ArrayList<>();
     
     final transient Logger LOGGER = LoggerFactory.getLogger(Clownfish.class);
     @Value("${bootstrap}") int bootstrap;
@@ -687,25 +683,6 @@ public class Clownfish {
         }
     }
     
-    /*
-    @GetMapping(path = "/maven")
-    public void universalGetMaven(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        try {
-            FileUtils.copyURLToFile(
-                    new URL("https://search.maven.org/remotecontent?filepath=joda-time/joda-time/2.10.13/joda-time-2.10.13.jar"),
-                    new File("D:\\server\\clownfish\\maven\\joda-time-2.10.13.jar"),
-                    6000,
-                    6000);
-            init();
-        } catch (MalformedURLException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    */
-    
-    
     /**
      * GET
      * 
@@ -1131,7 +1108,7 @@ public class Clownfish {
                                             Object object = ctor.newInstance();
                                             fmRoot.put(tpbc.getName().replaceAll("\\.", "_"), object);
                                         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                            LOGGER.error(ex.getMessage());
                                         }
                                     }
 
@@ -1148,7 +1125,7 @@ public class Clownfish {
                                             if (ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException)
                                                 continue;
 
-                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                            LOGGER.error(ex.getMessage());
                                         }
                                     }
 
@@ -1164,7 +1141,7 @@ public class Clownfish {
                                         }
                                         catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex)
                                         {
-                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                            LOGGER.error(ex.getMessage());
                                         }
                                     });
                                     
@@ -1220,7 +1197,7 @@ public class Clownfish {
                                             Object object = ctor.newInstance(new Object[] { });
                                             velContext.put(tpbc.getName().replaceAll("\\.", "_"), object);
                                         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                            LOGGER.error(ex.getMessage());
                                         }
                                     }
                                     
@@ -1237,7 +1214,7 @@ public class Clownfish {
                                             if (ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException)
                                                 continue;
 
-                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                            LOGGER.error(ex.getMessage());
                                         }
                                     }
 
@@ -1253,7 +1230,7 @@ public class Clownfish {
                                         }
                                         catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex)
                                         {
-                                            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                                            LOGGER.error(ex.getMessage());
                                         }
                                     });
                                     

@@ -29,8 +29,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -41,6 +40,8 @@ import java.util.logging.Logger;
 public class ClassPathUtil implements Serializable {
     private @Getter HashSet<Class<?>> class_set = new HashSet<>();
     private CfClassLoader cfclassLoader;
+    
+    final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ClassPathUtil.class);
 
     public void init(CfClassLoader cfclassLoader_)
     {
@@ -59,7 +60,7 @@ public class ClassPathUtil implements Serializable {
         try {
             loadClassesFromJar(files);
         } catch (IOException e) {
-            Logger.getLogger(ClassPathUtil.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -99,7 +100,7 @@ public class ClassPathUtil implements Serializable {
                 }
                 catch (ClassNotFoundException e)
                 {
-                    Logger.getLogger(ClassPathUtil.class.getName()).log(Level.SEVERE, null, e);
+                    LOGGER.error(e.getMessage());
                 }
             }
         }

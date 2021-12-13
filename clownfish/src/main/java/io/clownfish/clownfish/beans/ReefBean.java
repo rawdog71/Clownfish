@@ -32,7 +32,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
@@ -211,9 +210,9 @@ public class ReefBean implements Serializable {
                 try {
                     output = CompressionUtils.compress(content.getBytes("UTF-8"));
                 } catch (UnsupportedEncodingException ex1) {
-                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                    LOGGER.error(ex1.getMessage());
                 } catch (IOException ex1) {
-                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                    LOGGER.error(ex1.getMessage());
                 }
 
                 templateUtil.setCurrentVersion(1);
@@ -236,9 +235,9 @@ public class ReefBean implements Serializable {
                 try {
                     output = CompressionUtils.compress(content.getBytes("UTF-8"));
                 } catch (UnsupportedEncodingException ex1) {
-                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                    LOGGER.error(ex1.getMessage());
                 } catch (IOException ex1) {
-                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                    LOGGER.error(ex1.getMessage());
                 }
 
                 javascriptUtil.setCurrentVersion(1);
@@ -269,7 +268,7 @@ public class ReefBean implements Serializable {
                 }
                 catch (IOException ex1)
                 {
-                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                    LOGGER.error(ex1.getMessage());
                 }
 
                 javaUtil.setCurrentVersion(1);
@@ -293,9 +292,9 @@ public class ReefBean implements Serializable {
                 try {
                     output = CompressionUtils.compress(content.getBytes("UTF-8"));
                 } catch (UnsupportedEncodingException ex1) {
-                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                    LOGGER.error(ex1.getMessage());
                 } catch (IOException ex1) {
-                    java.util.logging.Logger.getLogger(ReefBean.class.getName()).log(Level.SEVERE, null, ex1);
+                    LOGGER.error(ex1.getMessage());
                 }
 
                 stylesheetUtil.setCurrentVersion(1);
