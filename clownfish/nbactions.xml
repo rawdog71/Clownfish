@@ -59,4 +59,11 @@
                 <exec.mainClass>io.clownfish.clownfish.Main</exec.mainClass>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-dependencylist</actionName>
+            <displayName>dependencylist</displayName>
+            <goals>
+                <goal>dependency:list</goal>
+            </goals>
+        </action>
     </actions>
