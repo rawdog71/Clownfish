@@ -39,6 +39,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SlideEndEvent;
@@ -135,6 +136,12 @@ public class StylesheetList implements ISourceContentInterface {
     @Override
     public void refresh() {
         stylesheetListe = cfstylesheetService.findAll();
+    }
+    
+    public List<CfStylesheet> completeText(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return stylesheetListe.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
     }
     
     @Override

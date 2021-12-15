@@ -35,6 +35,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Named("javaList")
 @Scope("singleton")
@@ -124,6 +125,12 @@ public class JavaList implements ISourceContentInterface
     public void refresh()
     {
         javaListe = cfjavaService.findAll();
+    }
+    
+    public List<CfJava> completeText(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return javaListe.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
     }
 
     @Override

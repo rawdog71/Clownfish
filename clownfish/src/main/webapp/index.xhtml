@@ -131,33 +131,27 @@
                                                 </p:column>
                                             </p:row>
                                             <p:row>
-                                                <p:column>    
-                                                    <p:outputLabel for="selecttemplate" value="Template:" />
-                                                    <p:selectOneMenu id="selecttemplate" value="#{sitetree.selectedTemplate}" required="false" converter="#{templateConverterBean}">
+                                                <p:column>
+                                                    <p:outputLabel value="Templates" for="@next"/>
+                                                    <p:autoComplete id="selecttemplate" dropdown="true" value="#{sitetree.selectedTemplate}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
                                                         <p:ajax listener="#{sitetree.onChangeTemplate}" update=":form:tabview:src_tabview:templateview" />
-                                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                                        <f:selectItems value="#{templateList.templateListe}" />
-                                                    </p:selectOneMenu>
+                                                    </p:autoComplete>
                                                 </p:column>
                                             </p:row>
                                             <p:row>
                                                 <p:column>    
-                                                    <p:outputLabel for="selectstylesheet" value="Stylesheet:" />
-                                                    <p:selectOneMenu id="selectstylesheet" value="#{sitetree.selectedStylesheet}" required="false" converter="#{stylesheetConverterBean}">
+                                                    <p:outputLabel value="Stylesheet" for="@next"/>
+                                                    <p:autoComplete id="selectstylesheet" dropdown="true" value="#{sitetree.selectedStylesheet}" completeMethod="#{stylesheetList.completeText}" converter="#{stylesheetConverterBean}" scrollHeight="250">
                                                         <p:ajax listener="#{sitetree.onChangeStylesheet}" update=":form:tabview:src_tabview:cssview" />
-                                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                                        <f:selectItems value="#{stylesheetList.stylesheetListe}" />
-                                                    </p:selectOneMenu>
+                                                    </p:autoComplete>
                                                 </p:column>
                                             </p:row>
                                             <p:row>
                                                 <p:column>    
-                                                    <p:outputLabel for="selectjavascript" value="Javascript:" />
-                                                    <p:selectOneMenu id="selectjavascript" value="#{sitetree.selectedJavascript}" required="false" converter="#{javascriptConverterBean}">
+                                                    <p:outputLabel value="Javascript" for="@next"/>
+                                                    <p:autoComplete id="selectjavascript" dropdown="true" value="#{sitetree.selectedJavascript}" completeMethod="#{javascriptList.completeText}" converter="#{javascriptConverterBean}" scrollHeight="250">
                                                         <p:ajax listener="#{sitetree.onChangeJavascript}" update=":form:tabview:src_tabview:jsview" />
-                                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                                        <f:selectItems value="#{javascriptList.javascriptListe}" />
-                                                    </p:selectOneMenu>
+                                                    </p:autoComplete>
                                                 </p:column>
                                             </p:row>
                                         </p:panelGrid>
@@ -372,11 +366,10 @@
                     
                     <div class="flex flex-row pb-2">
                         <div class="flex align-items-center pr-2">
-                            <p:selectOneMenu id="templatelist" value="#{templateList.selectedTemplate}" converter="#{templateConverterBean}">
+                            <p:outputLabel value="Templates" for="@next"/>
+                            <p:autoComplete id="templatelist" dropdown="true" value="#{templateList.selectedTemplate}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
                                 <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
-                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                <f:selectItems value="#{templateList.templateListe}" />
-                            </p:selectOneMenu>
+                            </p:autoComplete>
                         </div>  
 
                         <div class="flex align-items-center pr-2">
@@ -454,11 +447,10 @@
                     
                     <div class="flex flex-row pb-2">
                         <div class="flex align-items-center pr-2">
-                            <p:selectOneMenu id="stylesheetlist" value="#{stylesheetList.selectedStylesheet}" converter="#{stylesheetConverterBean}">
+                            <p:outputLabel value="Stylesheets" for="@next"/>
+                            <p:autoComplete id="stylesheetlist" dropdown="true" value="#{stylesheetList.selectedStylesheet}" completeMethod="#{stylesheetList.completeText}" converter="#{stylesheetConverterBean}" scrollHeight="250">
                                 <p:ajax listener="#{stylesheetList.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:diffstylesheetPanel" />
-                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                <f:selectItems value="#{stylesheetList.stylesheetListe}" />
-                            </p:selectOneMenu>
+                            </p:autoComplete>
                         </div>
                         
                         <div class="flex align-items-center pr-2">    
@@ -530,11 +522,10 @@
                     
                     <div class="flex flex-row pb-2">
                         <div class="flex align-items-center pr-2">
-                            <p:selectOneMenu id="javascriptlist" value="#{javascriptList.selectedJavascript}" converter="#{javascriptConverterBean}">
+                            <p:outputLabel value="Javascripts" for="@next"/>
+                            <p:autoComplete id="javascriptlist" dropdown="true" value="#{javascriptList.selectedJavascript}" completeMethod="#{javascriptList.completeText}" converter="#{javascriptConverterBean}" scrollHeight="250">
                                 <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:diffjavascriptPanel" />
-                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                <f:selectItems value="#{javascriptList.javascriptListe}" />
-                            </p:selectOneMenu>
+                            </p:autoComplete>
                         </div>
 
                         <div class="flex align-items-center pr-2">
@@ -607,11 +598,10 @@
                         <p:tab title="Java Source" id="javasourcepanel">
                             <div class="flex flex-row pb-2">
                                 <div class="flex align-items-center pr-2">
-                                    <p:selectOneMenu id="javalist" value="#{javaList.selectedJava}" converter="#{javaConverterBean}">
+                                    <p:outputLabel value="Java" for="@next"/>
+                                    <p:autoComplete id="javalist" dropdown="true" value="#{javaList.selectedJava}" completeMethod="#{javaList.completeText}" converter="#{javaConverterBean}" scrollHeight="250">
                                         <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:javatabview:editjava :form:tabview:javatabview:javaname :form:tabview:javatabview:newjava :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:diffjavaPanel" />
-                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                        <f:selectItems value="#{javaList.javaListe}" />
-                                    </p:selectOneMenu>
+                                    </p:autoComplete>
                                 </div>
 
                                 <div class="flex align-items-center pr-2">

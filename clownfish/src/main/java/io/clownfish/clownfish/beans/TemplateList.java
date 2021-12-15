@@ -39,6 +39,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SlideEndEvent;
@@ -137,6 +138,12 @@ public class TemplateList implements ISourceContentInterface {
     @Override
     public void refresh() {
         templateListe = cftemplateService.findAll();
+    }
+    
+    public List<CfTemplate> completeText(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return templateListe.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
     }
     
     @Override
