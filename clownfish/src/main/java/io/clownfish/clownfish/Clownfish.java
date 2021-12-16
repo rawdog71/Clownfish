@@ -117,7 +117,7 @@ public class Clownfish {
     @Autowired CfJavascriptService cfjavascriptService;
     @Autowired CfJavascriptversionService cfjavascriptversionService;
     @Autowired CfJavaService cfjavaService;
-    @Autowired CfClassCompiler cfclassCompiler;
+    //@Autowired CfClassCompiler cfclassCompiler;
     @Autowired CfClassLoader cfclassLoader;
     @Autowired CfJavaversionService cfjavaversionService;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
@@ -151,6 +151,7 @@ public class Clownfish {
     WebServiceTemplateBean webservicebean;
     ImportTemplateBean importbean;
     PDFTemplateBean pdfbean;
+    CfClassCompiler cfclassCompiler;
 
     private String contenttype;
     private String characterencoding;
@@ -244,8 +245,11 @@ public class Clownfish {
             propertyUtil = new PropertyUtil(propertylist);
         }
 
-        // if (cfclassCompiler == null)
-        //     cfclassCompiler = new CfClassCompiler();
+        if (cfclassCompiler == null)
+        {
+            cfclassCompiler = new CfClassCompiler();
+            cfclassCompiler.init(cfclassLoader, propertyUtil, cfjavaService);
+        }
         // if (cfclassLoader == null)
         //     cfclassLoader = new CfClassLoader(getClass().getClassLoader());
         

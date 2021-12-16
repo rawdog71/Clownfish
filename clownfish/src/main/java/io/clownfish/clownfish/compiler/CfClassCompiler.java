@@ -7,7 +7,6 @@ import io.clownfish.clownfish.utils.PropertyUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -34,25 +33,32 @@ import java.util.stream.Stream;
 public class CfClassCompiler
 {
     @Inject LoginBean loginbean;
-    @Autowired CfClassLoader cfclassLoader;
-    @Autowired CfJavaService cfjavaService;
-    @Autowired PropertyUtil propertyUtil;
+    private static CfClassLoader cfclassLoader;
+    private static PropertyUtil propertyUtil;
+    private static CfJavaService cfjavaService;
     private @Getter @Setter List<CfJava> javaListSelected;
     private @Getter @Setter Map<Class<?>, List<Method>> classMethodMap = new HashMap<>();
-    private @Getter @Setter Path tmpdir;
+    private static @Getter @Setter Path tmpdir;
     @Getter @Setter StringWriter compileOut;
     @Getter @Setter boolean verboseCompile;
 
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CfClassCompiler.class);
 
     public CfClassCompiler() {}
+    
+    public void init(CfClassLoader cfclassLoader_, PropertyUtil propertyUtil_, CfJavaService cfjavaService_)
+    {
+        cfclassLoader = cfclassLoader_;
+        propertyUtil = propertyUtil_;
+        cfjavaService = cfjavaService_;
+    }
 
     //TODO: Custom ClassLoader with the ability to unload/reload already loaded classes at runtime to allow
     // changes to Java templates in Clownfish without a restart
 
     public ArrayList<Class<?>> compileClasses(ArrayList<File> java, boolean withMessage)
     {
-        CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
+        //CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
         // Map<String, byte[]> classBytes = new HashMap<>();
         ArrayList<Class<?>> newClasses = new ArrayList<>();
         setCompileOut(new StringWriter());
@@ -62,7 +68,7 @@ public class CfClassCompiler
             List<String> options = new ArrayList<>(Arrays.asList("-classpath", constructClasspath()));
 
             File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
-            cl.add(tmpDirRoot.toURI().toURL());
+            cfclassLoader.add(tmpDirRoot.toURI().toURL());
 
             options.addAll(Arrays.asList("-d", tmpDirRoot.toString()));
 
@@ -99,7 +105,7 @@ public class CfClassCompiler
                     // FileObject fo = jfm.getJavaFileForInput(StandardLocation.CLASS_OUTPUT, "", JavaFileObject.Kind.CLASS);
                     // fileObjects.add(fo);
                     // classBytes.put(className, Files.readAllBytes(Paths.get(fo.toUri())));
-                    newClasses.add(cl.loadClass("io.clownfish.internal." + className));
+                    newClasses.add(cfclassLoader.loadClass("io.clownfish.internal." + className));
                 }
 
                 for (Class<?> clazz : newClasses)
@@ -222,7 +228,7 @@ public class CfClassCompiler
 
     public void createTempDir() throws IOException
     {
-        CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
+        //CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
         Path tmp = Files.createTempDirectory(Paths.get(propertyUtil.getPropertyValue("folder_cache")), "src");
 
         // $CLOWNFISH_DIR/cache/src/io/clownfish/internal
@@ -234,7 +240,7 @@ public class CfClassCompiler
         setTmpdir(dirs.toPath());
 
         // Add temp dir to classpath
-        cl.add(dirs.toURI().toURL());
+        cfclassLoader.add(dirs.toURI().toURL());
 
         // Recusively delete temp dir and contents on graceful shutdown
         Thread deleteHook = new Thread(() ->

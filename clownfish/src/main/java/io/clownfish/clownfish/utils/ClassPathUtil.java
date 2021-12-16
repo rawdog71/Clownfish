@@ -66,7 +66,7 @@ public class ClassPathUtil implements Serializable {
 
     public void loadClassesFromJar(File[] files) throws IOException
     {
-        CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
+        //CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
         JarFile[] jarFiles = new JarFile[files.length];
         URL[] urls = new URL[jarFiles.length];
 
@@ -74,7 +74,7 @@ public class ClassPathUtil implements Serializable {
         {
             jarFiles[i] = new JarFile(files[i]);
             urls[i] = new URL("jar:file:" + files[i].toString() + "!/");
-            cl.add(urls[i]);
+            cfclassLoader.add(urls[i]);
         }
 
         for (JarFile jar : jarFiles)
@@ -92,7 +92,7 @@ public class ClassPathUtil implements Serializable {
                 className = className.replace('/', '.');
                 try
                 {
-                    Class<?> c = cl.loadClass(className);
+                    Class<?> c = cfclassLoader.loadClass(className);
                     System.out.println(c.getCanonicalName() + ": Class loader " + c.getClassLoader());
                     System.out.println(c.getCanonicalName() + " package: " + c.getPackageName());
 
