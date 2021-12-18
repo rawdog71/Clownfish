@@ -111,4 +111,13 @@ public class CfClasscontentDAOImpl implements CfClasscontentDAO {
         List<CfClasscontent> cfclasscontentlist = query.getResultList();
         return cfclasscontentlist;
     }
+
+    @Override
+    public List<CfClasscontent> findByMaintenance(boolean maintenance) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findByMaintenance");
+        query.setParameter("maintenance", maintenance);
+        List<CfClasscontent> cfclasscontentlist = query.getResultList();
+        return cfclasscontentlist;
+    }
 }

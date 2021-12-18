@@ -31,4 +31,5 @@ public interface CfListService {
     CfList create(CfList entity);
     boolean delete(CfList entity);
     CfList edit(CfList entity);
+    List<CfList> findByMaintenance(boolean b);
 }

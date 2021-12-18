@@ -93,4 +93,13 @@ public class CfListDAOImpl implements CfListDAO {
         List<CfList> cfcontentlist = query.getResultList();
         return cfcontentlist;
     }
+
+    @Override
+    public List<CfList> findByMaintenance(boolean b) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfList.findByMaintenance");  
+        query.setParameter("maintenance", b);
+        List<CfList> cfcontentlist = query.getResultList();
+        return cfcontentlist;
+    }
 }

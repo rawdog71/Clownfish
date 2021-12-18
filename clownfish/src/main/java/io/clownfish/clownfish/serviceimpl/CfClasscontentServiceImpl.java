@@ -75,4 +75,9 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
     public List<CfClasscontent> findByScrapped(boolean scrapped) {
         return this.cfclasscontentDAO.findByScrapped(scrapped);
     }
+
+    @Override
+    public List<CfClasscontent> findByMaintenance(boolean maintenance) {
+        return this.cfclasscontentDAO.findByMaintenance(maintenance);
+    }
 }

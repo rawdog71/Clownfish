@@ -201,7 +201,7 @@ public class SiteTreeBean implements Serializable {
         loadTree();
         datasources = cfdatasourceService.findAll();
         contentlist = cflistService.findAll();
-        classcontentlist = cfclasscontentService.findAll();
+        classcontentlist = cfclasscontentService.findByMaintenance(true);
         assetlist = cfassetlistService.findAll();
         keywordlist = cfkeywordlistService.findAll();
         
@@ -221,11 +221,11 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void initContentlist() {
-        contentlist = cflistService.findAll();
+        contentlist = cflistService.findByMaintenance(true);
     }
     
     public void initClassContentlist() {
-        classcontentlist = cfclasscontentService.findAll();
+        classcontentlist = cfclasscontentService.findByMaintenance(true);
     }
     
     public void initAssetlibrarylist() {
@@ -239,7 +239,7 @@ public class SiteTreeBean implements Serializable {
     public void onRefreshAll() {
         datasources = cfdatasourceService.findAll();
         contentlist = cflistService.findAll();
-        classcontentlist = cfclasscontentService.findAll();
+        classcontentlist = cfclasscontentService.findByMaintenance(true);
         assetlist = cfassetlistService.findAll();
     }
 
@@ -338,7 +338,7 @@ public class SiteTreeBean implements Serializable {
     public void onSelect(NodeSelectEvent event) {
         selectedNode = event.getTreeNode();
         selectedSite = (CfSite) selectedNode.getData();
-        classcontentlist = cfclasscontentService.findAll();
+        classcontentlist = cfclasscontentService.findByMaintenance(true);
         if (null != selectedSite.getTemplateref()) {
             CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().longValue());
             int idx = templatelist.getTemplateListe().indexOf(template);

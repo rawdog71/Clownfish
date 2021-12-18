@@ -40,7 +40,7 @@ public class CfClassCompiler
     private @Getter @Setter Map<Class<?>, List<Method>> classMethodMap = new HashMap<>();
     private static @Getter @Setter Path tmpdir;
     @Getter @Setter StringWriter compileOut;
-    @Getter @Setter boolean verboseCompile;
+    @Getter @Setter boolean verboseCompile = true;
 
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CfClassCompiler.class);
 
@@ -102,6 +102,7 @@ public class CfClassCompiler
                 for (File file : java)
                 {
                     String className = file.getName().replaceFirst("[.][^.]+$", "");
+                    LOGGER.info("COMPILING " + className + "...");
                     // FileObject fo = jfm.getJavaFileForInput(StandardLocation.CLASS_OUTPUT, "", JavaFileObject.Kind.CLASS);
                     // fileObjects.add(fo);
                     // classBytes.put(className, Files.readAllBytes(Paths.get(fo.toUri())));
@@ -178,7 +179,7 @@ public class CfClassCompiler
                     //.forEach(jar -> classPath.append(classpathDelim()).append("\"").append(jar.getAbsolutePath()).append("\""));
                     .forEach(jar -> classPath.append(classpathDelim()).append(jar.getAbsolutePath()));
         }
-
+        LOGGER.info("CLASSPATH: " + classPath.toString());
         return classPath.toString();
     }
 
@@ -252,7 +253,7 @@ public class CfClassCompiler
                 files.close();
 
                 Stream<Path> directories = Files.walk(tmp.getParent());
-                directories.filter(dir -> Files.isDirectory(dir) && dir.startsWith("src")).map(Path::toFile).forEach(File::deleteOnExit);
+                directories.filter(dir -> Files.isDirectory(dir)).map(Path::toFile).forEach(File::deleteOnExit);
                 directories.close();
             }
             catch (IOException e)

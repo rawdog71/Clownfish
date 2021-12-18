@@ -57,6 +57,10 @@ public class CfClass implements Serializable {
     @NotNull
     @Column(name = "searchrelevant")
     private boolean searchrelevant;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "maintenance")
+    private boolean maintenance;
 
     public CfClass() {
     }
@@ -96,6 +100,14 @@ public class CfClass implements Serializable {
         this.searchrelevant = searchrelevant;
     }
 
+    public boolean isMaintenance() {
+        return maintenance;
+    }
+
+    public void setMaintenance(boolean maintenance) {
+        this.maintenance = maintenance;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

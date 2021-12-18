@@ -67,6 +67,7 @@ public class ClassList implements Serializable {
     private transient @Getter @Setter List<CfAttributetype> attributetypelist = null;
     private @Getter @Setter String className;
     private @Getter @Setter boolean classSearchrelevant;
+    private @Getter @Setter boolean classMaintenance;
     private @Getter @Setter String attributName;
     private @Getter @Setter boolean identity;
     private @Getter @Setter boolean autoinc;
@@ -102,6 +103,7 @@ public class ClassList implements Serializable {
         selectedAttributList = attributlist.init(selectedClass);
         className = selectedClass.getName();
         classSearchrelevant = selectedClass.isSearchrelevant();
+        classMaintenance = selectedClass.isMaintenance();
         attributName = "";
         selectedAttributeType = null;
         newButtonDisabled = true;
@@ -147,11 +149,13 @@ public class ClassList implements Serializable {
             CfClass newclass = new CfClass();
             newclass.setName(className);
             newclass.setSearchrelevant(classSearchrelevant);
+            newclass.setMaintenance(classMaintenance);
             cfclassService.create(newclass);
             classListe = cfclassService.findAll();
             classListeRef = cfclassService.findAll();
             className = "";
             classSearchrelevant = false;
+            classMaintenance = true;
             contentlist.init();
             datalist.init();
             //hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
@@ -164,6 +168,7 @@ public class ClassList implements Serializable {
         try {
             selectedClass.setName(className);
             selectedClass.setSearchrelevant(classSearchrelevant);
+            selectedClass.setMaintenance(classMaintenance);
             cfclassService.edit(selectedClass);
             classListe = cfclassService.findAll();
             contentlist.init();

@@ -31,4 +31,6 @@ public interface CfListDAO {
     CfList create(CfList entity);
     boolean delete(CfList entity);
     CfList edit(CfList entity);
+
+    public List<CfList> findByMaintenance(boolean b);
 }

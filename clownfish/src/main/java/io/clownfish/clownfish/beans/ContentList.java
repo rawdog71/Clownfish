@@ -27,8 +27,6 @@ import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfList;
-import io.clownfish.clownfish.dbentities.CfListcontent;
-import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
@@ -156,7 +154,7 @@ public class ContentList implements Serializable {
     public void init() {
         LOGGER.info("INIT CONTENTLIST START");
         memoryeditDatalist = null;
-        classcontentlist = cfclasscontentService.findAll();
+        classcontentlist = cfclasscontentService.findByMaintenance(true);
         classlist = cfclassService.findAll();
         assetlist = cfassetService.findAll();
         selectedAssetList = cfassetlistService.findAll();
@@ -303,7 +301,7 @@ public class ContentList implements Serializable {
             });
             hibernateUtil.insertContent(newclasscontent);
             classcontentlist.clear();
-            classcontentlist = cfclasscontentService.findAll();
+            classcontentlist = cfclasscontentService.findByMaintenance(true);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -324,7 +322,7 @@ public class ContentList implements Serializable {
                 LOGGER.warn(ex.getMessage());
             }
             cacheManager.getCache("classcontent").clear();                      // Hazelcast Cache clearing
-            classcontentlist = cfclasscontentService.findAll();
+            classcontentlist = cfclasscontentService.findByMaintenance(true);
             FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been scrapped.");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
@@ -342,7 +340,7 @@ public class ContentList implements Serializable {
         } catch (javax.persistence.NoResultException ex) {
             LOGGER.warn(ex.getMessage());
         }
-        classcontentlist = cfclasscontentService.findAll();
+        classcontentlist = cfclasscontentService.findByMaintenance(true);
         FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been recycled.");
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
@@ -462,7 +460,7 @@ public class ContentList implements Serializable {
     }
     
     public void onRefreshAll() {
-        classcontentlist = cfclasscontentService.findAll();
+        classcontentlist = cfclasscontentService.findByMaintenance(true);
         classlist = cfclassService.findAll();
         assetlist = cfassetService.findAll();
         keywordSource = cfkeywordService.findAll();
@@ -471,7 +469,7 @@ public class ContentList implements Serializable {
     
     public void onRefreshContent() {
         classcontentlist.clear();
-        classcontentlist = cfclasscontentService.findAll();
+        classcontentlist = cfclasscontentService.findByMaintenance(true);
     }
     
     public void jsonExport() {

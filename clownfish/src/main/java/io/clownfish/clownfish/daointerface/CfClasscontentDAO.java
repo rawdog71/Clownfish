@@ -32,4 +32,5 @@ public interface CfClasscontentDAO {
     CfClasscontent create(CfClasscontent entity);
     boolean delete(CfClasscontent entity);
     CfClasscontent edit(CfClasscontent entity);
+    List<CfClasscontent> findByMaintenance(boolean maintenance);
 }

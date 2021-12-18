@@ -42,7 +42,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfList.findAll", query = "SELECT c FROM CfList c"),
     @NamedQuery(name = "CfList.findById", query = "SELECT c FROM CfList c WHERE c.id = :id"),
     @NamedQuery(name = "CfList.findByName", query = "SELECT c FROM CfList c WHERE c.name = :name"),
-    @NamedQuery(name = "CfList.findByClassref", query = "SELECT c FROM CfList c WHERE c.classref = :classref")})
+    @NamedQuery(name = "CfList.findByClassref", query = "SELECT c FROM CfList c WHERE c.classref = :classref"),
+    @NamedQuery(name = "CfList.findByMaintenance", query = "SELECT l FROM CfList l INNER JOIN CfClass c ON l.classref = c.id WHERE c.maintenance = :maintenance")
+})
 public class CfList implements Serializable {
 
     private static final long serialVersionUID = 1L;
