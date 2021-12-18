@@ -138,7 +138,7 @@ public class CfClassCompiler
                 }
             }
         }
-        catch (ClassNotFoundException | IOException /*| NoSuchMethodException | IllegalAccessException | InvocationTargetException*/ e)
+        catch (ClassNotFoundException | IOException | IllegalStateException /*| NoSuchMethodException | IllegalAccessException | InvocationTargetException*/ e)
         {
             LOGGER.error(e.getMessage());
         }
