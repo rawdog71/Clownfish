@@ -291,4 +291,21 @@ public class ClownfishUtil {
         }
         return emailproperties;
     }
+
+    public void addUrlParams(Map parametermap, List urlParams) {
+        if (!urlParams.isEmpty()) {
+            int counter = 0;
+            String key = "";
+            String value = "";
+            for (Object urlparam : urlParams) {
+                counter++;
+                if (counter % 2 == 0) {
+                    value = (String) (urlparam);
+                    parametermap.put(key, value);
+                } else {
+                    key = (String) (urlparam);
+                }
+            }
+        }
+    }
 }

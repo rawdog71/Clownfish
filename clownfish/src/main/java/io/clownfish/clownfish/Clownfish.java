@@ -659,20 +659,6 @@ public class Clownfish {
         }
     }
 
-    @GetMapping(path = "/{name}.java")
-    public void universalGetJava(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        CfJava cfjava = null;
-        try {
-            cfjava = cfjavaService.findByName(name);
-            response.setContentType("text/x-java-source");
-            response.setCharacterEncoding("UTF-8");
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(cfjava.getContent());
-        } catch (Exception ex) {
-            System.out.println("Java NOT FOUND");
-        }
-    }
-    
     @GetMapping(path = "/robots.txt")
     public void universalGetRobots(@Context HttpServletRequest request, @Context HttpServletResponse response) {
         CfTemplate cftemplate = null;
@@ -854,12 +840,15 @@ public class Clownfish {
 
             // fetch parameter list
             Map parametermap = clownfishutil.getParametermap(postmap);
+            // manage urlParams
+            clownfishutil.addUrlParams(parametermap, urlParams);
+            
             if (parametermap.containsKey("modus")) {    // check mode for display (staging or dev)
                 if (parametermap.get("modus").toString().compareToIgnoreCase("dev") == 0) {
                     modus = DEVELOPMENT;
                 }
             }
-
+            
             // fetch site by name or aliasname
             CfSite cfsite = null;
             try {
