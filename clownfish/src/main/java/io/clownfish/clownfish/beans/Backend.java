@@ -35,7 +35,7 @@ public class Backend implements Serializable  {
     @Autowired ClassList classlist;
     @Autowired DataList datalist;
     @Autowired DatasourceList datasourcelist;
-    @Autowired MavenList mavenlist;
+    //@Autowired MavenList mavenlist;
     @Autowired KeywordList keywordlist;
     @Autowired transient TemplateList templatelist;
     @Autowired transient StylesheetList stylesheetlist;
@@ -57,6 +57,6 @@ public class Backend implements Serializable  {
         stylesheetlist.refresh();
         javascriptlist.refresh();
         javalist.refresh();
-        mavenlist.onRefreshAll();
+        //mavenlist.onRefreshAll();
     }
 }

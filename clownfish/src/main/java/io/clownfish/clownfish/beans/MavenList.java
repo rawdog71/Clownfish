@@ -58,8 +58,8 @@ import org.apache.commons.io.FileUtils;
 public class MavenList implements Serializable {
     @Autowired transient CfMavenService cfmavenService;
     @Autowired transient PropertyUtil propertyUtil;
-    @Autowired transient ClassPathUtil classpathUtil;
     
+    private static @Getter @Setter ClassPathUtil classpathUtil;
     private transient @Getter @Setter List<CfMaven> mavenlist = null;
     private @Getter @Setter CfMaven selectedMaven = null;
     private @Getter @Setter String group;
@@ -83,6 +83,8 @@ public class MavenList implements Serializable {
         mavenpath = propertyUtil.getPropertyValue("folder_maven");
         LOGGER.info("INIT MAVENLIST END");
     }
+    
+    
     
     public void onRefreshAll() {
         mavenlist = cfmavenService.findAll();

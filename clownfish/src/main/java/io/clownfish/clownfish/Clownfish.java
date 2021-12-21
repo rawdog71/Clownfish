@@ -172,6 +172,7 @@ public class Clownfish {
     private PDFUtil pdfUtil;
     private BeanUtil beanUtil;
     private ClassPathUtil classpathUtil;
+    private MavenList mavenlist;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map searchcontentmap;
     private @Getter @Setter Map searchassetmap;
@@ -268,6 +269,11 @@ public class Clownfish {
                 classpathUtil.init(cfclassLoader);
             }
             classpathUtil.addPath(mavenpath);
+        }
+        
+        if (null == mavenlist) {
+            mavenlist = new MavenList();
+            mavenlist.setClasspathUtil(classpathUtil);
         }
         
         cfclassCompiler.compileAll(false);
@@ -1114,8 +1120,8 @@ public class Clownfish {
                                                 Object object = ctor.newInstance();
                                                 fmRoot.put(c.getName().replaceAll("\\.", "_"), object);
                                             }
-                                        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                                            if (ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException)
+                                        } catch (NoClassDefFoundError | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                            if (ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException || ex instanceof InvocationTargetException || ex instanceof NoClassDefFoundError)
                                                 continue;
 
                                             LOGGER.error(ex.getMessage());
@@ -1203,8 +1209,8 @@ public class Clownfish {
                                                 Object object = ctor.newInstance();
                                                 velContext.put(c.getName().replaceAll("\\.", "_"), object);
                                             }
-                                        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                                            if (ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException)
+                                        } catch (NoClassDefFoundError | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                            if (ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException || ex instanceof InvocationTargetException || ex instanceof NoClassDefFoundError)
                                                 continue;
 
                                             LOGGER.error(ex.getMessage());
