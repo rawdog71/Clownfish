@@ -34,6 +34,8 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
@@ -158,6 +160,9 @@ public class ClassList implements Serializable {
             classMaintenance = true;
             contentlist.init();
             datalist.init();
+            
+            FacesMessage message = new FacesMessage("Class created");
+            FacesContext.getCurrentInstance().addMessage(null, message);
             //hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
@@ -173,6 +178,8 @@ public class ClassList implements Serializable {
             classListe = cfclassService.findAll();
             contentlist.init();
             datalist.init();
+            FacesMessage message = new FacesMessage("Content changed");
+            FacesContext.getCurrentInstance().addMessage(null, message);
             //hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
@@ -202,6 +209,9 @@ public class ClassList implements Serializable {
                 newattributcontent.setClasscontentref(classcontent);
                 cfattributcontentService.create(newattributcontent);
             }
+            
+            FacesMessage message = new FacesMessage("Attribute created");
+            FacesContext.getCurrentInstance().addMessage(null, message);
             //hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
@@ -217,6 +227,9 @@ public class ClassList implements Serializable {
             selectedAttribut.setIsindex(isindex);
             selectedAttribut.setRelationref(selectedClassRef);
             cfattributService.edit(selectedAttribut);
+            
+            FacesMessage message = new FacesMessage("Attribute changed");
+            FacesContext.getCurrentInstance().addMessage(null, message);
             //hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         }
     }
@@ -224,6 +237,8 @@ public class ClassList implements Serializable {
     public void onRecreateDatamodel(ActionEvent actionEvent) {
         if (null != selectedClass) {
             hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
+            FacesMessage message = new FacesMessage("Datamodel recreated");
+            FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
 }

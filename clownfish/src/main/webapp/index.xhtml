@@ -987,7 +987,7 @@
                                 </p:selectOneMenu>
 
                                 <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
-                                <p:commandButton id="editattribut" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" >
+                                <p:commandButton id="editattribut" icon="pi pi-pencil" process="form" value="Change" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" >
                                     
                                 </p:commandButton>
                                 <p:focus for="attributvalueString" />

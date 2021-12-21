@@ -302,6 +302,8 @@ public class ContentList implements Serializable {
             hibernateUtil.insertContent(newclasscontent);
             classcontentlist.clear();
             classcontentlist = cfclasscontentService.findByMaintenance(true);
+            FacesMessage message = new FacesMessage("Content created");
+            FacesContext.getCurrentInstance().addMessage(null, message);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -441,6 +443,8 @@ public class ContentList implements Serializable {
                 LOGGER.error(ex.getMessage());
             }
         }
+        FacesMessage message = new FacesMessage("Value changed");
+        FacesContext.getCurrentInstance().addMessage(null, message);
     }
     
     public void onAttach(ActionEvent actionEvent) {
