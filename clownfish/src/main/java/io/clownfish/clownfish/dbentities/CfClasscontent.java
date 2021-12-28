@@ -44,7 +44,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfClasscontent.findByClassref", query = "SELECT c FROM CfClasscontent c WHERE c.classref = :classref AND c.scrapped = 0"),
     @NamedQuery(name = "CfClasscontent.findByName", query = "SELECT c FROM CfClasscontent c WHERE c.name = :name"),
     @NamedQuery(name = "CfClasscontent.findByScrapped", query = "SELECT c FROM CfClasscontent c WHERE c.scrapped = :scrapped"),
-    @NamedQuery(name = "CfClasscontent.findByMaintenance", query = "SELECT cc FROM CfClasscontent cc INNER JOIN CfClass c ON cc.classref = c.id WHERE c.maintenance = :maintenance")
+    @NamedQuery(name = "CfClasscontent.findByMaintenance", query = "SELECT cc FROM CfClasscontent cc INNER JOIN CfClass c ON cc.classref = c.id WHERE c.maintenance = :maintenance AND cc.scrapped = 0")
        
 })
 public class CfClasscontent implements Serializable {

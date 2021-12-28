@@ -63,87 +63,92 @@ public class CfClassCompiler
         ArrayList<Class<?>> newClasses = new ArrayList<>();
         setCompileOut(new StringWriter());
 
-        try
-        {
-            List<String> options = new ArrayList<>(Arrays.asList("-classpath", constructClasspath()));
-
-            File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
-            cfclassLoader.add(tmpDirRoot.toURI().toURL());
-
-            options.addAll(Arrays.asList("-d", tmpDirRoot.toString()));
-
-            if (verboseCompile)
-                options.addAll(List.of("-verbose"));
-
-            // URL[] classpath = cl.getURLs();
-            // LOGGER.info("Classpath:");
-            // for (URL url : classpath)
-            // {
-            //     options.add(url.getPath());
-            //     LOGGER.info(url.toString());
-            // }
-
-            JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
-            StandardJavaFileManager jfm = javac.getStandardFileManager(null, null, Charset.defaultCharset());
-
-            jfm.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singleton(getTmpdir().toFile()));
-
-            Iterable<? extends JavaFileObject> compilationUnits = jfm.getJavaFileObjectsFromFiles(java);
-            JavaCompiler.CompilationTask task = javac.getTask(compileOut, jfm, null, options,
-                    Collections.emptySet(), compilationUnits);
-
-            for (JavaFileObject jfo : compilationUnits)
-                LOGGER.info("Compiling " + jfo.getName() + "...");
-
-            if (task.call())
+        if (!java.isEmpty()) {
+        
+            try
             {
-                // ArrayList<FileObject> fileObjects = new ArrayList<>();
+                List<String> options = new ArrayList<>(Arrays.asList("-classpath", constructClasspath()));
 
-                for (File file : java)
+                File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
+                cfclassLoader.add(tmpDirRoot.toURI().toURL());
+
+                options.addAll(Arrays.asList("-d", tmpDirRoot.toString()));
+
+                if (verboseCompile)
+                    options.addAll(List.of("-verbose"));
+
+                // URL[] classpath = cl.getURLs();
+                // LOGGER.info("Classpath:");
+                // for (URL url : classpath)
+                // {
+                //     options.add(url.getPath());
+                //     LOGGER.info(url.toString());
+                // }
+
+                JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
+                StandardJavaFileManager jfm = javac.getStandardFileManager(null, null, Charset.defaultCharset());
+
+                jfm.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singleton(getTmpdir().toFile()));
+
+                Iterable<? extends JavaFileObject> compilationUnits = jfm.getJavaFileObjectsFromFiles(java);
+                JavaCompiler.CompilationTask task = javac.getTask(compileOut, jfm, null, options,
+                        Collections.emptySet(), compilationUnits);
+
+                for (JavaFileObject jfo : compilationUnits)
+                    LOGGER.info("Compiling " + jfo.getName() + "...");
+
+                if (task.call())
                 {
-                    String className = file.getName().replaceFirst("[.][^.]+$", "");
-                    LOGGER.info("COMPILING " + className + "...");
-                    // FileObject fo = jfm.getJavaFileForInput(StandardLocation.CLASS_OUTPUT, "", JavaFileObject.Kind.CLASS);
-                    // fileObjects.add(fo);
-                    // classBytes.put(className, Files.readAllBytes(Paths.get(fo.toUri())));
-                    newClasses.add(cfclassLoader.loadClass("io.clownfish.internal." + className));
+                    // ArrayList<FileObject> fileObjects = new ArrayList<>();
+
+                    for (File file : java)
+                    {
+                        String className = file.getName().replaceFirst("[.][^.]+$", "");
+                        LOGGER.info("COMPILING " + className + "...");
+                        // FileObject fo = jfm.getJavaFileForInput(StandardLocation.CLASS_OUTPUT, "", JavaFileObject.Kind.CLASS);
+                        // fileObjects.add(fo);
+                        // classBytes.put(className, Files.readAllBytes(Paths.get(fo.toUri())));
+                        newClasses.add(cfclassLoader.loadClass("io.clownfish.internal." + className));
+                    }
+
+                    for (Class<?> clazz : newClasses)
+                    {
+                        classMethodMap.put(clazz, new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods())));
+
+                        LOGGER.info("Class name: " + clazz.getCanonicalName());
+                        LOGGER.info("Class package name: " + clazz.getPackageName());
+                        LOGGER.info("Class loader: " + clazz.getClassLoader());
+
+                        classMethodMap.forEach((k, v) -> v.forEach(method -> LOGGER.info(k.getSimpleName() + ": " + method.getName())));
+                        // LOGGER.info("Class path: " + clazz.getResource(clazz.getSimpleName() + ".class").toString());
+                        // LOGGER.info("Main method invocation:");
+                        // newClass.getMethod("main", String[].class).invoke(null, (Object) null);
+                    }
+
+                    if (withMessage)
+                    {
+                        FacesMessage message = new FacesMessage("Compiled class(es) successfully");
+                        FacesContext.getCurrentInstance().addMessage(null, message);
+                    }
                 }
-
-                for (Class<?> clazz : newClasses)
+                else
                 {
-                    classMethodMap.put(clazz, new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods())));
-
-                    LOGGER.info("Class name: " + clazz.getCanonicalName());
-                    LOGGER.info("Class package name: " + clazz.getPackageName());
-                    LOGGER.info("Class loader: " + clazz.getClassLoader());
-
-                    classMethodMap.forEach((k, v) -> v.forEach(method -> LOGGER.info(k.getSimpleName() + ": " + method.getName())));
-                    // LOGGER.info("Class path: " + clazz.getResource(clazz.getSimpleName() + ".class").toString());
-                    // LOGGER.info("Main method invocation:");
-                    // newClass.getMethod("main", String[].class).invoke(null, (Object) null);
-                }
-
-                if (withMessage)
-                {
-                    FacesMessage message = new FacesMessage("Compiled class(es) successfully");
-                    FacesContext.getCurrentInstance().addMessage(null, message);
+                    if (withMessage)
+                    {
+                        FacesMessage message = new FacesMessage("Compilation failed! Check compile log.");
+                        FacesContext.getCurrentInstance().addMessage(null, message);
+                    }
                 }
             }
-            else
+            catch (ClassNotFoundException | IOException | IllegalStateException /*| NoSuchMethodException | IllegalAccessException | InvocationTargetException*/ e)
             {
-                if (withMessage)
-                {
-                    FacesMessage message = new FacesMessage("Compilation failed! Check compile log.");
-                    FacesContext.getCurrentInstance().addMessage(null, message);
-                }
+                LOGGER.error(e.getMessage());
             }
-        }
-        catch (ClassNotFoundException | IOException | IllegalStateException /*| NoSuchMethodException | IllegalAccessException | InvocationTargetException*/ e)
-        {
-            LOGGER.error(e.getMessage());
-        }
 
-        return newClasses;
+            return newClasses;
+        } else {
+            return null;
+        }
     }
 
     // Create classpath String from temp dir, maven libs and custom libs for compilation

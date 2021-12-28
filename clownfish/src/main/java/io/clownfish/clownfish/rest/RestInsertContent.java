@@ -71,6 +71,7 @@ public class RestInsertContent {
 
                 try {
                     CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());
+                    LOGGER.warn("Duplicate Classcontent");
                     icp.setReturncode("Duplicate Classcontent");
                 } catch (javax.persistence.NoResultException ex) {
                     CfClasscontent newclasscontent = new CfClasscontent();
@@ -119,6 +120,7 @@ public class RestInsertContent {
                 icp.setReturncode("Wrong API KEY");
             }
         } catch (javax.persistence.NoResultException ex) {
+            LOGGER.error("NoResultException");
             icp.setReturncode("NoResultException");
         }
         return icp;

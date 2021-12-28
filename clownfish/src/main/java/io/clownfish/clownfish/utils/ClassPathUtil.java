@@ -52,15 +52,17 @@ public class ClassPathUtil implements Serializable {
         File dependencyDirectory = new File(libpath);
         File[] files = dependencyDirectory.listFiles();
 
-        for (int i = 0; i < files.length; i++) {
-            if (!files[i].getName().endsWith(".jar")) {
-                ArrayUtils.remove(files, i);
+        if (null != files) {
+            for (int i = 0; i < files.length; i++) {
+                if (!files[i].getName().endsWith(".jar")) {
+                    ArrayUtils.remove(files, i);
+                }
             }
-        }
-        try {
-            loadClassesFromJar(files);
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
+            try {
+                loadClassesFromJar(files);
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage());
+            }
         }
     }
 
