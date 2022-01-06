@@ -118,7 +118,7 @@ public class Clownfish {
     @Autowired CfJavascriptversionService cfjavascriptversionService;
     @Autowired CfJavaService cfjavaService;
     //@Autowired CfClassCompiler cfclassCompiler;
-    @Autowired CfClassLoader cfclassLoader;
+    //@Autowired CfClassLoader cfclassLoader;
     @Autowired CfJavaversionService cfjavaversionService;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired TemplateUtil templateUtil;
@@ -152,6 +152,7 @@ public class Clownfish {
     ImportTemplateBean importbean;
     PDFTemplateBean pdfbean;
     CfClassCompiler cfclassCompiler;
+    CfClassLoader cfclassLoader;
 
     private String contenttype;
     private String characterencoding;
@@ -229,6 +230,12 @@ public class Clownfish {
         universalGet(error_site, request, response);
     }
 
+    public void initClasspath() {
+        cfclassLoader = null;
+        cfclassCompiler = null;
+        init();
+    }
+    
     /**
      * Call of the "init" site
      * Init is called at the beginning of the Clownfish startup and after changing system properties
@@ -246,9 +253,15 @@ public class Clownfish {
             propertyUtil = new PropertyUtil(propertylist);
         }
 
-        if (cfclassCompiler == null)
+        if (null == cfclassLoader)
+        {
+            cfclassLoader = new CfClassLoader();
+        }
+        
+        if (null == cfclassCompiler)
         {
             cfclassCompiler = new CfClassCompiler();
+            cfclassCompiler.setClownfish(this);
             cfclassCompiler.init(cfclassLoader, propertyUtil, cfjavaService);
         }
         // if (cfclassLoader == null)
@@ -256,7 +269,7 @@ public class Clownfish {
         
         libloaderpath = propertyUtil.getPropertyValue("folder_libs");
         
-        if (beanUtil == null)
+        if (null == beanUtil)
             beanUtil = new BeanUtil();
         if ((!libloaderpath.isBlank()) && (null != libloaderpath)) 
             beanUtil.init(libloaderpath);
@@ -794,6 +807,7 @@ public class Clownfish {
             
             userSession = request.getSession();
             if (request.getContentType().startsWith("multipart/form-data")) {
+                Map rqMap = request.getParameterMap();
                 LOGGER.info("MULTIPART");
             } else {
                 String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));

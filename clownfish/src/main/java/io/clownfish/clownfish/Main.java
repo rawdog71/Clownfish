@@ -100,9 +100,13 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     AutowireCapableBeanFactory beanFactory;
     
     public static void main(String[] args) {
-        bootstrap();
-        bootstrap_update();
-        SpringApplication.run(Main.class, args);
+        try {
+            bootstrap();
+            bootstrap_update();
+            SpringApplication.run(Main.class, args);
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+        }
     }
 
     /**

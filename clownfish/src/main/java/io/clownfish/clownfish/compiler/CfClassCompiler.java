@@ -1,5 +1,6 @@
 package io.clownfish.clownfish.compiler;
 
+import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.beans.LoginBean;
 import io.clownfish.clownfish.dbentities.CfJava;
 import io.clownfish.clownfish.serviceinterface.CfJavaService;
@@ -41,10 +42,15 @@ public class CfClassCompiler
     private static @Getter @Setter Path tmpdir;
     @Getter @Setter StringWriter compileOut;
     @Getter @Setter boolean verboseCompile = true;
+    private static Clownfish clownfish;
 
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CfClassCompiler.class);
 
     public CfClassCompiler() {}
+    
+    public void setClownfish(Clownfish clownfish) {
+        this.clownfish = clownfish;
+    }
     
     public void init(CfClassLoader cfclassLoader_, PropertyUtil propertyUtil_, CfJavaService cfjavaService_)
     {
@@ -188,12 +194,16 @@ public class CfClassCompiler
         return classPath.toString();
     }
 
-    public void onCompileAll(ActionEvent actionEvent)
+    public void onCompileAll()
     {
         compileAll(true);
 
         FacesMessage message = new FacesMessage("Compiled class(es) successfully");
         FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+    
+    public void initClasspath() {
+        clownfish.initClasspath();
     }
     
     public void compileAll(boolean withMessage) {

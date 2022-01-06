@@ -671,7 +671,10 @@
                                     </p:selectCheckboxMenu>
                                 </div>
                                 <div class="flex align-items-center pr-2">
-                                    <p:commandButton id="compileall" icon="pi pi-cog" process="form" value="Compile all" actionListener="#{javaCompiler.onCompileAll}" update=":form:msgs" />
+                                    <p:commandButton id="compileall" icon="pi pi-cog" process="form" value="Compile all" update=":form:msgs">
+                                        <f:actionListener binding="#{javaCompiler.initClasspath()}" />
+                                        <f:actionListener binding="#{javaCompiler.onCompileAll()}" />
+                                    </p:commandButton>
                                 </div>
 								<div class="flex align-items-center pr-2">
                                     <p:outputLabel for="compileverbose">Verbose compile output:</p:outputLabel>
