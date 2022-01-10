@@ -600,7 +600,7 @@
                                 <div class="flex align-items-center pr-2">
                                     <p:outputLabel value="Java" for="@next"/>
                                     <p:autoComplete id="javalist" dropdown="true" value="#{javaList.selectedJava}" completeMethod="#{javaList.completeText}" converter="#{javaConverterBean}" scrollHeight="250">
-                                        <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:javatabview:editjava :form:tabview:javatabview:javaname :form:tabview:javatabview:newjava :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:diffjavaPanel" />
+                                        <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:javatabview:editjava :form:tabview:javatabview:javaname :form:tabview:javatabview:newjava :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:diffjavaPanel :form:tabview:javatabview:javalanguage" />
                                     </p:autoComplete>
                                 </div>
 
@@ -609,6 +609,13 @@
                                     <p:inputText id="javaname" value="#{javaList.javaName}" >
                                         <p:ajax event="keyup" listener="#{javaList.onChangeName(changeEvent)}" update=":form:tabview:javatabview:newjava :form:tabview:javatabview:changejava" />
                                     </p:inputText>
+                                </div>
+                                
+                                <div class="flex align-items-center pr-2">
+                                    <p:selectOneMenu id="javalanguage" value="#{javaList.javaLanguage}">
+                                        <f:selectItem itemValue="0" itemLabel="Java" />
+                                        <f:selectItem itemValue="1" itemLabel="Kotlin" />
+                                    </p:selectOneMenu>
                                 </div>
 
                                 <div class="flex align-items-center pr-2">
@@ -671,21 +678,21 @@
                                     </p:selectCheckboxMenu>
                                 </div>
                                 <div class="flex align-items-center pr-2">
-                                    <p:commandButton id="compileall" icon="pi pi-cog" process="form" value="Compile all" update=":form:msgs">
+                                    <p:commandButton id="compileall" icon="pi pi-cog" process="form" value="Compile all" update=":form:msgs :form:tabview:javatabview:compilelog">
                                         <f:actionListener binding="#{javaCompiler.initClasspath()}" />
                                         <f:actionListener binding="#{javaCompiler.onCompileAll()}" />
                                     </p:commandButton>
                                 </div>
-								<div class="flex align-items-center pr-2">
+                                <div class="flex align-items-center pr-2">
                                     <p:outputLabel for="compileverbose">Verbose compile output:</p:outputLabel>
                                 </div>
-								<div class="flex align-items-center pr-2">
-									<p:selectBooleanCheckbox id="compileverbose" value="#{javaCompiler.verboseCompile}" />
-								</div>
-								<div class="flex align-items-center pr-2">
-									<p:outputLabel for="compilelog">Compile log:</p:outputLabel>
-								</div>
-								<pe:monacoEditor id="compilelog" disabled="false" widgetVar="monacotemplate" readonly="true" editorOptions="#{javaList.editorOptions}" value="#{javaCompiler.compileOut.toString()}" locale="de" width="85%" height="300px" autoResize="true" />
+                                <div class="flex align-items-center pr-2">
+                                    <p:selectBooleanCheckbox id="compileverbose" value="#{javaCompiler.verboseCompile}" />
+                                </div>
+                                <div class="flex align-items-center pr-2">
+                                    <p:outputLabel for="compilelog">Compile log:</p:outputLabel>
+                                </div>
+                                <pe:monacoEditor id="compilelog" disabled="false" widgetVar="monacocompilelog" readonly="true" editorOptions="#{javaCompiler.editorOptions}" value="#{javaCompiler.compileOut.toString()}" locale="de" width="85%" height="300px" autoResize="true" />
                             </div>
                         </p:tab>
                         

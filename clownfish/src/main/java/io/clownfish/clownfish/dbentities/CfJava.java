@@ -36,6 +36,10 @@ public class CfJava implements Serializable {
     private String content;
     @Column(name = "checkedoutby")
     private BigInteger checkedoutby;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "language")
+    private int language;
     // @Column(name = "compilestatus")
     // private boolean compileStatus;
 
@@ -83,6 +87,14 @@ public class CfJava implements Serializable {
         this.checkedoutby = checkedoutby;
     }
 
+    public int getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(int language) {
+        this.language = language;
+    }
+    
     // public boolean getCompileStatus() { return compileStatus; }
 
     // public void setCompileStatus(boolean status) { compileStatus = status; }

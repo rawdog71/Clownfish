@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.tools.*;
@@ -25,8 +24,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+
+import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
+import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
+import org.primefaces.extensions.model.monacoeditor.ETheme;
+import org.primefaces.extensions.model.monacoeditor.EditorOptions;
+import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
 
 @Named("javaCompiler")
 @Scope("singleton")
@@ -43,6 +51,7 @@ public class CfClassCompiler
     @Getter @Setter StringWriter compileOut;
     @Getter @Setter boolean verboseCompile = true;
     private static Clownfish clownfish;
+    private @Getter @Setter EditorOptions editorOptions;
 
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CfClassCompiler.class);
 
@@ -57,20 +66,99 @@ public class CfClassCompiler
         cfclassLoader = cfclassLoader_;
         propertyUtil = propertyUtil_;
         cfjavaService = cfjavaService_;
+        editorOptions = new EditorOptions();
+        editorOptions.setLanguage("java");
+        editorOptions.setTheme(ETheme.VS_DARK);
+        editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
     }
 
     //TODO: Custom ClassLoader with the ability to unload/reload already loaded classes at runtime to allow
     // changes to Java templates in Clownfish without a restart
 
-    public ArrayList<Class<?>> compileClasses(ArrayList<File> java, boolean withMessage)
+    public ArrayList<Class<?>> compileClasses(ArrayList<File> srcfiles, boolean withMessage)
     {
+        ArrayList<File> java = new ArrayList<>();
+        ArrayList<File> kotlin = new ArrayList<>();
+        for (File f : srcfiles) {
+            switch (FilenameUtils.getExtension(f.getName())) {
+                case "java":
+                    java.add(f);
+                    break;
+                case "kt":
+                    kotlin.add(f);
+                    break;
+            }
+        }
         //CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
         // Map<String, byte[]> classBytes = new HashMap<>();
         ArrayList<Class<?>> newClasses = new ArrayList<>();
         setCompileOut(new StringWriter());
-
-        if (!java.isEmpty()) {
         
+        if (!kotlin.isEmpty()) {
+            try {
+                File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
+                cfclassLoader.add(tmpDirRoot.toURI().toURL());
+                
+                ProcessBuilder builder = new ProcessBuilder();
+                for (File kotlinfile : kotlin) {
+                    String className = kotlinfile.getName().replaceFirst("[.][^.]+$", "");
+                    LOGGER.info("COMPILING " + className + "...");
+                    compileOut.append("COMPILING " + className + "...\n");
+                    compileOut.flush();
+                    if (isWindows()) {
+                        builder.command("cmd.exe", "/c", "kotlinc -d " + tmpDirRoot.toString() + " " + kotlinfile.getCanonicalPath());
+                    } else {
+                        builder.command("sh", "-c", "kotlinc -d " + tmpDirRoot.toString() + " " + kotlinfile.getCanonicalPath());
+                    }
+                    builder.directory(getTmpdir().toFile());
+                    builder.redirectErrorStream(true);
+                    String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
+                    if (result.isBlank()) {
+                        compileOut.append("OK\n");
+                        compileOut.flush();
+                        LOGGER.info("OK");
+                    } else {
+                        compileOut.append("ERROR\n");
+                        compileOut.append(result);
+                        compileOut.flush();
+                        LOGGER.error("ERROR");
+                        LOGGER.error(result);
+                    }
+                }
+                
+                for (File file : kotlin)
+                {
+                    String className = file.getName().replaceFirst("[.][^.]+$", "");
+                    LOGGER.info("LOADING " + className + "...");
+                    compileOut.append("LOADING " + className + "...\n");
+                    compileOut.flush();
+                    newClasses.add(cfclassLoader.loadClass("io.clownfish.kotlin." + className));
+                }
+
+                for (Class<?> clazz : newClasses)
+                {
+                    classMethodMap.put(clazz, new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods())));
+
+                    LOGGER.info("Class name: " + clazz.getCanonicalName());
+                    compileOut.append("Class name: " + clazz.getCanonicalName() + "\n");
+                    compileOut.flush();
+                    LOGGER.info("Class package name: " + clazz.getPackageName());
+                    compileOut.append("Class package name: " + clazz.getPackageName() + "\n");
+                    compileOut.flush();
+                    LOGGER.info("Class loader: " + clazz.getClassLoader());
+                    compileOut.append("Class loader: " + clazz.getClassLoader() + "\n");
+                    compileOut.flush();
+
+                    classMethodMap.forEach((k, v) -> v.forEach(method -> LOGGER.info(k.getSimpleName() + ": " + method.getName())));
+                }
+            } catch (IOException | ClassNotFoundException ex) {
+                LOGGER.error(ex.getMessage());
+                compileOut.append(ex.getMessage() + "\n");
+                compileOut.flush();
+            }
+        }
+        
+        if (!java.isEmpty()) {
             try
             {
                 List<String> options = new ArrayList<>(Arrays.asList("-classpath", constructClasspath()));
@@ -90,8 +178,8 @@ public class CfClassCompiler
                 //     options.add(url.getPath());
                 //     LOGGER.info(url.toString());
                 // }
-
                 JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
+
                 StandardJavaFileManager jfm = javac.getStandardFileManager(null, null, Charset.defaultCharset());
 
                 jfm.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singleton(getTmpdir().toFile()));
@@ -110,11 +198,11 @@ public class CfClassCompiler
                     for (File file : java)
                     {
                         String className = file.getName().replaceFirst("[.][^.]+$", "");
-                        LOGGER.info("COMPILING " + className + "...");
+                        LOGGER.info("LOADING " + className + "...");
                         // FileObject fo = jfm.getJavaFileForInput(StandardLocation.CLASS_OUTPUT, "", JavaFileObject.Kind.CLASS);
                         // fileObjects.add(fo);
                         // classBytes.put(className, Files.readAllBytes(Paths.get(fo.toUri())));
-                        newClasses.add(cfclassLoader.loadClass("io.clownfish.internal." + className));
+                        newClasses.add(cfclassLoader.loadClass("io.clownfish.java." + className));
                     }
 
                     for (Class<?> clazz : newClasses)
@@ -223,9 +311,19 @@ public class CfClassCompiler
 
         for (CfJava java : cfjavaService.findAll())
         {
+            String extension = "";
             if (tmpdir != null)
             {
-                File src = new File(getTmpdir().toFile() + File.separator + java.getName() + ".java");
+                switch (java.getLanguage()) {
+                    case 0:
+                        extension = ".java";
+                        break;
+                    case 1:
+                        extension = ".kt";
+                        break;
+                }
+                
+                File src = new File(getTmpdir().toFile() + File.separator + java.getName() + extension);
 
                 try (Writer srcWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(src), StandardCharsets.UTF_8)))
                 {
@@ -287,5 +385,27 @@ public class CfClassCompiler
     private String classpathDelim()
     {
         return isWindows() ? ";" : ":";
+    }
+    
+    private static class MyOutputStream extends OutputStream {
+        private final Consumer<String> consumer;
+        private final StringBuffer stringBuffer = new StringBuffer();
+
+        public MyOutputStream(Consumer<String> consumer) {
+            this.consumer = consumer;
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            stringBuffer.append((char) b);
+        }
+
+        @Override
+        public void flush() {
+            if (stringBuffer.length() != 0) {
+                consumer.accept(stringBuffer.toString().trim());
+                stringBuffer.delete(0, stringBuffer.length());
+            }
+        }
     }
 }

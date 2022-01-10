@@ -55,6 +55,8 @@ public class JavaList implements ISourceContentInterface
     private @Getter @Setter long javaversionMin = 0;
     private @Getter @Setter long javaversionMax = 0;
     private @Getter @Setter long selectedjavaversion = 0;
+    private @Getter @Setter int javaLanguage = 0;
+    private @Getter @Setter String selectedLanguage = "";
     private @Getter @Setter List<CfJavaversion> versionlist;
     private @Getter @Setter boolean difference;
     private @Getter @Setter long checkedoutby = 0;
@@ -141,6 +143,18 @@ public class JavaList implements ISourceContentInterface
         {
             javaName = selectedJava.getName();
             javaUtility.setJavaContent(selectedJava.getContent());
+            javaLanguage = selectedJava.getLanguage();
+            switch (selectedJava.getLanguage()) {
+                case 0:
+                    selectedLanguage = "java";
+                    editorOptions.setLanguage("java");
+                    break;
+                case 1:
+                    selectedLanguage = "kotlin";
+                    editorOptions.setLanguage("kotlin");
+                    break;
+            }
+            
             versionlist = cfjavaversionService.findByJavaref(selectedJava.getId());
             difference = javaUtility.hasDifference(selectedJava);
             BigInteger co = selectedJava.getCheckedoutby();
@@ -165,6 +179,7 @@ public class JavaList implements ISourceContentInterface
     {
         if (null != selectedJava)
         {
+            selectedJava.setLanguage(javaLanguage);
             selectedJava.setContent(getContent());
             cfjavaService.edit(selectedJava);
             difference = javaUtility.hasDifference(selectedJava);
@@ -316,9 +331,18 @@ public class JavaList implements ISourceContentInterface
             {
                 CfJava newjava = new CfJava();
                 newjava.setName(javaName);
-                newjava.setContent("package io.clownfish.internal;\n\n"
-                        + "import io.clownfish.clownfish.compiler.ICompiledClass;\n\n"
-                        + "public class " + javaName + "implements ICompiledClass" + "\n{\n\n}");
+                
+                switch (selectedJava.getLanguage()) {
+                case 0:
+                    newjava.setContent("package io.clownfish.java;\n\n"
+                        + "public class " + javaName + "\n{\n\n}");
+                    break;
+                case 1:
+                    newjava.setContent("package io.clownfish.kotlin;\n\n"
+                        + "public class " + javaName + "\n{\n\n}");
+                    break;
+                }
+                newjava.setLanguage(javaLanguage);
                 cfjavaService.create(newjava);
                 javaListe = cfjavaService.findAll();
                 javaName = "";
@@ -401,6 +425,7 @@ public class JavaList implements ISourceContentInterface
     {
         if (null != selectedJava)
         {
+            selectedJava.setLanguage(javaLanguage);
             selectedJava.setName(javaName);
             cfjavaService.edit(selectedJava);
             difference = javaUtility.hasDifference(selectedJava);
