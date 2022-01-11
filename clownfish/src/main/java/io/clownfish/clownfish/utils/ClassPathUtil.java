@@ -100,7 +100,7 @@ public class ClassPathUtil implements Serializable {
 
                     class_set.add(c);
                 }
-                catch (ClassNotFoundException e)
+                catch (ClassNotFoundException | NoClassDefFoundError e)
                 {
                     LOGGER.error(e.getMessage());
                 }
