@@ -10,7 +10,6 @@ import lombok.Setter;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
@@ -72,9 +71,6 @@ public class CfClassCompiler
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
     }
 
-    //TODO: Custom ClassLoader with the ability to unload/reload already loaded classes at runtime to allow
-    // changes to Java templates in Clownfish without a restart
-
     public ArrayList<Class<?>> compileClasses(ArrayList<File> srcfiles, boolean withMessage)
     {
         ArrayList<File> java = new ArrayList<>();
@@ -89,8 +85,6 @@ public class CfClassCompiler
                     break;
             }
         }
-        //CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
-        // Map<String, byte[]> classBytes = new HashMap<>();
         ArrayList<Class<?>> newClasses = new ArrayList<>();
         setCompileOut(new StringWriter());
         
@@ -134,23 +128,6 @@ public class CfClassCompiler
                     compileOut.flush();
                     newClasses.add(cfclassLoader.loadClass("io.clownfish.kotlin." + className));
                 }
-
-                for (Class<?> clazz : newClasses)
-                {
-                    classMethodMap.put(clazz, new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods())));
-
-                    LOGGER.info("Class name: " + clazz.getCanonicalName());
-                    compileOut.append("Class name: " + clazz.getCanonicalName() + "\n");
-                    compileOut.flush();
-                    LOGGER.info("Class package name: " + clazz.getPackageName());
-                    compileOut.append("Class package name: " + clazz.getPackageName() + "\n");
-                    compileOut.flush();
-                    LOGGER.info("Class loader: " + clazz.getClassLoader());
-                    compileOut.append("Class loader: " + clazz.getClassLoader() + "\n");
-                    compileOut.flush();
-
-                    classMethodMap.forEach((k, v) -> v.forEach(method -> LOGGER.info(k.getSimpleName() + ": " + method.getName())));
-                }
             } catch (IOException | ClassNotFoundException ex) {
                 LOGGER.error(ex.getMessage());
                 compileOut.append(ex.getMessage() + "\n");
@@ -171,17 +148,8 @@ public class CfClassCompiler
                 if (verboseCompile)
                     options.addAll(List.of("-verbose"));
 
-                // URL[] classpath = cl.getURLs();
-                // LOGGER.info("Classpath:");
-                // for (URL url : classpath)
-                // {
-                //     options.add(url.getPath());
-                //     LOGGER.info(url.toString());
-                // }
                 JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
-
                 StandardJavaFileManager jfm = javac.getStandardFileManager(null, null, Charset.defaultCharset());
-
                 jfm.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singleton(getTmpdir().toFile()));
 
                 Iterable<? extends JavaFileObject> compilationUnits = jfm.getJavaFileObjectsFromFiles(java);
@@ -193,30 +161,11 @@ public class CfClassCompiler
 
                 if (task.call())
                 {
-                    // ArrayList<FileObject> fileObjects = new ArrayList<>();
-
                     for (File file : java)
                     {
                         String className = file.getName().replaceFirst("[.][^.]+$", "");
                         LOGGER.info("LOADING " + className + "...");
-                        // FileObject fo = jfm.getJavaFileForInput(StandardLocation.CLASS_OUTPUT, "", JavaFileObject.Kind.CLASS);
-                        // fileObjects.add(fo);
-                        // classBytes.put(className, Files.readAllBytes(Paths.get(fo.toUri())));
                         newClasses.add(cfclassLoader.loadClass("io.clownfish.java." + className));
-                    }
-
-                    for (Class<?> clazz : newClasses)
-                    {
-                        classMethodMap.put(clazz, new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods())));
-
-                        LOGGER.info("Class name: " + clazz.getCanonicalName());
-                        LOGGER.info("Class package name: " + clazz.getPackageName());
-                        LOGGER.info("Class loader: " + clazz.getClassLoader());
-
-                        classMethodMap.forEach((k, v) -> v.forEach(method -> LOGGER.info(k.getSimpleName() + ": " + method.getName())));
-                        // LOGGER.info("Class path: " + clazz.getResource(clazz.getSimpleName() + ".class").toString());
-                        // LOGGER.info("Main method invocation:");
-                        // newClass.getMethod("main", String[].class).invoke(null, (Object) null);
                     }
 
                     if (withMessage)
@@ -238,7 +187,20 @@ public class CfClassCompiler
             {
                 LOGGER.error(e.getMessage());
             }
+        }
+        
+        if (!newClasses.isEmpty()) {
+            classMethodMap.clear();
+            for (Class<?> clazz : newClasses)
+            {
+                classMethodMap.put(clazz, new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods())));
 
+                LOGGER.info("Class name: " + clazz.getCanonicalName());
+                LOGGER.info("Class package name: " + clazz.getPackageName());
+                LOGGER.info("Class loader: " + clazz.getClassLoader());
+
+            }
+            classMethodMap.forEach((k, v) -> v.forEach(method -> LOGGER.info(k.getSimpleName() + ": " + method.getName())));
             return newClasses;
         } else {
             return null;

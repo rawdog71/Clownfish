@@ -293,6 +293,7 @@ public class QuartzList {
             cfquartzService.create(newquartz);
 
             quartzlist = cfquartzService.findAll();
+            clownfish.setInitmessage(false);
             clownfish.init();
             //fillPropertyMap();
         } catch (ConstraintViolationException ex) {
@@ -309,6 +310,7 @@ public class QuartzList {
                 selectedQuartz.setSiteRef(BigInteger.valueOf(siteref.getId()));
                 cfquartzService.edit(selectedQuartz);
                 quartzlist = cfquartzService.findAll();
+                clownfish.setInitmessage(false);
                 clownfish.init();
             }
         } catch (ConstraintViolationException ex) {
@@ -320,6 +322,7 @@ public class QuartzList {
         if (null != selectedQuartz) {
             cfquartzService.delete(selectedQuartz);
             quartzlist = cfquartzService.findAll();
+            clownfish.setInitmessage(false);
             clownfish.init();
         }
     }

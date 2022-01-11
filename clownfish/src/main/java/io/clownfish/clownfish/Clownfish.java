@@ -197,6 +197,7 @@ public class Clownfish {
     @Value("${sapconnection.file}") String SAPCONNECTION;
     String libloaderpath;
     String mavenpath;
+    private @Getter @Setter boolean initmessage = false;
     
     /**
      * Call of the "root" site
@@ -233,6 +234,7 @@ public class Clownfish {
     public void initClasspath() {
         cfclassLoader = null;
         cfclassCompiler = null;
+        initmessage = true;
         init();
     }
     
@@ -264,8 +266,6 @@ public class Clownfish {
             cfclassCompiler.setClownfish(this);
             cfclassCompiler.init(cfclassLoader, propertyUtil, cfjavaService);
         }
-        // if (cfclassLoader == null)
-        //     cfclassLoader = new CfClassLoader(getClass().getClassLoader());
         
         libloaderpath = propertyUtil.getPropertyValue("folder_libs");
         
@@ -289,7 +289,7 @@ public class Clownfish {
             mavenlist.setClasspathUtil(classpathUtil);
         }
         
-        cfclassCompiler.compileAll(false);
+        cfclassCompiler.compileAll(initmessage);
         
         if (1 == bootstrap) {
             bootstrap = 0;

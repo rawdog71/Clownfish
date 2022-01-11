@@ -102,6 +102,7 @@ public class PropertyList {
             newproperty.setNodelete(false);
             cfpropertyService.create(newproperty);
             fillPropertyMap();
+            clownfish.setInitmessage(false);
             clownfish.init();
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
@@ -117,6 +118,7 @@ public class PropertyList {
                 selectedProperty.setValue(propertyvalue);
                 cfpropertyService.edit(selectedProperty);
                 fillPropertyMap();
+                clownfish.setInitmessage(false);
                 clownfish.init();
             }
         } catch (ConstraintViolationException ex) {
@@ -128,6 +130,7 @@ public class PropertyList {
         if (null != selectedProperty) {
             cfpropertyService.delete(selectedProperty);
             fillPropertyMap();
+            clownfish.setInitmessage(false);
             clownfish.init();
         }
     }

@@ -65,7 +65,7 @@ public class CfJava implements Serializable {
 
     public String getName() {
         return name;
-    }
+        }
 
     public void setName(String name) {
         this.name = name;
@@ -93,6 +93,19 @@ public class CfJava implements Serializable {
 
     public void setLanguage(int language) {
         this.language = language;
+    }
+    
+    public String getNameExt() {
+        String extension = "";
+        switch (getLanguage()) {
+            case 0:
+                extension = ".java";
+                break;
+            case 1:
+                extension = ".kt";
+                break;
+        }
+        return name + extension;
     }
     
     // public boolean getCompileStatus() { return compileStatus; }
