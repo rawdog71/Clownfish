@@ -971,7 +971,7 @@ public class Clownfish {
                                 templateContent = templateUtil.fetchIncludes(templateContent, modus);
                                 StringReader reader = new StringReader(templateContent);
                                 velTemplate.setRuntimeServices(runtimeServices);
-                                velTemplate.setData(runtimeServices.parse(reader, cftemplate.getName()));
+                                velTemplate.setData(runtimeServices.parse(reader, velTemplate));
                                 velTemplate.initDocument();
                                 break;
                             default:

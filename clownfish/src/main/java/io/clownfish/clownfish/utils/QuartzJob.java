@@ -180,7 +180,7 @@ public class QuartzJob implements Job {
                     templateContent = templateUtil.fetchIncludes(templateContent, modus);
                     StringReader reader = new StringReader(templateContent);
                     velTemplate.setRuntimeServices(runtimeServices);
-                    velTemplate.setData(runtimeServices.parse(reader, cftemplate.getName()));
+                    velTemplate.setData(runtimeServices.parse(reader, velTemplate));
                     velTemplate.initDocument();
                     canExecute = true;
                 } catch (org.apache.velocity.runtime.parser.ParseException ex) {

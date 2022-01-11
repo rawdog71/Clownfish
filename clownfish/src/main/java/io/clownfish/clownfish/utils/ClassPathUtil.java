@@ -17,7 +17,7 @@ package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.compiler.CfClassLoader;
 import lombok.Getter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
