@@ -75,6 +75,7 @@ public class CfClassCompiler
     {
         ArrayList<File> java = new ArrayList<>();
         ArrayList<File> kotlin = new ArrayList<>();
+        ArrayList<File> groovy = new ArrayList<>();
         for (File f : srcfiles) {
             switch (FilenameUtils.getExtension(f.getName())) {
                 case "java":
@@ -82,6 +83,9 @@ public class CfClassCompiler
                     break;
                 case "kt":
                     kotlin.add(f);
+                    break;
+                case "groovy":
+                    groovy.add(f);
                     break;
             }
         }
@@ -127,6 +131,53 @@ public class CfClassCompiler
                     compileOut.append("LOADING " + className + "...\n");
                     compileOut.flush();
                     newClasses.add(cfclassLoader.loadClass("io.clownfish.kotlin." + className));
+                }
+            } catch (IOException | ClassNotFoundException ex) {
+                LOGGER.error(ex.getMessage());
+                compileOut.append(ex.getMessage() + "\n");
+                compileOut.flush();
+            }
+        }
+        
+        if (!groovy.isEmpty()) {
+            try {
+                File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
+                cfclassLoader.add(tmpDirRoot.toURI().toURL());
+                
+                ProcessBuilder builder = new ProcessBuilder();
+                for (File groovyfile : groovy) {
+                    String className = groovyfile.getName().replaceFirst("[.][^.]+$", "");
+                    LOGGER.info("COMPILING " + className + "...");
+                    compileOut.append("COMPILING " + className + "...\n");
+                    compileOut.flush();
+                    if (isWindows()) {
+                        builder.command("cmd.exe", "/c", "groovyc -d " + tmpDirRoot.toString() + " " + groovyfile.getCanonicalPath());
+                    } else {
+                        builder.command("sh", "-c", "groovyc -d " + tmpDirRoot.toString() + " " + groovyfile.getCanonicalPath());
+                    }
+                    builder.directory(getTmpdir().toFile());
+                    builder.redirectErrorStream(true);
+                    String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
+                    if (result.isBlank()) {
+                        compileOut.append("OK\n");
+                        compileOut.flush();
+                        LOGGER.info("OK");
+                    } else {
+                        compileOut.append("ERROR\n");
+                        compileOut.append(result);
+                        compileOut.flush();
+                        LOGGER.error("ERROR");
+                        LOGGER.error(result);
+                    }
+                }
+                
+                for (File file : groovy)
+                {
+                    String className = file.getName().replaceFirst("[.][^.]+$", "");
+                    LOGGER.info("LOADING " + className + "...");
+                    compileOut.append("LOADING " + className + "...\n");
+                    compileOut.flush();
+                    newClasses.add(cfclassLoader.loadClass("io.clownfish.groovy." + className));
                 }
             } catch (IOException | ClassNotFoundException ex) {
                 LOGGER.error(ex.getMessage());
@@ -282,6 +333,9 @@ public class CfClassCompiler
                         break;
                     case 1:
                         extension = ".kt";
+                        break;
+                    case 2:
+                        extension = ".groovy";
                         break;
                 }
                 

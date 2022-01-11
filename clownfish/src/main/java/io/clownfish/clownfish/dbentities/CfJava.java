@@ -104,6 +104,9 @@ public class CfJava implements Serializable {
             case 1:
                 extension = ".kt";
                 break;
+            case 2:
+                extension = ".groovy";
+                break;
         }
         return name + extension;
     }

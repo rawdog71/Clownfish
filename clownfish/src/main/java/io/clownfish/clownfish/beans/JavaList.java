@@ -153,6 +153,10 @@ public class JavaList implements ISourceContentInterface
                     selectedLanguage = "kotlin";
                     editorOptions.setLanguage("kotlin");
                     break;
+                case 2:
+                    selectedLanguage = "groovy";
+                    editorOptions.setLanguage("kotlin");
+                    break;
             }
             
             versionlist = cfjavaversionService.findByJavaref(selectedJava.getId());
@@ -332,15 +336,19 @@ public class JavaList implements ISourceContentInterface
                 CfJava newjava = new CfJava();
                 newjava.setName(javaName);
                 
-                switch (selectedJava.getLanguage()) {
-                case 0:
-                    newjava.setContent("package io.clownfish.java;\n\n"
-                        + "public class " + javaName + "\n{\n\n}");
-                    break;
-                case 1:
-                    newjava.setContent("package io.clownfish.kotlin;\n\n"
-                        + "public class " + javaName + "\n{\n\n}");
-                    break;
+                switch (javaLanguage) {
+                    case 0:
+                        newjava.setContent("package io.clownfish.java;\n\n"
+                            + "public class " + javaName + "\n{\n\n}");
+                        break;
+                    case 1:
+                        newjava.setContent("package io.clownfish.kotlin;\n\n"
+                            + "public class " + javaName + "\n{\n\n}");
+                        break;
+                    case 2:
+                        newjava.setContent("package io.clownfish.groovy;\n\n"
+                            + "public class " + javaName + "\n{\n\n}");
+                        break;
                 }
                 newjava.setLanguage(javaLanguage);
                 cfjavaService.create(newjava);
