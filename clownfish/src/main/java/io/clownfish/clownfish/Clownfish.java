@@ -151,6 +151,7 @@ public class Clownfish {
     WebServiceTemplateBean webservicebean;
     ImportTemplateBean importbean;
     PDFTemplateBean pdfbean;
+    ExternalClassProvider externalclassproviderbean;
     CfClassCompiler cfclassCompiler;
     CfClassLoader cfclassLoader;
 
@@ -1076,6 +1077,8 @@ public class Clownfish {
                             importbean.init(sitedatasourcelist, cfdatasourceService);
                         }
                         
+                        externalclassproviderbean = new ExternalClassProvider(cfclassCompiler);
+                        
                         // write the output
                         Writer out = new StringWriter();
                         switch (cftemplate.getScriptlanguage()) {
@@ -1096,6 +1099,7 @@ public class Clownfish {
                                     fmRoot.put("networkBean", networkbean);
                                     fmRoot.put("webserviceBean", webservicebean);
                                     fmRoot.put("pdfBean", pdfbean);
+                                    fmRoot.put("classBean", externalclassproviderbean);
 
                                     fmRoot.put("parameter", parametermap);
                                     if (!searchmetadata.isEmpty()) {
@@ -1125,6 +1129,7 @@ public class Clownfish {
                                         }
                                     }
 
+                                    /*
                                     for (Class<?> c : classpathUtil.getClass_set()) {
                                         Constructor<?> ctor;
                                         try {
@@ -1141,6 +1146,7 @@ public class Clownfish {
                                             LOGGER.error(ex.getMessage());
                                         }
                                     }
+                                    */
 
                                     Map finalFmRoot = fmRoot;
                                     cfclassCompiler.getClassMethodMap().forEach((k, v) ->
@@ -1184,6 +1190,7 @@ public class Clownfish {
                                     velContext.put("networkBean", networkbean);
                                     velContext.put("webserviceBean", webservicebean);
                                     velContext.put("pdfBean", pdfbean);
+                                    velContext.put("classBean", externalclassproviderbean);
 
                                     velContext.put("parameter", parametermap);
                                     velContext.put("property", propertyUtil.getPropertymap());
@@ -1214,6 +1221,7 @@ public class Clownfish {
                                         }
                                     }
                                     
+                                    /*
                                     for (Class<?> c : classpathUtil.getClass_set()) {
                                         Constructor<?> ctor;
                                         try {
@@ -1230,6 +1238,7 @@ public class Clownfish {
                                             LOGGER.error(ex.getMessage());
                                         }
                                     }
+                                    */
 
                                     org.apache.velocity.VelocityContext finalvelContext = velContext;
                                     cfclassCompiler.getClassMethodMap().forEach((k, v) ->

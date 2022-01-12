@@ -51,6 +51,7 @@ public class CfClassCompiler
     @Getter @Setter boolean verboseCompile = true;
     private static Clownfish clownfish;
     private @Getter @Setter EditorOptions editorOptions;
+    @Getter @Setter ArrayList<Class<?>> classesList;
 
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CfClassCompiler.class);
 
@@ -62,6 +63,7 @@ public class CfClassCompiler
     
     public void init(CfClassLoader cfclassLoader_, PropertyUtil propertyUtil_, CfJavaService cfjavaService_)
     {
+        classesList = new ArrayList<>();
         cfclassLoader = cfclassLoader_;
         propertyUtil = propertyUtil_;
         cfjavaService = cfjavaService_;
@@ -89,7 +91,6 @@ public class CfClassCompiler
                     break;
             }
         }
-        ArrayList<Class<?>> newClasses = new ArrayList<>();
         setCompileOut(new StringWriter());
         
         if (!kotlin.isEmpty()) {
@@ -130,7 +131,7 @@ public class CfClassCompiler
                     LOGGER.info("LOADING " + className + "...");
                     compileOut.append("LOADING " + className + "...\n");
                     compileOut.flush();
-                    newClasses.add(cfclassLoader.loadClass("io.clownfish.kotlin." + className));
+                    classesList.add(cfclassLoader.loadClass("io.clownfish.kotlin." + className));
                 }
             } catch (IOException | ClassNotFoundException ex) {
                 LOGGER.error(ex.getMessage());
@@ -177,7 +178,7 @@ public class CfClassCompiler
                     LOGGER.info("LOADING " + className + "...");
                     compileOut.append("LOADING " + className + "...\n");
                     compileOut.flush();
-                    newClasses.add(cfclassLoader.loadClass("io.clownfish.groovy." + className));
+                    classesList.add(cfclassLoader.loadClass("io.clownfish.groovy." + className));
                 }
             } catch (IOException | ClassNotFoundException ex) {
                 LOGGER.error(ex.getMessage());
@@ -216,7 +217,7 @@ public class CfClassCompiler
                     {
                         String className = file.getName().replaceFirst("[.][^.]+$", "");
                         LOGGER.info("LOADING " + className + "...");
-                        newClasses.add(cfclassLoader.loadClass("io.clownfish.java." + className));
+                        classesList.add(cfclassLoader.loadClass("io.clownfish.java." + className));
                     }
 
                     if (withMessage)
@@ -240,9 +241,9 @@ public class CfClassCompiler
             }
         }
         
-        if (!newClasses.isEmpty()) {
+        if (!classesList.isEmpty()) {
             classMethodMap.clear();
-            for (Class<?> clazz : newClasses)
+            for (Class<?> clazz : classesList)
             {
                 classMethodMap.put(clazz, new ArrayList<>(Arrays.asList(clazz.getDeclaredMethods())));
 
@@ -252,7 +253,7 @@ public class CfClassCompiler
 
             }
             classMethodMap.forEach((k, v) -> v.forEach(method -> LOGGER.info(k.getSimpleName() + ": " + method.getName())));
-            return newClasses;
+            return classesList;
         } else {
             return null;
         }

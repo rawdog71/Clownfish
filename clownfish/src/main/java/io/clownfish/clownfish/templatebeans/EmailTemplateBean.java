@@ -22,7 +22,6 @@ import java.util.Map;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
