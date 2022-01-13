@@ -116,12 +116,24 @@ public class CfClassCompiler
                         compileOut.append("OK\n");
                         compileOut.flush();
                         LOGGER.info("OK");
+                        if (withMessage)
+                        {
+                            FacesMessage message = new FacesMessage("Compiled " + className + " successfully");
+                            message.setSeverity(FacesMessage.SEVERITY_INFO);
+                            FacesContext.getCurrentInstance().addMessage(null, message);
+                        }
                     } else {
                         compileOut.append("ERROR\n");
                         compileOut.append(result);
                         compileOut.flush();
                         LOGGER.error("ERROR");
                         LOGGER.error(result);
+                        if (withMessage)
+                        {
+                            FacesMessage message = new FacesMessage("Compiled " + className + " error", result);
+                            message.setSeverity(FacesMessage.SEVERITY_ERROR);
+                            FacesContext.getCurrentInstance().addMessage(null, message);
+                        }
                     }
                 }
                 
@@ -163,12 +175,24 @@ public class CfClassCompiler
                         compileOut.append("OK\n");
                         compileOut.flush();
                         LOGGER.info("OK");
+                        if (withMessage)
+                        {
+                            FacesMessage message = new FacesMessage("Compiled " + className + " successfully");
+                            message.setSeverity(FacesMessage.SEVERITY_INFO);
+                            FacesContext.getCurrentInstance().addMessage(null, message);
+                        }
                     } else {
                         compileOut.append("ERROR\n");
                         compileOut.append(result);
                         compileOut.flush();
                         LOGGER.error("ERROR");
                         LOGGER.error(result);
+                        if (withMessage)
+                        {
+                            FacesMessage message = new FacesMessage("Compiled " + className + " error", result);
+                            message.setSeverity(FacesMessage.SEVERITY_ERROR);
+                            FacesContext.getCurrentInstance().addMessage(null, message);
+                        }
                     }
                 }
                 
@@ -223,6 +247,7 @@ public class CfClassCompiler
                     if (withMessage)
                     {
                         FacesMessage message = new FacesMessage("Compiled class(es) successfully");
+                        message.setSeverity(FacesMessage.SEVERITY_INFO);
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
                 }
@@ -231,6 +256,7 @@ public class CfClassCompiler
                     if (withMessage)
                     {
                         FacesMessage message = new FacesMessage("Compilation failed! Check compile log.");
+                        message.setSeverity(FacesMessage.SEVERITY_ERROR);
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
                 }

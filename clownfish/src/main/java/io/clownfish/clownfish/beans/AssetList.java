@@ -81,6 +81,7 @@ public class AssetList {
     private List<CfKeyword> keywordSource;
     private List<CfKeyword> keywordTarget;
     private @Getter @Setter boolean isImage;
+    private @Getter @Setter boolean isPdf;
     private @Getter @Setter boolean renderDetail;
     private @Getter @Setter String description = "";
     
@@ -256,6 +257,7 @@ public class AssetList {
             keywords.getSource().remove(kw);
         }
         isImage = selectedAsset.getMimetype().contains("jpeg");
+        isPdf = selectedAsset.getMimetype().contains("pdf") || selectedAsset.getMimetype().contains("octet-stream");
     }
  
     /**

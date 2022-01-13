@@ -1182,7 +1182,6 @@
                             <p:dataViewListItem>
                                 <h:panelGrid columns="3" style="width:100%" columnClasses="logo,detail">
                                     <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{media.id}&amp;width=150" width="150" alt="#{media.name}" title="#{media.name}" /> 
-
                                     <p:outputPanel>
                                         <h:panelGrid columns="2" cellpadding="5">
                                             <h:outputText value="Name:" />
@@ -1206,7 +1205,7 @@
                         </p:dataView>
                         
                         <p:outputPanel id="assetDetail">
-                            <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{assetList.selectedAsset.id}&amp;width=500" width="500" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" rendered="#{assetList.renderDetail}" /> 
+                            <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{assetList.selectedAsset.id}&amp;width=500" width="500" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" rendered="#{assetList.renderDetail and assetList.image}" /> 
                             <h:panelGrid columns="1" style="width:100%" columnClasses="detail">
                                 <p:outputPanel>
                                     <h:panelGrid columns="2" cellpadding="5">
