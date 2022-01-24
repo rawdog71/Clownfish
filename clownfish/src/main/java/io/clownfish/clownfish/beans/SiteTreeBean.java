@@ -16,11 +16,16 @@
 package io.clownfish.clownfish.beans;
 
 import de.destrukt.sapconnection.SAPConnection;
+import io.clownfish.clownfish.datamodels.CfDiv;
+import io.clownfish.clownfish.datamodels.CfLayout;
+import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfKeywordlist;
+import io.clownfish.clownfish.dbentities.CfLayoutcontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSiteassetlist;
@@ -42,12 +47,15 @@ import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
 import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
 import io.clownfish.clownfish.sap.models.RfcFunction;
 import io.clownfish.clownfish.sap.models.RfcGroup;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
+import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
+import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfPropertyService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
@@ -61,6 +69,7 @@ import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.JavascriptUtil;
 import io.clownfish.clownfish.utils.StylesheetUtil;
@@ -83,6 +92,10 @@ import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.SelectEvent;
@@ -145,6 +158,42 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter String locale;
     private transient @Getter @Setter Map<String, String> propertymap = null;
     private @Getter @Setter boolean sapSupport = false;
+    private @Getter @Setter CfLayout layout = null;
+    private @Getter @Setter CfDiv selectedDiv = null;
+    private @Getter @Setter CfTemplate selectedDivTemplate = null;
+    private @Getter @Setter boolean contenteditable;
+    private @Getter @Setter String selected_contentclass = null;
+    private @Getter @Setter String selected_datalisttclass = null;
+    private @Getter @Setter String selected_asset = null;
+    private @Getter @Setter String selected_assetlist = null;
+    private @Getter @Setter String selected_keywordlist = null;
+    
+    private @Getter @Setter boolean showContent;
+    private @Getter @Setter CfClasscontent current_classcontent = null;
+    private @Getter @Setter List<CfClasscontent> current_classcontentlist = null;
+    private @Getter @Setter List<CfClasscontent> filteredContent;
+    
+    private @Getter @Setter boolean showDatalist;
+    private @Getter @Setter CfList current_list = null;
+    private @Getter @Setter List<CfList> current_datalist = null;
+    private @Getter @Setter List<CfList> filteredList;
+    
+    private @Getter @Setter boolean showAsset;
+    private @Getter @Setter CfAsset current_asset = null;
+    private @Getter @Setter List<CfAsset> current_assetlist = null;
+    private @Getter @Setter List<CfAsset> filteredAsset;
+    
+    private @Getter @Setter boolean showAssetLibrary;
+    private @Getter @Setter CfAssetlist current_assetlibrary = null;
+    private @Getter @Setter List<CfAssetlist> current_assetlibrarylist = null;
+    private @Getter @Setter List<CfAssetlist> filteredAssetlibrary;
+    
+    private @Getter @Setter boolean showKeywordLibrary;
+    private @Getter @Setter CfKeywordlist current_keywordlibrary = null;
+    private @Getter @Setter List<CfKeywordlist> current_keywordlibrarylist = null;
+    private @Getter @Setter List<CfKeywordlist> filteredKeywordlibrary;
+
+    private @Getter @Setter CfLayoutcontent current_layoutcontent = null;
     
     @Autowired transient CfTemplateService cftemplateService;
     @Autowired transient CfTemplateversionService cftemplateversionService;
@@ -160,9 +209,12 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfSitekeywordlistService cfsitekeywordlistService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfSitelistService cfsitelistService;
+    @Autowired transient CfClassService cfclassService;
     @Autowired transient CfClasscontentService cfclasscontentService;
+    @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired transient CfKeywordlistService cfkeywordlistService;
+    @Autowired CfLayoutcontentService cflayoutcontentService;
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
     @Autowired transient CfPropertyService cfpropertyService;
     @Autowired transient PropertyList propertylist;
@@ -174,6 +226,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
     @Autowired transient FolderUtil folderUtil;
     private SourceIndexer sourceindexer;
+    private @Getter @Setter String iframeurl = "";
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
@@ -213,6 +266,11 @@ public class SiteTreeBean implements Serializable {
         locale = propertymap.get("response_locale");
         contentType = propertymap.get("response_contenttype");
         characterEncoding = propertymap.get("response_characterencoding");
+        contenteditable = false;
+        showContent = false;
+        showDatalist = false;
+        showAssetLibrary = false;
+        showKeywordLibrary = false;
         LOGGER.info("INIT SITETREE END");
     }
     
@@ -333,6 +391,18 @@ public class SiteTreeBean implements Serializable {
         sitesearchrelevant = false;
         sitestatic = false;
         newButtonDisabled = false;
+        contenteditable = false;
+        selected_contentclass = null;
+        selected_datalisttclass = null;
+        selected_asset = null;
+        selected_assetlist = null;
+        selected_keywordlist = null;
+        showContent = false;
+        showDatalist = false;
+        showAsset = false;
+        showAssetLibrary = false;
+        showKeywordLibrary = false;
+        selectedDiv = null;
     }
     
     public void onSelect(NodeSelectEvent event) {
@@ -343,6 +413,58 @@ public class SiteTreeBean implements Serializable {
             CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().longValue());
             int idx = templatelist.getTemplateListe().indexOf(template);
             selectedTemplate = templatelist.getTemplateListe().get(idx);
+            
+            iframeurl = selectedSite.getName() + "?preview=true";
+            
+            selectedDiv = null;
+            showContent = false;
+            showDatalist = false;
+            showAsset = false;
+            showAssetLibrary = false;
+            showKeywordLibrary = false;
+            if (template.isLayout()) {
+                contenteditable = true;
+                FacesMessage message = new FacesMessage("LAYOUT TEMPLATE");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                //List<CfLayoutcontent> layoutcontent = cflayoutcontentService.findBySiteref(selectedSite.getId());
+                layout = new CfLayout(template.getName());
+                Document doc = Jsoup.parse(template.getContent());
+                Elements divs = doc.getElementsByAttribute("template");
+                for (Element div : divs) {
+                    String contents = div.attr("contents");
+                    String datalists = div.attr("datalists");
+                    String assets = div.attr("assets");
+                    String assetlists = div.attr("assetlists");
+                    String keywordlists = div.attr("keywordlists");
+                    CfDiv cfdiv = new CfDiv();
+                    cfdiv.setId(div.attr("id"));
+                    cfdiv.setName(div.attr("template"));
+                    if (!contents.isEmpty()) {
+                        cfdiv.getContentArray().addAll(ClownfishUtil.toList(contents.split(",")));
+                    }
+                    if (!datalists.isEmpty()) {
+                        cfdiv.getContentlistArray().addAll(ClownfishUtil.toList(datalists.split(",")));
+                    }
+                    if (!assets.isEmpty()) {
+                        cfdiv.getAssetArray().addAll(ClownfishUtil.toList(assets.split(",")));
+                    }
+                    if (!assetlists.isEmpty()) {
+                        cfdiv.getAssetlistArray().addAll(ClownfishUtil.toList(assetlists.split(",")));
+                    }
+                    if (!keywordlists.isEmpty()) {
+                        cfdiv.getKeywordlistArray().addAll(ClownfishUtil.toList(keywordlists.split(",")));
+                    }
+                    layout.getDivArray().put(div.attr("id"), cfdiv);
+                }
+            } else {
+                contenteditable = false;
+                selected_contentclass = null;
+                selected_datalisttclass = null;
+                selected_asset = null;
+                selected_assetlist = null;
+                selected_keywordlist = null;
+            }
+            
         } else {
             selectedTemplate = null;
         }
@@ -608,9 +730,21 @@ public class SiteTreeBean implements Serializable {
         }
     }
     
+    public void onPublish(ActionEvent actionEvent) {
+        if (null != selectedSite) {
+            List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiteref(selectedSite.getId());
+            for (CfLayoutcontent layoutcontent : layoutcontentlist) {
+                layoutcontent.setContentref(layoutcontent.getPreview_contentref());
+                cflayoutcontentService.edit(layoutcontent);
+            }
+            FacesMessage message = new FacesMessage("Published " + selectedSite.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
     public void onDeleteStaticSite(ActionEvent actionEvent) {
         if (null != folderUtil.getStatic_folder()) {
-            File file = new File(folderUtil.getStatic_folder() + File.separator +  selectedSite.getName());
+            File file = new File(folderUtil.getStatic_folder() + File.separator + selectedSite.getName());
             try {
                 Files.deleteIfExists(file.toPath());
                 FacesMessage message = new FacesMessage("Deleted static site for " + selectedSite.getName());
@@ -673,9 +807,9 @@ public class SiteTreeBean implements Serializable {
         } else {
             if (sapSupport) {
                 rfcgrouplist = new RFC_GROUP_SEARCH(sapc).getRfcGroupList();
-                for (RfcGroup rfcgroup : rfcgrouplist) {
-                    if (rfcgroup.getName().compareToIgnoreCase(value) == 0 ) {
-                        return rfcgroup;
+                for (RfcGroup rfcGroup : rfcgrouplist) {
+                    if (rfcGroup.getName().compareToIgnoreCase(value) == 0 ) {
+                        return rfcGroup;
                     }
                 }
             }
@@ -694,6 +828,292 @@ public class SiteTreeBean implements Serializable {
                 }
             }
             return null;
+        }
+    }
+    
+    public void onDivSelect(SelectEvent event) {
+        selectedDiv = (CfDiv) event.getObject();
+        if (null != selectedDiv) {
+            showContent = false;
+            showDatalist = false;
+            showAsset = false;
+            showAssetLibrary = false;
+            showKeywordLibrary = false;
+            selectedDivTemplate = cftemplateService.findByName(selectedDiv.getName());
+            selected_contentclass = null;
+            selected_datalisttclass = null;
+            selected_asset = null;
+            selected_assetlist = null;
+            selected_keywordlist = null;
+            current_classcontent = null;
+            current_classcontentlist = null;
+            current_asset = null;
+            current_assetlibrary = null;
+            current_keywordlibrary = null;
+            FacesMessage message = new FacesMessage("DIV selected " + selectedDiv.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public void onChangeLayoutContent() {
+        if (null != selected_contentclass) {
+            current_layoutcontent = null;
+            showContent = true;
+            showDatalist = false;
+            showAsset = false;
+            showAssetLibrary = false;
+            showKeywordLibrary = false;
+            String[] contentinfos = selected_contentclass.split(":");
+            String contentclass = contentinfos[0];
+            CfClass selectedclass = cfclassService.findByName(contentclass);
+            int lfdnr = Integer.parseInt(contentinfos[1]);
+            List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiterefAndTemplaterefAndContenttype(selectedSite.getId(), selectedDivTemplate.getId(), "C");
+            long classcontentref = 0;
+            for (CfLayoutcontent layoutcontent : layoutcontentlist) {
+                if (layoutcontent.getCfLayoutcontentPK().getLfdnr() == lfdnr) {
+                    classcontentref = layoutcontent.getPreview_contentref().longValue();
+                    current_layoutcontent = layoutcontent;
+                }
+            }
+            if (0 != classcontentref) {
+                current_classcontent = cfclasscontentService.findById(classcontentref);
+            }
+            current_classcontentlist = cfclasscontentService.findByClassref(selectedclass);
+            
+            selected_datalisttclass = null;
+            selected_asset = null;
+            selected_assetlist = null;
+            selected_keywordlist = null;
+        }
+    }
+    
+    /**
+     * Selects a Content
+     * @param event
+     */
+    public void onSelectLayoutContent(SelectEvent event) {
+        current_classcontent = (CfClasscontent) event.getObject();
+        if (null != current_classcontent) {
+            if (null == current_layoutcontent) {
+                String[] contentinfos = selected_contentclass.split(":");
+                int lfdnr = Integer.parseInt(contentinfos[1]);
+                current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "C", lfdnr);
+            }
+            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_classcontent.getId()));
+            try {
+                cflayoutcontentService.create(current_layoutcontent);
+            } catch (Exception ex) {
+                cflayoutcontentService.edit(current_layoutcontent);
+            }
+        }
+    }
+    
+    public void onChangeLayoutDatalist() {
+        if (null != selected_datalisttclass) {
+            current_layoutcontent = null;
+            showContent = false;
+            showDatalist = true;
+            showAsset = false;
+            showAssetLibrary = false;
+            showKeywordLibrary = false;
+            String[] datalistinfos = selected_datalisttclass.split(":");
+            String list = datalistinfos[0];
+            CfClass selectedclass = cfclassService.findByName(list);
+            int lfdnr = Integer.parseInt(datalistinfos[1]);
+            List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiterefAndTemplaterefAndContenttype(selectedSite.getId(), selectedDivTemplate.getId(), "DL");
+            long listref = 0;
+            for (CfLayoutcontent layoutcontent : layoutcontentlist) {
+                if (layoutcontent.getCfLayoutcontentPK().getLfdnr() == lfdnr) {
+                    listref = layoutcontent.getPreview_contentref().longValue();
+                    current_layoutcontent = layoutcontent;
+                }
+            }
+            if (0 != listref) {
+                current_list = cflistService.findById(listref);
+            }
+            current_datalist = cflistService.findByClassref(selectedclass);
+            
+            selected_contentclass = null;
+            selected_asset = null;
+            selected_assetlist = null;
+            selected_keywordlist = null;
+        }
+    }
+    
+    /**
+     * Selects a Datalist
+     * @param event
+     */
+    public void onSelectLayoutDatalist(SelectEvent event) {
+        current_list = (CfList) event.getObject();
+        if (null != current_list) {
+            if (null == current_layoutcontent) {
+                String[] datalistinfos = selected_datalisttclass.split(":");
+                int lfdnr = Integer.parseInt(datalistinfos[1]);
+                current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "DL", lfdnr);
+            }
+            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_list.getId()));
+            try {
+                cflayoutcontentService.create(current_layoutcontent);
+            } catch (Exception ex) {
+                cflayoutcontentService.edit(current_layoutcontent);
+            }
+        }
+    }
+    
+    public void onChangeLayoutAsset() {
+        if (null != selected_asset) {
+            current_layoutcontent = null;
+            showContent = false;
+            showDatalist = false;
+            showAsset = true;
+            showAssetLibrary = false;
+            showKeywordLibrary = false;
+            String[] assetinfos = selected_asset.split(":");
+            String name = assetinfos[0];
+            int lfdnr = Integer.parseInt(assetinfos[1]);
+            List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiterefAndTemplaterefAndContenttype(selectedSite.getId(), selectedDivTemplate.getId(), "A");
+            long assetref = 0;
+            for (CfLayoutcontent layoutcontent : layoutcontentlist) {
+                if (layoutcontent.getCfLayoutcontentPK().getLfdnr() == lfdnr) {
+                    assetref = layoutcontent.getPreview_contentref().longValue();
+                    current_layoutcontent = layoutcontent;
+                }
+            }
+            if (0 != assetref) {
+                current_asset = cfassetService.findById(assetref);
+            }
+            current_assetlist = cfassetService.findByScrapped(false);
+            
+            selected_contentclass = null;
+            selected_datalisttclass = null;
+            selected_assetlist = null;
+            selected_keywordlist = null;
+        }
+    }
+    
+    /**
+     * Selects a Asset
+     * @param event
+     */
+    public void onSelectLayoutAsset(SelectEvent event) {
+        current_asset = (CfAsset) event.getObject();
+        if (null != current_asset) {
+            if (null == current_layoutcontent) {
+                String[] assetinfos = selected_asset.split(":");
+                int lfdnr = Integer.parseInt(assetinfos[1]);
+                current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "A", lfdnr);
+            }
+            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_asset.getId()));
+            try {
+                cflayoutcontentService.create(current_layoutcontent);
+            } catch (Exception ex) {
+                cflayoutcontentService.edit(current_layoutcontent);
+            }
+        }
+    }
+    
+    public void onChangeLayoutAssetlibrary() {
+        if (null != selected_assetlist) {
+            current_layoutcontent = null;
+            showContent = false;
+            showDatalist = false;
+            showAsset = false;
+            showAssetLibrary = true;
+            showKeywordLibrary = false;
+            String[] assetlibraryinfos = selected_assetlist.split(":");
+            String assetlist = assetlibraryinfos[0];
+            int lfdnr = Integer.parseInt(assetlibraryinfos[1]);
+            List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiterefAndTemplaterefAndContenttype(selectedSite.getId(), selectedDivTemplate.getId(), "AL");
+            long listref = 0;
+            for (CfLayoutcontent layoutcontent : layoutcontentlist) {
+                if (layoutcontent.getCfLayoutcontentPK().getLfdnr() == lfdnr) {
+                    listref = layoutcontent.getPreview_contentref().longValue();
+                    current_layoutcontent = layoutcontent;
+                }
+            }
+            if (0 != listref) {
+                current_assetlibrary = cfassetlistService.findById(listref);
+            }
+            current_assetlibrarylist = cfassetlistService.findAll();
+            
+            selected_contentclass = null;
+            selected_asset = null;
+            selected_datalisttclass = null;
+            selected_keywordlist = null;
+        }
+    }
+    
+    /**
+     * Selects a Assetlibrary
+     * @param event
+     */
+    public void onSelectLayoutAssetlibrary(SelectEvent event) {
+        current_assetlibrary = (CfAssetlist) event.getObject();
+        if (null != current_assetlibrary) {
+            if (null == current_layoutcontent) {
+                String[] assetlistinfos = selected_assetlist.split(":");
+                int lfdnr = Integer.parseInt(assetlistinfos[1]);
+                current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "AL", lfdnr);
+            }
+            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_assetlibrary.getId()));
+            try {
+                cflayoutcontentService.create(current_layoutcontent);
+            } catch (Exception ex) {
+                cflayoutcontentService.edit(current_layoutcontent);
+            }
+        }
+    }
+    
+    public void onChangeLayoutKeywordlibrary() {
+        if (null != selected_keywordlist) {
+            current_layoutcontent = null;
+            showContent = false;
+            showDatalist = false;
+            showAsset = false;
+            showAssetLibrary = false;
+            showKeywordLibrary = true;
+            String[] keywordlibraryinfos = selected_keywordlist.split(":");
+            String keywordlist = keywordlibraryinfos[0];
+            int lfdnr = Integer.parseInt(keywordlibraryinfos[1]);
+            List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiterefAndTemplaterefAndContenttype(selectedSite.getId(), selectedDivTemplate.getId(), "KL");
+            long listref = 0;
+            for (CfLayoutcontent layoutcontent : layoutcontentlist) {
+                if (layoutcontent.getCfLayoutcontentPK().getLfdnr() == lfdnr) {
+                    listref = layoutcontent.getPreview_contentref().longValue();
+                    current_layoutcontent = layoutcontent;
+                }
+            }
+            if (0 != listref) {
+                current_keywordlibrary = cfkeywordlistService.findById(listref);
+            }
+            current_keywordlibrarylist = cfkeywordlistService.findAll();
+            
+            selected_contentclass = null;
+            selected_asset = null;
+            selected_datalisttclass = null;
+            selected_assetlist = null;
+        }
+    }
+    
+    /**
+     * Selects a Assetlibrary
+     * @param event
+     */
+    public void onSelectLayoutKeywordlibrary(SelectEvent event) {
+        current_keywordlibrary = (CfKeywordlist) event.getObject();
+        if (null != current_keywordlibrary) {
+            if (null == current_layoutcontent) {
+                String[] keywordlistinfos = selected_keywordlist.split(":");
+                int lfdnr = Integer.parseInt(keywordlistinfos[1]);
+                current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "KL", lfdnr);
+            }
+            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_keywordlibrary.getId()));
+            try {
+                cflayoutcontentService.create(current_layoutcontent);
+            } catch (Exception ex) {
+                cflayoutcontentService.edit(current_layoutcontent);
+            }
         }
     }
     

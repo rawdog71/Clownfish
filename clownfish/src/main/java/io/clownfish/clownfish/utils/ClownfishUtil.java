@@ -308,4 +308,17 @@ public class ClownfishUtil {
             }
         }
     }
+    
+    public static List<String> toList(String[] array) {
+        if (null == array) {
+           return new ArrayList(0);
+        } else {
+           int size = array.length;
+           List<String> list = new ArrayList(size);
+           for(int i = 0; i < size; i++) {
+              list.add(array[i]);
+           }
+           return list;
+        }
+    }
 }

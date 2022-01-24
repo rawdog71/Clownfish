@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
-    <version>0.6.2-SNAPSHOT</version>
+    <version>0.7.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
@@ -98,14 +98,14 @@
          <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
-            <version>11.0.0-RC2</version>
+            <version>11.0.0</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>primefaces-extensions</artifactId>
-            <version>11.0.0-RC1</version>
+            <version>11.0.0</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
@@ -342,13 +342,6 @@
             <version>6.17.0</version>
             <scope>compile</scope>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        -->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
@@ -411,13 +404,6 @@
             <scope>compile</scope>
         </dependency>
         
-        <!-- SWAGGER -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>3.0.0</version>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>resources-monacoeditor</artifactId>

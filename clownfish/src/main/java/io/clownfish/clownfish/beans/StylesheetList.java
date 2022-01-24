@@ -293,6 +293,9 @@ public class StylesheetList implements ISourceContentInterface {
                 cfstylesheetService.create(newstylesheet);
                 stylesheetListe = cfstylesheetService.findAll();
                 stylesheetName = "";
+                selectedStylesheet = newstylesheet;
+                onSelect(null);
+                onCheckOut(null);
             } else {
                 FacesMessage message = new FacesMessage("Please enter stylesheet name");
                 FacesContext.getCurrentInstance().addMessage(null, message);

@@ -41,8 +41,6 @@
     </h:head>
     <h:body>
         <h:form id="form" enctype="multipart/form-data">
-            
-            
             <div class="card">
                 <p:toolbar id="tb">
                     <f:facet name="left">
@@ -103,22 +101,21 @@
                         <h:outputText value="Siteoverview"/>
                     </f:facet>
                     
-                    
                     <p:panelGrid>
                         <p:row>
-                            <p:column colspan="12" style="vertical-align: top;">
+                            <p:column colspan="4" style="vertical-align: top;">
                                 <p:scrollPanel style="height: 400px; border: none;" mode="native">
                                     <p:tree id="sitetree" value="#{sitetree.root}" var="node" dynamic="true" selectionMode="single" draggable="true" droppable="true">
                                         <p:ajax event="dragdrop" listener="#{sitetree.onDragDrop}" update=":form:msgs" />
-                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:src_tabview:cssview :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:src_tabview:jsview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist" />
-                                        <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:src_tabview:cssview :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:src_tabview:jsview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist" />
+                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup" />
+                                        <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup" />
                                         <p:treeNode>
                                             <h:outputText value="#{node}" />
                                         </p:treeNode>
                                     </p:tree>
                                 </p:scrollPanel>
                             </p:column>
-                            <p:column colspan="12" style="vertical-align: top;">
+                            <p:column colspan="4" style="vertical-align: top;">
                                 <p:tabView id="tabsiteview">
                                     <p:tab title="Main" id="site_main">
                                         <p:panelGrid id="sitepanel_main">
@@ -134,7 +131,7 @@
                                                 <p:column>
                                                     <p:outputLabel value="Templates" for="@next"/>
                                                     <p:autoComplete id="selecttemplate" dropdown="true" value="#{sitetree.selectedTemplate}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
-                                                        <p:ajax listener="#{sitetree.onChangeTemplate}" update=":form:tabview:src_tabview:templateview" />
+                                                        <p:ajax listener="#{sitetree.onChangeTemplate}" />
                                                     </p:autoComplete>
                                                 </p:column>
                                             </p:row>
@@ -142,7 +139,7 @@
                                                 <p:column>    
                                                     <p:outputLabel value="Stylesheet" for="@next"/>
                                                     <p:autoComplete id="selectstylesheet" dropdown="true" value="#{sitetree.selectedStylesheet}" completeMethod="#{stylesheetList.completeText}" converter="#{stylesheetConverterBean}" scrollHeight="250">
-                                                        <p:ajax listener="#{sitetree.onChangeStylesheet}" update=":form:tabview:src_tabview:cssview" />
+                                                        <p:ajax listener="#{sitetree.onChangeStylesheet}" />
                                                     </p:autoComplete>
                                                 </p:column>
                                             </p:row>
@@ -150,7 +147,7 @@
                                                 <p:column>    
                                                     <p:outputLabel value="Javascript" for="@next"/>
                                                     <p:autoComplete id="selectjavascript" dropdown="true" value="#{sitetree.selectedJavascript}" completeMethod="#{javascriptList.completeText}" converter="#{javascriptConverterBean}" scrollHeight="250">
-                                                        <p:ajax listener="#{sitetree.onChangeJavascript}" update=":form:tabview:src_tabview:jsview" />
+                                                        <p:ajax listener="#{sitetree.onChangeJavascript}" />
                                                     </p:autoComplete>
                                                 </p:column>
                                             </p:row>
@@ -169,7 +166,7 @@
                                             <p:row>
                                                 <p:column>
                                                     <p:outputLabel for="sitelist" value="Datalist:" />
-                                                    <p:selectCheckboxMenu id="sitelist" value="#{sitetree.selectedContentlist}" required="false" label="Datalist" converter="#{sitelistConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                    <p:selectCheckboxMenu id="sitelist" value="#{sitetree.selectedContentlist}" required="false" label="Datalist" converter="#{sitelistConverterBean}" filter="true" filterMatchMode="startsWith" rendered="${!sitetree.contenteditable}">
                                                         <f:selectItems value="#{sitetree.contentlist}" var="contentlist" itemLabel="#{contentlist.name}" itemValue="#{contentlist}" />
                                                     </p:selectCheckboxMenu>
                                                 </p:column>
@@ -177,7 +174,7 @@
                                             <p:row>
                                                 <p:column>
                                                     <p:outputLabel for="classcontentdroplist" value="Contentlist:" />
-                                                    <p:selectCheckboxMenu id="classcontentdroplist" value="#{sitetree.selectedClasscontentlist}" required="false" label="Contentlist" converter="#{classcontentConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                    <p:selectCheckboxMenu id="classcontentdroplist" value="#{sitetree.selectedClasscontentlist}" required="false" label="Contentlist" converter="#{classcontentConverterBean}" filter="true" filterMatchMode="startsWith" rendered="${!sitetree.contenteditable}">
                                                         <f:selectItems value="#{sitetree.classcontentlist}" var="classcontent" itemLabel="#{classcontent.name}" itemValue="#{classcontent}" />
                                                     </p:selectCheckboxMenu>
                                                 </p:column>
@@ -185,7 +182,7 @@
                                             <p:row>
                                                 <p:column>
                                                     <p:outputLabel for="assetlibrarydroplist" value="Assetlibraries:" />
-                                                    <p:selectCheckboxMenu id="assetlibrarydroplist" value="#{sitetree.selectedAssetlist}" required="false" label="Assetlibrary" converter="#{assetlistConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                    <p:selectCheckboxMenu id="assetlibrarydroplist" value="#{sitetree.selectedAssetlist}" required="false" label="Assetlibrary" converter="#{assetlistConverterBean}" filter="true" filterMatchMode="startsWith" rendered="${!sitetree.contenteditable}">
                                                         <f:selectItems value="#{sitetree.assetlist}" var="assetlist" itemLabel="#{assetlist.name}" itemValue="#{assetlist}" />
                                                     </p:selectCheckboxMenu>
                                                 </p:column>
@@ -193,7 +190,7 @@
                                             <p:row>
                                                 <p:column>
                                                     <p:outputLabel for="keywordlibrarydroplist" value="Keywordlists:" />
-                                                    <p:selectCheckboxMenu id="keywordlibrarydroplist" value="#{sitetree.selectedKeywordlist}" required="false" label="Keywordlist" converter="#{keywordlistConverterBean}" filter="true" filterMatchMode="startsWith">
+                                                    <p:selectCheckboxMenu id="keywordlibrarydroplist" value="#{sitetree.selectedKeywordlist}" required="false" label="Keywordlist" converter="#{keywordlistConverterBean}" filter="true" filterMatchMode="startsWith" rendered="${!sitetree.contenteditable}">
                                                         <f:selectItems value="#{sitetree.keywordlist}" var="keywordlist" itemLabel="#{keywordlist.name}" itemValue="#{keywordlist}" />
                                                     </p:selectCheckboxMenu>
                                                 </p:column>
@@ -317,7 +314,7 @@
                                     </p:tab>
                                 </p:tabView>
                                     
-                                <p:panelGrid columns="1">    
+                                <p:panelGrid id="sitebuttongroup" columns="1">    
                                     <p:row>
                                         <p:column>
                                             <p:commandButton id="newsite" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{sitetree.onCreate}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref" disabled="#{sitetree.newButtonDisabled}">
@@ -330,28 +327,120 @@
                                                 <f:actionListener binding="#{quartzlist.refresh()}" />
                                                 <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
+                                            <p:commandButton id="publishSiteButton" icon="pi pi-save" value="Publish" actionListener="#{sitetree.onPublish}" update=":form:msgs" rendered="${sitetree.contenteditable}">
+                                                <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                            </p:commandButton>
                                         </p:column>
                                     </p:row>
+                                </p:panelGrid>
+                            </p:column>
+                            
+                            <p:column colspan="4" style="vertical-align: top;">
+                                <p:panelGrid id="layoutcontentedit" columns="1"> 
+                                    <p:dataTable id="layouttemplatelist" style="width:200px;" size="small" var="layouttemplate" value="#{sitetree.layout.divs}" selectionMode="single" selection="#{sitetree.selectedDiv}" rowKey="#{layouttemplate.name}" rendered="${sitetree.contenteditable}">
+                                        <p:ajax event="rowSelect" listener="#{sitetree.onDivSelect}" update=":form:msgs :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection" />
+                                        <p:column headerText="DIV Template">
+                                            <h:outputText value="#{layouttemplate.name}" />
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:panelGrid>
+                            </p:column>
+                            
+                            <p:column colspan="4" style="vertical-align: top;">
+                                <p:panelGrid id="layoutcontentclassedit" columns="1">
+                                    <p:selectOneMenu id="layoutcontentclass" value="#{sitetree.selected_contentclass}" required="false" rendered="${sitetree.contenteditable and sitetree.selectedDiv.contentArray.size() > 0}">
+                                        <p:ajax listener="#{sitetree.onChangeLayoutContent}" update=":form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection" />
+                                        <f:selectItem itemValue="#{null}" itemLabel="-Contents-" />
+                                        <f:selectItems value="#{sitetree.selectedDiv.contentArray}" />
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu id="layoutdatalistclass" value="#{sitetree.selected_datalisttclass}" required="false" rendered="${sitetree.contenteditable and sitetree.selectedDiv.contentlistArray.size() > 0}">
+                                        <p:ajax listener="#{sitetree.onChangeLayoutDatalist}" update=":form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection" />
+                                        <f:selectItem itemValue="#{null}" itemLabel="-Datalists-" />
+                                        <f:selectItems value="#{sitetree.selectedDiv.contentlistArray}" />
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu id="layoutasset" value="#{sitetree.selected_asset}" required="false" rendered="${sitetree.contenteditable and sitetree.selectedDiv.assetArray.size() > 0}">
+                                        <p:ajax listener="#{sitetree.onChangeLayoutAsset}" update=":form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection" />
+                                        <f:selectItem itemValue="#{null}" itemLabel="-Assets-" />
+                                        <f:selectItems value="#{sitetree.selectedDiv.assetArray}" />
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu id="layoutassetlist" value="#{sitetree.selected_assetlist}" required="false" rendered="${sitetree.contenteditable and sitetree.selectedDiv.assetlistArray.size() > 0}">
+                                        <p:ajax listener="#{sitetree.onChangeLayoutAssetlibrary}" update=":form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection" />
+                                        <f:selectItem itemValue="#{null}" itemLabel="-AssetLists-" />
+                                        <f:selectItems value="#{sitetree.selectedDiv.assetlistArray}" />
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu id="layoutkeywordlist" value="#{sitetree.selected_keywordlist}" required="false" rendered="${sitetree.contenteditable and sitetree.selectedDiv.keywordlistArray.size() > 0}">
+                                        <p:ajax listener="#{sitetree.onChangeLayoutKeywordlibrary}" update=":form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection" />
+                                        <f:selectItem itemValue="#{null}" itemLabel="-KeywordLists-" />
+                                        <f:selectItems value="#{sitetree.selectedDiv.keywordlistArray}" />
+                                    </p:selectOneMenu>
+                                </p:panelGrid>
+                            </p:column>
+                            
+                            <p:column colspan="4" style="vertical-align: top;">
+                                <p:panelGrid id="layoutcontentclassselection" columns="1">
+                                    <p:scrollPanel id="layoutcontentpanel" style="height: 400px; border: none;" mode="native">
+                                        
+                                        <p:dataTable id="layoutclasscontentlist" style="width: 400px" var="classcontent" value="#{sitetree.current_classcontentlist}" 
+                                                     paginator="false" 
+                                                     selectionMode="single" selection="#{sitetree.current_classcontent}" rowKey="#{classcontent.id}"
+                                                     emptyMessage="No content available" filteredValue="#{sitetree.filteredContent}" widgetVar="classcontentlist" rendered="${sitetree.contenteditable and sitetree.showContent}">
+                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutContent}" update=":form:tabview:preview" />
+                                            <p:column headerText="Content" filterBy="#{classcontent.name}" filterMatchMode="contains">
+                                                <h:outputText value="#{classcontent.name}" />
+                                            </p:column>
+                                        </p:dataTable>
+                                        
+                                        <p:dataTable id="layoutdatalist" style="width: 400px" var="datalist" value="#{sitetree.current_datalist}" 
+                                                     paginator="false" 
+                                                     selectionMode="single" selection="#{sitetree.current_list}" rowKey="#{datalist.id}"
+                                                     emptyMessage="No content available" filteredValue="#{sitetree.filteredList}" widgetVar="classcontentdatalist" rendered="${sitetree.contenteditable and sitetree.showDatalist}">
+                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutDatalist}" update=":form:tabview:preview" />
+                                            <p:column headerText="Datalist" filterBy="#{datalist.name}" filterMatchMode="contains">
+                                                <h:outputText value="#{datalist.name}" />
+                                            </p:column>
+                                        </p:dataTable>
+                                        
+                                        <p:dataTable id="layoutassetlistselect" style="width: 400px" var="asset" value="#{sitetree.current_assetlist}" 
+                                                     paginator="false" 
+                                                     selectionMode="single" selection="#{sitetree.current_asset}" rowKey="#{asset.id}"
+                                                     emptyMessage="No content available" filteredValue="#{sitetree.filteredAsset}" widgetVar="classcontentasset" rendered="${sitetree.contenteditable and sitetree.showAsset}">
+                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutAsset}" update=":form:tabview:preview" />
+                                            <p:column headerText="Assets" filterBy="#{asset.name}" filterMatchMode="contains">
+                                                <h:outputText value="#{asset.name}" />
+                                            </p:column>
+                                        </p:dataTable>
+                                        
+                                        <p:dataTable id="layoutassetlibrarylistselect" style="width: 400px" var="assetlibrary" value="#{sitetree.current_assetlibrarylist}" 
+                                                     paginator="false" 
+                                                     selectionMode="single" selection="#{sitetree.current_assetlibrary}" rowKey="#{assetlibrary.id}"
+                                                     emptyMessage="No content available" filteredValue="#{sitetree.filteredAssetlibrary}" widgetVar="classcontentassetlibrary" rendered="${sitetree.contenteditable and sitetree.showAssetLibrary}">
+                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutAssetlibrary}" update=":form:tabview:preview" />
+                                            <p:column headerText="Assetlibraries" filterBy="#{assetlibrary.name}" filterMatchMode="contains">
+                                                <h:outputText value="#{assetlibrary.name}" />
+                                            </p:column>
+                                        </p:dataTable>
+                                        
+                                        <p:dataTable id="layoutkeywordlibrarylistselect" style="width: 400px" var="keywordlibrary" value="#{sitetree.current_keywordlibrarylist}" 
+                                                     paginator="false" 
+                                                     selectionMode="single" selection="#{sitetree.current_keywordlibrary}" rowKey="#{keywordlibrary.id}"
+                                                     emptyMessage="No content available" filteredValue="#{sitetree.filteredKeywordlibrary}" widgetVar="classcontentkeywordlibrary" rendered="${sitetree.contenteditable and sitetree.showKeywordLibrary}">
+                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutKeywordlibrary}" update=":form:tabview:preview" />
+                                            <p:column headerText="Keywordlibraries" filterBy="#{keywordlibrary.name}" filterMatchMode="contains">
+                                                <h:outputText value="#{keywordlibrary.name}" />
+                                            </p:column>
+                                        </p:dataTable>
+                                        
+                                    </p:scrollPanel>
                                 </p:panelGrid>
                             </p:column>
                             
                         </p:row>
                     </p:panelGrid>
                     
-                    <p:panelGrid columns="1">
+                    <p:panelGrid id="preview" columns="1">
                         <p:row>
                             <p:column colspan="12" style="vertical-align: top;">
-                                <p:tabView id="src_tabview">
-                                    <p:tab title="Template" id="src_template">
-                                        <pe:codeMirror id="templateview" mode="#{sitetree.selectedTemplate.scriptLanguageTxt}" theme="ambiance" value="#{sitetree.template}" lineNumbers="true" matchBrackets="true" readonly="true" />
-                                    </p:tab>
-                                    <p:tab title="Stylesheet" id="src_stylesheet">
-                                        <pe:codeMirror id="cssview" mode="css" theme="ambiance" value="#{sitetree.stylesheet}" lineNumbers="true" matchBrackets="true" readonly="true" />
-                                    </p:tab>
-                                    <p:tab title="Javascript" id="src_javascript">
-                                        <pe:codeMirror id="jsview" mode="javascript" theme="ambiance" value="#{sitetree.javascript}" lineNumbers="true" matchBrackets="true" readonly="true" />
-                                    </p:tab>
-                                </p:tabView>
+                                <iframe src="#{sitetree.iframeurl}" height="800" width="1600"></iframe>
                             </p:column>
                         </p:row>
                     </p:panelGrid>
@@ -368,7 +457,7 @@
                         <div class="flex align-items-center pr-2">
                             <p:outputLabel value="Templates" for="@next"/>
                             <p:autoComplete id="templatelist" dropdown="true" value="#{templateList.selectedTemplate}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
-                                <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" />
+                                <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplate :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel :form:tabview:templatelayout" />
                             </p:autoComplete>
                         </div>  
 
@@ -389,7 +478,12 @@
                         </div>
                         
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="newtemplate" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
+                            <p:outputLabel for="templatelayout">Layout</p:outputLabel>
+                            <p:selectBooleanCheckbox id="templatelayout" value="#{templateList.layout}" />
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="newtemplate" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate :form:tabview:edittemplate :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" disabled="#{templateList.newButtonDisabled}" />
                         </div>
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="changetemplate" icon="pi pi-pencil" process="form" value="Change" actionListener="#{templateList.onChange}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
@@ -407,10 +501,10 @@
                     </div>
                     
                     <h:panelGroup id="difftemplateBtnGroup">
-                        <p:commandButton id="savetemplate" icon="pi pi-save" process="form" value="Save" rendered="#{templateList.checkedout}" actionListener="#{templateList.onSave}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
-                        <p:commandButton id="checkintemplate" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{templateList.checkedout}" actionListener="#{templateList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
-                        <p:commandButton id="checkouttemplate" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!templateList.checkedout and templateList.access}" actionListener="#{templateList.onCheckOut}" update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
-                        <p:commandButton id="committemplate" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{templateList.difference and !templateList.checkedout and templateList.access}" actionListener="#{templateList.onCommit}"  update=":form:msgs :form:tabview:src_tabview:templateview :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:selectedtemplateversion">
+                        <p:commandButton id="savetemplate" icon="pi pi-save" process="form" value="Save" rendered="#{templateList.checkedout}" actionListener="#{templateList.onSave}" update=":form:msgs :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
+                        <p:commandButton id="checkintemplate" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{templateList.checkedout}" actionListener="#{templateList.onCheckIn}"  update=":form:msgs :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
+                        <p:commandButton id="checkouttemplate" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!templateList.checkedout and templateList.access}" actionListener="#{templateList.onCheckOut}" update=":form:msgs :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
+                        <p:commandButton id="committemplate" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{templateList.difference and !templateList.checkedout and templateList.access}" actionListener="#{templateList.onCommit}" update=":form:msgs :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:selectedtemplateversion">
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
 
@@ -461,7 +555,7 @@
                         </div>
                         
                         <div class="flex align-items-center pr-2">    
-                            <p:commandButton id="newstylesheet" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
+                            <p:commandButton id="newstylesheet" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:editstylesheet :form:tabview:tabsiteview:selectstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup" disabled="#{stylesheetList.newButtonDisabled}" />
                         </div>
                         
                         <div class="flex align-items-center pr-2">
@@ -481,10 +575,10 @@
                     
                     <h:panelGroup id="diffstylesheetBtnGroup">
                             
-                        <p:commandButton id="savestylesheet" icon="pi pi-save" process="form" value="Save" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onSave}" update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:templateversion :form:tabview:diffstylesheetBtnGroup" />
-                        <p:commandButton id="checkinstylesheet" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
-                        <p:commandButton id="checkoutstylesheet" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCheckOut}" update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
-                        <p:commandButton id="commitstylesheet" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{stylesheetList.difference and !stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCommit}"  update=":form:msgs :form:tabview:src_tabview:cssview :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:selectedstylesheetversion">
+                        <p:commandButton id="savestylesheet" icon="pi pi-save" process="form" value="Save" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onSave}" update=":form:msgs :form:tabview:templateversion :form:tabview:diffstylesheetBtnGroup" />
+                        <p:commandButton id="checkinstylesheet" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onCheckIn}"  update=":form:msgs :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
+                        <p:commandButton id="checkoutstylesheet" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCheckOut}" update=":form:msgs :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
+                        <p:commandButton id="commitstylesheet" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{stylesheetList.difference and !stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCommit}"  update=":form:msgs :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:selectedstylesheetversion">
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                             
@@ -536,7 +630,7 @@
                         </div>
 
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="newjavascript" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{javascriptList.onCreate}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
+                            <p:commandButton id="newjavascript" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{javascriptList.onCreate}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:editjavascript :form:tabview:tabsiteview:selectjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup" disabled="#{javascriptList.newButtonDisabled}" />
                         </div>
 
                         <div class="flex align-items-center pr-2">
@@ -555,10 +649,10 @@
                     </div>
                         
                     <h:panelGroup id="diffjavascriptBtnGroup">
-                        <p:commandButton id="savejavascript" icon="pi pi-save" process="form" value="Save" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onSave}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup" />
-                        <p:commandButton id="checkinjavascript" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onCheckIn}"  update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
-                        <p:commandButton id="checkoutjavascript" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCheckOut}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
-                        <p:commandButton id="commitjavascript" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{javascriptList.difference and !javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCommit}" update=":form:msgs :form:tabview:src_tabview:jsview :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:selectedjavascriptversion">
+                        <p:commandButton id="savejavascript" icon="pi pi-save" process="form" value="Save" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onSave}" update=":form:msgs :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup" />
+                        <p:commandButton id="checkinjavascript" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onCheckIn}"  update=":form:msgs :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
+                        <p:commandButton id="checkoutjavascript" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCheckOut}" update=":form:msgs :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
+                        <p:commandButton id="commitjavascript" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{javascriptList.difference and !javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCommit}" update=":form:msgs :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:selectedjavascriptversion">
                             <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                         

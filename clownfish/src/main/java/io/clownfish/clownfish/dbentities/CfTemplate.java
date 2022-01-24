@@ -71,6 +71,8 @@ public class CfTemplate implements Serializable {
     private int scriptlanguage;
     @Column(name = "checkedoutby")
     private BigInteger checkedoutby;
+    @Column(name = "layout")
+    private boolean layout;
 
     public CfTemplate() {
     }
@@ -124,6 +126,14 @@ public class CfTemplate implements Serializable {
 
     public void setCheckedoutby(BigInteger checkedoutby) {
         this.checkedoutby = checkedoutby;
+    }
+
+    public boolean isLayout() {
+        return layout;
+    }
+
+    public void setLayout(boolean layout) {
+        this.layout = layout;
     }
 
     @Override

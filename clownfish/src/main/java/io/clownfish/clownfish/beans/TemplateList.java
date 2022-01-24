@@ -83,6 +83,7 @@ public class TemplateList implements ISourceContentInterface {
     private @Getter @Setter long checkedoutby = 0;
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
+    private @Getter @Setter boolean layout;
     private @Getter @Setter EditorOptions editorOptions;
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
     @Autowired @Getter @Setter IndexService indexService;
@@ -128,6 +129,7 @@ public class TemplateList implements ISourceContentInterface {
         templateUtility.setTemplateContent("");
         checkedout = false;
         access = false;
+        layout = false;
         editorOptions = new EditorOptions();
         editorOptions.setLanguage("");
         editorOptions.setTheme(ETheme.VS_DARK);
@@ -178,6 +180,7 @@ public class TemplateList implements ISourceContentInterface {
             checkoutUtil.getCheckoutAccess(co, loginbean);
             checkedout = checkoutUtil.isCheckedout();
             access = checkoutUtil.isAccess();
+            layout = selectedTemplate.isLayout();
             templateversionMin = 1;
             templateversionMax = versionlist.size();
             selectedtemplateversion = templateversionMax;
@@ -193,6 +196,7 @@ public class TemplateList implements ISourceContentInterface {
         if (null != selectedTemplate) {
             selectedTemplate.setScriptlanguage(templateScriptLanguage);
             selectedTemplate.setContent(getContent());
+            selectedTemplate.setLayout(layout);
             cftemplateService.edit(selectedTemplate);
             difference = templateUtility.hasDifference(selectedTemplate);
             
@@ -311,9 +315,12 @@ public class TemplateList implements ISourceContentInterface {
                 newtemplate.setName(templateName);
                 newtemplate.setContent("//"+templateName);
                 newtemplate.setScriptlanguage(templateScriptLanguage);
+                newtemplate.setLayout(layout);
                 cftemplateService.create(newtemplate);
                 templateListe = cftemplateService.findAll();
                 templateName = "";
+                selectedTemplate = newtemplate;
+                onSelect(null);
             } else {
                 FacesMessage message = new FacesMessage("Please enter template name");
                 FacesContext.getCurrentInstance().addMessage(null, message);
@@ -382,6 +389,7 @@ public class TemplateList implements ISourceContentInterface {
         if (null != selectedTemplate) {
             selectedTemplate.setScriptlanguage(templateScriptLanguage);
             selectedTemplate.setName(templateName);
+            selectedTemplate.setLayout(layout);
             cftemplateService.edit(selectedTemplate);
             difference = templateUtility.hasDifference(selectedTemplate);
             refresh();

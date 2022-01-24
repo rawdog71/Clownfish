@@ -15,9 +15,9 @@
  */
 package io.clownfish.clownfish.serviceimpl;
 
-import io.clownfish.clownfish.daointerface.CfSitecontentDAO;
-import io.clownfish.clownfish.dbentities.CfSitecontent;
-import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
+import io.clownfish.clownfish.daointerface.CfLayoutcontentDAO;
+import io.clownfish.clownfish.dbentities.CfLayoutcontent;
+import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,41 +29,46 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class CfSitecontentServiceImpl implements CfSitecontentService {
-    private final CfSitecontentDAO cfsitecontentDAO;
+public class CfLayoutcontentServiceImpl implements CfLayoutcontentService {
+    private final CfLayoutcontentDAO cfsitecontentDAO;
     
     @Autowired
-    public CfSitecontentServiceImpl(CfSitecontentDAO cfsitecontentDAO) {
+    public CfLayoutcontentServiceImpl(CfLayoutcontentDAO cfsitecontentDAO) {
         this.cfsitecontentDAO = cfsitecontentDAO;
     }
 
     @Override
-    public List<CfSitecontent> findAll() {
+    public List<CfLayoutcontent> findAll() {
         return this.cfsitecontentDAO.findAll();
     }
     
     @Override
-    public List<CfSitecontent> findBySiteref(Long ref) {
+    public List<CfLayoutcontent> findBySiteref(Long ref) {
         return this.cfsitecontentDAO.findBySiteref(ref);
+    }
+    
+    @Override
+    public List<CfLayoutcontent> findBySiterefAndTemplateref(Long ref, Long templateref) {
+        return this.cfsitecontentDAO.findBySiterefAndTemplateref(ref, templateref);
+    }
+    
+    @Override
+    public List<CfLayoutcontent> findBySiterefAndTemplaterefAndContenttype(Long ref, Long templateref, String contenttype) {
+        return this.cfsitecontentDAO.findBySiterefAndTemplaterefAndContenttype(ref, templateref, contenttype);
     }
 
     @Override
-    public CfSitecontent create(CfSitecontent entity) {
+    public CfLayoutcontent create(CfLayoutcontent entity) {
         return this.cfsitecontentDAO.create(entity);
     }
 
     @Override
-    public boolean delete(CfSitecontent entity) {
+    public boolean delete(CfLayoutcontent entity) {
         return this.cfsitecontentDAO.delete(entity);
     }
 
     @Override
-    public CfSitecontent edit(CfSitecontent entity) {
+    public CfLayoutcontent edit(CfLayoutcontent entity) {
         return this.cfsitecontentDAO.edit(entity);
-    }
-
-    @Override
-    public List<CfSitecontent> findByClasscontentref(Long ref) {
-        return this.cfsitecontentDAO.findByClasscontentref(ref);
     }
 }

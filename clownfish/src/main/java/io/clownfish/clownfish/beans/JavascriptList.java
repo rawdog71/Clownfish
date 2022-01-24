@@ -292,6 +292,8 @@ public class JavascriptList implements ISourceContentInterface {
                 cfjavascriptService.create(newjavascript);
                 javascriptListe = cfjavascriptService.findAll();
                 javascriptName = "";
+                selectedJavascript = newjavascript;
+                onSelect(null);
             } else {
                 FacesMessage message = new FacesMessage("Please enter javascript name");
                 FacesContext.getCurrentInstance().addMessage(null, message);

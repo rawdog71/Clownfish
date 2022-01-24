@@ -66,11 +66,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.util.DefaultPropertiesPersister;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  *
@@ -84,7 +79,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableCaching
 @ServletComponentScan
 @EnableWebMvc
-@EnableSwagger2
 @EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class})
 @PropertySources({
     @PropertySource("file:application.properties")
@@ -106,6 +100,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             SpringApplication.run(Main.class, args);
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
+            LOGGER.info("Check database or other Clownfish instance");
         }
     }
 
@@ -190,15 +185,6 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         configurer.setUseTrailingSlashMatch(true);
     }
     
-    @Bean
-    public Docket productApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.any())              
-                .paths(PathSelectors.any())
-                .build();
-    }
-
     /**
      * Checks the applications.properties file and runs the bootstrap routine when the bootstrap parameter is set to 1
      * Fetches the database (MySQL) parameters from applications.properties and runs the sql-bootstrap.sql script

@@ -110,6 +110,29 @@ public class SiteUtil {
         return sitecontentmap;
     }
     
+    public Map getSitelist_list(List<CfList> sitelist, Map sitecontentmap) {
+        if (!sitelist.isEmpty()) {
+            for (CfList cflist : sitelist) {
+                Map listcontentmap = new LinkedHashMap();
+
+                List<CfListcontent> contentlist = cflistcontentService.findByListref(cflist.getId());
+                for (CfListcontent listcontent : contentlist) {
+                    CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                    cfclassService.findById(classcontent.getClassref().getId());
+                    List<CfAttributcontent> attributcontentlist = new ArrayList<>();
+                    attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
+                    if (0 == useHibernate) {
+                        listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
+                    } else {
+                        listcontentmap.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId()));
+                    }
+                }
+                sitecontentmap.put(cflist.getName(), listcontentmap);
+            }
+        }
+        return sitecontentmap;
+    }
+    
     public Map getSitecontentmapList(List<CfSitecontent> sitecontentlist) {
         Map sitecontentmapdummy = new LinkedHashMap();
         for (CfSitecontent sitecontent : sitecontentlist) {
@@ -124,6 +147,24 @@ public class SiteUtil {
                 }
             } else {
                 LOGGER.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + sitecontent.getCfSitecontentPK().getClasscontentref());
+            }
+        }
+        return sitecontentmapdummy;
+    }
+    
+    public Map getClasscontentmapList(List<CfClasscontent> classcontentlist) {
+        Map sitecontentmapdummy = new LinkedHashMap();
+        for (CfClasscontent classcontent : classcontentlist) {
+            if (null != classcontent) {
+                List<CfAttributcontent> attributcontentlist = new ArrayList<>();
+                attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
+                if (0 == useHibernate) {
+                    sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
+                } else {
+                    sitecontentmapdummy.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId()));
+                }
+            } else {
+                LOGGER.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + classcontent.getId());
             }
         }
         return sitecontentmapdummy;
@@ -154,6 +195,27 @@ public class SiteUtil {
         return sitecontentmap;
     }
     
+
+    public Map getAssetlibrary(List<CfAssetlist> assetlibrary_list, Map sitecontentmap) {
+        HashMap<String, ArrayList> assetlibraryMap = new HashMap<>();
+        for (CfAssetlist cfassetlist : assetlibrary_list) {
+            List<CfAssetlistcontent> assetlist = new ArrayList<>();
+            assetlist.addAll(cfassetlistcontentService.findByAssetlistref(cfassetlist.getId()));
+            ArrayList<CfAsset> dummyassetlist = new ArrayList<>();
+            for (CfAssetlistcontent assetcontent : assetlist) {
+                CfAsset asset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
+                if (null != asset) {
+                    dummyassetlist.add(asset);
+                } else {
+                    LOGGER.warn("ASSET NOT FOUND (deleted or on scrapyard): " + assetcontent.getCfAssetlistcontentPK().getAssetref());
+                }
+            }
+            assetlibraryMap.put(cfassetlist.getName(), dummyassetlist);
+        }
+        sitecontentmap.put("AssetLibrary", assetlibraryMap);
+        return sitecontentmap;
+    }
+    
     public Map getSiteKeywordlibrary(CfSite cfsite, Map sitecontentmap) {
         List<CfSitekeywordlist> sitekeywordlibrary = new ArrayList<>();
         sitekeywordlibrary.addAll(cfsitekeywordlistService.findBySiteref(cfsite.getId()));
@@ -161,6 +223,22 @@ public class SiteUtil {
         HashMap<String, ArrayList> keywordlibraryMap = new HashMap<>();
         for (CfSitekeywordlist sitekeywordlist : sitekeywordlibrary) {
             CfKeywordlist cfkeywordlist = cfkeywordlistService.findById(sitekeywordlist.getCfSitekeywordlistPK().getKeywordlistref());
+            List<CfKeywordlistcontent> keywordlist = new ArrayList<>();
+            keywordlist.addAll(cfkeywordlistcontentService.findByKeywordlistref(cfkeywordlist.getId()));
+            ArrayList<CfKeyword> dummykeywordlist = new ArrayList<>();
+            for (CfKeywordlistcontent keywordcontent : keywordlist) {
+                CfKeyword keyword = cfkeywordService.findById(keywordcontent.getCfKeywordlistcontentPK().getKeywordref());
+                dummykeywordlist.add(keyword);
+            }
+            keywordlibraryMap.put(cfkeywordlist.getName(), dummykeywordlist);
+        }
+        sitecontentmap.put("KeywordLibrary", keywordlibraryMap);
+        return sitecontentmap;
+    }
+    
+    public Map getSiteKeywordlibrary(List<CfKeywordlist> keywordlibrary_list, Map sitecontentmap) {
+        HashMap<String, ArrayList> keywordlibraryMap = new HashMap<>();
+        for (CfKeywordlist cfkeywordlist : keywordlibrary_list) {
             List<CfKeywordlistcontent> keywordlist = new ArrayList<>();
             keywordlist.addAll(cfkeywordlistcontentService.findByKeywordlistref(cfkeywordlist.getId()));
             ArrayList<CfKeyword> dummykeywordlist = new ArrayList<>();
