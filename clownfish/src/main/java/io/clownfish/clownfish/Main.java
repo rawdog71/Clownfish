@@ -252,6 +252,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             File bootstrapDirectory = new File(path);
             
             File[] files = bootstrapDirectory.listFiles();
+            Arrays.sort(files);
             for (int i = 0; i < files.length; i++) {
                 if (files[i].getName().startsWith("bootstrap_")) {
                     InputStream is = null;

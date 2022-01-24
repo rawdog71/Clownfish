@@ -60,6 +60,11 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
+import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
+import org.primefaces.extensions.model.monacoeditor.ETheme;
+import org.primefaces.extensions.model.monacoeditor.EditorOptions;
+import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
 import org.primefaces.model.DualListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,6 +140,7 @@ public class ContentList implements Serializable {
     private List<CfClasscontentkeyword> contentkeywordlist;
     private @Getter @Setter List<CfAsset> assetlist;
     private @Getter @Setter String contentJson;
+    private @Getter @Setter EditorOptions editorOptions;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ContentList.class);
 
@@ -164,6 +170,11 @@ public class ContentList implements Serializable {
         keywordTarget = new ArrayList<>();
         
         keywords = new DualListModel<>(keywordSource, keywordTarget);
+        
+        editorOptions = new EditorOptions();
+        editorOptions.setLanguage("markdown");
+        editorOptions.setTheme(ETheme.VS_DARK);
+        editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
         LOGGER.info("INIT CONTENTLIST END");
     }
     
@@ -226,12 +237,14 @@ public class ContentList implements Serializable {
                 break;
             case "htmltext":
                 isHTMLTextType = true;
+                editorOptions.setLanguage("html");
                 break;    
             case "text":
                 isTextType = true;
                 break;
             case "markdown":
                 isMarkdownType = true;
+                editorOptions.setLanguage("markdown");
                 break;    
             case "datetime":
                 isDatetimeType = true;
