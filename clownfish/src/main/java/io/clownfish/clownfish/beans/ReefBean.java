@@ -67,6 +67,7 @@ public class ReefBean implements Serializable {
     @Autowired transient CfJavascriptService cfjavascriptService;
     @Autowired transient CfJavaService cfjavaService;
     @Autowired transient CfAttributService cfattributService;
+    @Autowired transient ClassList cl;
     @Autowired transient TemplateList tl;
     @Autowired transient JavascriptList jl;
     @Autowired transient StylesheetList sl;
@@ -157,23 +158,35 @@ public class ReefBean implements Serializable {
     private String reefcheck(Reef chkreef) {
         String reefchk = "";
         reefchk += chkreef.getName();
-        for (CfClass cfclass : chkreef.getClasslist()) {
-            reefchk += cfclass.getName();
+        if (null != chkreef.getClasslist()) {
+            for (CfClass cfclass : chkreef.getClasslist()) {
+                reefchk += cfclass.getName();
+            }
         }
-        for (CfAttribut cfattribut : chkreef.getAttributlist()) {
-            reefchk += cfattribut.getName()+cfattribut.getAttributetype().getName();
+        if (null != chkreef.getAttributlist()) {
+            for (CfAttribut cfattribut : chkreef.getAttributlist()) {
+                reefchk += cfattribut.getName()+cfattribut.getAttributetype().getName();
+            }
         }
-        for (CfTemplate cftemplate : chkreef.getTemplatelist()) {
-            reefchk += cftemplate.getName()+cftemplate.getContent()+cftemplate.getScriptLanguageTxt();
+        if (null != chkreef.getTemplatelist()) {
+            for (CfTemplate cftemplate : chkreef.getTemplatelist()) {
+                reefchk += cftemplate.getName()+cftemplate.getContent()+cftemplate.getScriptLanguageTxt();
+            }
         }
-        for (CfJavascript cfjavascript : chkreef.getJavascriptlist()) {
-            reefchk += cfjavascript.getName()+cfjavascript.getContent();
+        if (null != chkreef.getJavascriptlist()) {
+            for (CfJavascript cfjavascript : chkreef.getJavascriptlist()) {
+                reefchk += cfjavascript.getName()+cfjavascript.getContent();
+            }
         }
-        for (CfJava cfjava : chkreef.getJavalist()) {
-            reefchk += cfjava.getName()+cfjava.getContent();
+        if (null != chkreef.getJavalist()) {
+            for (CfJava cfjava : chkreef.getJavalist()) {
+                reefchk += cfjava.getName()+cfjava.getContent();
+            }
         }
-        for (CfStylesheet cfstylesheet : chkreef.getStylesheetlist()) {
-            reefchk += cfstylesheet.getName()+cfstylesheet.getContent();
+        if (null != chkreef.getStylesheetlist()) {
+            for (CfStylesheet cfstylesheet : chkreef.getStylesheetlist()) {
+                reefchk += cfstylesheet.getName()+cfstylesheet.getContent();
+            }
         }
         return reefchk;
     }
@@ -183,125 +196,137 @@ public class ReefBean implements Serializable {
     }
 
     private void importReef(Reef importreef) {
-        for (CfClass cfclass : importreef.getClasslist()) {
-            try {
-                CfClass checkclass = cfclassService.findByName(cfclass.getName());
-                LOGGER.error("CLASS {} already exists.", cfclass.getName());
-            } catch (NoResultException ex) {
-                long oldid = cfclass.getId();
-                cfclass.setId(null);
-                cfclassService.create(cfclass);
-                reorgAttributs(importreef, oldid, cfclass);
+        if (null != importreef.getClasslist()) {
+            for (CfClass cfclass : importreef.getClasslist()) {
+                try {
+                    CfClass checkclass = cfclassService.findByName(cfclass.getName());
+                    LOGGER.error("CLASS {} already exists.", cfclass.getName());
+                } catch (NoResultException ex) {
+                    long oldid = cfclass.getId();
+                    cfclass.setId(null);
+                    cfclassService.create(cfclass);
+                    reorgAttributs(importreef, oldid, cfclass);
+                }
             }
+            cl.onRefreshAll();
         }
         
-        for (CfTemplate cftemplate : importreef.getTemplatelist()) {
-            try {
-                CfTemplate checktemplate = cftemplateService.findByName(cftemplate.getName());
-                LOGGER.error("TEMPLATE {} already exists.", cftemplate.getName());
-            } catch (NoResultException ex) {
-                cftemplate.setId(null);
-                cftemplate = cftemplateService.create(cftemplate);
-                
-                templateUtil.setTemplateContent(cftemplate.getContent());
-
-                String content = templateUtil.getTemplateContent();
-                byte[] output = null;
+        if (null != importreef.getTemplatelist()) {
+            for (CfTemplate cftemplate : importreef.getTemplatelist()) {
                 try {
-                    output = CompressionUtils.compress(content.getBytes("UTF-8"));
-                } catch (UnsupportedEncodingException ex1) {
-                    LOGGER.error(ex1.getMessage());
-                } catch (IOException ex1) {
-                    LOGGER.error(ex1.getMessage());
+                    CfTemplate checktemplate = cftemplateService.findByName(cftemplate.getName());
+                    LOGGER.error("TEMPLATE {} already exists.", cftemplate.getName());
+                } catch (NoResultException ex) {
+                    cftemplate.setId(null);
+                    cftemplate = cftemplateService.create(cftemplate);
+
+                    templateUtil.setTemplateContent(cftemplate.getContent());
+
+                    String content = templateUtil.getTemplateContent();
+                    byte[] output = null;
+                    try {
+                        output = CompressionUtils.compress(content.getBytes("UTF-8"));
+                    } catch (UnsupportedEncodingException ex1) {
+                        LOGGER.error(ex1.getMessage());
+                    } catch (IOException ex1) {
+                        LOGGER.error(ex1.getMessage());
+                    }
+
+                    templateUtil.setCurrentVersion(1);
+                    templateUtil.writeVersion(cftemplate.getId(), templateUtil.getCurrentVersion(), output, 0);
                 }
-
-                templateUtil.setCurrentVersion(1);
-                templateUtil.writeVersion(cftemplate.getId(), templateUtil.getCurrentVersion(), output, 0);
             }
+            tl.refresh();
         }
-        tl.refresh();
-        for (CfJavascript cfjavascript : importreef.getJavascriptlist()) {
-            try {
-                CfJavascript checkjavascript = cfjavascriptService.findByName(cfjavascript.getName());
-                LOGGER.error("JAVASCRIPT {} already exists.", cfjavascript.getName());
-            } catch (NoResultException ex) {
-                cfjavascript.setId(null);
-                cfjavascript = cfjavascriptService.create(cfjavascript);
-                
-                javascriptUtil.setJavascriptContent(cfjavascript.getContent());
-
-                String content = javascriptUtil.getJavascriptContent();
-                byte[] output = null;
+        
+        if (null != importreef.getJavascriptlist()) {
+            for (CfJavascript cfjavascript : importreef.getJavascriptlist()) {
                 try {
-                    output = CompressionUtils.compress(content.getBytes("UTF-8"));
-                } catch (UnsupportedEncodingException ex1) {
-                    LOGGER.error(ex1.getMessage());
-                } catch (IOException ex1) {
-                    LOGGER.error(ex1.getMessage());
+                    CfJavascript checkjavascript = cfjavascriptService.findByName(cfjavascript.getName());
+                    LOGGER.error("JAVASCRIPT {} already exists.", cfjavascript.getName());
+                } catch (NoResultException ex) {
+                    cfjavascript.setId(null);
+                    cfjavascript = cfjavascriptService.create(cfjavascript);
+
+                    javascriptUtil.setJavascriptContent(cfjavascript.getContent());
+
+                    String content = javascriptUtil.getJavascriptContent();
+                    byte[] output = null;
+                    try {
+                        output = CompressionUtils.compress(content.getBytes("UTF-8"));
+                    } catch (UnsupportedEncodingException ex1) {
+                        LOGGER.error(ex1.getMessage());
+                    } catch (IOException ex1) {
+                        LOGGER.error(ex1.getMessage());
+                    }
+
+                    javascriptUtil.setCurrentVersion(1);
+                    javascriptUtil.writeVersion(cfjavascript.getId(), javascriptUtil.getCurrentVersion(), output, 0);
                 }
-
-                javascriptUtil.setCurrentVersion(1);
-                javascriptUtil.writeVersion(cfjavascript.getId(), javascriptUtil.getCurrentVersion(), output, 0);
             }
+            jl.refresh();
         }
-        jl.refresh();
 
-        for (CfJava cfjava : importreef.getJavalist())
-        {
-            try
+        if (null != importreef.getJavalist()) {
+            for (CfJava cfjava : importreef.getJavalist())
             {
-                CfJava checkjava = cfjavaService.findByName(cfjava.getName());
-                LOGGER.error("JAVA {} already exists.", cfjava.getName());
-            }
-            catch (NoResultException ex)
-            {
-                cfjava.setId(null);
-                cfjava = cfjavaService.create(cfjava);
-
-                javaUtil.setJavaContent(cfjava.getContent());
-
-                String content = javaUtil.getJavaContent();
-                byte[] output = null;
                 try
                 {
-                    output = CompressionUtils.compress(content.getBytes(StandardCharsets.UTF_8));
+                    CfJava checkjava = cfjavaService.findByName(cfjava.getName());
+                    LOGGER.error("JAVA {} already exists.", cfjava.getName());
                 }
-                catch (IOException ex1)
+                catch (NoResultException ex)
                 {
-                    LOGGER.error(ex1.getMessage());
+                    cfjava.setId(null);
+                    cfjava = cfjavaService.create(cfjava);
+
+                    javaUtil.setJavaContent(cfjava.getContent());
+
+                    String content = javaUtil.getJavaContent();
+                    byte[] output = null;
+                    try
+                    {
+                        output = CompressionUtils.compress(content.getBytes(StandardCharsets.UTF_8));
+                    }
+                    catch (IOException ex1)
+                    {
+                        LOGGER.error(ex1.getMessage());
+                    }
+
+                    javaUtil.setCurrentVersion(1);
+                    javaUtil.writeVersion(cfjava.getId(), javaUtil.getCurrentVersion(), output, 0);
                 }
-
-                javaUtil.setCurrentVersion(1);
-                javaUtil.writeVersion(cfjava.getId(), javaUtil.getCurrentVersion(), output, 0);
             }
+            javaList.refresh();
         }
-        javaList.refresh();
 
-        for (CfStylesheet cfstylesheet : importreef.getStylesheetlist()) {
-            try {
-                CfStylesheet checkstylesheet = cfstylesheetService.findByName(cfstylesheet.getName());
-                LOGGER.error("STYLESHEET {} already exists.", cfstylesheet.getName());
-            } catch (NoResultException ex) {
-                cfstylesheet.setId(null);
-                cfstylesheet = cfstylesheetService.create(cfstylesheet);
-                
-                stylesheetUtil.setStyelsheetContent(cfstylesheet.getContent());
-
-                String content = stylesheetUtil.getStyelsheetContent();
-                byte[] output = null;
+        if (null != importreef.getStylesheetlist()) {
+            for (CfStylesheet cfstylesheet : importreef.getStylesheetlist()) {
                 try {
-                    output = CompressionUtils.compress(content.getBytes("UTF-8"));
-                } catch (UnsupportedEncodingException ex1) {
-                    LOGGER.error(ex1.getMessage());
-                } catch (IOException ex1) {
-                    LOGGER.error(ex1.getMessage());
-                }
+                    CfStylesheet checkstylesheet = cfstylesheetService.findByName(cfstylesheet.getName());
+                    LOGGER.error("STYLESHEET {} already exists.", cfstylesheet.getName());
+                } catch (NoResultException ex) {
+                    cfstylesheet.setId(null);
+                    cfstylesheet = cfstylesheetService.create(cfstylesheet);
 
-                stylesheetUtil.setCurrentVersion(1);
-                stylesheetUtil.writeVersion(cfstylesheet.getId(), stylesheetUtil.getCurrentVersion(), output, 0);
+                    stylesheetUtil.setStyelsheetContent(cfstylesheet.getContent());
+
+                    String content = stylesheetUtil.getStyelsheetContent();
+                    byte[] output = null;
+                    try {
+                        output = CompressionUtils.compress(content.getBytes("UTF-8"));
+                    } catch (UnsupportedEncodingException ex1) {
+                        LOGGER.error(ex1.getMessage());
+                    } catch (IOException ex1) {
+                        LOGGER.error(ex1.getMessage());
+                    }
+
+                    stylesheetUtil.setCurrentVersion(1);
+                    stylesheetUtil.writeVersion(cfstylesheet.getId(), stylesheetUtil.getCurrentVersion(), output, 0);
+                }
             }
+            sl.refresh();
         }
-        sl.refresh();
     }
 
     private void reorgAttributs(Reef importreef, Long oldid, CfClass newclass) {
