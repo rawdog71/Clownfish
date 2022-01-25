@@ -874,7 +874,7 @@ public class Clownfish {
             clownfishutil.addUrlParams(parametermap, urlParams);
             
             preview = false;
-            if (parametermap.containsKey("preview")) {    // check mode for display (staging or dev)
+            if (parametermap.containsKey("preview")) {    // check mode for display (preview or productive)
                 if (parametermap.get("preview").toString().compareToIgnoreCase("true") == 0) {
                     preview = true;
                 }
@@ -959,7 +959,7 @@ public class Clownfish {
                         // fetch the dependend template
                         boolean isScripted = false;
                         switch (cftemplate.getScriptlanguage()) {
-                            case 0:
+                            case 0:                                     // FREEMARKER
                                 fmRoot = new LinkedHashMap();
                                 freemarkerTemplateloader.setModus(modus);
 
@@ -972,7 +972,7 @@ public class Clownfish {
                                 fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
                                 isScripted = true;
                                 break;
-                            case 1:
+                            case 1:                                     // VELOCITY
                                 velContext = new org.apache.velocity.VelocityContext();
 
                                 velTemplate = new org.apache.velocity.Template();
@@ -1400,6 +1400,12 @@ public class Clownfish {
                                         content = replacePlaceholders(content, cfdiv, layoutcontent);
                                         content = interpretscript(content, cfdivtemplate, cfstylesheet, cfjavascript, parametermap);
                                         //System.out.println(out);
+                                        div.removeAttr("template");
+                                        div.removeAttr("contents");
+                                        div.removeAttr("datalists");
+                                        div.removeAttr("assets");
+                                        div.removeAttr("assetlists");
+                                        div.removeAttr("keywordlists");
                                         div.html(content);
                                     }
                                     cflayout.getDivArray().put(div.attr("id"), cfdiv);
@@ -1855,122 +1861,116 @@ public class Clownfish {
     private String replacePlaceholders(String content, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
         // replace Content
         for (String c : cfdiv.getContentArray()) {
-            for (CfLayoutcontent lc : layoutcontent) {
-                if (0 == lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C")) {
-                    CfClasscontent cfcontent = null;
-                    if (preview) {
-                        if (lc.getPreview_contentref().longValue() > 0) {
-                            cfcontent = cfclasscontentService.findById(lc.getPreview_contentref().longValue());
-                        }
-                    } else {
-                        if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
-                            cfcontent = cfclasscontentService.findById(lc.getContentref().longValue());
-                        }
+            List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
+            for (CfLayoutcontent lc : contentlist) {
+                CfClasscontent cfcontent = null;
+                if (preview) {
+                    if (lc.getPreview_contentref().longValue() > 0) {
+                        cfcontent = cfclasscontentService.findById(lc.getPreview_contentref().longValue());
                     }
-                    String[] cs = c.split(":");
-                    if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
-                        String replacefilter = "#C:" + c + "#";
-                        if (null != cfcontent) {
-                            content = content.replaceAll(replacefilter, cfcontent.getName());
-                        }
+                } else {
+                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
+                        cfcontent = cfclasscontentService.findById(lc.getContentref().longValue());
+                    }
+                }
+                String[] cs = c.split(":");
+                if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
+                    String replacefilter = "#C:" + c + "#";
+                    if (null != cfcontent) {
+                        content = content.replaceAll(replacefilter, cfcontent.getName());
                     }
                 }
             }
         }
         // replace Datalists
         for (String c : cfdiv.getContentlistArray()) {
-            for (CfLayoutcontent lc : layoutcontent) {
-                if (0 == lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("DL")) {
-                    CfList cflist = null;
-                    if (preview) {
-                        if (lc.getPreview_contentref().longValue() > 0) {
-                            cflist = cflistService.findById(lc.getPreview_contentref().longValue());
-                        }
-                    } else {
-                        if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
-                            cflist = cflistService.findById(lc.getContentref().longValue());
-                        }
+            List<CfLayoutcontent> datalist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("DL") == 0).collect(Collectors.toList());
+            for (CfLayoutcontent lc : datalist) {
+                CfList cflist = null;
+                if (preview) {
+                    if (lc.getPreview_contentref().longValue() > 0) {
+                        cflist = cflistService.findById(lc.getPreview_contentref().longValue());
                     }
-                    String[] cs = c.split(":");
-                    if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
-                        String replacefilter = "#DL:" + c + "#";
-                        if (null != cflist) {
-                            content = content.replaceAll(replacefilter, cflist.getName());
-                        }
+                } else {
+                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
+                        cflist = cflistService.findById(lc.getContentref().longValue());
+                    }
+                }
+                String[] cs = c.split(":");
+                if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
+                    String replacefilter = "#DL:" + c + "#";
+                    if (null != cflist) {
+                        content = content.replaceAll(replacefilter, cflist.getName());
                     }
                 }
             }
         }
         // replace Assets
         for (String c : cfdiv.getAssetArray()) {
-            for (CfLayoutcontent lc : layoutcontent) {
-                if (0 == lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("A")) {
-                    CfAsset cfasset = null;
-                    if (preview) {
-                        if (lc.getPreview_contentref().longValue() > 0) {
-                            cfasset = cfassetService.findById(lc.getPreview_contentref().longValue());
-                        }
-                    } else {
-                        if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
-                            cfasset = cfassetService.findById(lc.getContentref().longValue());
-                        }
+            List<CfLayoutcontent> assets = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("A") == 0).collect(Collectors.toList());
+            for (CfLayoutcontent lc : assets) {
+                CfAsset cfasset = null;
+                if (preview) {
+                    if (lc.getPreview_contentref().longValue() > 0) {
+                        cfasset = cfassetService.findById(lc.getPreview_contentref().longValue());
                     }
-                    String replacefilter = "#A:" + c + "#";
-                    if (null != cfasset) {
-                        content = content.replaceAll(replacefilter, cfasset.getId().toString());
+                } else {
+                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
+                        cfasset = cfassetService.findById(lc.getContentref().longValue());
                     }
+                }
+                String replacefilter = "#A:" + c + "#";
+                if (null != cfasset) {
+                    content = content.replaceAll(replacefilter, cfasset.getId().toString());
                 }
             }
         }
         // replace Assetlists
         for (String c : cfdiv.getAssetlistArray()) {
-            for (CfLayoutcontent lc : layoutcontent) {
-                if (0 == lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("AL")) {
-                    CfAssetlist cfassetlist = null;
-                    if (preview) {
-                        if (lc.getPreview_contentref().longValue() > 0) {
-                            cfassetlist = cfassetlistService.findById(lc.getPreview_contentref().longValue());
-                        }
-                    } else {
-                        if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
-                            cfassetlist = cfassetlistService.findById(lc.getContentref().longValue());
-                        }
+            List<CfLayoutcontent> assetlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("AL") == 0).collect(Collectors.toList());
+            for (CfLayoutcontent lc : assetlist) {
+                CfAssetlist cfassetlist = null;
+                if (preview) {
+                    if (lc.getPreview_contentref().longValue() > 0) {
+                        cfassetlist = cfassetlistService.findById(lc.getPreview_contentref().longValue());
                     }
-                    String[] cs = c.split(":");
-                    if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
-                        String replacefilter = "#AL:" + c + "#";
-                        if (null != cfassetlist) {
-                            content = content.replaceAll(replacefilter, cfassetlist.getName());
-                        }
+                } else {
+                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
+                        cfassetlist = cfassetlistService.findById(lc.getContentref().longValue());
+                    }
+                }
+                String[] cs = c.split(":");
+                if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
+                    String replacefilter = "#AL:" + c + "#";
+                    if (null != cfassetlist) {
+                        content = content.replaceAll(replacefilter, cfassetlist.getName());
                     }
                 }
             }
         }
         // replace Keywordlists
         for (String c : cfdiv.getKeywordlistArray()) {
-            for (CfLayoutcontent lc : layoutcontent) {
-                if (0 == lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("KL")) {
-                    CfKeywordlist cfkeywordlist = null;
-                    if (preview) {
-                        if (lc.getPreview_contentref().longValue() > 0) {
-                            cfkeywordlist = cfkeywordlistService.findById(lc.getPreview_contentref().longValue());
-                        }
-                    } else {
-                        if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
-                            cfkeywordlist = cfkeywordlistService.findById(lc.getContentref().longValue());
-                        }
+            List<CfLayoutcontent> keywordlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("KL") == 0).collect(Collectors.toList());
+            for (CfLayoutcontent lc : keywordlist) {
+                CfKeywordlist cfkeywordlist = null;
+                if (preview) {
+                    if (lc.getPreview_contentref().longValue() > 0) {
+                        cfkeywordlist = cfkeywordlistService.findById(lc.getPreview_contentref().longValue());
                     }
-                    String[] cs = c.split(":");
-                    if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
-                        String replacefilter = "#KL:" + c + "#";
-                        if (null != cfkeywordlist) {
-                            content = content.replaceAll(replacefilter, cfkeywordlist.getName());
-                        }
+                } else {
+                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
+                        cfkeywordlist = cfkeywordlistService.findById(lc.getContentref().longValue());
+                    }
+                }
+                String[] cs = c.split(":");
+                if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
+                    String replacefilter = "#KL:" + c + "#";
+                    if (null != cfkeywordlist) {
+                        content = content.replaceAll(replacefilter, cfkeywordlist.getName());
                     }
                 }
             }
         }
-
         return content;
     }
 }
