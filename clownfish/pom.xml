@@ -11,6 +11,16 @@
         <developerConnection>scm:git:https://github.com/rawdog71/Clownfish.git</developerConnection>
         <tag>v0.7.1</tag>
     </scm>
+    <developers>
+        <developer>
+            <name>Rainer Sulzbach</name>
+            <email>rainer.sulzbach@koenig-neurath.de</email>
+            <organization>König + Neurath AG</organization>
+            <roles>
+                <role>Head of development</role>
+            </roles>
+        </developer>
+    </developers>
    
     <parent>
         <groupId>org.springframework.boot</groupId>
