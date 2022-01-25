@@ -157,6 +157,10 @@ public class JavaList implements ISourceContentInterface
                     selectedLanguage = "groovy";
                     editorOptions.setLanguage("kotlin");
                     break;
+                case 3:
+                    selectedLanguage = "scala";
+                    editorOptions.setLanguage("scala");
+                    break;
             }
             
             versionlist = cfjavaversionService.findByJavaref(selectedJava.getId());
@@ -348,6 +352,10 @@ public class JavaList implements ISourceContentInterface
                     case 2:
                         newjava.setContent("package io.clownfish.groovy;\n\n"
                             + "public class " + javaName + "\n{\n\n}");
+                        break;
+                    case 3:
+                        newjava.setContent("package io.clownfish.scala\n\n"
+                            + "class " + javaName + "\n{\n\n}");
                         break;
                 }
                 newjava.setLanguage(javaLanguage);
