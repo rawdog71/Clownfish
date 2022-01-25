@@ -122,11 +122,11 @@ public class MavenList implements Serializable {
             
             try {
                 CfMaven dummy = cfmavenService.findByMavenId(selectedMavenDoc.getId());
-            } catch (NoResultException ex) {
-                maven = cfmavenService.create(maven);
+            } catch (NoResultException ex) {           
                 String filepath = maven.getMavenGroup().replaceAll("\\.", "/") + "/" + maven.getMavenArtifact() + "/" + maven.getMavenLatestversion();
                 downloadMaven(filepath, maven.getMavenFilename());
                 classpathUtil.addPath(mavenpath);
+                maven = cfmavenService.create(maven);
                 mavenlist = cfmavenService.findAll();
             }
         }
