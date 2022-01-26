@@ -155,7 +155,7 @@ public class JavaList implements ISourceContentInterface
                     break;
                 case 2:
                     selectedLanguage = "groovy";
-                    editorOptions.setLanguage("kotlin");
+                    editorOptions.setLanguage("scala");
                     break;
                 case 3:
                     selectedLanguage = "scala";
