@@ -162,6 +162,8 @@ public class AssetIndexer implements Runnable {
         for (CfAsset asset : assetList) {
             indexAssetContent(asset);
         }
+        writer.commit();
+        writer.forceMerge(10);
         return writer.numRamDocs();
     }
     

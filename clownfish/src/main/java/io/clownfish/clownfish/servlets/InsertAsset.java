@@ -135,11 +135,8 @@ public class InsertAsset extends HttpServlet {
                         newasset = cfassetService.create(newasset);
                         // Index the uploaded assets and merge the Index files
                         if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
-                            //assetIndexer.run();
                             Thread assetindexer_thread = new Thread(assetIndexer);
                             assetindexer_thread.start();
-                            indexService.getWriter().commit();
-                            indexService.getWriter().forceMerge(10);
                         }
                     } catch (PersistenceException ex) {
                         newasset = cfassetService.findByName(filename);

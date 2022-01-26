@@ -461,14 +461,12 @@ public class Clownfish {
                 if (null == contentIndexer) {
                     contentIndexer = new ContentIndexer(cfattributcontentService, indexService);
                 }
-                //contentIndexer.run();
                 Thread contentindexer_thread = new Thread(contentIndexer);
                 contentindexer_thread.start();
                 LOGGER.info("CONTENTINDEXER RUN");
                 if (null == assetIndexer) {
                     assetIndexer = new AssetIndexer(cfassetService, indexService, propertylist);
                 }
-                //assetIndexer.run();
                 Thread assetindexer_thread = new Thread(assetIndexer);
                 assetindexer_thread.start();
                 LOGGER.info("ASSETINDEXER RUN");

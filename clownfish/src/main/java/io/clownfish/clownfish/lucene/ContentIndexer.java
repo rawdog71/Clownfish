@@ -110,6 +110,8 @@ public class ContentIndexer implements Runnable {
         for (CfAttributcontent attributcontent : attributcontentlist) {
             indexAttributContent(attributcontent);
         }
+        writer.commit();
+        writer.forceMerge(10);
         return writer.numRamDocs();
     }
 
