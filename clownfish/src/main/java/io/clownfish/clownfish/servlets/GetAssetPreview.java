@@ -213,6 +213,7 @@ public class GetAssetPreview extends HttpServlet {
             } catch (IOException | InterruptedException | ExecutionException ex) {
                 LOGGER.error(ex.getMessage());
             }
+            acontext.complete();
         });
     }
 
