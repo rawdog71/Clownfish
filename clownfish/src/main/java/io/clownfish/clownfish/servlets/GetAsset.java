@@ -74,7 +74,7 @@ public class GetAsset extends HttpServlet {
         LOGGER.info(url);
         //response.setHeader("Content-Encoding", "gzip");
         final AsyncContext acontext = request.startAsync();
-        
+        acontext.setTimeout(900000000);
         acontext.start(() -> {
             int inst_width = 0;
             int inst_height = 0;

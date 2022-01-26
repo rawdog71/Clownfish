@@ -72,6 +72,7 @@ public class GetAssetPreview extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Content-Encoding", "gzip");
         final AsyncContext acontext = request.startAsync();
+        acontext.setTimeout(900000000);
         
         acontext.start(() -> {
             try {
