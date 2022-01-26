@@ -448,7 +448,9 @@ public class ContentList implements Serializable {
         // Index the changed content and merge the Index files
         if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
             try {
-                contentIndexer.run();
+                //contentIndexer.run();
+                Thread contentindexer_thread = new Thread(contentIndexer);
+                contentindexer_thread.start();
                 indexService.getWriter().commit();
                 indexService.getWriter().forceMerge(10);
                 LOGGER.info("CONTENTINDEXER RUN");

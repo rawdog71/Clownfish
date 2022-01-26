@@ -898,6 +898,7 @@ public class SiteTreeBean implements Serializable {
                 String[] contentinfos = selected_contentclass.split(":");
                 int lfdnr = Integer.parseInt(contentinfos[1]);
                 current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "C", lfdnr);
+                current_layoutcontent.setContentref(BigInteger.ZERO);
             }
             current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_classcontent.getId()));
             try {
@@ -951,6 +952,7 @@ public class SiteTreeBean implements Serializable {
                 String[] datalistinfos = selected_datalisttclass.split(":");
                 int lfdnr = Integer.parseInt(datalistinfos[1]);
                 current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "DL", lfdnr);
+                current_layoutcontent.setContentref(BigInteger.ZERO);
             }
             current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_list.getId()));
             try {
@@ -1003,6 +1005,7 @@ public class SiteTreeBean implements Serializable {
                 String[] assetinfos = selected_asset.split(":");
                 int lfdnr = Integer.parseInt(assetinfos[1]);
                 current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "A", lfdnr);
+                current_layoutcontent.setContentref(BigInteger.ZERO);
             }
             current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_asset.getId()));
             try {
@@ -1055,6 +1058,7 @@ public class SiteTreeBean implements Serializable {
                 String[] assetlistinfos = selected_assetlist.split(":");
                 int lfdnr = Integer.parseInt(assetlistinfos[1]);
                 current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "AL", lfdnr);
+                current_layoutcontent.setContentref(BigInteger.ZERO);
             }
             current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_assetlibrary.getId()));
             try {
@@ -1107,6 +1111,7 @@ public class SiteTreeBean implements Serializable {
                 String[] keywordlistinfos = selected_keywordlist.split(":");
                 int lfdnr = Integer.parseInt(keywordlistinfos[1]);
                 current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "KL", lfdnr);
+                current_layoutcontent.setContentref(BigInteger.ZERO);
             }
             current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_keywordlibrary.getId()));
             try {
