@@ -1869,9 +1869,18 @@ public class Clownfish {
                 div.removeAttr("assets");
                 div.removeAttr("assetlists");
                 div.removeAttr("keywordlists");
+                
+                if (preview) {
+                    div.addClass("cf_div");
+                }
+                
                 div.html(content);
             }
             cflayout.getDivArray().put(div.attr("id"), cfdiv);
+        }
+        if (preview) {
+            doc.head().append("<link rel=\"stylesheet\" href=\"resources/css/cf_preview.css\">");
+            doc.head().append("<script async=\"\" defer=\"\" src=\"resources/js/cf_preview.js\"></script>");
         }
         return doc.html();
     }
