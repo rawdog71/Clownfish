@@ -135,6 +135,14 @@ public class CfTemplate implements Serializable {
     public void setLayout(boolean layout) {
         this.layout = layout;
     }
+    
+    public String layoutflag() {
+        if (layout) {
+            return "th-large";
+        } else {
+            return "file";
+        }
+    }
 
     @Override
     public int hashCode() {
