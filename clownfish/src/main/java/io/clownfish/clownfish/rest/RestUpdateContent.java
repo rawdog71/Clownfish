@@ -62,9 +62,8 @@ public class RestUpdateContent {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestUpdateContent.class);
 
     @PostMapping("/updatecontent")
-    @Async
-    public Future<UpdateContentParameter> restUpdateContent(@RequestBody UpdateContentParameter ucp) {
-        return new AsyncResult<>(updateContent(ucp));
+    public UpdateContentParameter restUpdateContent(@RequestBody UpdateContentParameter ucp) {
+        return updateContent(ucp);
     }
     
     private UpdateContentParameter updateContent(UpdateContentParameter ucp) {
