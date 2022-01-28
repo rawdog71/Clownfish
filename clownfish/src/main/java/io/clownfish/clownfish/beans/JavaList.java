@@ -1,5 +1,7 @@
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.compiler.CfClassCompiler;
+import io.clownfish.clownfish.compiler.JVMLanguages;
 import io.clownfish.clownfish.dbentities.CfJava;
 import io.clownfish.clownfish.dbentities.CfJavaversion;
 import io.clownfish.clownfish.dbentities.CfJavaversionPK;
@@ -33,7 +35,9 @@ import javax.persistence.NoResultException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,6 +70,7 @@ public class JavaList implements ISourceContentInterface
     @Autowired private @Getter @Setter JavaUtil javaUtility;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
+    @Autowired @Getter @Setter CfClassCompiler classcompiler;
 
     final transient Logger LOGGER = LoggerFactory.getLogger(JavaList.class);
 
@@ -127,6 +132,16 @@ public class JavaList implements ISourceContentInterface
     public void refresh()
     {
         javaListe = cfjavaService.findAll();
+    }
+    
+    public HashMap<Integer, String> getJvmLanguages() {
+        HashMap<Integer, String> availableLanguages = new HashMap<>();
+        for (JVMLanguages language : classcompiler.getcompilerlanguages().getJvm_languages().keySet()) {
+            if (classcompiler.getcompilerlanguages().getJvm_languages().get(language)) {
+                availableLanguages.put(language.getId(), language.getName());
+            }
+        }
+        return availableLanguages;
     }
     
     public List<CfJava> completeText(String query) {

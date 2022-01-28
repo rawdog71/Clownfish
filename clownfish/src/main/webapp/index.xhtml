@@ -711,10 +711,7 @@
                                 
                                 <div class="flex align-items-center pr-2">
                                     <p:selectOneMenu id="javalanguage" value="#{javaList.javaLanguage}">
-                                        <f:selectItem itemValue="0" itemLabel="Java" />
-                                        <f:selectItem itemValue="1" itemLabel="Kotlin" />
-                                        <f:selectItem itemValue="2" itemLabel="Groovy" />
-                                        <f:selectItem itemValue="3" itemLabel="Scala" />
+                                        <f:selectItems value="#{javaList.getJvmLanguages().entrySet()}" var="entry" itemValue="#{entry.key}" itemLabel="#{entry.value}" />
                                     </p:selectOneMenu>
                                 </div>
 

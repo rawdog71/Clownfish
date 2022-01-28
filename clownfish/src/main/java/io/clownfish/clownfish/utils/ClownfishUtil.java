@@ -321,4 +321,14 @@ public class ClownfishUtil {
            return list;
         }
     }
+    
+    public static boolean isWindows()
+    {
+        return System.getProperty("os.name").startsWith("Windows");
+    }
+
+    public static String classpathDelim()
+    {
+        return isWindows() ? ";" : ":";
+    }
 }

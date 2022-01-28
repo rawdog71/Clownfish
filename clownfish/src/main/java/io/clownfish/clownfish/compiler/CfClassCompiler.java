@@ -4,6 +4,7 @@ import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.beans.LoginBean;
 import io.clownfish.clownfish.dbentities.CfJava;
 import io.clownfish.clownfish.serviceinterface.CfJavaService;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,10 +53,15 @@ public class CfClassCompiler
     private static Clownfish clownfish;
     private @Getter @Setter EditorOptions editorOptions;
     @Getter @Setter ArrayList<Class<?>> classesList;
+    public static CfCompilerLanguages compilerlanguages = null;
 
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CfClassCompiler.class);
 
-    public CfClassCompiler() {}
+    public CfClassCompiler() {
+        if (null == compilerlanguages) {
+            compilerlanguages = new CfCompilerLanguages();
+        }
+    }
     
     public void setClownfish(Clownfish clownfish) {
         this.clownfish = clownfish;
@@ -72,261 +78,265 @@ public class CfClassCompiler
         editorOptions.setTheme(ETheme.VS_DARK);
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
     }
+    
+    public CfCompilerLanguages getcompilerlanguages() {
+        return compilerlanguages;
+    }
 
     public ArrayList<Class<?>> compileClasses(ArrayList<File> srcfiles, boolean withMessage)
     {
-        ArrayList<File> java = new ArrayList<>();
-        ArrayList<File> kotlin = new ArrayList<>();
-        ArrayList<File> groovy = new ArrayList<>();
-        ArrayList<File> scala = new ArrayList<>();
         for (File f : srcfiles) {
-            switch (FilenameUtils.getExtension(f.getName())) {
-                case "java":
-                    java.add(f);
-                    break;
-                case "kt":
-                    kotlin.add(f);
-                    break;
-                case "groovy":
-                    groovy.add(f);
-                    break;
-                case "scala":
-                    scala.add(f);
-                    break;
+            for (JVMLanguages language : compilerlanguages.getJvm_languages().keySet()) {
+                if (compilerlanguages.getJvm_languages().get(language)) {
+                    if (0 == FilenameUtils.getExtension(f.getName()).compareToIgnoreCase(language.getExt())) {
+                        language.getFilelist().add(f);
+                    }
+                }
             }
         }
         setCompileOut(new StringWriter());
         
-        if (!kotlin.isEmpty()) {
-            try {
-                File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
-                cfclassLoader.add(tmpDirRoot.toURI().toURL());
-                
-                ProcessBuilder builder = new ProcessBuilder();
-                for (File kotlinfile : kotlin) {
-                    String className = kotlinfile.getName().replaceFirst("[.][^.]+$", "");
-                    LOGGER.info("COMPILING " + className + "...");
-                    compileOut.append("COMPILING " + className + "...\n");
-                    compileOut.flush();
-                    if (isWindows()) {
-                        builder.command("cmd.exe", "/c", "kotlinc -d " + tmpDirRoot.toString() + " " + kotlinfile.getCanonicalPath());
-                    } else {
-                        builder.command("sh", "-c", "kotlinc -d " + tmpDirRoot.toString() + " " + kotlinfile.getCanonicalPath());
-                    }
-                    builder.directory(getTmpdir().toFile());
-                    builder.redirectErrorStream(true);
-                    String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
-                    if (result.isBlank()) {
-                        compileOut.append("OK\n");
-                        compileOut.flush();
-                        LOGGER.info("OK");
-                        if (withMessage)
-                        {
-                            FacesMessage message = new FacesMessage("Compiled " + className + " successfully");
-                            message.setSeverity(FacesMessage.SEVERITY_INFO);
-                            FacesContext.getCurrentInstance().addMessage(null, message);
+        for (JVMLanguages language : compilerlanguages.getJvm_languages().keySet()) {
+            if (compilerlanguages.getJvm_languages().get(language)) {
+                switch (language) {
+                    case KOTLIN:
+                        if (!language.getFilelist().isEmpty()) {
+                            try {
+                                File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
+                                cfclassLoader.add(tmpDirRoot.toURI().toURL());
+
+                                ProcessBuilder builder = new ProcessBuilder();
+                                for (File kotlinfile : language.getFilelist()) {
+                                    String className = kotlinfile.getName().replaceFirst("[.][^.]+$", "");
+                                    LOGGER.info("COMPILING " + className + "...");
+                                    compileOut.append("COMPILING " + className + "...\n");
+                                    compileOut.flush();
+                                    if (ClownfishUtil.isWindows()) {
+                                        builder.command("cmd.exe", "/c", "kotlinc -d " + tmpDirRoot.toString() + " " + kotlinfile.getCanonicalPath());
+                                    } else {
+                                        builder.command("sh", "-c", "kotlinc -d " + tmpDirRoot.toString() + " " + kotlinfile.getCanonicalPath());
+                                    }
+                                    builder.directory(getTmpdir().toFile());
+                                    builder.redirectErrorStream(true);
+                                    String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
+                                    if (result.isBlank()) {
+                                        compileOut.append("OK\n");
+                                        compileOut.flush();
+                                        LOGGER.info("OK");
+                                        if (withMessage)
+                                        {
+                                            FacesMessage message = new FacesMessage("Compiled " + className + " successfully");
+                                            message.setSeverity(FacesMessage.SEVERITY_INFO);
+                                            FacesContext.getCurrentInstance().addMessage(null, message);
+                                        }
+                                    } else {
+                                        compileOut.append("ERROR\n");
+                                        compileOut.append(result);
+                                        compileOut.flush();
+                                        LOGGER.error("ERROR");
+                                        LOGGER.error(result);
+                                        if (withMessage)
+                                        {
+                                            FacesMessage message = new FacesMessage("Compiled " + className + " error", result);
+                                            message.setSeverity(FacesMessage.SEVERITY_ERROR);
+                                            FacesContext.getCurrentInstance().addMessage(null, message);
+                                        }
+                                    }
+                                }
+
+                                for (File file : language.getFilelist())
+                                {
+                                    String className = file.getName().replaceFirst("[.][^.]+$", "");
+                                    LOGGER.info("LOADING " + className + "...");
+                                    compileOut.append("LOADING " + className + "...\n");
+                                    compileOut.flush();
+                                    classesList.add(cfclassLoader.loadClass("io.clownfish.kotlin." + className));
+                                }
+                            } catch (IOException | ClassNotFoundException ex) {
+                                LOGGER.error(ex.getMessage());
+                                compileOut.append(ex.getMessage() + "\n");
+                                compileOut.flush();
+                            }
                         }
-                    } else {
-                        compileOut.append("ERROR\n");
-                        compileOut.append(result);
-                        compileOut.flush();
-                        LOGGER.error("ERROR");
-                        LOGGER.error(result);
-                        if (withMessage)
-                        {
-                            FacesMessage message = new FacesMessage("Compiled " + className + " error", result);
-                            message.setSeverity(FacesMessage.SEVERITY_ERROR);
-                            FacesContext.getCurrentInstance().addMessage(null, message);
+                        break;
+                    case GROOVY:
+                        if (!language.getFilelist().isEmpty()) {
+                            try {
+                                File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
+                                cfclassLoader.add(tmpDirRoot.toURI().toURL());
+
+                                ProcessBuilder builder = new ProcessBuilder();
+                                for (File groovyfile : language.getFilelist()) {
+                                    String className = groovyfile.getName().replaceFirst("[.][^.]+$", "");
+                                    LOGGER.info("COMPILING " + className + "...");
+                                    compileOut.append("COMPILING " + className + "...\n");
+                                    compileOut.flush();
+                                    if (ClownfishUtil.isWindows()) {
+                                        builder.command("cmd.exe", "/c", "groovyc -d " + tmpDirRoot.toString() + " " + groovyfile.getCanonicalPath());
+                                    } else {
+                                        builder.command("sh", "-c", "groovyc -d " + tmpDirRoot.toString() + " " + groovyfile.getCanonicalPath());
+                                    }
+                                    builder.directory(getTmpdir().toFile());
+                                    builder.redirectErrorStream(true);
+                                    String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
+                                    if (result.isBlank()) {
+                                        compileOut.append("OK\n");
+                                        compileOut.flush();
+                                        LOGGER.info("OK");
+                                        if (withMessage)
+                                        {
+                                            FacesMessage message = new FacesMessage("Compiled " + className + " successfully");
+                                            message.setSeverity(FacesMessage.SEVERITY_INFO);
+                                            FacesContext.getCurrentInstance().addMessage(null, message);
+                                        }
+                                    } else {
+                                        compileOut.append("ERROR\n");
+                                        compileOut.append(result);
+                                        compileOut.flush();
+                                        LOGGER.error("ERROR");
+                                        LOGGER.error(result);
+                                        if (withMessage)
+                                        {
+                                            FacesMessage message = new FacesMessage("Compiled " + className + " error", result);
+                                            message.setSeverity(FacesMessage.SEVERITY_ERROR);
+                                            FacesContext.getCurrentInstance().addMessage(null, message);
+                                        }
+                                    }
+                                }
+
+                                for (File file : language.getFilelist())
+                                {
+                                    String className = file.getName().replaceFirst("[.][^.]+$", "");
+                                    LOGGER.info("LOADING " + className + "...");
+                                    compileOut.append("LOADING " + className + "...\n");
+                                    compileOut.flush();
+                                    classesList.add(cfclassLoader.loadClass("io.clownfish.groovy." + className));
+                                }
+                            } catch (IOException | ClassNotFoundException ex) {
+                                LOGGER.error(ex.getMessage());
+                                compileOut.append(ex.getMessage() + "\n");
+                                compileOut.flush();
+                            }
                         }
-                    }
-                }
-                
-                for (File file : kotlin)
-                {
-                    String className = file.getName().replaceFirst("[.][^.]+$", "");
-                    LOGGER.info("LOADING " + className + "...");
-                    compileOut.append("LOADING " + className + "...\n");
-                    compileOut.flush();
-                    classesList.add(cfclassLoader.loadClass("io.clownfish.kotlin." + className));
-                }
-            } catch (IOException | ClassNotFoundException ex) {
-                LOGGER.error(ex.getMessage());
-                compileOut.append(ex.getMessage() + "\n");
-                compileOut.flush();
-            }
-        }
-        
-        if (!groovy.isEmpty()) {
-            try {
-                File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
-                cfclassLoader.add(tmpDirRoot.toURI().toURL());
-                
-                ProcessBuilder builder = new ProcessBuilder();
-                for (File groovyfile : groovy) {
-                    String className = groovyfile.getName().replaceFirst("[.][^.]+$", "");
-                    LOGGER.info("COMPILING " + className + "...");
-                    compileOut.append("COMPILING " + className + "...\n");
-                    compileOut.flush();
-                    if (isWindows()) {
-                        builder.command("cmd.exe", "/c", "groovyc -d " + tmpDirRoot.toString() + " " + groovyfile.getCanonicalPath());
-                    } else {
-                        builder.command("sh", "-c", "groovyc -d " + tmpDirRoot.toString() + " " + groovyfile.getCanonicalPath());
-                    }
-                    builder.directory(getTmpdir().toFile());
-                    builder.redirectErrorStream(true);
-                    String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
-                    if (result.isBlank()) {
-                        compileOut.append("OK\n");
-                        compileOut.flush();
-                        LOGGER.info("OK");
-                        if (withMessage)
-                        {
-                            FacesMessage message = new FacesMessage("Compiled " + className + " successfully");
-                            message.setSeverity(FacesMessage.SEVERITY_INFO);
-                            FacesContext.getCurrentInstance().addMessage(null, message);
+                        break;
+                    case SCALA:
+                        if (!language.getFilelist().isEmpty()) {
+                            try {
+                                File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
+                                cfclassLoader.add(tmpDirRoot.toURI().toURL());
+
+                                ProcessBuilder builder = new ProcessBuilder();
+                                for (File scalafile : language.getFilelist()) {
+                                    String className = scalafile.getName().replaceFirst("[.][^.]+$", "");
+                                    LOGGER.info("COMPILING " + className + "...");
+                                    compileOut.append("COMPILING " + className + "...\n");
+                                    compileOut.flush();
+                                    if (ClownfishUtil.isWindows()) {
+                                        builder.command("cmd.exe", "/c", "scalac -d " + tmpDirRoot.toString() + " " + scalafile.getCanonicalPath());
+                                    } else {
+                                        builder.command("sh", "-c", "scalac -d " + tmpDirRoot.toString() + " " + scalafile.getCanonicalPath());
+                                    }
+                                    builder.directory(getTmpdir().toFile());
+                                    builder.redirectErrorStream(true);
+                                    String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
+                                    if (result.isBlank()) {
+                                        compileOut.append("OK\n");
+                                        compileOut.flush();
+                                        LOGGER.info("OK");
+                                        if (withMessage)
+                                        {
+                                            FacesMessage message = new FacesMessage("Compiled " + className + " successfully");
+                                            message.setSeverity(FacesMessage.SEVERITY_INFO);
+                                            FacesContext.getCurrentInstance().addMessage(null, message);
+                                        }
+                                    } else {
+                                        compileOut.append("ERROR\n");
+                                        compileOut.append(result);
+                                        compileOut.flush();
+                                        LOGGER.error("ERROR");
+                                        LOGGER.error(result);
+                                        if (withMessage)
+                                        {
+                                            FacesMessage message = new FacesMessage("Compiled " + className + " error", result);
+                                            message.setSeverity(FacesMessage.SEVERITY_ERROR);
+                                            FacesContext.getCurrentInstance().addMessage(null, message);
+                                        }
+                                    }
+                                }
+
+                                for (File file : language.getFilelist())
+                                {
+                                    String className = file.getName().replaceFirst("[.][^.]+$", "");
+                                    LOGGER.info("LOADING " + className + "...");
+                                    compileOut.append("LOADING " + className + "...\n");
+                                    compileOut.flush();
+                                    classesList.add(cfclassLoader.loadClass("io.clownfish.scala." + className));
+                                }
+                            } catch (IOException | ClassNotFoundException ex) {
+                                LOGGER.error(ex.getMessage());
+                                compileOut.append(ex.getMessage() + "\n");
+                                compileOut.flush();
+                            }
                         }
-                    } else {
-                        compileOut.append("ERROR\n");
-                        compileOut.append(result);
-                        compileOut.flush();
-                        LOGGER.error("ERROR");
-                        LOGGER.error(result);
-                        if (withMessage)
-                        {
-                            FacesMessage message = new FacesMessage("Compiled " + className + " error", result);
-                            message.setSeverity(FacesMessage.SEVERITY_ERROR);
-                            FacesContext.getCurrentInstance().addMessage(null, message);
+                        break;
+                    case JAVA:
+                        if (!language.getFilelist().isEmpty()) {
+                            try
+                            {
+                                List<String> options = new ArrayList<>(Arrays.asList("-classpath", constructClasspath()));
+
+                                File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
+                                cfclassLoader.add(tmpDirRoot.toURI().toURL());
+
+                                options.addAll(Arrays.asList("-d", tmpDirRoot.toString()));
+
+                                if (verboseCompile)
+                                    options.addAll(List.of("-verbose"));
+
+                                JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
+                                StandardJavaFileManager jfm = javac.getStandardFileManager(null, null, Charset.defaultCharset());
+                                jfm.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singleton(getTmpdir().toFile()));
+
+                                Iterable<? extends JavaFileObject> compilationUnits = jfm.getJavaFileObjectsFromFiles(language.getFilelist());
+                                JavaCompiler.CompilationTask task = javac.getTask(compileOut, jfm, null, options,
+                                        Collections.emptySet(), compilationUnits);
+
+                                for (JavaFileObject jfo : compilationUnits)
+                                    LOGGER.info("Compiling " + jfo.getName() + "...");
+
+                                if (task.call())
+                                {
+                                    for (File file : language.getFilelist())
+                                    {
+                                        String className = file.getName().replaceFirst("[.][^.]+$", "");
+                                        LOGGER.info("LOADING " + className + "...");
+                                        classesList.add(cfclassLoader.loadClass("io.clownfish.java." + className));
+                                    }
+
+                                    if (withMessage)
+                                    {
+                                        FacesMessage message = new FacesMessage("Compiled class(es) successfully");
+                                        message.setSeverity(FacesMessage.SEVERITY_INFO);
+                                        FacesContext.getCurrentInstance().addMessage(null, message);
+                                    }
+                                }
+                                else
+                                {
+                                    if (withMessage)
+                                    {
+                                        FacesMessage message = new FacesMessage("Compilation failed! Check compile log.");
+                                        message.setSeverity(FacesMessage.SEVERITY_ERROR);
+                                        FacesContext.getCurrentInstance().addMessage(null, message);
+                                    }
+                                }
+                            }
+                            catch (ClassNotFoundException | IOException | IllegalStateException /*| NoSuchMethodException | IllegalAccessException | InvocationTargetException*/ e)
+                            {
+                                LOGGER.error(e.getMessage());
+                            }
                         }
-                    }
+                        break;
                 }
-                
-                for (File file : groovy)
-                {
-                    String className = file.getName().replaceFirst("[.][^.]+$", "");
-                    LOGGER.info("LOADING " + className + "...");
-                    compileOut.append("LOADING " + className + "...\n");
-                    compileOut.flush();
-                    classesList.add(cfclassLoader.loadClass("io.clownfish.groovy." + className));
-                }
-            } catch (IOException | ClassNotFoundException ex) {
-                LOGGER.error(ex.getMessage());
-                compileOut.append(ex.getMessage() + "\n");
-                compileOut.flush();
-            }
-        }
-        
-        if (!scala.isEmpty()) {
-            try {
-                File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
-                cfclassLoader.add(tmpDirRoot.toURI().toURL());
-                
-                ProcessBuilder builder = new ProcessBuilder();
-                for (File scalafile : scala) {
-                    String className = scalafile.getName().replaceFirst("[.][^.]+$", "");
-                    LOGGER.info("COMPILING " + className + "...");
-                    compileOut.append("COMPILING " + className + "...\n");
-                    compileOut.flush();
-                    if (isWindows()) {
-                        builder.command("cmd.exe", "/c", "scalac -d " + tmpDirRoot.toString() + " " + scalafile.getCanonicalPath());
-                    } else {
-                        builder.command("sh", "-c", "scalac -d " + tmpDirRoot.toString() + " " + scalafile.getCanonicalPath());
-                    }
-                    builder.directory(getTmpdir().toFile());
-                    builder.redirectErrorStream(true);
-                    String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
-                    if (result.isBlank()) {
-                        compileOut.append("OK\n");
-                        compileOut.flush();
-                        LOGGER.info("OK");
-                        if (withMessage)
-                        {
-                            FacesMessage message = new FacesMessage("Compiled " + className + " successfully");
-                            message.setSeverity(FacesMessage.SEVERITY_INFO);
-                            FacesContext.getCurrentInstance().addMessage(null, message);
-                        }
-                    } else {
-                        compileOut.append("ERROR\n");
-                        compileOut.append(result);
-                        compileOut.flush();
-                        LOGGER.error("ERROR");
-                        LOGGER.error(result);
-                        if (withMessage)
-                        {
-                            FacesMessage message = new FacesMessage("Compiled " + className + " error", result);
-                            message.setSeverity(FacesMessage.SEVERITY_ERROR);
-                            FacesContext.getCurrentInstance().addMessage(null, message);
-                        }
-                    }
-                }
-                
-                for (File file : scala)
-                {
-                    String className = file.getName().replaceFirst("[.][^.]+$", "");
-                    LOGGER.info("LOADING " + className + "...");
-                    compileOut.append("LOADING " + className + "...\n");
-                    compileOut.flush();
-                    classesList.add(cfclassLoader.loadClass("io.clownfish.scala." + className));
-                }
-            } catch (IOException | ClassNotFoundException ex) {
-                LOGGER.error(ex.getMessage());
-                compileOut.append(ex.getMessage() + "\n");
-                compileOut.flush();
-            }
-        }
-        
-        if (!java.isEmpty()) {
-            try
-            {
-                List<String> options = new ArrayList<>(Arrays.asList("-classpath", constructClasspath()));
-
-                File tmpDirRoot = new File(getTmpdir().getParent().getParent().getParent().toString());
-                cfclassLoader.add(tmpDirRoot.toURI().toURL());
-
-                options.addAll(Arrays.asList("-d", tmpDirRoot.toString()));
-
-                if (verboseCompile)
-                    options.addAll(List.of("-verbose"));
-
-                JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
-                StandardJavaFileManager jfm = javac.getStandardFileManager(null, null, Charset.defaultCharset());
-                jfm.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singleton(getTmpdir().toFile()));
-
-                Iterable<? extends JavaFileObject> compilationUnits = jfm.getJavaFileObjectsFromFiles(java);
-                JavaCompiler.CompilationTask task = javac.getTask(compileOut, jfm, null, options,
-                        Collections.emptySet(), compilationUnits);
-
-                for (JavaFileObject jfo : compilationUnits)
-                    LOGGER.info("Compiling " + jfo.getName() + "...");
-
-                if (task.call())
-                {
-                    for (File file : java)
-                    {
-                        String className = file.getName().replaceFirst("[.][^.]+$", "");
-                        LOGGER.info("LOADING " + className + "...");
-                        classesList.add(cfclassLoader.loadClass("io.clownfish.java." + className));
-                    }
-
-                    if (withMessage)
-                    {
-                        FacesMessage message = new FacesMessage("Compiled class(es) successfully");
-                        message.setSeverity(FacesMessage.SEVERITY_INFO);
-                        FacesContext.getCurrentInstance().addMessage(null, message);
-                    }
-                }
-                else
-                {
-                    if (withMessage)
-                    {
-                        FacesMessage message = new FacesMessage("Compilation failed! Check compile log.");
-                        message.setSeverity(FacesMessage.SEVERITY_ERROR);
-                        FacesContext.getCurrentInstance().addMessage(null, message);
-                    }
-                }
-            }
-            catch (ClassNotFoundException | IOException | IllegalStateException /*| NoSuchMethodException | IllegalAccessException | InvocationTargetException*/ e)
-            {
-                LOGGER.error(e.getMessage());
             }
         }
         
@@ -356,7 +366,7 @@ public class CfClassCompiler
 
         // $CLOWNFISH_DIR/cache/src/io/clownfish/internal
         // classPath.append(classpathDelim()).append("\"").append(getTmpdir().toString()).append("\"");
-        classPath.append(classpathDelim()).append(getTmpdir().toString());
+        classPath.append(ClownfishUtil.classpathDelim()).append(getTmpdir().toString());
 
         // $CLOWNFISH_DIR/maven/
         List<File> maven = Files.walk(Paths.get(propertyUtil.getPropertyValue("folder_maven")))
@@ -367,7 +377,7 @@ public class CfClassCompiler
         {
             maven.stream().filter(file -> file.getName().endsWith(".jar")).collect(Collectors.toList())
                     //.forEach(jar -> classPath.append(classpathDelim()).append("\"").append(jar.getAbsolutePath()).append("\""));
-                    .forEach(jar -> classPath.append(classpathDelim()).append(jar.getAbsolutePath()));
+                    .forEach(jar -> classPath.append(ClownfishUtil.classpathDelim()).append(jar.getAbsolutePath()));
         }
 
         // $CLOWNFISH_DIR/libs
@@ -379,7 +389,7 @@ public class CfClassCompiler
         {
             libs.stream().filter(file -> file.getName().endsWith(".jar")).collect(Collectors.toList())
                     //.forEach(jar -> classPath.append(classpathDelim()).append("\"").append(jar.getAbsolutePath()).append("\""));
-                    .forEach(jar -> classPath.append(classpathDelim()).append(jar.getAbsolutePath()));
+                    .forEach(jar -> classPath.append(ClownfishUtil.classpathDelim()).append(jar.getAbsolutePath()));
         }
         LOGGER.info("CLASSPATH: " + classPath.toString());
         return classPath.toString();
@@ -486,16 +496,6 @@ public class CfClassCompiler
         Runtime.getRuntime().addShutdownHook(deleteHook);
     }
 
-    private boolean isWindows()
-    {
-        return System.getProperty("os.name").startsWith("Windows");
-    }
-
-    private String classpathDelim()
-    {
-        return isWindows() ? ";" : ":";
-    }
-    
     private static class MyOutputStream extends OutputStream {
         private final Consumer<String> consumer;
         private final StringBuffer stringBuffer = new StringBuffer();
