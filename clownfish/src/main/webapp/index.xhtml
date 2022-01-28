@@ -10,85 +10,10 @@
         <title>Clownfish CMS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <h:outputStylesheet library="webjars" name="primeflex/3.1.0/primeflex.min.css" />
-        <link type="text/css" src="resources/css/main.css"></link>
         <script src="resources/js/main.js"></script>
-        <style>
-            .ui-state-disabled {
-                opacity: 0.9 !important;
-                pointer-events: all !important;
-            }
-            .tabview {
-                padding: 0 15px 0 0;
-            }
-            /** tabs **/
-            .ui-tabs.ui-tabs-left > .ui-tabs-nav {
-               width: 10% !important;
-            }
-            /** panels **/
-            .ui-tabs.ui-tabs-left > .ui-tabs-panels {
-               width: 90% !important;
-            }
-            body .ui-tabs .ui-tabs-nav li.ui-tabs-header {
-                padding: 0.5rem !important;
-            }
-            body {
-                background-color: black;
-            }
-            .assets-list-buttons {
-                padding-left: 10px;
-            }
-            .unset-position-loginbar {
-                position: unset !important;
-                top: 0 !important;
-            }
-            .ui-sticky-ghost {
-                height: 0 !important;
-            }
-            .navbar-list .ui-tabs-nav {
-                position: sticky !important;
-                top: 0;
-            }
-            .ui-picklist .ui-picklist-list {
-                width: 100% !important;
-            }
-            .tester-justify {
-                display: flex !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-            }
-
-            .tester-justify .test {
-                width: 77% !important;
-            }
-
-            .content-justify {
-                display: flex !important;
-                justify-content: space-between !important;
-                align-items: center !important;    
-            }
-            .content-items-width {
-                width: 55% !important;
-            }
-            
-            ::-webkit-scrollbar {
-                background-color: transparent;
-                width: 7px;
-            }
-
-            ::-webkit-scrollbar-track {
-                background-color: transparent;
-            }
-
-            ::-webkit-scrollbar-thumb {
-                background-color: #babac0;
-                border-radius: 7px;
-                border: 4px solid transparent;
-            }
-
-            ::-webkit-scrollbar-button {
-                display:none;
-            }
-        </style>
+        <f:facet name="last">
+            <link rel="stylesheet" type="text/css" href="resources/css/main.css" />
+        </f:facet>
     </h:head>
     <h:body>
         <h:form id="form" enctype="multipart/form-data">
@@ -348,7 +273,7 @@
                                                 <p:column>
                                                     <div class="content-justify">
                                                         <p:commandButton id="deletestaticsite" icon="pi pi-trash" process="form" style="width: 100%" value="Delete static site" actionListener="#{sitetree.onDeleteStaticSite}">
-                                                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                         </p:commandButton>
                                                     </div>
                                                 </p:column>
@@ -382,7 +307,7 @@
                                                 </p:selectOneMenu>
                                                 <p:commandButton id="newRfc" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{sitetree.onNewRfc}" update=":form:tabview:tabsiteview:saprfclist" />
                                                 <p:commandButton id="deleteRfc" process="form" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDeleteRfc}" update=":form:tabview:tabsiteview:saprfclist">
-                                                    <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                 </p:commandButton>
                                             </p:column>
                                         </p:panelGrid>
@@ -402,10 +327,10 @@
                                                     </p:commandButton>
                                                     <p:commandButton id="deleteSiteButton" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
-                                                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                                        <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                     </p:commandButton>
                                                     <p:commandButton id="publishSiteButton" icon="pi pi-save" value="Publish" actionListener="#{sitetree.onPublish}" update=":form:msgs" rendered="${sitetree.contenteditable}">
-                                                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                                        <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                     </p:commandButton>
                                                 </div>
                                             </p:column>
@@ -570,7 +495,7 @@
                         
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="deletetemplateButton" icon="pi pi-trash" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:tabsiteview:selecttemplate">
-                                <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                         </div>
                     </div>
@@ -584,7 +509,7 @@
                         <p:commandButton id="checkintemplate" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{templateList.checkedout}" actionListener="#{templateList.onCheckIn}"  update=":form:msgs :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
                         <p:commandButton id="checkouttemplate" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!templateList.checkedout and templateList.access}" actionListener="#{templateList.onCheckOut}" update=":form:msgs :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
                         <p:commandButton id="committemplate" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{templateList.difference and !templateList.checkedout and templateList.access}" actionListener="#{templateList.onCommit}" update=":form:msgs :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:selectedtemplateversion">
-                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
 
                         <p:outputLabel> Version </p:outputLabel><p:outputLabel id="templateversion">#{templateList.templateUtility.currentVersion}</p:outputLabel>
@@ -643,7 +568,7 @@
                         
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="deletestylesheetButton" icon="pi pi-trash" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:tabsiteview:selectstylesheet">
-                                <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                         </div>
                     </div>
@@ -658,7 +583,7 @@
                         <p:commandButton id="checkinstylesheet" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onCheckIn}"  update=":form:msgs :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
                         <p:commandButton id="checkoutstylesheet" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCheckOut}" update=":form:msgs :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
                         <p:commandButton id="commitstylesheet" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{stylesheetList.difference and !stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCommit}"  update=":form:msgs :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:selectedstylesheetversion">
-                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                             
                         <p:outputLabel> Version </p:outputLabel><p:outputLabel id="stylesheetversion">#{stylesheetList.stylesheetUtility.currentVersion}</p:outputLabel>
@@ -718,7 +643,7 @@
                         
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="deletejavascriptButton" icon="pi pi-trash" value="Delete" actionListener="#{javascriptList.onDelete}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:tabsiteview:selectjavascript">
-                                <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                         </div>
                     </div>
@@ -732,7 +657,7 @@
                         <p:commandButton id="checkinjavascript" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onCheckIn}"  update=":form:msgs :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
                         <p:commandButton id="checkoutjavascript" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCheckOut}" update=":form:msgs :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascript" />
                         <p:commandButton id="commitjavascript" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{javascriptList.difference and !javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCommit}" update=":form:msgs :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:selectedjavascriptversion">
-                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                         
                         <p:outputLabel> Version </p:outputLabel><p:outputLabel id="javascriptversion">#{javascriptList.javascriptUtility.currentVersion}</p:outputLabel>
@@ -803,7 +728,7 @@
                                 
                                 <div class="flex align-items-center pr-2">
                                     <p:commandButton id="deletejavaButton" icon="pi pi-trash" value="Delete" actionListener="#{javaList.onDelete}" update=":form:msgs :form:tabview:javatabview:javalist">
-                                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                        <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
                                 </div>
                             </div>
@@ -817,7 +742,7 @@
                                 <p:commandButton id="checkinjava" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{javaList.checkedout}" actionListener="#{javaList.onCheckIn}"  update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjava" />
                                 <p:commandButton id="checkoutjava" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!javaList.checkedout and javaList.access}" actionListener="#{javaList.onCheckOut}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjava" />
                                 <p:commandButton id="commitjava" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{javaList.difference and !javaList.checkedout and javaList.access}" actionListener="#{javaList.onCommit}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:selectedjavaversion">
-                                    <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
 
                                 <p:outputLabel> Version </p:outputLabel><p:outputLabel id="javaversion">#{javaList.javaUtility.currentVersion}</p:outputLabel>
@@ -988,7 +913,9 @@
                         </div>
                         
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="recreatetable" process="form" value="Recreate Datatable" actionListener="#{classList.onRecreateDatamodel(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass" />
+                            <p:commandButton id="recreatetable" process="form" value="Recreate Datatable" actionListener="#{classList.onRecreateDatamodel(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+                                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
                         </div>
                     </div>
 
@@ -1126,7 +1053,7 @@
                             <div class="flex align-items-center pr-2">
                                 <p:commandButton id="deletecontent" icon="pi pi-trash" process="form" value="Delete" actionListener="#{classcontentList.onScrappContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
                                     <f:actionListener binding="#{sitetree.initClassContentlist()}" />
-                                    <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                             </div>
                         </div>
@@ -1240,7 +1167,7 @@
                     </p:commandButton>
                     <p:commandButton id="deletecontentlist" icon="pi pi-trash" process="form" value="Delete" actionListener="#{datacontentList.onDeleteContent}" update=":form:msgs :form:tabview:tabsiteview:sitelist :form:tabview:datalistcontent">
                         <f:actionListener binding="#{sitetree.initContentlist()}" />
-                        <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                        <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                     </p:commandButton>
                     
                     <p:selectManyCheckbox id="datacontentlistbox" value="#{datacontentList.selectedListcontent}" layout="responsive" columns="4" converter="#{classcontentConverterBean}">
@@ -1304,7 +1231,7 @@
                         <p:commandButton id="editdatasource" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{datasourceList.onEditContent}" update=":form:msgs :form:tabview:datalistcontent" />
                         <p:commandButton id="deletedatasource" icon="pi pi-trash" process="form" value="Delete" actionListener="#{datasourceList.onDeleteContent}" update=":form:msgs :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist">
                             <f:actionListener binding="#{sitetree.initDatasources()}" />
-                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                         <p:commandButton id="checkdatasource" process="form" value="Check connection" actionListener="#{datasourceList.onConnectionCheck}" update=":form:msgs" />
                     </p:panelGrid>
@@ -1339,7 +1266,7 @@
                                         <div class="assets-list-buttons">
                                             <p:commandButton icon="pi pi-trash" action="#{assetList.onScrapp}" update=":form:tabview:assetlist">
                                                 <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
-                                                <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
                                         </div>
                                         <div class="assets-list-buttons">
@@ -1520,7 +1447,7 @@
                         <p:commandButton id="newproperty" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{propertylist.onCreateProperty}" update=":form:msgs :form:tabview:propertylist" disabled="#{propertylist.newPropertyButtonDisabled}" />
                         <p:commandButton id="editproperty" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{propertylist.onEditProperty}" update=":form:msgs :form:tabview:propertylist" />
                         <p:commandButton id="deleteproperty" icon="pi pi-trash" process="form" value="Delete" actionListener="#{propertylist.onDeleteProperty}" disabled="#{propertylist.deletePropertyButtonDisabled}" update=":form:msgs :form:tabview:propertylist">
-                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                     </p:panelGrid>
                     
@@ -1949,7 +1876,7 @@
                         <p:commandButton id="newjob" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{quartzlist.onCreateJob}" update=":form:msgs :form:tabview:joblist" disabled="#{quartzlist.newJobButtonDisabled}" />
                         <p:commandButton id="editjob" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{quartzlist.onEditJob}" update=":form:msgs :form:tabview:joblist" />
                         <p:commandButton id="deletejob" icon="pi pi-trash" process="form" value="Delete" actionListener="#{quartzlist.onDeleteJob}" disabled="#{quartzlist.deleteJobButtonDisabled}" update=":form:msgs :form:tabview:joblist">
-                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                     </p:panelGrid>
                     
@@ -2000,7 +1927,7 @@
                         <p:commandButton id="newuser" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{userlist.onCreateUser}" update=":form:msgs :form:tabview:userlist" disabled="#{userlist.newUserButtonDisabled}" />
                         <p:commandButton id="edituser" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{userlist.onEditUser}" update=":form:msgs :form:tabview:userlist" />
                         <p:commandButton id="deleteuser" icon="pi pi-trash" process="form" value="Delete" actionListener="#{userlist.onDeleteUser}" update=":form:msgs :form:tabview:userlist">
-                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                     </p:panelGrid>
                     
@@ -2166,7 +2093,7 @@
                         </p:commandButton>
                         <p:commandButton id="killcontent" icon="pi pi-trash" process="form" value="Destroy" actionListener="#{scrapyardList.onDeleteContent}" update=":form:msgs :form:tabview:scrapyardclasscontentlist">
                             <f:actionListener binding="#{sitetree.initClassContentlist()}" />
-                            <p:confirm header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                     </p:panelGrid>
 
@@ -2188,10 +2115,10 @@
 
             </p:tabView>
             
-            <p:confirmDialog global="true">
-                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
-            </p:confirmDialog>
+            <p:confirmPopup global="true">
+                <p:commandButton value="No" type="button" styleClass="ui-confirm-popup-no ui-button-flat" icon="pi pi-check" />
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirm-popup-yes" icon="pi pi-times" />
+            </p:confirmPopup>
         </h:form>
     </h:body>          
 </html>
