@@ -910,7 +910,7 @@ public class Clownfish {
                 }
                 
                 // Site has static flag
-                if ((cfsite.isStaticsite()) && (!makestatic)) {
+                if ((cfsite.isStaticsite()) && (!makestatic) && (!preview)) {
                     if ((cfsite.getContenttype() != null)) {
                         if (!cfsite.getContenttype().isEmpty()) {
                             this.contenttype = cfsite.getContenttype();
@@ -1527,6 +1527,37 @@ public class Clownfish {
                 src = makeStaticImage(src);
                 image.attr("src", src);
             }
+            /* UIKIT data-src */
+            elem_images = doc.getElementsByAttribute("data-src");
+            for (Element image : elem_images) {
+                String src = image.attr("data-src");
+                src = makeStaticImage(src);
+                image.attr("data-src", src);
+            }
+            /* UIKIT data-srcset */
+            elem_images = doc.getElementsByAttribute("data-srcset");
+            for (Element image : elem_images) {
+                String src = image.attr("data-srcset");
+                src = makeStaticImage(src, ",");
+                image.attr("data-srcset", src);
+            }
+            // Remove preview utils in preview
+            Elements divs = doc.getElementsByClass("cf_div");
+            for (Element div : divs) {
+                div.removeClass("cf_div");
+            }
+            Elements links = doc.head().getElementsByAttribute("href");
+            for (Element link : links) {
+                if (0 == link.attr("href").compareToIgnoreCase("resources/css/cf_preview.css")) {
+                    link.remove();
+                }
+            }
+            Elements scripts = doc.head().getElementsByAttribute("src");
+            for (Element script : scripts) {
+                if (0 == script.attr("src").compareToIgnoreCase("resources/js/cf_preview.js")) {
+                    script.remove();
+                }
+            }
             fileStream = new FileOutputStream(new File(folderUtil.getStatic_folder()+ File.separator + sitename));
             OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
             try {
@@ -2035,6 +2066,44 @@ public class Clownfish {
             if (null != asset) {
                 src = "cache/cache" + asset.getName() + width + height;
             }
+        }
+        return src;
+    }
+    
+    private String makeStaticImage(String src, String separator) {
+        if (src.contains("GetAsset?apikey=")) {
+            String[] datasources = src.split(separator);
+            StringBuilder src_out = new StringBuilder();
+            for (String datasource : datasources) {
+                String[] datasource_components = datasource.trim().split(" ");
+                String[] src_params = datasource_components[0].split("&");
+                CfAsset asset = null;
+                String width = "W0";
+                String height = "H0";
+                for (String param : src_params) {
+                    if (param.startsWith("file")) {
+                        String[] file_params = param.split("=");
+                        asset = cfassetService.findByName(file_params[1]);
+                    }
+                    if (param.startsWith("mediaid")) {
+                        String[] media_params = param.split("=");
+                        asset = cfassetService.findById(Long.parseLong(media_params[1]));
+                    }
+                    if (param.startsWith("width")) {
+                        String[] width_params = param.split("=");
+                        width = "W" + width_params[1];
+                    }
+                    if (param.startsWith("height")) {
+                        String[] height_params = param.split("=");
+                        height = "H" + height_params[1];
+                    }
+                }
+                if (null != asset) {
+                    src_out = src_out.append("cache/cache" + asset.getName() + width + height + " " + datasource_components[1] + ", ");
+                }
+            }
+            src_out = src_out.delete(src_out.length() - 2, src_out.length());
+            src = src_out.toString();
         }
         return src;
     }
