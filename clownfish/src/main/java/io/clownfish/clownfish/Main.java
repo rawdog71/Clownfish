@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish;
 
+import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.ScriptRunner;
 import io.clownfish.clownfish.servlets.ClownfishWebdavServlet;
@@ -66,6 +67,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.util.DefaultPropertiesPersister;
+import io.clownfish.clownfish.utils.PropertyUtil;
 
 /**
  *
@@ -92,6 +94,8 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     
     @Autowired
     AutowireCapableBeanFactory beanFactory;
+    @Autowired PropertyList propertylist;
+    private static PropertyUtil propertyUtil;
     
     public static void main(String[] args) {
         try {
@@ -173,6 +177,13 @@ public class Main extends SpringBootServletInitializer implements ServletContext
 
         // Register resource handler for images
         registry.addResourceHandler("images/**").addResourceLocations("/WEB-INF/images/")
+            .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+            .resourceChain(true)
+            .addResolver(new PathResourceResolver());
+        
+        propertyUtil = new PropertyUtil(propertylist);
+        // Register resource handler for cached_images
+        registry.addResourceHandler("cache/**").addResourceLocations("file:///" + propertyUtil.getPropertyValue("folder_cache")+"/")
             .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
             .resourceChain(true)
             .addResolver(new PathResourceResolver());

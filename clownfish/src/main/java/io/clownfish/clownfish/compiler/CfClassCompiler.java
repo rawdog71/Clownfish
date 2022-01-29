@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.io.FilenameUtils;
@@ -330,7 +329,7 @@ public class CfClassCompiler
                                     }
                                 }
                             }
-                            catch (ClassNotFoundException | IOException | IllegalStateException /*| NoSuchMethodException | IllegalAccessException | InvocationTargetException*/ e)
+                            catch (ClassNotFoundException | IOException | IllegalStateException e)
                             {
                                 LOGGER.error(e.getMessage());
                             }
@@ -361,11 +360,9 @@ public class CfClassCompiler
     // Create classpath String from temp dir, maven libs and custom libs for compilation
     public String constructClasspath() throws IOException
     {
-        // StringBuilder classPath = new StringBuilder(System.getProperty("java.class.path").trim());
         StringBuilder classPath = new StringBuilder(System.getProperty("java.class.path"));
 
         // $CLOWNFISH_DIR/cache/src/io/clownfish/internal
-        // classPath.append(classpathDelim()).append("\"").append(getTmpdir().toString()).append("\"");
         classPath.append(ClownfishUtil.classpathDelim()).append(getTmpdir().toString());
 
         // $CLOWNFISH_DIR/maven/
@@ -376,7 +373,6 @@ public class CfClassCompiler
         if (!maven.isEmpty())
         {
             maven.stream().filter(file -> file.getName().endsWith(".jar")).collect(Collectors.toList())
-                    //.forEach(jar -> classPath.append(classpathDelim()).append("\"").append(jar.getAbsolutePath()).append("\""));
                     .forEach(jar -> classPath.append(ClownfishUtil.classpathDelim()).append(jar.getAbsolutePath()));
         }
 
@@ -388,7 +384,6 @@ public class CfClassCompiler
         if (!libs.isEmpty())
         {
             libs.stream().filter(file -> file.getName().endsWith(".jar")).collect(Collectors.toList())
-                    //.forEach(jar -> classPath.append(classpathDelim()).append("\"").append(jar.getAbsolutePath()).append("\""));
                     .forEach(jar -> classPath.append(ClownfishUtil.classpathDelim()).append(jar.getAbsolutePath()));
         }
         LOGGER.info("CLASSPATH: " + classPath.toString());
@@ -421,29 +416,11 @@ public class CfClassCompiler
         }
 
         ArrayList<File> javas = new ArrayList<>();
-
         for (CfJava java : cfjavaService.findAll())
         {
-            String extension = "";
             if (tmpdir != null)
             {
-                switch (java.getLanguage()) {
-                    case 0:
-                        extension = ".java";
-                        break;
-                    case 1:
-                        extension = ".kt";
-                        break;
-                    case 2:
-                        extension = ".groovy";
-                        break;
-                    case 3:
-                        extension = ".scala";
-                        break;
-                }
-                
-                File src = new File(getTmpdir().toFile() + File.separator + java.getName() + extension);
-
+                File src = new File(getTmpdir().toFile() + File.separator + java.getName() + getClassExtension(java));
                 try (Writer srcWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(src), StandardCharsets.UTF_8)))
                 {
                     srcWriter.write(java.getContent());
@@ -455,16 +432,14 @@ public class CfClassCompiler
                 }
             }
         }
-
         compileClasses(javas, withMessage);
     }
 
     public void createTempDir() throws IOException
     {
-        //CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
-        Path tmp = Files.createTempDirectory(Paths.get(propertyUtil.getPropertyValue("folder_cache")), "src");
+        Path tmp = Files.createTempDirectory(Paths.get(propertyUtil.getPropertyValue("folder_libs")), "src");
 
-        // $CLOWNFISH_DIR/cache/src/io/clownfish/internal
+        // $CLOWNFISH_DIR/libs/src/io/clownfish/internal
         File dirs = new File(Paths.get(tmp.toString()
                 + File.separator + "io"
                 + File.separator + "clownfish"
@@ -495,26 +470,17 @@ public class CfClassCompiler
         });
         Runtime.getRuntime().addShutdownHook(deleteHook);
     }
-
-    private static class MyOutputStream extends OutputStream {
-        private final Consumer<String> consumer;
-        private final StringBuffer stringBuffer = new StringBuffer();
-
-        public MyOutputStream(Consumer<String> consumer) {
-            this.consumer = consumer;
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            stringBuffer.append((char) b);
-        }
-
-        @Override
-        public void flush() {
-            if (stringBuffer.length() != 0) {
-                consumer.accept(stringBuffer.toString().trim());
-                stringBuffer.delete(0, stringBuffer.length());
+    
+    private String getClassExtension(CfJava java) {
+        String extension = "";
+        for (JVMLanguages language : compilerlanguages.getJvm_languages().keySet()) {
+            if (compilerlanguages.getJvm_languages().get(language)) {
+                if (java.getLanguage() == language.getId()) {
+                    extension = "." + language.getExt();
+                    break;
+                }
             }
         }
+        return extension;
     }
 }

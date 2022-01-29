@@ -1520,10 +1520,17 @@ public class Clownfish {
     private void generateStaticSite(String sitename, String content) {
         FileOutputStream fileStream = null;
         try {
+            Document doc = Jsoup.parse(content);
+            Elements elem_images = doc.body().select("img");
+            for (Element image : elem_images) {
+                String src = image.attr("src");
+                src = makeStaticImage(src);
+                image.attr("src", src);
+            }
             fileStream = new FileOutputStream(new File(folderUtil.getStatic_folder()+ File.separator + sitename));
             OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
             try {
-                writer.write(content);
+                writer.write(doc.html());
                 writer.close();
             } catch (IOException e) {
                 throw new RuntimeException("Unable to create the destination file", e);
@@ -1999,5 +2006,36 @@ public class Clownfish {
             }
         }
         return content;
+    }
+
+    private String makeStaticImage(String src) {
+        if (src.contains("GetAsset?apikey=")) {
+            String[] src_params = src.split("&");
+            CfAsset asset = null;
+            String width = "W0";
+            String height = "H0";
+            for (String param : src_params) {
+                if (param.startsWith("file")) {
+                    String[] file_params = param.split("=");
+                    asset = cfassetService.findByName(file_params[1]);
+                }
+                if (param.startsWith("mediaid")) {
+                    String[] media_params = param.split("=");
+                    asset = cfassetService.findById(Long.parseLong(media_params[1]));
+                }
+                if (param.startsWith("width")) {
+                    String[] width_params = param.split("=");
+                    width = "W" + width_params[1];
+                }
+                if (param.startsWith("height")) {
+                    String[] height_params = param.split("=");
+                    height = "H" + height_params[1];
+                }
+            }
+            if (null != asset) {
+                src = "cache/cache" + asset.getName() + width + height;
+            }
+        }
+        return src;
     }
 }
