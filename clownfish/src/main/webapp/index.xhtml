@@ -391,10 +391,12 @@
                                                      paginator="false" 
                                                      selectionMode="single" selection="#{sitetree.current_classcontent}" rowKey="#{classcontent.id}"
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredContent}" widgetVar="classcontentlist" rendered="${sitetree.contenteditable and sitetree.showContent}">
-                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutContent}" update=":form:tabview:preview" />
-                                            <p:ajax event="" listener="#{sitetree.onSelectLayoutContent}" update=":form:tabview:preview" />
+                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutContent}" />
                                             <p:column headerText="Content" filterBy="#{classcontent.name}" filterMatchMode="contains">
                                                 <h:outputText value="#{classcontent.name}" />
+                                            </p:column>
+                                            <p:column width="25px">
+                                                <p:commandButton icon="pi pi-save" styleClass="rounded-button ui-button-flat ui-button-plain" actionListener="#{sitetree.onSaveLayoutContent(classcontent)}" update=":form:tabview:layoutcontentedit :form:tabview:preview" />
                                             </p:column>
                                         </p:dataTable>
                                         

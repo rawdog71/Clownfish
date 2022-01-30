@@ -898,6 +898,21 @@ public class SiteTreeBean implements Serializable {
         }
     }
     
+    public void onSaveLayoutContent(CfClasscontent classcontent) {
+        if (null != classcontent) {
+            String[] contentinfos = selected_contentclass.split(":");
+            int lfdnr = Integer.parseInt(contentinfos[1]);
+            current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "C", lfdnr);
+            current_layoutcontent.setContentref(BigInteger.ZERO);          
+            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_classcontent.getId()));
+            try {
+                cflayoutcontentService.create(current_layoutcontent);
+            } catch (Exception ex) {
+                cflayoutcontentService.edit(current_layoutcontent);
+            }
+        }
+    }
+
     /**
      * Selects a Content
      * @param event
@@ -905,18 +920,7 @@ public class SiteTreeBean implements Serializable {
     public void onSelectLayoutContent(SelectEvent event) {
         current_classcontent = (CfClasscontent) event.getObject();
         if (null != current_classcontent) {
-            if (null == current_layoutcontent) {
-                String[] contentinfos = selected_contentclass.split(":");
-                int lfdnr = Integer.parseInt(contentinfos[1]);
-                current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "C", lfdnr);
-                current_layoutcontent.setContentref(BigInteger.ZERO);
-            }
-            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_classcontent.getId()));
-            try {
-                cflayoutcontentService.create(current_layoutcontent);
-            } catch (Exception ex) {
-                cflayoutcontentService.edit(current_layoutcontent);
-            }
+            
         }
     }
     
