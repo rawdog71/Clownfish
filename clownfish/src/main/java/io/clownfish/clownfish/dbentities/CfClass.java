@@ -27,6 +27,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -61,6 +63,9 @@ public class CfClass implements Serializable {
     @NotNull
     @Column(name = "maintenance")
     private boolean maintenance;
+    @JoinColumn(name = "templateref", referencedColumnName = "id")
+    @ManyToOne(optional = true)
+    private CfTemplate templateref;
 
     public CfClass() {
     }
@@ -106,6 +111,14 @@ public class CfClass implements Serializable {
 
     public void setMaintenance(boolean maintenance) {
         this.maintenance = maintenance;
+    }
+
+    public CfTemplate getTemplateref() {
+        return templateref;
+    }
+
+    public void setTemplateref(CfTemplate templateref) {
+        this.templateref = templateref;
     }
     
     @Override

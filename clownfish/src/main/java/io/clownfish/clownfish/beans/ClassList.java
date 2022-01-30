@@ -20,11 +20,13 @@ import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.Serializable;
 import java.util.List;
@@ -34,6 +36,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.util.stream.Collectors;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import lombok.Getter;
@@ -58,6 +61,7 @@ public class ClassList implements Serializable {
     @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfClasscontentService cfclascontentService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired transient CfTemplateService cftemplateService;
     @Autowired DataList datalist;
     @Autowired ContentList contentlist;
     
@@ -76,6 +80,8 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean isindex;
     private @Getter @Setter List<CfClass> classListeRef;
     private @Getter @Setter CfClass selectedClassRef = null;
+    private @Getter @Setter List<CfTemplate> templateListeRef;
+    private @Getter @Setter CfTemplate selectedTemplateRef = null;
     private @Getter @Setter boolean newButtonDisabled;
     private @Getter @Setter boolean newAttributButtonDisabled;
     private @Getter @Setter boolean renderClass;
@@ -90,6 +96,7 @@ public class ClassList implements Serializable {
         classListe = cfclassService.findAll();
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
+        templateListeRef = cftemplateService.findAll();
         renderClass = false;
         LOGGER.info("INIT CLASSLIST END");
     }
@@ -98,6 +105,13 @@ public class ClassList implements Serializable {
         classListe = cfclassService.findAll();
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
+        templateListeRef = cftemplateService.findAll();
+    }
+    
+    public List<CfTemplate> completeText(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return templateListeRef.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
     }
     
     public void onSelect(SelectEvent event) {
@@ -106,6 +120,7 @@ public class ClassList implements Serializable {
         className = selectedClass.getName();
         classSearchrelevant = selectedClass.isSearchrelevant();
         classMaintenance = selectedClass.isMaintenance();
+        selectedTemplateRef = selectedClass.getTemplateref();
         attributName = "";
         selectedAttributeType = null;
         newButtonDisabled = true;
@@ -152,6 +167,7 @@ public class ClassList implements Serializable {
             newclass.setName(className);
             newclass.setSearchrelevant(classSearchrelevant);
             newclass.setMaintenance(classMaintenance);
+            newclass.setTemplateref(selectedTemplateRef);
             cfclassService.create(newclass);
             classListe = cfclassService.findAll();
             classListeRef = cfclassService.findAll();
@@ -174,6 +190,7 @@ public class ClassList implements Serializable {
             selectedClass.setName(className);
             selectedClass.setSearchrelevant(classSearchrelevant);
             selectedClass.setMaintenance(classMaintenance);
+            selectedClass.setTemplateref(selectedTemplateRef);
             cfclassService.edit(selectedClass);
             classListe = cfclassService.findAll();
             contentlist.init();

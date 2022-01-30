@@ -392,6 +392,7 @@
                                                      selectionMode="single" selection="#{sitetree.current_classcontent}" rowKey="#{classcontent.id}"
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredContent}" widgetVar="classcontentlist" rendered="${sitetree.contenteditable and sitetree.showContent}">
                                             <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutContent}" update=":form:tabview:preview" />
+                                            <p:ajax event="" listener="#{sitetree.onSelectLayoutContent}" update=":form:tabview:preview" />
                                             <p:column headerText="Content" filterBy="#{classcontent.name}" filterMatchMode="contains">
                                                 <h:outputText value="#{classcontent.name}" />
                                             </p:column>
@@ -874,7 +875,7 @@
                     
                     <div class="flex flex-row pb-2">
                         <p:dataTable id="classlist" size="small" scrollable="true" scrollHeight="250" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
-                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass" />
+                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate" />
                             <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains">
                                 <h:outputText value="#{clazz.name}" />
                             </p:column>
@@ -897,6 +898,12 @@
                         <div class="flex align-items-center pr-2">
                             <p:outputLabel for="classmaintenance" style="margin-right: 0.5rem">Backend maintenance: </p:outputLabel>
                             <p:selectBooleanCheckbox id="classmaintenance" value="#{classList.classMaintenance}" />
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="classtemplate" style="margin-right: 0.5rem">Preview Template: </p:outputLabel>
+                            <p:autoComplete id="classtemplate" dropdown="true" value="#{classList.selectedTemplateRef}" completeMethod="#{classList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
+                            </p:autoComplete>
                         </div>
                         
                         <div class="flex align-items-center pr-2">    
