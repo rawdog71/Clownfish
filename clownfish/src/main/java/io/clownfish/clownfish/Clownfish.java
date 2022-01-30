@@ -77,7 +77,6 @@ import javax.ws.rs.core.Context;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -208,6 +207,7 @@ public class Clownfish {
     String libloaderpath;
     String mavenpath;
     private @Getter @Setter boolean initmessage = false;
+    private @Getter @Setter SiteTreeBean sitetree;
     
     /**
      * Call of the "root" site
@@ -1911,8 +1911,17 @@ public class Clownfish {
                 if (preview) {
                     div.addClass("cf_div");
                 }
-                
-                div.html(content);
+                if (preview) {
+                    if ((null != sitetree) && (null != sitetree.getLayout())) {
+                        for (CfDiv comp_div : sitetree.getLayout().getDivs()) {
+                            if ((0 == cfdiv.getName().compareToIgnoreCase(comp_div.getName())) && (comp_div.isVisible())) {
+                                div.html(content);
+                            }
+                        }
+                    }
+                } else {
+                    div.html(content);
+                }
             }
             cflayout.getDivArray().put(div.attr("id"), cfdiv);
         }

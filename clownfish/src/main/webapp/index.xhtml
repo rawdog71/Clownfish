@@ -18,7 +18,7 @@
     <h:body>
         <h:form id="form" enctype="multipart/form-data">
             <div class="card">
-                <p:toolbar id="tb">
+                <p:toolbar id="tb" class="toolbar">
                     <f:facet name="left">
                         <p:graphicImage value="images/clownfish-48.png" />
                         <p:outputLabel value="&nbsp;" />
@@ -283,7 +283,7 @@
                                     <p:tab title="SAP" id="site_sap" rendered="#{sitetree.sapSupport}">
                                         <p:panelGrid id="sitepanel_sap" columns="1">
                                             <p:column colspan="12" style="vertical-align: top;">
-                                                <p:dataTable id="saprfclist" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.cfSitesaprfcPK}">
+                                                <p:dataTable id="saprfclist" size="small" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.cfSitesaprfcPK}">
                                                     <p:ajax event="rowSelect" listener="#{sitetree.onRfcSelect}" update=":form:tabview:tabsiteview:siterfcgroup :form:tabview:tabsiteview:siterfcfunction" />
                                                     <p:column headerText="RFC GRUPPE">
                                                         <h:outputText value="#{rfclist.cfSitesaprfcPK.rfcgroup}" />
@@ -346,6 +346,9 @@
                                         <p:column headerText="DIV Template">
                                             <h:outputText value="#{layouttemplate.name}" />
                                         </p:column>
+                                        <p:column width="25px">
+                                            <p:commandButton icon="pi #{layouttemplate.showIcon()}" styleClass="rounded-button ui-button-flat ui-button-plain" actionListener="#{sitetree.invertShow(layouttemplate)}" update=":form:tabview:layoutcontentedit :form:tabview:preview" />
+                                        </p:column>
                                     </p:dataTable>
                                 </p:panelGrid>
                             </p:column>
@@ -384,7 +387,7 @@
                                 <p:panelGrid id="layoutcontentclassselection" columns="1">
                                     <p:scrollPanel id="layoutcontentpanel" style="height: 400px; border: none;" mode="native">
                                         
-                                        <p:dataTable id="layoutclasscontentlist" style="width: 400px" var="classcontent" value="#{sitetree.current_classcontentlist}" 
+                                        <p:dataTable id="layoutclasscontentlist" size="small" style="width: 400px" var="classcontent" value="#{sitetree.current_classcontentlist}" 
                                                      paginator="false" 
                                                      selectionMode="single" selection="#{sitetree.current_classcontent}" rowKey="#{classcontent.id}"
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredContent}" widgetVar="classcontentlist" rendered="${sitetree.contenteditable and sitetree.showContent}">
@@ -394,7 +397,7 @@
                                             </p:column>
                                         </p:dataTable>
                                         
-                                        <p:dataTable id="layoutdatalist" style="width: 400px" var="datalist" value="#{sitetree.current_datalist}" 
+                                        <p:dataTable id="layoutdatalist" size="small" style="width: 400px" var="datalist" value="#{sitetree.current_datalist}" 
                                                      paginator="false" 
                                                      selectionMode="single" selection="#{sitetree.current_list}" rowKey="#{datalist.id}"
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredList}" widgetVar="classcontentdatalist" rendered="${sitetree.contenteditable and sitetree.showDatalist}">
@@ -404,7 +407,7 @@
                                             </p:column>
                                         </p:dataTable>
                                         
-                                        <p:dataTable id="layoutassetlistselect" style="width: 400px" var="asset" value="#{sitetree.current_assetlist}" 
+                                        <p:dataTable id="layoutassetlistselect" size="small" style="width: 400px" var="asset" value="#{sitetree.current_assetlist}" 
                                                      paginator="false" 
                                                      selectionMode="single" selection="#{sitetree.current_asset}" rowKey="#{asset.id}"
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredAsset}" widgetVar="classcontentasset" rendered="${sitetree.contenteditable and sitetree.showAsset}">
@@ -414,7 +417,7 @@
                                             </p:column>
                                         </p:dataTable>
                                         
-                                        <p:dataTable id="layoutassetlibrarylistselect" style="width: 400px" var="assetlibrary" value="#{sitetree.current_assetlibrarylist}" 
+                                        <p:dataTable id="layoutassetlibrarylistselect" size="small" style="width: 400px" var="assetlibrary" value="#{sitetree.current_assetlibrarylist}" 
                                                      paginator="false" 
                                                      selectionMode="single" selection="#{sitetree.current_assetlibrary}" rowKey="#{assetlibrary.id}"
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredAssetlibrary}" widgetVar="classcontentassetlibrary" rendered="${sitetree.contenteditable and sitetree.showAssetLibrary}">
@@ -424,7 +427,7 @@
                                             </p:column>
                                         </p:dataTable>
                                         
-                                        <p:dataTable id="layoutkeywordlibrarylistselect" style="width: 400px" var="keywordlibrary" value="#{sitetree.current_keywordlibrarylist}" 
+                                        <p:dataTable id="layoutkeywordlibrarylistselect" size="small" style="width: 400px" var="keywordlibrary" value="#{sitetree.current_keywordlibrarylist}" 
                                                      paginator="false" 
                                                      selectionMode="single" selection="#{sitetree.current_keywordlibrary}" rowKey="#{keywordlibrary.id}"
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredKeywordlibrary}" widgetVar="classcontentkeywordlibrary" rendered="${sitetree.contenteditable and sitetree.showKeywordLibrary}">
@@ -522,7 +525,7 @@
                         </p:slider>
 
                         <p:overlayPanel id="difftemplatePanel" for="difftemplateBtn" dynamic="false" style="width:600px" modal="true">
-                            <p:dataTable var="diff" lazy="false" value="#{templateList.templateUtility.patch.deltas}" rows="#{templateList.templateUtility.patch.deltas.size()}" paginator="false">
+                            <p:dataTable var="diff" lazy="false" size="small" value="#{templateList.templateUtility.patch.deltas}" rows="#{templateList.templateUtility.patch.deltas.size()}" paginator="false">
                                 <p:column headerText="DiffTyp">
                                     <h:outputText value="#{diff.type}" />
                                 </p:column>
@@ -596,7 +599,7 @@
                         </p:slider>
                         
                         <p:overlayPanel id="diffstylesheetPanel" for="diffstylesheetBtn" dynamic="false" style="width:600px" modal="true">
-                            <p:dataTable var="diff" lazy="false" value="#{stylesheetList.stylesheetUtility.patch.deltas}" rows="#{stylesheetList.stylesheetUtility.patch.deltas.size()}" paginator="false">
+                            <p:dataTable var="diff" size="small" lazy="false" value="#{stylesheetList.stylesheetUtility.patch.deltas}" rows="#{stylesheetList.stylesheetUtility.patch.deltas.size()}" paginator="false">
                                 <p:column headerText="DiffTyp">
                                     <h:outputText value="#{diff.type}" />
                                 </p:column>
@@ -670,7 +673,7 @@
                         </p:slider>
                         
                         <p:overlayPanel id="diffjavascriptPanel" for="diffjavascriptBtn" dynamic="false" style="width:600px" modal="true">
-                            <p:dataTable var="diff" lazy="false" value="#{javascriptList.javascriptUtility.patch.deltas}" rows="#{javascriptList.javascriptUtility.patch.deltas.size()}" paginator="false">
+                            <p:dataTable size="small" var="diff" lazy="false" value="#{javascriptList.javascriptUtility.patch.deltas}" rows="#{javascriptList.javascriptUtility.patch.deltas.size()}" paginator="false">
                                 <p:column headerText="DiffTyp">
                                     <h:outputText value="#{diff.type}" />
                                 </p:column>
@@ -752,7 +755,7 @@
                                 </p:slider>
 
                                 <p:overlayPanel id="diffjavaPanel" for="diffjavaBtn" dynamic="false" style="width:600px" modal="true">
-                                    <p:dataTable var="diff" lazy="false" value="#{javaList.javaUtility.patch.deltas}" rows="#{javaList.javaUtility.patch.deltas.size()}" paginator="false">
+                                    <p:dataTable size="small" var="diff" lazy="false" value="#{javaList.javaUtility.patch.deltas}" rows="#{javaList.javaUtility.patch.deltas.size()}" paginator="false">
                                         <p:column headerText="DiffTyp">
                                             <h:outputText value="#{diff.type}" />
                                         </p:column>
@@ -809,7 +812,7 @@
                                 </p:commandButton>
                             </p:panelGrid>
 
-                            <p:dataTable id="mavensearchlist" stickyHeader="true" var="mvndoc" value="#{mavenList.mvnDocs}" selectionMode="single" selection="#{mavenList.selectedMavenDoc}" rowKey="#{mvndoc.id}">
+                            <p:dataTable id="mavensearchlist" size="small" scrollable="true" scrollHeight="250" var="mvndoc" value="#{mavenList.mvnDocs}" selectionMode="single" selection="#{mavenList.selectedMavenDoc}" rowKey="#{mvndoc.id}">
                                 <p:ajax event="rowSelect" listener="#{mavenList.onSelectMavenDoc}" />
                                 <p:column headerText="ID">
                                     <h:outputText value="#{mvndoc.id}" />
@@ -836,7 +839,7 @@
                                 </p:commandButton>
                             </p:panelGrid>
 
-                            <p:dataTable id="maveninstalledlist" var="mvn" value="#{mavenList.mavenlist}" selectionMode="single" selection="#{mavenList.selectedMaven}" rowKey="#{mvn.id}">
+                            <p:dataTable id="maveninstalledlist" size="small" var="mvn" value="#{mavenList.mavenlist}" selectionMode="single" selection="#{mavenList.selectedMaven}" rowKey="#{mvn.id}">
                                 <p:ajax event="rowSelect" listener="#{mavenList.onSelectMaven}" />
                                 <p:column headerText="ID">
                                     <h:outputText value="#{mvn.mavenId}" />
@@ -870,14 +873,12 @@
                     </f:facet>
                     
                     <div class="flex flex-row pb-2">
-                        <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                            <p:dataTable id="classlist" stickyHeader="true" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
-                                <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass" />
-                                <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains">
-                                    <h:outputText value="#{clazz.name}" />
-                                </p:column>
-                            </p:dataTable>
-                        </p:scrollPanel>
+                        <p:dataTable id="classlist" size="small" scrollable="true" scrollHeight="250" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
+                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass" />
+                            <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains">
+                                <h:outputText value="#{clazz.name}" />
+                            </p:column>
+                        </p:dataTable>
                     </div>
 
                     <div class="flex flex-row pb-2">
@@ -916,7 +917,7 @@
                         </div>
                     </div>
 
-                    <p:dataTable id="attributlist" var="attribut" value="#{classList.selectedAttributList}" selectionMode="single" selection="#{classList.selectedAttribut}" rowKey="#{attribut.id}">
+                    <p:dataTable id="attributlist" size="small" var="attribut" value="#{classList.selectedAttributList}" selectionMode="single" selection="#{classList.selectedAttribut}" rowKey="#{attribut.id}">
                         <p:ajax event="rowSelect" listener="#{classList.onSelectAttribute}" update=":form:msgs :form:tabview:attributname :form:tabview:attributtype :form:tabview:classeditor" />
                         <p:column headerText="Name">
                             <h:outputText value="#{attribut.name}" />
@@ -996,8 +997,8 @@
                     </f:facet>
                     
                     <div class="flex flex-row pb-2">
-                        <p:scrollPanel id="contentpanel" style="height: 400px; border: none;" mode="native">
-                            <p:dataTable id="classcontentlist" stickyHeader="true" var="classcontent" value="#{classcontentList.classcontentlist}" 
+                        <p:panel id="contentpanel">
+                            <p:dataTable id="classcontentlist" size="small" scrollable="true" scrollHeight="250" var="classcontent" value="#{classcontentList.classcontentlist}" 
                                          paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                                          rowsPerPageTemplate="10,50,100"
                                          selectionMode="single" selection="#{classcontentList.selectedContent}" rowKey="#{classcontent.id}"
@@ -1016,7 +1017,7 @@
                                     <h:outputText value="#{classcontent.classref}" />
                                 </p:column>
                             </p:dataTable>
-                        </p:scrollPanel>
+                        </p:panel>
                     </div>
 
                     <p:panel id="contentbtnpanel">
@@ -1057,7 +1058,7 @@
                     </p:panel>
                     
                     <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
-                        <p:dataTable id="attributcontentlist" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentList.selectedAttributContent}" rowKey="#{attributcontent.id}">
+                        <p:dataTable id="attributcontentlist" size="small" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentList.selectedAttributContent}" rowKey="#{attributcontent.id}">
                             <p:ajax event="rowSelect" listener="#{classcontentList.onSelectAttribut}" update=":form:tabview:attributcontentlist" />
                             <p:column headerText="Name" style="width: 200px;">
                                 <h:outputText value="#{attributcontent.attributref.name}" />
@@ -1066,44 +1067,44 @@
                                 <h:outputText value="#{attributcontent.attributref.attributetype}" />
                             </p:column>
                             <p:column headerText="Wert">
-                                <p:inputText id="attributvalueString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.stringType}" />
-                                <p:password id="attributvalueHashString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.hashStringType}" />
-                                <p:inputNumber id="attributvalueInt" value="#{classcontentList.editContent}" decimalPlaces="0" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.integerType}" />
-                                <p:inputNumber id="attributvalueReal" value="#{classcontentList.editContent}" decimalPlaces="2" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.realType}" />
-                                <pe:monacoEditor id="attributvalueHtmlText" disabled="false" widgetVar="editor1" editorOptions="#{classcontentList.editorOptions}" value="#{classcontentList.editContent}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.HTMLTextType}" />
-                                <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px; width:100%" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.textType}" />
-                                <pe:monacoEditor id="attributvalueMarkdown" disabled="false" widgetVar="editor13" editorOptions="#{classcontentList.editorOptions}" value="#{classcontentList.editContent}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.markdownType}" />
-                                <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.booleanType}" />
-                                <p:calendar id="attributvalueDatetime" value="#{classcontentList.editCalendar}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" />
-                                <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" var="mp" converter="#{assetConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}">
-                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                    <f:selectItems value="#{classcontentList.assetlist}" var="media" itemLabel="#{media.name}" itemValue="#{media}" />
-                                    <p:column>
-                                    <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
-                                    </p:column>
-                                    <p:column>
-                                    #{mp.name}
-                                    </p:column>
-                                </p:selectOneMenu>
-                                <p:selectOneMenu dynamic="true" id="classref" value="#{classcontentList.editDatalist}" converter="#{sitelistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType}">
-                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                    <f:selectItems value="#{classcontentList.selectedList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
-                                </p:selectOneMenu>
-                                <p:selectOneMenu dynamic="true" id="assetref" value="#{classcontentList.editAssetlist}" converter="#{assetlistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.assetrefType}">
-                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                    <f:selectItems value="#{classcontentList.selectedAssetList}" var="assetdatalist" itemLabel="#{assetdatalist.name}" itemValue="#{assetdatalist}" />
-                                </p:selectOneMenu>
+                                    <p:inputText id="attributvalueString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.stringType}" />
+                                    <p:password id="attributvalueHashString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.hashStringType}" />
+                                    <p:inputNumber id="attributvalueInt" value="#{classcontentList.editContent}" decimalPlaces="0" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.integerType}" />
+                                    <p:inputNumber id="attributvalueReal" value="#{classcontentList.editContent}" decimalPlaces="2" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.realType}" />
+                                    <pe:monacoEditor id="attributvalueHtmlText" disabled="false" widgetVar="editor1" editorOptions="#{classcontentList.editorOptions}" value="#{classcontentList.editContent}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.HTMLTextType}" />
+                                    <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px; width:100%" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.textType}" />
+                                    <pe:monacoEditor id="attributvalueMarkdown" disabled="false" widgetVar="editor13" editorOptions="#{classcontentList.editorOptions}" value="#{classcontentList.editContent}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.markdownType}" />
+                                    <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.booleanType}" />
+                                    <p:calendar id="attributvalueDatetime" value="#{classcontentList.editCalendar}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" />
+                                    <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" var="mp" converter="#{assetConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}">
+                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                        <f:selectItems value="#{classcontentList.assetlist}" var="media" itemLabel="#{media.name}" itemValue="#{media}" />
+                                        <p:column>
+                                        <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
+                                        </p:column>
+                                        <p:column>
+                                        #{mp.name}
+                                        </p:column>
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu dynamic="true" id="classref" value="#{classcontentList.editDatalist}" converter="#{sitelistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType}">
+                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                        <f:selectItems value="#{classcontentList.selectedList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu dynamic="true" id="assetref" value="#{classcontentList.editAssetlist}" converter="#{assetlistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.assetrefType}">
+                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                        <f:selectItems value="#{classcontentList.selectedAssetList}" var="assetdatalist" itemLabel="#{assetdatalist.name}" itemValue="#{assetdatalist}" />
+                                    </p:selectOneMenu>
 
-                                <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
-                                <p:commandButton id="editattribut" icon="pi pi-pencil" process="form" value="Change" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" >
-                                    
-                                </p:commandButton>
-                                <p:focus for="attributvalueString" />
-                                <p:focus for="attributvalueInt" />
-                                <p:focus for="attributvalueReal" />
-                                <p:focus for="attributvalueHtmlText" />
-                                <p:focus for="attributvalueText" />
-                                <p:focus for="attributvalueMarkdown" />
+                                    <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
+                                    <p:commandButton id="editattribut" icon="pi pi-pencil" process="form" value="Change" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" >
+
+                                    </p:commandButton>
+                                    <p:focus for="attributvalueString" />
+                                    <p:focus for="attributvalueInt" />
+                                    <p:focus for="attributvalueReal" />
+                                    <p:focus for="attributvalueHtmlText" />
+                                    <p:focus for="attributvalueText" />
+                                    <p:focus for="attributvalueMarkdown" />
                             </p:column>
                         </p:dataTable>
                     </h:panelGrid>
@@ -1128,8 +1129,8 @@
                         <h:outputText value="Datalists"/>
                     </f:facet>
                     
-                    <p:scrollPanel id="datapanel" style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="datalistcontent" stickyHeader="true" var="datalist" value="#{datacontentList.datacontentlist}" 
+                    <p:panel id="datapanel">
+                        <p:dataTable id="datalistcontent" size="small" scrollable="true" scrollHeight="250" var="datalist" value="#{datacontentList.datacontentlist}" 
                                      paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                                      rowsPerPageTemplate="10,50,100"
                                      selectionMode="single" selection="#{datacontentList.selectedList}" rowKey="#{datalist.id}" widgetVar="datalistcontent">
@@ -1147,7 +1148,7 @@
                                 <h:outputText value="#{datalist.classref}" />
                             </p:column>
                         </p:dataTable>
-                    </p:scrollPanel>    
+                    </p:panel>
                     
                     <p:outputLabel for="datacontentname" style="margin-right: 0.5rem">Name</p:outputLabel>
                     <p:inputText id="datacontentname" value="#{datacontentList.contentName}" >
@@ -1180,14 +1181,12 @@
                         <h:outputText value="Datasources"/>
                     </f:facet>
 
-                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="datasourcelist" stickyHeader="true" var="datasource" value="#{datasourceList.datasourcelist}" selectionMode="single" selection="#{datasourceList.selectedDatasource}" rowKey="#{datasource.id}">
-                            <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver" />
-                            <p:column headerText="Name" filterBy="#{datasource.name}" filterMatchMode="contains">
-                                <h:outputText value="#{datasource.name}" />
-                            </p:column>
-                        </p:dataTable>
-                    </p:scrollPanel>    
+                    <p:dataTable id="datasourcelist" size="small" scrollable="true" scrollHeight="250" var="datasource" value="#{datasourceList.datasourcelist}" selectionMode="single" selection="#{datasourceList.selectedDatasource}" rowKey="#{datasource.id}">
+                        <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver" />
+                        <p:column headerText="Name" filterBy="#{datasource.name}" filterMatchMode="contains">
+                            <h:outputText value="#{datasource.name}" />
+                        </p:column>
+                    </p:dataTable>
 
                     <div style="display: flex; margin-bottom: 20px" class="datasource-table">
                         <p:panelGrid columns="2" style="width: 150px">
@@ -1248,7 +1247,7 @@
                         <p:growl id="messages" showDetail="true" />
                     </h:form>
                     <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
-                        <p:dataTable id="assetlist" var="media" value="#{assetList.assetlist}" paginator="true" rows="5"
+                        <p:dataTable id="assetlist" size="small" var="media" value="#{assetList.assetlist}" paginator="true" rows="5"
                                      paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                                      rowsPerPageTemplate="5,10,25,50,100" rowKey="#{media.id}"
                                      emptyMessage="No content available">
@@ -1321,18 +1320,15 @@
                         <h:outputText value="AssetLibraries"/>
                     </f:facet>
                     
-                    
-                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="assetlistcontent" stickyHeader="true" var="assetlistcontent" value="#{assetLibrary.assetlist}" 
-                                     selectionMode="single" selection="#{assetLibrary.selectedAssetlist}" rowKey="#{assetlistcontent.id}"
-                                     emptyMessage="No content available" filteredValue="#{assetLibrary.filteredAssetlist}" widgetVar="assetcontentlist">
-                            <p:ajax event="rowSelect" listener="#{assetLibrary.onSelect}" update=":form:msgs :form:tabview:assetcontentlist :form:tabview:assetcontentlistbox" />
-                            <p:column headerText="Name" filterBy="#{assetlistcontent.name}" filterMatchMode="contains">
-                                <h:outputText value="#{assetlistcontent.name}" />
-                            </p:column>
-                        </p:dataTable>
-                    </p:scrollPanel>    
-                    
+                    <p:dataTable id="assetlistcontent" size="small" scrollable="true" scrollHeight="250" var="assetlistcontent" value="#{assetLibrary.assetlist}" 
+                                 selectionMode="single" selection="#{assetLibrary.selectedAssetlist}" rowKey="#{assetlistcontent.id}"
+                                 emptyMessage="No content available" filteredValue="#{assetLibrary.filteredAssetlist}" widgetVar="assetcontentlist">
+                        <p:ajax event="rowSelect" listener="#{assetLibrary.onSelect}" update=":form:msgs :form:tabview:assetcontentlist :form:tabview:assetcontentlistbox" />
+                        <p:column headerText="Name" filterBy="#{assetlistcontent.name}" filterMatchMode="contains">
+                            <h:outputText value="#{assetlistcontent.name}" />
+                        </p:column>
+                    </p:dataTable>
+
                     <h:panelGrid columns="2">
                         <p:outputLabel for="assetcontentlist" value="Assetlist: " />
                         <p:inputText id="assetcontentlist" value="#{assetLibrary.assetlistname}" />
@@ -1355,16 +1351,13 @@
                         <h:outputText value="Keywords"/>
                     </f:facet>
                     
-                    
-                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="keywordlist" stickyHeader="true" var="keywordcontent" value="#{keywordList.keywordlist}" 
-                                     selectionMode="single" selection="#{keywordList.selectedKeyword}" rowKey="#{keywordcontent.id}"
-                                     emptyMessage="No content available" filteredValue="#{keywordList.filteredKeyword}" widgetVar="keywordlist">
-                            <p:column headerText="Name" filterBy="#{keywordcontent.name}" filterMatchMode="contains">
-                                <h:outputText value="#{keywordcontent.name}" />
-                            </p:column>
-                        </p:dataTable>
-                    </p:scrollPanel>    
+                    <p:dataTable id="keywordlist" size="small" scrollable="true" scrollHeight="250" var="keywordcontent" value="#{keywordList.keywordlist}" 
+                                 selectionMode="single" selection="#{keywordList.selectedKeyword}" rowKey="#{keywordcontent.id}"
+                                 emptyMessage="No content available" filteredValue="#{keywordList.filteredKeyword}" widgetVar="keywordlist">
+                        <p:column headerText="Name" filterBy="#{keywordcontent.name}" filterMatchMode="contains">
+                            <h:outputText value="#{keywordcontent.name}" />
+                        </p:column>
+                    </p:dataTable>
                     
                     <h:panelGrid columns="2">
                         <p:outputLabel for="keywords" value="Keywords: " />
@@ -1381,17 +1374,14 @@
                         <h:outputText value="KeywordLists"/>
                     </f:facet>
                     
-                    
-                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="keywordlistcontent" stickyHeader="true" var="keywordlistcontent" value="#{keywordContentList.keywordlist}" 
-                                     selectionMode="single" selection="#{keywordContentList.selectedKeywordlist}" rowKey="#{keywordlistcontent.id}"
-                                     emptyMessage="No content available" filteredValue="#{keywordContentList.filteredKeywordlist}" widgetVar="keywordcontentlist">
-                            <p:ajax event="rowSelect" listener="#{keywordContentList.onSelect}" update=":form:msgs :form:tabview:keywordcontentlist :form:tabview:keywordcontentlistbox" />
-                            <p:column headerText="Name" filterBy="#{keywordlistcontent.name}" filterMatchMode="contains">
-                                <h:outputText value="#{keywordlistcontent.name}" />
-                            </p:column>
-                        </p:dataTable>
-                    </p:scrollPanel>    
+                    <p:dataTable id="keywordlistcontent" size="small" scrollable="true" scrollHeight="250" var="keywordlistcontent" value="#{keywordContentList.keywordlist}" 
+                                 selectionMode="single" selection="#{keywordContentList.selectedKeywordlist}" rowKey="#{keywordlistcontent.id}"
+                                 emptyMessage="No content available" filteredValue="#{keywordContentList.filteredKeywordlist}" widgetVar="keywordcontentlist">
+                        <p:ajax event="rowSelect" listener="#{keywordContentList.onSelect}" update=":form:msgs :form:tabview:keywordcontentlist :form:tabview:keywordcontentlistbox" />
+                        <p:column headerText="Name" filterBy="#{keywordlistcontent.name}" filterMatchMode="contains">
+                            <h:outputText value="#{keywordlistcontent.name}" />
+                        </p:column>
+                    </p:dataTable>
                     
                     <h:panelGrid columns="2">
                         <p:outputLabel for="keywordcontentlist" value="Keywordlist: " />
@@ -1415,20 +1405,17 @@
                         <h:outputText value="Properties"/>
                     </f:facet>
                     
-                    
-                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="propertylist" stickyHeader="true" var="propertycontent" value="#{propertylist.propertylist}" 
-                                     selectionMode="single" selection="#{propertylist.selectedProperty}" rowKey="#{propertycontent.hashkey}"
-                                     emptyMessage="No content available" filteredValue="#{propertylist.filteredProperty}" widgetVar="propertylist">
-                            <p:ajax event="rowSelect" listener="#{propertylist.onSelect}" update=":form:tabview:propertypanel :form:tabview:propertybtnpanel" />
-                            <p:column headerText="Key" filterBy="#{propertycontent.hashkey}" filterMatchMode="contains">
-                                <h:outputText value="#{propertycontent.hashkey}" />
-                            </p:column>
-                            <p:column headerText="Value" filterBy="#{propertycontent.value}" filterMatchMode="contains">
-                                <h:outputText value="#{propertycontent.value}" />
-                            </p:column>
-                        </p:dataTable>
-                    </p:scrollPanel>
+                    <p:dataTable id="propertylist" size="small" scrollable="true" scrollHeight="250" var="propertycontent" value="#{propertylist.propertylist}" 
+                                 selectionMode="single" selection="#{propertylist.selectedProperty}" rowKey="#{propertycontent.hashkey}"
+                                 emptyMessage="No content available" filteredValue="#{propertylist.filteredProperty}" widgetVar="propertylist">
+                        <p:ajax event="rowSelect" listener="#{propertylist.onSelect}" update=":form:tabview:propertypanel :form:tabview:propertybtnpanel" />
+                        <p:column headerText="Key" filterBy="#{propertycontent.hashkey}" filterMatchMode="contains">
+                            <h:outputText value="#{propertycontent.hashkey}" />
+                        </p:column>
+                        <p:column headerText="Value" filterBy="#{propertycontent.value}" filterMatchMode="contains">
+                            <h:outputText value="#{propertycontent.value}" />
+                        </p:column>
+                    </p:dataTable>
                     
                     <p:panelGrid id="propertypanel" columns="2">
                         <p:outputLabel for="propertykey">Property Key</p:outputLabel>
@@ -1456,20 +1443,17 @@
                         <h:outputText value="Jobs"/>
                     </f:facet>
                     
-                    
-                    <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="joblist" stickyHeader="true" var="jobcontent" value="#{quartzlist.quartzlist}" 
-                                     selectionMode="single" selection="#{quartzlist.selectedQuartz}" rowKey="#{jobcontent.id}"
-                                     emptyMessage="No content available" filteredValue="#{quartzlist.filteredQuartz}" widgetVar="quartzlist">
-                            <p:ajax event="rowSelect" listener="#{quartzlist.onSelect}" update=":form:tabview:jobpanel :form:tabview:jobbtnpanel" />
-                            <p:column headerText="Name" filterBy="#{jobcontent.name}" filterMatchMode="contains">
-                                <h:outputText value="#{jobcontent.name}" />
-                            </p:column>
-                            <p:column headerText="Value" filterBy="#{jobcontent.schedule}" filterMatchMode="contains">
-                                <h:outputText value="#{jobcontent.schedule}" />
-                            </p:column>
-                        </p:dataTable>
-                    </p:scrollPanel>
+                    <p:dataTable id="joblist" size="small" scrollable="true" scrollHeight="250" var="jobcontent" value="#{quartzlist.quartzlist}" 
+                                 selectionMode="single" selection="#{quartzlist.selectedQuartz}" rowKey="#{jobcontent.id}"
+                                 emptyMessage="No content available" filteredValue="#{quartzlist.filteredQuartz}" widgetVar="quartzlist">
+                        <p:ajax event="rowSelect" listener="#{quartzlist.onSelect}" update=":form:tabview:jobpanel :form:tabview:jobbtnpanel" />
+                        <p:column headerText="Name" filterBy="#{jobcontent.name}" filterMatchMode="contains">
+                            <h:outputText value="#{jobcontent.name}" />
+                        </p:column>
+                        <p:column headerText="Value" filterBy="#{jobcontent.schedule}" filterMatchMode="contains">
+                            <h:outputText value="#{jobcontent.schedule}" />
+                        </p:column>
+                    </p:dataTable>
                     
                     <p:panelGrid id="jobpanelcustomize" columns="3">
                         <p:panelGrid id="jobpanel" columns="2">
@@ -1885,8 +1869,7 @@
                         <h:outputText value="User"/>
                     </f:facet>
                     
-                    
-                    <p:dataTable id="userlist" var="user" value="#{userlist.userlist}" 
+                    <p:dataTable id="userlist" size="small" var="user" value="#{userlist.userlist}" 
                                  selectionMode="single" selection="#{userlist.selectedUser}" rowKey="#{user.id}"
                                  emptyMessage="No content available">
                         <p:ajax event="rowSelect" listener="#{userlist.onSelect}" update=":form:tabview:userpanel :form:tabview:userbtnpanel :form:tabview:userbackendpanel" />
@@ -1941,26 +1924,24 @@
                         <h:outputText value="Webservice"/>
                     </f:facet>
 
-                    <p:scrollPanel style="height: 600px; border: none;" mode="native">
-                        <p:dataTable id="webserviceauthlist" stickyHeader="true" var="webserviceauth" value="#{webserviceauthlist.webserviceauthlist}" 
-                                    selectionMode="single" selection="#{webserviceauthlist.selectedWebserviceauth}" rowKey="#{webserviceauth.hash}"
-                                   emptyMessage="No content available">
-                           <p:ajax event="rowSelect" listener="#{webserviceauthlist.onSelect}" />
-                           <p:column headerText="Webservice" filterBy="#{webserviceauth.cfWebserviceauthPK.webserviceRef}" filterMatchMode="contains">
-                               <h:outputText value="#{webserviceauth.cfWebserviceauthPK.webserviceRef}" />
-                           </p:column>
-                           <p:column headerText="Hash">
-                               <h:outputText value="#{webserviceauth.hash}" />
-                           </p:column>
-                       </p:dataTable>
+                    <p:dataTable id="webserviceauthlist" size="small" scrollable="true" scrollHeight="250" var="webserviceauth" value="#{webserviceauthlist.webserviceauthlist}" 
+                                selectionMode="single" selection="#{webserviceauthlist.selectedWebserviceauth}" rowKey="#{webserviceauth.hash}"
+                               emptyMessage="No content available">
+                       <p:ajax event="rowSelect" listener="#{webserviceauthlist.onSelect}" />
+                       <p:column headerText="Webservice" filterBy="#{webserviceauth.cfWebserviceauthPK.webserviceRef}" filterMatchMode="contains">
+                           <h:outputText value="#{webserviceauth.cfWebserviceauthPK.webserviceRef}" />
+                       </p:column>
+                       <p:column headerText="Hash">
+                           <h:outputText value="#{webserviceauth.hash}" />
+                       </p:column>
+                    </p:dataTable>
 
-                       <p:outputLabel for="webservicelist" value="Webservices" />
-                       <p:selectOneMenu id="webservicelist" value="#{webserviceauthlist.selectedWebservice}" required="false" converter="#{webserviceConverterBean}">
-                           <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                           <f:selectItems value="#{webserviceauthlist.webservicelist}" />
-                       </p:selectOneMenu>
-                       <p:commandButton id="newwebserviceauth" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{webserviceauthlist.onCreateWebserviceAuth}" update=":form:msgs :form:tabview:webserviceauthlist" disabled="#{webserviceauthlist.newAuthButtonDisabled}" />
-                    </p:scrollPanel>
+                    <p:outputLabel for="webservicelist" value="Webservices" />
+                    <p:selectOneMenu id="webservicelist" value="#{webserviceauthlist.selectedWebservice}" required="false" converter="#{webserviceConverterBean}">
+                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                        <f:selectItems value="#{webserviceauthlist.webservicelist}" />
+                    </p:selectOneMenu>
+                    <p:commandButton id="newwebserviceauth" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{webserviceauthlist.onCreateWebserviceAuth}" update=":form:msgs :form:tabview:webserviceauthlist" disabled="#{webserviceauthlist.newAuthButtonDisabled}" />
                 </p:tab>
 
                 <p:tab title="Reef" id="reef" rendered="#{loginBean.login and loginBean.hasRights(17)}">
@@ -2061,7 +2042,7 @@
                     </f:facet>
 
                     <p:scrollPanel id="scrapyardpanel" style="height: 400px; border: none;" mode="native">
-                        <p:dataTable id="scrapyardclasscontentlist" var="scrapyardclasscontent" value="#{scrapyardList.classcontentlist}" 
+                        <p:dataTable id="scrapyardclasscontentlist" size="small" var="scrapyardclasscontent" value="#{scrapyardList.classcontentlist}" 
                                      paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                                      rowsPerPageTemplate="10,50,100"
                                      selectionMode="single" selection="#{scrapyardList.selectedContent}" rowKey="#{scrapyardclasscontent.id}"
@@ -2095,7 +2076,7 @@
                     </p:panelGrid>
 
                     <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
-                        <p:dataTable id="attributscrapyardcontentlist" var="scrapyardattributcontent" value="#{scrapyardList.attributcontentlist}" selectionMode="single" selection="#{scrapyardList.selectedAttributContent}" rowKey="#{scrapyardattributcontent.id}">
+                        <p:dataTable id="attributscrapyardcontentlist" size="small" var="scrapyardattributcontent" value="#{scrapyardList.attributcontentlist}" selectionMode="single" selection="#{scrapyardList.selectedAttributContent}" rowKey="#{scrapyardattributcontent.id}">
                             <p:column headerText="Name" style="width: 200px;">
                                 <h:outputText value="#{scrapyardattributcontent.attributref.name}" />
                             </p:column>

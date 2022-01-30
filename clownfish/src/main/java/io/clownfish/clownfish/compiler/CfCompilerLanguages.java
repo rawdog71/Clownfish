@@ -19,8 +19,6 @@ import io.clownfish.clownfish.utils.ClownfishUtil;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.IOUtils;

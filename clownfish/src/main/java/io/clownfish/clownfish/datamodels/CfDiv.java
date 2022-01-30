@@ -31,6 +31,7 @@ public class CfDiv {
     private @Getter @Setter ArrayList<String> assetArray;
     private @Getter @Setter ArrayList<String> assetlistArray;
     private @Getter @Setter ArrayList<String> keywordlistArray;
+    private @Getter @Setter boolean visible;
 
     public CfDiv() {
         contentArray = new ArrayList<>();
@@ -38,6 +39,7 @@ public class CfDiv {
         assetArray = new ArrayList<>();
         assetlistArray = new ArrayList<>();
         keywordlistArray = new ArrayList<>();
+        visible = true;
     }
 
     public CfDiv(String id, String name) {
@@ -48,5 +50,14 @@ public class CfDiv {
         assetArray = new ArrayList<>();
         assetlistArray = new ArrayList<>();
         keywordlistArray = new ArrayList<>();
+        visible = true;
+    }
+    
+    public String showIcon() {
+        if (visible) {
+            return "pi-eye";
+        } else {
+            return "pi-eye-slash";
+        }
     }
 }

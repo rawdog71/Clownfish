@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.beans;
 
 import de.destrukt.sapconnection.SAPConnection;
+import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.dbentities.CfAsset;
@@ -227,12 +228,16 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient FolderUtil folderUtil;
     private SourceIndexer sourceindexer;
     private @Getter @Setter String iframeurl = "";
+    @Autowired transient Clownfish clownfish;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
     @PostConstruct
     public void init() {
         LOGGER.info("INIT SITETREE START");
+        if (null != clownfish) {
+            clownfish.setSitetree(this);
+        }
         if (null == sourceindexer) {
             sourceindexer = new SourceIndexer();
         }
@@ -852,6 +857,12 @@ public class SiteTreeBean implements Serializable {
             current_keywordlibrary = null;
             FacesMessage message = new FacesMessage("DIV selected " + selectedDiv.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public void invertShow(CfDiv div) {
+        if (null != div) {
+            div.setVisible(!div.isVisible());
         }
     }
     
