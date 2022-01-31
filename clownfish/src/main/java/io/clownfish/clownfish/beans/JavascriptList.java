@@ -85,6 +85,7 @@ public class JavascriptList implements ISourceContentInterface {
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
+    private @Getter @Setter SiteTreeBean sitetree;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(JavascriptList.class);
 
@@ -136,6 +137,9 @@ public class JavascriptList implements ISourceContentInterface {
     @Override
     public void refresh() {
         javascriptListe = cfjavascriptService.findAll();
+        if (null != sitetree) {
+            sitetree.onRefreshSelection();
+        }
     }
     
     public List<CfJavascript> completeText(String query) {

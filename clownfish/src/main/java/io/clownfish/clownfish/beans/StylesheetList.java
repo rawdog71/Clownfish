@@ -85,6 +85,7 @@ public class StylesheetList implements ISourceContentInterface {
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
+    private @Getter @Setter SiteTreeBean sitetree;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(StylesheetList.class);
 
@@ -136,6 +137,9 @@ public class StylesheetList implements ISourceContentInterface {
     @Override
     public void refresh() {
         stylesheetListe = cfstylesheetService.findAll();
+        if (null != sitetree) {
+            sitetree.onRefreshSelection();
+        }
     }
     
     public List<CfStylesheet> completeText(String query) {

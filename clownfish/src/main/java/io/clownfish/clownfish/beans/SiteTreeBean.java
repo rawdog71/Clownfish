@@ -21,6 +21,7 @@ import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
+import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfDatasource;
@@ -50,6 +51,7 @@ import io.clownfish.clownfish.sap.models.RfcFunction;
 import io.clownfish.clownfish.sap.models.RfcGroup;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
@@ -109,6 +111,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  *
@@ -116,6 +119,7 @@ import org.springframework.context.annotation.Scope;
  */
 @Scope("session")
 @Named("sitetree")
+@Component
 public class SiteTreeBean implements Serializable {
     @Value("${sapconnection.file}") String SAPCONNECTION;
     private static SAPConnection sapc = null;
@@ -208,6 +212,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfSitecontentService cfsitecontentService;
     @Autowired transient CfSiteassetlistService cfsiteassetlistService;
     @Autowired transient CfSitekeywordlistService cfsitekeywordlistService;
+    @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfSitelistService cfsitelistService;
     @Autowired transient CfClassService cfclassService;
@@ -229,6 +234,8 @@ public class SiteTreeBean implements Serializable {
     private SourceIndexer sourceindexer;
     private @Getter @Setter String iframeurl = "";
     @Autowired transient Clownfish clownfish;
+    private transient @Getter @Setter List<CfAttributcontent> attributcontentlist = null;
+    private @Getter @Setter String previewContentOutput = "";
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
@@ -276,6 +283,9 @@ public class SiteTreeBean implements Serializable {
         showDatalist = false;
         showAssetLibrary = false;
         showKeywordLibrary = false;
+        templatelist.setSitetree(this);
+        javascriptlist.setSitetree(this);
+        stylesheetlist.setSitetree(this);
         LOGGER.info("INIT SITETREE END");
     }
     
@@ -304,6 +314,23 @@ public class SiteTreeBean implements Serializable {
         contentlist = cflistService.findByMaintenance(true);
         classcontentlist = cfclasscontentService.findByMaintenance(true);
         assetlist = cfassetlistService.findAll();
+    }
+    
+    public void onRefreshSelection() {
+        if (null != selectedTemplate) {
+            selectedTemplate = cftemplateService.findById(selectedTemplate.getId());
+        }
+        if (null != selectedJavascript) {
+            selectedJavascript = cfjavascriptService.findById(selectedJavascript.getId());
+        }
+        if (null != selectedStylesheet) {
+            selectedStylesheet = cfstylesheetService.findById(selectedStylesheet.getId());
+        }
+        if (null != current_classcontent) {
+            onChangeLayoutContent();
+            current_classcontent = cfclasscontentService.findById(current_classcontent.getId());
+            current_classcontent.getClassref().setTemplateref(current_classcontent.getClassref().getTemplateref());
+        }
     }
 
     private void fillChildren(long parentid, TreeNode node) {
@@ -912,7 +939,7 @@ public class SiteTreeBean implements Serializable {
             }
         }
     }
-
+    
     /**
      * Selects a Content
      * @param event
@@ -920,7 +947,12 @@ public class SiteTreeBean implements Serializable {
     public void onSelectLayoutContent(SelectEvent event) {
         current_classcontent = (CfClasscontent) event.getObject();
         if (null != current_classcontent) {
-            
+            attributcontentlist = cfattributcontentService.findByClasscontentref(current_classcontent);
+            String output = current_classcontent.getClassref().getTemplateref().getContent();
+            for (CfAttributcontent attributcontent : attributcontentlist) {
+                output = output.replaceAll("#" + attributcontent.getAttributref().getName() + "#", attributcontent.toString());
+            }
+            previewContentOutput = output;
         }
     }
     

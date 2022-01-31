@@ -391,7 +391,7 @@
                                                      paginator="false" 
                                                      selectionMode="single" selection="#{sitetree.current_classcontent}" rowKey="#{classcontent.id}"
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredContent}" widgetVar="classcontentlist" rendered="${sitetree.contenteditable and sitetree.showContent}">
-                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutContent}" />
+                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutContent}" oncomplete="PF('contentpreviewDlg').show()" update=":form:contentpreviewDlg" />
                                             <p:column headerText="Content" filterBy="#{classcontent.name}" filterMatchMode="contains">
                                                 <h:outputText value="#{classcontent.name}" />
                                             </p:column>
@@ -493,14 +493,13 @@
                         </div>
                         
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="newtemplate" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate :form:tabview:edittemplate :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel" disabled="#{templateList.newButtonDisabled}" />
+                            <p:commandButton id="newtemplate" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate :form:tabview:edittemplate :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:difftemplatePanel :form:tabview:classtemplate" disabled="#{templateList.newButtonDisabled}" />
                         </div>
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="changetemplate" icon="pi pi-pencil" process="form" value="Change" actionListener="#{templateList.onChange}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate" disabled="#{templateList.newButtonDisabled}" />
+                            <p:commandButton id="changetemplate" icon="pi pi-pencil" process="form" value="Change" actionListener="#{templateList.onChange}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate :form:tabview:classtemplate" disabled="#{templateList.newButtonDisabled}" />
                         </div>
-                        
                         <div class="flex align-items-center pr-2">
-                            <p:commandButton id="deletetemplateButton" icon="pi pi-trash" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:tabsiteview:selecttemplate">
+                            <p:commandButton id="deletetemplateButton" icon="pi pi-trash" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:tabsiteview:selecttemplate :form:tabview:classtemplate">
                                 <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                         </div>
@@ -904,7 +903,7 @@
                         
                         <div class="flex align-items-center pr-2">
                             <p:outputLabel for="classtemplate" style="margin-right: 0.5rem">Preview Template: </p:outputLabel>
-                            <p:autoComplete id="classtemplate" dropdown="true" value="#{classList.selectedTemplateRef}" completeMethod="#{classList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
+                            <p:autoComplete id="classtemplate" dropdown="true" value="#{classList.selectedTemplateRef}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
                             </p:autoComplete>
                         </div>
                         
@@ -2101,6 +2100,10 @@
                 </p:tab>
 
             </p:tabView>
+            
+            <p:dialog id="contentpreviewDlg" header="Content Preview" widgetVar="contentpreviewDlg" minHeight="100" width="500" showEffect="fade">
+                <h:outputText value="#{sitetree.previewContentOutput}" escape="false" />
+            </p:dialog>
             
             <p:confirmPopup global="true">
                 <p:commandButton value="No" type="button" styleClass="ui-confirm-popup-no ui-button-flat" icon="pi pi-times" />

@@ -36,7 +36,6 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
-import java.util.stream.Collectors;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import lombok.Getter;
@@ -80,7 +79,6 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean isindex;
     private @Getter @Setter List<CfClass> classListeRef;
     private @Getter @Setter CfClass selectedClassRef = null;
-    private @Getter @Setter List<CfTemplate> templateListeRef;
     private @Getter @Setter CfTemplate selectedTemplateRef = null;
     private @Getter @Setter boolean newButtonDisabled;
     private @Getter @Setter boolean newAttributButtonDisabled;
@@ -96,7 +94,6 @@ public class ClassList implements Serializable {
         classListe = cfclassService.findAll();
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
-        templateListeRef = cftemplateService.findAll();
         renderClass = false;
         LOGGER.info("INIT CLASSLIST END");
     }
@@ -105,13 +102,13 @@ public class ClassList implements Serializable {
         classListe = cfclassService.findAll();
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
-        templateListeRef = cftemplateService.findAll();
     }
     
-    public List<CfTemplate> completeText(String query) {
-        String queryLowerCase = query.toLowerCase();
-
-        return templateListeRef.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
+    public void onRefreshSelection() {
+        if (null != selectedClass) {
+            selectedClass = cfclassService.findById(selectedClass.getId());
+            selectedTemplateRef = selectedClass.getTemplateref();
+        }
     }
     
     public void onSelect(SelectEvent event) {

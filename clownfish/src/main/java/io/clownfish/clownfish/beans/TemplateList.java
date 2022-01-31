@@ -88,6 +88,8 @@ public class TemplateList implements ISourceContentInterface {
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
+    @Autowired private @Getter @Setter ClassList classlist;
+    private @Getter @Setter SiteTreeBean sitetree;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(TemplateList.class);
 
@@ -140,6 +142,12 @@ public class TemplateList implements ISourceContentInterface {
     @Override
     public void refresh() {
         templateListe = cftemplateService.findAll();
+        if (null != classlist) {
+            classlist.onRefreshSelection();
+        }
+        if (null != sitetree) {
+            sitetree.onRefreshSelection();
+        }
     }
     
     public List<CfTemplate> completeText(String query) {
@@ -223,13 +231,15 @@ public class TemplateList implements ISourceContentInterface {
                         difference = templateUtility.hasDifference(selectedTemplate);
                         this.templateversionMax = templateUtility.getCurrentVersion();
                         this.selectedtemplateversion = this.templateversionMax;
-
+                        refresh();
+                        
                         FacesMessage message = new FacesMessage("Commited " + selectedTemplate.getName() + " Version: " + (maxversion + 1));
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     } catch (NullPointerException npe) {
                         writeVersion(selectedTemplate.getId(), 1, output);
                         templateUtility.setCurrentVersion(1);
                         difference = templateUtility.hasDifference(selectedTemplate);
+                        refresh();
 
                         FacesMessage message = new FacesMessage("Commited " + selectedTemplate.getName() + " Version: " + 1);
                         FacesContext.getCurrentInstance().addMessage(null, message);
@@ -320,6 +330,7 @@ public class TemplateList implements ISourceContentInterface {
                 templateListe = cftemplateService.findAll();
                 templateName = "";
                 selectedTemplate = newtemplate;
+                refresh();
                 onSelect(null);
             } else {
                 FacesMessage message = new FacesMessage("Please enter template name");
@@ -335,7 +346,7 @@ public class TemplateList implements ISourceContentInterface {
         if (null != selectedTemplate) {
             cftemplateService.delete(selectedTemplate);
             templateListe = cftemplateService.findAll();
-            
+            refresh();
             FacesMessage message = new FacesMessage("Deleted " + selectedTemplate.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
