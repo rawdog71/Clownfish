@@ -134,7 +134,6 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter boolean newButtonDisabled = false;
     private @Getter @Setter List<CfDatasource> datasources;
     private @Getter @Setter List<CfDatasource> selectedDatasources;
-    private LazyDataModel<CfDatasource> lazyDatasources;
     private @Getter @Setter List<CfList> contentlist;
     private @Getter @Setter List<CfList> selectedContentlist;
     private transient @Getter @Setter List<CfSitesaprfc> saprfclist = null;
@@ -601,7 +600,7 @@ public class SiteTreeBean implements Serializable {
                 cfsitedatasourceService.delete(sitedatasource);
             }
             // Add selected siteresources
-            if (selectedDatasources.size() > 0) {
+            if (!selectedDatasources.isEmpty()) {
                 for (CfDatasource datasource : selectedDatasources) {
                     CfSitedatasource sitedatasource = new CfSitedatasource();
                     CfSitedatasourcePK cfsitedatasourcePK = new CfSitedatasourcePK();
@@ -618,12 +617,12 @@ public class SiteTreeBean implements Serializable {
                 cfsitelistService.delete(sitelist);
             }
             // Add selected sitelists
-            if (selectedContentlist.size() > 0) {
-                for (CfList contentlist : selectedContentlist) {
+            if (!selectedContentlist.isEmpty()) {
+                for (CfList contentList : selectedContentlist) {
                     CfSitelist sitelist = new CfSitelist();
                     CfSitelistPK cfsitelistPK = new CfSitelistPK();
                     cfsitelistPK.setSiteref(selectedSite.getId());
-                    cfsitelistPK.setListref(contentlist.getId());
+                    cfsitelistPK.setListref(contentList.getId());
                     sitelist.setCfSitelistPK(cfsitelistPK);
                     cfsitelistService.create(sitelist);
                 }
@@ -635,7 +634,7 @@ public class SiteTreeBean implements Serializable {
                 cfsitecontentService.delete(content);
             }
             // Add selected sitecontent
-            if (selectedClasscontentlist.size() > 0) {
+            if (!selectedClasscontentlist.isEmpty()) {
                 for (CfClasscontent content : selectedClasscontentlist) {
                     CfSitecontent sitecontent = new CfSitecontent();
                     CfSitecontentPK cfsitecontentPK = new CfSitecontentPK();
@@ -648,11 +647,11 @@ public class SiteTreeBean implements Serializable {
             
             // Delete siteassetlist first
             List<CfSiteassetlist> siteassetlists = cfsiteassetlistService.findBySiteref(selectedSite.getId());
-            for (CfSiteassetlist assetlist : siteassetlists) {
-                cfsiteassetlistService.delete(assetlist);
+            for (CfSiteassetlist assetList : siteassetlists) {
+                cfsiteassetlistService.delete(assetList);
             }
             // Add selected sitecontent
-            if (selectedAssetlist.size() > 0) {
+            if (!selectedAssetlist.isEmpty()) {
                 for (CfAssetlist content : selectedAssetlist) {
                     CfSiteassetlist siteassetlist = new CfSiteassetlist();
                     CfSiteassetlistPK cfsitecontentPK = new CfSiteassetlistPK();
@@ -665,11 +664,11 @@ public class SiteTreeBean implements Serializable {
             
             // Delete sitekeywordlist first
             List<CfSitekeywordlist> sitekeywordlists = cfsitekeywordlistService.findBySiteref(selectedSite.getId());
-            for (CfSitekeywordlist keywordlist : sitekeywordlists) {
-                cfsitekeywordlistService.delete(keywordlist);
+            for (CfSitekeywordlist keywordList : sitekeywordlists) {
+                cfsitekeywordlistService.delete(keywordList);
             }
             // Add selected sitecontent
-            if (selectedKeywordlist.size() > 0) {
+            if (!selectedKeywordlist.isEmpty()) {
                 for (CfKeywordlist content : selectedKeywordlist) {
                     CfSitekeywordlist sitekeywordlist = new CfSitekeywordlist();
                     CfSitekeywordlistPK cfsitecontentPK = new CfSitekeywordlistPK();
@@ -1168,28 +1167,4 @@ public class SiteTreeBean implements Serializable {
             }
         }
     }
-    
-    /*
-    public LazyDataModel<CfDatasource> getLazyDatasources() {
-        if (null == lazyDatasources) {
-            lazyDatasources = new LazyDataModel<CfDatasource>() {
-                @Override
-                public List<CfDatasource> load(int first, int pageSize, Map<String, SortMeta> sortmap, Map<String, FilterMeta> filtermap) {
-                    int start = first;
-                    int end = first + pageSize;
-
-
-                    //CNCProgramme2QueryData qData = new CNCProgramme2QueryData(start, end, sortField, order, filters);
-                    //getClassicModelsService().findCncProgramme2(qData);
-                    List<CfDatasource> dsList = cfdatasourceService.findAll();
-                    int count = dsList.size();
-                    this.setRowCount(count);
-
-                    return dsList;
-                }
-            };
-        } 
-        return lazyDatasources;
-    }
-    */
 }

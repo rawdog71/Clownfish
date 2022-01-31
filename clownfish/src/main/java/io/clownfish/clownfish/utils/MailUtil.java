@@ -90,7 +90,7 @@ public class MailUtil implements Serializable {
             try {
                 Transport.send( message );
                 return true;
-            } catch (Exception ex) {
+            } catch (MessagingException ex) {
                 LOGGER.error(ex.getMessage());
                 return false;
             }
@@ -143,7 +143,7 @@ public class MailUtil implements Serializable {
                 Transport.send( message );
                 return true;
             }
-            catch (Exception ex)
+            catch (MessagingException ex)
             {
                 LOGGER.error(ex.getMessage());
                 return false;

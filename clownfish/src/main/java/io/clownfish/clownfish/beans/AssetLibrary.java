@@ -111,7 +111,7 @@ public class AssetLibrary {
         List<CfAssetlistcontent> selectedassetlist = cfassetlistcontentService.findByAssetlistref(selectedAssetlist.getId());
         
         selectedAssetcontent.clear();
-        if (selectedassetlist.size() > 0) {
+        if (!selectedassetlist.isEmpty()) {
             for (CfAssetlistcontent assetcontent : selectedassetlist) {
                 CfAsset selectedAasset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
                 selectedAssetcontent.add(selectedAasset);
@@ -132,7 +132,7 @@ public class AssetLibrary {
             cfassetlistcontentService.delete(content);
         }
         // Add selected listcontent
-        if (selectedAssetcontent.size() > 0) {
+        if (!selectedAssetcontent.isEmpty()) {
             for (CfAsset selected : selectedAssetcontent) {
                 CfAssetlistcontent assetlistcontent = new CfAssetlistcontent();
                 CfAssetlistcontentPK cflistcontentPK = new CfAssetlistcontentPK();

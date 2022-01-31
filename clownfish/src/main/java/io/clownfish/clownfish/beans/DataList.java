@@ -97,7 +97,7 @@ public class DataList implements Serializable {
         List<CfListcontent> selectedcontent = cflistcontentService.findByListref(selectedList.getId());
         
         selectedListcontent.clear();
-        if (selectedcontent.size() > 0) {
+        if (!selectedcontent.isEmpty()) {
             for (CfListcontent listcontent : selectedcontent) {
                 CfClasscontent selectedContent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
                 if (null != selectedContent) {
@@ -152,7 +152,7 @@ public class DataList implements Serializable {
             cflistcontentService.delete(content);
         }
         // Add selected listcontent
-        if (selectedListcontent.size() > 0) {
+        if (!selectedListcontent.isEmpty()) {
             for (CfClasscontent selected : selectedListcontent) {
                 CfListcontent listcontent = new CfListcontent();
                 CfListcontentPK cflistcontentPK = new CfListcontentPK();

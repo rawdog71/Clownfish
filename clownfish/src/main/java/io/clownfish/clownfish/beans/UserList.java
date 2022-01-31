@@ -90,7 +90,7 @@ public class UserList implements Serializable {
         List<CfUserbackend> selectedcontent = cfuserbackendService.findByUserRef(selectedUser.getId());
         
         selectedbackendListcontent.clear();
-        if (selectedcontent.size() > 0) {
+        if (!selectedcontent.isEmpty()) {
             for (CfUserbackend listcontent : selectedcontent) {
                 CfBackend selectedContent = cfbackendService.findById(listcontent.getCfUserbackendPK().getBackendref());
                 selectedbackendListcontent.add(selectedContent);
@@ -155,7 +155,7 @@ public class UserList implements Serializable {
             cfuserbackendService.delete(content);
         }
         // Add selected listcontent
-        if (selectedbackendListcontent.size() > 0) {
+        if (!selectedbackendListcontent.isEmpty()) {
             for (CfBackend selected : selectedbackendListcontent) {
                 CfUserbackend listcontent = new CfUserbackend();
                 CfUserbackendPK cflistcontentPK = new CfUserbackendPK();

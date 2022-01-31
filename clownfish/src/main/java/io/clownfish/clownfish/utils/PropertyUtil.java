@@ -83,11 +83,7 @@ public class PropertyUtil {
         String boolvalue = getPropertymap().get(propertyfield);
         if (null != boolvalue) {
             try {
-                if ((0 == boolvalue.compareToIgnoreCase("on")) || (0 == boolvalue.compareToIgnoreCase("true"))) {
-                    value = true;
-                } else {
-                    value = false;
-                }
+                value = (0 == boolvalue.compareToIgnoreCase("on")) || (0 == boolvalue.compareToIgnoreCase("true"));
             } catch (NumberFormatException nex) {
                 value = defaultvalue;
                 LOGGER.warn(nex.getMessage());

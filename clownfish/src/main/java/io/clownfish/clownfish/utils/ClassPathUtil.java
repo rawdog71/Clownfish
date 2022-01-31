@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 @Scope("singleton")
 @Component
 public class ClassPathUtil implements Serializable {
-    private @Getter HashSet<Class<?>> class_set = new HashSet<>();
+    private final @Getter HashSet<Class<?>> class_set = new HashSet<>();
     private CfClassLoader cfclassLoader;
     
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ClassPathUtil.class);

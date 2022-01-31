@@ -70,9 +70,6 @@ public class GetAsset extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        String url = request.getRequestURL().toString();
-        LOGGER.info(url);
-        //response.setHeader("Content-Encoding", "gzip");
         final AsyncContext acontext = request.startAsync();
         acontext.setTimeout(900000000);
         acontext.start(() -> {

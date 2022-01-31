@@ -119,7 +119,7 @@ public class GetFilteredAssets extends HttpServlet {
                 CfAsset asset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
 
                 // Check the keyword filter (at least one keyword must be found (OR))
-                if (searchkeywords.size() > 0) {
+                if (!searchkeywords.isEmpty()) {
                     ArrayList contentkeywords = getContentOutputKeywords(asset, true);
                     boolean dummyfound = false;
                     for (String keyword : searchkeywords) {
@@ -127,11 +127,7 @@ public class GetFilteredAssets extends HttpServlet {
                             dummyfound = true;
                         }
                     }
-                    if (dummyfound) {
-                        found = true;
-                    } else {
-                        found = false;
-                    }
+                    found = dummyfound;
                 } else {
                     found = true;
                 }
@@ -181,7 +177,7 @@ public class GetFilteredAssets extends HttpServlet {
     private ArrayList getContentOutputKeywords(CfAsset asset, boolean toLower) {
         ArrayList<String> keywords = new ArrayList<>();
         List<CfAssetkeyword> keywordlist = cfassetkeywordService.findByAssetRef(asset.getId());
-        if (keywordlist.size() > 0) {
+        if (!keywordlist.isEmpty()) {
             for (CfAssetkeyword ak : keywordlist) {
                 if (toLower) {
                     keywords.add(cfkeywordService.findById(ak.getCfAssetkeywordPK().getKeywordref()).getName().toLowerCase());

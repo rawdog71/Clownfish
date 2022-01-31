@@ -37,11 +37,7 @@ public class ApiKeyUtil implements Serializable {
     public boolean checkApiKey(String apikey, String webservicename) {
         try {
             CfWebserviceauth webserviceauth = cfwebserviceauthService.findByHash(apikey);
-            if (webserviceauth.getCfWebserviceauthPK().getWebserviceRef().getName().compareToIgnoreCase(webservicename) == 0) {
-                return true;
-            } else {
-                return false;
-            }
+            return webserviceauth.getCfWebserviceauthPK().getWebserviceRef().getName().compareToIgnoreCase(webservicename) == 0;
         } catch (Exception ex) {
             return false;
         }

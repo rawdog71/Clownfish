@@ -93,7 +93,7 @@ public class KeywordContentList implements Serializable {
         List<CfKeywordlistcontent> selectedkeywordlist = cfkeywordlistcontentService.findByKeywordlistref(selectedKeywordlist.getId());
         
         selectedKeywordcontent.clear();
-        if (selectedkeywordlist.size() > 0) {
+        if (!selectedkeywordlist.isEmpty()) {
             for (CfKeywordlistcontent keywordcontent : selectedkeywordlist) {
                 CfKeyword selectedKeyword = cfkeywordService.findById(keywordcontent.getCfKeywordlistcontentPK().getKeywordref());
                 selectedKeywordcontent.add(selectedKeyword);
@@ -104,12 +104,11 @@ public class KeywordContentList implements Serializable {
     public void onChangeContent(AjaxBehaviorEvent event) {
         // Delete listcontent first
         List<CfKeywordlistcontent> keywordList = cfkeywordlistcontentService.findByKeywordlistref(selectedKeywordlist.getId());
-        //List<CfKeyword> keywordList = cfkeywordlistService.findById(selectedKeywordlist.getId());
         for (CfKeywordlistcontent content : keywordList) {
             cfkeywordlistcontentService.delete(content);
         }
         // Add selected listcontent
-        if (selectedKeywordcontent.size() > 0) {
+        if (!selectedKeywordcontent.isEmpty()) {
             for (CfKeyword selected : selectedKeywordcontent) {
                 CfKeywordlistcontent keywordlistcontent = new CfKeywordlistcontent();
                 CfKeywordlistcontentPK cflistcontentPK = new CfKeywordlistcontentPK();

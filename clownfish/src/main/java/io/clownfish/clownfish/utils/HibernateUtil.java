@@ -627,7 +627,7 @@ public class HibernateUtil {
             /* add keywords  */
             List<CfClasscontentkeyword> contentkeywordlist;
             contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(contentid);
-            if (contentkeywordlist.size() > 0) {
+            if (!contentkeywordlist.isEmpty()) {
                 ArrayList listcontentmap = new ArrayList();
                 contentkeywordlist.stream().forEach((contentkeyword) -> {
                     listcontentmap.add(cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref()));

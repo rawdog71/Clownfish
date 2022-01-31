@@ -128,7 +128,7 @@ public class GetAssetData extends HttpServlet {
     private ArrayList getAssetKeywords(CfAsset asset, boolean toLower) {
         ArrayList<String> keywords = new ArrayList<>();
         List<CfAssetkeyword> keywordlist = cfassetkeywordService.findByAssetRef(asset.getId());
-        if (keywordlist.size() > 0) {
+        if (!keywordlist.isEmpty()) {
             for (CfAssetkeyword ak : keywordlist) {
                 if (toLower) {
                     keywords.add(cfkeywordService.findById(ak.getCfAssetkeywordPK().getKeywordref()).getName().toLowerCase());

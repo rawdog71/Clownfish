@@ -113,7 +113,7 @@ public class ClassUtil implements Serializable {
                         List<CfListcontent> selectedcontent = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
                         List<CfClasscontent> selectedListcontent = new ArrayList<>();
                         selectedListcontent.clear();
-                        if (selectedcontent.size() > 0) {
+                        if (!selectedcontent.isEmpty()) {
                             selectedcontent.stream().map((listcontent) -> cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref())).forEach((selectedContent) -> {
                                 if (null != selectedContent) {
                                     selectedListcontent.add(selectedContent);
@@ -134,7 +134,7 @@ public class ClassUtil implements Serializable {
                         List<CfAssetlistcontent> selectedlistassets = cfassetlistcontentService.findByAssetlistref(attributcontent.getAssetcontentlistref().getId());
                         List<CfAsset> selectedAssets = new ArrayList<>();
                         selectedAssets.clear();
-                        if (selectedlistassets.size() > 0) {
+                        if (!selectedlistassets.isEmpty()) {
                             selectedlistassets.stream().map((listcontent) -> cfassetService.findById(listcontent.getCfAssetlistcontentPK().getAssetref())).forEach((selectedContent) -> {
                                 if (null != selectedContent) {
                                     selectedAssets.add(selectedContent);
@@ -152,7 +152,7 @@ public class ClassUtil implements Serializable {
         /* add keywords  */
         List<CfClasscontentkeyword> contentkeywordlist;
         contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(classcontent.getId());
-        if (contentkeywordlist.size() > 0) {
+        if (!contentkeywordlist.isEmpty()) {
             ArrayList listcontentmap = new ArrayList();
             contentkeywordlist.stream().forEach((contentkeyword) -> {
                 listcontentmap.add(cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref()));

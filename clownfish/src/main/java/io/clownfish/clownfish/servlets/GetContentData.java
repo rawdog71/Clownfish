@@ -126,7 +126,7 @@ public class GetContentData extends HttpServlet {
     private ArrayList getAssetKeywords(CfClasscontent content, boolean toLower) {
         ArrayList<String> keywords = new ArrayList<>();
         List<CfClasscontentkeyword> keywordlist = cfcontentkeywordService.findByClassContentRef(content.getId());
-        if (keywordlist.size() > 0) {
+        if (!keywordlist.isEmpty()) {
             for (CfClasscontentkeyword ak : keywordlist) {
                 if (toLower) {
                     keywords.add(cfkeywordService.findById(ak.getCfClasscontentkeywordPK().getKeywordref()).getName().toLowerCase());

@@ -191,7 +191,7 @@ public class GetContentHibernate extends HttpServlet {
                     }
                 });
 
-                Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+                Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
                 Query query = getQuery(session_tables, searchmap, inst_klasse);
 
                 try {
@@ -340,7 +340,7 @@ public class GetContentHibernate extends HttpServlet {
                 }
             }
 
-            Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+            Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
             Query query = getQuery(session_tables, searchmap, inst_klasse);
 
             List<Map> contentliste = (List<Map>) query.getResultList();
@@ -419,7 +419,7 @@ public class GetContentHibernate extends HttpServlet {
             while ((line = reader.readLine()) != null) {
                 jb.append(line);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             /*report an error*/
         }
 
@@ -499,7 +499,7 @@ public class GetContentHibernate extends HttpServlet {
     private ArrayList getContentKeywords(CfClasscontent content, boolean toLower) {
         ArrayList<String> keywords = new ArrayList<>();
         List<CfClasscontentkeyword> keywordlist = cfcontentkeywordService.findByClassContentRef(content.getId());
-        if (keywordlist.size() > 0) {
+        if (!keywordlist.isEmpty()) {
             for (CfClasscontentkeyword ak : keywordlist) {
                 if (toLower) {
                     keywords.add(cfkeywordService.findById(ak.getCfClasscontentkeywordPK().getKeywordref()).getName().toLowerCase());

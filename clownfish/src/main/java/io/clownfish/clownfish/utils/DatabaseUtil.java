@@ -162,7 +162,7 @@ public class DatabaseUtil {
                 sql_inner.append("SELECT ");
                 sql_count.append("SELECT COUNT(*) AS count FROM ");
                 
-                if ((dtp != null) && (dtp.getGroupbylist().size() > 0)) {
+                if ((dtp != null) && (!dtp.getGroupbylist().isEmpty())) {
                     sql_outer.append("count(*) AS groupbycount, ");
                     tfs.getTableFieldsList().stream().filter((tf) -> (dtp.getGroupbylist().contains(tf.getName()))).map((tf) -> {
                         sql_outer.append(tf.getName());
@@ -225,7 +225,7 @@ public class DatabaseUtil {
                 sql_outer.append("SELECT ");
                 sql_count.append("SELECT COUNT(*) AS count FROM ");
                 
-                if ((dtp != null) && (dtp.getGroupbylist().size() > 0)) {
+                if ((dtp != null) && (!dtp.getGroupbylist().isEmpty())) {
                     sql_outer.append("count(*) AS groupbycount, ");
                     tfs.getTableFieldsList().stream().filter((tf) -> (dtp.getGroupbylist().contains(tf.getName()))).map((tf) -> {
                         sql_outer.append(tf.getName());

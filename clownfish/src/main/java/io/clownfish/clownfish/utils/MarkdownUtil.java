@@ -65,7 +65,7 @@ public class MarkdownUtil {
     public @Getter @Setter MutableDataSet markdownOptions = null;
     private @Getter @Setter List<CfProperty> propertylist;
     private @Getter @Setter Map<String, String> propertymap;
-    @Autowired private PropertyList proplist;
+    @Autowired private final PropertyList proplist;
     private List<Extension> extensionList;
 
     final transient Logger LOGGER = LoggerFactory.getLogger(MarkdownUtil.class);

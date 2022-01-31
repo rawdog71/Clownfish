@@ -184,7 +184,7 @@ public class GetContentCountHibernate extends HttpServlet {
                         counter++;
                     }
                 });
-                Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+                Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
                 Query query = null;
                 if (!searchmap.isEmpty()) {
                     String whereclause = " WHERE "; 
@@ -346,7 +346,7 @@ public class GetContentCountHibernate extends HttpServlet {
                 }
             }
 
-            Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+            Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
             Query query = null;
             if (!searchmap.isEmpty()) {
                 String whereclause = " WHERE "; 

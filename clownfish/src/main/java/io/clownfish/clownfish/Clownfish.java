@@ -654,7 +654,7 @@ public class Clownfish {
             response.setCharacterEncoding("UTF-8");
             PrintWriter outwriter = response.getWriter();
             outwriter.println(cfstylesheet.getContent());
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             System.out.println("CSS NOT FOUND");
         }
     }
@@ -672,7 +672,7 @@ public class Clownfish {
             } else {
                 LOGGER.warn("ONLY HTML Templates");
             }
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             LOGGER.warn("Template NOT FOUND");
         }
     }
@@ -686,7 +686,7 @@ public class Clownfish {
             response.setCharacterEncoding("UTF-8");
             PrintWriter outwriter = response.getWriter();
             outwriter.println(cfjavascript.getContent());
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             System.out.println("JS NOT FOUND");
         }
     }
@@ -700,7 +700,7 @@ public class Clownfish {
             response.setCharacterEncoding("UTF-8");
             PrintWriter outwriter = response.getWriter();
             outwriter.print(cftemplate.getContent());
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             System.out.print("ROBOTS NOT FOUND");
         }
     }
@@ -2108,7 +2108,13 @@ public class Clownfish {
                     }
                 }
                 if (null != asset) {
-                    src_out = src_out.append("cache/cache" + asset.getName() + width + height + " " + datasource_components[1] + ", ");
+                    src_out = src_out.append("cache/cache").
+                            append(asset.getName()).
+                            append(width).
+                            append(height).
+                            append(" ").
+                            append(datasource_components[1]).
+                            append(", ");
                 }
             }
             src_out = src_out.delete(src_out.length() - 2, src_out.length());

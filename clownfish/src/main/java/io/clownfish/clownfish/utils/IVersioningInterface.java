@@ -18,6 +18,7 @@ package io.clownfish.clownfish.utils;
 /**
  *
  * @author raine
+ * @param <T>
  */
 public interface IVersioningInterface<T> {
     public String getVersion(long ref, long version);

@@ -96,7 +96,7 @@ public class LoginBean implements Serializable {
                 login = true;
                 List<CfUserbackend> selectedcontent = cfuserbackendService.findByUserRef(cfuser.getId());
                 userrights.clear();
-                if (selectedcontent.size() > 0) {
+                if (!selectedcontent.isEmpty()) {
                     for (CfUserbackend listcontent : selectedcontent) {
                         CfBackend selectedContent = cfbackendService.findById(listcontent.getCfUserbackendPK().getBackendref());
                         userrights.add(selectedContent);

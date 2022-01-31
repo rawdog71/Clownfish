@@ -223,18 +223,14 @@ public class GetContent extends HttpServlet {
                         }
                     }
                     // Check the keyword filter (at least one keyword must be found (OR))
-                    if (searchkeywords.size() > 0) {
+                    if (!searchkeywords.isEmpty()) {
                         boolean dummyfound = false;
                         for (String keyword : searchkeywords) {
                             if (keywords.contains(keyword.toLowerCase())) {
                                 dummyfound = true;
                             }
                         }
-                        if (dummyfound) {
-                            putToList = true;
-                        } else {
-                            putToList = false;
-                        }
+                        putToList = dummyfound;
                     }
                     if (putToList) {
                         found = true;
@@ -397,18 +393,14 @@ public class GetContent extends HttpServlet {
                         }
                     }
                     // Check the keyword filter (at least one keyword must be found (OR))
-                    if (searchkeywords.size() > 0) {
+                    if (!searchkeywords.isEmpty()) {
                         boolean dummyfound = false;
                         for (String keyword : searchkeywords) {
                             if (keywords.contains(keyword.toLowerCase())) {
                                 dummyfound = true;
                             }
                         }
-                        if (dummyfound) {
-                            putToList = true;
-                        } else {
-                            putToList = false;
-                        }
+                        putToList = dummyfound;
                     }
                     if (putToList) {
                         found = true;
@@ -530,18 +522,6 @@ public class GetContent extends HttpServlet {
         return new SearchValues(comparator, searchvalue);
     }
 
-    /*
-    private boolean inlist(ArrayList<ContentOutput> outputlist, ContentOutput co) {
-        boolean found = false;
-        for (ContentOutput content : outputlist) {
-            if (0 == content.getIdentifier().compareTo(co.getIdentifier())) {
-                found = true;
-            }
-        }
-        return found;
-    }
-    */
-    
     private ArrayList getContentKeywords(CfClasscontent content, boolean toLower) {
         ArrayList<String> keywords = new ArrayList<>();
         List<CfClasscontentkeyword> keywordlist = cfcontentkeywordService.findByClassContentRef(content.getId());

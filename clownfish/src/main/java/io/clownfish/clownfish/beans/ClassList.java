@@ -250,7 +250,7 @@ public class ClassList implements Serializable {
     
     public void onRecreateDatamodel(ActionEvent actionEvent) {
         if (null != selectedClass) {
-            hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
+            HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
             FacesMessage message = new FacesMessage("Datamodel recreated");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }

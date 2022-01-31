@@ -189,7 +189,6 @@ public class SiteUtil {
                 }
             }
             assetlibraryMap.put(cfassetlist.getName(), dummyassetlist);
-            //sitecontentmap.put(, listcontentmap);
         }
         sitecontentmap.put("AssetLibrary", assetlibraryMap);
         return sitecontentmap;

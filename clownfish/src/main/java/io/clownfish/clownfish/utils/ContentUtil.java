@@ -35,7 +35,6 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -205,19 +204,18 @@ public class ContentUtil {
                     break;
                 case "datetime":
                     Date datum;
-                    DateTime dt = new DateTime();
                     DateTimeFormatter fmt = DateTimeFormat.forPattern("dd.MM.yyyy").withZone(DateTimeZone.forID("Europe/Berlin"));
                     try {
-                        datum = dt.parse(editContent, fmt).toDate();
+                        datum = DateTime.parse(editContent, fmt).toDate();
                         selectedAttribut.setContentDate(datum);
                     } catch (IllegalArgumentException ex) {
                         try {
                             fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(DateTimeZone.forID("Europe/Berlin"));
-                            datum = dt.parse(editContent, fmt).toDate();
+                            datum = DateTime.parse(editContent, fmt).toDate();
                             selectedAttribut.setContentDate(datum);
                         } catch (IllegalArgumentException ex2) {
                             fmt = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZone(DateTimeZone.forID("Europe/Berlin"));
-                            datum = dt.parse(editContent, fmt).toDate();
+                            datum = DateTime.parse(editContent, fmt).toDate();
                             selectedAttribut.setContentDate(datum);
                         }
                     }
@@ -274,7 +272,7 @@ public class ContentUtil {
     public ArrayList getContentOutputKeywords(CfClasscontent classcontent, boolean toLower) {
         ArrayList<String> keywords = new ArrayList<>();
         List<CfClasscontentkeyword> keywordlist = cfclasscontentkeywordService.findByClassContentRef(classcontent.getId());
-        if (keywordlist.size() > 0) {
+        if (!keywordlist.isEmpty()) {
             for (CfClasscontentkeyword cck : keywordlist) {
                 if (toLower) {
                     keywords.add(cfkeywordService.findById(cck.getCfClasscontentkeywordPK().getKeywordref()).getName().toLowerCase());

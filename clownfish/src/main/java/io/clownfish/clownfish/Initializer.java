@@ -40,10 +40,16 @@ public class Initializer implements ServletContextInitializer {
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         servletContext.setInitParameter("primefaces.CLIENT_SIDE_VALIDATION", "true");
-        servletContext.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
         servletContext.setInitParameter("primefaces.UPLOADER", "commons");
         servletContext.setInitParameter("primefaces.FONT_AWESOME", "true");
+        servletContext.setInitParameter("primefaces.SUBMIT", "partial");
+        servletContext.setInitParameter("primefaces.MOVE_SCRIPTS_TO_BOTTOM", "bottom");
         servletContext.setInitParameter("primefaces.THEME", "vela");
+        
+        servletContext.setInitParameter("javax.faces.PROJECT_STAGE", "Production");
+        servletContext.setInitParameter("javax.faces.FACELETS_REFRESH_PERIOD", "-1");
+        servletContext.setInitParameter("javax.faces.STATE_SAVING_METHOD", "server");
+        
     }
     
     /**

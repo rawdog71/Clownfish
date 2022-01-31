@@ -79,7 +79,7 @@ public class MavenList implements Serializable {
         mavenlist = cfmavenService.findAll();
         packaging = "jar";
         newContentButtonDisabled = false;
-        mvnDocs = new ArrayList<MvnDocs>();
+        mvnDocs = new ArrayList<>();
         mavenpath = propertyUtil.getPropertyValue("folder_maven");
         LOGGER.info("INIT MAVENLIST END");
     }

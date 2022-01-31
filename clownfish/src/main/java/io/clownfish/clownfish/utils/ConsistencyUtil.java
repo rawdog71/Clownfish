@@ -67,7 +67,7 @@ public class ConsistencyUtil {
         
         LOGGER.info("CONSISTENCY CHECK AttributContent - START");     
         List<CfClasscontent> classcontentlist = cfclasscontentservice.findAll();
-        if (classcontentlist.size() > 0) {
+        if (!classcontentlist.isEmpty()) {
             long lastId = classcontentlist.get(classcontentlist.size()-1).getId();
             for (long i = 0; i <= lastId; i++) {
                 try {
@@ -86,7 +86,7 @@ public class ConsistencyUtil {
             }
         }
         List<CfList> list = cflistservice.findAll();
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             long lastlistId = list.get(list.size()-1).getId();
             for (long i = 0; i <= lastlistId; i++) {
                 try {

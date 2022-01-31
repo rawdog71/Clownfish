@@ -85,7 +85,7 @@ public class InsertContent extends HttpServlet {
             while ((line = reader.readLine()) != null) {
                 jb.append(line);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.error(e.getMessage());
         }
 

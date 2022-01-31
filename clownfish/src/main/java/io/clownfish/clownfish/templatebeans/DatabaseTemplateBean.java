@@ -121,7 +121,7 @@ public class DatabaseTemplateBean implements Serializable {
                 } else {
                     LOGGER.warn("Connection to database not established");
                 }
-            } catch (Exception ex) {
+            } catch (SQLException ex) {
                 LOGGER.error(ex.getMessage());
             }
         });
@@ -178,7 +178,7 @@ public class DatabaseTemplateBean implements Serializable {
             } else {
                 LOGGER.warn("Connection to database not established");
             }
-        };
+        }
         //LOGGER.info("END dbexecute");
         return ok;
     }

@@ -115,7 +115,7 @@ public class GetDatalistHibernate extends HttpServlet {
             while ((line = reader.readLine()) != null) {
                 jb.append(line);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             /*report an error*/ 
         }
 
@@ -170,7 +170,7 @@ public class GetDatalistHibernate extends HttpServlet {
                 }
             }
             
-            Session session_tables = hibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+            Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
             //Session session = hibernateUtil.getSession_tables();
             for (CfClasscontent classcontent : classcontentList) {
                 

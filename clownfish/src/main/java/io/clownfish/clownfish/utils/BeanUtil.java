@@ -62,24 +62,14 @@ public class BeanUtil implements Serializable {
         }
     }
     
-    private Set<Class> findAllClassesInPackage(String packageName) throws IOException {
-        return ClassPath.from(ClassLoader.getSystemClassLoader())
-                .getAllClasses()
-                .stream()
-                .filter(clazz -> clazz.getPackageName()
-                .equalsIgnoreCase(packageName))
-                .map(clazz -> clazz.load())
-                .collect(Collectors.toSet());
-    }
-    
     private Set<Class> findAllClassesInLibfolder(String libdir) throws IOException {
         try {
             File dependencyDirectory = new File(libdir);
             File[] files = dependencyDirectory.listFiles();
             ArrayList<URL> urls = new ArrayList();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].getName().endsWith(".jar")) {
-                    urls.add(files[i].toURI().toURL());
+            for (File file : files) {
+                if (file.getName().endsWith(".jar")) {
+                    urls.add(file.toURI().toURL());
                 }
             }
 
@@ -95,7 +85,7 @@ public class BeanUtil implements Serializable {
                     .filter(clazz -> isClassLoadable(clazz))
                     .map(clazz -> clazz.load())
                     .collect(Collectors.toSet());
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             return null;
         }
     }
