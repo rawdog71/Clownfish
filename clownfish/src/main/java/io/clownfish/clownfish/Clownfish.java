@@ -651,7 +651,7 @@ public class Clownfish {
         try {
             response.setContentType("text/css");
             response.setCharacterEncoding("UTF-8");
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getStatic_folder() + File.separator + name + ".css"), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getCache_folder() + File.separator + name + ".css"), "UTF-8"));
             StringBuilder sb = new StringBuilder(1024);
             String line;
             while ((line = br.readLine()) != null) {
@@ -706,7 +706,7 @@ public class Clownfish {
         try {
             response.setContentType("application/javascript");
             response.setCharacterEncoding("UTF-8");
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getStatic_folder() + File.separator + name + ".js"), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getCache_folder() + File.separator + name + ".js"), "UTF-8"));
             StringBuilder sb = new StringBuilder(1024);
             String line;
             while ((line = br.readLine()) != null) {
