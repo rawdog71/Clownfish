@@ -176,7 +176,6 @@ public class ClassList implements Serializable {
             
             FacesMessage message = new FacesMessage("Class created");
             FacesContext.getCurrentInstance().addMessage(null, message);
-            //hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -194,7 +193,6 @@ public class ClassList implements Serializable {
             datalist.init();
             FacesMessage message = new FacesMessage("Content changed");
             FacesContext.getCurrentInstance().addMessage(null, message);
-            //hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -226,7 +224,6 @@ public class ClassList implements Serializable {
             
             FacesMessage message = new FacesMessage("Attribute created");
             FacesContext.getCurrentInstance().addMessage(null, message);
-            //hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -244,7 +241,6 @@ public class ClassList implements Serializable {
             
             FacesMessage message = new FacesMessage("Attribute changed");
             FacesContext.getCurrentInstance().addMessage(null, message);
-            //hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
         }
     }
     

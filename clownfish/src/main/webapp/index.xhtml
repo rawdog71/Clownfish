@@ -1951,7 +1951,7 @@
                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
                         <f:selectItems value="#{webserviceauthlist.webservicelist}" />
                     </p:selectOneMenu>
-                    <p:commandButton id="newwebserviceauth" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{webserviceauthlist.onCreateWebserviceAuth}" update=":form:msgs :form:tabview:webserviceauthlist" disabled="#{webserviceauthlist.newAuthButtonDisabled}" />
+                    <p:commandButton id="newwebserviceauth" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{webserviceauthlist.onCreateWebserviceAuth}" update=":form:msgs :form:tabview:webserviceauthlist :form:tabview:webservicelist" disabled="#{webserviceauthlist.newAuthButtonDisabled}" />
                 </p:tab>
 
                 <p:tab title="Reef" id="reef" rendered="#{loginBean.login and loginBean.hasRights(17)}">

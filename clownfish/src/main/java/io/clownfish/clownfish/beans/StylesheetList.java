@@ -24,6 +24,7 @@ import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
+import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.StylesheetUtil;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -39,6 +40,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
@@ -85,6 +91,7 @@ public class StylesheetList implements ISourceContentInterface {
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
+    @Autowired private FolderUtil folderUtil;
     private @Getter @Setter SiteTreeBean sitetree;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(StylesheetList.class);
@@ -201,6 +208,7 @@ public class StylesheetList implements ISourceContentInterface {
                         difference = stylesheetUtility.hasDifference(selectedStylesheet);
                         this.stylesheetversionMax = stylesheetUtility.getCurrentVersion();
                         this.selectedstylesheetversion = this.stylesheetversionMax;
+                        writeStaticCSS(selectedStylesheet.getName(), content);
 
                         FacesMessage message = new FacesMessage("Commited " + selectedStylesheet.getName() + " Version: " + (maxversion + 1));
                         FacesContext.getCurrentInstance().addMessage(null, message);
@@ -208,6 +216,7 @@ public class StylesheetList implements ISourceContentInterface {
                         writeVersion(selectedStylesheet.getId(), 1, output);
                         stylesheetUtility.setCurrentVersion(1);
                         difference = stylesheetUtility.hasDifference(selectedStylesheet);
+                        writeStaticCSS(selectedStylesheet.getName(), content);
 
                         FacesMessage message = new FacesMessage("Commited " + selectedStylesheet.getName() + " Version: " + 1);
                         FacesContext.getCurrentInstance().addMessage(null, message);
@@ -374,6 +383,30 @@ public class StylesheetList implements ISourceContentInterface {
         }  else {
             FacesMessage message = new FacesMessage("No stylesheet selected. Nothing changed.");
             FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    private void writeStaticCSS(String filename, String js) {
+        FileOutputStream fileStream = null;
+        try {
+            fileStream = new FileOutputStream(new File(folderUtil.getStatic_folder()+ File.separator + filename + ".css"));
+            OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
+            try {
+                writer.write(js);
+                writer.close();
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to create the destination file", e);
+            }
+        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+            LOGGER.error(ex.getMessage());
+        } finally {
+            try {
+                if (null != fileStream) {
+                    fileStream.close();
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
         }
     }
 }

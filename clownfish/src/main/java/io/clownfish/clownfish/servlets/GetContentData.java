@@ -104,7 +104,7 @@ public class GetContentData extends HttpServlet {
         } catch (javax.persistence.NoResultException | java.lang.IllegalArgumentException ex) {
             response.setContentType("text/html;charset=UTF-8");
             try (PrintWriter out = response.getWriter()) {
-                out.print("No image");
+                out.print("No content");
             } catch (IOException ex1) {
                 LOGGER.error(ex1.getMessage());
             }

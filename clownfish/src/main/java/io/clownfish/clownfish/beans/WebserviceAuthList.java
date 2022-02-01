@@ -73,6 +73,9 @@ public class WebserviceAuthList implements Serializable {
     public void setUser(CfUser user) {
         currentUser = user;
         webserviceauthlist = cfwebserviceauthService.findByUserRef(currentUser);
+        for (CfWebserviceauth webserviceauth : webserviceauthlist) {
+            webservicelist.remove(webserviceauth.getCfWebserviceauthPK().getWebserviceRef());
+        }
     }
     
     public void onSelect(SelectEvent event) {
@@ -89,5 +92,6 @@ public class WebserviceAuthList implements Serializable {
         webserviceauth.setHash(hash);
         cfwebserviceauthService.create(webserviceauth);
         webserviceauthlist = cfwebserviceauthService.findByUserRef(currentUser);
+        webservicelist.remove(webserviceauth.getCfWebserviceauthPK().getWebserviceRef());
     }
 }

@@ -647,15 +647,38 @@ public class Clownfish {
     
     @GetMapping(path = "/{name}.css")
     public void universalGetCSS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        CfStylesheet cfstylesheet = null;
+        BufferedReader br = null;
         try {
-            cfstylesheet = cfstylesheetService.findByName(name);
             response.setContentType("text/css");
             response.setCharacterEncoding("UTF-8");
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getStatic_folder() + File.separator + name + ".css"), "UTF-8"));
+            StringBuilder sb = new StringBuilder(1024);
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+            br.close();
             PrintWriter outwriter = response.getWriter();
-            outwriter.println(cfstylesheet.getContent());
+            outwriter.println(sb);
         } catch (IOException ex) {
-            System.out.println("CSS NOT FOUND");
+            CfStylesheet cfstylesheet = null;
+            try {
+                cfstylesheet = cfstylesheetService.findByName(name);
+                response.setContentType("text/css");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter outwriter = response.getWriter();
+                outwriter.println(cfstylesheet.getContent());
+            } catch (IOException iex) {
+                System.out.println("CSS NOT FOUND");
+            }
+        } finally {
+            try {
+                if (null != br) {
+                    br.close();
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
         }
     }
     
@@ -679,15 +702,38 @@ public class Clownfish {
     
     @GetMapping(path = "/{name}.js")
     public void universalGetJS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        CfJavascript cfjavascript = null;
+        BufferedReader br = null;
         try {
-            cfjavascript = cfjavascriptService.findByName(name);
             response.setContentType("application/javascript");
             response.setCharacterEncoding("UTF-8");
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getStatic_folder() + File.separator + name + ".js"), "UTF-8"));
+            StringBuilder sb = new StringBuilder(1024);
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+            br.close();
             PrintWriter outwriter = response.getWriter();
-            outwriter.println(cfjavascript.getContent());
+            outwriter.println(sb);
         } catch (IOException ex) {
-            System.out.println("JS NOT FOUND");
+            CfJavascript cfjavascript = null;
+            try {
+                cfjavascript = cfjavascriptService.findByName(name);
+                response.setContentType("application/javascript");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter outwriter = response.getWriter();
+                outwriter.println(cfjavascript.getContent());
+            } catch (IOException iex) {
+                System.out.println("JS NOT FOUND");
+            }
+        } finally {
+            try {
+                if (null != br) {
+                    br.close();
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
         }
     }
 
