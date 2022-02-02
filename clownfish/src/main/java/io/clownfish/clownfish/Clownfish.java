@@ -1573,6 +1573,14 @@ public class Clownfish {
                 src = makeStaticImage(src);
                 image.attr("src", src);
             }
+            Elements elem_styles = doc.body().getElementsByAttribute("style");
+            for (Element style : elem_styles) {
+                String src = style.attr("style");
+                if (src.contains("url")) {
+                    src = makeStaticImageInStyle(src);
+                    style.attr("style", src);
+                }
+            }
             /* UIKIT data-src */
             elem_images = doc.getElementsByAttribute("data-src");
             for (Element image : elem_images) {
@@ -2172,5 +2180,33 @@ public class Clownfish {
             src = src_out.toString();
         }
         return src;
+    }
+
+    private String makeStaticImageInStyle(String src) {
+        String output = "";
+        String[] semikolon_split = src.split(";");
+        for (String semikolon_part : semikolon_split) {
+            String[] colon_split = semikolon_part.split(":");
+            String[] comma_split = colon_split[1].trim().split(",");
+            String url = "";
+            for (String comma_part : comma_split) {
+                if (comma_part.contains("'")) {
+                    url = comma_part.substring(comma_part.indexOf("'")+1, comma_part.lastIndexOf("'"));
+                    url = makeStaticImage(url);
+                    url = "url('" + url + "'),";
+                }
+                if (comma_part.contains("\"")) {
+                    url = comma_part.substring(comma_part.indexOf("\"")+1, comma_part.lastIndexOf("\""));
+                    url = makeStaticImage(url);
+                    url = "url(\"" + url + "\"),";
+                }
+            }
+            output += colon_split[0] + ": " + url.substring(0, url.length()-1) +"; ";
+        }
+        if (!output.isBlank()) {
+            return output;
+        } else {
+            return src;
+        }
     }
 }
