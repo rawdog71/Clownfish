@@ -2119,7 +2119,11 @@ public class Clownfish {
                 }
             }
             if (null != asset) {
-                src = "cache/cache" + asset.getName() + width + height;
+                    if (asset.getMimetype().contains("svg")) {
+                        src = "cache/cache" + asset.getName();
+                    } else {
+                        src = "cache/cache" + asset.getName() + width + height;
+                    }
             }
         }
         return src;
@@ -2154,13 +2158,14 @@ public class Clownfish {
                     }
                 }
                 if (null != asset) {
-                    src_out = src_out.append("cache/cache").
-                            append(asset.getName()).
-                            append(width).
-                            append(height).
-                            append(" ").
-                            append(datasource_components[1]).
-                            append(", ");
+                    src_out = src_out.append("cache/cache").append(asset.getName());
+                    if (!asset.getMimetype().contains("svg")) {
+                        src_out.append(width).
+                        append(height);
+                    }
+                    src_out.append(" ").
+                    append(datasource_components[1]).
+                    append(", ");
                 }
             }
             src_out = src_out.delete(src_out.length() - 2, src_out.length());
