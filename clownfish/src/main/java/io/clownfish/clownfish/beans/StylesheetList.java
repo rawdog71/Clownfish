@@ -389,7 +389,7 @@ public class StylesheetList implements ISourceContentInterface {
     private void writeStaticCSS(String filename, String js) {
         FileOutputStream fileStream = null;
         try {
-            fileStream = new FileOutputStream(new File(folderUtil.getCache_folder()+ File.separator + filename + ".css"));
+            fileStream = new FileOutputStream(new File(folderUtil.getCss_folder()+ File.separator + filename + ".css"));
             OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
             try {
                 writer.write(js);

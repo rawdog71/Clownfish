@@ -388,7 +388,7 @@ public class JavascriptList implements ISourceContentInterface {
     private void writeStaticJS(String filename, String js) {
         FileOutputStream fileStream = null;
         try {
-            fileStream = new FileOutputStream(new File(folderUtil.getCache_folder()+ File.separator + filename + ".js"));
+            fileStream = new FileOutputStream(new File(folderUtil.getJs_folder()+ File.separator + filename + ".js"));
             OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
             try {
                 writer.write(js);

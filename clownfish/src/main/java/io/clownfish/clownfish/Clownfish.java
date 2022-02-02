@@ -645,13 +645,50 @@ public class Clownfish {
         }
     }
     
+    @GetMapping(path = "/{name}.js")
+    public void universalGetJS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        BufferedReader br = null;
+        try {
+            response.setContentType("application/javascript");
+            response.setCharacterEncoding("UTF-8");
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getJs_folder() + File.separator + name + ".js"), "UTF-8"));
+            StringBuilder sb = new StringBuilder(1024);
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+            br.close();
+            PrintWriter outwriter = response.getWriter();
+            outwriter.println(sb);
+        } catch (IOException ex) {
+            CfJavascript cfjavascript = null;
+            try {
+                cfjavascript = cfjavascriptService.findByName(name);
+                response.setContentType("application/javascript");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter outwriter = response.getWriter();
+                outwriter.println(cfjavascript.getContent());
+            } catch (IOException iex) {
+                System.out.println("JS NOT FOUND");
+            }
+        } finally {
+            try {
+                if (null != br) {
+                    br.close();
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }
+    }
+    
     @GetMapping(path = "/{name}.css")
     public void universalGetCSS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         BufferedReader br = null;
         try {
             response.setContentType("text/css");
             response.setCharacterEncoding("UTF-8");
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getCache_folder() + File.separator + name + ".css"), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getCss_folder() + File.separator + name + ".css"), "UTF-8"));
             StringBuilder sb = new StringBuilder(1024);
             String line;
             while ((line = br.readLine()) != null) {
@@ -697,43 +734,6 @@ public class Clownfish {
             }
         } catch (IOException ex) {
             LOGGER.warn("Template NOT FOUND");
-        }
-    }
-    
-    @GetMapping(path = "/{name}.js")
-    public void universalGetJS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        BufferedReader br = null;
-        try {
-            response.setContentType("application/javascript");
-            response.setCharacterEncoding("UTF-8");
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getCache_folder() + File.separator + name + ".js"), "UTF-8"));
-            StringBuilder sb = new StringBuilder(1024);
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-            br.close();
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(sb);
-        } catch (IOException ex) {
-            CfJavascript cfjavascript = null;
-            try {
-                cfjavascript = cfjavascriptService.findByName(name);
-                response.setContentType("application/javascript");
-                response.setCharacterEncoding("UTF-8");
-                PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfjavascript.getContent());
-            } catch (IOException iex) {
-                System.out.println("JS NOT FOUND");
-            }
-        } finally {
-            try {
-                if (null != br) {
-                    br.close();
-                }
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage());
-            }
         }
     }
 

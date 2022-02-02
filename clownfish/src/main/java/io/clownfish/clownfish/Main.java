@@ -182,11 +182,52 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             .addResolver(new PathResourceResolver());
         
         propertyUtil = new PropertyUtil(propertylist);
-        // Register resource handler for cached_images
-        registry.addResourceHandler("cache/**").addResourceLocations("file:///" + propertyUtil.getPropertyValue("folder_cache")+"/")
-            .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
-            .resourceChain(true)
-            .addResolver(new PathResourceResolver());
+        if (!propertyUtil.getPropertyValue("folder_cache").isBlank()) {
+            // Register resource handler for cached_images
+            registry.addResourceHandler("cache/**").addResourceLocations("file:///" + propertyUtil.getPropertyValue("folder_cache")+"/")
+                .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver());
+        } else {
+            LOGGER.error("Please set the folder_cache in the database");
+            System.exit(1);
+        }
+        
+        if (!propertyUtil.getPropertyValue("folder_js").isBlank()) {
+            propertyUtil = new PropertyUtil(propertylist);
+            // Register resource handler for js files
+            registry.addResourceHandler("js/**").addResourceLocations("file:///" + propertyUtil.getPropertyValue("folder_js")+"/")
+                .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver());
+        } else {
+            LOGGER.error("Please set the folder_js in the database");
+            System.exit(1);
+        }
+
+        if (!propertyUtil.getPropertyValue("folder_css").isBlank()) {
+            propertyUtil = new PropertyUtil(propertylist);
+            // Register resource handler for css files
+            registry.addResourceHandler("css/**").addResourceLocations("file:///" + propertyUtil.getPropertyValue("folder_css")+"/")
+                .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver());
+        } else {
+            LOGGER.error("Please set the folder_css in the database");
+            System.exit(1);
+        }
+        
+        if (!propertyUtil.getPropertyValue("folder_fonts").isBlank()) {
+            propertyUtil = new PropertyUtil(propertylist);
+            // Register resource handler for font files
+            registry.addResourceHandler("fonts/**").addResourceLocations("file:///" + propertyUtil.getPropertyValue("folder_fonts")+"/")
+                .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver());
+        } else {
+            LOGGER.error("Please set the folder_fonts in the database");
+            System.exit(1);
+        }
         
         registry.setOrder(-1);
     }

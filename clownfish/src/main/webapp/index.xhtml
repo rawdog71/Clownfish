@@ -324,7 +324,7 @@
                                                     <p:commandButton id="newsite" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{sitetree.onCreate}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref" disabled="#{sitetree.newButtonDisabled}">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                     </p:commandButton>
-                                                    <p:commandButton id="changeSiteButton" icon="pi pi-pencil" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref">
+                                                    <p:commandButton id="changeSiteButton" icon="pi pi-pencil" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref :form:tabview:preview">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                     </p:commandButton>
                                                     <p:commandButton id="deleteSiteButton" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref">

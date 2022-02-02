@@ -36,6 +36,9 @@ public class FolderUtil {
     private @Getter @Setter String media_folder;
     private @Getter @Setter String pdf_folder;
     private @Getter @Setter String attachments_folder;
+    private @Getter @Setter String js_folder;
+    private @Getter @Setter String css_folder;
+    private @Getter @Setter String fonts_folder;
     
     @Autowired private PropertyUtil propertyUtil;
 
@@ -47,6 +50,9 @@ public class FolderUtil {
         setMedia_folder(propertyUtil.getPropertyValue("folder_media"));
         setPdf_folder(propertyUtil.getPropertyValue("folder_pdf"));
         setAttachments_folder(propertyUtil.getPropertyValue("folder_attachments"));
+        setJs_folder(propertyUtil.getPropertyValue("folder_js"));
+        setCss_folder(propertyUtil.getPropertyValue("folder_css"));
+        setFonts_folder(propertyUtil.getPropertyValue("folder_fonts"));
     }
     
     public FolderUtil() {
