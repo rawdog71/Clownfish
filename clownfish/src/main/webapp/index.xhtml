@@ -274,7 +274,7 @@
                                             <p:row>
                                                 <p:column>
                                                     <div class="content-justify">
-                                                        <p:commandButton id="deletestaticsite" icon="pi pi-trash" process="form" style="width: 100%" value="Delete static site" actionListener="#{sitetree.onDeleteStaticSite}">
+                                                        <p:commandButton id="deletestaticsite" icon="pi pi-trash" process="form" style="width: 100%" value="Delete static site" update=":form:msgs" actionListener="#{sitetree.onDeleteStaticSite}">
                                                             <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                         </p:commandButton>
                                                     </div>

@@ -40,6 +40,10 @@ public class StaticSiteUtil {
     /**
      * generateStaticSite
      * 
+     * @param sitename
+     * @param content
+     * @param cfassetService
+     * @param folderUtil
      */
     public static void generateStaticSite(String sitename, String content, CfAssetService cfassetService, FolderUtil folderUtil) {
         FileOutputStream fileStream = null;

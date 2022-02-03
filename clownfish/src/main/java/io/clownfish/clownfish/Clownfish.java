@@ -300,7 +300,9 @@ public class Clownfish {
             mavenlist.setClasspathUtil(classpathUtil);
         }
         
-        cfclassCompiler.compileAll(initmessage);
+        Thread compileThread = new Thread(cfclassCompiler);
+        compileThread.start();
+        //cfclassCompiler.compileAll(initmessage);
         
         if (1 == bootstrap) {
             bootstrap = 0;
@@ -406,9 +408,15 @@ public class Clownfish {
             if (null == hibernateInitializer) {
                 hibernateInitializer = new HibernateInit(servicestatus, cfclassService, cfattributService, cfclasscontentService, cfattributcontentService, cflistcontentService, cfclasscontentkeywordService, cfkeywordService, dburl);
                 hibernateUtil.init(hibernateInitializer);
+                hibernateUtil.setHibernateInit(hibernateInit);
+                
+                Thread hibernateThread = new Thread(hibernateUtil);
+                hibernateThread.start();
+                /*
                 hibernateUtil.generateTablesDatamodel(hibernateInit);
                 // generate Relation Tables
                 hibernateUtil.generateRelationsDatamodel(hibernateInit);
+                */
             }
             
             propertylist.setClownfish(this);

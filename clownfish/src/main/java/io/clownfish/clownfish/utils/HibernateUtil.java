@@ -59,7 +59,7 @@ import org.springframework.stereotype.Component;
  * @author SulzbachR
  */
 @Component
-public class HibernateUtil {
+public class HibernateUtil implements Runnable {
     private static CfClassService cfclassservice;
     private static CfAttributService cfattributservice;
     private static CfClasscontentService cfclasscontentService;
@@ -71,6 +71,7 @@ public class HibernateUtil {
     private static ServiceStatus serviceStatus;
     private static String datasourceURL;
     @Autowired MarkdownUtil markdownUtil;
+    private @Getter @Setter int hibernateInit = 0;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     
@@ -639,5 +640,12 @@ public class HibernateUtil {
             LOGGER.error("HIBERNATEUTIL: " + tablename + " is empty. Please use hibernate.init=1 in application.properties");
         }
         return outputmap;
+    }
+
+    @Override
+    public void run() {
+        generateTablesDatamodel(hibernateInit);
+        // generate Relation Tables
+        generateRelationsDatamodel(hibernateInit);
     }
 }

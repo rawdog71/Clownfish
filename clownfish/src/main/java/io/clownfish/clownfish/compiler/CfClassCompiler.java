@@ -39,7 +39,7 @@ import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
 @Named("javaCompiler")
 @Scope("singleton")
 @Component
-public class CfClassCompiler
+public class CfClassCompiler implements Runnable
 {
     @Inject LoginBean loginbean;
     private static CfClassLoader cfclassLoader;
@@ -374,5 +374,10 @@ public class CfClassCompiler
                 compileOut.flush();
             }
         }
+    }
+
+    @Override
+    public void run() {
+        compileAll(false);
     }
 }
