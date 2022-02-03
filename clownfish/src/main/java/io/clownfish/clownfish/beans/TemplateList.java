@@ -332,6 +332,7 @@ public class TemplateList implements ISourceContentInterface {
                 selectedTemplate = newtemplate;
                 refresh();
                 onSelect(null);
+                onCheckOut(null);
             } else {
                 FacesMessage message = new FacesMessage("Please enter template name");
                 FacesContext.getCurrentInstance().addMessage(null, message);

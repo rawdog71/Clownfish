@@ -307,6 +307,7 @@ public class JavascriptList implements ISourceContentInterface {
                 javascriptName = "";
                 selectedJavascript = newjavascript;
                 onSelect(null);
+                onCheckOut(null);
             } else {
                 FacesMessage message = new FacesMessage("Please enter javascript name");
                 FacesContext.getCurrentInstance().addMessage(null, message);

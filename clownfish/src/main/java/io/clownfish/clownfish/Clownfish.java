@@ -194,6 +194,7 @@ public class Clownfish {
     private @Getter @Setter AssetIndexer assetIndexer;
     private @Getter @Setter int searchlimit;
     private @Getter @Setter Map<String, String> metainfomap;
+    private static HibernateInit hibernateInitializer = null;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(Clownfish.class);
     @Value("${bootstrap}") int bootstrap;
@@ -402,11 +403,13 @@ public class Clownfish {
             }
             
             // Generate Hibernate DOM Mapping
-            HibernateInit hibernateInitializer = new HibernateInit(servicestatus, cfclassService, cfattributService, cfclasscontentService, cfattributcontentService, cflistcontentService, cfclasscontentkeywordService, cfkeywordService, dburl);
-            hibernateUtil.init(hibernateInitializer);
-            hibernateUtil.generateTablesDatamodel(hibernateInit);
-            // generate Relation Tables
-            hibernateUtil.generateRelationsDatamodel(hibernateInit);
+            if (null == hibernateInitializer) {
+                hibernateInitializer = new HibernateInit(servicestatus, cfclassService, cfattributService, cfclasscontentService, cfattributcontentService, cflistcontentService, cfclasscontentkeywordService, cfkeywordService, dburl);
+                hibernateUtil.init(hibernateInitializer);
+                hibernateUtil.generateTablesDatamodel(hibernateInit);
+                // generate Relation Tables
+                hibernateUtil.generateRelationsDatamodel(hibernateInit);
+            }
             
             propertylist.setClownfish(this);
             if (null == defaultUtil) {

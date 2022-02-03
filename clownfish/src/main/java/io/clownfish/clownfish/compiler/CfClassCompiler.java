@@ -138,7 +138,7 @@ public class CfClassCompiler
                                         LOGGER.info("LOADING " + className + "...");
                                         classesList.add(cfclassLoader.loadClass("io.clownfish.java." + className));
                                     }
-
+                                    LOGGER.info(compileOut.toString());
                                     if (withMessage)
                                     {
                                         compileOut.flush();
@@ -149,6 +149,7 @@ public class CfClassCompiler
                                 }
                                 else
                                 {
+                                    LOGGER.error(compileOut.toString());
                                     if (withMessage)
                                     {
                                         compileOut.flush();
