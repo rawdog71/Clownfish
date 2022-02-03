@@ -16,13 +16,13 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
-import io.clownfish.clownfish.datamodels.KeywordListOutput;
-import io.clownfish.clownfish.dbentities.CfKeyword;
-import io.clownfish.clownfish.dbentities.CfKeywordlist;
-import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
-import io.clownfish.clownfish.serviceinterface.CfKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
-import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
+import io.clownfish.clownfish.datamodels.AssetListOutput;
+import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfAssetlist;
+import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -41,15 +41,15 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@WebServlet(name = "GetKeywordLibraries", urlPatterns = {"/GetKeywordLibraries"})
+@WebServlet(name = "GetAssetLibraries", urlPatterns = {"/GetAssetLibraries"})
 @Component
-public class GetKeywordLibraries extends HttpServlet {
-    @Autowired transient CfKeywordService cfkeywordService;
-    @Autowired transient CfKeywordlistService cfkeywordlistService;
-    @Autowired transient CfKeywordlistcontentService cfkeywordlistcontentService;
+public class GetAssetLibraries extends HttpServlet {
+    @Autowired transient CfAssetService cfassetService;
+    @Autowired transient CfAssetlistService cfassetlistService;
+    @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
     @Autowired ApiKeyUtil apikeyutil;
         
-    final transient Logger LOGGER = LoggerFactory.getLogger(GetKeywordLibraries.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetAssetLibraries.class);
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -62,39 +62,39 @@ public class GetKeywordLibraries extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
-            if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {
-                CfKeywordlist keywordlist = null;
-                List<CfKeywordlist> keywordlistList = new ArrayList<>();
-                String keywordlistid = request.getParameter("id");
-                if (keywordlistid != null) {
-                    keywordlist = cfkeywordlistService.findById(Long.parseLong(keywordlistid));
-                    keywordlistList.add(keywordlist);
+            if (apikeyutil.checkApiKey(apikey, "GetAssetLibraries")) {
+                CfAssetlist assetlist = null;
+                List<CfAssetlist> assetlistList = new ArrayList<>();
+                String assetlistid = request.getParameter("id");
+                if (assetlistid != null) {
+                    assetlist = cfassetlistService.findById(Long.parseLong(assetlistid));
+                    assetlistList.add(assetlist);
                 }
-                String keywordlistname = request.getParameter("name");
-                if (keywordlistname != null) {
-                    keywordlist = cfkeywordlistService.findByName(keywordlistname);
-                    keywordlistList.clear();
-                    keywordlistList.add(keywordlist);
+                String assetlistname = request.getParameter("name");
+                if (assetlistname != null) {
+                    assetlist = cfassetlistService.findByName(assetlistname);
+                    assetlistList.clear();
+                    assetlistList.add(assetlist);
                 }
-                if ((null == keywordlistid) && (null == keywordlistname)) {
-                    keywordlistList = cfkeywordlistService.findAll();
+                if ((null == assetlistid) && (null == assetlistname)) {
+                    assetlistList = cfassetlistService.findAll();
                 }
                 
-                ArrayList<KeywordListOutput> keywordlistoutputList = new ArrayList<>();
-                for (CfKeywordlist keywordlistItem : keywordlistList) {
-                    List<CfKeyword> keywordList = new ArrayList<>();
-                    List<CfKeywordlistcontent> keywordlistcontentList = cfkeywordlistcontentService.findByKeywordlistref(keywordlistItem.getId());
-                    for (CfKeywordlistcontent keywordlistcontent : keywordlistcontentList) {
-                        keywordList.add(cfkeywordService.findById(keywordlistcontent.getCfKeywordlistcontentPK().getKeywordref()));
+                ArrayList<AssetListOutput> assetlistoutputList = new ArrayList<>();
+                for (CfAssetlist assetlistItem : assetlistList) {
+                    List<CfAsset> assetList = new ArrayList<>();
+                    List<CfAssetlistcontent> assetlistcontentList = cfassetlistcontentService.findByAssetlistref(assetlistItem.getId());
+                    for (CfAssetlistcontent assetlistcontent : assetlistcontentList) {
+                        assetList.add(cfassetService.findById(assetlistcontent.getCfAssetlistcontentPK().getAssetref()));
                     }
-                    KeywordListOutput keywordlistoutput = new KeywordListOutput();
-                    keywordlistoutput.setKeywordlist(keywordlistItem);
-                    keywordlistoutput.setKeywords(keywordList);
-                    keywordlistoutputList.add(keywordlistoutput);
+                    AssetListOutput assetlistoutput = new AssetListOutput();
+                    assetlistoutput.setAssetlist(assetlistItem);
+                    assetlistoutput.setAssets(assetList);
+                    assetlistoutputList.add(assetlistoutput);
                 }
                 
                 Gson gson = new Gson(); 
-                String json = gson.toJson(keywordlistoutputList);
+                String json = gson.toJson(assetlistoutputList);
                 response.setContentType("application/json;charset=UTF-8");
                 try (PrintWriter out = response.getWriter()) {
                     out.print(json);
@@ -108,7 +108,7 @@ public class GetKeywordLibraries extends HttpServlet {
         } catch (javax.persistence.NoResultException | java.lang.IllegalArgumentException ex) {
             response.setContentType("text/html;charset=UTF-8");
             try (PrintWriter out = response.getWriter()) {
-                out.print("No keyword lists");
+                out.print("No asset lists");
             } catch (IOException ex1) {
                 LOGGER.error(ex1.getMessage());
             }
