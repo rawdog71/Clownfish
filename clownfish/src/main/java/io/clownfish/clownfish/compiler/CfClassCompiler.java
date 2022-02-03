@@ -1,5 +1,6 @@
 package io.clownfish.clownfish.compiler;
 
+import freemarker.template.DefaultMapAdapter;
 import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.beans.LoginBean;
 import io.clownfish.clownfish.dbentities.CfJava;
@@ -84,6 +85,7 @@ public class CfClassCompiler
 
     public ArrayList<Class<?>> compileClasses(ArrayList<File> srcfiles, boolean withMessage)
     {
+        compilerlanguages.clearFilelist();
         for (File f : srcfiles) {
             for (JVMLanguages language : compilerlanguages.getJvm_languages().keySet()) {
                 if (compilerlanguages.getJvm_languages().get(language)) {
@@ -139,6 +141,7 @@ public class CfClassCompiler
 
                                     if (withMessage)
                                     {
+                                        compileOut.flush();
                                         FacesMessage message = new FacesMessage("Compiled class(es) successfully");
                                         message.setSeverity(FacesMessage.SEVERITY_INFO);
                                         FacesContext.getCurrentInstance().addMessage(null, message);
@@ -148,6 +151,7 @@ public class CfClassCompiler
                                 {
                                     if (withMessage)
                                     {
+                                        compileOut.flush();
                                         FacesMessage message = new FacesMessage("Compilation failed! Check compile log.");
                                         message.setSeverity(FacesMessage.SEVERITY_ERROR);
                                         FacesContext.getCurrentInstance().addMessage(null, message);
@@ -156,6 +160,7 @@ public class CfClassCompiler
                             }
                             catch (ClassNotFoundException | IOException | IllegalStateException e)
                             {
+                                compileOut.flush();
                                 LOGGER.error(e.getMessage());
                             }
                         }

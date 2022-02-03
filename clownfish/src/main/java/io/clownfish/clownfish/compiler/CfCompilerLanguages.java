@@ -38,6 +38,15 @@ public class CfCompilerLanguages {
         checkLanguages();
     }
     
+    public void clearFilelist() {
+        if (!jvm_languages.isEmpty()) {
+            JVMLanguages[] languages = JVMLanguages.values();
+            for (JVMLanguages language : languages) {
+                language.getFilelist().clear();
+            }
+        }
+    }
+    
     private void checkLanguages() {
         if (jvm_languages.isEmpty()) {
             JVMLanguages[] languages = JVMLanguages.values();
