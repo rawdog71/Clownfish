@@ -17,6 +17,7 @@ package io.clownfish.clownfish.datamodels;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -28,4 +29,16 @@ import lombok.Setter;
 public class AssetDataOutput {
     private @Getter @Setter CfAsset asset;
     private @Getter @Setter ArrayList<String> keywords;
+
+    @Override
+    public boolean equals(Object object) {
+        return object instanceof AssetDataOutput && ((AssetDataOutput) object).asset.getId().equals(asset.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 23 * hash + Objects.hashCode(this.asset);
+        return hash;
+    }
 }

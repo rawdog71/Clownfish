@@ -21,6 +21,7 @@ import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetkeyword;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
+import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.list.SetUniqueList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -82,9 +84,8 @@ public class GetFilteredAssets extends HttpServlet {
         ArrayList<String> searchkeywords;
         List<CfAssetlistcontent> assetlistcontent = null;
         HashMap<String, String> outputmap;
-        ArrayList<AssetDataOutput> outputlist;
-        
-        outputlist = new ArrayList<>();
+        //List<AssetDataOutput> outputlist = new ArrayList<>();
+        List<AssetDataOutput> outputlist = SetUniqueList.decorate(new ArrayList<AssetDataOutput>());
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
@@ -115,28 +116,51 @@ public class GetFilteredAssets extends HttpServlet {
             });
 
             boolean found = true;
-            for (CfAssetlistcontent assetcontent : assetlistcontent) {
-                CfAsset asset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
+            if (null != assetlistcontent) {
+                for (CfAssetlistcontent assetcontent : assetlistcontent) {
+                    CfAsset asset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
 
-                // Check the keyword filter (at least one keyword must be found (OR))
+                    // Check the keyword filter (at least one keyword must be found (OR))
+                    if (!searchkeywords.isEmpty()) {
+                        ArrayList contentkeywords = getContentOutputKeywords(asset, true);
+                        boolean dummyfound = false;
+                        for (String keyword : searchkeywords) {
+                            if (contentkeywords.contains(keyword.toLowerCase())) {
+                                dummyfound = true;
+                            }
+                        }
+                        found = dummyfound;
+                    } else {
+                        found = true;
+                    }
+
+                    if (found) {
+                        AssetDataOutput ao = new AssetDataOutput();
+                        ao.setAsset(asset);
+                        ao.setKeywords(getContentOutputKeywords(asset, false));
+                        outputlist.add(ao);
+                    }
+                }
+            } else {
+                // If Assetlist is empty but keywords are set
                 if (!searchkeywords.isEmpty()) {
-                    ArrayList contentkeywords = getContentOutputKeywords(asset, true);
-                    boolean dummyfound = false;
-                    for (String keyword : searchkeywords) {
-                        if (contentkeywords.contains(keyword.toLowerCase())) {
-                            dummyfound = true;
+                    for (String searchkeyword : searchkeywords) {
+                        CfKeyword keyword = cfkeywordService.findByName(searchkeyword);
+                        if (null != keyword) {
+                            List<CfAssetkeyword> assetkeywords = cfassetkeywordService.findByKeywordRef(keyword.getId());
+                            for (CfAssetkeyword assetkeyword : assetkeywords) {
+                                CfAsset asset = cfassetService.findById(assetkeyword.getCfAssetkeywordPK().getAssetref());
+                                AssetDataOutput ao = new AssetDataOutput();
+                                ao.setAsset(asset);
+                                ao.setKeywords(getContentOutputKeywords(asset, false));
+                                if (!outputlist.contains(ao)) {
+                                    outputlist.add(ao);
+                                }
+                            }
                         }
                     }
-                    found = dummyfound;
                 } else {
-                    found = true;
-                }
-
-                if (found) {
-                    AssetDataOutput ao = new AssetDataOutput();
-                    ao.setAsset(asset);
-                    ao.setKeywords(getContentOutputKeywords(asset, false));
-                    outputlist.add(ao);
+                    found = false;
                 }
             }
 
