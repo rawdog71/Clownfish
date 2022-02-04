@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.KeywordListOutput;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfKeywordlist;
@@ -48,6 +49,7 @@ public class GetKeywordLibraries extends HttpServlet {
     @Autowired transient CfKeywordlistService cfkeywordlistService;
     @Autowired transient CfKeywordlistcontentService cfkeywordlistcontentService;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired transient AuthTokenList authtokenlist;
         
     final transient Logger LOGGER = LoggerFactory.getLogger(GetKeywordLibraries.class);
 
@@ -62,48 +64,54 @@ public class GetKeywordLibraries extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
-            if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {
-                CfKeywordlist keywordlist = null;
-                List<CfKeywordlist> keywordlistList = new ArrayList<>();
-                String keywordlistid = request.getParameter("id");
-                if (keywordlistid != null) {
-                    keywordlist = cfkeywordlistService.findById(Long.parseLong(keywordlistid));
-                    keywordlistList.add(keywordlist);
-                }
-                String keywordlistname = request.getParameter("name");
-                if (keywordlistname != null) {
-                    keywordlist = cfkeywordlistService.findByName(keywordlistname);
-                    keywordlistList.clear();
-                    keywordlistList.add(keywordlist);
-                }
-                if ((null == keywordlistid) && (null == keywordlistname)) {
-                    keywordlistList = cfkeywordlistService.findAll();
-                }
-                
-                ArrayList<KeywordListOutput> keywordlistoutputList = new ArrayList<>();
-                for (CfKeywordlist keywordlistItem : keywordlistList) {
-                    List<CfKeyword> keywordList = new ArrayList<>();
-                    List<CfKeywordlistcontent> keywordlistcontentList = cfkeywordlistcontentService.findByKeywordlistref(keywordlistItem.getId());
-                    for (CfKeywordlistcontent keywordlistcontent : keywordlistcontentList) {
-                        keywordList.add(cfkeywordService.findById(keywordlistcontent.getCfKeywordlistcontentPK().getKeywordref()));
+            String token = request.getParameter("token");
+            if (authtokenlist.checkValidToken(token)) {
+                if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {
+                    CfKeywordlist keywordlist = null;
+                    List<CfKeywordlist> keywordlistList = new ArrayList<>();
+                    String keywordlistid = request.getParameter("id");
+                    if (keywordlistid != null) {
+                        keywordlist = cfkeywordlistService.findById(Long.parseLong(keywordlistid));
+                        keywordlistList.add(keywordlist);
                     }
-                    KeywordListOutput keywordlistoutput = new KeywordListOutput();
-                    keywordlistoutput.setKeywordlist(keywordlistItem);
-                    keywordlistoutput.setKeywords(keywordList);
-                    keywordlistoutputList.add(keywordlistoutput);
-                }
-                
-                Gson gson = new Gson(); 
-                String json = gson.toJson(keywordlistoutputList);
-                response.setContentType("application/json;charset=UTF-8");
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(json);
-                } catch (IOException ex) {
-                    LOGGER.error(ex.getMessage());
+                    String keywordlistname = request.getParameter("name");
+                    if (keywordlistname != null) {
+                        keywordlist = cfkeywordlistService.findByName(keywordlistname);
+                        keywordlistList.clear();
+                        keywordlistList.add(keywordlist);
+                    }
+                    if ((null == keywordlistid) && (null == keywordlistname)) {
+                        keywordlistList = cfkeywordlistService.findAll();
+                    }
+
+                    ArrayList<KeywordListOutput> keywordlistoutputList = new ArrayList<>();
+                    for (CfKeywordlist keywordlistItem : keywordlistList) {
+                        List<CfKeyword> keywordList = new ArrayList<>();
+                        List<CfKeywordlistcontent> keywordlistcontentList = cfkeywordlistcontentService.findByKeywordlistref(keywordlistItem.getId());
+                        for (CfKeywordlistcontent keywordlistcontent : keywordlistcontentList) {
+                            keywordList.add(cfkeywordService.findById(keywordlistcontent.getCfKeywordlistcontentPK().getKeywordref()));
+                        }
+                        KeywordListOutput keywordlistoutput = new KeywordListOutput();
+                        keywordlistoutput.setKeywordlist(keywordlistItem);
+                        keywordlistoutput.setKeywords(keywordList);
+                        keywordlistoutputList.add(keywordlistoutput);
+                    }
+
+                    Gson gson = new Gson(); 
+                    String json = gson.toJson(keywordlistoutputList);
+                    response.setContentType("application/json;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        out.print(json);
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                } else {
+                    PrintWriter out = response.getWriter();
+                    out.print("Wrong API KEY");
                 }
             } else {
                 PrintWriter out = response.getWriter();
-                out.print("Wrong API KEY");
+                out.print("Invalid Token");
             }
         } catch (javax.persistence.NoResultException | java.lang.IllegalArgumentException ex) {
             response.setContentType("text/html;charset=UTF-8");

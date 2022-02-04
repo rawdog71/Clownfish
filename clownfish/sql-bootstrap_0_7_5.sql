@@ -23,4 +23,7 @@ INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,2
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,21,'Gq33nmeRjW2MYPCA+i354PBsc1pugAp9R7P5QXtAd2Y=');
 INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,22,'rB7O43FOtfaG6IRfH+JIGoIJNS4DK0DpLZoOOkU5ORc=');
 
+INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
+('check_authtoken', 'true', 1);
+
 COMMIT;

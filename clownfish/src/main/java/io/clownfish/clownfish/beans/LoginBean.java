@@ -15,6 +15,8 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.datamodels.AuthToken;
+import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.dbentities.CfBackend;
 import io.clownfish.clownfish.dbentities.CfUser;
 import io.clownfish.clownfish.dbentities.CfUserbackend;
@@ -33,6 +35,7 @@ import javax.inject.Named;
 import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -50,6 +53,7 @@ public class LoginBean implements Serializable {
     @Autowired transient CfUserService cfuserService;
     @Autowired transient CfUserBackendService cfuserbackendService;
     @Autowired transient CfBackendService cfbackendService;
+    @Autowired transient AuthTokenList authtokenlist;
     
     private boolean login;
     private @Getter @Setter String vorname;
@@ -93,6 +97,11 @@ public class LoginBean implements Serializable {
             String salt = cfuser.getSalt();
             String secure = PasswordUtil.generateSecurePassword(passwort, salt);
             if (secure.compareTo(cfuser.getPasswort()) == 0) {
+                AuthToken at = new AuthToken();
+                String token = at.generateToken(passwort, salt);
+                at.setToken(token);
+                at.setValiduntil(new DateTime().plusMinutes(60));
+                authtokenlist.getAuthtokens().put(token, at);
                 login = true;
                 List<CfUserbackend> selectedcontent = cfuserbackendService.findByUserRef(cfuser.getId());
                 userrights.clear();

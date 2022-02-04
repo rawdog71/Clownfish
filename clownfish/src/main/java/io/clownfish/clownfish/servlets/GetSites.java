@@ -16,10 +16,12 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.SiteDataOutput;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
+import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -42,7 +44,8 @@ import org.springframework.stereotype.Component;
 public class GetSites extends HttpServlet {
     @Autowired transient CfSiteService cfsiteService;
     @Autowired ApiKeyUtil apikeyutil;
-        
+    @Autowired transient AuthTokenList authtokenlist;
+    
     final transient Logger LOGGER = LoggerFactory.getLogger(GetSites.class);
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -56,40 +59,46 @@ public class GetSites extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
-            if (apikeyutil.checkApiKey(apikey, "GetSites")) {
-                CfSite site = null;
-                List<CfSite> siteList = new ArrayList<>();
-                String siteid = request.getParameter("id");
-                if (siteid != null) {
-                    site = cfsiteService.findById(Long.parseLong(siteid));
-                    siteList.add(site);
-                }
-                String sitename = request.getParameter("name");
-                if (sitename != null) {
-                    site = cfsiteService.findByName(sitename);
-                    siteList.clear();
-                    siteList.add(site);
-                }
-                if ((null == siteid) && (null == sitename)) {
-                    siteList = cfsiteService.findAll();
-                }
-                ArrayList<SiteDataOutput> sitedataoutputList = new ArrayList<>();
-                for (CfSite siteItem : siteList) {
-                    SiteDataOutput sitedataoutput = new SiteDataOutput();
-                    sitedataoutput.setSite(siteItem);
-                    sitedataoutputList.add(sitedataoutput);
-                }
-                Gson gson = new Gson(); 
-                String json = gson.toJson(sitedataoutputList);
-                response.setContentType("application/json;charset=UTF-8");
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(json);
-                } catch (IOException ex) {
-                    LOGGER.error(ex.getMessage());
+            String token = request.getParameter("token");
+            if (authtokenlist.checkValidToken(token)) {
+                if (apikeyutil.checkApiKey(apikey, "GetSites")) {
+                    CfSite site = null;
+                    List<CfSite> siteList = new ArrayList<>();
+                    String siteid = request.getParameter("id");
+                    if (siteid != null) {
+                        site = cfsiteService.findById(Long.parseLong(siteid));
+                        siteList.add(site);
+                    }
+                    String sitename = request.getParameter("name");
+                    if (sitename != null) {
+                        site = cfsiteService.findByName(sitename);
+                        siteList.clear();
+                        siteList.add(site);
+                    }
+                    if ((null == siteid) && (null == sitename)) {
+                        siteList = cfsiteService.findAll();
+                    }
+                    ArrayList<SiteDataOutput> sitedataoutputList = new ArrayList<>();
+                    for (CfSite siteItem : siteList) {
+                        SiteDataOutput sitedataoutput = new SiteDataOutput();
+                        sitedataoutput.setSite(siteItem);
+                        sitedataoutputList.add(sitedataoutput);
+                    }
+                    Gson gson = new Gson(); 
+                    String json = gson.toJson(sitedataoutputList);
+                    response.setContentType("application/json;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        out.print(json);
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                } else {
+                    PrintWriter out = response.getWriter();
+                    out.print("Wrong API KEY");
                 }
             } else {
                 PrintWriter out = response.getWriter();
-                out.print("Wrong API KEY");
+                out.print("Invalid Token");
             }
         } catch (javax.persistence.NoResultException | java.lang.IllegalArgumentException ex) {
             response.setContentType("text/html;charset=UTF-8");

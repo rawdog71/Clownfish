@@ -17,6 +17,7 @@ package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.AssetListOutput;
+import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
@@ -48,6 +49,7 @@ public class GetAssetLibraries extends HttpServlet {
     @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired transient AuthTokenList authtokenlist;
         
     final transient Logger LOGGER = LoggerFactory.getLogger(GetAssetLibraries.class);
 
@@ -62,48 +64,54 @@ public class GetAssetLibraries extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
-            if (apikeyutil.checkApiKey(apikey, "GetAssetLibraries")) {
-                CfAssetlist assetlist = null;
-                List<CfAssetlist> assetlistList = new ArrayList<>();
-                String assetlistid = request.getParameter("id");
-                if (assetlistid != null) {
-                    assetlist = cfassetlistService.findById(Long.parseLong(assetlistid));
-                    assetlistList.add(assetlist);
-                }
-                String assetlistname = request.getParameter("name");
-                if (assetlistname != null) {
-                    assetlist = cfassetlistService.findByName(assetlistname);
-                    assetlistList.clear();
-                    assetlistList.add(assetlist);
-                }
-                if ((null == assetlistid) && (null == assetlistname)) {
-                    assetlistList = cfassetlistService.findAll();
-                }
-                
-                ArrayList<AssetListOutput> assetlistoutputList = new ArrayList<>();
-                for (CfAssetlist assetlistItem : assetlistList) {
-                    List<CfAsset> assetList = new ArrayList<>();
-                    List<CfAssetlistcontent> assetlistcontentList = cfassetlistcontentService.findByAssetlistref(assetlistItem.getId());
-                    for (CfAssetlistcontent assetlistcontent : assetlistcontentList) {
-                        assetList.add(cfassetService.findById(assetlistcontent.getCfAssetlistcontentPK().getAssetref()));
+            String token = request.getParameter("token");
+            if (authtokenlist.checkValidToken(token)) {
+                if (apikeyutil.checkApiKey(apikey, "GetAssetLibraries")) {
+                    CfAssetlist assetlist = null;
+                    List<CfAssetlist> assetlistList = new ArrayList<>();
+                    String assetlistid = request.getParameter("id");
+                    if (assetlistid != null) {
+                        assetlist = cfassetlistService.findById(Long.parseLong(assetlistid));
+                        assetlistList.add(assetlist);
                     }
-                    AssetListOutput assetlistoutput = new AssetListOutput();
-                    assetlistoutput.setAssetlist(assetlistItem);
-                    assetlistoutput.setAssets(assetList);
-                    assetlistoutputList.add(assetlistoutput);
-                }
-                
-                Gson gson = new Gson(); 
-                String json = gson.toJson(assetlistoutputList);
-                response.setContentType("application/json;charset=UTF-8");
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(json);
-                } catch (IOException ex) {
-                    LOGGER.error(ex.getMessage());
+                    String assetlistname = request.getParameter("name");
+                    if (assetlistname != null) {
+                        assetlist = cfassetlistService.findByName(assetlistname);
+                        assetlistList.clear();
+                        assetlistList.add(assetlist);
+                    }
+                    if ((null == assetlistid) && (null == assetlistname)) {
+                        assetlistList = cfassetlistService.findAll();
+                    }
+
+                    ArrayList<AssetListOutput> assetlistoutputList = new ArrayList<>();
+                    for (CfAssetlist assetlistItem : assetlistList) {
+                        List<CfAsset> assetList = new ArrayList<>();
+                        List<CfAssetlistcontent> assetlistcontentList = cfassetlistcontentService.findByAssetlistref(assetlistItem.getId());
+                        for (CfAssetlistcontent assetlistcontent : assetlistcontentList) {
+                            assetList.add(cfassetService.findById(assetlistcontent.getCfAssetlistcontentPK().getAssetref()));
+                        }
+                        AssetListOutput assetlistoutput = new AssetListOutput();
+                        assetlistoutput.setAssetlist(assetlistItem);
+                        assetlistoutput.setAssets(assetList);
+                        assetlistoutputList.add(assetlistoutput);
+                    }
+
+                    Gson gson = new Gson(); 
+                    String json = gson.toJson(assetlistoutputList);
+                    response.setContentType("application/json;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        out.print(json);
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                } else {
+                    PrintWriter out = response.getWriter();
+                    out.print("Wrong API KEY");
                 }
             } else {
                 PrintWriter out = response.getWriter();
-                out.print("Wrong API KEY");
+                out.print("Invalid Token");
             }
         } catch (javax.persistence.NoResultException | java.lang.IllegalArgumentException ex) {
             response.setContentType("text/html;charset=UTF-8");

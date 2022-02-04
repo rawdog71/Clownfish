@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.ClassDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfClass;
@@ -47,6 +48,7 @@ public class GetClasses extends HttpServlet {
     @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired transient AuthTokenList authtokenlist;
         
     final transient Logger LOGGER = LoggerFactory.getLogger(GetClasses.class);
 
@@ -61,42 +63,48 @@ public class GetClasses extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
-            if (apikeyutil.checkApiKey(apikey, "GetClasses")) {
-                CfClass clazz = null;
-                List<CfClass> classList = new ArrayList<>();
-                String classid = request.getParameter("id");
-                if (classid != null) {
-                    clazz = cfclassService.findById(Long.parseLong(classid));
-                    classList.add(clazz);
-                }
-                String classname = request.getParameter("name");
-                if (classname != null) {
-                    clazz = cfclassService.findByName(classname);
-                    classList.clear();
-                    classList.add(clazz);
-                }
-                if ((null == classid) && (null == classname)) {
-                    classList = cfclassService.findAll();
-                }
-                ArrayList<ClassDataOutput> classdataoutputList = new ArrayList<>();
-                for (CfClass classItem : classList) {
-                    List<CfAttribut> attributList = cfattributService.findByClassref(classItem);
-                    ClassDataOutput classdataoutput = new ClassDataOutput();
-                    classdataoutput.setClazz(classItem);
-                    classdataoutput.setAttributlist(attributList);
-                    classdataoutputList.add(classdataoutput);
-                }
-                Gson gson = new Gson(); 
-                String json = gson.toJson(classdataoutputList);
-                response.setContentType("application/json;charset=UTF-8");
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(json);
-                } catch (IOException ex) {
-                    LOGGER.error(ex.getMessage());
+            String token = request.getParameter("token");
+            if (authtokenlist.checkValidToken(token)) {
+                if (apikeyutil.checkApiKey(apikey, "GetClasses")) {
+                    CfClass clazz = null;
+                    List<CfClass> classList = new ArrayList<>();
+                    String classid = request.getParameter("id");
+                    if (classid != null) {
+                        clazz = cfclassService.findById(Long.parseLong(classid));
+                        classList.add(clazz);
+                    }
+                    String classname = request.getParameter("name");
+                    if (classname != null) {
+                        clazz = cfclassService.findByName(classname);
+                        classList.clear();
+                        classList.add(clazz);
+                    }
+                    if ((null == classid) && (null == classname)) {
+                        classList = cfclassService.findAll();
+                    }
+                    ArrayList<ClassDataOutput> classdataoutputList = new ArrayList<>();
+                    for (CfClass classItem : classList) {
+                        List<CfAttribut> attributList = cfattributService.findByClassref(classItem);
+                        ClassDataOutput classdataoutput = new ClassDataOutput();
+                        classdataoutput.setClazz(classItem);
+                        classdataoutput.setAttributlist(attributList);
+                        classdataoutputList.add(classdataoutput);
+                    }
+                    Gson gson = new Gson(); 
+                    String json = gson.toJson(classdataoutputList);
+                    response.setContentType("application/json;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        out.print(json);
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                } else {
+                    PrintWriter out = response.getWriter();
+                    out.print("Wrong API KEY");
                 }
             } else {
                 PrintWriter out = response.getWriter();
-                out.print("Wrong API KEY");
+                out.print("Invalid Token");
             }
         } catch (javax.persistence.NoResultException | java.lang.IllegalArgumentException ex) {
             response.setContentType("text/html;charset=UTF-8");

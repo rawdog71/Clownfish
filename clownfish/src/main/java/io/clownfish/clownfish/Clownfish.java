@@ -84,6 +84,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
+import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
@@ -161,6 +162,7 @@ public class Clownfish {
     ExternalClassProvider externalclassproviderbean;
     CfClassCompiler cfclassCompiler;
     CfClassLoader cfclassLoader;
+    AuthTokenList authtokenlist = null;
 
     private String contenttype;
     private String characterencoding;
@@ -260,6 +262,10 @@ public class Clownfish {
         LOGGER.info("INIT CLOWNFISH START");
         servicestatus.setMessage("Clownfish is initializing");
         servicestatus.setOnline(false);
+        
+        if (null == authtokenlist) {
+            authtokenlist = new AuthTokenList();
+        }
         
         // read all System Properties of the property table
         if (null == propertyUtil) {

@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
@@ -41,6 +42,7 @@ import org.springframework.stereotype.Component;
 public class GetKeywords extends HttpServlet {
     @Autowired transient CfKeywordService cfkeywordService;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired transient AuthTokenList authtokenlist;
         
     final transient Logger LOGGER = LoggerFactory.getLogger(GetKeywords.class);
 
@@ -55,20 +57,26 @@ public class GetKeywords extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
-            if (apikeyutil.checkApiKey(apikey, "GetKeywords")) {
-                List<CfKeyword> keywordList = new ArrayList<>();
-                keywordList = cfkeywordService.findAll();
-                Gson gson = new Gson(); 
-                String json = gson.toJson(keywordList);
-                response.setContentType("application/json;charset=UTF-8");
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(json);
-                } catch (IOException ex) {
-                    LOGGER.error(ex.getMessage());
+            String token = request.getParameter("token");
+            if (authtokenlist.checkValidToken(token)) {
+                if (apikeyutil.checkApiKey(apikey, "GetKeywords")) {
+                    List<CfKeyword> keywordList = new ArrayList<>();
+                    keywordList = cfkeywordService.findAll();
+                    Gson gson = new Gson(); 
+                    String json = gson.toJson(keywordList);
+                    response.setContentType("application/json;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        out.print(json);
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                } else {
+                    PrintWriter out = response.getWriter();
+                    out.print("Wrong API KEY");
                 }
             } else {
                 PrintWriter out = response.getWriter();
-                out.print("Wrong API KEY");
+                out.print("Invalid Token");
             }
         } catch (javax.persistence.NoResultException | java.lang.IllegalArgumentException ex) {
             response.setContentType("text/html;charset=UTF-8");
