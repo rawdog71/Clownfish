@@ -84,7 +84,6 @@ public class GetFilteredAssets extends HttpServlet {
         ArrayList<String> searchkeywords;
         List<CfAssetlistcontent> assetlistcontent = null;
         HashMap<String, String> outputmap;
-        //List<AssetDataOutput> outputlist = new ArrayList<>();
         List<AssetDataOutput> outputlist = SetUniqueList.decorate(new ArrayList<AssetDataOutput>());
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();

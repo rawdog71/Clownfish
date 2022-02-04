@@ -16,12 +16,9 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
-import io.clownfish.clownfish.datamodels.ClassDataOutput;
-import io.clownfish.clownfish.dbentities.CfAttribut;
-import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.serviceinterface.CfAttributService;
-import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
-import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.datamodels.SiteDataOutput;
+import io.clownfish.clownfish.dbentities.CfSite;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,15 +37,13 @@ import org.springframework.stereotype.Component;
  *
  * @author sulzbachr
  */
-@WebServlet(name = "GetClasses", urlPatterns = {"/GetClasses"})
+@WebServlet(name = "GetSites", urlPatterns = {"/GetSites"})
 @Component
-public class GetClasses extends HttpServlet {
-    @Autowired transient CfClassService cfclassService;
-    @Autowired transient CfAttributetypeService cfattributetypeService;
-    @Autowired transient CfAttributService cfattributService;
+public class GetSites extends HttpServlet {
+    @Autowired transient CfSiteService cfsiteService;
     @Autowired ApiKeyUtil apikeyutil;
         
-    final transient Logger LOGGER = LoggerFactory.getLogger(GetClasses.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(GetSites.class);
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -61,33 +56,31 @@ public class GetClasses extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
-            if (apikeyutil.checkApiKey(apikey, "GetClasses")) {
-                CfClass clazz = null;
-                List<CfClass> classList = new ArrayList<>();
-                String classid = request.getParameter("id");
-                if (classid != null) {
-                    clazz = cfclassService.findById(Long.parseLong(classid));
-                    classList.add(clazz);
+            if (apikeyutil.checkApiKey(apikey, "GetSites")) {
+                CfSite site = null;
+                List<CfSite> siteList = new ArrayList<>();
+                String siteid = request.getParameter("id");
+                if (siteid != null) {
+                    site = cfsiteService.findById(Long.parseLong(siteid));
+                    siteList.add(site);
                 }
-                String classname = request.getParameter("name");
-                if (classname != null) {
-                    clazz = cfclassService.findByName(classname);
-                    classList.clear();
-                    classList.add(clazz);
+                String sitename = request.getParameter("name");
+                if (sitename != null) {
+                    site = cfsiteService.findByName(sitename);
+                    siteList.clear();
+                    siteList.add(site);
                 }
-                if ((null == classid) && (null == classname)) {
-                    classList = cfclassService.findAll();
+                if ((null == siteid) && (null == sitename)) {
+                    siteList = cfsiteService.findAll();
                 }
-                ArrayList<ClassDataOutput> classdataoutputList = new ArrayList<>();
-                for (CfClass classItem : classList) {
-                    List<CfAttribut> attributList = cfattributService.findByClassref(classItem);
-                    ClassDataOutput classdataoutput = new ClassDataOutput();
-                    classdataoutput.setClazz(classItem);
-                    classdataoutput.setAttributlist(attributList);
-                    classdataoutputList.add(classdataoutput);
+                ArrayList<SiteDataOutput> sitedataoutputList = new ArrayList<>();
+                for (CfSite siteItem : siteList) {
+                    SiteDataOutput sitedataoutput = new SiteDataOutput();
+                    sitedataoutput.setSite(siteItem);
+                    sitedataoutputList.add(sitedataoutput);
                 }
                 Gson gson = new Gson(); 
-                String json = gson.toJson(classdataoutputList);
+                String json = gson.toJson(sitedataoutputList);
                 response.setContentType("application/json;charset=UTF-8");
                 try (PrintWriter out = response.getWriter()) {
                     out.print(json);
