@@ -30,8 +30,13 @@ public class AuthToken {
 
     public AuthToken() {
     }
+
+    public AuthToken(String token, DateTime validuntil) {
+        this.token = token;
+        this.validuntil = validuntil;
+    }
     
-    public String generateToken(String password, String salt) {
+    public static String generateToken(String password, String salt) {
         return PasswordUtil.generateSecurePassword(password + new DateTime().toString(), salt);
     }
 }

@@ -52,7 +52,6 @@ public class BackendLoginServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         Map<String, String[]> parameters = request.getParameterMap();
-        AuthToken at = new AuthToken();
         
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("email") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             email = values[0];
@@ -63,15 +62,14 @@ public class BackendLoginServlet extends HttpServlet {
             password = values[0];
         });
         String inst_password = password;
-        
+        AuthToken at = null;
         if ((null != inst_email) && (null != inst_password)) {
             CfUser cfuser = cfuserService.findByEmail(inst_email);
             String salt = cfuser.getSalt();
             String secure = PasswordUtil.generateSecurePassword(inst_password, salt);
             if (secure.compareTo(cfuser.getPasswort()) == 0) {
-                String token = at.generateToken(inst_password, salt);
-                at.setToken(token);
-                at.setValiduntil(new DateTime().plusMinutes(60));
+                String token = AuthToken.generateToken(inst_password, salt);
+                at = new AuthToken(token, new DateTime().plusMinutes(60));      // Tokens valid for 60 minutes
                 authtokenlist.getAuthtokens().put(token, at);
             }
         }

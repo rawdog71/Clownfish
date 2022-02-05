@@ -62,9 +62,9 @@ public class GetClasses extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            String apikey = request.getParameter("apikey");
             String token = request.getParameter("token");
             if (authtokenlist.checkValidToken(token)) {
+                String apikey = request.getParameter("apikey");
                 if (apikeyutil.checkApiKey(apikey, "GetClasses")) {
                     CfClass clazz = null;
                     List<CfClass> classList = new ArrayList<>();

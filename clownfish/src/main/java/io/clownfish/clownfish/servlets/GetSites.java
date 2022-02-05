@@ -21,7 +21,6 @@ import io.clownfish.clownfish.datamodels.SiteDataOutput;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
-import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -58,9 +57,9 @@ public class GetSites extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            String apikey = request.getParameter("apikey");
             String token = request.getParameter("token");
             if (authtokenlist.checkValidToken(token)) {
+                String apikey = request.getParameter("apikey");
                 if (apikeyutil.checkApiKey(apikey, "GetSites")) {
                     CfSite site = null;
                     List<CfSite> siteList = new ArrayList<>();

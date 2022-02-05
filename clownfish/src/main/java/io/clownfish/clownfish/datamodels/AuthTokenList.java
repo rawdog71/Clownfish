@@ -17,6 +17,9 @@ package io.clownfish.clownfish.datamodels;
 
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,11 @@ public class AuthTokenList {
 
     public AuthTokenList() {
         authtokens = new HashMap<>();
+        Runnable gcRunnable = () -> {
+            deleteTokens();
+        };
+        ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
+        exec.scheduleAtFixedRate(gcRunnable , 0, 1, TimeUnit.MINUTES);
     }
     
     public boolean checkValidToken(String token) {
@@ -44,6 +52,14 @@ public class AuthTokenList {
             }
         } else {
             return true;
+        }
+    }
+    
+    private void deleteTokens() {
+        for (String token : authtokens.keySet()) {
+            if (authtokens.get(token).getValiduntil().isBeforeNow()) {
+                authtokens.remove(token);
+            }
         }
     }
 }
