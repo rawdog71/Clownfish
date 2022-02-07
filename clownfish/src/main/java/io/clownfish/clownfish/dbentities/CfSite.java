@@ -51,7 +51,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfSite.findByCharacterencoding", query = "SELECT c FROM CfSite c WHERE c.characterencoding = :characterencoding"),
     @NamedQuery(name = "CfSite.findByContenttype", query = "SELECT c FROM CfSite c WHERE c.contenttype = :contenttype"),
     @NamedQuery(name = "CfSite.findByLocale", query = "SELECT c FROM CfSite c WHERE c.locale = :locale"),
-    @NamedQuery(name = "CfSite.findByAliaspath", query = "SELECT c FROM CfSite c WHERE c.aliaspath = :aliaspath")})
+    @NamedQuery(name = "CfSite.findByAliaspath", query = "SELECT c FROM CfSite c WHERE c.aliaspath = :aliaspath"),
+    @NamedQuery(name = "CfSite.findBySitemap", query = "SELECT c FROM CfSite c WHERE c.sitemap = :sitemap")
+})
 public class CfSite implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -106,6 +108,8 @@ public class CfSite implements Serializable {
     private boolean searchrelevant;
     @Column(name = "hitcounter")
     private BigInteger hitcounter;
+    @Column(name = "sitemap")
+    private boolean sitemap;
 
     public CfSite() {
     }
@@ -290,6 +294,14 @@ public class CfSite implements Serializable {
 
     public void setHitcounter(BigInteger hitcounter) {
         this.hitcounter = hitcounter;
+    }
+
+    public boolean isSitemap() {
+        return sitemap;
+    }
+
+    public void setSitemap(boolean sitemap) {
+        this.sitemap = sitemap;
     }
 
     @Override

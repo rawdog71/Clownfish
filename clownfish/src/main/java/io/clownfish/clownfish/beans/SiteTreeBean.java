@@ -153,6 +153,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter boolean sitejob;
     private @Getter @Setter boolean sitestatic;
     private @Getter @Setter boolean sitesearchrelevant;
+    private @Getter @Setter boolean sitemap;
     private @Getter @Setter String siteTitle;
     private @Getter @Setter String siteDescription;
     private @Getter @Setter String aliaspath;
@@ -419,6 +420,7 @@ public class SiteTreeBean implements Serializable {
         selectedKeywordlist.clear();
         sitejob = false;
         sitesearchrelevant = false;
+        sitemap = false;
         sitestatic = false;
         newButtonDisabled = false;
         contenteditable = false;
@@ -552,6 +554,7 @@ public class SiteTreeBean implements Serializable {
         siteDescription = selectedSite.getDescription();
         sitejob = selectedSite.isJob();
         sitesearchrelevant = selectedSite.isSearchrelevant();
+        sitemap = selectedSite.isSitemap();
         sitestatic = selectedSite.isStaticsite();
         aliaspath = selectedSite.getAliaspath();
         sitehtmlcompression = selectedSite.getHtmlcompression();
@@ -688,6 +691,7 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setDescription(siteDescription);
             selectedSite.setJob(sitejob);
             selectedSite.setSearchrelevant(sitesearchrelevant);
+            selectedSite.setSitemap(sitemap);
             selectedSite.setStaticsite(sitestatic);
             cfsiteService.edit(selectedSite);
             loadTree();
@@ -752,6 +756,7 @@ public class SiteTreeBean implements Serializable {
             newsite.setDescription(siteDescription);
             newsite.setJob(sitejob);
             newsite.setSearchrelevant(sitesearchrelevant);
+            newsite.setSitemap(sitemap);
             newsite.setStaticsite(sitestatic);
             cfsiteService.create(newsite);
             loadTree();

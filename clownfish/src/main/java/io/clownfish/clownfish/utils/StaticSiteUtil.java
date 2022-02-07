@@ -45,7 +45,7 @@ public class StaticSiteUtil {
      * @param cfassetService
      * @param folderUtil
      */
-    public static void generateStaticSite(String sitename, String content, CfAssetService cfassetService, FolderUtil folderUtil) {
+    public static void generateStaticSite(String sitename, String aliasname, String content, CfAssetService cfassetService, FolderUtil folderUtil) {
         FileOutputStream fileStream = null;
         try {
             Document doc = Jsoup.parse(content);
@@ -94,13 +94,23 @@ public class StaticSiteUtil {
                     script.remove();
                 }
             }
-            fileStream = new FileOutputStream(new File(folderUtil.getStatic_folder()+ File.separator + sitename));
+            fileStream = new FileOutputStream(new File(folderUtil.getStatic_folder() + File.separator + sitename));
             OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
             try {
                 writer.write(doc.html());
                 writer.close();
             } catch (IOException e) {
                 throw new RuntimeException("Unable to create the destination file", e);
+            }
+            if ((!aliasname.isBlank()) && (0 != aliasname.compareToIgnoreCase(sitename))) {
+                fileStream = new FileOutputStream(new File(folderUtil.getStatic_folder() + File.separator + aliasname));
+                writer = new OutputStreamWriter(fileStream, "UTF-8");
+                try {
+                    writer.write(doc.html());
+                    writer.close();
+                } catch (IOException e) {
+                    throw new RuntimeException("Unable to create the destination file", e);
+                }
             }
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
             LOGGER.error(ex.getMessage());

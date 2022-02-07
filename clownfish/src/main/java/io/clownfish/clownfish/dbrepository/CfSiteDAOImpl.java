@@ -112,4 +112,13 @@ public class CfSiteDAOImpl implements CfSiteDAO {
         CfSite cfsite = (CfSite) query.getSingleResult();
         return cfsite;
     }
+
+    @Override
+    public List<CfSite> findBySitemap(boolean sitemap) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfSite.findBySitemap");  
+        query.setParameter("sitemap", sitemap);
+        List<CfSite> cfsitelist = query.getResultList();
+        return cfsitelist;
+    }
 }

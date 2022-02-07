@@ -699,6 +699,39 @@ public class Clownfish {
         }
     }
     
+    @GetMapping(path = "/sitemap.xml")
+    public void sitemap(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+        try {
+            String domain = propertyUtil.getPropertyValue("domain");
+            response.setContentType("application/xml");
+            response.setCharacterEncoding("UTF-8");
+            
+            StringBuilder sb = new StringBuilder(1024);
+            sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            sb.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
+            // Site root
+            sb.append("<url>");
+            sb.append("<loc>").append(domain).append("/").append("</loc>");
+            sb.append("</url>");
+            List<CfSite> sitemapList = cfsiteService.findBySitemap(true);
+            for (CfSite sitemapItem : sitemapList) {
+                sb.append("<url>");
+                sb.append("<loc>").append(domain).append("/").append(sitemapItem.getName()).append("</loc>");
+                sb.append("</url>");
+                if ((!sitemapItem.getAliaspath().isBlank()) && (0 != sitemapItem.getAliaspath().compareToIgnoreCase(sitemapItem.getName()))) {
+                    sb.append("<url>");
+                    sb.append("<loc>").append(domain).append("/").append(sitemapItem.getAliaspath()).append("</loc>");
+                    sb.append("</url>");
+                }
+            }
+            sb.append("</urlset>");
+            PrintWriter outwriter = response.getWriter();
+            outwriter.println(sb);
+        } catch (IOException ex) {
+           
+        }
+    }
+    
     @GetMapping(path = "/{name}.css")
     public void universalGetCSS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         BufferedReader br = null;
@@ -996,7 +1029,8 @@ public class Clownfish {
                     } else {
                         Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, urlParams, true);
                         try {
-                            StaticSiteUtil.generateStaticSite(name, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                            String aliasname = cfsite.getAliaspath();
+                            StaticSiteUtil.generateStaticSite(name, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
                             return makeResponse(name, postmap, urlParams, false);
                         } catch (InterruptedException | ExecutionException ex) {
                             LOGGER.error(ex.getMessage());

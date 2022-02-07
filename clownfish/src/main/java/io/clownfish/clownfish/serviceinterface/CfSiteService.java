@@ -29,6 +29,7 @@ public interface CfSiteService {
     CfSite findByAliaspath(String alias);
     CfSite findByTemplateref(Long ref);
     List<CfSite> findByParentref(Long ref);
+    List<CfSite> findBySitemap(boolean sitemap);
     CfSite create(CfSite entity);
     boolean delete(CfSite entity);
     CfSite edit(CfSite entity);
