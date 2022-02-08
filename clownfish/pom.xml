@@ -115,14 +115,14 @@
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>primefaces-extensions</artifactId>
-            <version>11.0.0</version>
+            <version>11.0.1</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>resources-monacoeditor</artifactId>
-            <version>11.0.0</version>
+            <version>11.0.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

@@ -166,7 +166,7 @@ public class TemplateList implements ISourceContentInterface {
             switch (selectedTemplate.getScriptlanguage()) {
                 case 0:
                     selectedScriptlanguage = "freemarker";
-                    editorOptions.setLanguage("html");
+                    editorOptions.setLanguage("freemarker2");
                     break;
                 case 1:
                     selectedScriptlanguage = "velocity";
