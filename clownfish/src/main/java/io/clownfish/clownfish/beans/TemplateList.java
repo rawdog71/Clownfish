@@ -43,11 +43,13 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SlideEndEvent;
+import org.primefaces.extensions.model.monacoeditor.DiffEditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
 import org.primefaces.extensions.model.monacoeditor.ETheme;
 import org.primefaces.extensions.model.monacoeditor.EditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
+import org.primefaces.extensions.model.monacoeditor.MonacoDiffEditorModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +86,10 @@ public class TemplateList implements ISourceContentInterface {
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
     private @Getter @Setter boolean layout;
+    private @Getter @Setter boolean showDiff;
     private @Getter @Setter EditorOptions editorOptions;
+    private @Getter @Setter DiffEditorOptions editorOptionsDiff;
+    private @Getter @Setter MonacoDiffEditorModel contentDiff;
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
@@ -136,6 +141,9 @@ public class TemplateList implements ISourceContentInterface {
         editorOptions.setLanguage("");
         editorOptions.setTheme(ETheme.VS_DARK);
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
+        editorOptionsDiff = new DiffEditorOptions();
+        editorOptionsDiff.setTheme(ETheme.VS_DARK);
+        editorOptionsDiff.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
         LOGGER.info("INIT TEMPLATE END");
     }
     
@@ -159,6 +167,7 @@ public class TemplateList implements ISourceContentInterface {
     @Override
     public void onSelect(AjaxBehaviorEvent event) {
         difference = false;
+        showDiff = false;
         if (null != selectedTemplate) {
             templateName = selectedTemplate.getName();
             templateUtility.setTemplateContent(selectedTemplate.getContent());
@@ -278,6 +287,7 @@ public class TemplateList implements ISourceContentInterface {
                 cftemplateService.edit(selectedTemplate);
                 difference = templateUtility.hasDifference(selectedTemplate);
                 checkedout = true;
+                showDiff = false;
 
                 FacesMessage message = new FacesMessage("Checked Out " + selectedTemplate.getName());
                 FacesContext.getCurrentInstance().addMessage(null, message);
@@ -382,6 +392,10 @@ public class TemplateList implements ISourceContentInterface {
         }
         if (selectedtemplateversion >= templateversionMax) {
             selectedtemplateversion = templateversionMax;
+        }
+        showDiff = (selectedtemplateversion < templateversionMax);
+        if (showDiff) {
+            contentDiff = new MonacoDiffEditorModel(templateUtility.getVersion(selectedTemplate.getId(), selectedtemplateversion), templateUtility.getVersion(selectedTemplate.getId(), templateversionMax));
         }
     }
    

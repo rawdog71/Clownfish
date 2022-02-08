@@ -49,11 +49,13 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SlideEndEvent;
+import org.primefaces.extensions.model.monacoeditor.DiffEditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
 import org.primefaces.extensions.model.monacoeditor.ETheme;
 import org.primefaces.extensions.model.monacoeditor.EditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
+import org.primefaces.extensions.model.monacoeditor.MonacoDiffEditorModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +90,9 @@ public class StylesheetList implements ISourceContentInterface {
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
     private @Getter @Setter EditorOptions editorOptions;
+    private @Getter @Setter boolean showDiff;
+    private @Getter @Setter DiffEditorOptions editorOptionsDiff;
+    private @Getter @Setter MonacoDiffEditorModel contentDiff;
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
@@ -138,6 +143,9 @@ public class StylesheetList implements ISourceContentInterface {
         editorOptions.setLanguage("css");
         editorOptions.setTheme(ETheme.VS_DARK);
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
+        editorOptionsDiff = new DiffEditorOptions();
+        editorOptionsDiff.setTheme(ETheme.VS_DARK);
+        editorOptionsDiff.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
         LOGGER.info("INIT STYLESHEET END");
     }
     
@@ -158,6 +166,7 @@ public class StylesheetList implements ISourceContentInterface {
     @Override
     public void onSelect(AjaxBehaviorEvent event) {
         difference = false;
+        showDiff = false;
         if (null != selectedStylesheet) {
             stylesheetName = selectedStylesheet.getName();
             stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
@@ -271,6 +280,7 @@ public class StylesheetList implements ISourceContentInterface {
                 
                 difference = stylesheetUtility.hasDifference(selectedStylesheet);
                 checkedout = true;
+                showDiff = false;
 
                 FacesMessage message = new FacesMessage("Checked Out " + selectedStylesheet.getName());
                 FacesContext.getCurrentInstance().addMessage(null, message);
@@ -356,6 +366,10 @@ public class StylesheetList implements ISourceContentInterface {
         }
         if (selectedstylesheetversion >= stylesheetversionMax) {
             selectedstylesheetversion = stylesheetversionMax;
+        }
+        showDiff = (selectedstylesheetversion < stylesheetversionMax);
+        if (showDiff) {
+            contentDiff = new MonacoDiffEditorModel(stylesheetUtility.getVersion(selectedStylesheet.getId(), selectedstylesheetversion), stylesheetUtility.getVersion(selectedStylesheet.getId(), stylesheetversionMax));
         }
     }
    

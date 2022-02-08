@@ -49,11 +49,13 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SlideEndEvent;
+import org.primefaces.extensions.model.monacoeditor.DiffEditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
 import org.primefaces.extensions.model.monacoeditor.ETheme;
 import org.primefaces.extensions.model.monacoeditor.EditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
+import org.primefaces.extensions.model.monacoeditor.MonacoDiffEditorModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
@@ -88,6 +90,9 @@ public class JavascriptList implements ISourceContentInterface {
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
     private @Getter @Setter EditorOptions editorOptions;
+    private @Getter @Setter boolean showDiff;
+    private @Getter @Setter DiffEditorOptions editorOptionsDiff;
+    private @Getter @Setter MonacoDiffEditorModel contentDiff;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
@@ -138,6 +143,9 @@ public class JavascriptList implements ISourceContentInterface {
         editorOptions.setLanguage("javascript");
         editorOptions.setTheme(ETheme.VS_DARK);
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
+        editorOptionsDiff = new DiffEditorOptions();
+        editorOptionsDiff.setTheme(ETheme.VS_DARK);
+        editorOptionsDiff.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
         LOGGER.info("INIT JAVASCRIPT END");
     }
     
@@ -158,6 +166,7 @@ public class JavascriptList implements ISourceContentInterface {
     @Override
     public void onSelect(AjaxBehaviorEvent event) {
         difference = false;
+        showDiff = false;
         if (null != selectedJavascript) {
             javascriptName = selectedJavascript.getName();
             javascriptUtility.setJavascriptContent(selectedJavascript.getContent());
@@ -270,6 +279,7 @@ public class JavascriptList implements ISourceContentInterface {
                 cfjavascriptService.edit(selectedJavascript);
                 difference = javascriptUtility.hasDifference(selectedJavascript);
                 checkedout = true;
+                showDiff = false;
 
                 FacesMessage message = new FacesMessage("Checked Out " + selectedJavascript.getName());
                 FacesContext.getCurrentInstance().addMessage(null, message);
@@ -356,6 +366,10 @@ public class JavascriptList implements ISourceContentInterface {
         }
         if (selectedjavascriptversion >= javascriptversionMax) {
             selectedjavascriptversion = javascriptversionMax;
+        }
+        showDiff = (selectedjavascriptversion < javascriptversionMax);
+        if (showDiff) {
+            contentDiff = new MonacoDiffEditorModel(javascriptUtility.getVersion(selectedJavascript.getId(), selectedjavascriptversion), javascriptUtility.getVersion(selectedJavascript.getId(), javascriptversionMax));
         }
     }
    

@@ -66,6 +66,9 @@ public class JavaList implements ISourceContentInterface
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
     private @Getter @Setter EditorOptions editorOptions;
+    private @Getter @Setter boolean showDiff;
+    private @Getter @Setter DiffEditorOptions editorOptionsDiff;
+    private @Getter @Setter MonacoDiffEditorModel contentDiff;
     @Autowired private @Getter @Setter JavaUtil javaUtility;
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
@@ -124,6 +127,9 @@ public class JavaList implements ISourceContentInterface
         editorOptions.setLanguage("java");
         editorOptions.setTheme(ETheme.VS_DARK);
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
+        editorOptionsDiff = new DiffEditorOptions();
+        editorOptionsDiff.setTheme(ETheme.VS_DARK);
+        editorOptionsDiff.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
         LOGGER.info("INIT JAVA END");
     }
 
@@ -153,6 +159,7 @@ public class JavaList implements ISourceContentInterface
     public void onSelect(AjaxBehaviorEvent event)
     {
         difference = false;
+        showDiff = false;
         if (null != selectedJava)
         {
             javaName = selectedJava.getName();
@@ -310,6 +317,7 @@ public class JavaList implements ISourceContentInterface
                 cfjavaService.edit(selectedJava);
                 difference = javaUtility.hasDifference(selectedJava);
                 checkedout = true;
+                showDiff = false;
 
                 FacesMessage message = new FacesMessage("Checked out " + selectedJava.getName());
                 FacesContext.getCurrentInstance().addMessage(null, message);
@@ -436,6 +444,10 @@ public class JavaList implements ISourceContentInterface
         if (selectedjavaversion >= javaversionMax)
         {
             selectedjavaversion = javaversionMax;
+        }
+        showDiff = (selectedjavaversion < javaversionMax);
+        if (showDiff) {
+            contentDiff = new MonacoDiffEditorModel(javaUtility.getVersion(selectedJava.getId(), selectedjavaversion), javaUtility.getVersion(selectedJava.getId(), javaversionMax));
         }
     }
 
