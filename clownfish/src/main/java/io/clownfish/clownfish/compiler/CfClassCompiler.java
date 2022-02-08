@@ -1,6 +1,5 @@
 package io.clownfish.clownfish.compiler;
 
-import freemarker.template.DefaultMapAdapter;
 import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.beans.LoginBean;
 import io.clownfish.clownfish.dbentities.CfJava;
@@ -60,6 +59,9 @@ public class CfClassCompiler implements Runnable
     public CfClassCompiler() {
         if (null == compilerlanguages) {
             compilerlanguages = new CfCompilerLanguages();
+        }
+        if (null == compileOut) {
+            compileOut = new StringWriter();
         }
     }
     
