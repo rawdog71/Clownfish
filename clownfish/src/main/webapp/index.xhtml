@@ -716,7 +716,7 @@
                             
                             <h:panelGroup id="editjavapanel">
                                 <div class="flex flex-row pb-2">
-                                    <pe:monacoEditor id="editjava" disabled="false" widgetVar="monacojava" readonly="#{!javasList.checkedout}" editorOptions="#{javaList.editorOptions}" value="#{javaList.content}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{!javaList.showDiff}" />
+                                    <pe:monacoEditor id="editjava" disabled="false" widgetVar="monacojava" readonly="#{!javaList.checkedout}" editorOptions="#{javaList.editorOptions}" value="#{javaList.content}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{!javaList.showDiff}" />
                                     <pe:monacoDiffEditor id="editjavadiff" widgetVar="monacojavadiff" rendered="#{javaList.showDiff}" 
                                                          value="#{javaList.contentDiff}" editorOptions="#{javaList.editorOptionsDiff}" language="#{javaList.editorOptions.language}" readonly="#{!javaList.checkedout}"
                                                          locale="de" width="100%" height="600px" autoResize="true" />
