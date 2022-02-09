@@ -41,6 +41,13 @@
                         <p:outputLabel value="&nbsp;" />
                         <p:outputLabel rendered="#{loginBean.login}" value="#{loginBean.cfuser.nachname}" />
                         <p:outputLabel value="&nbsp;" />
+                        
+                        <p:avatar styleClass="p-mr-2" size="large" shape="circle" rendered="#{loginBean.login}">
+                            <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{loginBean.cfuser.assetref.id}&amp;width=50" />
+                        </p:avatar>
+                        
+                        <p:outputLabel value="&nbsp;" />
+                        
                         <p:commandButton id="refreshcontentall" icon="pi pi-refresh" process="form" value="Refresh" actionListener="#{backendBean.onRefreshAll()}" update=":form:msgs :form:tabview" rendered="#{loginBean.login}">
                             <f:actionListener binding="#{sitetree.onRefreshAll()}" />
                         </p:commandButton>
@@ -1879,6 +1886,19 @@
                         
                         <p:outputLabel for="uservorname">Nachname</p:outputLabel>
                         <p:inputText id="usernachname" value="#{userlist.nachname}"></p:inputText>
+                        
+                        <p:outputLabel for="avatar">Avatar</p:outputLabel>
+                        <p:selectOneMenu id="avatar" value="#{userlist.avatar}" var="mp" converter="#{assetConverterBean}">
+                            <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                            <f:selectItems value="#{userlist.assetlist}" var="media" itemLabel="#{media.name}" itemValue="#{media}" />
+                            <p:column>
+                            <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
+                            </p:column>
+                            <p:column>
+                            #{mp.name}
+                            </p:column>
+                        </p:selectOneMenu>
+                        
                         
                         <p:outputLabel for="userpassword">Passwort</p:outputLabel>
                         <p:inputText id="userpassword" type="password" value="#{userlist.passwort}"></p:inputText>

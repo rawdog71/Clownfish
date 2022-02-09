@@ -15,10 +15,12 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfBackend;
 import io.clownfish.clownfish.dbentities.CfUser;
 import io.clownfish.clownfish.dbentities.CfUserbackend;
 import io.clownfish.clownfish.dbentities.CfUserbackendPK;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfBackendService;
 import io.clownfish.clownfish.serviceinterface.CfUserBackendService;
 import io.clownfish.clownfish.serviceinterface.CfUserService;
@@ -53,17 +55,20 @@ public class UserList implements Serializable {
     @Autowired CfUserService cfuserService;
     @Autowired CfBackendService cfbackendService;
     @Autowired CfUserBackendService cfuserbackendService;
+    @Autowired transient CfAssetService cfassetService;
     
     private @Getter @Setter List<CfUser> userlist;
     private @Getter @Setter CfUser selectedUser;
     private @Getter @Setter String email;
     private @Getter @Setter String vorname;
     private @Getter @Setter String nachname;
+    private @Getter @Setter CfAsset avatar;
     private @Getter @Setter String passwort;
     private @Getter @Setter String passwort_validate;
     private @Getter @Setter boolean newUserButtonDisabled;
     private transient @Getter @Setter List<CfBackend> selectedbackendListcontent = null;
     private transient @Getter @Setter List<CfBackend> backendListcontent = null;
+    private @Getter @Setter List<CfAsset> assetlist;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(UserList.class);
 
@@ -74,16 +79,21 @@ public class UserList implements Serializable {
         newUserButtonDisabled = false;
         backendListcontent = cfbackendService.findAll();
         selectedbackendListcontent = new ArrayList<>();
+        // only show assets for internal usage
+        // assetlist = cfassetService.findByPublicuse(false);
         LOGGER.info("INIT USER END");
     }
     
     public void onSelect(SelectEvent event) {
         selectedUser = (CfUser) event.getObject();
+        // only show assets for internal usage
+        assetlist = cfassetService.findByPublicuse(false);
         
         email = selectedUser.getEmail();
         vorname = selectedUser.getVorname();
         nachname = selectedUser.getNachname();
-        passwort = selectedUser.getPasswort();
+        avatar = selectedUser.getAssetref();
+        //passwort = selectedUser.getPasswort();
         
         newUserButtonDisabled = true;
         
@@ -104,6 +114,7 @@ public class UserList implements Serializable {
             newuser.setEmail(email);
             newuser.setVorname(vorname);
             newuser.setNachname(nachname);
+            newuser.setAssetref(avatar);
             newuser.setPasswort(passwort);
             String salt = PasswordUtil.getSalt(30);
             String secure = PasswordUtil.generateSecurePassword(passwort, salt);
@@ -120,10 +131,15 @@ public class UserList implements Serializable {
     public void onEditUser(ActionEvent actionEvent) {
         try {
             if (null != selectedUser) {
-                String salt = PasswordUtil.getSalt(30);
-                String secure = PasswordUtil.generateSecurePassword(passwort, salt);
-                selectedUser.setSalt(salt);
-                selectedUser.setPasswort(secure);
+                selectedUser.setVorname(vorname);
+                selectedUser.setNachname(nachname);
+                if (!passwort.isBlank()) {
+                    String salt = PasswordUtil.getSalt(30);
+                    String secure = PasswordUtil.generateSecurePassword(passwort, salt);
+                    selectedUser.setSalt(salt);
+                    selectedUser.setPasswort(secure);
+                }
+                selectedUser.setAssetref(avatar);
                 cfuserService.edit(selectedUser);
                 userlist = cfuserService.findAll();
             }

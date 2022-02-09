@@ -9,6 +9,9 @@ ADD COLUMN `sitemap` TINYINT NOT NULL DEFAULT '0' AFTER `hitcounter`;
 ALTER TABLE `clownfish`.`cf_asset` 
 ADD COLUMN `publicuse` TINYINT NOT NULL DEFAULT '1' AFTER `scrapped`;
 
+ALTER TABLE `clownfish`.`cf_user` 
+ADD COLUMN `assetref` BIGINT NULL DEFAULT NULL AFTER `salt`;
+
 INSERT INTO `cf_webservice` (`id`, `name`) VALUES
 (23, 'GetTemplates');
 

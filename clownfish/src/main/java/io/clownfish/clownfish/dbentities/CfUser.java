@@ -27,6 +27,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -76,6 +78,9 @@ public class CfUser implements Serializable {
     @Size(max = 30)
     @Column(name = "salt")
     private String salt;
+    @JoinColumn(name = "assetref", referencedColumnName = "id")
+    @ManyToOne(optional = true)
+    private CfAsset assetref;
 
     public CfUser() {
     }
@@ -138,6 +143,14 @@ public class CfUser implements Serializable {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public CfAsset getAssetref() {
+        return assetref;
+    }
+
+    public void setAssetref(CfAsset assetref) {
+        this.assetref = assetref;
     }
 
     @Override

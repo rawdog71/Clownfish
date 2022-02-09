@@ -48,7 +48,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfAsset.findByImageheight", query = "SELECT c FROM CfAsset c WHERE c.imageheight = :imageheight"),
     @NamedQuery(name = "CfAsset.findByIndexed", query = "SELECT c FROM CfAsset c WHERE c.indexed = :indexed"),
     @NamedQuery(name = "CfAsset.findByScrapped", query = "SELECT c FROM CfAsset c WHERE c.scrapped = :scrapped"),
-    @NamedQuery(name = "CfAsset.findByPublic", query = "SELECT c FROM CfAsset c WHERE c.publicuse = :publicuse")
+    @NamedQuery(name = "CfAsset.findByPublicuse", query = "SELECT c FROM CfAsset c WHERE c.publicuse = :publicuse")
 })
 public class CfAsset implements Serializable {
 
