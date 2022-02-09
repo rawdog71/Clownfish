@@ -71,6 +71,11 @@ public class KeywordContentList implements Serializable {
         selectedKeywordcontent = new ArrayList<>();
         LOGGER.info("INIT KEYWORDCONTENTLIST END");
     }
+    
+    public void onRefreshAll() {
+        keywordlist = cfkeywordlistService.findAll();
+        keywords = cfkeywordService.findAll();
+    }
 
     public void onCreate(ActionEvent actionEvent) {
         try {

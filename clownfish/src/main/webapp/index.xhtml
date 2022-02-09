@@ -1355,6 +1355,7 @@
                         <p:chips id="keywords" value="#{keywordList.items}" />
                         
                         <p:commandButton id="newkeyword" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{keywordList.onCreate}" update=":form:tabview:keywordlist :form:tabview:assetkeywordpicklist :form:tabview:contentkeywordpicklist" />
+                        <p:commandButton id="refreshkeyword" icon="pi pi-refresh" value="Refresh" actionListener="#{keywordList.onRefreshAll}" update=":form:tabview:keywordlist :form:tabview:assetkeywordpicklist :form:tabview:contentkeywordpicklist" />
                     </h:panelGrid>
                     
                 </p:tab>
@@ -1381,6 +1382,7 @@
                         <p:commandButton id="newkeywordlist" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{keywordContentList.onCreate}" update=":form:tabview:keywordlistcontent :form:tabview:tabsiteview:keywordlibrarydroplist">
                             <f:actionListener binding="#{sitetree.initKeywordlibrarylist()}" />
                         </p:commandButton>
+                        <p:commandButton id="refreshkeywordlist" icon="pi pi-refresh" value="Refresh" actionListener="#{keywordContentList.onRefreshAll}" update=":form:tabview:keywordlistcontent :form:tabview:tabsiteview:keywordlibrarydroplist" />
                     </h:panelGrid>
                     
                     <p:selectManyCheckbox id="keywordcontentlistbox" value="#{keywordContentList.selectedKeywordcontent}" layout="responsive" columns="4" converter="#{keywordConverterBean}">
