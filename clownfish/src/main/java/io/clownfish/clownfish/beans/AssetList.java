@@ -84,6 +84,8 @@ public class AssetList {
     private @Getter @Setter boolean isPdf;
     private @Getter @Setter boolean renderDetail;
     private @Getter @Setter String description = "";
+    private @Getter @Setter boolean assetpublicusage;
+    private @Getter @Setter boolean publicusage;
     
     private List<CfAssetkeyword> assetkeywordlist;
     
@@ -100,6 +102,7 @@ public class AssetList {
         renderDetail = false;
         assetName = "";
         assetlist = cfassetService.findAll();
+        publicusage = true;
         
         keywordSource = cfkeywordService.findAll();
         keywordTarget = new ArrayList<>();
@@ -170,6 +173,7 @@ public class AssetList {
             newasset.setMimetype(metamap.get("Content-Type"));
             newasset.setImagewidth(metamap.get("Image Width"));
             newasset.setImageheight(metamap.get("Image Height"));
+            newasset.setPublicuse(publicusage);
             cfassetService.create(newasset);
             assetlist = cfassetService.findAll();
             
@@ -216,34 +220,11 @@ public class AssetList {
     }
     
     /**
-     * Handles the file delete
-     * Deletes the files from the media path and the database
-     * Removes from Lucene index
-     */
-    /*
-    public void onDelete() {
-        try {
-            assetIndexer.removeDocument(selectedAsset);
-            indexService.getWriter().commit();
-            indexService.getWriter().forceMerge(10);
-            cfassetService.delete(selectedAsset);
-            File file = new File(folderUtil.getMedia_folder() + File.separator + selectedAsset.getName());
-            assetlist = cfassetService.findAll();
-            if (file.delete()) {
-                FacesMessage message = new FacesMessage("Succesful", selectedAsset.getName() + " has been deleted.");
-                FacesContext.getCurrentInstance().addMessage(null, message);
-            }
-        } catch (IOException ex) {
-            LOGGER.error(ex.getMessage());
-        }
-    }
-    */
-    
-    /**
      * Handles the detail event
      * Retrieves the metadata from the asset
      */
     public void onDetail() {
+        assetpublicusage = selectedAsset.isPublicuse();
         description = selectedAsset.getDescription();
         keywords.getTarget().clear();
         keywords.getSource().clear();
@@ -285,9 +266,14 @@ public class AssetList {
      */
     public void editDescription(ActionEvent actionEvent) {
         selectedAsset.setDescription(description);
+        selectedAsset.setPublicuse(assetpublicusage);
         cfassetService.edit(selectedAsset);
         FacesMessage message = new FacesMessage("Succesful", selectedAsset.getName() + " has been updated.");
         FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+    
+    public void onChangePublicusage() {
+        System.out.println(publicusage);
     }
     
 }

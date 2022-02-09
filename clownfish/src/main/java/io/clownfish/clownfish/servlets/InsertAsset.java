@@ -22,6 +22,7 @@ import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import java.io.File;
 import java.io.FileInputStream;
@@ -81,6 +82,7 @@ public class InsertAsset extends HttpServlet {
         try {
             String apikey = request.getParameter("apikey");
             if (apikeyutil.checkApiKey(apikey, "InsertAsset")) {
+                boolean publicuse = ClownfishUtil.getBoolean(request.getParameter("publicuse"), false);
             
                 HashMap<String, String> metamap = new HashMap<>();
                 List<Part> fileParts = request.getParts().stream().filter(part -> "file".equals(part.getName()) && part.getSize() > 0).collect(Collectors.toList()); // Retrieves <input type="file" name="file" multiple="true">
@@ -131,6 +133,7 @@ public class InsertAsset extends HttpServlet {
                     newasset.setMimetype(metamap.get("Content-Type"));
                     newasset.setImagewidth(metamap.get("Image Width"));
                     newasset.setImageheight(metamap.get("Image Height"));
+                    newasset.setPublicuse(publicuse);
                     try {
                         newasset = cfassetService.create(newasset);
                         // Index the uploaded assets and merge the Index files

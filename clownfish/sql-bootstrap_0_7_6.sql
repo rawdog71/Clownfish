@@ -6,6 +6,9 @@ INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
 ALTER TABLE `clownfish`.`cf_site` 
 ADD COLUMN `sitemap` TINYINT NOT NULL DEFAULT '0' AFTER `hitcounter`;
 
+ALTER TABLE `clownfish`.`cf_asset` 
+ADD COLUMN `publicuse` TINYINT NOT NULL DEFAULT '1' AFTER `scrapped`;
+
 INSERT INTO `cf_webservice` (`id`, `name`) VALUES
 (23, 'GetTemplates');
 

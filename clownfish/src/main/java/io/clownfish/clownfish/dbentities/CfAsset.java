@@ -47,7 +47,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfAsset.findByImagewidth", query = "SELECT c FROM CfAsset c WHERE c.imagewidth = :imagewidth"),
     @NamedQuery(name = "CfAsset.findByImageheight", query = "SELECT c FROM CfAsset c WHERE c.imageheight = :imageheight"),
     @NamedQuery(name = "CfAsset.findByIndexed", query = "SELECT c FROM CfAsset c WHERE c.indexed = :indexed"),
-    @NamedQuery(name = "CfAsset.findByScrapped", query = "SELECT c FROM CfAsset c WHERE c.scrapped = :scrapped")
+    @NamedQuery(name = "CfAsset.findByScrapped", query = "SELECT c FROM CfAsset c WHERE c.scrapped = :scrapped"),
+    @NamedQuery(name = "CfAsset.findByPublic", query = "SELECT c FROM CfAsset c WHERE c.publicuse = :publicuse")
 })
 public class CfAsset implements Serializable {
 
@@ -81,6 +82,8 @@ public class CfAsset implements Serializable {
     private boolean indexed;
     @Column(name = "scrapped")
     private boolean scrapped;
+    @Column(name = "publicuse")
+    private boolean publicuse;
 
     public CfAsset() {
     }
@@ -173,6 +176,14 @@ public class CfAsset implements Serializable {
 
     public void setScrapped(boolean scrapped) {
         this.scrapped = scrapped;
+    }
+
+    public boolean isPublicuse() {
+        return publicuse;
+    }
+
+    public void setPublicuse(boolean publicuse) {
+        this.publicuse = publicuse;
     }
 
     @Override

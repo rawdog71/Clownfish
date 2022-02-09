@@ -331,4 +331,18 @@ public class ClownfishUtil {
     {
         return isWindows() ? ";" : ":";
     }
+    
+    public static boolean getBoolean(String booleanfield, boolean defaultvalue) {
+        boolean value;
+        if (null != booleanfield) {
+            try {
+                value = (0 == booleanfield.compareToIgnoreCase("on")) || (0 == booleanfield.compareToIgnoreCase("true"));
+            } catch (NumberFormatException nex) {
+                value = defaultvalue;
+            }
+        } else {
+            value = defaultvalue;
+        }
+        return value;
+    }
 }

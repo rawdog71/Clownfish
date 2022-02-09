@@ -1218,6 +1218,10 @@
                     </f:facet>
 
                     <h:form enctype="multipart/form-data">
+                        <p:outputLabel for="uploadpublicuse" value="For public use:" />
+                        <p:selectBooleanCheckbox id="uploadpublicuse" value="#{assetList.publicusage}">
+                            <p:ajax listener="#{assetList.onChangePublicusage}"/>
+                        </p:selectBooleanCheckbox>
                         <p:fileUpload listener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true" 
                                       update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|svg|ppt|pptx|xls|xlsx|zip|jar|xml)$/i" >
                         </p:fileUpload>
@@ -1237,7 +1241,7 @@
                                             <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
                                         </div>
                                         <div class="assets-list-buttons">
-                                            <p:commandButton icon="pi pi-trash" action="#{assetList.onScrapp}" update=":form:tabview:assetlist">
+                                            <p:commandButton icon="pi pi-trash" action="#{assetList.onScrapp}" update=":form:tabview:assetlist :form:msgs">
                                                 <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                                 <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
@@ -1264,6 +1268,9 @@
 
                                         <h:outputText value="Description:" />
                                         <p:inputText id="assetDescription" value="#{assetList.description}"></p:inputText>
+                                        
+                                        <h:outputText value="Public use:" />
+                                        <p:selectBooleanCheckbox id="assetpublicuse" value="#{assetList.assetpublicusage}"/>
 
                                         <h:outputText value="Mimetype:" />
                                         <h:outputText value="#{assetList.selectedAsset.mimetype}" style="font-weight: bold"/>
@@ -1274,7 +1281,7 @@
                                         <h:outputText value="Height:" rendered="#{assetList.image}" />
                                         <h:outputText value="#{assetList.selectedAsset.imageheight}" rendered="#{assetList.image}" style="font-weight: bold"/>
 
-                                        <p:commandButton id="editDescription" icon="pi pi-pencil" value="Edit" actionListener="#{assetList.editDescription}" />
+                                        <p:commandButton id="editDescription" icon="pi pi-pencil" value="Edit" actionListener="#{assetList.editDescription}" update=":form:msgs" />
                                     </h:panelGrid>
                                 </p:outputPanel>
                             </h:panelGrid>

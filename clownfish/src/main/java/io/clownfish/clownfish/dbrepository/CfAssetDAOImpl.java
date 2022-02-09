@@ -107,4 +107,13 @@ public class CfAssetDAOImpl implements CfAssetDAO {
         return cfassetlist;
     }
 
+    @Override
+    public List<CfAsset> findByPublicuse(boolean publicuse) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findByPublicuse");
+        query.setParameter("publicuse", publicuse);
+        List<CfAsset> cfassetlist = query.getResultList();
+        return cfassetlist;
+    }
+
 }

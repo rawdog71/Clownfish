@@ -28,6 +28,7 @@ public interface CfAssetService {
     CfAsset findByName(String name);
     List<CfAsset> findByIndexed(boolean indexed);
     List<CfAsset> findByScrapped(boolean scrapped);
+    List<CfAsset> findByPublicuse(boolean publicuse);
     CfAsset create(CfAsset entity);
     boolean delete(CfAsset entity);
     CfAsset edit(CfAsset entity);
