@@ -16,9 +16,9 @@
 package io.clownfish.clownfish.rest;
 
 import io.clownfish.clownfish.datamodels.AuthTokenList;
-import io.clownfish.clownfish.datamodels.KeywordParameter;
-import io.clownfish.clownfish.dbentities.CfKeyword;
-import io.clownfish.clownfish.serviceinterface.CfKeywordService;
+import io.clownfish.clownfish.datamodels.KeywordListParameter;
+import io.clownfish.clownfish.dbentities.CfKeywordlist;
+import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,43 +32,43 @@ import org.springframework.web.bind.annotation.RestController;
  * @author SulzbachR
  */
 @RestController
-public class RestInsertKeyword {
-    @Autowired transient CfKeywordService cfkeywordService;
+public class RestKeywordList {
+    @Autowired transient CfKeywordlistService cfkeywordlistService;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired transient AuthTokenList authtokenlist;
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestInsertKeyword.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestKeywordList.class);
 
-    @PostMapping("/insertkeyword")
-    public KeywordParameter restInsertKeyword(@RequestBody KeywordParameter ikp) {
-        return insertKeyword(ikp);
+    @PostMapping("/insertkeywordlist")
+    public KeywordListParameter restInsertKeyword(@RequestBody KeywordListParameter iklp) {
+        return insertKeywordList(iklp);
     }
     
-    private KeywordParameter insertKeyword(KeywordParameter ikp) {
+    private KeywordListParameter insertKeywordList(KeywordListParameter iklp) {
         try {
-            String token = ikp.getToken();
+            String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {
-                String apikey = ikp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetKeywords")) {
+                String apikey = iklp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {
                     try {
-                        CfKeyword keyword = cfkeywordService.findByName(ikp.getKeyword());
-                        LOGGER.warn("Duplicate Keyword");
-                        ikp.setReturncode("Duplicate Keyword");
+                        CfKeywordlist keywordlist = cfkeywordlistService.findByName(iklp.getKeywordlist());
+                        LOGGER.warn("Duplicate Keywordlist");
+                        iklp.setReturncode("Duplicate Keywordlist");
                     } catch (javax.persistence.NoResultException ex) {
-                        CfKeyword newkeyword = new CfKeyword();
-                        newkeyword.setName(ikp.getKeyword());
-                        CfKeyword newkeyword2 = cfkeywordService.create(newkeyword);
-                        ikp.setReturncode("OK");
+                        CfKeywordlist newkeywordlist = new CfKeywordlist();
+                        newkeywordlist.setName(iklp.getKeywordlist());
+                        CfKeywordlist newkeywordlist2 = cfkeywordlistService.create(newkeywordlist);
+                        iklp.setReturncode("OK");
                     }
                 } else {
-                    ikp.setReturncode("Wrong API KEY");
+                    iklp.setReturncode("Wrong API KEY");
                 }
             } else {
-                ikp.setReturncode("Invalid token");
+                iklp.setReturncode("Invalid token");
             }
         } catch (javax.persistence.NoResultException ex) {
             LOGGER.error("NoResultException");
-            ikp.setReturncode("NoResultException");
+            iklp.setReturncode("NoResultException");
         }
-        return ikp;
+        return iklp;
     }
 }
