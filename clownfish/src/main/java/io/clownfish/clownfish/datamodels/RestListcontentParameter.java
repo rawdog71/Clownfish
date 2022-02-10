@@ -22,12 +22,13 @@ import lombok.Setter;
  *
  * @author sulzbachr
  */
-public class InsertListcontentParameter {
+public class RestListcontentParameter {
     private @Getter @Setter String returncode;
     private @Getter @Setter String apikey;
+    private @Getter @Setter String token;
     private @Getter @Setter String classcontentname;
     private @Getter @Setter String listname;
 
-    public InsertListcontentParameter() {
+    public RestListcontentParameter() {
     }
 }

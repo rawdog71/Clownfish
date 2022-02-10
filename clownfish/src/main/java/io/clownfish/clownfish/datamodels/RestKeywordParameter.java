@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 raine.
+ * Copyright 2020 sulzbachr.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,19 @@
  */
 package io.clownfish.clownfish.datamodels;
 
-import io.clownfish.clownfish.dbentities.CfKeyword;
-import io.clownfish.clownfish.dbentities.CfKeywordlist;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  *
- * @author raine
+ * @author sulzbachr
  */
-public class KeywordListOutput {
-    private @Getter @Setter CfKeywordlist keywordlist;
-    private @Getter @Setter List<CfKeyword> keywords;
+public class RestKeywordParameter {
+    private @Getter @Setter String returncode;
+    private @Getter @Setter String apikey;
+    private @Getter @Setter String token;
+    private @Getter @Setter String keyword;
+
+    public RestKeywordParameter() {
+    }
 }

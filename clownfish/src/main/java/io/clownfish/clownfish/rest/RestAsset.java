@@ -31,7 +31,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  */
 @RestController
 @MultipartConfig
-public class RestInsertAsset {
+public class RestAsset {
     
     @Bean
     public MultipartConfigElement multipartConfigElement() {

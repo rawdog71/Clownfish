@@ -16,7 +16,7 @@
 package io.clownfish.clownfish.rest;
 
 import io.clownfish.clownfish.datamodels.AuthTokenList;
-import io.clownfish.clownfish.datamodels.KeywordAssetParameter;
+import io.clownfish.clownfish.datamodels.RestKeywordAssetParameter;
 import io.clownfish.clownfish.dbentities.CfAssetkeyword;
 import io.clownfish.clownfish.dbentities.CfAssetkeywordPK;
 import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
@@ -40,11 +40,11 @@ public class RestKeywordAsset {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestKeywordAsset.class);
 
     @PostMapping("/insertkeywordasset")
-    public KeywordAssetParameter restInsertKeywordAsset(@RequestBody KeywordAssetParameter iklp) {
+    public RestKeywordAssetParameter restInsertKeywordAsset(@RequestBody RestKeywordAssetParameter iklp) {
         return insertKeywordAsset(iklp);
     }
     
-    private KeywordAssetParameter insertKeywordAsset(KeywordAssetParameter iklp) {
+    private RestKeywordAssetParameter insertKeywordAsset(RestKeywordAssetParameter iklp) {
         try {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {
@@ -74,11 +74,11 @@ public class RestKeywordAsset {
     }
     
     @PostMapping("/deletekeywordasset")
-    public KeywordAssetParameter restDeleteKeywordContent(@RequestBody KeywordAssetParameter iklp) {
+    public RestKeywordAssetParameter restDeleteKeywordContent(@RequestBody RestKeywordAssetParameter iklp) {
         return deleteKeywordAsset(iklp);
     }
     
-    private KeywordAssetParameter deleteKeywordAsset(KeywordAssetParameter iklp) {
+    private RestKeywordAssetParameter deleteKeywordAsset(RestKeywordAssetParameter iklp) {
         try {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {

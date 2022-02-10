@@ -22,12 +22,14 @@ import lombok.Setter;
  *
  * @author sulzbachr
  */
-public class KeywordParameter {
+public class RestDatalistParameter {
     private @Getter @Setter String returncode;
     private @Getter @Setter String apikey;
     private @Getter @Setter String token;
-    private @Getter @Setter String keyword;
+    private @Getter @Setter String classname;
+    private @Getter @Setter String listname;
+    private @Getter @Setter Long listid;
 
-    public KeywordParameter() {
+    public RestDatalistParameter() {
     }
 }

@@ -16,7 +16,7 @@
 package io.clownfish.clownfish.rest;
 
 import io.clownfish.clownfish.datamodels.AuthTokenList;
-import io.clownfish.clownfish.datamodels.KeywordParameter;
+import io.clownfish.clownfish.datamodels.RestKeywordParameter;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
@@ -39,11 +39,11 @@ public class RestKeyword {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestKeyword.class);
 
     @PostMapping("/insertkeyword")
-    public KeywordParameter restInsertKeyword(@RequestBody KeywordParameter ikp) {
+    public RestKeywordParameter restInsertKeyword(@RequestBody RestKeywordParameter ikp) {
         return insertKeyword(ikp);
     }
     
-    private KeywordParameter insertKeyword(KeywordParameter ikp) {
+    private RestKeywordParameter insertKeyword(RestKeywordParameter ikp) {
         try {
             String token = ikp.getToken();
             if (authtokenlist.checkValidToken(token)) {

@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.datamodels;
 
-import java.util.HashMap;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,15 +22,13 @@ import lombok.Setter;
  *
  * @author sulzbachr
  */
-public class UpdateContentParameter {
+public class RestKeywordContentParameter {
     private @Getter @Setter String returncode;
     private @Getter @Setter String apikey;
-    private @Getter @Setter String classname;
-    private @Getter @Setter String contentname;
-    private @Getter @Setter boolean indexing;
-    private @Getter @Setter HashMap<String, String> attributmap;
+    private @Getter @Setter String token;
+    private @Getter @Setter long contentref;
+    private @Getter @Setter long keywordref;
 
-    public UpdateContentParameter() {
-        attributmap = new HashMap<>();
+    public RestKeywordContentParameter() {
     }
 }

@@ -15,7 +15,8 @@
  */
 package io.clownfish.clownfish.rest;
 
-import io.clownfish.clownfish.datamodels.InsertDatalistParameter;
+import io.clownfish.clownfish.datamodels.AuthTokenList;
+import io.clownfish.clownfish.datamodels.RestDatalistParameter;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
@@ -34,38 +35,44 @@ import org.springframework.web.bind.annotation.RestController;
  * @author SulzbachR
  */
 @RestController
-public class RestInsertDatalist {
+public class RestDatalist {
     @Autowired transient CfClassService cfclassService;
     @Autowired transient CfListService cflistService;
     @Autowired FolderUtil folderUtil;
     @Autowired ApiKeyUtil apikeyutil;
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestInsertDatalist.class);
+    @Autowired transient AuthTokenList authtokenlist;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestDatalist.class);
 
     @PostMapping("/insertdatalist")
-    public InsertDatalistParameter restInsertDatalist(@RequestBody InsertDatalistParameter idp) {
+    public RestDatalistParameter restInsertDatalist(@RequestBody RestDatalistParameter idp) {
         return insertDatalist(idp);
     }
     
-    private InsertDatalistParameter insertDatalist(InsertDatalistParameter idp) {
+    private RestDatalistParameter insertDatalist(RestDatalistParameter idp) {
         try {
-            String apikey = idp.getApikey();
-            if (apikeyutil.checkApiKey(apikey, "InsertDatalist")) {
-                try {
-                    CfList list = cflistService.findByName(idp.getListname());
-                    idp.setReturncode("Duplicate Datalistcontent");
-                } catch (javax.persistence.NoResultException ex) {
-                    CfClass clazz = cfclassService.findByName(idp.getClassname());
-                    
-                    CfList newlist = new CfList();
-                    newlist.setName(idp.getListname());
-                    newlist.setClassref(clazz);
-                    
-                    CfList newlist2 = cflistService.create(newlist);
-                    idp.setListid(newlist2.getId());
-                    idp.setReturncode("OK");
+            String token = idp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = idp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "InsertDatalist")) {
+                    try {
+                        CfList list = cflistService.findByName(idp.getListname());
+                        idp.setReturncode("Duplicate Datalistcontent");
+                    } catch (javax.persistence.NoResultException ex) {
+                        CfClass clazz = cfclassService.findByName(idp.getClassname());
+
+                        CfList newlist = new CfList();
+                        newlist.setName(idp.getListname());
+                        newlist.setClassref(clazz);
+
+                        CfList newlist2 = cflistService.create(newlist);
+                        idp.setListid(newlist2.getId());
+                        idp.setReturncode("OK");
+                    }
+                } else {
+                    idp.setReturncode("Wrong API KEY");
                 }
             } else {
-                idp.setReturncode("Wrong API KEY");
+                idp.setReturncode("Invalid token");
             }
         } catch (javax.persistence.NoResultException ex) {
             idp.setReturncode("NoResultException");

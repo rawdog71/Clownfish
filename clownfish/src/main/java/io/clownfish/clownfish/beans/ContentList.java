@@ -17,7 +17,7 @@ package io.clownfish.clownfish.beans;
 
 import com.google.gson.Gson;
 import com.hazelcast.spring.cache.HazelcastCacheManager;
-import io.clownfish.clownfish.datamodels.InsertContentParameter;
+import io.clownfish.clownfish.datamodels.RestContentParameter;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttribut;
@@ -484,7 +484,7 @@ public class ContentList implements Serializable {
     }
     
     public void jsonExport() {
-        InsertContentParameter contentparameter = new InsertContentParameter();
+        RestContentParameter contentparameter = new RestContentParameter();
         contentparameter.setClassname(selectedContent.getClassref().getName());
         contentparameter.setContentname(selectedContent.getName());
         for (CfAttributcontent attributcontent : attributcontentlist) {

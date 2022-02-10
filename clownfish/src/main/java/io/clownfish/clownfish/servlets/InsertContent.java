@@ -16,7 +16,7 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
-import io.clownfish.clownfish.datamodels.InsertContentParameter;
+import io.clownfish.clownfish.datamodels.RestContentParameter;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
@@ -90,11 +90,11 @@ public class InsertContent extends HttpServlet {
         }
 
         Gson gson = new Gson();
-        InsertContentParameter icp = gson.fromJson(jb.toString(), InsertContentParameter.class);
+        RestContentParameter icp = gson.fromJson(jb.toString(), RestContentParameter.class);
         insertContent(icp, response);
     }
     
-    private InsertContentParameter insertContent(InsertContentParameter icp, HttpServletResponse response) throws IOException {
+    private RestContentParameter insertContent(RestContentParameter icp, HttpServletResponse response) throws IOException {
         try {
             String apikey = icp.getApikey();
             if (apikeyutil.checkApiKey(apikey, "InsertContent")) {

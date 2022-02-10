@@ -16,7 +16,7 @@
 package io.clownfish.clownfish.rest;
 
 import io.clownfish.clownfish.datamodels.AuthTokenList;
-import io.clownfish.clownfish.datamodels.KeywordListContentParameter;
+import io.clownfish.clownfish.datamodels.RestKeywordListContentParameter;
 import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
 import io.clownfish.clownfish.dbentities.CfKeywordlistcontentPK;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
@@ -40,11 +40,11 @@ public class RestKeywordListContent {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestKeywordListContent.class);
 
     @PostMapping("/insertkeywordlistcontent")
-    public KeywordListContentParameter restInsertKeywordContent(@RequestBody KeywordListContentParameter iklp) {
+    public RestKeywordListContentParameter restInsertKeywordContent(@RequestBody RestKeywordListContentParameter iklp) {
         return insertKeywordListContent(iklp);
     }
     
-    private KeywordListContentParameter insertKeywordListContent(KeywordListContentParameter iklp) {
+    private RestKeywordListContentParameter insertKeywordListContent(RestKeywordListContentParameter iklp) {
         try {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {
@@ -74,11 +74,11 @@ public class RestKeywordListContent {
     }
     
     @PostMapping("/deletekeywordlistcontent")
-    public KeywordListContentParameter restDeleteKeywordContent(@RequestBody KeywordListContentParameter iklp) {
+    public RestKeywordListContentParameter restDeleteKeywordContent(@RequestBody RestKeywordListContentParameter iklp) {
         return deleteKeywordListContent(iklp);
     }
     
-    private KeywordListContentParameter deleteKeywordListContent(KeywordListContentParameter iklp) {
+    private RestKeywordListContentParameter deleteKeywordListContent(RestKeywordListContentParameter iklp) {
         try {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {

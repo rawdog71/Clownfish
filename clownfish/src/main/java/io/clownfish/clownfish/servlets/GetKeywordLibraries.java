@@ -17,7 +17,7 @@ package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.AuthTokenList;
-import io.clownfish.clownfish.datamodels.KeywordListOutput;
+import io.clownfish.clownfish.datamodels.RestKeywordListOutput;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfKeywordlist;
 import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
@@ -84,14 +84,14 @@ public class GetKeywordLibraries extends HttpServlet {
                         keywordlistList = cfkeywordlistService.findAll();
                     }
 
-                    ArrayList<KeywordListOutput> keywordlistoutputList = new ArrayList<>();
+                    ArrayList<RestKeywordListOutput> keywordlistoutputList = new ArrayList<>();
                     for (CfKeywordlist keywordlistItem : keywordlistList) {
                         List<CfKeyword> keywordList = new ArrayList<>();
                         List<CfKeywordlistcontent> keywordlistcontentList = cfkeywordlistcontentService.findByKeywordlistref(keywordlistItem.getId());
                         for (CfKeywordlistcontent keywordlistcontent : keywordlistcontentList) {
                             keywordList.add(cfkeywordService.findById(keywordlistcontent.getCfKeywordlistcontentPK().getKeywordref()));
                         }
-                        KeywordListOutput keywordlistoutput = new KeywordListOutput();
+                        RestKeywordListOutput keywordlistoutput = new RestKeywordListOutput();
                         keywordlistoutput.setKeywordlist(keywordlistItem);
                         keywordlistoutput.setKeywords(keywordList);
                         keywordlistoutputList.add(keywordlistoutput);
