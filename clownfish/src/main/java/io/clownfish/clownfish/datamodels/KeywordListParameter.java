@@ -25,6 +25,7 @@ import lombok.Setter;
 public class KeywordListParameter {
     private @Getter @Setter String returncode;
     private @Getter @Setter String apikey;
+    private @Getter @Setter String token;
     private @Getter @Setter String keywordlist;
 
     public KeywordListParameter() {

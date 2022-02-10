@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.rest;
 
+import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.KeywordParameter;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestInsertKeyword {
     @Autowired transient CfKeywordService cfkeywordService;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired transient AuthTokenList authtokenlist;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestInsertKeyword.class);
 
     @PostMapping("/insertkeyword")
@@ -43,20 +45,25 @@ public class RestInsertKeyword {
     
     private KeywordParameter insertKeyword(KeywordParameter ikp) {
         try {
-            String apikey = ikp.getApikey();
-            if (apikeyutil.checkApiKey(apikey, "GetKeywords")) {
-                try {
-                    CfKeyword keyword = cfkeywordService.findByName(ikp.getKeyword());
-                    LOGGER.warn("Duplicate Keyword");
-                    ikp.setReturncode("Duplicate Keyword");
-                } catch (javax.persistence.NoResultException ex) {
-                    CfKeyword newkeyword = new CfKeyword();
-                    newkeyword.setName(ikp.getKeyword());
-                    CfKeyword newkeyword2 = cfkeywordService.create(newkeyword);
-                    ikp.setReturncode("OK");
+            String token = ikp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = ikp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "GetKeywords")) {
+                    try {
+                        CfKeyword keyword = cfkeywordService.findByName(ikp.getKeyword());
+                        LOGGER.warn("Duplicate Keyword");
+                        ikp.setReturncode("Duplicate Keyword");
+                    } catch (javax.persistence.NoResultException ex) {
+                        CfKeyword newkeyword = new CfKeyword();
+                        newkeyword.setName(ikp.getKeyword());
+                        CfKeyword newkeyword2 = cfkeywordService.create(newkeyword);
+                        ikp.setReturncode("OK");
+                    }
+                } else {
+                    ikp.setReturncode("Wrong API KEY");
                 }
             } else {
-                ikp.setReturncode("Wrong API KEY");
+                ikp.setReturncode("Invalid token");
             }
         } catch (javax.persistence.NoResultException ex) {
             LOGGER.error("NoResultException");

@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.rest;
 
+import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.KeywordListParameter;
 import io.clownfish.clownfish.dbentities.CfKeywordlist;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestInsertKeywordList {
     @Autowired transient CfKeywordlistService cfkeywordlistService;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired transient AuthTokenList authtokenlist;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestInsertKeywordList.class);
 
     @PostMapping("/insertkeywordlist")
@@ -43,20 +45,25 @@ public class RestInsertKeywordList {
     
     private KeywordListParameter insertKeywordList(KeywordListParameter iklp) {
         try {
-            String apikey = iklp.getApikey();
-            if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {
-                try {
-                    CfKeywordlist keywordlist = cfkeywordlistService.findByName(iklp.getKeywordlist());
-                    LOGGER.warn("Duplicate Keywordlist");
-                    iklp.setReturncode("Duplicate Keywordlist");
-                } catch (javax.persistence.NoResultException ex) {
-                    CfKeywordlist newkeywordlist = new CfKeywordlist();
-                    newkeywordlist.setName(iklp.getKeywordlist());
-                    CfKeywordlist newkeywordlist2 = cfkeywordlistService.create(newkeywordlist);
-                    iklp.setReturncode("OK");
+            String token = iklp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = iklp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {
+                    try {
+                        CfKeywordlist keywordlist = cfkeywordlistService.findByName(iklp.getKeywordlist());
+                        LOGGER.warn("Duplicate Keywordlist");
+                        iklp.setReturncode("Duplicate Keywordlist");
+                    } catch (javax.persistence.NoResultException ex) {
+                        CfKeywordlist newkeywordlist = new CfKeywordlist();
+                        newkeywordlist.setName(iklp.getKeywordlist());
+                        CfKeywordlist newkeywordlist2 = cfkeywordlistService.create(newkeywordlist);
+                        iklp.setReturncode("OK");
+                    }
+                } else {
+                    iklp.setReturncode("Wrong API KEY");
                 }
             } else {
-                iklp.setReturncode("Wrong API KEY");
+                iklp.setReturncode("Invalid token");
             }
         } catch (javax.persistence.NoResultException ex) {
             LOGGER.error("NoResultException");
