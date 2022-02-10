@@ -33,7 +33,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "CfKeywordlistcontent.findAll", query = "SELECT c FROM CfKeywordlistcontent c"),
     @NamedQuery(name = "CfKeywordlistcontent.findByKeywordlistref", query = "SELECT c FROM CfKeywordlistcontent c WHERE c.cfKeywordlistcontentPK.keywordlistref = :keywordlistref"),
-    @NamedQuery(name = "CfKeywordlistcontent.findByKeywordref", query = "SELECT c FROM CfKeywordlistcontent c WHERE c.cfKeywordlistcontentPK.keywordref = :keywordref")})
+    @NamedQuery(name = "CfKeywordlistcontent.findByKeywordref", query = "SELECT c FROM CfKeywordlistcontent c WHERE c.cfKeywordlistcontentPK.keywordref = :keywordref"),
+    @NamedQuery(name = "CfKeywordlistcontent.findByKeywordrefAndKeywordlistref", query = "SELECT c FROM CfKeywordlistcontent c WHERE c.cfKeywordlistcontentPK.keywordref = :keywordref AND c.cfKeywordlistcontentPK.keywordlistref = :keywordlistref")
+})
 public class CfKeywordlistcontent implements Serializable {
 
     private static final long serialVersionUID = 1L;

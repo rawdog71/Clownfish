@@ -22,11 +22,12 @@ import lombok.Setter;
  *
  * @author sulzbachr
  */
-public class InsertKeywordParameter {
+public class KeywordListContentParameter {
     private @Getter @Setter String returncode;
     private @Getter @Setter String apikey;
-    private @Getter @Setter String keyword;
+    private @Getter @Setter long keywordlistref;
+    private @Getter @Setter long keywordref;
 
-    public InsertKeywordParameter() {
+    public KeywordListContentParameter() {
     }
 }

@@ -20,9 +20,6 @@ import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +54,11 @@ public class CfKeywordlistcontentServiceImpl implements CfKeywordlistcontentServ
     public List<CfKeywordlistcontent> findByKeywordref(long keywordref) {
         return cfkeywordlistcontentDAO.findByKeywordref(keywordref);
     }
+    
+    @Override
+    public CfKeywordlistcontent findByKeywordrefAndKeywordlistref(long keywordref, long keywordlistref) {
+        return cfkeywordlistcontentDAO.findByKeywordrefAndKeywordlistref(keywordref, keywordlistref);
+    }
 
     //@CachePut(value = "keywordlistcontent", key = "#entity.cfKeywordlistcontentPK")
     @Override
@@ -75,5 +77,4 @@ public class CfKeywordlistcontentServiceImpl implements CfKeywordlistcontentServ
     public CfKeywordlistcontent edit(CfKeywordlistcontent entity) {
         return cfkeywordlistcontentDAO.edit(entity);
     }
-
 }

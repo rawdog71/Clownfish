@@ -15,7 +15,7 @@
  */
 package io.clownfish.clownfish.rest;
 
-import io.clownfish.clownfish.datamodels.InsertKeywordParameter;
+import io.clownfish.clownfish.datamodels.KeywordParameter;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
@@ -37,11 +37,11 @@ public class RestInsertKeyword {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestInsertKeyword.class);
 
     @PostMapping("/insertkeyword")
-    public InsertKeywordParameter restInsertKeyword(@RequestBody InsertKeywordParameter ikp) {
+    public KeywordParameter restInsertKeyword(@RequestBody KeywordParameter ikp) {
         return insertKeyword(ikp);
     }
     
-    private InsertKeywordParameter insertKeyword(InsertKeywordParameter ikp) {
+    private KeywordParameter insertKeyword(KeywordParameter ikp) {
         try {
             String apikey = ikp.getApikey();
             if (apikeyutil.checkApiKey(apikey, "GetKeywords")) {

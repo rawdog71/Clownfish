@@ -15,11 +15,8 @@
  */
 package io.clownfish.clownfish.rest;
 
-import io.clownfish.clownfish.datamodels.InsertKeywordListParameter;
-import io.clownfish.clownfish.datamodels.InsertKeywordParameter;
-import io.clownfish.clownfish.dbentities.CfKeyword;
+import io.clownfish.clownfish.datamodels.KeywordListParameter;
 import io.clownfish.clownfish.dbentities.CfKeywordlist;
-import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import org.slf4j.Logger;
@@ -40,11 +37,11 @@ public class RestInsertKeywordList {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestInsertKeywordList.class);
 
     @PostMapping("/insertkeywordlist")
-    public InsertKeywordListParameter restInsertKeyword(@RequestBody InsertKeywordListParameter iklp) {
+    public KeywordListParameter restInsertKeyword(@RequestBody KeywordListParameter iklp) {
         return insertKeywordList(iklp);
     }
     
-    private InsertKeywordListParameter insertKeywordList(InsertKeywordListParameter iklp) {
+    private KeywordListParameter insertKeywordList(KeywordListParameter iklp) {
         try {
             String apikey = iklp.getApikey();
             if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {

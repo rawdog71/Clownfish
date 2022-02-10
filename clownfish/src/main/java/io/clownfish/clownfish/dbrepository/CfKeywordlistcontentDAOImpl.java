@@ -64,6 +64,16 @@ public class CfKeywordlistcontentDAOImpl implements CfKeywordlistcontentDAO {
     }
     
     @Override
+    public CfKeywordlistcontent findByKeywordrefAndKeywordlistref(long keywordref, long keywordlistref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfKeywordlistcontent.findByKeywordrefAndKeywordlistref");
+        query.setParameter("keywordref", keywordref);
+        query.setParameter("keywordlistref", keywordlistref);
+        CfKeywordlistcontent cfcontent = (CfKeywordlistcontent) query.getSingleResult();
+        return cfcontent;
+    }
+    
+    @Override
     public CfKeywordlistcontent create(CfKeywordlistcontent entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
