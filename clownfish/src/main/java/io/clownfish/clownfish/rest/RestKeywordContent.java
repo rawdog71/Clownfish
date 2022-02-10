@@ -16,10 +16,10 @@
 package io.clownfish.clownfish.rest;
 
 import io.clownfish.clownfish.datamodels.AuthTokenList;
-import io.clownfish.clownfish.datamodels.KeywordListContentParameter;
-import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
-import io.clownfish.clownfish.dbentities.CfKeywordlistcontentPK;
-import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
+import io.clownfish.clownfish.datamodels.KeywordContentParameter;
+import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
+import io.clownfish.clownfish.dbentities.CfClasscontentkeywordPK;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,31 +33,31 @@ import org.springframework.web.bind.annotation.RestController;
  * @author SulzbachR
  */
 @RestController
-public class RestKeywordListContent {
-    @Autowired transient CfKeywordlistcontentService cfkeywordlistcontentService;
+public class RestKeywordContent {
+    @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired transient AuthTokenList authtokenlist;
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestKeywordListContent.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestKeywordContent.class);
 
-    @PostMapping("/insertkeywordlistcontent")
-    public KeywordListContentParameter restInsertKeywordContent(@RequestBody KeywordListContentParameter iklp) {
-        return insertKeywordListContent(iklp);
+    @PostMapping("/insertkeywordcontent")
+    public KeywordContentParameter restInsertKeywordContent(@RequestBody KeywordContentParameter iklp) {
+        return insertKeywordContent(iklp);
     }
     
-    private KeywordListContentParameter insertKeywordListContent(KeywordListContentParameter iklp) {
+    private KeywordContentParameter insertKeywordContent(KeywordContentParameter iklp) {
         try {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = iklp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {
+                if (apikeyutil.checkApiKey(apikey, "GetContent")) {
                     try {
-                        CfKeywordlistcontent keywordlistcontent = cfkeywordlistcontentService.findByKeywordrefAndKeywordlistref(iklp.getKeywordref(), iklp.getKeywordlistref());
-                        LOGGER.warn("Duplicate Keywordlistcontent");
-                        iklp.setReturncode("Duplicate Keywordlistcontent");
+                        CfClasscontentkeyword contentkeyword = cfclasscontentkeywordService.findByClasscontentRefAndKeywordRef(iklp.getContentref(), iklp.getKeywordref());
+                        LOGGER.warn("Duplicate ContentKeyword");
+                        iklp.setReturncode("Duplicate ContentKeyword");
                     } catch (javax.persistence.NoResultException ex) {
-                        CfKeywordlistcontent newkeywordlistcontent = new CfKeywordlistcontent();
-                        newkeywordlistcontent.setCfKeywordlistcontentPK(new CfKeywordlistcontentPK(iklp.getKeywordlistref(), iklp.getKeywordref()));
-                        CfKeywordlistcontent newkeywordliscontent2 = cfkeywordlistcontentService.create(newkeywordlistcontent);
+                        CfClasscontentkeyword newcontentkeyword = new CfClasscontentkeyword();
+                        newcontentkeyword.setCfClasscontentkeywordPK(new CfClasscontentkeywordPK(iklp.getContentref(), iklp.getKeywordref()));
+                        CfClasscontentkeyword newcontentkeyword2 = cfclasscontentkeywordService.create(newcontentkeyword);
                         iklp.setReturncode("OK");
                     }
                 } else {
@@ -73,24 +73,24 @@ public class RestKeywordListContent {
         return iklp;
     }
     
-    @PostMapping("/deletekeywordlistcontent")
-    public KeywordListContentParameter restDeleteKeywordContent(@RequestBody KeywordListContentParameter iklp) {
-        return deleteKeywordListContent(iklp);
+    @PostMapping("/deletekeywordcontent")
+    public KeywordContentParameter restDeleteKeywordContent(@RequestBody KeywordContentParameter iklp) {
+        return deleteKeywordContent(iklp);
     }
     
-    private KeywordListContentParameter deleteKeywordListContent(KeywordListContentParameter iklp) {
+    private KeywordContentParameter deleteKeywordContent(KeywordContentParameter iklp) {
         try {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = iklp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {
+                if (apikeyutil.checkApiKey(apikey, "GetContent")) {
                     try {
-                        CfKeywordlistcontent keywordlistcontent = cfkeywordlistcontentService.findByKeywordrefAndKeywordlistref(iklp.getKeywordref(), iklp.getKeywordlistref());
-                        cfkeywordlistcontentService.delete(keywordlistcontent);
+                        CfClasscontentkeyword contentkeyword = cfclasscontentkeywordService.findByClasscontentRefAndKeywordRef(iklp.getContentref(), iklp.getKeywordref());
+                        cfclasscontentkeywordService.delete(contentkeyword);
                         iklp.setReturncode("OK");
                     } catch (javax.persistence.NoResultException ex) {
-                        LOGGER.warn("Keywordlistcontent not found");
-                        iklp.setReturncode("Keywordlistcontent not found");
+                        LOGGER.warn("ContentKeyword not found");
+                        iklp.setReturncode("ContentKeyword not found");
                     }
                 } else {
                     iklp.setReturncode("Wrong API KEY");

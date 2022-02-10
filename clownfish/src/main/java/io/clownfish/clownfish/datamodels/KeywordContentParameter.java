@@ -22,13 +22,13 @@ import lombok.Setter;
  *
  * @author sulzbachr
  */
-public class KeywordListContentParameter {
+public class KeywordContentParameter {
     private @Getter @Setter String returncode;
     private @Getter @Setter String apikey;
     private @Getter @Setter String token;
-    private @Getter @Setter long keywordlistref;
+    private @Getter @Setter long contentref;
     private @Getter @Setter long keywordref;
 
-    public KeywordListContentParameter() {
+    public KeywordContentParameter() {
     }
 }

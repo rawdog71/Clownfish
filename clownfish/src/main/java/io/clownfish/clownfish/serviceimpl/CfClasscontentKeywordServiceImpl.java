@@ -21,9 +21,6 @@ import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +66,11 @@ public class CfClasscontentKeywordServiceImpl implements CfClasscontentKeywordSe
     @Override
     public List<CfClasscontentkeyword> findByKeywordRef(Long id) {
         return this.cfclasscontentkeywordDAO.findByKeywordRef(id);
+    }
+    
+    @Override
+    public CfClasscontentkeyword findByClasscontentRefAndKeywordRef(Long contentref, Long keywordref) {
+        return this.cfclasscontentkeywordDAO.findByClasscontentKeywordRef(contentref, keywordref);
     }
 
     //@Cacheable(value = "classcontentkeyword")

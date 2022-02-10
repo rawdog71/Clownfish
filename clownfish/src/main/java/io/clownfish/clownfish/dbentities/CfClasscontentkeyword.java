@@ -33,7 +33,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "CfClasscontentkeyword.findAll", query = "SELECT c FROM CfClasscontentkeyword c"),
     @NamedQuery(name = "CfClasscontentkeyword.findByClasscontentref", query = "SELECT c FROM CfClasscontentkeyword c WHERE c.cfClasscontentkeywordPK.classcontentref = :classcontentref"),
-    @NamedQuery(name = "CfClasscontentkeyword.findByKeywordref", query = "SELECT c FROM CfClasscontentkeyword c WHERE c.cfClasscontentkeywordPK.keywordref = :keywordref")})
+    @NamedQuery(name = "CfClasscontentkeyword.findByKeywordref", query = "SELECT c FROM CfClasscontentkeyword c WHERE c.cfClasscontentkeywordPK.keywordref = :keywordref"),
+    @NamedQuery(name = "CfClasscontentkeyword.findByClasscontentrefAndKeywordref", query = "SELECT c FROM CfClasscontentkeyword c WHERE c.cfClasscontentkeywordPK.classcontentref = :classcontentref AND c.cfClasscontentkeywordPK.keywordref = :keywordref")
+})
 public class CfClasscontentkeyword implements Serializable {
 
     private static final long serialVersionUID = 1L;
