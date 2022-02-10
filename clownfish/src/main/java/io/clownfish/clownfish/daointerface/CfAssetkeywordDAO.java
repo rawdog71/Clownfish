@@ -26,6 +26,7 @@ public interface CfAssetkeywordDAO {
     List<CfAssetkeyword> findAll();
     List<CfAssetkeyword> findByAssetRef(Long id);
     List<CfAssetkeyword> findByKeywordRef(Long id);
+    CfAssetkeyword findByAssetRefAndKeywordRef(Long assetref, Long keywordref);
     CfAssetkeyword create(CfAssetkeyword entity);
     boolean delete(CfAssetkeyword entity);
     CfAssetkeyword edit(CfAssetkeyword entity);

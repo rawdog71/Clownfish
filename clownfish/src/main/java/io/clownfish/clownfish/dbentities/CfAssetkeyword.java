@@ -33,7 +33,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "CfAssetkeyword.findAll", query = "SELECT c FROM CfAssetkeyword c"),
     @NamedQuery(name = "CfAssetkeyword.findByAssetref", query = "SELECT c FROM CfAssetkeyword c WHERE c.cfAssetkeywordPK.assetref = :assetref"),
-    @NamedQuery(name = "CfAssetkeyword.findByKeywordref", query = "SELECT c FROM CfAssetkeyword c WHERE c.cfAssetkeywordPK.keywordref = :keywordref")})
+    @NamedQuery(name = "CfAssetkeyword.findByKeywordref", query = "SELECT c FROM CfAssetkeyword c WHERE c.cfAssetkeywordPK.keywordref = :keywordref"),
+    @NamedQuery(name = "CfAssetkeyword.findByAssetrefAndKeywordref", query = "SELECT c FROM CfAssetkeyword c WHERE c.cfAssetkeywordPK.assetref = :assetref AND c.cfAssetkeywordPK.keywordref = :keywordref")
+})
 public class CfAssetkeyword implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -70,4 +70,9 @@ public class CfAssetKeywordServiceImpl implements CfAssetKeywordService {
     public List<CfAssetkeyword> findAll() {
         return this.cfassetkeywordDAO.findAll();
     }
+
+    @Override
+    public CfAssetkeyword findByAssetRefAndKeywordRef(Long assetref, Long keywordref) {
+        return this.cfassetkeywordDAO.findByAssetRefAndKeywordRef(assetref, keywordref);
+    }
 }
