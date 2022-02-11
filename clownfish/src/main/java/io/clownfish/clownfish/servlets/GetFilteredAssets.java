@@ -118,19 +118,21 @@ public class GetFilteredAssets extends HttpServlet {
             if (null != assetlistcontent) {
                 for (CfAssetlistcontent assetcontent : assetlistcontent) {
                     CfAsset asset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
-
-                    // Check the keyword filter (at least one keyword must be found (OR))
-                    if (!searchkeywords.isEmpty()) {
-                        ArrayList contentkeywords = getContentOutputKeywords(asset, true);
-                        boolean dummyfound = false;
-                        for (String keyword : searchkeywords) {
-                            if (contentkeywords.contains(keyword.toLowerCase())) {
-                                dummyfound = true;
+                    // Only assets that are for public use and not scrapped
+                    if ((!asset.isScrapped()) && (asset.isPublicuse())) {
+                        // Check the keyword filter (at least one keyword must be found (OR))
+                        if (!searchkeywords.isEmpty()) {
+                            ArrayList contentkeywords = getContentOutputKeywords(asset, true);
+                            boolean dummyfound = false;
+                            for (String keyword : searchkeywords) {
+                                if (contentkeywords.contains(keyword.toLowerCase())) {
+                                    dummyfound = true;
+                                }
                             }
+                            found = dummyfound;
+                        } else {
+                            found = true;
                         }
-                        found = dummyfound;
-                    } else {
-                        found = true;
                     }
 
                     if (found) {
@@ -149,17 +151,32 @@ public class GetFilteredAssets extends HttpServlet {
                             List<CfAssetkeyword> assetkeywords = cfassetkeywordService.findByKeywordRef(keyword.getId());
                             for (CfAssetkeyword assetkeyword : assetkeywords) {
                                 CfAsset asset = cfassetService.findById(assetkeyword.getCfAssetkeywordPK().getAssetref());
-                                AssetDataOutput ao = new AssetDataOutput();
-                                ao.setAsset(asset);
-                                ao.setKeywords(getContentOutputKeywords(asset, false));
-                                if (!outputlist.contains(ao)) {
-                                    outputlist.add(ao);
+                                // Only assets that are for public use and not scrapped
+                                if ((!asset.isScrapped()) && (asset.isPublicuse())) {
+                                    AssetDataOutput ao = new AssetDataOutput();
+                                    ao.setAsset(asset);
+                                    ao.setKeywords(getContentOutputKeywords(asset, false));
+                                    if (!outputlist.contains(ao)) {
+                                        outputlist.add(ao);
+                                    }
                                 }
                             }
                         }
                     }
                 } else {
-                    found = false;
+                    List<CfAsset> assetlist = cfassetService.findByScrapped(false);
+                    for (CfAsset asset : assetlist) {
+                        // Only assets that are for public
+                        if (asset.isPublicuse()) {
+                            AssetDataOutput ao = new AssetDataOutput();
+                            ao.setAsset(asset);
+                            ao.setKeywords(getContentOutputKeywords(asset, false));
+                            if (!outputlist.contains(ao)) {
+                                outputlist.add(ao);
+                            }
+                        }
+                    }
+                    found = true;
                 }
             }
 
