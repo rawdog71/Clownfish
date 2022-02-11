@@ -43,6 +43,32 @@ public class RestAssetlist {
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired transient AuthTokenList authtokenlist;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestAssetlist.class);
+    
+    @PostMapping("/getassetlists")
+    public RestAssetlistParameter restGetAssetlists(@RequestBody RestAssetlistParameter idp) {
+        return getAssetlists(idp);
+    }
+    
+    private RestAssetlistParameter getAssetlists(RestAssetlistParameter idp) {
+        try {
+            String token = idp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = idp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "GetAssetLibraries")) {
+                    idp.setAssetlist(cfassetlistService.findAll());
+                    idp.setReturncode("OK");
+
+                } else {
+                    idp.setReturncode("Wrong API KEY");
+                }
+            } else {
+                idp.setReturncode("Invalid token");
+            }
+        } catch (javax.persistence.NoResultException ex) {
+            idp.setReturncode("NoResultException");
+        }
+        return idp;
+    }
 
     @PostMapping("/insertassetlist")
     public RestAssetlistParameter restInsertAssetlist(@RequestBody RestAssetlistParameter idp) {
