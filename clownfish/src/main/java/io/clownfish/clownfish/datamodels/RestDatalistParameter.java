@@ -15,6 +15,8 @@
  */
 package io.clownfish.clownfish.datamodels;
 
+import io.clownfish.clownfish.dbentities.CfList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,6 +31,7 @@ public class RestDatalistParameter {
     private @Getter @Setter String classname;
     private @Getter @Setter String listname;
     private @Getter @Setter Long listid;
+    private @Getter @Setter List<CfList> list;
 
     public RestDatalistParameter() {
     }

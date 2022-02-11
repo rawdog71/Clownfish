@@ -115,7 +115,9 @@ public class GetDatalist extends HttpServlet {
 
         Gson gson = new Gson();
         GetContentParameter gcp = gson.fromJson(jb.toString(), GetContentParameter.class);
-        processRequest(gcp, response);
+        if (null != gcp) {
+            processRequest(gcp, response);
+        }
         
         String json = gson.toJson(gcp);
         response.setContentType("application/json;charset=UTF-8");
@@ -205,29 +207,30 @@ public class GetDatalist extends HttpServlet {
     protected GetContentParameter processRequest(GetContentParameter gcp, HttpServletResponse response) {
         DatalistOutput datalistoutput = new DatalistOutput();
         ArrayList<ContentOutput> outputlist = new ArrayList<>();
-        //HashMap<String, String> outputmap;
-        String inst_name = "";
-        int range_start = 0;
-        int range_end = 0;
-        if (!gcp.getRange().isEmpty()) {
-            if (gcp.getRange().contains("-")) {
-                String[] ranges = gcp.getRange().split("-");
-                range_start = Integer.parseInt(ranges[0]);
-                range_end = Integer.parseInt(ranges[1]);
-                if (range_start > range_end) {
-                    int dummy = range_start;
-                    range_start = range_end;
-                    range_end = dummy;
-                }
-            } else {
-                range_start = Integer.parseInt(gcp.getRange());
-                range_end = range_start;
-            }
-        }
+        
         outputlist = new ArrayList<>();
         //outputmap = new HashMap<>();
         apikey = gcp.getApikey();
         if (apikeyutil.checkApiKey(apikey, "GetDatalist")) {
+            String inst_name = "";
+            int range_start = 0;
+            int range_end = 0;
+            if ((null != gcp.getRange()) && (!gcp.getRange().isEmpty())) {
+                if (gcp.getRange().contains("-")) {
+                    String[] ranges = gcp.getRange().split("-");
+                    range_start = Integer.parseInt(ranges[0]);
+                    range_end = Integer.parseInt(ranges[1]);
+                    if (range_start > range_end) {
+                        int dummy = range_start;
+                        range_start = range_end;
+                        range_end = dummy;
+                    }
+                } else {
+                    range_start = Integer.parseInt(gcp.getRange());
+                    range_end = range_start;
+                }
+            }
+            
             name = "";
             name = gcp.getListname();
             inst_name = name;

@@ -47,6 +47,36 @@ public class RestDatalist {
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired transient AuthTokenList authtokenlist;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestDatalist.class);
+    
+    @PostMapping("/getdatalists")
+    public RestDatalistParameter restGetDatalists(@RequestBody RestDatalistParameter idp) {
+        return getDatalists(idp);
+    }
+    
+    private RestDatalistParameter getDatalists(RestDatalistParameter idp) {
+        try {
+            String token = idp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = idp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "GetDatalist")) {
+                    if ((null == idp.getClassname()) || (idp.getClassname().isBlank())) {
+                        idp.setList(cflistService.findAll());
+                        idp.setReturncode("OK");
+                    } else {
+                        idp.setList(cflistService.findByClassref(cfclassService.findByName(idp.getClassname())));
+                        idp.setReturncode("OK");
+                    }
+                } else {
+                    idp.setReturncode("Wrong API KEY");
+                }
+            } else {
+                idp.setReturncode("Invalid token");
+            }
+        } catch (javax.persistence.NoResultException ex) {
+            idp.setReturncode("NoResultException");
+        }
+        return idp;
+    }
 
     @PostMapping("/insertdatalist")
     public RestDatalistParameter restInsertDatalist(@RequestBody RestDatalistParameter idp) {
