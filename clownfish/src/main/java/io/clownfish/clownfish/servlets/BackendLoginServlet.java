@@ -64,13 +64,19 @@ public class BackendLoginServlet extends HttpServlet {
         String inst_password = password;
         AuthToken at = null;
         if ((null != inst_email) && (null != inst_password)) {
-            CfUser cfuser = cfuserService.findByEmail(inst_email);
-            String salt = cfuser.getSalt();
-            String secure = PasswordUtil.generateSecurePassword(inst_password, salt);
-            if (secure.compareTo(cfuser.getPasswort()) == 0) {
-                String token = AuthToken.generateToken(inst_password, salt);
-                at = new AuthToken(token, new DateTime().plusMinutes(60));      // Tokens valid for 60 minutes
-                authtokenlist.getAuthtokens().put(token, at);
+            try {
+                CfUser cfuser = cfuserService.findByEmail(inst_email);
+                String salt = cfuser.getSalt();
+                String secure = PasswordUtil.generateSecurePassword(inst_password, salt);
+                if (secure.compareTo(cfuser.getPasswort()) == 0) {
+                    String token = AuthToken.generateToken(inst_password, salt);
+                    at = new AuthToken(token, new DateTime().plusMinutes(60));      // Tokens valid for 60 minutes
+                    authtokenlist.getAuthtokens().put(token, at);
+                } else {
+                    at = new AuthToken("", new DateTime());      // Invalid token
+                }
+            } catch (Exception ex) {
+                at = new AuthToken("", new DateTime());      // Invalid token
             }
         }
         
