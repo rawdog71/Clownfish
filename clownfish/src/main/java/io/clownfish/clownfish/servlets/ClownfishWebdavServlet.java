@@ -67,6 +67,7 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -508,6 +509,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                     newasset.setImagewidth(metamap.get("Image Width"));
                     newasset.setImageheight(metamap.get("Image Height"));
                 }
+                newasset.setUploadtime(new DateTime().toDate());
                 newasset = cfassetService.create(newasset);
                 assetlist = cfassetService.findAll();
 

@@ -49,6 +49,7 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,6 +135,7 @@ public class InsertAsset extends HttpServlet {
                     newasset.setImagewidth(metamap.get("Image Width"));
                     newasset.setImageheight(metamap.get("Image Height"));
                     newasset.setPublicuse(publicuse);
+                    newasset.setUploadtime(new DateTime().toDate());
                     try {
                         newasset = cfassetService.create(newasset);
                         // Index the uploaded assets and merge the Index files

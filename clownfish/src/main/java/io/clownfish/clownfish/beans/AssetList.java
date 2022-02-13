@@ -48,6 +48,7 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.joda.time.DateTime;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DualListModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,6 +175,7 @@ public class AssetList {
             newasset.setImagewidth(metamap.get("Image Width"));
             newasset.setImageheight(metamap.get("Image Height"));
             newasset.setPublicuse(publicusage);
+            newasset.setUploadtime(new DateTime().toDate());
             cfassetService.create(newasset);
             assetlist = cfassetService.findAll();
             

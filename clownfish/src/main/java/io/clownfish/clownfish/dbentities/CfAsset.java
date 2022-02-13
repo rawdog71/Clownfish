@@ -28,6 +28,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -84,6 +85,9 @@ public class CfAsset implements Serializable {
     private boolean scrapped;
     @Column(name = "publicuse")
     private boolean publicuse;
+    @Basic(optional = true)
+    @Column(name = "uploadtime")
+    private Date uploadtime;
 
     public CfAsset() {
     }
@@ -184,6 +188,14 @@ public class CfAsset implements Serializable {
 
     public void setPublicuse(boolean publicuse) {
         this.publicuse = publicuse;
+    }
+
+    public Date getUploadtime() {
+        return uploadtime;
+    }
+
+    public void setUploadtime(Date uploadtime) {
+        this.uploadtime = uploadtime;
     }
 
     @Override
