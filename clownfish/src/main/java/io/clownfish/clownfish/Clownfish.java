@@ -2012,7 +2012,8 @@ public class Clownfish {
         }
         // replace Assets
         for (String c : cfdiv.getAssetArray()) {
-            List<CfLayoutcontent> assets = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("A") == 0).collect(Collectors.toList());
+            int lfdnr = Integer.parseInt(c.split(":")[1]);
+            List<CfLayoutcontent> assets = layoutcontent.stream().filter(lc -> (lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("A") == 0) && (lc.getCfLayoutcontentPK().getLfdnr() == lfdnr)).collect(Collectors.toList());
             for (CfLayoutcontent lc : assets) {
                 CfAsset cfasset = null;
                 if (preview) {

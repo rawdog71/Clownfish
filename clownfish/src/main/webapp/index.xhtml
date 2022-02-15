@@ -432,6 +432,9 @@
                                                      selectionMode="single" selection="#{sitetree.current_asset}" rowKey="#{asset.id}"
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredAsset}" widgetVar="classcontentasset" rendered="${sitetree.contenteditable and sitetree.showAsset}">
                                             <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutAsset}" update=":form:tabview:preview" />
+                                            <p:column>
+                                                <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{asset.id}&amp;width=50" width="50" alt="#{asset.name}" title="#{asset.name}" /> 
+                                            </p:column>
                                             <p:column headerText="Assets" filterBy="#{asset.name}" filterMatchMode="contains">
                                                 <h:outputText value="#{asset.name}" />
                                             </p:column>
