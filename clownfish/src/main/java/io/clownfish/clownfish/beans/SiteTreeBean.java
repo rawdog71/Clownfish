@@ -235,6 +235,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient Clownfish clownfish;
     private transient @Getter @Setter List<CfAttributcontent> attributcontentlist = null;
     private @Getter @Setter String previewContentOutput = "";
+    private @Getter @Setter long previewAssetOutput = 0;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
@@ -766,6 +767,17 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onPublish(ActionEvent actionEvent) {
+        if (null != folderUtil.getStatic_folder()) {
+            File file = new File(folderUtil.getStatic_folder() + File.separator + selectedSite.getName());
+            try {
+                Files.deleteIfExists(file.toPath());
+                FacesMessage message = new FacesMessage("Deleted static site for " + selectedSite.getName());
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }
+        
         if (null != selectedSite) {
             List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiteref(selectedSite.getId());
             for (CfLayoutcontent layoutcontent : layoutcontentlist) {
@@ -1044,6 +1056,23 @@ public class SiteTreeBean implements Serializable {
         }
     }
     
+    public void onSaveLayoutAsset(CfAsset asset) {
+        if (null != asset) {
+            if (null == current_layoutcontent) {
+                String[] assetinfos = selected_asset.split(":");
+                int lfdnr = Integer.parseInt(assetinfos[1]);
+                current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "A", lfdnr);
+                current_layoutcontent.setContentref(BigInteger.ZERO);
+            }
+            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(asset.getId()));
+            try {
+                cflayoutcontentService.create(current_layoutcontent);
+            } catch (Exception ex) {
+                cflayoutcontentService.edit(current_layoutcontent);
+            }
+        }
+    }
+    
     /**
      * Selects a Asset
      * @param event
@@ -1051,18 +1080,7 @@ public class SiteTreeBean implements Serializable {
     public void onSelectLayoutAsset(SelectEvent event) {
         current_asset = (CfAsset) event.getObject();
         if (null != current_asset) {
-            if (null == current_layoutcontent) {
-                String[] assetinfos = selected_asset.split(":");
-                int lfdnr = Integer.parseInt(assetinfos[1]);
-                current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "A", lfdnr);
-                current_layoutcontent.setContentref(BigInteger.ZERO);
-            }
-            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_asset.getId()));
-            try {
-                cflayoutcontentService.create(current_layoutcontent);
-            } catch (Exception ex) {
-                cflayoutcontentService.edit(current_layoutcontent);
-            }
+            previewAssetOutput = current_asset.getId();
         }
     }
     

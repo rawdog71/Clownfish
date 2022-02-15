@@ -427,16 +427,19 @@
                                             </p:column>
                                         </p:dataTable>
                                         
-                                        <p:dataTable id="layoutassetlistselect" size="small" style="width: 400px" var="asset" value="#{sitetree.current_assetlist}" 
+                                        <p:dataTable id="layoutassetlistselect" size="small" scrollable="true" scrollHeight="250" style="width: 400px" var="asset" value="#{sitetree.current_assetlist}" 
                                                      paginator="false" 
                                                      selectionMode="single" selection="#{sitetree.current_asset}" rowKey="#{asset.id}"
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredAsset}" widgetVar="classcontentasset" rendered="${sitetree.contenteditable and sitetree.showAsset}">
-                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutAsset}" update=":form:tabview:preview" />
+                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutAsset}" oncomplete="PF('assetpreviewDlg').show()" update=":form:assetpreviewDlg" />
                                             <p:column>
                                                 <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{asset.id}&amp;width=50" width="50" alt="#{asset.name}" title="#{asset.name}" /> 
                                             </p:column>
                                             <p:column headerText="Assets" filterBy="#{asset.name}" filterMatchMode="contains">
                                                 <h:outputText value="#{asset.name}" />
+                                            </p:column>
+                                            <p:column width="25px">
+                                                <p:commandButton icon="pi pi-save" styleClass="rounded-button ui-button-flat ui-button-plain" actionListener="#{sitetree.onSaveLayoutAsset(asset)}" update=":form:tabview:layoutcontentedit :form:tabview:preview" />
                                             </p:column>
                                         </p:dataTable>
                                         
@@ -2105,6 +2108,10 @@
             
             <p:dialog id="contentpreviewDlg" header="Content Preview" widgetVar="contentpreviewDlg" minHeight="100" width="500" showEffect="fade">
                 <h:outputText value="#{sitetree.previewContentOutput}" escape="false" />
+            </p:dialog>
+            
+            <p:dialog id="assetpreviewDlg" header="Asset Preview" widgetVar="assetpreviewDlg" minHeight="100" width="500" showEffect="fade">
+                <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{sitetree.previewAssetOutput}&amp;width=400" width="400"></p:graphicImage>
             </p:dialog>
             
             <p:confirmPopup global="true">
