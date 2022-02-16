@@ -21,6 +21,7 @@ import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
+import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
@@ -51,6 +52,7 @@ import io.clownfish.clownfish.sap.models.RfcFunction;
 import io.clownfish.clownfish.sap.models.RfcGroup;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
@@ -212,6 +214,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfSiteassetlistService cfsiteassetlistService;
     @Autowired transient CfSitekeywordlistService cfsitekeywordlistService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfSitelistService cfsitelistService;
     @Autowired transient CfClassService cfclassService;
@@ -236,6 +239,7 @@ public class SiteTreeBean implements Serializable {
     private transient @Getter @Setter List<CfAttributcontent> attributcontentlist = null;
     private @Getter @Setter String previewContentOutput = "";
     private @Getter @Setter long previewAssetOutput = 0;
+    private @Getter @Setter List<CfAsset> previewAssetlistOutput = new ArrayList<>();
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
@@ -946,7 +950,7 @@ public class SiteTreeBean implements Serializable {
             int lfdnr = Integer.parseInt(contentinfos[1]);
             current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "C", lfdnr);
             current_layoutcontent.setContentref(BigInteger.ZERO);          
-            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_classcontent.getId()));
+            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(classcontent.getId()));
             try {
                 cflayoutcontentService.create(current_layoutcontent);
             } catch (Exception ex) {
@@ -1120,15 +1124,23 @@ public class SiteTreeBean implements Serializable {
      * @param event
      */
     public void onSelectLayoutAssetlibrary(SelectEvent event) {
-        current_assetlibrary = (CfAssetlist) event.getObject();
-        if (null != current_assetlibrary) {
+        CfAssetlist selected_assetlist = (CfAssetlist) event.getObject();
+        
+        previewAssetlistOutput.clear();
+        for (CfAssetlistcontent assetlistcontent : cfassetlistcontentService.findByAssetlistref(selected_assetlist.getId())) {
+            previewAssetlistOutput.add(cfassetService.findById(assetlistcontent.getCfAssetlistcontentPK().getAssetref()));
+        }
+    }
+    
+    public void onSaveLayoutAssetlist(CfAssetlist assetlist) {
+        if (null != assetlist) {
             if (null == current_layoutcontent) {
                 String[] assetlistinfos = selected_assetlist.split(":");
                 int lfdnr = Integer.parseInt(assetlistinfos[1]);
                 current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "AL", lfdnr);
                 current_layoutcontent.setContentref(BigInteger.ZERO);
             }
-            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_assetlibrary.getId()));
+            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(assetlist.getId()));
             try {
                 cflayoutcontentService.create(current_layoutcontent);
             } catch (Exception ex) {
