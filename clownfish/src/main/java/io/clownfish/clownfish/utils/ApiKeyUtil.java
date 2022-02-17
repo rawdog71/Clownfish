@@ -15,9 +15,17 @@
  */
 package io.clownfish.clownfish.utils;
 
+import io.clownfish.clownfish.dbentities.CfUser;
+import io.clownfish.clownfish.dbentities.CfWebservice;
 import io.clownfish.clownfish.dbentities.CfWebserviceauth;
+import io.clownfish.clownfish.serviceinterface.CfWebserviceService;
 import io.clownfish.clownfish.serviceinterface.CfWebserviceauthService;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -30,6 +38,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApiKeyUtil implements Serializable {
     @Autowired CfWebserviceauthService cfwebserviceauthService;
+    @Autowired CfWebserviceService cfwebserviceService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiKeyUtil.class);
 
     public ApiKeyUtil() {
     }
@@ -41,5 +51,20 @@ public class ApiKeyUtil implements Serializable {
         } catch (Exception ex) {
             return false;
         }
+    }
+    
+    public String getRestApikey(CfUser userref) {
+        String apikey = "";
+        for (CfWebserviceauth auth : cfwebserviceauthService.findByUserRef(userref)) {
+            CfWebservice webservice = cfwebserviceService.findById(auth.getCfWebserviceauthPK().getWebserviceRef().getId());
+            if (0 == webservice.getName().compareToIgnoreCase("RestService")) {
+                try {
+                    apikey = URLEncoder.encode(auth.getHash(), StandardCharsets.UTF_8.toString());
+                } catch (UnsupportedEncodingException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+            }
+        }
+        return apikey;
     }
 }

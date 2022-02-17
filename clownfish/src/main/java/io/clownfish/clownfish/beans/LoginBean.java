@@ -23,6 +23,7 @@ import io.clownfish.clownfish.dbentities.CfUserbackend;
 import io.clownfish.clownfish.serviceinterface.CfBackendService;
 import io.clownfish.clownfish.serviceinterface.CfUserBackendService;
 import io.clownfish.clownfish.serviceinterface.CfUserService;
+import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ public class LoginBean implements Serializable {
     @Autowired transient CfUserBackendService cfuserbackendService;
     @Autowired transient CfBackendService cfbackendService;
     @Autowired transient AuthTokenList authtokenlist;
+    @Autowired ApiKeyUtil apikeyutil;
     
     private boolean login;
     private @Getter @Setter String vorname;
@@ -61,6 +63,7 @@ public class LoginBean implements Serializable {
     private @Getter @Setter String email;
     private @Getter @Setter String passwort;
     private @Getter @Setter CfUser cfuser;
+    private @Getter @Setter String apikey;
     private @Getter @Setter List<CfBackend> userrights = null;
 
     public LoginBean() {
@@ -109,7 +112,7 @@ public class LoginBean implements Serializable {
                         userrights.add(selectedContent);
                     }
                 }
-                
+                apikey = apikeyutil.getRestApikey(cfuser);
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Login", "Welcome " + cfuser.getVorname());
                 FacesContext.getCurrentInstance().addMessage(null, message);
             } else {
