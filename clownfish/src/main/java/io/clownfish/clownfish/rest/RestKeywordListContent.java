@@ -49,7 +49,7 @@ public class RestKeywordListContent {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = iklp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         CfKeywordlistcontent keywordlistcontent = cfkeywordlistcontentService.findByKeywordrefAndKeywordlistref(iklp.getKeywordref(), iklp.getKeywordlistref());
                         LOGGER.warn("Duplicate Keywordlistcontent");
@@ -83,7 +83,7 @@ public class RestKeywordListContent {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = iklp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         CfKeywordlistcontent keywordlistcontent = cfkeywordlistcontentService.findByKeywordrefAndKeywordlistref(iklp.getKeywordref(), iklp.getKeywordlistref());
                         cfkeywordlistcontentService.delete(keywordlistcontent);

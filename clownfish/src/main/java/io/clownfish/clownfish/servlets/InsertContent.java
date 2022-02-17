@@ -97,7 +97,7 @@ public class InsertContent extends HttpServlet {
     private RestContentParameter insertContent(RestContentParameter icp, HttpServletResponse response) throws IOException {
         try {
             String apikey = icp.getApikey();
-            if (apikeyutil.checkApiKey(apikey, "InsertContent")) {
+            if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 CfClass clazz = cfclassService.findByName(icp.getClassname());
                 try {
                     CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());

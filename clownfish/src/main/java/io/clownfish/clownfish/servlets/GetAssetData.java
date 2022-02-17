@@ -61,7 +61,7 @@ public class GetAssetData extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
-            if (apikeyutil.checkApiKey(apikey, "GetAssetData")) {
+            if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 CfAsset asset = null;
                 String imagefilename = request.getParameter("file");
                 if (imagefilename != null) {

@@ -87,6 +87,7 @@ public class AssetLibrary {
      */
     public void onCreate(ActionEvent actionEvent) {
         try {
+            assetlistname = assetlistname.trim().replaceAll("\\s+", "_");
             cfassetlistService.findByName(assetlistname);
         } catch (NoResultException ex) {
             CfAssetlist newassetlist = new CfAssetlist();

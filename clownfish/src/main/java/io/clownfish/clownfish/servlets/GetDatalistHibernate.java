@@ -150,7 +150,7 @@ public class GetDatalistHibernate extends HttpServlet {
             apikey = values[0];
         });
         inst_apikey = apikey;
-        if (apikeyutil.checkApiKey(inst_apikey, "GetDatalist")) {
+        if (apikeyutil.checkApiKey(inst_apikey, "RestService")) {
             name = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("name") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 name = values[0];
@@ -241,7 +241,7 @@ public class GetDatalistHibernate extends HttpServlet {
         outputlist = new ArrayList<>();
         //outputmap = new HashMap<>();
         apikey = gcp.getApikey();
-        if (apikeyutil.checkApiKey(apikey, "GetDatalist")) {
+        if (apikeyutil.checkApiKey(apikey, "RestService")) {
             name = "";
             name = gcp.getListname();
             inst_name = name;

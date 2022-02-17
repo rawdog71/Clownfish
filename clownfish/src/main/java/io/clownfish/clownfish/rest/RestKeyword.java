@@ -48,7 +48,7 @@ public class RestKeyword {
             String token = ikp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ikp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetKeywords")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         CfKeyword keyword = cfkeywordService.findByName(ikp.getKeyword());
                         LOGGER.warn("Duplicate Keyword");

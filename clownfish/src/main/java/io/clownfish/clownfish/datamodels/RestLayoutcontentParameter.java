@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 raine.
+ * Copyright 2020 sulzbachr.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,24 @@
  */
 package io.clownfish.clownfish.datamodels;
 
-import io.clownfish.clownfish.dbentities.CfLayoutcontent;
-import io.clownfish.clownfish.dbentities.CfSite;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  *
- * @author raine
+ * @author sulzbachr
  */
-public class SiteDataOutput {
-    private @Getter @Setter CfSite site;
-    private @Getter @Setter List<CfLayoutcontent> layoutcontentlist;
+public class RestLayoutcontentParameter {
+    private @Getter @Setter String returncode;
+    private @Getter @Setter String apikey;
+    private @Getter @Setter String token;
+    private @Getter @Setter long siteref;
+    private @Getter @Setter long divref;
+    private @Getter @Setter String contenttype;
+    private @Getter @Setter int lfdnr;
+    private @Getter @Setter long contentref;
+    private @Getter @Setter long preview_contentref;
+
+    public RestLayoutcontentParameter() {
+    }
 }

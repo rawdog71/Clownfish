@@ -54,7 +54,7 @@ public class RestAssetlist {
             String token = idp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = idp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetAssetLibraries")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     idp.setAssetlist(cfassetlistService.findAll());
                     idp.setReturncode("OK");
 
@@ -80,13 +80,13 @@ public class RestAssetlist {
             String token = idp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = idp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetAssetLibraries")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
-                        CfAssetlist list = cfassetlistService.findByName(idp.getListname());
+                        CfAssetlist list = cfassetlistService.findByName(idp.getListname().trim().replaceAll("\\s+", "_"));
                         idp.setReturncode("Duplicate Assetlistcontent");
                     } catch (javax.persistence.NoResultException ex) {
                         CfAssetlist newlist = new CfAssetlist();
-                        newlist.setName(idp.getListname());
+                        newlist.setName(idp.getListname().trim().replaceAll("\\s+", "_"));
 
                         CfAssetlist newlist2 = cfassetlistService.create(newlist);
                         idp.setListid(newlist2.getId());
@@ -114,7 +114,7 @@ public class RestAssetlist {
             String token = idp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = idp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetAssetLibraries")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         CfAssetlist list = cfassetlistService.findByName(idp.getListname());
                         List<CfAssetlistcontent> listcontentList = cfassetlistcontentService.findByAssetlistref(list.getId());

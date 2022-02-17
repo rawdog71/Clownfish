@@ -79,7 +79,7 @@ public class GetAsset extends HttpServlet {
             int inst_download = 0;
             try {
                 String apikey = acontext.getRequest().getParameter("apikey");
-                if (apikeyutil.checkApiKey(apikey, "GetAsset")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 
                     String paramdownload = acontext.getRequest().getParameter("dl");
                     if (paramdownload != null) {

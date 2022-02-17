@@ -65,7 +65,7 @@ public class GetClasses extends HttpServlet {
             String token = request.getParameter("token");
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = request.getParameter("apikey");
-                if (apikeyutil.checkApiKey(apikey, "GetClasses")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfClass clazz = null;
                     List<CfClass> classList = new ArrayList<>();
                     String classid = request.getParameter("id");

@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.SiteDataOutput;
 import io.clownfish.clownfish.dbentities.CfSite;
+import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import java.io.IOException;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GetSites extends HttpServlet {
     @Autowired transient CfSiteService cfsiteService;
+    @Autowired transient CfLayoutcontentService cflayoutcontentService;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired transient AuthTokenList authtokenlist;
     
@@ -60,7 +62,7 @@ public class GetSites extends HttpServlet {
             String token = request.getParameter("token");
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = request.getParameter("apikey");
-                if (apikeyutil.checkApiKey(apikey, "GetSites")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfSite site = null;
                     List<CfSite> siteList = new ArrayList<>();
                     String siteid = request.getParameter("id");
@@ -81,6 +83,7 @@ public class GetSites extends HttpServlet {
                     for (CfSite siteItem : siteList) {
                         SiteDataOutput sitedataoutput = new SiteDataOutput();
                         sitedataoutput.setSite(siteItem);
+                        sitedataoutput.setLayoutcontentlist(cflayoutcontentService.findBySiteref(siteItem.getId()));
                         sitedataoutputList.add(sitedataoutput);
                     }
                     Gson gson = new Gson(); 

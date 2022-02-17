@@ -60,7 +60,7 @@ public class RestAssetlistcontent {
             String token = ilcp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ilcp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetAssetLibraries")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         CfAssetlist assetlist = cfassetlistService.findByName(ilcp.getListname());
                         CfAsset asset = cfassetService.findById(ilcp.getAssetref());
@@ -97,7 +97,7 @@ public class RestAssetlistcontent {
             String token = ilcp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ilcp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetAssetLibraries")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         ilcp.setReturncode("");
                         CfAssetlist assetlist = cfassetlistService.findByName(ilcp.getListname());

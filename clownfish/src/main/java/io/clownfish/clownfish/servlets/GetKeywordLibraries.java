@@ -66,7 +66,7 @@ public class GetKeywordLibraries extends HttpServlet {
             String token = request.getParameter("token");
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = request.getParameter("apikey");
-                if (apikeyutil.checkApiKey(apikey, "GetKeywordLibraries")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfKeywordlist keywordlist = null;
                     List<CfKeywordlist> keywordlistList = new ArrayList<>();
                     String keywordlistid = request.getParameter("id");

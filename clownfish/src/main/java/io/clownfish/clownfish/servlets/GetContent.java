@@ -120,7 +120,7 @@ public class GetContent extends HttpServlet {
             apikey = values[0];
         });
         inst_apikey = apikey;
-        if (apikeyutil.checkApiKey(inst_apikey, "GetContent")) {
+        if (apikeyutil.checkApiKey(inst_apikey, "RestService")) {
             klasse = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("class") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 klasse = values[0];
@@ -319,7 +319,7 @@ public class GetContent extends HttpServlet {
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
         inst_apikey = gcp.getApikey();
-        if (apikeyutil.checkApiKey(inst_apikey, "GetContent")) {
+        if (apikeyutil.checkApiKey(inst_apikey, "RestService")) {
             inst_klasse = gcp.getClassname();
             inst_identifier = gcp.getIdentifier();
             if (null == inst_identifier) {

@@ -49,7 +49,7 @@ public class RestKeywordAsset {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = iklp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetAsset")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         CfAssetkeyword assetkeyword = cfassetkeywordService.findByAssetRefAndKeywordRef(iklp.getAssetref(), iklp.getKeywordref());
                         LOGGER.warn("Duplicate AssetKeyword");
@@ -83,7 +83,7 @@ public class RestKeywordAsset {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = iklp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetAsset")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         CfAssetkeyword assetkeyword = cfassetkeywordService.findByAssetRefAndKeywordRef(iklp.getAssetref(), iklp.getKeywordref());
                         cfassetkeywordService.delete(assetkeyword);

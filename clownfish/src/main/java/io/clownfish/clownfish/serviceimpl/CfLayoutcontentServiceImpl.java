@@ -48,15 +48,20 @@ public class CfLayoutcontentServiceImpl implements CfLayoutcontentService {
     }
     
     @Override
-    public List<CfLayoutcontent> findBySiterefAndTemplateref(Long ref, Long templateref) {
-        return this.cfsitecontentDAO.findBySiterefAndTemplateref(ref, templateref);
+    public List<CfLayoutcontent> findBySiterefAndTemplateref(Long siteref, Long templateref) {
+        return this.cfsitecontentDAO.findBySiterefAndTemplateref(siteref, templateref);
     }
     
     @Override
-    public List<CfLayoutcontent> findBySiterefAndTemplaterefAndContenttype(Long ref, Long templateref, String contenttype) {
-        return this.cfsitecontentDAO.findBySiterefAndTemplaterefAndContenttype(ref, templateref, contenttype);
+    public List<CfLayoutcontent> findBySiterefAndTemplaterefAndContenttype(Long siteref, Long templateref, String contenttype) {
+        return this.cfsitecontentDAO.findBySiterefAndTemplaterefAndContenttype(siteref, templateref, contenttype);
     }
 
+    @Override
+    public CfLayoutcontent findBySiterefAndTemplaterefAndContenttypeAndLfdnr(Long siteref, Long templateref, String contenttype, int lfdnr) {
+        return this.cfsitecontentDAO.findBySiterefAndTemplaterefAndContenttypeAndLfdnr(siteref, templateref, contenttype, lfdnr);
+    }
+    
     @Override
     public CfLayoutcontent create(CfLayoutcontent entity) {
         return this.cfsitecontentDAO.create(entity);

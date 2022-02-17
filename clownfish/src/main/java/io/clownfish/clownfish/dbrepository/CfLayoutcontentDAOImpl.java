@@ -77,23 +77,35 @@ public class CfLayoutcontentDAOImpl implements CfLayoutcontentDAO {
     }
 
     @Override
-    public List<CfLayoutcontent> findBySiterefAndTemplateref(Long ref, Long templateref) {
+    public List<CfLayoutcontent> findBySiterefAndTemplateref(Long siteref, Long templateref) {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfLayoutcontent.findBySiterefAndTemplateref");  
-        query.setParameter("siteref", ref);
+        query.setParameter("siteref", siteref);
         query.setParameter("templateref", templateref);
         List<CfLayoutcontent> cflayoutcontentlist = query.getResultList();
         return cflayoutcontentlist;
     }
 
     @Override
-    public List<CfLayoutcontent> findBySiterefAndTemplaterefAndContenttype(Long ref, Long templateref, String contenttype) {
+    public List<CfLayoutcontent> findBySiterefAndTemplaterefAndContenttype(Long siteref, Long templateref, String contenttype) {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfLayoutcontent.findBySiterefAndTemplaterefAndContenttype");  
-        query.setParameter("siteref", ref);
+        query.setParameter("siteref", siteref);
         query.setParameter("templateref", templateref);
         query.setParameter("contenttype", contenttype);
         List<CfLayoutcontent> cflayoutcontentlist = query.getResultList();
+        return cflayoutcontentlist;
+    }
+
+    @Override
+    public CfLayoutcontent findBySiterefAndTemplaterefAndContenttypeAndLfdnr(Long siteref, Long templateref, String contenttype, int lfdnr) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfLayoutcontent.findBySiterefAndTemplaterefAndContenttypeAndLfdnr");  
+        query.setParameter("siteref", siteref);
+        query.setParameter("templateref", templateref);
+        query.setParameter("contenttype", contenttype);
+        query.setParameter("lfdnr", lfdnr);
+        CfLayoutcontent cflayoutcontentlist = (CfLayoutcontent) query.getSingleResult();
         return cflayoutcontentlist;
     }
 

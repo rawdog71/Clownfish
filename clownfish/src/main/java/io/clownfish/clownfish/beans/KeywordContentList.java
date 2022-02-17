@@ -79,6 +79,7 @@ public class KeywordContentList implements Serializable {
 
     public void onCreate(ActionEvent actionEvent) {
         try {
+            keywordlistname = keywordlistname.trim().replaceAll("\\s+", "_");
             cfkeywordlistService.findByName(keywordlistname);
         } catch (NoResultException ex) {
             CfKeywordlist newkeywordlist = new CfKeywordlist();

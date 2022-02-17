@@ -78,17 +78,17 @@ public class RestContent {
             String token = icp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = icp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "InsertContent")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfClass clazz = cfclassService.findByName(icp.getClassname());
                     //System.out.println(clazz.isSearchrelevant());
 
                     try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());
+                        CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname().trim().replaceAll("\\s+", "_"));
                         LOGGER.warn("Duplicate Classcontent");
                         icp.setReturncode("Duplicate Classcontent");
                     } catch (javax.persistence.NoResultException ex) {
                         CfClasscontent newclasscontent = new CfClasscontent();
-                        newclasscontent.setName(icp.getContentname());
+                        newclasscontent.setName(icp.getContentname().trim().replaceAll("\\s+", "_"));
                         newclasscontent.setClassref(clazz);
                         CfClasscontent newclasscontent2 = cfclasscontentService.create(newclasscontent);
                         hibernateUtil.insertContent(newclasscontent);
@@ -152,7 +152,7 @@ public class RestContent {
             String token = ucp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ucp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "DeleteContent")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfClass clazz = cfclassService.findByName(ucp.getClassname());
 
                     try {
@@ -186,7 +186,7 @@ public class RestContent {
             String token = ucp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ucp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "UpdateContent")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfClass clazz = cfclassService.findByName(ucp.getClassname());
 
                     try {
@@ -230,7 +230,7 @@ public class RestContent {
             String token = ucp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ucp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "DestroyContent")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfClass clazz = cfclassService.findByName(ucp.getClassname());
                     try {
                         CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname());

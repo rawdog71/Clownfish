@@ -27,7 +27,9 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfJavascript;
+import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfKeywordlist;
+import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
 import io.clownfish.clownfish.dbentities.CfLayoutcontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfSite;
@@ -59,7 +61,9 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfPropertyService;
@@ -215,6 +219,8 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfSitekeywordlistService cfsitekeywordlistService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
+    @Autowired transient CfKeywordlistcontentService cfkeywordlistcontentService;
+    @Autowired transient CfKeywordService cfkeywordService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfSitelistService cfsitelistService;
     @Autowired transient CfClassService cfclassService;
@@ -240,6 +246,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter String previewContentOutput = "";
     private @Getter @Setter long previewAssetOutput = 0;
     private @Getter @Setter List<CfAsset> previewAssetlistOutput = new ArrayList<>();
+    private @Getter @Setter List<CfKeyword> previewKeywordlistOutput = new ArrayList<>();
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
@@ -1120,7 +1127,7 @@ public class SiteTreeBean implements Serializable {
     }
     
     /**
-     * Selects a Assetlibrary
+     * Selects an Assetlibrary
      * @param event
      */
     public void onSelectLayoutAssetlibrary(SelectEvent event) {
@@ -1180,25 +1187,33 @@ public class SiteTreeBean implements Serializable {
         }
     }
     
-    /**
-     * Selects a Assetlibrary
-     * @param event
-     */
-    public void onSelectLayoutKeywordlibrary(SelectEvent event) {
-        current_keywordlibrary = (CfKeywordlist) event.getObject();
-        if (null != current_keywordlibrary) {
-            if (null == current_layoutcontent) {
+    public void onSaveLayoutKeywordlist(CfKeywordlist keywordlist) {
+        if (null != keywordlist) {
+            if (null != current_keywordlibrary) {
                 String[] keywordlistinfos = selected_keywordlist.split(":");
                 int lfdnr = Integer.parseInt(keywordlistinfos[1]);
                 current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "KL", lfdnr);
                 current_layoutcontent.setContentref(BigInteger.ZERO);
             }
-            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_keywordlibrary.getId()));
+            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(keywordlist.getId()));
             try {
                 cflayoutcontentService.create(current_layoutcontent);
             } catch (Exception ex) {
                 cflayoutcontentService.edit(current_layoutcontent);
             }
+        }
+    }
+    
+    /**
+     * Selects a Keywordlibrary
+     * @param event
+     */
+    public void onSelectLayoutKeywordlibrary(SelectEvent event) {
+        CfKeywordlist selected_keywordlist = (CfKeywordlist) event.getObject();
+        
+        previewKeywordlistOutput.clear();
+        for (CfKeywordlistcontent keywordlistcontent : cfkeywordlistcontentService.findByKeywordlistref(selected_keywordlist.getId())) {
+            previewKeywordlistOutput.add(cfkeywordService.findById(keywordlistcontent.getCfKeywordlistcontentPK().getKeywordref()));
         }
     }
 }

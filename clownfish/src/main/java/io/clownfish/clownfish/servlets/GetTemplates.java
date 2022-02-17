@@ -60,7 +60,7 @@ public class GetTemplates extends HttpServlet {
             String token = request.getParameter("token");
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = request.getParameter("apikey");
-                if (apikeyutil.checkApiKey(apikey, "GetTemplates")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfTemplate template = null;
                     List<CfTemplate> templateList = new ArrayList<>();
                     String templateid = request.getParameter("id");

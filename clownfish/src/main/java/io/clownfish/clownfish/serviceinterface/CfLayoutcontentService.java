@@ -25,8 +25,9 @@ import java.util.List;
 public interface CfLayoutcontentService {
     List<CfLayoutcontent> findAll();
     List<CfLayoutcontent> findBySiteref(Long ref);
-    List<CfLayoutcontent> findBySiterefAndTemplateref(Long ref, Long templateref);
-    List<CfLayoutcontent> findBySiterefAndTemplaterefAndContenttype(Long ref, Long templateref, String contenttype);
+    List<CfLayoutcontent> findBySiterefAndTemplateref(Long siteref, Long templateref);
+    List<CfLayoutcontent> findBySiterefAndTemplaterefAndContenttype(Long siteref, Long templateref, String contenttype);
+    CfLayoutcontent findBySiterefAndTemplaterefAndContenttypeAndLfdnr(Long siteref, Long templateref, String contenttype, int lfdnr);
     CfLayoutcontent create(CfLayoutcontent entity);
     boolean delete(CfLayoutcontent entity);
     CfLayoutcontent edit(CfLayoutcontent entity);

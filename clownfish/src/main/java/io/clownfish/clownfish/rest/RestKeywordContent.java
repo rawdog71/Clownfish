@@ -49,7 +49,7 @@ public class RestKeywordContent {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = iklp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetContent")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         CfClasscontentkeyword contentkeyword = cfclasscontentkeywordService.findByClasscontentRefAndKeywordRef(iklp.getContentref(), iklp.getKeywordref());
                         LOGGER.warn("Duplicate ContentKeyword");
@@ -83,7 +83,7 @@ public class RestKeywordContent {
             String token = iklp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = iklp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetContent")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         CfClasscontentkeyword contentkeyword = cfclasscontentkeywordService.findByClasscontentRefAndKeywordRef(iklp.getContentref(), iklp.getKeywordref());
                         cfclasscontentkeywordService.delete(contentkeyword);

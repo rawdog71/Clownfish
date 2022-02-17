@@ -62,7 +62,7 @@ public class RestListcontent {
             String token = ilcp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ilcp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "InsertListcontent")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         CfList list = cflistService.findByName(ilcp.getListname());
                         CfClasscontent classcontent = cfclasscontentService.findByName(ilcp.getClasscontentname());
@@ -100,7 +100,7 @@ public class RestListcontent {
             String token = ilcp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ilcp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "InsertListcontent")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         ilcp.setReturncode("");
                         CfList list = cflistService.findByName(ilcp.getListname());

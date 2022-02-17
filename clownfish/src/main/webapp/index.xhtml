@@ -43,7 +43,7 @@
                         <p:outputLabel value="&nbsp;" />
                         
                         <p:avatar styleClass="p-mr-2" size="large" shape="circle" rendered="#{loginBean.login}">
-                            <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{loginBean.cfuser.assetref.id}&amp;width=50" />
+                            <p:graphicImage url="GetAssetPreview?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&amp;mediaid=#{loginBean.cfuser.assetref.id}&amp;width=50" />
                         </p:avatar>
                         
                         <p:outputLabel value="&nbsp;" />
@@ -433,7 +433,7 @@
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredAsset}" widgetVar="classcontentasset" rendered="${sitetree.contenteditable and sitetree.showAsset}">
                                             <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutAsset}" oncomplete="PF('assetpreviewDlg').show()" update=":form:assetpreviewDlg" />
                                             <p:column>
-                                                <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{asset.id}&amp;width=50" width="50" alt="#{asset.name}" title="#{asset.name}" /> 
+                                                <p:graphicImage url="GetAssetPreview?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&amp;mediaid=#{asset.id}&amp;width=50" width="50" alt="#{asset.name}" title="#{asset.name}" /> 
                                             </p:column>
                                             <p:column headerText="Assets" filterBy="#{asset.name}" filterMatchMode="contains">
                                                 <h:outputText value="#{asset.name}" />
@@ -460,9 +460,12 @@
                                                      paginator="false" 
                                                      selectionMode="single" selection="#{sitetree.current_keywordlibrary}" rowKey="#{keywordlibrary.id}"
                                                      emptyMessage="No content available" filteredValue="#{sitetree.filteredKeywordlibrary}" widgetVar="classcontentkeywordlibrary" rendered="${sitetree.contenteditable and sitetree.showKeywordLibrary}">
-                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutKeywordlibrary}" update=":form:tabview:preview" />
+                                            <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutKeywordlibrary}" oncomplete="PF('keywordlistpreviewDlg').show()" update=":form:keywordlistpreviewDlg" />
                                             <p:column headerText="Keywordlibraries" filterBy="#{keywordlibrary.name}" filterMatchMode="contains">
                                                 <h:outputText value="#{keywordlibrary.name}" />
+                                            </p:column>
+                                            <p:column width="25px">
+                                                <p:commandButton icon="pi pi-save" styleClass="rounded-button ui-button-flat ui-button-plain" actionListener="#{sitetree.onSaveLayoutKeywordlist(keywordlibrary)}" update=":form:tabview:layoutcontentedit :form:tabview:preview" />
                                             </p:column>
                                         </p:dataTable>
                                         
@@ -1074,7 +1077,7 @@
                                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
                                         <f:selectItems value="#{classcontentList.assetlist}" var="media" itemLabel="#{media.name}" itemValue="#{media}" />
                                         <p:column>
-                                        <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
+                                        <p:graphicImage url="GetAssetPreview?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&amp;mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
                                         </p:column>
                                         <p:column>
                                         #{mp.name}
@@ -1251,7 +1254,7 @@
                                      emptyMessage="No content available">
                             <p:column headerText="Filename" filterBy="#{media.name}">
                                 <div style="display: flex; align-items: center">
-                                    <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{media.id}&amp;width=150" width="150" alt="#{media.name}" title="#{media.name}" /> 
+                                    <p:graphicImage url="GetAssetPreview?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&amp;mediaid=#{media.id}&amp;width=150" width="150" alt="#{media.name}" title="#{media.name}" /> 
                                     <div align="right" style="display: flex; justify-content: end; align-items: center; width: 100%">
                                         <h:outputText value="#{media.name}" />
                                         <div class="assets-list-buttons">
@@ -1273,7 +1276,7 @@
                             </p:column>
                         </p:dataTable>
                         <p:outputPanel id="assetDetail">
-                            <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{assetList.selectedAsset.id}&amp;width=500" width="500" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" rendered="#{assetList.renderDetail}" /> 
+                            <p:graphicImage url="GetAssetPreview?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&amp;mediaid=#{assetList.selectedAsset.id}&amp;width=500" width="500" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" rendered="#{assetList.renderDetail}" /> 
                             <h:panelGrid columns="1" style="width:100%" columnClasses="detail">
                                 <p:outputPanel>
                                     <h:panelGrid columns="2" cellpadding="5">
@@ -1904,7 +1907,7 @@
                             <f:selectItem itemValue="#{null}" itemLabel="--select--" />
                             <f:selectItems value="#{userlist.assetlist}" var="media" itemLabel="#{media.name}" itemValue="#{media}" />
                             <p:column>
-                            <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
+                            <p:graphicImage url="GetAssetPreview?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&amp;mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
                             </p:column>
                             <p:column>
                             #{mp.name}
@@ -2114,7 +2117,7 @@
             </p:dialog>
             
             <p:dialog id="assetpreviewDlg" header="Asset Preview" widgetVar="assetpreviewDlg" minHeight="100" width="500" showEffect="fade">
-                <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{sitetree.previewAssetOutput}&amp;width=400" width="400"></p:graphicImage>
+                <p:graphicImage url="GetAssetPreview?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&amp;mediaid=#{sitetree.previewAssetOutput}&amp;width=400" width="400"></p:graphicImage>
             </p:dialog>
             
             <p:dialog id="assetlistpreviewDlg" header="Assetlist Preview" widgetVar="assetlistpreviewDlg" minHeight="100" width="500" showEffect="fade">
@@ -2125,13 +2128,23 @@
                     </f:facet>
                     <div class="flex flex-row">
                         <div class="flex align-items-center justify-content-center w-10rem h-10rem">
-                            <p:graphicImage url="GetAssetPreview?apikey=8O1XFPgfLeUG7ZZpZix0DQNjU%2bf%2bZGGO5lLYlJYbUvM=&amp;mediaid=#{asset.id}&amp;width=200" width="200"></p:graphicImage>
+                            <p:graphicImage url="GetAssetPreview?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&amp;mediaid=#{asset.id}&amp;width=200" width="200"></p:graphicImage>
                         </div>
                         <div class="flex flex-column align-items-center justify-content-center w-20rem h-10rem">
                             <div class="flex w-10rem">#{asset.name}</div>
                             <div class="flex w-10rem">#{asset.description}</div>
                         </div>
                     </div>
+                </p:dataScroller>
+            </p:dialog>
+            
+            <p:dialog id="keywordlistpreviewDlg" header="Keywordlist Preview" widgetVar="keywordlistpreviewDlg" minHeight="100" width="500" showEffect="fade">
+                <p:dataScroller value="#{sitetree.previewKeywordlistOutput}" var="keyword" chunkSize="10" mode="inline"
+                            scrollHeight="500">
+                    <f:facet name="header">
+                        Keywords
+                    </f:facet>
+                    <div class="flex">#{keyword.name}</div>
                 </p:dataScroller>
             </p:dialog>
             

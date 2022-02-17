@@ -78,7 +78,7 @@ public class GetAssetPreview extends HttpServlet {
             try {
                 
                 String apikey = acontext.getRequest().getParameter("apikey");
-                if (apikeyutil.checkApiKey(apikey, "GetAssetPreview")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 
                     int width = 0;
                     int height = 0;

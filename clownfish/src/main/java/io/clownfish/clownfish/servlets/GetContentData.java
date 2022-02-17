@@ -71,7 +71,7 @@ public class GetContentData extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
-            if (apikeyutil.checkApiKey(apikey, "GetContentData")) {
+            if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 CfClasscontent content = null;
                 String contentid = request.getParameter("contentid");
                 if (contentid != null) {

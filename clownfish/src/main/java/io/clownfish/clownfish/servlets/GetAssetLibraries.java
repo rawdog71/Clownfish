@@ -66,7 +66,7 @@ public class GetAssetLibraries extends HttpServlet {
             String token = request.getParameter("token");
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = request.getParameter("apikey");
-                if (apikeyutil.checkApiKey(apikey, "GetAssetLibraries")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfAssetlist assetlist = null;
                     List<CfAssetlist> assetlistList = new ArrayList<>();
                     String assetlistid = request.getParameter("id");

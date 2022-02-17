@@ -111,6 +111,9 @@ public class DataList implements Serializable {
     
     public void onCreateContent(ActionEvent actionEvent) {
         try {
+            contentName = contentName.trim().replaceAll("\\s+", "_");
+            cflistService.findByName(contentName);
+        } catch (NoResultException ex) {
             CfList newlistcontent = new CfList();
             newlistcontent.setName(contentName);
             newlistcontent.setClassref(selectedClass);

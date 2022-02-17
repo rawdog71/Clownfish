@@ -82,7 +82,7 @@ public class InsertAsset extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             String apikey = request.getParameter("apikey");
-            if (apikeyutil.checkApiKey(apikey, "InsertAsset")) {
+            if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 boolean publicuse = ClownfishUtil.getBoolean(request.getParameter("publicuse"), false);
             
                 HashMap<String, String> metamap = new HashMap<>();

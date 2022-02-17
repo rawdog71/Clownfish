@@ -91,7 +91,7 @@ public class GetFilteredAssets extends HttpServlet {
             apikey = values[0];
         });
         inst_apikey = apikey;
-        if (apikeyutil.checkApiKey(inst_apikey, "GetFilteredAssets")) {
+        if (apikeyutil.checkApiKey(inst_apikey, "RestService")) {
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("assetlibrary") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 assetlibrary = values[0];
             });

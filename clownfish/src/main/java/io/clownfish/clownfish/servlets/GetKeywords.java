@@ -59,7 +59,7 @@ public class GetKeywords extends HttpServlet {
             String token = request.getParameter("token");
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = request.getParameter("apikey");
-                if (apikeyutil.checkApiKey(apikey, "GetKeywords")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     List<CfKeyword> keywordList = new ArrayList<>();
                     keywordList = cfkeywordService.findAll();
                     Gson gson = new Gson(); 

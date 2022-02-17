@@ -18,7 +18,6 @@ package io.clownfish.clownfish.rest;
 import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.RestDatalistParameter;
 import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
@@ -58,7 +57,7 @@ public class RestDatalist {
             String token = idp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = idp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "GetDatalist")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     if ((null == idp.getClassname()) || (idp.getClassname().isBlank())) {
                         idp.setList(cflistService.findAll());
                         idp.setReturncode("OK");
@@ -88,15 +87,15 @@ public class RestDatalist {
             String token = idp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = idp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "InsertDatalist")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
-                        CfList list = cflistService.findByName(idp.getListname());
+                        CfList list = cflistService.findByName(idp.getListname().trim().replaceAll("\\s+", "_"));
                         idp.setReturncode("Duplicate Datalistcontent");
                     } catch (javax.persistence.NoResultException ex) {
                         CfClass clazz = cfclassService.findByName(idp.getClassname());
 
                         CfList newlist = new CfList();
-                        newlist.setName(idp.getListname());
+                        newlist.setName(idp.getListname().trim().replaceAll("\\s+", "_"));
                         newlist.setClassref(clazz);
 
                         CfList newlist2 = cflistService.create(newlist);
@@ -125,7 +124,7 @@ public class RestDatalist {
             String token = idp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = idp.getApikey();
-                if (apikeyutil.checkApiKey(apikey, "InsertDatalist")) {
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
                         CfList list = cflistService.findByName(idp.getListname());
                         List<CfListcontent> listcontentList = cflistcontentService.findByListref(list.getId());

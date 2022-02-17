@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfLayoutcontent.findBySiteref", query = "SELECT c FROM CfLayoutcontent c WHERE c.cfLayoutcontentPK.siteref = :siteref"),
     @NamedQuery(name = "CfLayoutcontent.findBySiterefAndTemplateref", query = "SELECT c FROM CfLayoutcontent c WHERE c.cfLayoutcontentPK.siteref = :siteref AND c.cfLayoutcontentPK.divref = :templateref"),
     @NamedQuery(name = "CfLayoutcontent.findBySiterefAndTemplaterefAndContenttype", query = "SELECT c FROM CfLayoutcontent c WHERE c.cfLayoutcontentPK.siteref = :siteref AND c.cfLayoutcontentPK.divref = :templateref AND c.cfLayoutcontentPK.contenttype = :contenttype"),
+    @NamedQuery(name = "CfLayoutcontent.findBySiterefAndTemplaterefAndContenttypeAndLfdnr", query = "SELECT c FROM CfLayoutcontent c WHERE c.cfLayoutcontentPK.siteref = :siteref AND c.cfLayoutcontentPK.divref = :templateref AND c.cfLayoutcontentPK.contenttype = :contenttype AND c.cfLayoutcontentPK.lfdnr = :lfdnr"),
     @NamedQuery(name = "CfLayoutcontent.findByDivref", query = "SELECT c FROM CfLayoutcontent c WHERE c.cfLayoutcontentPK.divref = :divref"),
     @NamedQuery(name = "CfLayoutcontent.findByContenttype", query = "SELECT c FROM CfLayoutcontent c WHERE c.cfLayoutcontentPK.contenttype = :contenttype"),
     @NamedQuery(name = "CfLayoutcontent.findByLfdnr", query = "SELECT c FROM CfLayoutcontent c WHERE c.cfLayoutcontentPK.lfdnr = :lfdnr"),

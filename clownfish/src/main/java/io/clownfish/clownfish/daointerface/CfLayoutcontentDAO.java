@@ -27,6 +27,7 @@ public interface CfLayoutcontentDAO {
     List<CfLayoutcontent> findBySiteref(Long ref);
     List<CfLayoutcontent> findBySiterefAndTemplateref(Long ref, Long templateref);
     List<CfLayoutcontent> findBySiterefAndTemplaterefAndContenttype(Long ref, Long templateref, String contenttype);
+    CfLayoutcontent findBySiterefAndTemplaterefAndContenttypeAndLfdnr(Long siteref, Long templateref, String contenttype, int lfdnr);
     CfLayoutcontent create(CfLayoutcontent entity);
     boolean delete(CfLayoutcontent entity);
     CfLayoutcontent edit(CfLayoutcontent entity);
