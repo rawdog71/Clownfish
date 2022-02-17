@@ -660,17 +660,7 @@ INSERT INTO `cf_backend` (`id`, `name`) VALUES
 -- Daten für Tabelle `cf_webservice`
 --
 
-INSERT INTO `cf_webservice` (`id`, `name`) VALUES
-(1, 'BarcodeServlet'),
-(2, 'GetAsset'),
-(3, 'GetAssetData'),
-(4, 'GetAssetPreview'),
-(5, 'GetContent'),
-(6, 'GetContentData'),
-(7, 'GetFilteredAssets'),
-(8, 'GetSearchHistory'),
-(9, 'InsertContent'),
-(10, 'InsertAsset');
+INSERT INTO `cf_webservice` (`name`) VALUES ('BarcodeServlet');
 
 INSERT INTO `cf_user` (`id`, `vorname`, `nachname`, `email`, `passwort`, `salt`) VALUES
 (1, 'Admin', 'Istrator', 'admin', 'Ll66CGHeusR7eoQPejg8t3CKkpVdpm2IlN/dZif4aGE=', 'zm85UW0YCIyBCxOXTagQQYcezjLzIQ');
@@ -692,17 +682,6 @@ INSERT INTO `cf_userbackend` (`userref`, `backendref`) VALUES
 (1, 14),
 (1, 15),
 (1, 16);
-
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,1,'jt/TFHczpIkYVyAaOHODbHxMSkl3BTw7QuIbJ8sDZwA=');
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,2,'5omcWwYPuFXOv/WSdnmYgZv7vMJ3DNGkUH0NvfWpIKs=');
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,3,'Yj3zjM8039zkaOVQSOSMnC0yBiyN1QJ/6Rg9+JAEu+Y=');
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,4,'8O1XFPgfLeUG7ZZpZix0DQNjU+f+ZGGO5lLYlJYbUvM=');
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,5,'yg4xe4auehbqc2P4KtPyN6bVf4Ac46skKLzulnYDxkg=');
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,6,'QcMMQINDlmBkd9s1eGf4snpEpuh0efbxHNRTvo00RmU=');
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,7,'LCCg7qrIkpH0C3Ke21c6OT3smWp+/Fj3pQx894ywO3c=');
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,8,'/HXD6g4NltEmt8eqgWU7fSVcvNnj0p6uzFt6IRNEvjY=');
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,9,'iCLANmx6evKdk3D40ct7EG24tusD76yndBpdPCdsBt8=');
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,10,'VtKfOXVJRJwjsgR9AWDs29Xpyc6mepUjbVKMBLU2hek=');
 
 INSERT INTO `cf_site` (`id`, `name`, `templateref`, `parentref`, `stylesheetref`, `javascriptref`, `htmlcompression`, `characterencoding`, `contenttype`, `locale`, `aliaspath`, `gzip`, `title`, `job`, `description`, `staticsite`, `searchrelevant`) VALUES
 (1, 'root', 1, 0, NULL, NULL, 0, 'UTF-8', 'text/html', 'de', 'root', 0, 'Clownfish root', 0, 'Default root site', 0, 0),

@@ -15,11 +15,6 @@ ADD COLUMN `uploadtime` DATETIME NULL DEFAULT NULL AFTER `publicuse`;
 ALTER TABLE `clownfish`.`cf_user` 
 ADD COLUMN `assetref` BIGINT NULL DEFAULT NULL AFTER `salt`;
 
-INSERT INTO `cf_webservice` (`id`, `name`) VALUES (23, 'GetTemplates');
-
-INSERT INTO `clownfish`.`cf_webservice` (`id`, `name`) VALUES (24, 'RestService');
-
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,23,'+4XDcVioKyA2wrDCd1f2zH5vYZ5JnzvbK5pbtSGouTA=');
-INSERT INTO `cf_webserviceauth` (`user_ref`,`webservice_ref`,`hash`) VALUES (1,24,'+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=');
+INSERT INTO `clownfish`.`cf_webservice` (`name`) VALUES ('RestService');
 
 COMMIT;
