@@ -63,7 +63,7 @@ public class LoginBean implements Serializable {
     private @Getter @Setter String email;
     private @Getter @Setter String passwort;
     private @Getter @Setter CfUser cfuser;
-    private @Getter @Setter String apikey;
+    private @Getter @Setter String apikey = "";
     private @Getter @Setter List<CfBackend> userrights = null;
 
     public LoginBean() {
