@@ -324,7 +324,6 @@ public class Main extends SpringBootServletInitializer implements ServletContext
                             System.out.println("BOOTSTRAPPING UPDATE VERSION " + version);
                             System.out.println(ansi().reset());
                             JDBCUtil jdbcutil = new JDBCUtil(dbclass, dburl, dbuser, dbpassword);
-                            
                             ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), false, false);
                             runner.runScript(new BufferedReader(new FileReader(bootstrapfile)));
 

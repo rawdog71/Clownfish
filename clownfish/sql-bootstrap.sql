@@ -572,6 +572,9 @@ CREATE TABLE IF NOT EXISTS `cf_webservice` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+ALTER TABLE `clownfish`.`cf_webservice` 
+ADD UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE;
+
 -- --------------------------------------------------------
 
 --
@@ -615,14 +618,13 @@ INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
 ('mail_smtp_host', '', 1),
 ('mail_transport_protocol', 'smtp', 1),
 ('mail_user', '', 1),
-('folder_cache', '', 1),
-('folder_media', '', 1),
-('folder_static', '', 1),
-('folder_index', '', 1),
-('folder_icon', '', 1),
-('folder_pdf', '', 1),
-('folder_libs', '', 1),
-('folder_attachments', '', 1),
+('folder_cache', '#foldercache#', 1),
+('folder_media', '#foldermedia#', 1),
+('folder_static', '#folderstatic#', 1),
+('folder_index', '#folderindex#', 1),
+('folder_icon', '#foldericon#', 1),
+('folder_pdf', '#folderpdf#', 1),
+('folder_attachments', '#folderattachments#', 1),
 ('job_support', 'true', 1),
 ('lucene_searchlimit', '25', 1),
 ('response_characterencoding', 'UTF-8', 1),

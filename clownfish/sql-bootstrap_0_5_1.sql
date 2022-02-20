@@ -48,6 +48,6 @@ CREATE TABLE IF NOT EXISTS  `cf_maven` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `cf_property` (`hashkey`, `value`, `nodelete`) VALUES
-('folder_maven', '', 1);
+('folder_maven', '#foldermaven#', 1);
 
 COMMIT;
