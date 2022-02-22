@@ -32,6 +32,7 @@ import io.clownfish.clownfish.dbentities.CfKeywordlist;
 import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
 import io.clownfish.clownfish.dbentities.CfLayoutcontent;
 import io.clownfish.clownfish.dbentities.CfList;
+import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSiteassetlist;
 import io.clownfish.clownfish.dbentities.CfSiteassetlistPK;
@@ -66,6 +67,7 @@ import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfPropertyService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
@@ -219,6 +221,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfSitekeywordlistService cfsitekeywordlistService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
+    @Autowired transient CfListcontentService cflistcontentService;
     @Autowired transient CfKeywordlistcontentService cfkeywordlistcontentService;
     @Autowired transient CfKeywordService cfkeywordService;
     @Autowired transient CfListService cflistService;
@@ -246,6 +249,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter String previewContentOutput = "";
     private @Getter @Setter long previewAssetOutput = 0;
     private @Getter @Setter List<CfAsset> previewAssetlistOutput = new ArrayList<>();
+    private @Getter @Setter String previewDatalistOutput = "";
     private @Getter @Setter List<CfKeyword> previewKeywordlistOutput = new ArrayList<>();
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
@@ -1019,15 +1023,34 @@ public class SiteTreeBean implements Serializable {
      * @param event
      */
     public void onSelectLayoutDatalist(SelectEvent event) {
-        current_list = (CfList) event.getObject();
-        if (null != current_list) {
+        CfList selected_datalist = (CfList) event.getObject();
+        
+        previewDatalistOutput = "";
+        for (CfListcontent datalistcontent : cflistcontentService.findByListref(selected_datalist.getId())) {
+            
+            CfClasscontent cc = cfclasscontentService.findById(datalistcontent.getCfListcontentPK().getClasscontentref());
+            String template = templateUtility.getVersion(cc.getClassref().getTemplateref().getId(), cftemplateversionService.findMaxVersion(cc.getClassref().getTemplateref().getId()));
+            
+            if (null != cc) {
+                attributcontentlist = cfattributcontentService.findByClasscontentref(cc);
+                //String output = cc.getClassref().getTemplateref().getContent();
+                for (CfAttributcontent attributcontent : attributcontentlist) {
+                    template = template.replaceAll("#" + attributcontent.getAttributref().getName() + "#", attributcontent.toString());
+                }
+                previewDatalistOutput += template;
+            }
+        }
+    }
+    
+    public void onSaveLayoutDatalist(CfList datalist) {
+        if (null != datalist) {
             if (null == current_layoutcontent) {
                 String[] datalistinfos = selected_datalisttclass.split(":");
                 int lfdnr = Integer.parseInt(datalistinfos[1]);
                 current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "DL", lfdnr);
                 current_layoutcontent.setContentref(BigInteger.ZERO);
             }
-            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(current_list.getId()));
+            current_layoutcontent.setPreview_contentref(BigInteger.valueOf(datalist.getId()));
             try {
                 cflayoutcontentService.create(current_layoutcontent);
             } catch (Exception ex) {
