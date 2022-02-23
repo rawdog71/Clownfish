@@ -185,7 +185,7 @@ public class ClassUtil implements Serializable {
         StringBuilder sb = new StringBuilder();
         switch (language) {
             case JAVA:
-                sb.append("package io.clownfish.java;\n").append("\n");
+                sb.append("package io.clownfish.java;\n\n");
                 sb.append("import java.util.Date;\n");
                 sb.append("import java.util.Map;\n");
                 sb.append("import java.util.HashMap;\n\n");
@@ -240,10 +240,13 @@ public class ClassUtil implements Serializable {
                 
                 break;
             case KOTLIN:
+                sb.append("package io.clownfish.kotlin;\n\n");
                 break;
             case GROOVY:
+                sb.append("package io.clownfish.groovy;\n\n");
                 break;
             case SCALA:
+                sb.append("package io.clownfish.scala;\n\n");
                 break;
         }
     }

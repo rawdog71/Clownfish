@@ -87,6 +87,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean newAttributButtonDisabled;
     private @Getter @Setter boolean renderClass;
     @Autowired HibernateUtil hibernateUtil;
+    private @Getter @Setter int javaLanguage = 0;
     
     @Autowired transient private @Getter @Setter AttributList attributlist;
     final transient Logger LOGGER = LoggerFactory.getLogger(ClassList.class);
@@ -258,7 +259,7 @@ public class ClassList implements Serializable {
     
     public void onGenerateJVMClass(ActionEvent actionEvent) {
         if (null != selectedClass) {
-            classutil.generateJVMClass(selectedClass, JVMLanguages.JAVA);
+            classutil.generateJVMClass(selectedClass, JVMLanguages.valueOf(javaLanguage));
             FacesMessage message = new FacesMessage("JVM class generated");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }

@@ -45,6 +45,10 @@ public enum JVMLanguages {
         this.compiler = compilerOfLanguage;
         this.result = resultOfLanguage;
     }
+    
+    public static JVMLanguages valueOf(int val) {
+        return JVMLanguages.stream().filter(v -> v.getId() == val).findFirst().get();
+    }
 	
     public static Stream<JVMLanguages> stream() {
         return Stream.of(JVMLanguages.values()); 
