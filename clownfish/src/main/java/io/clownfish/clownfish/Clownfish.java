@@ -1874,6 +1874,7 @@ public class Clownfish {
                     }
                     break;
                 default:                                            // HTML
+                    out.append(templatecontent);
             }
             return out.toString();
         } catch (MalformedTemplateNameException ex) {

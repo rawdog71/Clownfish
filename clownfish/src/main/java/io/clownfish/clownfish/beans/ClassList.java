@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.compiler.JVMLanguages;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
@@ -27,6 +28,7 @@ import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.Serializable;
 import java.util.List;
@@ -63,6 +65,7 @@ public class ClassList implements Serializable {
     @Autowired transient CfTemplateService cftemplateService;
     @Autowired DataList datalist;
     @Autowired ContentList contentlist;
+    @Autowired ClassUtil classutil;
     
     private @Getter @Setter List<CfClass> classListe;
     private @Getter @Setter CfClass selectedClass = null;
@@ -249,6 +252,14 @@ public class ClassList implements Serializable {
         if (null != selectedClass) {
             HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
             FacesMessage message = new FacesMessage("Datamodel recreated");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public void onGenerateJVMClass(ActionEvent actionEvent) {
+        if (null != selectedClass) {
+            classutil.generateJVMClass(selectedClass, JVMLanguages.JAVA);
+            FacesMessage message = new FacesMessage("JVM class generated");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }

@@ -15,13 +15,17 @@
  */
 package io.clownfish.clownfish.utils;
 
+import io.clownfish.clownfish.beans.JavaList;
+import io.clownfish.clownfish.compiler.JVMLanguages;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
+import io.clownfish.clownfish.dbentities.CfJava;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
@@ -30,13 +34,19 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfJavaService;
+import io.clownfish.clownfish.serviceinterface.CfJavaversionService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -57,7 +67,13 @@ public class ClassUtil implements Serializable {
     @Autowired CfKeywordService cfkeywordService;
     @Autowired CfAssetlistcontentService cfassetlistcontentService;
     @Autowired CfAssetService cfassetService;
+    @Autowired CfJavaService cfjavaService;
+    @Autowired CfJavaversionService cfjavaversionService;
+    @Autowired JavaUtil javaUtility;
     @Autowired MarkdownUtil markdownUtil;
+    @Autowired JavaList javalist;
+    
+    final transient Logger LOGGER = LoggerFactory.getLogger(ClassUtil.class);
     
     public ClassUtil() {
     }
@@ -161,5 +177,98 @@ public class ClassUtil implements Serializable {
         }
         
         return attributcontentmap;
+    }
+    
+    public void generateJVMClass(CfClass clazz, JVMLanguages language) {
+        List<CfAttribut> attributllist =  cfattributService.findByClassref(clazz);
+        String output = "";
+        StringBuilder sb = new StringBuilder();
+        switch (language) {
+            case JAVA:
+                sb.append("package io.clownfish.java;\n").append("\n");
+                sb.append("import java.util.Date;\n");
+                sb.append("import java.util.Map;\n");
+                sb.append("import java.util.HashMap;\n\n");
+                sb.append("public class ").append(clazz.getName()).append("Class {\n");
+                sb.append("\tprivate HashMap<String, Object> ").append(clazz.getName().toLowerCase()).append(";\n\n");
+                
+                sb.append("\tpublic void set").append(clazz.getName()).append("(Map<String, Object> ").append(clazz.getName().toLowerCase()).append(") {\n");
+
+                sb.append("\t\tthis.").append(clazz.getName().toLowerCase()).append(" = new HashMap<String, Object>(").append(clazz.getName().toLowerCase()).append(");\n");
+                
+                sb.append("\t}\n");
+                sb.append("\n");
+                for (CfAttribut attribut : attributllist) {
+                    String type = getAttributeJVMType(attribut);
+                    sb.append("\tpublic ").append(type).append(" get").append(attribut.getName().toUpperCase().charAt(0)).append(attribut.getName().substring(1)).append("() {\n");
+                    sb.append("\t\treturn (").append(type).append(") ").append(clazz.getName().toLowerCase()).append(".get(\"").append(attribut.getName()).append("\");\n");
+                    sb.append("\t}\n\n");
+                    sb.append("\tpublic void set").append(attribut.getName().toUpperCase().charAt(0)).append(attribut.getName().substring(1)).append("(").append(type).append(" ").append(attribut.getName()).append(") {\n");
+                    sb.append("\t\tthis.").append(clazz.getName().toLowerCase()).append(".put(\"").append(attribut.getName()).append("\", ").append(attribut.getName()).append(");\n");
+                    sb.append("\t}\n\n");
+                }
+                sb.append("}\n");
+                
+                try {
+                    CfJava java = cfjavaService.findByName(clazz.getName()+"Class");
+                    try {
+                        long maxversion = cfjavaversionService.findMaxVersion(java.getId());
+                        javaUtility.setCurrentVersion(maxversion + 1);
+                        byte[] joutput = CompressionUtils.compress(sb.toString().getBytes(StandardCharsets.UTF_8));
+
+                        javalist.writeVersion(java.getId(), javaUtility.getCurrentVersion(), joutput);
+                        java.setContent(sb.toString());
+                        cfjavaService.edit(java);
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                } catch (javax.persistence.NoResultException nrex) {
+                    try {
+                        CfJava newjava = new CfJava();
+                        newjava.setName(clazz.getName()+"Class");
+                        newjava.setLanguage(language.getId());
+                        newjava.setContent(sb.toString());
+                        cfjavaService.create(newjava);
+
+                        byte[] joutput = CompressionUtils.compress(sb.toString().getBytes(StandardCharsets.UTF_8));
+                        javalist.writeVersion(newjava.getId(), 1, joutput);
+                        javaUtility.setCurrentVersion(1);
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                }
+                
+                break;
+            case KOTLIN:
+                break;
+            case GROOVY:
+                break;
+            case SCALA:
+                break;
+        }
+    }
+    
+    private String getAttributeJVMType(CfAttribut attribut) {
+        switch (attribut.getAttributetype().getName()) {
+            case "boolean":
+                return "boolean";
+            case "string":
+            case "htmltext":
+            case "hashstring":
+            case "markdown":
+            case "text":
+                return "String";
+            case "integer":
+            case "media":
+            case "classref":
+            case "assetref":
+                return "long";
+            case "real":
+                return "double";
+            case "datetime":
+                return "Date";
+            default:
+                return "";
+        }
     }
 }

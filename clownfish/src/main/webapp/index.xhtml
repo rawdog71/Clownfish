@@ -916,6 +916,13 @@
                                 <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                         </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="generatejvmclass" process="form" value="Generate JVM Class" actionListener="#{classList.onGenerateJVMClass(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+                                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                <f:actionListener binding="#{javaList.refresh()}" />
+                            </p:commandButton>
+                        </div>
                     </div>
 
                     <p:dataTable id="attributlist" size="small" var="attribut" value="#{classList.selectedAttributList}" selectionMode="single" selection="#{classList.selectedAttribut}" rowKey="#{attribut.id}">
