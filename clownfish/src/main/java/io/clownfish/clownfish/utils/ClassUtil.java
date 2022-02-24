@@ -290,6 +290,59 @@ public class ClassUtil implements Serializable {
                 break;
             case GROOVY:
                 sb.append("package io.clownfish.groovy;\n\n");
+                sb.append("import java.util.Date;\n");
+                sb.append("import java.util.Map;\n");
+                sb.append("import java.util.HashMap;\n\n");
+                sb.append("public class ").append(clazz.getName()).append("ClassGroovy {\n");
+                sb.append("\tprivate HashMap<String, Object> ").append(clazz.getName().toLowerCase()).append(";\n\n");
+                
+                sb.append("\tdef void set").append(clazz.getName()).append("(Map<String, Object> ").append(clazz.getName().toLowerCase()).append(") {\n");
+
+                sb.append("\t\tthis.").append(clazz.getName().toLowerCase()).append(" = new HashMap<String, Object>(").append(clazz.getName().toLowerCase()).append(");\n");
+                
+                sb.append("\t}\n\n");
+                for (CfAttribut attribut : attributllist) {
+                    String type = getAttributeJVMType(attribut, language);
+                    sb.append("\tdef ").append(type).append(" get").append(attribut.getName().toUpperCase().charAt(0)).append(attribut.getName().substring(1)).append("() {\n");
+                    sb.append("\t\treturn (").append(type).append(") ").append(clazz.getName().toLowerCase()).append(".get(\"").append(attribut.getName()).append("\");\n");
+                    sb.append("\t}\n\n");
+                    /*
+                    sb.append("\tpublic void set").append(attribut.getName().toUpperCase().charAt(0)).append(attribut.getName().substring(1)).append("(").append(type).append(" ").append(attribut.getName()).append(") {\n");
+                    sb.append("\t\tthis.").append(clazz.getName().toLowerCase()).append(".put(\"").append(attribut.getName()).append("\", ").append(attribut.getName()).append(");\n");
+                    sb.append("\t}\n\n");
+                    */
+                }
+                sb.append("}\n");
+                
+                try {
+                    CfJava java = cfjavaService.findByName(clazz.getName()+"ClassGroovy");
+                    try {
+                        long maxversion = cfjavaversionService.findMaxVersion(java.getId());
+                        javaUtility.setCurrentVersion(maxversion + 1);
+                        byte[] joutput = CompressionUtils.compress(sb.toString().getBytes(StandardCharsets.UTF_8));
+
+                        javalist.writeVersion(java.getId(), javaUtility.getCurrentVersion(), joutput);
+                        java.setContent(sb.toString());
+                        cfjavaService.edit(java);
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                } catch (javax.persistence.NoResultException nrex) {
+                    try {
+                        CfJava newjava = new CfJava();
+                        newjava.setName(clazz.getName()+"ClassGroovy");
+                        newjava.setLanguage(language.getId());
+                        newjava.setContent(sb.toString());
+                        cfjavaService.create(newjava);
+
+                        byte[] joutput = CompressionUtils.compress(sb.toString().getBytes(StandardCharsets.UTF_8));
+                        javalist.writeVersion(newjava.getId(), 1, joutput);
+                        javaUtility.setCurrentVersion(1);
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                }
+                
                 break;
             case SCALA:
                 sb.append("package io.clownfish.scala;\n\n");
@@ -322,6 +375,7 @@ public class ClassUtil implements Serializable {
                         return "";
                 }
             case KOTLIN:
+            case GROOVY:
                 switch (attribut.getAttributetype().getName()) {
                     case "boolean":
                         return "boolean";
