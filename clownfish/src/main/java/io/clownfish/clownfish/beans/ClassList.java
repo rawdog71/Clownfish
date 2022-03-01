@@ -42,6 +42,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.Setter;
+import org.codehaus.plexus.util.StringUtils;
 import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,6 +166,7 @@ public class ClassList implements Serializable {
     public void onCreate(ActionEvent actionEvent) {
         try {
             className = className.trim().replaceAll("\\s+", "_");
+            StringUtils.capitalise(className);
             CfClass newclass = new CfClass();
             newclass.setName(className);
             newclass.setSearchrelevant(classSearchrelevant);
