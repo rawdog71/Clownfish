@@ -345,7 +345,49 @@ public class ClassUtil implements Serializable {
                 
                 break;
             case SCALA:
-                sb.append("package io.clownfish.scala;\n\n");
+                sb.append("package io.clownfish.scala\n\n");
+                sb.append("import java.util.Date\n");
+                sb.append("import java.util.Map\n");
+                sb.append("import java.util.HashMap\n\n");
+                sb.append("class ").append(clazz.getName()).append("ClassScala(var ").append(clazz.getName().toLowerCase()).append(": HashMap[String, Object])\n");
+                sb.append("{\n");
+                sb.append("\tdef this() = this(").append(clazz.getName().toLowerCase()).append(" = new HashMap[String, Object]())\n\n");
+                sb.append("\tdef set").append(clazz.getName()).append("(new").append(clazz.getName().toLowerCase()).append(": Map[String, Object]) = { ").append(clazz.getName().toLowerCase()).append(" = new HashMap[String, Object](new").append(clazz.getName().toLowerCase()).append(") }\n\n");
+                for (CfAttribut attribut : attributllist) {
+                    String type = getAttributeJVMType(attribut, language);
+                    sb.append("\tdef get").append(attribut.getName().toUpperCase().charAt(0)).append(attribut.getName().substring(1)).append("(): ").append(type).append(" = ").append(clazz.getName().toLowerCase()).append(".get(\"").append(attribut.getName()).append("\").asInstanceOf[").append(type).append("]\n\n");
+                }
+                sb.append("}\n");
+                
+                try {
+                    CfJava java = cfjavaService.findByName(clazz.getName()+"ClassScala");
+                    try {
+                        long maxversion = cfjavaversionService.findMaxVersion(java.getId());
+                        javaUtility.setCurrentVersion(maxversion + 1);
+                        byte[] joutput = CompressionUtils.compress(sb.toString().getBytes(StandardCharsets.UTF_8));
+
+                        javalist.writeVersion(java.getId(), javaUtility.getCurrentVersion(), joutput);
+                        java.setContent(sb.toString());
+                        cfjavaService.edit(java);
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                } catch (javax.persistence.NoResultException nrex) {
+                    try {
+                        CfJava newjava = new CfJava();
+                        newjava.setName(clazz.getName()+"ClassScala");
+                        newjava.setLanguage(language.getId());
+                        newjava.setContent(sb.toString());
+                        cfjavaService.create(newjava);
+
+                        byte[] joutput = CompressionUtils.compress(sb.toString().getBytes(StandardCharsets.UTF_8));
+                        javalist.writeVersion(newjava.getId(), 1, joutput);
+                        javaUtility.setCurrentVersion(1);
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                }
+                
                 break;
         }
     }
@@ -379,6 +421,28 @@ public class ClassUtil implements Serializable {
                 switch (attribut.getAttributetype().getName()) {
                     case "boolean":
                         return "boolean";
+                    case "string":
+                    case "htmltext":
+                    case "hashstring":
+                    case "markdown":
+                    case "text":
+                        return "String";
+                    case "integer":
+                    case "media":
+                    case "classref":
+                    case "assetref":
+                        return "Long";
+                    case "real":
+                        return "Double";
+                    case "datetime":
+                        return "Date";
+                    default:
+                        return "";
+                }
+            case SCALA:
+                switch (attribut.getAttributetype().getName()) {
+                    case "boolean":
+                        return "Boolean";
                     case "string":
                     case "htmltext":
                     case "hashstring":
