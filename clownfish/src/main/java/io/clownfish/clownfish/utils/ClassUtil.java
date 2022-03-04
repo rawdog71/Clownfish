@@ -15,8 +15,10 @@
  */
 package io.clownfish.clownfish.utils;
 
+import com.google.gson.Gson;
 import io.clownfish.clownfish.beans.JavaList;
 import io.clownfish.clownfish.compiler.JVMLanguages;
+import io.clownfish.clownfish.datamodels.RestContentParameter;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.dbentities.CfAttribut;
@@ -177,6 +179,79 @@ public class ClassUtil implements Serializable {
         }
         
         return attributcontentmap;
+    }
+    
+    public String jsonExport(CfClasscontent classcontent, List<CfAttributcontent> attributcontentlist) {
+        RestContentParameter contentparameter = new RestContentParameter();
+        contentparameter.setClassname(classcontent.getClassref().getName());
+        contentparameter.setContentname(classcontent.getName());
+        for (CfAttributcontent attributcontent : attributcontentlist) {
+            switch (attributcontent.getAttributref().getAttributetype().getName()) {
+                case "boolean":
+                    if (null != attributcontent.getContentBoolean()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentBoolean().toString());
+                    }
+                    break;
+                case "string":
+                    if (null != attributcontent.getContentString()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentString());
+                    }
+                    break;
+                case "hashstring":
+                    if (null != attributcontent.getContentString()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentString());
+                    }
+                    break;    
+                case "integer":
+                    if (null != attributcontent.getContentInteger()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                    }
+                    break;
+                case "real":
+                    if (null != attributcontent.getContentReal()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentReal().toString());
+                    }
+                    break;
+                case "htmltext":
+                    if (null != attributcontent.getContentText()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    }
+                    break;    
+                case "text":
+                    if (null != attributcontent.getContentText()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    }
+                    break;
+                case "markdown":
+                    if (null != attributcontent.getContentText()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
+                    }
+                    break;    
+                case "datetime":
+                    if (null != attributcontent.getContentDate()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentDate().toString());
+                    }
+                    break;
+                case "media":
+                    if (null != attributcontent.getContentInteger()) {
+                        CfAsset asset = cfassetService.findById(attributcontent.getContentInteger().longValue());
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), asset.getName());
+                    }
+                    break;
+                case "classref":
+                    if (null != attributcontent.getClasscontentref()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getClasscontentref().getName());
+                    }
+                    break;
+                case "assetref":
+                    if (null != attributcontent.getAssetcontentlistref()) {
+                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getAssetcontentlistref().getName());
+                    }
+                    break;    
+            }
+        }
+        Gson gson = new Gson();
+        return gson.toJson(contentparameter);
     }
     
     public void generateJVMClass(CfClass clazz, JVMLanguages language) {

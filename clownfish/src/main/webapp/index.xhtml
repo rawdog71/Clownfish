@@ -1068,6 +1068,21 @@
                                     <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                             </div>
+                            
+                            <div class="flex align-items-center pr-2">
+                                <p:commandButton id="checkincontent" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{classcontentList.checkedout}" actionListener="#{classcontentList.onCheckIn}"  update=":form:msgs :form:tabview:templateversion :form:tabview:contentbtnpanel :form:tabview:edittemplate" />
+                            </div>
+                            <div class="flex align-items-center pr-2">
+                                <p:commandButton id="checkoutcontent" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!classcontentList.checkedout and classcontentList.access}" actionListener="#{classcontentList.onCheckOut}" update=":form:msgs :form:tabview:templateversion :form:tabview:contentbtnpanel :form:tabview:edittemplatepanel" />
+                            </div>
+                            <div class="flex align-items-center pr-2">
+                                <p:commandButton id="commitcontent" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{!classcontentList.checkedout and classcontentList.access and classcontentList.difference}" actionListener="#{classcontentList.onCommit}" update=":form:msgs :form:tabview:templateversion :form:tabview:contentbtnpanel :form:tabview:selectedtemplateversion">
+                                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            
+                            <p:outputLabel> Version </p:outputLabel><p:outputLabel id="contentversion">#{classcontentList.contentUtility.currentVersion}</p:outputLabel>
+                            
                         </div>
                     </p:panel>
                     
@@ -1110,7 +1125,7 @@
                                     </p:selectOneMenu>
 
                                     <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
-                                    <p:commandButton id="editattribut" icon="pi pi-pencil" process="form" value="Change" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent)}" >
+                                    <p:commandButton id="editattribut" icon="pi pi-pencil" process="form" value="Change" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.checkedout}" >
 
                                     </p:commandButton>
                                     <p:focus for="attributvalueString" />

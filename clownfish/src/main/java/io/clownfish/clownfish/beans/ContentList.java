@@ -15,9 +15,7 @@
  */
 package io.clownfish.clownfish.beans;
 
-import com.google.gson.Gson;
 import com.hazelcast.spring.cache.HazelcastCacheManager;
-import io.clownfish.clownfish.datamodels.RestContentParameter;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttribut;
@@ -25,6 +23,8 @@ import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
+import io.clownfish.clownfish.dbentities.CfContentversion;
+import io.clownfish.clownfish.dbentities.CfContentversionPK;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.lucene.ContentIndexer;
@@ -36,10 +36,15 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
+import io.clownfish.clownfish.utils.CheckoutUtil;
+import io.clownfish.clownfish.utils.ClassUtil;
+import io.clownfish.clownfish.utils.CompressionUtils;
+import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
@@ -56,6 +61,8 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.io.IOException;
+import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
@@ -79,6 +86,8 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 @Component
 public class ContentList implements Serializable {
+    @Inject
+    LoginBean loginbean;
     @Autowired transient CfClassService cfclassService;
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
@@ -94,6 +103,9 @@ public class ContentList implements Serializable {
     @Autowired ContentIndexer contentIndexer;
     @Autowired FolderUtil folderUtil;
     @Autowired HibernateUtil hibernateUtil;
+    @Autowired private @Getter @Setter ContentUtil contentUtility;
+    @Autowired private @Getter @Setter CfContentversionService cfcontentversionService;
+    @Autowired ClassUtil classutil;
     
     @Autowired private HazelcastCacheManager cacheManager;
     
@@ -140,6 +152,14 @@ public class ContentList implements Serializable {
     private @Getter @Setter List<CfAsset> assetlist;
     private @Getter @Setter String contentJson;
     private @Getter @Setter EditorOptions editorOptions;
+    private @Getter @Setter boolean difference;
+    private @Getter @Setter long selectedcontentversion = 0;
+    private @Getter @Setter long contentversionMin = 0;
+    private @Getter @Setter long contentversionMax = 0;
+    private @Getter @Setter boolean checkedout;
+    private @Getter @Setter boolean access;
+    private @Getter @Setter CfContentversion version = null;
+    private @Getter @Setter List<CfContentversion> versionlist;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ContentList.class);
 
@@ -198,6 +218,17 @@ public class ContentList implements Serializable {
             keywords.getTarget().add(kw);
             keywords.getSource().remove(kw);
         }
+        
+        versionlist = cfcontentversionService.findByContentref(selectedContent.getId());
+        difference = contentUtility.hasDifference(selectedContent);
+        BigInteger co = selectedContent.getCheckedoutby();
+        CheckoutUtil checkoutUtil = new CheckoutUtil();
+        checkoutUtil.getCheckoutAccess(co, loginbean);
+        checkedout = checkoutUtil.isCheckedout();
+        access = checkoutUtil.isAccess();
+        contentversionMin = 1;
+        contentversionMax = versionlist.size();
+        selectedcontentversion = contentversionMax;
     }
     
     public void onSelectAttribut(SelectEvent event) {
@@ -484,75 +515,121 @@ public class ContentList implements Serializable {
     }
     
     public void jsonExport() {
-        RestContentParameter contentparameter = new RestContentParameter();
-        contentparameter.setClassname(selectedContent.getClassref().getName());
-        contentparameter.setContentname(selectedContent.getName());
-        for (CfAttributcontent attributcontent : attributcontentlist) {
-            switch (attributcontent.getAttributref().getAttributetype().getName()) {
-                case "boolean":
-                    if (null != attributcontent.getContentBoolean()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentBoolean().toString());
-                    }
-                    break;
-                case "string":
-                    if (null != attributcontent.getContentString()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentString());
-                    }
-                    break;
-                case "hashstring":
-                    if (null != attributcontent.getContentString()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentString());
-                    }
-                    break;    
-                case "integer":
-                    if (null != attributcontent.getContentInteger()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
-                    }
-                    break;
-                case "real":
-                    if (null != attributcontent.getContentReal()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentReal().toString());
-                    }
-                    break;
-                case "htmltext":
-                    if (null != attributcontent.getContentText()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
-                    }
-                    break;    
-                case "text":
-                    if (null != attributcontent.getContentText()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
-                    }
-                    break;
-                case "markdown":
-                    if (null != attributcontent.getContentText()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
-                    }
-                    break;    
-                case "datetime":
-                    if (null != attributcontent.getContentDate()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentDate().toString());
-                    }
-                    break;
-                case "media":
-                    if (null != attributcontent.getContentInteger()) {
-                        CfAsset asset = cfassetService.findById(attributcontent.getContentInteger().longValue());
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), asset.getName());
-                    }
-                    break;
-                case "classref":
-                    if (null != attributcontent.getClasscontentref()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getClasscontentref().getName());
-                    }
-                    break;
-                case "assetref":
-                    if (null != attributcontent.getAssetcontentlistref()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getAssetcontentlistref().getName());
-                    }
-                    break;    
+        contentJson = classutil.jsonExport(selectedContent, attributcontentlist);
+    }
+
+    public String getContent() {
+        if (null != selectedContent) {
+            if (selectedcontentversion != contentversionMax) {
+                return contentUtility.getVersion(selectedContent.getId(), selectedcontentversion);
+            } else {
+                contentUtility.setContent(classutil.jsonExport(selectedContent, attributcontentlist));
+                return contentUtility.getContent();
+            }
+        } else {
+            return "";
+        }
+    }
+    
+    public void onCheckOut(ActionEvent actionEvent) {
+        if (null != selectedContent) {
+            boolean canCheckout = false;
+            CfClasscontent checkcontent = cfclasscontentService.findById(selectedContent.getId());
+            BigInteger co = checkcontent.getCheckedoutby();
+            if (null != co) {
+                if (co.longValue() == 0) {
+                    canCheckout = true;
+                } 
+            } else {
+                canCheckout = true;
+            }
+                    
+            if (canCheckout) {
+                selectedContent.setCheckedoutby(BigInteger.valueOf(loginbean.getCfuser().getId()));
+                
+                //selectedContent.setContent(getContent());
+                cfclasscontentService.edit(selectedContent);
+                difference = contentUtility.hasDifference(selectedContent);
+                checkedout = true;
+                //showDiff = false;
+
+                FacesMessage message = new FacesMessage("Checked Out " + selectedContent.getName());
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            } else {
+                access = false;
+                FacesMessage message = new FacesMessage("could not Checked Out " + selectedContent.getName());
+                FacesContext.getCurrentInstance().addMessage(null, message);
             }
         }
-        Gson gson = new Gson();
-        contentJson = gson.toJson(contentparameter);
+    }
+    
+    public void onCheckIn(ActionEvent actionEvent) {
+        if (null != selectedContent) {
+            selectedContent.setCheckedoutby(BigInteger.valueOf(0));
+            //selectedContent.setContent(getContent());
+            cfclasscontentService.edit(selectedContent);
+            difference = contentUtility.hasDifference(selectedContent);
+            checkedout = false;
+            
+            FacesMessage message = new FacesMessage("Checked Out " + selectedContent.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public void onCommit(ActionEvent actionEvent) {
+        if (null != selectedContent) {
+            boolean canCommit = false;
+            
+            if (contentUtility.hasDifference(selectedContent)) {
+                canCommit = true;
+            }
+            if (canCommit) {
+                try {
+                    String content = getContent();
+                    byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
+                    try {
+                        long maxversion = cfcontentversionService.findMaxVersion(selectedContent.getId());
+                        contentUtility.setCurrentVersion(maxversion + 1);
+                        writeVersion(selectedContent.getId(), contentUtility.getCurrentVersion(), output);
+                        difference = contentUtility.hasDifference(selectedContent);
+                        this.contentversionMax = contentUtility.getCurrentVersion();
+                        this.selectedcontentversion = this.contentversionMax;
+                        //refresh();
+                        
+                        FacesMessage message = new FacesMessage("Commited " + selectedContent.getName() + " Version: " + (maxversion + 1));
+                        FacesContext.getCurrentInstance().addMessage(null, message);
+                    } catch (NullPointerException npe) {
+                        writeVersion(selectedContent.getId(), 1, output);
+                        contentUtility.setCurrentVersion(1);
+                        difference = contentUtility.hasDifference(selectedContent);
+                        //refresh();
+
+                        FacesMessage message = new FacesMessage("Commited " + selectedContent.getName() + " Version: " + 1);
+                        FacesContext.getCurrentInstance().addMessage(null, message);
+                    }
+                } catch (IOException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+            } else {
+                difference = contentUtility.hasDifference(selectedContent);
+                access = true;
+
+                FacesMessage message = new FacesMessage("Could not commit " + selectedContent.getName() + " Version: " + 1);
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
+        }
+    }
+    
+    public void writeVersion(long ref, long version, byte[] content) {
+        CfContentversionPK contentversionpk = new CfContentversionPK();
+        contentversionpk.setContentref(ref);
+        contentversionpk.setVersion(version);
+
+        CfContentversion cfcontentversion = new CfContentversion();
+        cfcontentversion.setCfContentversionPK(contentversionpk);
+        cfcontentversion.setContent(content);
+        cfcontentversion.setTstamp(new Date());
+        cfcontentversion.setCommitedby(BigInteger.valueOf(loginbean.getCfuser().getId()));
+        cfcontentversionService.create(cfcontentversion);
     }
 }

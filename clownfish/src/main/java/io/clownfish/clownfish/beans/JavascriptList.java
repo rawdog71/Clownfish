@@ -348,6 +348,7 @@ public class JavascriptList implements ISourceContentInterface {
         cfjavascriptversion.setCfJavascriptversionPK(javascriptversionpk);
         cfjavascriptversion.setContent(content);
         cfjavascriptversion.setTstamp(new Date());
+        cfjavascriptversion.setCommitedby(BigInteger.valueOf(loginbean.getCfuser().getId()));
         cfjavascriptversionService.create(cfjavascriptversion);
     }
     

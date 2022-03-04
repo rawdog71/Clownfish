@@ -417,11 +417,12 @@ public class JavaList implements ISourceContentInterface
         javaversionpk.setJavaref(javaref);
         javaversionpk.setVersion(version);
 
-        CfJavaversion CfJavaversion = new CfJavaversion();
-        CfJavaversion.setCfJavaversionPK(javaversionpk);
-        CfJavaversion.setContent(content);
-        CfJavaversion.setTstamp(new Date());
-        cfjavaversionService.create(CfJavaversion);
+        CfJavaversion cfjavaversion = new CfJavaversion();
+        cfjavaversion.setCfJavaversionPK(javaversionpk);
+        cfjavaversion.setContent(content);
+        cfjavaversion.setTstamp(new Date());
+        cfjavaversion.setCommitedby(BigInteger.valueOf(loginbean.getCfuser().getId()));
+        cfjavaversionService.create(cfjavaversion);
     }
 
     @Override

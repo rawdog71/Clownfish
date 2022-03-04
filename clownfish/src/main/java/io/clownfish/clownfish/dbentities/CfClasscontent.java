@@ -29,6 +29,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -65,6 +66,8 @@ public class CfClasscontent implements Serializable {
     private String name;
     @Column(name = "scrapped")
     private boolean scrapped;
+    @Column(name = "checkedoutby")
+    private BigInteger checkedoutby;
 
     public CfClasscontent() {
     }
@@ -109,6 +112,14 @@ public class CfClasscontent implements Serializable {
 
     public void setScrapped(boolean scrapped) {
         this.scrapped = scrapped;
+    }
+
+    public BigInteger getCheckedoutby() {
+        return checkedoutby;
+    }
+
+    public void setCheckedoutby(BigInteger checkedoutby) {
+        this.checkedoutby = checkedoutby;
     }
 
     @Override

@@ -348,6 +348,7 @@ public class StylesheetList implements ISourceContentInterface {
         cfstylesheetversion.setCfStylesheetversionPK(stylesheetversionpk);
         cfstylesheetversion.setContent(content);
         cfstylesheetversion.setTstamp(new Date());
+        cfstylesheetversion.setCommitedby(BigInteger.valueOf(loginbean.getCfuser().getId()));
         cfstylesheetversionService.create(cfstylesheetversion);
     }
     

@@ -23,6 +23,8 @@ import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
+import io.clownfish.clownfish.dbentities.CfContentversion;
+import io.clownfish.clownfish.dbentities.CfContentversionPK;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
@@ -33,13 +35,19 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.zip.DataFormatException;
+import lombok.Getter;
+import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -54,7 +62,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Component
-public class ContentUtil {
+public class ContentUtil implements IVersioningInterface {
     @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
@@ -67,6 +75,10 @@ public class ContentUtil {
     @Autowired FolderUtil folderUtil;
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
+    @Autowired transient CfContentversionService cfcontentversionService;
+    @Autowired ClassUtil classUtil;
+    private @Getter @Setter long currentVersion;
+    private @Getter @Setter String content = "";
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentUtil.class);
     
     public AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent) {
@@ -291,5 +303,56 @@ public class ContentUtil {
             contentindexer_thread.start();
             LOGGER.info("CONTENTINDEXER RUN");
         }
+    }
+
+    @Override
+    public String getVersion(long ref, long version) {
+        try {
+            CfContentversion contentversion = cfcontentversionService.findByPK(ref, version);
+            byte[] decompress = CompressionUtils.decompress(contentversion.getContent());
+            return new String(decompress, StandardCharsets.UTF_8);
+        } catch (IOException | DataFormatException ex) {
+            LOGGER.error(ex.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public void writeVersion(long ref, long version, byte[] content, long userid) {
+        CfContentversionPK contentversionpk = new CfContentversionPK();
+        contentversionpk.setContentref(ref);
+        contentversionpk.setVersion(version);
+
+        CfContentversion cfcontentversion = new CfContentversion();
+        cfcontentversion.setCfContentversionPK(contentversionpk);
+        cfcontentversion.setContent(content);
+        cfcontentversion.setTstamp(new Date());
+        cfcontentversion.setCommitedby(BigInteger.valueOf(userid));
+        cfcontentversionService.create(cfcontentversion);
+    }
+
+    @Override
+    public long getCurrentVersionNumber(String name) {
+        CfClasscontent cfcontent = cfclasscontentService.findByName(name);
+        return cfcontentversionService.findMaxVersion((cfcontent).getId());
+    }
+    
+    @Override
+    public boolean hasDifference(Object object) {
+        boolean diff = false;
+        try {
+            currentVersion = (long) cfcontentversionService.findMaxVersion(((CfClasscontent)object).getId());
+        } catch (NullPointerException ex) {
+            currentVersion = 0;
+        }
+        if (currentVersion > 0) {
+            List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref((CfClasscontent)object);
+            String currentContent = classUtil.jsonExport(((CfClasscontent)object), attributcontentlist);
+            String contentVersion = getVersion(((CfClasscontent)object).getId(), currentVersion);
+            diff = 0 != currentContent.compareToIgnoreCase(contentVersion);
+        } else {
+            diff = true;
+        }
+        return diff;
     }
 }
