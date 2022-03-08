@@ -66,6 +66,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.SlideEndEvent;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
 import org.primefaces.extensions.model.monacoeditor.ETheme;
@@ -631,5 +632,49 @@ public class ContentList implements Serializable {
         cfcontentversion.setTstamp(new Date());
         cfcontentversion.setCommitedby(BigInteger.valueOf(loginbean.getCfuser().getId()));
         cfcontentversionService.create(cfcontentversion);
+    }
+    
+    public void onSlideEnd(SlideEndEvent event) {
+        selectedcontentversion = (int) event.getValue();
+        if (selectedcontentversion <= contentversionMin) {
+            selectedcontentversion = contentversionMin;
+        }
+        if (selectedcontentversion >= contentversionMax) {
+            selectedcontentversion = contentversionMax;
+            attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
+        } else {
+            String jsoncontent = getContent();
+            List<CfAttributcontent> attributcontentversionlist = classutil.jsonImport(jsoncontent);
+            for (CfAttributcontent attributcontent : attributcontentlist) {
+                for (CfAttributcontent attributcontentversion : attributcontentversionlist) {
+                    if (0 == attributcontent.getAttributref().getName().compareToIgnoreCase(attributcontentversion.getAttributref().getName())) {
+                        if (null != attributcontent.getContentBoolean()) {
+                            attributcontent.setContentBoolean(attributcontentversion.getContentBoolean());
+                        }
+                        if (null != attributcontent.getContentDate()) {
+                            attributcontent.setContentDate(attributcontentversion.getContentDate());
+                        }
+                        if (null != attributcontent.getContentInteger()) {
+                            attributcontent.setContentInteger(attributcontentversion.getContentInteger());
+                        }
+                        if (null != attributcontent.getContentReal()) {
+                            attributcontent.setContentReal(attributcontentversion.getContentReal());
+                        }
+                        if (null != attributcontent.getContentString()) {
+                            attributcontent.setContentString(attributcontentversion.getContentString());
+                        }
+                        if (null != attributcontent.getContentText()) {
+                            attributcontent.setContentText(attributcontentversion.getContentText());
+                        }
+                        if (null != attributcontent.getAssetcontentlistref()) {
+                            attributcontent.setAssetcontentlistref(attributcontentversion.getAssetcontentlistref());
+                        }
+                        if (null != attributcontent.getClasscontentlistref()) {
+                            attributcontent.setClasscontentlistref(attributcontentversion.getClasscontentlistref());
+                        }
+                    }
+                }
+            }
+        }
     }
 }

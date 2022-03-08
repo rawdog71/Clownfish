@@ -1081,8 +1081,15 @@
                                 </p:commandButton>
                             </div>
                             
-                            <p:outputLabel> Version </p:outputLabel><p:outputLabel id="contentversion">#{classcontentList.contentUtility.currentVersion}</p:outputLabel>
-                            
+                            <h:panelGroup id="versioncontentBtnGroup">
+                                <p:outputLabel> Version </p:outputLabel><p:outputLabel id="contentversion">#{classcontentList.contentUtility.currentVersion}</p:outputLabel>
+
+                                <h5>Select Version</h5>           
+                                <p:inputText id="selectedcontentversion" value="#{classcontentList.selectedcontentversion}" disabled="true" />
+                                <p:slider id="selectedcontentversionslider" for="selectedcontentversion" minValue="#{classcontentList.contentversionMin}" maxValue="#{classcontentList.contentversionMax}">
+                                    <p:ajax event="slideEnd" listener="#{classcontentList.onSlideEnd}" update=":form:msgs :form:tabview:contentversion :form:tabview:selectedcontentversion :form:tabview:contentbtnpanel :form:tabview:attributcontentlist" />
+                                </p:slider>
+                            </h:panelGroup>
                         </div>
                     </p:panel>
                     
