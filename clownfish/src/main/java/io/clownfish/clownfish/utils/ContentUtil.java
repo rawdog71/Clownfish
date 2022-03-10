@@ -146,7 +146,7 @@ public class ContentUtil implements IVersioningInterface {
                 }
             case "classref":
                 if (null != attributcontent.getClasscontentref()) {
-                    return new AttributDef(attributcontent.getClasscontentref().getName(), "classref");
+                    return new AttributDef(attributcontent.getClasscontentlistref().getName(), "classref");
                 } else {
                     return new AttributDef(null, "classref");
                 }
