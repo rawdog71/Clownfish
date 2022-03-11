@@ -191,7 +191,7 @@ public class GetAssetPreview extends HttpServlet {
                                 }
                             }
                         }    
-                        //acontext.complete();
+                        acontext.complete();
                     } else {
                         OutputStream outputStream = acontext.getResponse().getOutputStream();
                         outputStream.close();
@@ -214,7 +214,7 @@ public class GetAssetPreview extends HttpServlet {
             } catch (IOException | InterruptedException | ExecutionException ex) {
                 LOGGER.error(ex.getMessage());
             }
-            acontext.complete();
+            //acontext.complete();
         });
     }
 

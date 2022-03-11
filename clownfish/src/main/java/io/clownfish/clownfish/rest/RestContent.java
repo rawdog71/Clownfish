@@ -17,11 +17,14 @@ package io.clownfish.clownfish.rest;
 
 import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.RestContentParameter;
+import io.clownfish.clownfish.datamodels.RestContentParameterExt;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
+import io.clownfish.clownfish.dbentities.CfContentversion;
+import io.clownfish.clownfish.dbentities.CfContentversionPK;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
@@ -31,13 +34,18 @@ import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
+import io.clownfish.clownfish.utils.ClassUtil;
+import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,9 +71,11 @@ public class RestContent {
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired transient CfSitecontentService cfsitecontentService;
     @Autowired ContentUtil contentUtil;
+    @Autowired ClassUtil classutil;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired HibernateUtil hibernateUtil;
     @Autowired transient AuthTokenList authtokenlist;
+    @Autowired private CfContentversionService cfcontentversionService;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestContent.class);
 
     @PostMapping("/insertcontent")
@@ -279,5 +289,90 @@ public class RestContent {
             ucp.setReturncode("NoResultException");
         }
         return ucp;
+    }
+    
+    private String getContent(CfClasscontent content) {
+        if (null != content) {
+            List<CfContentversion> versionlist = cfcontentversionService.findByContentref(content.getId());
+            List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(content);
+            long contentversionMax = versionlist.size();
+            long selectedcontentversion = contentversionMax;
+            
+            if (selectedcontentversion != contentversionMax) {
+                return contentUtil.getVersion(content.getId(), selectedcontentversion);
+            } else {
+                contentUtil.setContent(classutil.jsonExport(content, attributcontentlist));
+                return contentUtil.getContent();
+            }
+        } else {
+            return "";
+        }
+    }
+    
+    private void writeVersion(long ref, long version, byte[] content, long userid) {
+        CfContentversionPK contentversionpk = new CfContentversionPK();
+        contentversionpk.setContentref(ref);
+        contentversionpk.setVersion(version);
+
+        CfContentversion cfcontentversion = new CfContentversion();
+        cfcontentversion.setCfContentversionPK(contentversionpk);
+        cfcontentversion.setContent(content);
+        cfcontentversion.setTstamp(new Date());
+        cfcontentversion.setCommitedby(BigInteger.valueOf(userid));
+        cfcontentversionService.create(cfcontentversion);
+    }
+    
+    @PostMapping("/commitcontent")
+    public RestContentParameterExt restCommitContent(@RequestBody RestContentParameterExt icp) {
+        return commitContent(icp);
+    }
+    
+    private RestContentParameterExt commitContent(RestContentParameterExt icp) {
+        try {
+            String token = icp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = icp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
+                    try {
+                        CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname().trim().replaceAll("\\s+", "_"));
+                        if (contentUtil.hasDifference(classcontent)) {
+                            try {
+                                String content = getContent(classcontent);
+                                byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
+                                try {
+                                    long maxversion = cfcontentversionService.findMaxVersion(classcontent.getId());
+                                    contentUtil.setCurrentVersion(maxversion + 1);
+                                    writeVersion(classcontent.getId(), contentUtil.getCurrentVersion(), output, icp.getUserid());
+                                    icp.setReturncode("OK");
+                                    // difference = contentUtil.hasDifference(classcontent);
+                                    // contentversionMax = contentUtil.getCurrentVersion();
+                                    // this.selectedcontentversion = this.contentversionMax;
+                                } catch (NullPointerException npe) {
+                                    writeVersion(classcontent.getId(), 1, output, icp.getUserid());
+                                    contentUtil.setCurrentVersion(1);
+                                    //difference = contentUtil.hasDifference(classcontent);
+                                    icp.setReturncode("OK");
+                                }
+                            } catch (IOException ex) {
+                                icp.setReturncode(ex.getMessage());
+                                LOGGER.error(ex.getMessage());
+                            }
+                        } else {
+                            icp.setReturncode("Cannot commit");
+                        }
+                    } catch (javax.persistence.NoResultException ex) {
+                        icp.setReturncode("Classcontent not found");
+                    }
+                } else {
+                    icp.setReturncode("Wrong API KEY");
+                }
+            } else {
+                icp.setReturncode("Invalid token");
+            }
+        } catch (javax.persistence.NoResultException ex) {
+            LOGGER.error("NoResultException");
+            icp.setReturncode("NoResultException");
+        }
+        return icp;
     }
 }

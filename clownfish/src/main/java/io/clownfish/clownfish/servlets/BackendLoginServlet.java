@@ -70,13 +70,13 @@ public class BackendLoginServlet extends HttpServlet {
                 String secure = PasswordUtil.generateSecurePassword(inst_password, salt);
                 if (secure.compareTo(cfuser.getPasswort()) == 0) {
                     String token = AuthToken.generateToken(inst_password, salt);
-                    at = new AuthToken(token, new DateTime().plusMinutes(60));      // Tokens valid for 60 minutes
+                    at = new AuthToken(token, new DateTime().plusMinutes(60), cfuser);      // Tokens valid for 60 minutes
                     authtokenlist.getAuthtokens().put(token, at);
                 } else {
-                    at = new AuthToken("", new DateTime());      // Invalid token
+                    at = new AuthToken("", new DateTime(), null);      // Invalid token
                 }
             } catch (Exception ex) {
-                at = new AuthToken("", new DateTime());      // Invalid token
+                at = new AuthToken("", new DateTime(), null);      // Invalid token
             }
         }
         

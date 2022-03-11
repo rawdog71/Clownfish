@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 SulzbachR.
+ * Copyright 2020 sulzbachr.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,17 @@
  */
 package io.clownfish.clownfish.datamodels;
 
-import io.clownfish.clownfish.dbentities.CfClasscontent;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  *
- * @author SulzbachR
+ * @author sulzbachr
  */
-public class ContentDataOutput {
-    private @Getter @Setter CfClasscontent content;
-    private @Getter @Setter ArrayList<HashMap> keyvals;
-    private @Getter @Setter ArrayList<String> keywords;
-    private @Getter @Setter boolean difference;
+public class RestContentParameterExt extends RestContentParameter {
+    private @Getter @Setter long userid;
+
+    public RestContentParameterExt() {
+        super();
+    }
 }

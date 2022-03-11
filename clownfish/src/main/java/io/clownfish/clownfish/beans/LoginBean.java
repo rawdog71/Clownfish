@@ -101,7 +101,7 @@ public class LoginBean implements Serializable {
             String secure = PasswordUtil.generateSecurePassword(passwort, salt);
             if (secure.compareTo(cfuser.getPasswort()) == 0) {
                 String token = AuthToken.generateToken(passwort, salt);
-                AuthToken at = new AuthToken(token, new DateTime().plusMinutes(60));          // Tokens valid for 60 minutes
+                AuthToken at = new AuthToken(token, new DateTime().plusMinutes(60), cfuser);          // Tokens valid for 60 minutes
                 authtokenlist.getAuthtokens().put(token, at);
                 login = true;
                 List<CfUserbackend> selectedcontent = cfuserbackendService.findByUserRef(cfuser.getId());

@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.datamodels;
 
+import io.clownfish.clownfish.dbentities.CfUser;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,13 +28,15 @@ import org.joda.time.DateTime;
 public class AuthToken {
     private @Getter @Setter String token;
     private @Getter @Setter DateTime validuntil;
+    private @Getter @Setter CfUser user;
 
     public AuthToken() {
     }
 
-    public AuthToken(String token, DateTime validuntil) {
+    public AuthToken(String token, DateTime validuntil, CfUser user) {
         this.token = token;
         this.validuntil = validuntil;
+        this.user = user;
     }
     
     public static String generateToken(String password, String salt) {
