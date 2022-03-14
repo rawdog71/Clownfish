@@ -31,4 +31,5 @@ public class ContentDataOutput {
     private @Getter @Setter ArrayList<HashMap> keyvals;
     private @Getter @Setter ArrayList<String> keywords;
     private @Getter @Setter boolean difference;
+    private @Getter @Setter long maxversion;
 }

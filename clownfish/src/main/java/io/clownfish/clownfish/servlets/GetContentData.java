@@ -26,6 +26,7 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
 import java.io.IOException;
@@ -37,8 +38,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +56,7 @@ public class GetContentData extends HttpServlet {
     @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired private CfContentversionService cfcontentversionService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
         
@@ -75,9 +75,14 @@ public class GetContentData extends HttpServlet {
             String apikey = request.getParameter("apikey");
             if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 CfClasscontent content = null;
+                long lversion = 0;
                 String contentid = request.getParameter("contentid");
+                String version = request.getParameter("version"); 
                 if (contentid != null) {
                     content = cfclasscontentService.findById(Long.parseLong(contentid));
+                }
+                if (null != version) {
+                    lversion = Long.parseLong(version);
                 }
 
                 if (null != content) {
@@ -90,6 +95,7 @@ public class GetContentData extends HttpServlet {
                     contentdataoutput.setKeywords(keywords);
                     contentdataoutput.setKeyvals(keyvals);
                     contentdataoutput.setDifference(contentUtil.hasDifference(content));
+                    contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(content.getId()));
 
                     Gson gson = new Gson(); 
                     String json = gson.toJson(contentdataoutput);
