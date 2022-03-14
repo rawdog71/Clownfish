@@ -28,6 +28,7 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
+import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -58,6 +59,7 @@ public class GetContentData extends HttpServlet {
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired private CfContentversionService cfcontentversionService;
     @Autowired ContentUtil contentUtil;
+    @Autowired ClassUtil classutil;
     @Autowired ApiKeyUtil apikeyutil;
         
     final transient Logger LOGGER = LoggerFactory.getLogger(GetContentData.class);
@@ -75,28 +77,47 @@ public class GetContentData extends HttpServlet {
             String apikey = request.getParameter("apikey");
             if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 CfClasscontent content = null;
-                long lversion = 0;
+                
                 String contentid = request.getParameter("contentid");
+                long lversion = 0;
+                long maxversion = 0;
                 String version = request.getParameter("version"); 
                 if (contentid != null) {
                     content = cfclasscontentService.findById(Long.parseLong(contentid));
+                    maxversion = cfcontentversionService.findMaxVersion(content.getId());
                 }
                 if (null != version) {
                     lversion = Long.parseLong(version);
+                    if (lversion > maxversion) {
+                        lversion = maxversion;
+                    }
+                    if (lversion <= 0) {
+                        lversion = 1;
+                    }
+                } else {
+                    lversion = maxversion;
                 }
 
                 if (null != content) {
-                    List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(content);
-                    ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
-                    ArrayList<String> keywords = getAssetKeywords(content, true);
                     ContentDataOutput contentdataoutput = new ContentDataOutput();
-
                     contentdataoutput.setContent(content);
+                    ArrayList<String> keywords = getAssetKeywords(content, true);
+                    
+                    if (lversion < maxversion) {
+                        String contentversion = contentUtil.getVersion(content.getId(), lversion);
+                        List<CfAttributcontent> attributcontentList = classutil.jsonImport(contentversion);
+                        ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
+                        contentdataoutput.setKeyvals(keyvals);
+                    } else {
+                        List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(content);
+                        ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
+                        contentdataoutput.setKeyvals(keyvals);
+                        
+                    }
                     contentdataoutput.setKeywords(keywords);
-                    contentdataoutput.setKeyvals(keyvals);
                     contentdataoutput.setDifference(contentUtil.hasDifference(content));
                     contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(content.getId()));
-
+                    
                     Gson gson = new Gson(); 
                     String json = gson.toJson(contentdataoutput);
                     response.setContentType("application/json;charset=UTF-8");
