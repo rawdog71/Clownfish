@@ -22,13 +22,14 @@ import lombok.Setter;
  *
  * @author sulzbachr
  */
-public class RestKeywordParameter {
+public class RestAssetParameter {
     private @Getter @Setter String returncode;
     private @Getter @Setter String apikey;
     private @Getter @Setter String token;
     private @Getter @Setter long id;
-    private @Getter @Setter String keyword;
+    private @Getter @Setter String description;
+    private @Getter @Setter boolean publicuse;
 
-    public RestKeywordParameter() {
+    public RestAssetParameter() {
     }
 }

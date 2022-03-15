@@ -71,4 +71,37 @@ public class RestKeyword {
         }
         return ikp;
     }
+
+    @PostMapping("/updatekeyword")
+    public RestKeywordParameter restUpdateKeyword(@RequestBody RestKeywordParameter ikp) {
+        return updateKeyword(ikp);
+    }
+    
+    private RestKeywordParameter updateKeyword(RestKeywordParameter ikp) {
+        try {
+            String token = ikp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = ikp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
+                    try {
+                        CfKeyword keyword = cfkeywordService.findById(ikp.getId());
+                        keyword.setName(ikp.getKeyword());
+                        CfKeyword newkeyword2 = cfkeywordService.edit(keyword);
+                        ikp.setReturncode("OK");
+                    } catch (javax.persistence.NoResultException ex) {
+                        LOGGER.warn("No Keyword");
+                        ikp.setReturncode("No Keyword");
+                    }
+                } else {
+                    ikp.setReturncode("Wrong API KEY");
+                }
+            } else {
+                ikp.setReturncode("Invalid token");
+            }
+        } catch (javax.persistence.NoResultException ex) {
+            LOGGER.error("NoResultException");
+            ikp.setReturncode("NoResultException");
+        }
+        return ikp;
+    }
 }

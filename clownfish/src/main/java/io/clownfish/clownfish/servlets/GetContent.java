@@ -301,7 +301,7 @@ public class GetContent extends HttpServlet {
         List<CfListcontent> listcontent = null;
         int range_start = 0;
         int range_end = 0;
-        if (!gcp.getRange().isEmpty()) {
+        if ((null != gcp.getRange()) && (!gcp.getRange().isEmpty())) {
             if (gcp.getRange().contains("-")) {
                 String[] ranges = gcp.getRange().split("-");
                 range_start = Integer.parseInt(ranges[0]);

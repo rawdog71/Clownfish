@@ -15,15 +15,20 @@
  */
 package io.clownfish.clownfish.rest;
 
+import io.clownfish.clownfish.datamodels.AuthTokenList;
+import io.clownfish.clownfish.datamodels.RestAssetParameter;
+import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.utils.ApiKeyUtil;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.annotation.MultipartConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -32,6 +37,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RestController
 @MultipartConfig
 public class RestAsset {
+    @Autowired transient CfAssetService cfassetService;
+    @Autowired ApiKeyUtil apikeyutil;
+    @Autowired transient AuthTokenList authtokenlist;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestKeyword.class);
     
     @Bean
     public MultipartConfigElement multipartConfigElement() {
@@ -47,17 +56,37 @@ public class RestAsset {
     }
     */
 
-    @GetMapping(value = "/insertasset")
-    public String handle() {
-        return "OK";
+    @PostMapping("/updateasset")
+    public RestAssetParameter restUpdateAsset(@RequestBody RestAssetParameter ikp) {
+        return updateAsset(ikp);
     }
     
-    @PostMapping(value = "/insertasset", consumes = "multipart/form-data")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
-        if (!file.isEmpty()) { 
-           //your logic
+    private RestAssetParameter updateAsset(RestAssetParameter ikp) {
+        try {
+            String token = ikp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = ikp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
+                    try {
+                        CfAsset asset = cfassetService.findById(ikp.getId());
+                        asset.setDescription(ikp.getDescription());
+                        asset.setPublicuse(ikp.isPublicuse());
+                        CfAsset newasset2 = cfassetService.edit(asset);
+                        ikp.setReturncode("OK");
+                    } catch (javax.persistence.NoResultException ex) {
+                        LOGGER.warn("No Asset");
+                        ikp.setReturncode("No Asset");
+                    }
+                } else {
+                    ikp.setReturncode("Wrong API KEY");
+                }
+            } else {
+                ikp.setReturncode("Invalid token");
+            }
+        } catch (javax.persistence.NoResultException ex) {
+            LOGGER.error("NoResultException");
+            ikp.setReturncode("NoResultException");
         }
-        return "some json";
-
+        return ikp;
     }
 }
