@@ -33,6 +33,7 @@ import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.datamodels.GetContentParameter;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
+import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
 import java.io.BufferedReader;
@@ -71,6 +72,7 @@ public class GetContent extends HttpServlet {
     @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
     @Autowired transient CfClasscontentKeywordService cfcontentkeywordService;
+    @Autowired private CfContentversionService cfcontentversionService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
     
@@ -242,6 +244,8 @@ public class GetContent extends HttpServlet {
                                 contentdataoutput.setContent(classcontent);
                                 contentdataoutput.setKeywords(keywords);
                                 contentdataoutput.setKeyvals(keyvals);
+                                contentdataoutput.setDifference(contentUtil.hasDifference(classcontent));
+                                contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(classcontent.getId()));
                                 outputlist.add(contentdataoutput);
                                 //System.out.println(inst_klasse + " - " + listcounter);
                             }
@@ -250,6 +254,8 @@ public class GetContent extends HttpServlet {
                             contentdataoutput.setContent(classcontent);
                             contentdataoutput.setKeywords(keywords);
                             contentdataoutput.setKeyvals(keyvals);
+                            contentdataoutput.setDifference(contentUtil.hasDifference(classcontent));
+                            contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(classcontent.getId()));
                             outputlist.add(contentdataoutput);
                             //System.out.println(inst_klasse + " - " + listcounter);
                         }
