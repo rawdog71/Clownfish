@@ -31,6 +31,7 @@ public class RestContentParameter {
     private @Getter @Setter String contentname;
     private @Getter @Setter boolean indexing;
     private @Getter @Setter HashMap<String, String> attributmap;
+    private @Getter @Setter long checkedoutby;
 
     public RestContentParameter() {
         attributmap = new HashMap<>();

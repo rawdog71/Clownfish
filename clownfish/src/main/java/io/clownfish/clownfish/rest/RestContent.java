@@ -290,6 +290,82 @@ public class RestContent {
         }
         return ucp;
     }
+
+    @PostMapping("/checkoutcontent")
+    public RestContentParameterExt restCheckoutContent(@RequestBody RestContentParameterExt ucp) {
+        return checkoutContent(ucp);
+    }
+    
+    private RestContentParameterExt checkoutContent(RestContentParameterExt ucp) {
+        try {
+            String token = ucp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = ucp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
+                    try {
+                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname());
+                        if (0 == classcontent.getCheckedoutby().longValue()) {
+                            classcontent.setCheckedoutby(BigInteger.valueOf(ucp.getUserid()));
+                            ucp.setCheckedoutby(ucp.getUserid());
+                            cfclasscontentService.edit(classcontent);
+                            ucp.setReturncode("OK");
+                        } else {
+                            ucp.setReturncode("Classcontent already checkedout");
+                        }
+                    } catch (javax.persistence.NoResultException ex) {
+                        ucp.setReturncode("Classcontent not found");
+                    }
+                } else {
+                    ucp.setReturncode("Wrong API KEY");
+                }
+            } else {
+                ucp.setReturncode("Invalid token");
+            }
+        } catch (javax.persistence.NoResultException ex) {
+            ucp.setReturncode("NoResultException");
+        }
+        return ucp;
+    }
+
+    @PostMapping("/checkincontent")
+    public RestContentParameterExt restCheckinContent(@RequestBody RestContentParameterExt ucp) {
+        return checkinContent(ucp);
+    }
+    
+    private RestContentParameterExt checkinContent(RestContentParameterExt ucp) {
+        try {
+            String token = ucp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = ucp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
+                    try {
+                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname());
+                        if (ucp.getUserid() == classcontent.getCheckedoutby().longValue()) {
+                            classcontent.setCheckedoutby(BigInteger.ZERO);
+                            ucp.setCheckedoutby(0);
+                            cfclasscontentService.edit(classcontent);
+                            ucp.setReturncode("OK");
+                        } else {
+                            if (0 == classcontent.getCheckedoutby().longValue()) {
+                                ucp.setReturncode("Classcontent not checked out");
+                            } else {
+                                ucp.setReturncode("Classcontent checkedout by other user");
+                            }
+                        }
+                    } catch (javax.persistence.NoResultException ex) {
+                        ucp.setReturncode("Classcontent not found");
+                    }
+                } else {
+                    ucp.setReturncode("Wrong API KEY");
+                }
+            } else {
+                ucp.setReturncode("Invalid token");
+            }
+        } catch (javax.persistence.NoResultException ex) {
+            ucp.setReturncode("NoResultException");
+        }
+        return ucp;
+    }
     
     private String getContent(CfClasscontent content) {
         if (null != content) {

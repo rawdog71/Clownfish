@@ -147,6 +147,14 @@ public class GetContentHibernate extends HttpServlet {
             range_start = 0;
             range_end = 0;
             if (!inst_klasse.isEmpty()) {
+                String searchidentifier = "";
+                if (!inst_identifier.isEmpty()) {
+                    CfClasscontent content = cfclasscontentService.findByName(inst_identifier);
+                    if (null != content) {
+                        searchidentifier = "search$CF__CONTENTREF__$" + String.valueOf(content.getId());
+                    }
+                }
+
                 if (!inst_range.isEmpty()) {
                     if (inst_range.contains("-")) {
                         String[] ranges = inst_range.split("-");
@@ -179,6 +187,18 @@ public class GetContentHibernate extends HttpServlet {
                         counter++;
                     }
                 });
+                if (!searchidentifier.isEmpty()) {
+                    searchmap.clear();
+                    String[] keys = searchidentifier.split("\\$");
+                    int counter = 0;
+                    for (String key : keys) {
+                        if ((counter > 0) && ((counter%2) == 0)) {
+                            searchmap.put(keys[counter-1] + "_" + counter, keys[counter]);
+                        }
+                        counter++;
+                    }
+                }
+
                 searchkeywords = new ArrayList<>();
                 parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("keywords"))).forEach((paramname) -> {
                     String[] keys = paramname.split("\\$");
