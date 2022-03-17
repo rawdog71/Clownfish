@@ -70,6 +70,8 @@ public class DatasourceList implements Serializable {
     private @Getter @Setter boolean newContentButtonDisabled = false;
     private transient @Getter @Setter List<TableData> tablelist = null;
     private @Getter @Setter TableData selectedTable = null;
+    private @Getter @Setter JDBCUtil selectedJdbcutil = null;
+    private @Getter @Setter DatabaseMetaData selectedDdbmd = null;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(DatasourceList.class);
 
@@ -106,19 +108,19 @@ public class DatasourceList implements Serializable {
 
         tablelist.clear();
         try {
-            JDBCUtil jdbcutil = new JDBCUtil(selectedDatasource.getDriverclass(), selectedDatasource.getUrl(), selectedDatasource.getUser(), selectedDatasource.getPassword());
-            Connection con = jdbcutil.getConnection();
+            selectedJdbcutil = new JDBCUtil(selectedDatasource.getDriverclass(), selectedDatasource.getUrl(), selectedDatasource.getUser(), selectedDatasource.getPassword());
+            Connection con = selectedJdbcutil.getConnection();
             if (null != con) {
-                DatabaseMetaData dbmd = jdbcutil.getMetadata();
-                System.out.println(dbmd.getDatabaseMajorVersion());
-                ResultSet rs = dbmd.getCatalogs();
-                ResultSetMetaData rmd = rs.getMetaData();
+                selectedDdbmd = selectedJdbcutil.getMetadata();
+                System.out.println(selectedDdbmd.getDatabaseMajorVersion());
+                ResultSet rs = selectedDdbmd.getCatalogs();
+                //ResultSetMetaData rmd = rs.getMetaData();
                 //TableFieldStructure tfs = getTableFieldsList(rmd);
                 while (rs.next()) {
                     String value = rs.getString("TABLE_CAT");
                     if (0 == value.compareToIgnoreCase(datasourceDatabasename)) {
                         System.out.println(value);
-                        ResultSet tables = dbmd.getTables(value, null, null, null);
+                        ResultSet tables = selectedDdbmd.getTables(value, null, null, null);
                         while (tables.next()) {
                             TableData td = new TableData();
                             td.setName(tables.getString("TABLE_NAME"));
@@ -126,6 +128,32 @@ public class DatasourceList implements Serializable {
                             tablelist.add(td);
                         }
                     }
+                }
+            }
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+    }
+
+    /**
+     * Selects an external datasource
+     * @param event
+     */
+    public void onTableSelect(SelectEvent event) {
+        selectedTable = (TableData) event.getObject();
+
+        try {
+            Connection con = selectedJdbcutil.getConnection();
+            if (null != con) {
+                ResultSet rs = selectedDdbmd.getColumns(datasourceDatabasename, null, selectedTable.getName(), null);
+                //ResultSetMetaData rmd = rs.getMetaData();
+                //TableFieldStructure tfs = getTableFieldsList(rmd);
+                while (rs.next()) {
+                    String name = rs.getString("COLUMN_NAME");
+                    int datatype = rs.getInt("DATA_TYPE");
+                    String datatypename = rs.getString("TYPE_NAME");
+                    int size = rs.getInt("COLUMN_SIZE");
+                    System.out.println(name + " " + datatype + " " + datatypename + " " + size);
                 }
             }
         } catch (SQLException ex) {

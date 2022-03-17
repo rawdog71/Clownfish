@@ -1257,8 +1257,8 @@
                             </p:panelGrid>
                         </p:panelGrid>
                         <p:panelGrid columns="1">
-                            <p:dataTable id="tablelist" size="small" scrollable="true" scrollHeight="250" var="table" value="#{datasourceList.tablelist}" selectionMode="single" selection="#{datasourceList.selectedTable}" rowKey="#{datasource.name}">
-                                <p:ajax event="rowSelect" listener="#{datasourceList.onTableSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver" />
+                            <p:dataTable id="tablelist" size="small" scrollable="true" scrollHeight="250" var="table" value="#{datasourceList.tablelist}" selectionMode="single" selection="#{datasourceList.selectedTable}" rowKey="#{table.name}">
+                                <p:ajax event="rowSelect" listener="#{datasourceList.onTableSelect}" />
                                 <p:column headerText="Name" filterBy="#{table.name}" filterMatchMode="contains">
                                     <h:outputText value="#{table.name}" />
                                 </p:column>
