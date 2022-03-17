@@ -52,9 +52,11 @@ public class ScriptRunner {
 
     /**
      * Default constructor
+     * @param connection
+     * @param autoCommit
+     * @param stopOnError
      */
-    public ScriptRunner(Connection connection, boolean autoCommit,
-                        boolean stopOnError) {
+    public ScriptRunner(Connection connection, boolean autoCommit, boolean stopOnError) {
         this.connection = connection;
         this.autoCommit = autoCommit;
         this.stopOnError = stopOnError;
@@ -107,7 +109,8 @@ public class ScriptRunner {
     }
 
     /**
-     * Set the current working directory.  Source commands will be relative to this.
+     * Set the current working directory.Source commands will be relative to this.
+     * @param userDirectory
      */
     public void setUserDirectory(String userDirectory) {
         this.userDirectory = userDirectory;
@@ -117,6 +120,8 @@ public class ScriptRunner {
      * Runs an SQL script (read in using the Reader parameter)
      *
      * @param filepath - the filepath of the script to run. May be relative to the userDirectory.
+     * @throws java.io.IOException
+     * @throws java.sql.SQLException
      */
     public void runScript(String filepath) throws IOException, SQLException {
         File file = new File(userDirectory, filepath);
@@ -127,6 +132,8 @@ public class ScriptRunner {
      * Runs an SQL script (read in using the Reader parameter)
      *
      * @param reader - the source of the script
+     * @throws java.io.IOException
+     * @throws java.sql.SQLException
      */
     public void runScript(Reader reader) throws IOException, SQLException {
         try {
@@ -140,8 +147,6 @@ public class ScriptRunner {
                 connection.setAutoCommit(originalAutoCommit);
             }
         } catch (IOException | SQLException e) {
-            throw e;
-        } catch (Exception e) {
             throw new RuntimeException("Error running script.  Cause: " + e, e);
         }
     }
@@ -271,7 +276,7 @@ public class ScriptRunner {
 
         try {
             statement.close();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Ignore to workaround a bug in Jakarta DBCP
         }
     }

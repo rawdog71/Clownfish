@@ -1218,41 +1218,54 @@
                     </f:facet>
 
                     <p:dataTable id="datasourcelist" size="small" scrollable="true" scrollHeight="250" var="datasource" value="#{datasourceList.datasourcelist}" selectionMode="single" selection="#{datasourceList.selectedDatasource}" rowKey="#{datasource.id}">
-                        <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver" />
+                        <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver :form:tabview:tablelist" />
                         <p:column headerText="Name" filterBy="#{datasource.name}" filterMatchMode="contains">
                             <h:outputText value="#{datasource.name}" />
                         </p:column>
                     </p:dataTable>
 
                     <div style="display: flex; margin-bottom: 20px" class="datasource-table">
-                        <p:panelGrid columns="2" style="width: 150px">
-                            <p:outputLabel for="datasourcename">Name</p:outputLabel>
-                            <p:inputText id="datasourcename" value="#{datasourceList.datasourceName}" >
-                                <p:ajax event="keyup" listener="#{datasourceList.onChangeName(changeEvent)}" update="newdatasource" />
-                            </p:inputText>
+                        <p:panelGrid columns="2">
+                            <p:panelGrid columns="2" style="width: 150px">
+                                <p:outputLabel for="datasourcename">Name</p:outputLabel>
+                                <p:inputText id="datasourcename" value="#{datasourceList.datasourceName}" >
+                                    <p:ajax event="keyup" listener="#{datasourceList.onChangeName(changeEvent)}" update="newdatasource" />
+                                </p:inputText>
 
-                            <p:outputLabel for="datasourceserver">Server</p:outputLabel>
-                            <p:inputText id="datasourceserver" value="#{datasourceList.datasourceServer}" ></p:inputText>
+                                <p:outputLabel for="datasourceserver">Server</p:outputLabel>
+                                <p:inputText id="datasourceserver" value="#{datasourceList.datasourceServer}" ></p:inputText>
 
-                            <p:outputLabel for="datasourceurl">URL</p:outputLabel>
-                            <p:inputText id="datasourceurl" value="#{datasourceList.datasourceURL}" ></p:inputText>
+                                <p:outputLabel for="datasourceurl">URL</p:outputLabel>
+                                <p:inputText id="datasourceurl" value="#{datasourceList.datasourceURL}" ></p:inputText>
 
-                            <p:outputLabel for="datasourceport">Port</p:outputLabel>
-                            <p:inputText id="datasourceport" value="#{datasourceList.datasourcePort}" ></p:inputText>
+                                <p:outputLabel for="datasourceport">Port</p:outputLabel>
+                                <p:inputText id="datasourceport" value="#{datasourceList.datasourcePort}" ></p:inputText>
+                            </p:panelGrid>
+
+                            <p:panelGrid columns="2" style="margin-left: 30px !important">
+                                <p:outputLabel for="datasourcedbname">Database Name</p:outputLabel>
+                                <p:inputText id="datasourcedbname" value="#{datasourceList.datasourceDatabasename}" ></p:inputText>
+
+                                <p:outputLabel for="datasourceuser">User</p:outputLabel>
+                                <p:inputText id="datasourceuser" value="#{datasourceList.datasourceUser}" ></p:inputText>
+
+                                <p:outputLabel for="datasourcepassword">Password</p:outputLabel>
+                                <p:inputText id="datasourcepassword" value="#{datasourceList.datasourcePassword}" ></p:inputText>
+
+                                <p:outputLabel for="datasourcedriver">Driver Class</p:outputLabel>
+                                <p:inputText id="datasourcedriver" value="#{datasourceList.datasourceDriverclass}" ></p:inputText>
+                            </p:panelGrid>
                         </p:panelGrid>
-
-                        <p:panelGrid columns="2" style="margin-left: 30px !important">
-                            <p:outputLabel for="datasourcedbname">Database Name</p:outputLabel>
-                            <p:inputText id="datasourcedbname" value="#{datasourceList.datasourceDatabasename}" ></p:inputText>
-
-                            <p:outputLabel for="datasourceuser">User</p:outputLabel>
-                            <p:inputText id="datasourceuser" value="#{datasourceList.datasourceUser}" ></p:inputText>
-
-                            <p:outputLabel for="datasourcepassword">Password</p:outputLabel>
-                            <p:inputText id="datasourcepassword" value="#{datasourceList.datasourcePassword}" ></p:inputText>
-
-                            <p:outputLabel for="datasourcedriver">Driver Class</p:outputLabel>
-                            <p:inputText id="datasourcedriver" value="#{datasourceList.datasourceDriverclass}" ></p:inputText>
+                        <p:panelGrid columns="1">
+                            <p:dataTable id="tablelist" size="small" scrollable="true" scrollHeight="250" var="table" value="#{datasourceList.tablelist}" selectionMode="single" selection="#{datasourceList.selectedTable}" rowKey="#{datasource.name}">
+                                <p:ajax event="rowSelect" listener="#{datasourceList.onTableSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver" />
+                                <p:column headerText="Name" filterBy="#{table.name}" filterMatchMode="contains">
+                                    <h:outputText value="#{table.name}" />
+                                </p:column>
+                                <p:column headerText="Type" filterBy="#{table.type}" filterMatchMode="contains">
+                                    <h:outputText value="#{table.type}" />
+                                </p:column>
+                            </p:dataTable>
                         </p:panelGrid>
                     </div>
 

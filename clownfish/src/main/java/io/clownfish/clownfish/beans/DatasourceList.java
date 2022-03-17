@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.datamodels.TableData;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
@@ -31,6 +32,11 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
@@ -62,6 +68,8 @@ public class DatasourceList implements Serializable {
     private @Getter @Setter String datasourcePassword;
     private @Getter @Setter String datasourceDriverclass;
     private @Getter @Setter boolean newContentButtonDisabled = false;
+    private transient @Getter @Setter List<TableData> tablelist = null;
+    private @Getter @Setter TableData selectedTable = null;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(DatasourceList.class);
 
@@ -70,6 +78,7 @@ public class DatasourceList implements Serializable {
         LOGGER.info("INIT DATASOURCELIST START");
         datasourcelist = cfdatasourceService.findAll();
         newContentButtonDisabled = false;
+        tablelist = new ArrayList<>();
         LOGGER.info("INIT DATASOURCELIST END");
     }
     
@@ -94,6 +103,34 @@ public class DatasourceList implements Serializable {
         datasourceUser = selectedDatasource.getUser();
         
         newContentButtonDisabled = true;
+
+        tablelist.clear();
+        try {
+            JDBCUtil jdbcutil = new JDBCUtil(selectedDatasource.getDriverclass(), selectedDatasource.getUrl(), selectedDatasource.getUser(), selectedDatasource.getPassword());
+            Connection con = jdbcutil.getConnection();
+            if (null != con) {
+                DatabaseMetaData dbmd = jdbcutil.getMetadata();
+                System.out.println(dbmd.getDatabaseMajorVersion());
+                ResultSet rs = dbmd.getCatalogs();
+                ResultSetMetaData rmd = rs.getMetaData();
+                //TableFieldStructure tfs = getTableFieldsList(rmd);
+                while (rs.next()) {
+                    String value = rs.getString("TABLE_CAT");
+                    if (0 == value.compareToIgnoreCase(datasourceDatabasename)) {
+                        System.out.println(value);
+                        ResultSet tables = dbmd.getTables(value, null, null, null);
+                        while (tables.next()) {
+                            TableData td = new TableData();
+                            td.setName(tables.getString("TABLE_NAME"));
+                            td.setType(tables.getString("TABLE_TYPE"));
+                            tablelist.add(td);
+                        }
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getMessage());
+        }
     }
     
     /**

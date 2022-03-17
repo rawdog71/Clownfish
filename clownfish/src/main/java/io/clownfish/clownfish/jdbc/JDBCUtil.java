@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.jdbc;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import org.slf4j.Logger;
@@ -61,5 +62,15 @@ public class JDBCUtil {
             return null;
         }
         return connection;
+    }
+
+    public DatabaseMetaData getMetadata() {
+        try {
+            DatabaseMetaData dmd = connection.getMetaData();
+            return dmd;
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getMessage());
+            return null;
+        }
     }
 }

@@ -540,7 +540,7 @@ public class Clownfish {
                 });
             }
             AnsiConsole.systemUninstall();
-        } catch (SchedulerException | IOException ex) {
+        } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
         }
         folderUtil.init();
