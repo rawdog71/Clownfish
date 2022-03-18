@@ -1258,12 +1258,22 @@
                         </p:panelGrid>
                         <p:panelGrid columns="1">
                             <p:dataTable id="tablelist" size="small" scrollable="true" scrollHeight="250" var="table" value="#{datasourceList.tablelist}" selectionMode="single" selection="#{datasourceList.selectedTable}" rowKey="#{table.name}">
-                                <p:ajax event="rowSelect" listener="#{datasourceList.onTableSelect}" />
+                                <p:ajax event="rowSelect" listener="#{datasourceList.onTableSelect}" update=":form:tabview:columnlist" />
                                 <p:column headerText="Name" filterBy="#{table.name}" filterMatchMode="contains">
                                     <h:outputText value="#{table.name}" />
                                 </p:column>
                                 <p:column headerText="Type" filterBy="#{table.type}" filterMatchMode="contains">
                                     <h:outputText value="#{table.type}" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:panelGrid>
+                        <p:panelGrid columns="1">
+                            <p:dataTable lazy="true" id="columnlist" size="small" scrollable="true" scrollHeight="250" var="column" value="#{datasourceList.selectedTable.columns}" selectionMode="single" selection="#{datasourceList.selectedColumn}" rowKey="#{column.name}">
+                                <p:column headerText="Name" filterBy="#{column.name}" filterMatchMode="contains">
+                                    <h:outputText value="#{column.name}" />
+                                </p:column>
+                                <p:column headerText="Type" filterBy="#{column.typename}" filterMatchMode="contains">
+                                    <h:outputText value="#{column.typename}" />
                                 </p:column>
                             </p:dataTable>
                         </p:panelGrid>

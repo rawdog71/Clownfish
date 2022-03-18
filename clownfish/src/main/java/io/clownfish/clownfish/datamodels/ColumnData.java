@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.datamodels;
 
-import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,12 +22,15 @@ import lombok.Setter;
  *
  * @author SulzbachR
  */
-public class TableData {
+public class ColumnData {
     private @Getter @Setter String name;
-    private @Getter @Setter String type;
-    private @Getter @Setter ArrayList<ColumnData> columns;
-
-    public TableData() {
-        columns = new ArrayList<>();
-    }
+    private @Getter @Setter int type;
+    private @Getter @Setter String typename;
+    private @Getter @Setter int size;
+    private @Getter @Setter int digits;
+    private @Getter @Setter int radix;
+    private @Getter @Setter int nullable;
+    private @Getter @Setter String defaultvalue;
+    private @Getter @Setter String autoinc;
+    private @Getter @Setter String generated;
 }

@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.datamodels.ColumnData;
 import io.clownfish.clownfish.datamodels.TableData;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
@@ -34,7 +35,6 @@ import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import lombok.Getter;
@@ -72,6 +72,7 @@ public class DatasourceList implements Serializable {
     private @Getter @Setter TableData selectedTable = null;
     private @Getter @Setter JDBCUtil selectedJdbcutil = null;
     private @Getter @Setter DatabaseMetaData selectedDdbmd = null;
+    private @Getter @Setter ColumnData selectedColumn = null;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(DatasourceList.class);
 
@@ -125,6 +126,22 @@ public class DatasourceList implements Serializable {
                             TableData td = new TableData();
                             td.setName(tables.getString("TABLE_NAME"));
                             td.setType(tables.getString("TABLE_TYPE"));
+
+                            ResultSet crs = selectedDdbmd.getColumns(datasourceDatabasename, null, tables.getString("TABLE_NAME"), null);
+                            while (crs.next()) {
+                                ColumnData cd = new ColumnData();
+                                cd.setName(crs.getString("COLUMN_NAME"));
+                                cd.setType(crs.getInt("DATA_TYPE"));
+                                cd.setTypename(crs.getString("TYPE_NAME"));
+                                cd.setSize(crs.getInt("COLUMN_SIZE"));
+                                cd.setDigits(crs.getInt("DECIMAL_DIGITS"));
+                                cd.setRadix(crs.getInt("NUM_PREC_RADIX"));
+                                cd.setNullable(crs.getInt("NULLABLE"));
+                                cd.setDefaultvalue(crs.getString("COLUMN_DEF"));
+                                cd.setAutoinc(crs.getString("IS_AUTOINCREMENT"));
+                                cd.setGenerated(crs.getString("IS_GENERATEDCOLUMN"));
+                                td.getColumns().add(cd);
+                            }
                             tablelist.add(td);
                         }
                     }
@@ -142,23 +159,6 @@ public class DatasourceList implements Serializable {
     public void onTableSelect(SelectEvent event) {
         selectedTable = (TableData) event.getObject();
 
-        try {
-            Connection con = selectedJdbcutil.getConnection();
-            if (null != con) {
-                ResultSet rs = selectedDdbmd.getColumns(datasourceDatabasename, null, selectedTable.getName(), null);
-                //ResultSetMetaData rmd = rs.getMetaData();
-                //TableFieldStructure tfs = getTableFieldsList(rmd);
-                while (rs.next()) {
-                    String name = rs.getString("COLUMN_NAME");
-                    int datatype = rs.getInt("DATA_TYPE");
-                    String datatypename = rs.getString("TYPE_NAME");
-                    int size = rs.getInt("COLUMN_SIZE");
-                    System.out.println(name + " " + datatype + " " + datatypename + " " + size);
-                }
-            }
-        } catch (SQLException ex) {
-            LOGGER.error(ex.getMessage());
-        }
     }
     
     /**
