@@ -130,16 +130,20 @@ public class DatasourceList implements Serializable {
                             ResultSet crs = selectedDdbmd.getColumns(datasourceDatabasename, null, tables.getString("TABLE_NAME"), null);
                             while (crs.next()) {
                                 ColumnData cd = new ColumnData();
-                                cd.setName(crs.getString("COLUMN_NAME"));
-                                cd.setType(crs.getInt("DATA_TYPE"));
-                                cd.setTypename(crs.getString("TYPE_NAME"));
-                                cd.setSize(crs.getInt("COLUMN_SIZE"));
-                                cd.setDigits(crs.getInt("DECIMAL_DIGITS"));
-                                cd.setRadix(crs.getInt("NUM_PREC_RADIX"));
-                                cd.setNullable(crs.getInt("NULLABLE"));
-                                cd.setDefaultvalue(crs.getString("COLUMN_DEF"));
-                                cd.setAutoinc(crs.getString("IS_AUTOINCREMENT"));
-                                cd.setGenerated(crs.getString("IS_GENERATEDCOLUMN"));
+                                try {
+                                    cd.setName(crs.getString("COLUMN_NAME"));
+                                    cd.setType(crs.getInt("DATA_TYPE"));
+                                    cd.setTypename(crs.getString("TYPE_NAME"));
+                                    cd.setSize(crs.getInt("COLUMN_SIZE"));
+                                    cd.setDigits(crs.getInt("DECIMAL_DIGITS"));
+                                    cd.setRadix(crs.getInt("NUM_PREC_RADIX"));
+                                    cd.setNullable(crs.getInt("NULLABLE"));
+                                    cd.setDefaultvalue(crs.getString("COLUMN_DEF"));
+                                    cd.setAutoinc(crs.getString("IS_AUTOINCREMENT"));
+                                    //cd.setGenerated(crs.getString("IS_GENERATEDCOLUMN"));
+                                } catch (Exception e) {
+                                    LOGGER.error(e.getMessage());
+                                }
                                 td.getColumns().add(cd);
                             }
                             tablelist.add(td);
