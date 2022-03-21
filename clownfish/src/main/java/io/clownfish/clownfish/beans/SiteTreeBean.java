@@ -162,6 +162,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter boolean sitestatic;
     private @Getter @Setter boolean sitesearchrelevant;
     private @Getter @Setter boolean sitemap;
+    private @Getter @Setter boolean searchresult;
     private @Getter @Setter String siteTitle;
     private @Getter @Setter String siteDescription;
     private @Getter @Setter String aliaspath;
@@ -294,6 +295,7 @@ public class SiteTreeBean implements Serializable {
         contentType = propertymap.get("response_contenttype");
         characterEncoding = propertymap.get("response_characterencoding");
         contenteditable = false;
+        searchresult = false;
         showContent = false;
         showDatalist = false;
         showAssetLibrary = false;
@@ -436,6 +438,7 @@ public class SiteTreeBean implements Serializable {
         selectedKeywordlist.clear();
         sitejob = false;
         sitesearchrelevant = false;
+        searchresult = false;
         sitemap = false;
         sitestatic = false;
         newButtonDisabled = false;
@@ -572,6 +575,7 @@ public class SiteTreeBean implements Serializable {
         sitesearchrelevant = selectedSite.isSearchrelevant();
         sitemap = selectedSite.isSitemap();
         sitestatic = selectedSite.isStaticsite();
+        searchresult = selectedSite.isSearchresult();
         aliaspath = selectedSite.getAliaspath();
         sitehtmlcompression = selectedSite.getHtmlcompression();
         characterEncoding = selectedSite.getCharacterencoding();
@@ -707,6 +711,7 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setDescription(siteDescription);
             selectedSite.setJob(sitejob);
             selectedSite.setSearchrelevant(sitesearchrelevant);
+            selectedSite.setSearchresult(searchresult);
             selectedSite.setSitemap(sitemap);
             selectedSite.setStaticsite(sitestatic);
             cfsiteService.edit(selectedSite);
@@ -772,6 +777,7 @@ public class SiteTreeBean implements Serializable {
             newsite.setDescription(siteDescription);
             newsite.setJob(sitejob);
             newsite.setSearchrelevant(sitesearchrelevant);
+            newsite.setSearchresult(searchresult);
             newsite.setSitemap(sitemap);
             newsite.setStaticsite(sitestatic);
             cfsiteService.create(newsite);

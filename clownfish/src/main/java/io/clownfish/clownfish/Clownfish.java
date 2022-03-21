@@ -813,7 +813,19 @@ public class Clownfish {
         if (servicestatus.isOnline()) {
             try {
                 ArrayList urlParams = new ArrayList();
-                if (0 != name.compareToIgnoreCase("searchresult")) {
+                // fetch site by name or aliasname
+                CfSite cfsite = null;
+                try {
+                    cfsite = cfsiteService.findByName(name);
+                } catch (Exception ex) {
+                    try {
+                        cfsite = cfsiteService.findByAliaspath(name);
+                    } catch (Exception e1) {
+                        throw new PageNotFoundException("PageNotFound Exception: " + name);
+                    }
+                }
+                
+                if (!cfsite.isSearchresult()) {
                     String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
                     
                     if (path.contains("/")) {
@@ -832,6 +844,50 @@ public class Clownfish {
                         if (name.lastIndexOf("/")+1 == name.length()) {
                             name = name.substring(0, name.length()-1);
                         }
+                    }
+                } else {
+                    if (searchcontentmap.isEmpty()) {
+                        String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+                        String query = "";
+                        if (path.contains("/")) {
+                            String[] params = path.split("/");
+                            for (int i = 1; i < params.length; i++) {
+                                if (1 == i) {
+                                    path = params[i];
+                                } else {
+                                    query += params[i];
+                                }
+                            }
+                        }
+                        
+                        String[] searchexpressions = query.split(" ");
+                        updateSearchhistory(searchexpressions);
+
+                        searcher.setIndexPath(folderUtil.getIndex_folder());
+                        long startTime = System.currentTimeMillis();
+                        SearchResult searchresult = searcher.search(query, searchlimit);
+                        long endTime = System.currentTimeMillis();
+
+                        LOGGER.info("Search Time :" + (endTime - startTime));
+                        searchmetadata.clear();
+                        searchmetadata.put("cfSearchQuery", query);
+                        searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
+                        searchcontentmap.clear();
+                        searchresult.getFoundSites().stream().forEach((site) -> {
+                            searchcontentmap.put(site.getName(), site);
+                        });
+                        searchassetmap.clear();
+                        searchresult.getFoundAssets().stream().forEach((asset) -> {
+                            searchassetmap.put(asset.getName(), asset);
+                        });
+                        searchassetmetadatamap.clear();
+                        searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
+                            searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
+                        });
+                        searchclasscontentmap.clear();
+                        searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
+                            searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
+                        });
                     }
                 }
 
@@ -860,7 +916,7 @@ public class Clownfish {
                 }
                 ServletOutputStream out = response.getOutputStream();
                 out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
-            } catch (IOException | InterruptedException | ExecutionException ex) {
+            } catch (IOException | InterruptedException | ExecutionException | ParseException ex) {
                 LOGGER.error(ex.getMessage());
             } catch (PageNotFoundException ex) {
                 String error_site = propertyUtil.getPropertyValue("site_error");
@@ -891,9 +947,10 @@ public class Clownfish {
      * @param name
      * @param request
      * @param response
+     * @throws io.clownfish.clownfish.exceptions.PageNotFoundException
      */
     @PostMapping("/{name}/**")
-    public void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+    public void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) throws PageNotFoundException {
         try {
             ArrayList urlParams = new ArrayList();
             String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
@@ -924,6 +981,58 @@ public class Clownfish {
                 Gson gson = new Gson();
                 List<JsonFormParameter> map;
                 map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
+                
+                // fetch site by name or aliasname
+                CfSite cfsite = null;
+                try {
+                    cfsite = cfsiteService.findByName(name);
+                } catch (Exception ex) {
+                    try {
+                        cfsite = cfsiteService.findByAliaspath(name);
+                    } catch (Exception e1) {
+                        throw new PageNotFoundException("PageNotFound Exception: " + name);
+                    }
+                }
+                
+                if (cfsite.isSearchresult()) {
+                    if (searchcontentmap.isEmpty()) {
+                        String query = "";
+                        for (JsonFormParameter jsp : map) {
+                            if (0 == jsp.getName().compareToIgnoreCase("search")) {
+                                query += jsp.getValue();
+                            }
+                        }
+                        String[] searchexpressions = query.split(" ");
+                        updateSearchhistory(searchexpressions);
+
+                        searcher.setIndexPath(folderUtil.getIndex_folder());
+                        long startTime = System.currentTimeMillis();
+                        SearchResult searchresult = searcher.search(query, searchlimit);
+                        long endTime = System.currentTimeMillis();
+
+                        LOGGER.info("Search Time :" + (endTime - startTime));
+                        searchmetadata.clear();
+                        searchmetadata.put("cfSearchQuery", query);
+                        searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
+                        searchcontentmap.clear();
+                        searchresult.getFoundSites().stream().forEach((site) -> {
+                            searchcontentmap.put(site.getName(), site);
+                        });
+                        searchassetmap.clear();
+                        searchresult.getFoundAssets().stream().forEach((asset) -> {
+                            searchassetmap.put(asset.getName(), asset);
+                        });
+                        searchassetmetadatamap.clear();
+                        searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
+                            searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
+                        });
+                        searchclasscontentmap.clear();
+                        searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
+                            searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
+                        });
+                    }
+                }
+                
                 addHeader(response, clownfishutil.getVersion());
                 Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false);
                 if (cfResponse.get().getErrorcode() == 0) {
@@ -938,7 +1047,7 @@ public class Clownfish {
                     out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
                 }
             }
-        } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException | IllegalStateException ex) {
+        } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException | IllegalStateException | ParseException ex) {
             LOGGER.error(ex.getMessage());
         }
     }

@@ -52,7 +52,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfSite.findByContenttype", query = "SELECT c FROM CfSite c WHERE c.contenttype = :contenttype"),
     @NamedQuery(name = "CfSite.findByLocale", query = "SELECT c FROM CfSite c WHERE c.locale = :locale"),
     @NamedQuery(name = "CfSite.findByAliaspath", query = "SELECT c FROM CfSite c WHERE c.aliaspath = :aliaspath"),
-    @NamedQuery(name = "CfSite.findBySitemap", query = "SELECT c FROM CfSite c WHERE c.sitemap = :sitemap")
+    @NamedQuery(name = "CfSite.findBySitemap", query = "SELECT c FROM CfSite c WHERE c.sitemap = :sitemap"),
+    @NamedQuery(name = "CfSite.findBySearchresult", query = "SELECT c FROM CfSite c WHERE c.searchresult = :searchresult")
 })
 public class CfSite implements Serializable {
 
@@ -110,6 +111,8 @@ public class CfSite implements Serializable {
     private BigInteger hitcounter;
     @Column(name = "sitemap")
     private boolean sitemap;
+    @Column(name = "searchresult")
+    private boolean searchresult;
 
     public CfSite() {
     }
@@ -302,6 +305,14 @@ public class CfSite implements Serializable {
 
     public void setSitemap(boolean sitemap) {
         this.sitemap = sitemap;
+    }
+
+    public boolean isSearchresult() {
+        return searchresult;
+    }
+
+    public void setSearchresult(boolean searchresult) {
+        this.searchresult = searchresult;
     }
 
     @Override
