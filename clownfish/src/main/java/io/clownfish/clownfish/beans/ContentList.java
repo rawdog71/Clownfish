@@ -27,6 +27,8 @@ import io.clownfish.clownfish.dbentities.CfContentversion;
 import io.clownfish.clownfish.dbentities.CfContentversionPK;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfList;
+import io.clownfish.clownfish.dbentities.CfListcontent;
+import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
@@ -362,12 +364,26 @@ public class ContentList implements Serializable {
         if (selectedContent != null) {            
             selectedContent.setScrapped(true);
             cfclasscontentService.edit(selectedContent);
+            
+            // Delete from Listcontent - consistency
+            List<CfListcontent> listcontent = cflistcontentService.findByClasscontentref(selectedContent.getId());
+            for (CfListcontent lc : listcontent) {
+                cflistcontentService.delete(lc);
+                hibernateUtil.deleteRelation(cflistService.findById(lc.getCfListcontentPK().getListref()), cfclasscontentService.findById(lc.getCfListcontentPK().getClasscontentref()));
+            }
+            
+            // Delete from Sitecontent - consistency
+            List<CfSitecontent> sitecontent = cfsitecontentService.findByClasscontentref(selectedContent.getId());
+            for (CfSitecontent sc : sitecontent) {
+                cfsitecontentService.delete(sc);
+            }
+            
             try {
                 hibernateUtil.updateContent(selectedContent);
             } catch (javax.persistence.NoResultException ex) {
                 LOGGER.warn(ex.getMessage());
             }
-            cacheManager.getCache("classcontent").clear();                      // Hazelcast Cache clearing
+            //cacheManager.getCache("classcontent").clear();                      // Hazelcast Cache clearing
             classcontentlist = cfclasscontentService.findByMaintenance(true);
             FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been scrapped.");
             FacesContext.getCurrentInstance().addMessage(null, message);

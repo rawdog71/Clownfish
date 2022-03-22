@@ -168,6 +168,20 @@ public class RestContent {
                     try {
                         CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname());
                         classcontent.setScrapped(true);
+                        
+                        // Delete from Listcontent - consistency
+                        List<CfListcontent> listcontent = cflistcontentService.findByClasscontentref(classcontent.getId());
+                        for (CfListcontent lc : listcontent) {
+                            cflistcontentService.delete(lc);
+                            hibernateUtil.deleteRelation(cflistService.findById(lc.getCfListcontentPK().getListref()), cfclasscontentService.findById(lc.getCfListcontentPK().getClasscontentref()));
+                        }
+
+                        // Delete from Sitecontent - consistency
+                        List<CfSitecontent> sitecontent = cfsitecontentService.findByClasscontentref(classcontent.getId());
+                        for (CfSitecontent sc : sitecontent) {
+                            cfsitecontentService.delete(sc);
+                        }
+                        
                         cfclasscontentService.edit(classcontent);
                         ucp.setReturncode("OK");
                         hibernateUtil.updateContent(classcontent);

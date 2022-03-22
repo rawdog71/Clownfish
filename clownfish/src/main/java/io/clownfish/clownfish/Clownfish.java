@@ -1065,7 +1065,9 @@ public class Clownfish {
     @Async
     public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, List urlParams, boolean makestatic) throws PageNotFoundException {
         ClownfishResponse cfresponse = new ClownfishResponse();
-        
+        if (null != sitecontentmap) {
+            sitecontentmap.clear();
+        }
         try {
             List<CfSitedatasource> sitedatasourcelist = null;
             // Freemarker Template
