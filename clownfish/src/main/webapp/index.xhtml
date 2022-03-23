@@ -9,9 +9,9 @@
     <h:head>
         <title>Clownfish CMS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <h:outputStylesheet library="webjars" name="primeflex/3.1.0/primeflex.min.css" />
-        <h:outputStylesheet library="webjars" name="font-awesome/5.15.4/css/all.min-jsf.css" />
-        <h:outputStylesheet library="webjars" name="font-awesome/5.15.4/css/v4-shims.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="primeflex/3.1.3/primeflex.min.css" />
+        <h:outputStylesheet library="webjars" name="font-awesome/6.0.0/css/all.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="font-awesome/6.0.0/css/v4-shims.min-jsf.css" />
         <script src="resources/js/main.js"></script>
         <f:facet name="last">
             <link rel="stylesheet" type="text/css" href="resources/css/main.css" />
@@ -576,7 +576,7 @@
 
                 <p:tab title="Stylesheets" id="stylesheetpanel" rendered="#{loginBean.login and loginBean.hasRights(3)}">
                     <f:facet name="title">
-                        <i class="fab fa-css3"></i><h:outputText value="&nbsp;"/>
+                        <i class="fa-brands fa-css3"></i><h:outputText value="&nbsp;"/>
                         <h:outputText value="Stylesheets"/>
                     </f:facet>
                     
@@ -640,7 +640,7 @@
 
                 <p:tab title="Javascripts" id="javascriptpanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
                     <f:facet name="title">
-                        <i class="fab fa-js"></i><h:outputText value="&nbsp;"/>
+                        <i class="fa-brands fa-js"></i><h:outputText value="&nbsp;"/>
                         <h:outputText value="Javascripts"/>
                     </f:facet>
                     
@@ -704,7 +704,7 @@
 
                 <p:tab title="JVM" id="javapanel" rendered="#{loginBean.login and loginBean.hasRights(4)}">
                     <f:facet name="title">
-                        <i class="fab fa-java"></i><h:outputText value="&nbsp;"/>
+                        <i class="fa-brands fa-java"></i><h:outputText value="&nbsp;"/>
                         <h:outputText value="JVM"/>
                     </f:facet>
                     
