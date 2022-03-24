@@ -233,8 +233,12 @@ public class GetContentHibernate extends HttpServlet {
                                         contentdataoutput.setContent(cfclasscontent);
                                         contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
                                         contentdataoutput.setKeyvals(getContentMap(content));
-                                        contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
-                                        contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                                        try {
+                                            contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
+                                            contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                                        } catch (Exception ex) {
+                                            
+                                        }
                                         outputlist.add(contentdataoutput);
                                     }
                                 } else {
@@ -242,8 +246,12 @@ public class GetContentHibernate extends HttpServlet {
                                     contentdataoutput.setContent(cfclasscontent);
                                     contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
                                     contentdataoutput.setKeyvals(getContentMap(content));
-                                    contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
-                                    contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                                    try {
+                                        contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
+                                        contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                                    } catch (Exception ex) {
+                                            
+                                    }
                                     outputlist.add(contentdataoutput);
                                 }
                             }
