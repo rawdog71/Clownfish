@@ -100,13 +100,13 @@ public class InsertContent extends HttpServlet {
             if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 CfClass clazz = cfclassService.findByName(icp.getClassname());
                 try {
-                    CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname());
-                    response.getOutputStream().println("Duplicate Classcontent: " + icp.getContentname());
+                    CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname().trim().replaceAll("\\s+", "_"));
+                    response.getOutputStream().println("Duplicate Classcontent: " + icp.getContentname().trim().replaceAll("\\s+", "_"));
                     icp.setReturncode("NOK");
                 } catch (javax.persistence.NoResultException ex) {
                     try {
                         CfClasscontent newclasscontent = new CfClasscontent();
-                        newclasscontent.setName(icp.getContentname());
+                        newclasscontent.setName(icp.getContentname().trim().replaceAll("\\s+", "_"));
                         newclasscontent.setClassref(clazz);
                         CfClasscontent newclasscontent2 = cfclasscontentService.create(newclasscontent);
                         hibernateUtil.insertContent(newclasscontent);

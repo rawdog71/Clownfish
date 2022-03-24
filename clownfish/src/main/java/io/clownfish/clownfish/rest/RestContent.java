@@ -166,7 +166,7 @@ public class RestContent {
                     CfClass clazz = cfclassService.findByName(ucp.getClassname());
 
                     try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname());
+                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
                         classcontent.setScrapped(true);
                         
                         // Delete from Listcontent - consistency
@@ -214,7 +214,7 @@ public class RestContent {
                     CfClass clazz = cfclassService.findByName(ucp.getClassname());
 
                     try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname());
+                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
                         List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
                         for (CfAttributcontent attributcontent : attributcontentlist) {
                             CfAttribut attribut = attributcontent.getAttributref();
@@ -257,7 +257,7 @@ public class RestContent {
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfClass clazz = cfclassService.findByName(ucp.getClassname());
                     try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname());
+                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
                         // Delete corresponding attributcontent entries
                         List<CfAttributcontent> attributcontentlistdummy = cfattributcontentService.findByClasscontentref(classcontent);
                         for (CfAttributcontent attributcontent : attributcontentlistdummy) {
@@ -317,7 +317,7 @@ public class RestContent {
                 String apikey = ucp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname());
+                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
                         if (0 == classcontent.getCheckedoutby().longValue()) {
                             classcontent.setCheckedoutby(BigInteger.valueOf(ucp.getUserid()));
                             ucp.setCheckedoutby(ucp.getUserid());
@@ -353,7 +353,7 @@ public class RestContent {
                 String apikey = ucp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname());
+                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
                         if (ucp.getUserid() == classcontent.getCheckedoutby().longValue()) {
                             classcontent.setCheckedoutby(BigInteger.ZERO);
                             ucp.setCheckedoutby(0);
