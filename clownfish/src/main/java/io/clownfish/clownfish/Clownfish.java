@@ -65,7 +65,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerMapping;
-
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.persistence.NoResultException;
@@ -151,6 +150,7 @@ public class Clownfish {
     @Autowired ConsistencyUtil consistencyUtil;
     @Autowired HibernateUtil hibernateUtil;
     @Autowired ServiceStatus servicestatus;
+    @Autowired SearchUtil searchUtil;
     
     DatabaseTemplateBean databasebean;
     EmailTemplateBean emailbean;
@@ -228,22 +228,6 @@ public class Clownfish {
         universalGet(root_site, request, response);
     }
     
-    /**
-     * Call of the "error" site
-     * Fetches the error site from the system property "site_error" and calls universalGet 
-     * @param request
-     * @param response
-     */
-    @RequestMapping("/error")
-    public void error(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        String error_site = propertyUtil.getPropertyValue("site_error");
-        if (null == error_site) {
-            error_site = "error";
-        }
-        request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, error_site);
-        universalGet(error_site, request, response);
-    }
-
     public void initClasspath() {
         cfclassLoader = null;
         cfclassCompiler = null;
@@ -308,7 +292,6 @@ public class Clownfish {
         
         Thread compileThread = new Thread(cfclassCompiler);
         compileThread.start();
-        //cfclassCompiler.compileAll(initmessage);
         
         if (1 == bootstrap) {
             bootstrap = 0;
@@ -418,11 +401,6 @@ public class Clownfish {
                 
                 Thread hibernateThread = new Thread(hibernateUtil);
                 hibernateThread.start();
-                /*
-                hibernateUtil.generateTablesDatamodel(hibernateInit);
-                // generate Relation Tables
-                hibernateUtil.generateRelationsDatamodel(hibernateInit);
-                */
             }
             
             propertylist.setClownfish(this);
@@ -552,255 +530,6 @@ public class Clownfish {
     public Clownfish() {
     }
     
-    @PostMapping(path = "/search")
-    public void postsearch(@Context HttpServletRequest request, @Context HttpServletResponse response) throws ParseException {
-        try {
-            userSession = request.getSession();
-            String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-
-            Gson gson = new Gson();
-            List<JsonFormParameter> map;
-            map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
-            
-            Map parametermap = clownfishutil.getParametermap(map);
-            
-            String[] searchexpressions = parametermap.get("searchparam").toString().split(" ");
-            updateSearchhistory(searchexpressions);
-            
-            searcher.setIndexPath(folderUtil.getIndex_folder());
-            searcher.setPropertyList(propertylist);
-            long startTime = System.currentTimeMillis();
-            SearchResult searchresult = searcher.search(parametermap.get("searchparam").toString(), searchlimit);
-            long endTime = System.currentTimeMillis();
-            
-            LOGGER.info("Search Time :" + (endTime - startTime));
-            searchmetadata.clear();
-            searchmetadata.put("cfSearchQuery", parametermap.get("searchparam").toString());
-            searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
-            searchcontentmap.clear();
-            searchresult.getFoundSites().stream().forEach((site) -> {
-                searchcontentmap.put(site.getName(), site);
-            });
-            searchassetmap.clear();
-            searchresult.getFoundAssets().stream().forEach((asset) -> {
-                searchassetmap.put(asset.getName(), asset);
-            });
-            searchassetmetadatamap.clear();
-            searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
-                searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
-            });
-            searchclasscontentmap.clear();
-            searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
-                searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
-            });
-            
-            String search_site = propertyUtil.getPropertyValue("site_search");
-            if (null == search_site) {
-                search_site = "searchresult";
-            }
-            request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, search_site);
-            universalGet(search_site, request, response);
-        } catch (IOException ex) {
-            LOGGER.error(ex.getMessage());
-        }    
-    }
-    
-    /**
-     * Call of the "search" site
-     * Fetches the search site from the system property "site_search" and calls universalGet
-     * Instantiates the Searcher class
-     * Clears and fills the searchmetadata
-     * @param query
-     * @param request
-     * @param response
-     */
-    @GetMapping(path = "/search/{query}")
-    public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        try {
-            String[] searchexpressions = query.split(" ");
-            updateSearchhistory(searchexpressions);
-            
-            searcher.setIndexPath(folderUtil.getIndex_folder());
-            long startTime = System.currentTimeMillis();
-            SearchResult searchresult = searcher.search(query, searchlimit);
-            long endTime = System.currentTimeMillis();
-            
-            LOGGER.info("Search Time :" + (endTime - startTime));
-            searchmetadata.clear();
-            searchmetadata.put("cfSearchQuery", query);
-            searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
-            searchcontentmap.clear();
-            searchresult.getFoundSites().stream().forEach((site) -> {
-                searchcontentmap.put(site.getName(), site);
-            });
-            searchassetmap.clear();
-            searchresult.getFoundAssets().stream().forEach((asset) -> {
-                searchassetmap.put(asset.getName(), asset);
-            });
-            searchassetmetadatamap.clear();
-            searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
-                searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
-            });
-            searchclasscontentmap.clear();
-            searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
-                searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
-            });
-            
-            String search_site = propertyUtil.getPropertyValue("site_search");
-            if (null == search_site) {
-                search_site = "searchresult";
-            }
-            request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, search_site);
-            universalGet(search_site, request, response);
-        } catch (IOException | ParseException ex) {
-            LOGGER.error(ex.getMessage());
-            String search_site = propertyUtil.getPropertyValue("site_search");
-            if (null == search_site) {
-                search_site = "searchresult";
-            }
-            universalGet(search_site, request, response);
-        }
-    }
-    
-    @GetMapping(path = "/{name}.js")
-    public void universalGetJS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        BufferedReader br = null;
-        try {
-            response.setContentType("application/javascript");
-            response.setCharacterEncoding("UTF-8");
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getJs_folder() + File.separator + name + ".js"), "UTF-8"));
-            StringBuilder sb = new StringBuilder(1024);
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-            br.close();
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(sb);
-        } catch (IOException ex) {
-            CfJavascript cfjavascript = null;
-            try {
-                cfjavascript = cfjavascriptService.findByName(name);
-                response.setContentType("application/javascript");
-                response.setCharacterEncoding("UTF-8");
-                PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfjavascript.getContent());
-            } catch (IOException iex) {
-                System.out.println("JS NOT FOUND");
-            }
-        } finally {
-            try {
-                if (null != br) {
-                    br.close();
-                }
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage());
-            }
-        }
-    }
-    
-    @GetMapping(path = "/sitemap.xml")
-    public void sitemap(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        try {
-            String domain = propertyUtil.getPropertyValue("domain");
-            response.setContentType("application/xml");
-            response.setCharacterEncoding("UTF-8");
-            
-            StringBuilder sb = new StringBuilder(1024);
-            sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            sb.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
-            // Site root
-            sb.append("<url>");
-            sb.append("<loc>").append(domain).append("/").append("</loc>");
-            sb.append("</url>");
-            List<CfSite> sitemapList = cfsiteService.findBySitemap(true);
-            for (CfSite sitemapItem : sitemapList) {
-                sb.append("<url>");
-                sb.append("<loc>").append(domain).append("/").append(sitemapItem.getName()).append("</loc>");
-                sb.append("</url>");
-                if ((!sitemapItem.getAliaspath().isBlank()) && (0 != sitemapItem.getAliaspath().compareToIgnoreCase(sitemapItem.getName()))) {
-                    sb.append("<url>");
-                    sb.append("<loc>").append(domain).append("/").append(sitemapItem.getAliaspath()).append("</loc>");
-                    sb.append("</url>");
-                }
-            }
-            sb.append("</urlset>");
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(sb);
-        } catch (IOException ex) {
-           
-        }
-    }
-    
-    @GetMapping(path = "/{name}.css")
-    public void universalGetCSS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        BufferedReader br = null;
-        try {
-            response.setContentType("text/css");
-            response.setCharacterEncoding("UTF-8");
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getCss_folder() + File.separator + name + ".css"), "UTF-8"));
-            StringBuilder sb = new StringBuilder(1024);
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-            br.close();
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(sb);
-        } catch (IOException ex) {
-            CfStylesheet cfstylesheet = null;
-            try {
-                cfstylesheet = cfstylesheetService.findByName(name);
-                response.setContentType("text/css");
-                response.setCharacterEncoding("UTF-8");
-                PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfstylesheet.getContent());
-            } catch (IOException iex) {
-                System.out.println("CSS NOT FOUND");
-            }
-        } finally {
-            try {
-                if (null != br) {
-                    br.close();
-                }
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage());
-            }
-        }
-    }
-    
-    @GetMapping(path = {"/{name}.tpl", "/{name}.html"})
-    public void universalGetTemplate(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        CfTemplate cftemplate = null;
-        try {
-            cftemplate = cftemplateService.findByName(name);
-            if (2 == cftemplate.getScriptlanguage()) {
-                response.setContentType("text/html");
-                response.setCharacterEncoding("UTF-8");
-                PrintWriter outwriter = response.getWriter();
-                outwriter.println(cftemplate.getContent());
-            } else {
-                LOGGER.warn("ONLY HTML Templates");
-            }
-        } catch (IOException ex) {
-            LOGGER.warn("Template NOT FOUND");
-        }
-    }
-
-    @GetMapping(path = "/robots.txt")
-    public void universalGetRobots(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        CfTemplate cftemplate = null;
-        try {
-            cftemplate = cftemplateService.findByName("robots");
-            response.setContentType("text/plain;charset=UTF-8");
-            response.setCharacterEncoding("UTF-8");
-            PrintWriter outwriter = response.getWriter();
-            outwriter.print(cftemplate.getContent());
-        } catch (IOException ex) {
-            System.out.print("ROBOTS NOT FOUND");
-        }
-    }
-    
     /**
      * GET
      * 
@@ -846,7 +575,7 @@ public class Clownfish {
                         }
                     }
                 } else {
-                    if (searchcontentmap.isEmpty()) {
+                    if (searchmetadata.isEmpty()) {
                         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
                         String query = "";
                         if (path.contains("/")) {
@@ -861,7 +590,7 @@ public class Clownfish {
                         }
                         
                         String[] searchexpressions = query.split(" ");
-                        updateSearchhistory(searchexpressions);
+                        searchUtil.updateSearchhistory(searchexpressions);
 
                         searcher.setIndexPath(folderUtil.getIndex_folder());
                         long startTime = System.currentTimeMillis();
@@ -1003,7 +732,7 @@ public class Clownfish {
                             }
                         }
                         String[] searchexpressions = query.split(" ");
-                        updateSearchhistory(searchexpressions);
+                        searchUtil.updateSearchhistory(searchexpressions);
 
                         searcher.setIndexPath(folderUtil.getIndex_folder());
                         long startTime = System.currentTimeMillis();
@@ -1742,27 +1471,6 @@ public class Clownfish {
         }
     }
     
-    /**
-     * updateSearchhistory
-     * 
-     */
-    private void updateSearchhistory(String[] searchexpressions) {
-        for (String expression : searchexpressions) {
-            if ((expression.length() >= 3) && (!expression.endsWith("*"))) {
-                try {
-                    CfSearchhistory searchhistory = cfsearchhistoryService.findByExpression(expression.toLowerCase());
-                    searchhistory.setCounter(searchhistory.getCounter()+1);
-                    cfsearchhistoryService.edit(searchhistory);
-                } catch (NoResultException ex) {
-                    CfSearchhistory newsearchhistory = new CfSearchhistory();
-                    newsearchhistory.setExpression(expression.toLowerCase());
-                    newsearchhistory.setCounter(1);
-                    cfsearchhistoryService.create(newsearchhistory);
-                }
-            }
-        }
-    }
-    
     private String interpretscript(String templatecontent, CfTemplate cftemplate, String cfstylesheet, String cfjavascript, Map parametermap) {
         StringWriter out = new StringWriter();
         try {
@@ -2041,7 +1749,7 @@ public class Clownfish {
                 }
                 String content = templateUtil.getVersion((cfdivtemplate).getId(), currentTemplateVersion);
                 content = templateUtil.fetchIncludes(content, modus);
-                content = replacePlaceholders(content, cfdiv, layoutcontent);
+                content = templateUtil.replacePlaceholders(content, cfdiv, layoutcontent, preview);
                 content = interpretscript(content, cfdivtemplate, cfstylesheet, cfjavascript, parametermap);
                 //System.out.println(out);
                 div.removeAttr("template");
@@ -2073,122 +1781,5 @@ public class Clownfish {
             doc.head().append("<script async=\"\" defer=\"\" src=\"resources/js/cf_preview.js\"></script>");
         }
         return doc.html();
-    }
-    
-    private String replacePlaceholders(String content, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
-        // replace Content
-        for (String c : cfdiv.getContentArray()) {
-            List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
-            for (CfLayoutcontent lc : contentlist) {
-                CfClasscontent cfcontent = null;
-                if (preview) {
-                    if (lc.getPreview_contentref().longValue() > 0) {
-                        cfcontent = cfclasscontentService.findById(lc.getPreview_contentref().longValue());
-                    }
-                } else {
-                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
-                        cfcontent = cfclasscontentService.findById(lc.getContentref().longValue());
-                    }
-                }
-                String[] cs = c.split(":");
-                if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
-                    String replacefilter = "#C:" + c + "#";
-                    if (null != cfcontent) {
-                        content = content.replaceAll(replacefilter, cfcontent.getName());
-                    }
-                }
-            }
-        }
-        // replace Datalists
-        for (String c : cfdiv.getContentlistArray()) {
-            List<CfLayoutcontent> datalist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("DL") == 0).collect(Collectors.toList());
-            for (CfLayoutcontent lc : datalist) {
-                CfList cflist = null;
-                if (preview) {
-                    if (lc.getPreview_contentref().longValue() > 0) {
-                        cflist = cflistService.findById(lc.getPreview_contentref().longValue());
-                    }
-                } else {
-                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
-                        cflist = cflistService.findById(lc.getContentref().longValue());
-                    }
-                }
-                String[] cs = c.split(":");
-                if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
-                    String replacefilter = "#DL:" + c + "#";
-                    if (null != cflist) {
-                        content = content.replaceAll(replacefilter, cflist.getName());
-                    }
-                }
-            }
-        }
-        // replace Assets
-        for (String c : cfdiv.getAssetArray()) {
-            int lfdnr = Integer.parseInt(c.split(":")[1]);
-            List<CfLayoutcontent> assets = layoutcontent.stream().filter(lc -> (lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("A") == 0) && (lc.getCfLayoutcontentPK().getLfdnr() == lfdnr)).collect(Collectors.toList());
-            for (CfLayoutcontent lc : assets) {
-                CfAsset cfasset = null;
-                if (preview) {
-                    if (lc.getPreview_contentref().longValue() > 0) {
-                        cfasset = cfassetService.findById(lc.getPreview_contentref().longValue());
-                    }
-                } else {
-                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
-                        cfasset = cfassetService.findById(lc.getContentref().longValue());
-                    }
-                }
-                String replacefilter = "#A:" + c + "#";
-                if (null != cfasset) {
-                    content = content.replaceAll(replacefilter, cfasset.getId().toString());
-                }
-            }
-        }
-        // replace Assetlists
-        for (String c : cfdiv.getAssetlistArray()) {
-            List<CfLayoutcontent> assetlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("AL") == 0).collect(Collectors.toList());
-            for (CfLayoutcontent lc : assetlist) {
-                CfAssetlist cfassetlist = null;
-                if (preview) {
-                    if (lc.getPreview_contentref().longValue() > 0) {
-                        cfassetlist = cfassetlistService.findById(lc.getPreview_contentref().longValue());
-                    }
-                } else {
-                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
-                        cfassetlist = cfassetlistService.findById(lc.getContentref().longValue());
-                    }
-                }
-                String[] cs = c.split(":");
-                if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
-                    String replacefilter = "#AL:" + c + "#";
-                    if (null != cfassetlist) {
-                        content = content.replaceAll(replacefilter, cfassetlist.getName());
-                    }
-                }
-            }
-        }
-        // replace Keywordlists
-        for (String c : cfdiv.getKeywordlistArray()) {
-            List<CfLayoutcontent> keywordlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("KL") == 0).collect(Collectors.toList());
-            for (CfLayoutcontent lc : keywordlist) {
-                CfKeywordlist cfkeywordlist = null;
-                if (preview) {
-                    if (lc.getPreview_contentref().longValue() > 0) {
-                        cfkeywordlist = cfkeywordlistService.findById(lc.getPreview_contentref().longValue());
-                    }
-                } else {
-                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
-                        cfkeywordlist = cfkeywordlistService.findById(lc.getContentref().longValue());
-                    }
-                }
-                String[] cs = c.split(":");
-                if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
-                    String replacefilter = "#KL:" + c + "#";
-                    if (null != cfkeywordlist) {
-                        content = content.replaceAll(replacefilter, cfkeywordlist.getName());
-                    }
-                }
-            }
-        }
-        return content;
     }
 }
