@@ -66,6 +66,10 @@ public class CfClass implements Serializable {
     @JoinColumn(name = "templateref", referencedColumnName = "id")
     @ManyToOne(optional = true)
     private CfTemplate templateref;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "encrypted")
+    private boolean encrypted;
 
     public CfClass() {
     }
@@ -119,6 +123,14 @@ public class CfClass implements Serializable {
 
     public void setTemplateref(CfTemplate templateref) {
         this.templateref = templateref;
+    }
+
+    public boolean isEncrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(boolean encrypted) {
+        this.encrypted = encrypted;
     }
     
     @Override

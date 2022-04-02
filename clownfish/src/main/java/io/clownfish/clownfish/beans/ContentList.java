@@ -47,6 +47,7 @@ import io.clownfish.clownfish.utils.CheckoutUtil;
 import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.EncryptUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
@@ -441,7 +442,11 @@ public class ContentList implements Serializable {
                         selectedAttribut.setContentString(editContent);
                     }
                 } else {
-                    selectedAttribut.setContentString(editContent);
+                    if (selectedAttribut.getClasscontentref().getClassref().isEncrypted()) {
+                        selectedAttribut.setContentString(EncryptUtil.encrypt(editContent, "128BitKey!clownf"));
+                    } else {
+                        selectedAttribut.setContentString(editContent);
+                    }
                 }
                 break;
             case "hashstring":
