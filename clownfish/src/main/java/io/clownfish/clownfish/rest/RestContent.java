@@ -99,6 +99,7 @@ public class RestContent {
                     } catch (javax.persistence.NoResultException ex) {
                         CfClasscontent newclasscontent = new CfClasscontent();
                         newclasscontent.setName(icp.getContentname().trim().replaceAll("\\s+", "_"));
+                        newclasscontent.setCheckedoutby(BigInteger.valueOf(icp.getCheckedoutby()));
                         newclasscontent.setClassref(clazz);
                         CfClasscontent newclasscontent2 = cfclasscontentService.create(newclasscontent);
                         hibernateUtil.insertContent(newclasscontent);
