@@ -235,7 +235,7 @@ public class ContentUtil implements IVersioningInterface {
                 case "media":
                     if (null != editContent) {
                         try {
-                            CfAsset asset = cfassetService.findByName(editContent);
+                            CfAsset asset = cfassetService.findById(Long.parseLong(editContent));
                             selectedAttribut.setContentInteger(BigInteger.valueOf(asset.getId()));
                         } catch (Exception ex) {
                             selectedAttribut.setContentInteger(null);
