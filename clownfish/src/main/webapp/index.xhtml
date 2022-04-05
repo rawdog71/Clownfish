@@ -903,6 +903,11 @@
                         </div>
                         
                         <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="classencrypted" style="margin-right: 0.5rem">Encrypted: </p:outputLabel>
+                            <p:selectBooleanCheckbox id="classencrypted" value="#{classList.classEncrypted}" />
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
                             <p:outputLabel for="classtemplate" style="margin-right: 0.5rem">Preview Template: </p:outputLabel>
                             <p:autoComplete id="classtemplate" dropdown="true" value="#{classList.selectedTemplateRef}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
                             </p:autoComplete>

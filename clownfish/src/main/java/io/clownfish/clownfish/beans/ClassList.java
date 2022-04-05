@@ -77,6 +77,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter String className;
     private @Getter @Setter boolean classSearchrelevant;
     private @Getter @Setter boolean classMaintenance;
+    private @Getter @Setter boolean classEncrypted;
     private @Getter @Setter String attributName;
     private @Getter @Setter boolean identity;
     private @Getter @Setter boolean autoinc;
@@ -122,6 +123,7 @@ public class ClassList implements Serializable {
         className = selectedClass.getName();
         classSearchrelevant = selectedClass.isSearchrelevant();
         classMaintenance = selectedClass.isMaintenance();
+        classEncrypted = selectedClass.isEncrypted();
         selectedTemplateRef = selectedClass.getTemplateref();
         attributName = "";
         selectedAttributeType = null;
@@ -171,6 +173,7 @@ public class ClassList implements Serializable {
             newclass.setName(className);
             newclass.setSearchrelevant(classSearchrelevant);
             newclass.setMaintenance(classMaintenance);
+            newclass.setEncrypted(classEncrypted);
             newclass.setTemplateref(selectedTemplateRef);
             cfclassService.create(newclass);
             classListe = cfclassService.findAll();
@@ -178,6 +181,7 @@ public class ClassList implements Serializable {
             className = "";
             classSearchrelevant = false;
             classMaintenance = true;
+            classEncrypted = false;
             contentlist.init();
             datalist.init();
             
@@ -193,6 +197,7 @@ public class ClassList implements Serializable {
             selectedClass.setName(className);
             selectedClass.setSearchrelevant(classSearchrelevant);
             selectedClass.setMaintenance(classMaintenance);
+            selectedClass.setEncrypted(classEncrypted);
             selectedClass.setTemplateref(selectedTemplateRef);
             cfclassService.edit(selectedClass);
             classListe = cfclassService.findAll();
