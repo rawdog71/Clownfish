@@ -1,0 +1,57 @@
+/*
+ * Copyright 2022 raine.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.clownfish.clownfish.graphql;
+
+import graphql.schema.DataFetcher;
+import io.clownfish.clownfish.dbentities.CfAttribut;
+import io.clownfish.clownfish.dbentities.CfClass;
+import io.clownfish.clownfish.serviceinterface.CfAttributService;
+import io.clownfish.clownfish.serviceinterface.CfClassService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+/**
+ *
+ * @author raine
+ */
+@Component
+public class GraphQLDataFetchers {
+    @Autowired private CfClassService cfclassservice;
+    @Autowired private CfAttributService cfattributservice;
+    
+    public DataFetcher getDataByField(String classname, String fieldname) {
+        return dataFetchingEnvironment -> {
+            CfClass clazz = cfclassservice.findByName(classname);
+            CfAttribut attribut = cfattributservice.findByNameAndClassref(fieldname, clazz);
+            switch (attribut.getAttributetype().getName()) {
+                case "boolean":
+                    boolean bool_value = dataFetchingEnvironment.getArgument(fieldname);
+                    break;
+                case "string":
+                    String string_value = dataFetchingEnvironment.getArgument(fieldname);
+                    break;
+                case "integer":
+                    long integer_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).longValue();
+                    break;
+                case "real":
+                    double double_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).doubleValue();
+                    break;
+            }
+            
+            return null;
+        };
+    }
+}

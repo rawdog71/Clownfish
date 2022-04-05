@@ -106,6 +106,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
             LOGGER.info("Check database or other Clownfish instance");
+            System.exit(-1);
         }
     }
 
