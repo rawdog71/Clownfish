@@ -34,11 +34,8 @@ public class EncryptUtil {
     
     public static String encrypt(String source, String key) {
         try {
-            //String key = "Bar12345Bar12345"; // 128 bit key
-            // Create key and cipher
             Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
             Cipher cipher = Cipher.getInstance("AES");
-            // encrypt the text
             cipher.init(Cipher.ENCRYPT_MODE, aesKey);
             byte[] encrypted = cipher.doFinal(source.getBytes());
             
@@ -47,7 +44,6 @@ public class EncryptUtil {
                 sb.append((char)b);
             }
             
-            // the encrypted String
             String enc = sb.toString();
             return enc;
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
@@ -58,16 +54,12 @@ public class EncryptUtil {
     
     public static String decrypt(String source, String key) {
         try {
-            //String key = "Bar12345Bar12345"; // 128 bit key
-            // Create key and cipher
             Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
-            // for decryption
             byte[] bb = new byte[source.length()];
             for (int i=0; i<source.length(); i++) {
                 bb[i] = (byte) source.charAt(i);
             }
             
-            // decrypt the text
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, aesKey);
             String decrypted = new String(cipher.doFinal(bb));

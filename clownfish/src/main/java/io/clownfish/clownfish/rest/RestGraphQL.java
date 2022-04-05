@@ -16,20 +16,15 @@
 package io.clownfish.clownfish.rest;
 
 import com.github.openjson.JSONObject;
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.DataFetcher;
-import graphql.schema.DataFetcherFactory;
-import graphql.schema.DataFetcherFactoryEnvironment;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import graphql.schema.idl.TypeRuntimeWiring.Builder;
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfClass;
@@ -37,12 +32,9 @@ import io.clownfish.clownfish.graphql.GraphQLDataFetchers;
 import io.clownfish.clownfish.graphql.GraphQLUtil;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
-import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,8 +59,6 @@ public class RestGraphQL {
 
         String sdl = graphQLUtil.generateSchema();
         
-        //URL url = Resources.getResource("schema.graphqls");
-        //sdl = Resources.toString(url, Charsets.UTF_8);
         GraphQLSchema graphQLSchema = buildSchema(sdl);
         GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
 
@@ -78,19 +68,6 @@ public class RestGraphQL {
         return executionResult.toSpecification();
     }
     
-/*
-    @PostConstruct
-    public void init() throws IOException {
-        try {
-            String sdl = graphQLUtil.generateSchema();
-            GraphQLSchema graphQLSchema = buildSchema(sdl);
-            this.graphQL = GraphQL.newGraphQL(graphQLSchema).build();
-        } catch (Exception ex) {
-            System.out.print(ex.getMessage());
-        }
-    }
-*/
-
     private GraphQLSchema buildSchema(String sdl) {
         TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(sdl);
         RuntimeWiring runtimeWiring = buildWiring();

@@ -17,9 +17,17 @@ package io.clownfish.clownfish.graphql;
 
 import graphql.schema.DataFetcher;
 import io.clownfish.clownfish.dbentities.CfAttribut;
+import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
+import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.utils.ContentUtil;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,27 +39,82 @@ import org.springframework.stereotype.Component;
 public class GraphQLDataFetchers {
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfAttributService cfattributservice;
+    @Autowired private CfClasscontentService cfclasscontentService;
+    @Autowired private CfAttributcontentService cfattributcontentservice;
+    @Autowired ContentUtil contentUtil;
     
     public DataFetcher getDataByField(String classname, String fieldname) {
         return dataFetchingEnvironment -> {
             CfClass clazz = cfclassservice.findByName(classname);
             CfAttribut attribut = cfattributservice.findByNameAndClassref(fieldname, clazz);
+            Map<String, String> resultlist = null;
             switch (attribut.getAttributetype().getName()) {
                 case "boolean":
                     boolean bool_value = dataFetchingEnvironment.getArgument(fieldname);
+                    resultlist = getList(clazz, attribut.getName(), bool_value);
                     break;
                 case "string":
                     String string_value = dataFetchingEnvironment.getArgument(fieldname);
+                    resultlist = getList(clazz, attribut.getName(), string_value);
                     break;
                 case "integer":
-                    long integer_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).longValue();
+                    long long_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).longValue();
+                    resultlist = getList(clazz, attribut.getName(), long_value);
                     break;
                 case "real":
                     double double_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).doubleValue();
+                    resultlist = getList(clazz, attribut.getName(), double_value);
                     break;
             }
-            
-            return null;
+            return resultlist;
         };
+    }
+    
+    private Map<String, String> getList(CfClass clazz, String attributname, Object attributvalue) {
+        Map<String, String> result = new HashMap<>();
+        List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(clazz);
+        for (CfClasscontent cc : classcontentList) {
+            if (!cc.isScrapped()) {
+                HashMap<String, String> attributmap = new HashMap<>();
+                List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
+                if (checkCompare(aclist, cc, attributname, attributvalue)) {
+                    List keyvals = contentUtil.getContentOutputKeyval(aclist);
+                
+                    result.putAll((Map)keyvals.get(0));
+                }
+            }
+        }
+        return result;
+    }
+    
+    private boolean checkCompare(List<CfAttributcontent> aclist, CfClasscontent cc, String attributname, Object attributvalue) {
+        boolean found = false;
+        for (CfAttributcontent ac : aclist) {
+            if ((!found) && (0 == ac.getAttributref().getName().compareToIgnoreCase(attributname))) {
+                switch (ac.getAttributref().getAttributetype().getName()) {
+                    case "string":
+                        if (0 == ac.getContentString().compareTo((String) attributvalue)) {
+                            found = true;
+                        }
+                        break;
+                    case "boolean":
+                        if (ac.getContentBoolean() == (boolean) attributvalue) {
+                            found = true;
+                        }
+                        break;
+                    case "integer":
+                        if (ac.getContentInteger().longValue()  == (long) attributvalue) {
+                            found = true;
+                        }
+                        break;
+                    case "real":
+                        if (ac.getContentReal().floatValue()  == (float) attributvalue) {
+                            found = true;
+                        }
+                        break;
+                }
+            }
+        }
+        return found;
     }
 }

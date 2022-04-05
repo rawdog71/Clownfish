@@ -94,9 +94,9 @@ public class GraphQLUtil {
             case "text":
                 return "String";
             case "classref":
-                return "???";
+                return "Int";
             case "assetref":
-                return "???";
+                return "Int";
             default:
                 return null;
         }
