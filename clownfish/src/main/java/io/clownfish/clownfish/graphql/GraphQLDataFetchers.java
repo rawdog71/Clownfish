@@ -25,6 +25,7 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,30 +48,53 @@ public class GraphQLDataFetchers {
         return dataFetchingEnvironment -> {
             CfClass clazz = cfclassservice.findByName(classname);
             CfAttribut attribut = cfattributservice.findByNameAndClassref(fieldname, clazz);
-            Map<String, String> resultlist = null;
-            switch (attribut.getAttributetype().getName()) {
-                case "boolean":
-                    boolean bool_value = dataFetchingEnvironment.getArgument(fieldname);
-                    resultlist = getList(clazz, attribut.getName(), bool_value);
-                    break;
-                case "string":
-                    String string_value = dataFetchingEnvironment.getArgument(fieldname);
-                    resultlist = getList(clazz, attribut.getName(), string_value);
-                    break;
-                case "integer":
-                    long long_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).longValue();
-                    resultlist = getList(clazz, attribut.getName(), long_value);
-                    break;
-                case "real":
-                    double double_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).doubleValue();
-                    resultlist = getList(clazz, attribut.getName(), double_value);
-                    break;
+            if (attribut.getIdentity()) {
+                Map<String, String> resultlist = null;
+                switch (attribut.getAttributetype().getName()) {
+                    case "boolean":
+                        boolean bool_value = dataFetchingEnvironment.getArgument(fieldname);
+                        resultlist = getSingle(clazz, attribut.getName(), bool_value);
+                        break;
+                    case "string":
+                        String string_value = dataFetchingEnvironment.getArgument(fieldname);
+                        resultlist = getSingle(clazz, attribut.getName(), string_value);
+                        break;
+                    case "integer":
+                        long long_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).longValue();
+                        resultlist = getSingle(clazz, attribut.getName(), long_value);
+                        break;
+                    case "real":
+                        double double_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).doubleValue();
+                        resultlist = getSingle(clazz, attribut.getName(), double_value);
+                        break;
+                }
+                return resultlist;
+            } else {
+                List<Map<String, String>> resultlist = null;
+                switch (attribut.getAttributetype().getName()) {
+                    case "boolean":
+                        boolean bool_value = dataFetchingEnvironment.getArgument(fieldname);
+                        resultlist = getList(clazz, attribut.getName(), bool_value);
+                        break;
+                    case "string":
+                        String string_value = dataFetchingEnvironment.getArgument(fieldname);
+                        resultlist = getList(clazz, attribut.getName(), string_value);
+                        break;
+                    case "integer":
+                        long long_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).longValue();
+                        resultlist = getList(clazz, attribut.getName(), long_value);
+                        break;
+                    case "real":
+                        double double_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).doubleValue();
+                        resultlist = getList(clazz, attribut.getName(), double_value);
+                        break;
+                }
+                return resultlist;
             }
-            return resultlist;
         };
     }
     
-    private Map<String, String> getList(CfClass clazz, String attributname, Object attributvalue) {
+    private Map<String, String> getSingle(CfClass clazz, String attributname, Object attributvalue) {
         Map<String, String> result = new HashMap<>();
         List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(clazz);
         for (CfClasscontent cc : classcontentList) {
@@ -81,6 +105,22 @@ public class GraphQLDataFetchers {
                     List keyvals = contentUtil.getContentOutputKeyval(aclist);
                 
                     result.putAll((Map)keyvals.get(0));
+                }
+            }
+        }
+        return result;
+    }
+    
+    private List<Map<String, String>> getList(CfClass clazz, String attributname, Object attributvalue) {
+        List<Map<String, String>> result = new ArrayList<>();
+        List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(clazz);
+        for (CfClasscontent cc : classcontentList) {
+            if (!cc.isScrapped()) {
+                HashMap<String, String> attributmap = new HashMap<>();
+                List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
+                if (checkCompare(aclist, cc, attributname, attributvalue)) {
+                    List keyvals = contentUtil.getContentOutputKeyval(aclist);
+                    result.add((Map)keyvals.get(0));
                 }
             }
         }

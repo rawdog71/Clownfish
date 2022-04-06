@@ -47,9 +47,15 @@ public class GraphQLUtil {
             List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
             for (CfAttribut attribut : attributlist) {
                 if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
-                    sb.append("  ").append(clazz.getName().toLowerCase()).append("By")
-                      .append(attribut.getName().toUpperCase().charAt(0)).append(attribut.getName().substring(1))
-                      .append("(").append(attribut.getName()).append(": ").append(getSchemaType(attribut.getAttributetype().getName())).append("): ").append(clazz.getName()).append("\n");
+                    if (attribut.getIdentity()) {
+                        sb.append("  ").append(clazz.getName().toLowerCase()).append("By")
+                            .append(attribut.getName().toUpperCase().charAt(0)).append(attribut.getName().substring(1))
+                            .append("(").append(attribut.getName()).append(": ").append(getSchemaType(attribut.getAttributetype().getName())).append("): ").append(clazz.getName()).append("\n");
+                    } else {
+                        sb.append("  ").append(clazz.getName().toLowerCase()).append("By")
+                            .append(attribut.getName().toUpperCase().charAt(0)).append(attribut.getName().substring(1))
+                            .append("(").append(attribut.getName()).append(": ").append(getSchemaType(attribut.getAttributetype().getName())).append("): [").append(clazz.getName()).append("]\n");
+                    }
                 }
             }
         }

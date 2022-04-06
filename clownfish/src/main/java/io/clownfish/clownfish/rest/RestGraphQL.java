@@ -26,6 +26,7 @@ import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
+import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.graphql.GraphQLDataFetchers;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,20 +54,26 @@ public class RestGraphQL {
     @Autowired GraphQLUtil graphQLUtil;
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfAttributService cfattributservice;
+    @Autowired transient AuthTokenList authtokenlist;
 
     @RequestMapping(value = "/graphql", method = RequestMethod.POST)
-    public Map<String, Object> myGraphql(@RequestBody String request) throws Exception {
-        JSONObject jsonRequest = new JSONObject(request);
-
-        String sdl = graphQLUtil.generateSchema();
+    public Map<String, Object> myGraphql(@RequestHeader("token") String token, @RequestBody String request) throws Exception {
+        if (authtokenlist.checkValidToken(token)) {
         
-        GraphQLSchema graphQLSchema = buildSchema(sdl);
-        GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
+            JSONObject jsonRequest = new JSONObject(request);
 
-        ExecutionInput executionInput = ExecutionInput.newExecutionInput().query(jsonRequest.getString("query")).build();
-        ExecutionResult executionResult = build.execute(executionInput);
+            String sdl = graphQLUtil.generateSchema();
 
-        return executionResult.toSpecification();
+            GraphQLSchema graphQLSchema = buildSchema(sdl);
+            GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
+
+            ExecutionInput executionInput = ExecutionInput.newExecutionInput().query(jsonRequest.getString("query")).build();
+            ExecutionResult executionResult = build.execute(executionInput);
+
+            return executionResult.toSpecification();
+        } else {
+            return null;
+        }
     }
     
     private GraphQLSchema buildSchema(String sdl) {
