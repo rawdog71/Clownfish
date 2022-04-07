@@ -51,6 +51,7 @@ import io.clownfish.clownfish.utils.EncryptUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
+import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -110,6 +111,8 @@ public class ContentList implements Serializable {
     @Autowired private @Getter @Setter ContentUtil contentUtility;
     @Autowired private @Getter @Setter CfContentversionService cfcontentversionService;
     @Autowired ClassUtil classutil;
+    @Autowired private PropertyUtil propertyUtil;
+    @Autowired private ContentUtil contentUtil;
     
     @Autowired private HazelcastCacheManager cacheManager;
     
@@ -308,7 +311,7 @@ public class ContentList implements Serializable {
                 }
                 break;    
         }
-        editContent = selectedAttribut.toString();
+        editContent = contentUtil.toString(selectedAttribut);
     }
     
     public void onCreateContent(ActionEvent actionEvent) {
@@ -443,7 +446,7 @@ public class ContentList implements Serializable {
                     }
                 } else {
                     if (selectedAttribut.getClasscontentref().getClassref().isEncrypted()) {
-                        selectedAttribut.setContentString(EncryptUtil.encrypt(editContent, "128BitKey!clownf"));
+                        selectedAttribut.setContentString(EncryptUtil.encrypt(editContent, propertyUtil.getPropertyValue("aes_key")));
                     } else {
                         selectedAttribut.setContentString(editContent);
                     }
@@ -697,5 +700,9 @@ public class ContentList implements Serializable {
                 }
             }
         }
+    }
+    
+    public String toString(CfAttributcontent attributcontent) {
+        return contentUtil.toString(attributcontent);
     }
 }

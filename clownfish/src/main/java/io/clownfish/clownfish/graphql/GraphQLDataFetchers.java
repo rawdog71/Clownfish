@@ -25,6 +25,8 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.EncryptUtil;
+import io.clownfish.clownfish.utils.PropertyUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +45,7 @@ public class GraphQLDataFetchers {
     @Autowired private CfClasscontentService cfclasscontentService;
     @Autowired private CfAttributcontentService cfattributcontentservice;
     @Autowired ContentUtil contentUtil;
+    @Autowired private PropertyUtil propertyUtil;
     
     public DataFetcher getDataByField(String classname, String fieldname) {
         return dataFetchingEnvironment -> {
@@ -133,8 +136,14 @@ public class GraphQLDataFetchers {
             if ((!found) && (0 == ac.getAttributref().getName().compareToIgnoreCase(attributname))) {
                 switch (ac.getAttributref().getAttributetype().getName()) {
                     case "string":
-                        if (0 == ac.getContentString().compareTo((String) attributvalue)) {
-                            found = true;
+                        if ((ac.getClasscontentref().getClassref().isEncrypted()) && (!ac.getAttributref().getIdentity())) {
+                            if (0 == EncryptUtil.decrypt(ac.getContentString(), propertyUtil.getPropertyValue("aes_key")).compareTo((String) attributvalue)) {
+                                found = true;
+                            }
+                        } else {
+                            if (0 == ac.getContentString().compareTo((String) attributvalue)) {
+                                found = true;
+                            }
                         }
                         break;
                     case "boolean":

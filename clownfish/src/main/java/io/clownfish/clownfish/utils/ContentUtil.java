@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.DataFormatException;
 import lombok.Getter;
 import lombok.Setter;
@@ -77,6 +78,7 @@ public class ContentUtil implements IVersioningInterface {
     @Autowired ContentIndexer contentIndexer;
     @Autowired transient CfContentversionService cfcontentversionService;
     @Autowired ClassUtil classUtil;
+    @Autowired private PropertyUtil propertyUtil;
     private @Getter @Setter long currentVersion;
     private @Getter @Setter String content = "";
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentUtil.class);
@@ -191,7 +193,11 @@ public class ContentUtil implements IVersioningInterface {
                             selectedAttribut.setContentString(editContent);
                         }
                     } else {
-                        selectedAttribut.setContentString(editContent);
+                        if (selectedAttribut.getClasscontentref().getClassref().isEncrypted()) {
+                            selectedAttribut.setContentString(EncryptUtil.encrypt(editContent, propertyUtil.getPropertyValue("aes_key")));
+                        } else {
+                            selectedAttribut.setContentString(editContent);
+                        }
                     }
                     break;
                 case "hashstring":
@@ -274,7 +280,11 @@ public class ContentUtil implements IVersioningInterface {
             long attributtypeid = knattribut.getAttributetype().getId();
             AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
             if (attributdef.getType().compareToIgnoreCase("hashstring") != 0) {
-                dummyoutputmap.put(knattribut.getName(), attributdef.getValue());
+                if (((knattribut.getClassref().isEncrypted()) && (!knattribut.getIdentity())) && (0 == knattribut.getAttributetype().getName().compareToIgnoreCase("string"))) {
+                    dummyoutputmap.put(knattribut.getName(), EncryptUtil.decrypt(attributdef.getValue(), propertyUtil.getPropertyValue("aes_key")));
+                } else {
+                    dummyoutputmap.put(knattribut.getName(), attributdef.getValue());
+                }
             }
         });
         output.add(dummyoutputmap);
@@ -354,5 +364,93 @@ public class ContentUtil implements IVersioningInterface {
             diff = true;
         }
         return diff;
+    }
+    
+    public String toString(CfAttributcontent attributcontent) {
+        switch (attributcontent.getAttributref().getAttributetype().getId().intValue()) {
+            case 1: // boolean
+                if (null != attributcontent.getContentBoolean()) {
+                    return attributcontent.getContentBoolean().toString();
+                } else {
+                    return "";
+                }    
+            case 2: // string
+                if (null != attributcontent.getContentString()) {
+                    if ((!attributcontent.getAttributref().getClassref().isEncrypted()) || (attributcontent.getAttributref().getIdentity())) {
+                        return attributcontent.getContentString();
+                    } else {
+                        return EncryptUtil.decrypt(attributcontent.getContentString(), propertyUtil.getPropertyValue("aes_key"));
+                    }
+                } else {
+                    return "";
+                }
+            case 3: // integer
+                if (null != attributcontent.getContentInteger()) {
+                    return attributcontent.getContentInteger().toString();
+                } else {
+                    return "";
+                }
+            case 4: // real
+                if (null != attributcontent.getContentReal()) {
+                    return attributcontent.getContentReal().toString();
+                } else {
+                    return "";
+                }    
+            case 5: // htmltext (formatted)
+                if (null != attributcontent.getContentText()) {
+                    return attributcontent.getContentText();
+                } else {
+                    return "";
+                }
+            case 6: // datetime
+                if (null != attributcontent.getContentDate()) {
+                    DateTime dt = new DateTime(attributcontent.getContentDate());
+                    DateTimeFormatter dtf1 = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy").withLocale(Locale.GERMANY);
+                    
+                    dt.toString(dtf1);
+                    DateTimeFormatter dtf = DateTimeFormat.forPattern("dd.MM.yyyy");
+                    
+                    return dt.toString(dtf);
+                } else {
+                    return "";
+                }
+            case 7: // hashstring (crypted with salt - for passwords)
+                if (null != attributcontent.getContentString()) {
+                    return attributcontent.getContentString();
+                } else {
+                    return "";
+                }
+            case 8: // media (id to asset)
+                if (null != attributcontent.getContentInteger()) {
+                    return attributcontent.getContentInteger().toString();
+                } else {
+                    return "";
+                }
+            case 9: // text (unformatted)
+                if (null != attributcontent.getContentText()) {
+                    return attributcontent.getContentText();
+                } else {
+                    return "";
+                }
+            case 10: // text (markdown formatted)
+                if (null != attributcontent.getContentText()) {
+                    return attributcontent.getContentText();
+                } else {
+                    return "";
+                } 
+            case 11: // 
+                if (null != attributcontent.getClasscontentlistref()) {
+                    return attributcontent.getClasscontentlistref().getName();
+                } else {
+                    return "";
+                }
+            case 12: // 
+                if (null != attributcontent.getAssetcontentlistref()) {
+                    return attributcontent.getAssetcontentlistref().getName();
+                } else {
+                    return "";
+                }     
+        }
+        return "?";
     }
 }

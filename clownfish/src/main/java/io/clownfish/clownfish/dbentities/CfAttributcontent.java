@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.dbentities;
 
+import io.clownfish.clownfish.utils.EncryptUtil;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
@@ -244,90 +245,4 @@ public class CfAttributcontent implements Serializable {
         }
         return true;
     }
-
-    @Override
-    public String toString() {
-        switch (attributref.getAttributetype().getId().intValue()) {
-            case 1: // boolean
-                if (null != getContentBoolean()) {
-                    return getContentBoolean().toString();
-                } else {
-                    return "";
-                }    
-            case 2: // string
-                if (null != getContentString()) {
-                    return getContentString();
-                } else {
-                    return "";
-                }
-            case 3: // integer
-                if (null != getContentInteger()) {
-                    return getContentInteger().toString();
-                } else {
-                    return "";
-                }
-            case 4: // real
-                if (null != getContentReal()) {
-                    return getContentReal().toString();
-                } else {
-                    return "";
-                }    
-            case 5: // htmltext (formatted)
-                if (null != getContentText()) {
-                    return getContentText();
-                } else {
-                    return "";
-                }
-            case 6: // datetime
-                if (null != getContentDate()) {
-                    DateTime dt = new DateTime(getContentDate());
-                    DateTimeFormatter dtf1 = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss zzz yyyy").withLocale(Locale.GERMANY);
-                    
-                    dt.toString(dtf1);
-                    DateTimeFormatter dtf = DateTimeFormat.forPattern("dd.MM.yyyy");
-                    
-                    return dt.toString(dtf);
-                } else {
-                    return "";
-                }
-            case 7: // hashstring (crypted with salt - for passwords)
-                if (null != getContentString()) {
-                    return getContentString();
-                } else {
-                    return "";
-                }
-            case 8: // media (id to asset)
-                if (null != getContentInteger()) {
-                    return getContentInteger().toString();
-                } else {
-                    return "";
-                }
-            case 9: // text (unformatted)
-                if (null != getContentText()) {
-                    return getContentText();
-                } else {
-                    return "";
-                }
-            case 10: // text (markdown formatted)
-                if (null != getContentText()) {
-                    return getContentText();
-                } else {
-                    return "";
-                } 
-            case 11: // 
-                if (null != getClasscontentlistref()) {
-                    return getClasscontentlistref().getName();
-                } else {
-                    return "";
-                }
-            case 12: // 
-                if (null != getAssetcontentlistref()) {
-                    return getAssetcontentlistref().getName();
-                } else {
-                    return "";
-                }     
-        }
-        return "?";
-    }
-    
 }

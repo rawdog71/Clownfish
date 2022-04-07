@@ -17,6 +17,8 @@ package io.clownfish.clownfish.lucene;
 
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
+import io.clownfish.clownfish.utils.EncryptUtil;
+import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.util.List;
 import org.apache.lucene.index.IndexWriter;
@@ -28,6 +30,7 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.CorruptIndexException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +45,7 @@ public class ContentIndexer implements Runnable {
     List<CfAttributcontent> attributcontentlist;
     private final IndexWriter writer;
     private final CfAttributcontentService cfattributcontentService;
+    @Autowired private PropertyUtil propertyUtil;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ContentIndexer.class);
     
@@ -70,7 +74,11 @@ public class ContentIndexer implements Runnable {
             switch (attributcontent.getAttributref().getAttributetype().getName()) {
                 case "string":
                     if (null != attributcontent.getContentString()) {
-                        document.add(new TextField(LuceneConstants.CONTENT_STRING, attributcontent.getContentString(), Field.Store.YES));
+                        if ((attributcontent.getClasscontentref().getClassref().isEncrypted()) && (!attributcontent.getAttributref().getIdentity())) {
+                            document.add(new TextField(LuceneConstants.CONTENT_STRING, EncryptUtil.decrypt(attributcontent.getContentString(), propertyUtil.getPropertyValue("aes_key")) , Field.Store.YES));
+                        } else {
+                            document.add(new TextField(LuceneConstants.CONTENT_STRING, attributcontent.getContentString(), Field.Store.YES));
+                        }
                     }
                     break;
                 case "text":

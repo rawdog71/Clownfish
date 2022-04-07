@@ -10,8 +10,8 @@
         <title>Clownfish CMS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <h:outputStylesheet library="webjars" name="primeflex/3.1.3/primeflex.min.css" />
-        <h:outputStylesheet library="webjars" name="font-awesome/6.0.0/css/all.min-jsf.css" />
-        <h:outputStylesheet library="webjars" name="font-awesome/6.0.0/css/v4-shims.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="font-awesome/6.1.0/css/all.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="font-awesome/6.1.0/css/v4-shims.min-jsf.css" />
         <script src="resources/js/main.js"></script>
         <f:facet name="last">
             <link rel="stylesheet" type="text/css" href="resources/css/main.css" />
@@ -877,7 +877,7 @@
                     
                     <div class="flex flex-row pb-2">
                         <p:dataTable id="classlist" size="small" scrollable="true" scrollHeight="250" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
-                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate" />
+                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate :form:tabview:classencrypted" />
                             <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains">
                                 <h:outputText value="#{clazz.name}" />
                             </p:column>
@@ -1144,7 +1144,7 @@
                                         <f:selectItems value="#{classcontentList.selectedAssetList}" var="assetdatalist" itemLabel="#{assetdatalist.name}" itemValue="#{assetdatalist}" />
                                     </p:selectOneMenu>
 
-                                    <h:outputText value="#{attributcontent}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
+                                    <h:outputText value="#{classcontentList.toString(attributcontent)}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
                                     <p:commandButton id="editattribut" icon="pi pi-pencil" process="form" value="Change" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.checkedout}" >
 
                                     </p:commandButton>

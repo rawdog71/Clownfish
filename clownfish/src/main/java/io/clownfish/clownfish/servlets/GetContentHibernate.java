@@ -30,11 +30,15 @@ import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.datamodels.GetContentParameter;
+import io.clownfish.clownfish.dbentities.CfAttribut;
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.EncryptUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
+import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -78,6 +82,7 @@ public class GetContentHibernate extends HttpServlet {
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired HibernateUtil hibernateUtil;
+    @Autowired private PropertyUtil propertyUtil;
 
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter String identifier;
@@ -232,7 +237,11 @@ public class GetContentHibernate extends HttpServlet {
                                         ContentDataOutput contentdataoutput = new ContentDataOutput();
                                         contentdataoutput.setContent(cfclasscontent);
                                         contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
-                                        contentdataoutput.setKeyvals(getContentMap(content));
+                                        if (cfclasscontent.getClassref().isEncrypted()) {
+                                            contentdataoutput.setKeyvals(getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                        } else {
+                                            contentdataoutput.setKeyvals(getContentMap(content));
+                                        }
                                         try {
                                             contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
                                             contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
@@ -245,7 +254,11 @@ public class GetContentHibernate extends HttpServlet {
                                     ContentDataOutput contentdataoutput = new ContentDataOutput();
                                     contentdataoutput.setContent(cfclasscontent);
                                     contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
-                                    contentdataoutput.setKeyvals(getContentMap(content));
+                                    if (cfclasscontent.getClassref().isEncrypted()) {
+                                        contentdataoutput.setKeyvals(getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                    } else {
+                                        contentdataoutput.setKeyvals(getContentMap(content));
+                                    }
                                     try {
                                         contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
                                         contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
@@ -384,21 +397,28 @@ public class GetContentHibernate extends HttpServlet {
                 CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
                 if (null != cfclasscontent) {
                     if (!cfclasscontent.isScrapped()) {
-
                         listcounter++;
                         if (range_start > 0){
                             if ((listcounter >= range_start) && (listcounter <= range_end)) {
                                 ContentDataOutput contentdataoutput = new ContentDataOutput();
                                 contentdataoutput.setContent(cfclasscontent);
                                 contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
-                                contentdataoutput.setKeyvals(getContentMap(content));
+                                if (cfclasscontent.getClassref().isEncrypted()) {
+                                    contentdataoutput.setKeyvals(getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                } else {
+                                    contentdataoutput.setKeyvals(getContentMap(content));
+                                }
                                 outputlist.add(contentdataoutput);
                             }
                         } else {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
                             contentdataoutput.setContent(cfclasscontent);
                             contentdataoutput.setKeywords(getContentKeywords(cfclasscontent, true));
-                            contentdataoutput.setKeyvals(getContentMap(content));
+                            if (cfclasscontent.getClassref().isEncrypted()) {
+                                contentdataoutput.setKeyvals(getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                            } else {
+                                contentdataoutput.setKeyvals(getContentMap(content));
+                            }
                             outputlist.add(contentdataoutput);
                         }
                     }
@@ -552,13 +572,35 @@ public class GetContentHibernate extends HttpServlet {
         return contenList;
     }
     
+    private ArrayList getContentMapDecrypted(Map content, CfClass classref) {
+        List<CfAttribut> attributlist = cfattributService.findByClassref(classref);
+        HashMap<String, String> contentMap = new HashMap<>(content);
+        for (CfAttribut attribut : attributlist) {
+            if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("string")) && (!attribut.getIdentity())) {
+                contentMap.put(attribut.getName(), EncryptUtil.decrypt(contentMap.get(attribut.getName()), propertyUtil.getPropertyValue("aes_key")));
+            }
+        }
+        ArrayList contenList = new ArrayList<>();
+        contenList.add(contentMap);
+        return contenList;
+    }
+    
     private Query getQuery(Session session_tables, HashMap<String, String> searchmap, String inst_klasse) {
         Query query = null;
         if (!searchmap.isEmpty()) {
+            CfClass clazz = cfclassService.findByName(inst_klasse);
             String whereclause = " WHERE ";
             for (String searchcontent : searchmap.keySet()) {
                 String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
                 String searchvalue = searchmap.get(searchcontent);
+                if (clazz.isEncrypted()) {
+                    List<CfAttribut> attributlist = cfattributService.findByClassref(clazz);
+                    for (CfAttribut attribut : attributlist) {
+                        if (((0 == attribut.getAttributetype().getName().compareToIgnoreCase("string")) && (!attribut.getIdentity())) && (0 == attribut.getName().compareToIgnoreCase(searchcontentval))) {
+                            searchvalue = EncryptUtil.encrypt(searchvalue, propertyUtil.getPropertyValue("aes_key"));
+                        }
+                    }
+                }
                 SearchValues sv = getSearchValues(searchvalue);
                 switch (sv.getComparartor()) {
                     case "eq":
