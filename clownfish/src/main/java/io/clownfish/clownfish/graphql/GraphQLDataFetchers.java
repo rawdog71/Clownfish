@@ -141,23 +141,24 @@ public class GraphQLDataFetchers {
                                 found = true;
                             }
                         } else {
-                            if (0 == ac.getContentString().compareTo((String) attributvalue)) {
+                            
+                            if ((null != ac.getContentString()) && (0 == ac.getContentString().compareTo((String) attributvalue))) {
                                 found = true;
                             }
                         }
                         break;
                     case "boolean":
-                        if (ac.getContentBoolean() == (boolean) attributvalue) {
+                        if ((null != ac.getContentBoolean()) && (ac.getContentBoolean() == (boolean) attributvalue)) {
                             found = true;
                         }
                         break;
                     case "integer":
-                        if (ac.getContentInteger().longValue()  == (long) attributvalue) {
+                        if ((null != ac.getContentInteger()) && (ac.getContentInteger().longValue() == (long) attributvalue)) {
                             found = true;
                         }
                         break;
                     case "real":
-                        if (ac.getContentReal().floatValue()  == (float) attributvalue) {
+                        if ((null != ac.getContentReal()) && (ac.getContentReal().floatValue()  == (float) attributvalue)) {
                             found = true;
                         }
                         break;
