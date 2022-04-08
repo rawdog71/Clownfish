@@ -33,6 +33,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +55,8 @@ public class ClownfishLoginServlet extends HttpServlet {
     @Autowired
     transient CfAttributService cfattributService;
     String klasse, id, pw_field, id_field, clearPw;
+    
+    final transient Logger LOGGER = LoggerFactory.getLogger(ClownfishLoginServlet.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
 
@@ -63,53 +67,58 @@ public class ClownfishLoginServlet extends HttpServlet {
         String inst_clearTextPw;
         String inst_identifierField;
         boolean success = false;
-        Map<String, String[]> parameters = request.getParameterMap();
+        try {
+            Map<String, String[]> parameters = request.getParameterMap();
 
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("class") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            klasse = values[0];
-        });
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("clearPw") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            clearPw = values[0];
-        });
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("idField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            id_field = values[0];
-        });
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("id") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            id = values[0];
-        });
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("pwField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            pw_field = values[0];
-        });
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("class") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                klasse = values[0];
+            });
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("clearPw") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                clearPw = values[0];
+            });
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("idField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                id_field = values[0];
+            });
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("id") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                id = values[0];
+            });
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("pwField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                pw_field = values[0];
+            });
 
-        inst_klasse = klasse;
-        inst_identifier = id;
-        inst_passwordField = pw_field;
-        inst_identifierField = id_field;
-        inst_clearTextPw = clearPw;
+            inst_klasse = klasse;
+            inst_identifier = id;
+            inst_passwordField = pw_field;
+            inst_identifierField = id_field;
+            inst_clearTextPw = clearPw;
 
-        CfClass cfclass = cfclassService.findByName(inst_klasse);
-        List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
-        CfAttribut attributField = cfattributService.findByNameAndClassref(inst_identifierField, cfclass);
-        CfAttribut attributPassword = cfattributService.findByNameAndClassref(inst_passwordField, cfclass);
+            CfClass cfclass = cfclassService.findByName(inst_klasse);
+            List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
+            CfAttribut attributField = cfattributService.findByNameAndClassref(inst_identifierField, cfclass);
+            CfAttribut attributPassword = cfattributService.findByNameAndClassref(inst_passwordField, cfclass);
 
-        for (CfClasscontent classcontent : classcontentList) {
-            CfAttributcontent attributContent = cfattributcontentService.findByAttributrefAndClasscontentref(attributField, classcontent);
-            if (attributContent.getContentString().equals(inst_identifier)) {
-                long cref = attributContent.getClasscontentref().getId();
-                for (CfClasscontent classcontent1 : classcontentList) {
-                    CfAttributcontent attributContent1 = cfattributcontentService.findByAttributrefAndClasscontentref(attributPassword, classcontent1);
-                    salt = attributContent1.getSalt();
-                    if (null != salt) {
-                        String test = PasswordUtil.generateSecurePassword(inst_clearTextPw, salt);
-                        if ((attributContent1.getContentString().compareTo(test) == 0) && (attributContent1.getClasscontentref().getId() == cref)) {
-                            success = PasswordUtil.verifyUserPassword(inst_clearTextPw, PasswordUtil.generateSecurePassword(inst_clearTextPw, salt), salt);
-                            if (success) {
-                                break;
+            for (CfClasscontent classcontent : classcontentList) {
+                CfAttributcontent attributContent = cfattributcontentService.findByAttributrefAndClasscontentref(attributField, classcontent);
+                if (attributContent.getContentString().equals(inst_identifier)) {
+                    long cref = attributContent.getClasscontentref().getId();
+                    for (CfClasscontent classcontent1 : classcontentList) {
+                        CfAttributcontent attributContent1 = cfattributcontentService.findByAttributrefAndClasscontentref(attributPassword, classcontent1);
+                        salt = attributContent1.getSalt();
+                        if (null != salt) {
+                            String test = PasswordUtil.generateSecurePassword(inst_clearTextPw, salt);
+                            if ((attributContent1.getContentString().compareTo(test) == 0) && (attributContent1.getClasscontentref().getId() == cref)) {
+                                success = PasswordUtil.verifyUserPassword(inst_clearTextPw, PasswordUtil.generateSecurePassword(inst_clearTextPw, salt), salt);
+                                if (success) {
+                                    break;
+                                }
                             }
                         }
                     }
                 }
             }
+        } catch (Exception ex) {
+            success = false;
+            LOGGER.error(ex.getMessage());
         }
 
         try (PrintWriter out = response.getWriter()) {
