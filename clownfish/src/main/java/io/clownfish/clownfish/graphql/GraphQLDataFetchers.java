@@ -50,48 +50,55 @@ public class GraphQLDataFetchers {
     public DataFetcher getDataByField(String classname, String fieldname) {
         return dataFetchingEnvironment -> {
             CfClass clazz = cfclassservice.findByName(classname);
-            CfAttribut attribut = cfattributservice.findByNameAndClassref(fieldname, clazz);
-            if (attribut.getIdentity()) {
-                Map<String, String> resultlist = null;
-                switch (attribut.getAttributetype().getName()) {
-                    case "boolean":
-                        boolean bool_value = dataFetchingEnvironment.getArgument(fieldname);
-                        resultlist = getSingle(clazz, attribut.getName(), bool_value);
-                        break;
-                    case "string":
-                        String string_value = dataFetchingEnvironment.getArgument(fieldname);
-                        resultlist = getSingle(clazz, attribut.getName(), string_value);
-                        break;
-                    case "integer":
-                        long long_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).longValue();
-                        resultlist = getSingle(clazz, attribut.getName(), long_value);
-                        break;
-                    case "real":
-                        double double_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).doubleValue();
-                        resultlist = getSingle(clazz, attribut.getName(), double_value);
-                        break;
+            
+            if (!fieldname.isEmpty()) {
+                CfAttribut attribut = cfattributservice.findByNameAndClassref(fieldname, clazz);
+                if (attribut.getIdentity()) {
+                    Map<String, String> resultlist = null;
+                    switch (attribut.getAttributetype().getName()) {
+                        case "boolean":
+                            boolean bool_value = dataFetchingEnvironment.getArgument(fieldname);
+                            resultlist = getSingle(clazz, attribut.getName(), bool_value);
+                            break;
+                        case "string":
+                            String string_value = dataFetchingEnvironment.getArgument(fieldname);
+                            resultlist = getSingle(clazz, attribut.getName(), string_value);
+                            break;
+                        case "integer":
+                            long long_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).longValue();
+                            resultlist = getSingle(clazz, attribut.getName(), long_value);
+                            break;
+                        case "real":
+                            double double_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).doubleValue();
+                            resultlist = getSingle(clazz, attribut.getName(), double_value);
+                            break;
+                    }
+                    return resultlist;
+                } else {
+                    List<Map<String, String>> resultlist = null;
+                    switch (attribut.getAttributetype().getName()) {
+                        case "boolean":
+                            boolean bool_value = dataFetchingEnvironment.getArgument(fieldname);
+                            resultlist = getList(clazz, attribut.getName(), bool_value);
+                            break;
+                        case "string":
+                            String string_value = dataFetchingEnvironment.getArgument(fieldname);
+                            resultlist = getList(clazz, attribut.getName(), string_value);
+                            break;
+                        case "integer":
+                            long long_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).longValue();
+                            resultlist = getList(clazz, attribut.getName(), long_value);
+                            break;
+                        case "real":
+                            double double_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).doubleValue();
+                            resultlist = getList(clazz, attribut.getName(), double_value);
+                            break;
+                    }
+                    return resultlist;
                 }
-                return resultlist;
             } else {
                 List<Map<String, String>> resultlist = null;
-                switch (attribut.getAttributetype().getName()) {
-                    case "boolean":
-                        boolean bool_value = dataFetchingEnvironment.getArgument(fieldname);
-                        resultlist = getList(clazz, attribut.getName(), bool_value);
-                        break;
-                    case "string":
-                        String string_value = dataFetchingEnvironment.getArgument(fieldname);
-                        resultlist = getList(clazz, attribut.getName(), string_value);
-                        break;
-                    case "integer":
-                        long long_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).longValue();
-                        resultlist = getList(clazz, attribut.getName(), long_value);
-                        break;
-                    case "real":
-                        double double_value = ((Number) dataFetchingEnvironment.getArgument(fieldname)).doubleValue();
-                        resultlist = getList(clazz, attribut.getName(), double_value);
-                        break;
-                }
+                resultlist = getList(clazz, "", null);
                 return resultlist;
             }
         };
@@ -120,8 +127,14 @@ public class GraphQLDataFetchers {
         for (CfClasscontent cc : classcontentList) {
             if (!cc.isScrapped()) {
                 HashMap<String, String> attributmap = new HashMap<>();
-                List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
-                if (checkCompare(aclist, cc, attributname, attributvalue)) {
+                if (!attributname.isEmpty()) {
+                    List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
+                    if (checkCompare(aclist, cc, attributname, attributvalue)) {
+                        List keyvals = contentUtil.getContentOutputKeyval(aclist);
+                        result.add((Map)keyvals.get(0));
+                    }
+                } else {
+                    List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
                     List keyvals = contentUtil.getContentOutputKeyval(aclist);
                     result.add((Map)keyvals.get(0));
                 }

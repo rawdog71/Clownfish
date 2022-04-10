@@ -61,13 +61,13 @@ public class RestGraphQL {
         if (authtokenlist.checkValidToken(token)) {
         
             JSONObject jsonRequest = new JSONObject(request);
-
-            String sdl = graphQLUtil.generateSchema();
-
-            GraphQLSchema graphQLSchema = buildSchema(sdl);
-            GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
-
             ExecutionInput executionInput = ExecutionInput.newExecutionInput().query(jsonRequest.getString("query")).build();
+
+            CfClass clazz = cfclassservice.findByName(graphQLUtil.getClassnameFromQuery(jsonRequest.getString("query")));
+            String sdl = graphQLUtil.generateSchema(clazz.getName());
+
+            GraphQLSchema graphQLSchema = buildSchema(clazz, sdl);
+            GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
             ExecutionResult executionResult = build.execute(executionInput);
 
             return executionResult.toSpecification();
@@ -83,17 +83,41 @@ public class RestGraphQL {
         return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
     }
     
+    private GraphQLSchema buildSchema(CfClass clazz, String sdl) {
+        TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(sdl);
+        RuntimeWiring runtimeWiring = buildWiring(clazz);
+        SchemaGenerator schemaGenerator = new SchemaGenerator();
+        return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
+    }
+    
     private RuntimeWiring buildWiring() {
         RuntimeWiring.Builder rtw = RuntimeWiring.newRuntimeWiring();
         List<CfClass> classlist = cfclassservice.findAll();
         Map<String, DataFetcher> dataFetchersMap = new HashMap();
         for (CfClass clazz : classlist) {
+            String fetchername = clazz.getName()+"All";
+            dataFetchersMap.put(fetchername, graphQLDataFetchers.getDataByField(clazz.getName(), ""));
             List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
             for (CfAttribut attribut : attributlist) {
                 if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
-                    String fetchername = clazz.getName().toLowerCase()+"By"+attribut.getName().toUpperCase().charAt(0)+attribut.getName().substring(1);
+                    fetchername = clazz.getName()+"By"+attribut.getName().toUpperCase().charAt(0)+attribut.getName().substring(1);
                     dataFetchersMap.put(fetchername, graphQLDataFetchers.getDataByField(clazz.getName(), attribut.getName()));
                 }
+            }
+        }
+        return rtw.type(newTypeWiring("Query").dataFetchers(dataFetchersMap)).build();
+    }
+    
+    private RuntimeWiring buildWiring(CfClass clazz) {
+        RuntimeWiring.Builder rtw = RuntimeWiring.newRuntimeWiring();
+        Map<String, DataFetcher> dataFetchersMap = new HashMap();
+        String fetchername = clazz.getName()+"All";
+        dataFetchersMap.put(fetchername, graphQLDataFetchers.getDataByField(clazz.getName(), ""));
+        List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
+        for (CfAttribut attribut : attributlist) {
+            if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
+                fetchername = clazz.getName()+"By"+attribut.getName().toUpperCase().charAt(0)+attribut.getName().substring(1);
+                dataFetchersMap.put(fetchername, graphQLDataFetchers.getDataByField(clazz.getName(), attribut.getName()));
             }
         }
         return rtw.type(newTypeWiring("Query").dataFetchers(dataFetchersMap)).build();
