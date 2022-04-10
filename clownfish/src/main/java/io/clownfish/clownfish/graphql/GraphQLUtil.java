@@ -63,7 +63,7 @@ public class GraphQLUtil {
         
         List<CfClass> classlist = cfclassservice.findAll();
         for (CfClass clazzitem : classlist) {
-            sb.append("type ").append(clazz.getName()).append(" {\n");
+            sb.append("type ").append(clazzitem.getName()).append(" {\n");
             attributlist = cfattributservice.findByClassref(clazzitem);
             for (CfAttribut attribut : attributlist) {
                 if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
