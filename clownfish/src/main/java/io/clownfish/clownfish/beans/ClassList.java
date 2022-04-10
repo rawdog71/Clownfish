@@ -169,7 +169,7 @@ public class ClassList implements Serializable {
         try {
             className = className.trim().replaceAll("\\s+", "_");
             className = className.toLowerCase();
-            StringUtils.capitalise(className);
+            className = StringUtils.capitalise(className);
             CfClass newclass = new CfClass();
             newclass.setName(className);
             newclass.setSearchrelevant(classSearchrelevant);
