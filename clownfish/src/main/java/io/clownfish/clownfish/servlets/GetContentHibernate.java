@@ -30,7 +30,6 @@ import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.datamodels.GetContentParameter;
-import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
@@ -88,18 +87,6 @@ public class GetContentHibernate extends HttpServlet {
     private static transient @Getter @Setter String range;
 
     final transient Logger LOGGER = LoggerFactory.getLogger(GetContentHibernate.class);
-
-    /*
-    private class SearchValues {
-        private @Getter @Setter String comparartor;
-        private @Getter @Setter String searchvalue;
-
-        SearchValues(String comparator, String searchvalue) {
-            this.comparartor = comparator;
-            this.searchvalue = searchvalue;
-        }
-    }
-    */
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -497,156 +484,4 @@ public class GetContentHibernate extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
-    /*
-    private SearchValues getSearchValues(String searchvalue) {
-        String comparator = "eq";
-        // contains
-        if (searchvalue.startsWith(":co:")) {
-            comparator = "co";
-            searchvalue = searchvalue.substring(4);
-        }
-        // equals
-        if (searchvalue.startsWith(":eq:")) {
-            comparator = "eq";
-            searchvalue = searchvalue.substring(4);
-        }
-        // ends with
-        if (searchvalue.startsWith(":ew:")) {
-            comparator = "ew";
-            searchvalue = searchvalue.substring(4);
-        }
-        // starts with
-        if (searchvalue.startsWith(":sw:")) {
-            comparator = "sw";
-            searchvalue = searchvalue.substring(4);
-        }
-        // not equals
-        if (searchvalue.startsWith(":ne:")) {
-            comparator = "ne";
-            searchvalue = searchvalue.substring(4);
-        }
-        // greater than
-        if (searchvalue.startsWith(":gt:")) {
-            comparator = "gt";
-            searchvalue = searchvalue.substring(4);
-        }
-        // less than
-        if (searchvalue.startsWith(":lt:")) {
-            comparator = "lt";
-            searchvalue = searchvalue.substring(4);
-        }
-        // greater than or equal
-        if (searchvalue.startsWith(":gte:")) {
-            comparator = "gte";
-            searchvalue = searchvalue.substring(4);
-        }
-        // less than or equal
-        if (searchvalue.startsWith(":lte:")) {
-            comparator = "lte";
-            searchvalue = searchvalue.substring(4);
-        }
-        searchvalue = searchvalue.toLowerCase();
-        return new SearchValues(comparator, searchvalue);
-    }
-    */
-
-    /*
-    private ArrayList getContentKeywords(CfClasscontent content, boolean toLower) {
-        ArrayList<String> keywords = new ArrayList<>();
-        List<CfClasscontentkeyword> keywordlist = cfcontentkeywordService.findByClassContentRef(content.getId());
-        if (!keywordlist.isEmpty()) {
-            for (CfClasscontentkeyword ak : keywordlist) {
-                if (toLower) {
-                    keywords.add(cfkeywordService.findById(ak.getCfClasscontentkeywordPK().getKeywordref()).getName().toLowerCase());
-                } else {
-                    keywords.add(cfkeywordService.findById(ak.getCfClasscontentkeywordPK().getKeywordref()).getName());
-                }
-            }
-        }
-        return keywords;
-    }
-    */
-
-    /*
-    private ArrayList getContentMap(Map content) {
-        HashMap<String, String> contentMap = new HashMap<>(content);
-        ArrayList contenList = new ArrayList<>();
-        contenList.add(contentMap);
-        return contenList;
-    }
-    */
-    
-    /*
-    private ArrayList getContentMapDecrypted(Map content, CfClass classref) {
-        List<CfAttribut> attributlist = cfattributService.findByClassref(classref);
-        HashMap<String, String> contentMap = new HashMap<>(content);
-        for (CfAttribut attribut : attributlist) {
-            if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("string")) && (!attribut.getIdentity())) {
-                contentMap.put(attribut.getName(), EncryptUtil.decrypt(contentMap.get(attribut.getName()), propertyUtil.getPropertyValue("aes_key")));
-            }
-        }
-        ArrayList contenList = new ArrayList<>();
-        contenList.add(contentMap);
-        return contenList;
-    }
-    */
-    
-    /*
-    private Query getQuery(Session session_tables, HashMap<String, String> searchmap, String inst_klasse) {
-        Query query = null;
-        if (!searchmap.isEmpty()) {
-            CfClass clazz = cfclassService.findByName(inst_klasse);
-            String whereclause = " WHERE ";
-            for (String searchcontent : searchmap.keySet()) {
-                String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
-                String searchvalue = searchmap.get(searchcontent);
-                if (clazz.isEncrypted()) {
-                    List<CfAttribut> attributlist = cfattributService.findByClassref(clazz);
-                    for (CfAttribut attribut : attributlist) {
-                        if (((0 == attribut.getAttributetype().getName().compareToIgnoreCase("string")) && (!attribut.getIdentity())) && (0 == attribut.getName().compareToIgnoreCase(searchcontentval))) {
-                            searchvalue = EncryptUtil.encrypt(searchvalue, propertyUtil.getPropertyValue("aes_key"));
-                        }
-                    }
-                }
-                SearchValues sv = getSearchValues(searchvalue);
-                switch (sv.getComparartor()) {
-                    case "eq":
-                        whereclause += searchcontentval + " = '" + sv.getSearchvalue() + "' AND ";
-                        break;
-                    case "sw":
-                        whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue() + "%' AND ";
-                        break;
-                    case "ew":
-                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "' AND ";
-                        break;
-                    case "co":
-                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "%' AND ";
-                        break;
-                    case "gt":
-                        whereclause += searchcontentval + " > '" + sv.getSearchvalue() + "' AND ";
-                        break;
-                    case "lt":
-                        whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
-                        break;
-                    case "gte":
-                        whereclause += searchcontentval + " >= '" + sv.getSearchvalue() + "' AND ";
-                        break;
-                    case "lte":
-                        whereclause += searchcontentval + " <= '" + sv.getSearchvalue() + "' AND ";
-                        break;
-                    case "ne":
-                        whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
-                        break;
-                }
-
-            }
-            whereclause = whereclause.substring(0, whereclause.length()-5);
-            query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
-        } else {
-            query = session_tables.createQuery("FROM " + inst_klasse + " c ");
-        }
-        return query;
-    }
-    */
 }
