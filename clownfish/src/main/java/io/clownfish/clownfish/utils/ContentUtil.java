@@ -21,6 +21,7 @@ import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfContentversion;
@@ -46,6 +47,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.zip.DataFormatException;
 import lombok.Getter;
 import lombok.Setter;
@@ -73,6 +75,7 @@ public class ContentUtil implements IVersioningInterface {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfAssetlistService cfassetlistService;
+    @Autowired transient CfClasscontentKeywordService cfcontentkeywordService;
     @Autowired FolderUtil folderUtil;
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
@@ -364,6 +367,41 @@ public class ContentUtil implements IVersioningInterface {
             diff = true;
         }
         return diff;
+    }
+    
+    public ArrayList getContentKeywords(CfClasscontent content, boolean toLower) {
+        ArrayList<String> keywords = new ArrayList<>();
+        List<CfClasscontentkeyword> keywordlist = cfcontentkeywordService.findByClassContentRef(content.getId());
+        if (!keywordlist.isEmpty()) {
+            for (CfClasscontentkeyword ak : keywordlist) {
+                if (toLower) {
+                    keywords.add(cfkeywordService.findById(ak.getCfClasscontentkeywordPK().getKeywordref()).getName().toLowerCase());
+                } else {
+                    keywords.add(cfkeywordService.findById(ak.getCfClasscontentkeywordPK().getKeywordref()).getName());
+                }
+            }
+        }
+        return keywords;
+    }
+    
+    public ArrayList getContentMap(Map content) {
+        HashMap<String, String> contentMap = new HashMap<>(content);
+        ArrayList contenList = new ArrayList<>();
+        contenList.add(contentMap);
+        return contenList;
+    }
+    
+    public ArrayList getContentMapDecrypted(Map content, CfClass classref) {
+        List<CfAttribut> attributlist = cfattributService.findByClassref(classref);
+        HashMap<String, String> contentMap = new HashMap<>(content);
+        for (CfAttribut attribut : attributlist) {
+            if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("string")) && (!attribut.getIdentity())) {
+                contentMap.put(attribut.getName(), EncryptUtil.decrypt(contentMap.get(attribut.getName()), propertyUtil.getPropertyValue("aes_key")));
+            }
+        }
+        ArrayList contenList = new ArrayList<>();
+        contenList.add(contentMap);
+        return contenList;
     }
     
     public String toString(CfAttributcontent attributcontent) {

@@ -17,6 +17,7 @@ package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.beans.ServiceStatus;
 import io.clownfish.clownfish.datamodels.HibernateInit;
+import io.clownfish.clownfish.datamodels.SearchValues;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
@@ -72,6 +73,7 @@ public class HibernateUtil implements Runnable {
     private static String datasourceURL;
     @Autowired MarkdownUtil markdownUtil;
     private @Getter @Setter int hibernateInit = 0;
+    @Autowired private PropertyUtil propertyUtil;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     
@@ -641,6 +643,114 @@ public class HibernateUtil implements Runnable {
         }
         return outputmap;
     }
+    
+    private SearchValues getSearchValues(String searchvalue) {
+        String comparator = "eq";
+        // contains
+        if (searchvalue.startsWith(":co:")) {
+            comparator = "co";
+            searchvalue = searchvalue.substring(4);
+        }
+        // equals
+        if (searchvalue.startsWith(":eq:")) {
+            comparator = "eq";
+            searchvalue = searchvalue.substring(4);
+        }
+        // ends with
+        if (searchvalue.startsWith(":ew:")) {
+            comparator = "ew";
+            searchvalue = searchvalue.substring(4);
+        }
+        // starts with
+        if (searchvalue.startsWith(":sw:")) {
+            comparator = "sw";
+            searchvalue = searchvalue.substring(4);
+        }
+        // not equals
+        if (searchvalue.startsWith(":ne:")) {
+            comparator = "ne";
+            searchvalue = searchvalue.substring(4);
+        }
+        // greater than
+        if (searchvalue.startsWith(":gt:")) {
+            comparator = "gt";
+            searchvalue = searchvalue.substring(4);
+        }
+        // less than
+        if (searchvalue.startsWith(":lt:")) {
+            comparator = "lt";
+            searchvalue = searchvalue.substring(4);
+        }
+        // greater than or equal
+        if (searchvalue.startsWith(":gte:")) {
+            comparator = "gte";
+            searchvalue = searchvalue.substring(4);
+        }
+        // less than or equal
+        if (searchvalue.startsWith(":lte:")) {
+            comparator = "lte";
+            searchvalue = searchvalue.substring(4);
+        }
+        searchvalue = searchvalue.toLowerCase();
+        return new SearchValues(comparator, searchvalue);
+    }
+    
+    public Query getQuery(Session session_tables, HashMap<String, String> searchmap, String inst_klasse) {
+        Query query = null;
+        if (!searchmap.isEmpty()) {
+            CfClass clazz = cfclassservice.findByName(inst_klasse);
+            String whereclause = " WHERE ";
+            for (String searchcontent : searchmap.keySet()) {
+                String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
+                String searchvalue = searchmap.get(searchcontent);
+                if (clazz.isEncrypted()) {
+                    List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
+                    for (CfAttribut attribut : attributlist) {
+                        if (((0 == attribut.getAttributetype().getName().compareToIgnoreCase("string")) && (!attribut.getIdentity())) && (0 == attribut.getName().compareToIgnoreCase(searchcontentval))) {
+                            searchvalue = EncryptUtil.encrypt(searchvalue, propertyUtil.getPropertyValue("aes_key"));
+                        }
+                    }
+                }
+                SearchValues sv = getSearchValues(searchvalue);
+                switch (sv.getComparartor()) {
+                    case "eq":
+                        whereclause += searchcontentval + " = '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "sw":
+                        whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue() + "%' AND ";
+                        break;
+                    case "ew":
+                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "co":
+                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "%' AND ";
+                        break;
+                    case "gt":
+                        whereclause += searchcontentval + " > '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "lt":
+                        whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "gte":
+                        whereclause += searchcontentval + " >= '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "lte":
+                        whereclause += searchcontentval + " <= '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                    case "ne":
+                        whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
+                        break;
+                }
+
+            }
+            whereclause = whereclause.substring(0, whereclause.length()-5);
+            query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
+        } else {
+            query = session_tables.createQuery("FROM " + inst_klasse + " c ");
+        }
+        return query;
+    }
+    
 
     @Override
     public void run() {
