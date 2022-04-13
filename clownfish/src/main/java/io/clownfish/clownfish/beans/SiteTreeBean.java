@@ -80,6 +80,7 @@ import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
+import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.JavascriptUtil;
@@ -242,6 +243,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
+    @Autowired private @Getter @Setter ClassUtil classUtility;
     @Autowired transient FolderUtil folderUtil;
     private SourceIndexer sourceindexer;
     private @Getter @Setter String iframeurl = "";
@@ -303,6 +305,7 @@ public class SiteTreeBean implements Serializable {
         templatelist.setSitetree(this);
         javascriptlist.setSitetree(this);
         stylesheetlist.setSitetree(this);
+        classUtility.setSitetree(this);
         LOGGER.info("INIT SITETREE END");
     }
     
@@ -360,7 +363,7 @@ public class SiteTreeBean implements Serializable {
         }
     }
     
-    private void loadTree() {
+    public void loadTree() {
         root = new DefaultTreeNode("Root", null);
         List<CfSite> sitelist = cfsiteService.findByParentref(0L);
         for (CfSite site : sitelist) {

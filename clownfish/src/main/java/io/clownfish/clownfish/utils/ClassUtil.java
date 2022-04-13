@@ -16,53 +16,49 @@
 package io.clownfish.clownfish.utils;
 
 import com.google.gson.Gson;
+import io.clownfish.clownfish.Main;
 import io.clownfish.clownfish.beans.JavaList;
+import io.clownfish.clownfish.beans.JavascriptList;
+import io.clownfish.clownfish.beans.SiteTreeBean;
 import io.clownfish.clownfish.compiler.JVMLanguages;
 import io.clownfish.clownfish.datamodels.RestContentParameter;
-import io.clownfish.clownfish.dbentities.CfAsset;
-import io.clownfish.clownfish.dbentities.CfAssetlist;
-import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
-import io.clownfish.clownfish.dbentities.CfAttribut;
-import io.clownfish.clownfish.dbentities.CfAttributcontent;
-import io.clownfish.clownfish.dbentities.CfAttributetype;
-import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.dbentities.CfClasscontent;
-import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
-import io.clownfish.clownfish.dbentities.CfJava;
-import io.clownfish.clownfish.dbentities.CfList;
-import io.clownfish.clownfish.dbentities.CfListcontent;
-import io.clownfish.clownfish.serviceinterface.CfAssetService;
-import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
-import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
-import io.clownfish.clownfish.serviceinterface.CfAttributService;
-import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
-import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
-import io.clownfish.clownfish.serviceinterface.CfClassService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
-import io.clownfish.clownfish.serviceinterface.CfJavaService;
-import io.clownfish.clownfish.serviceinterface.CfJavaversionService;
-import io.clownfish.clownfish.serviceinterface.CfKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfListService;
-import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.dbentities.*;
+import io.clownfish.clownfish.serviceinterface.*;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
+
+import j2html.Config;
+import static j2html.TagCreator.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import scala.language;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 
 /**
  *
@@ -85,9 +81,14 @@ public class ClassUtil implements Serializable {
     @Autowired CfAssetService cfassetService;
     @Autowired CfJavaService cfjavaService;
     @Autowired CfJavaversionService cfjavaversionService;
+    @Autowired CfTemplateService cfTemplateService;
+    @Autowired CfSiteService cfSiteService;
+    @Autowired CfJavascriptService cfJavaScriptService;
     @Autowired JavaUtil javaUtility;
     @Autowired MarkdownUtil markdownUtil;
+    @Autowired FolderUtil folderUtil;
     @Autowired JavaList javalist;
+    private @Getter @Setter SiteTreeBean sitetree;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ClassUtil.class);
     
@@ -544,6 +545,251 @@ public class ClassUtil implements Serializable {
                 
                 break;
         }
+    }
+
+    public void generateHTMLForm(CfClass clazz) {
+        List<CfAttribut> attributList = cfattributService.findByClassref(clazz);
+        StringBuilder html = new StringBuilder();
+        CfTemplate template = new CfTemplate();
+        CfSite site = new CfSite();
+        CfJavascript js = new CfJavascript();
+
+        html.append("<!DOCTYPE html>").append("\n");
+        html.append("<html lang=\"en\">").append("\n\n");
+        html.append(head(
+                meta().attr("charset", "UTF-8"),
+                meta().attr("http-equiv", "X-UA-Compatible").attr("content", "IE=edge"),
+                meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1.0"),
+                script().withSrc("https://unpkg.com/axios/dist/axios.min.js"),
+                script().withSrc("/js/User_Webform.js"),
+                title("Document")).renderFormatted()).append("\n");
+
+        html.append("<body>").append("\n");
+        html.append("\t").append(h1(clazz.getName()).withId("classname")).append("\n");
+
+        html.append("\t").append(label("Content name").withFor("contentname")).append("\n");
+        html.append("\t").append(input().withId("contentname").withType("text")).append(br()).append("\n");
+        html.append("\t").append(("<form action=\"\" id=\"forms\">")).append("\n");
+
+        for (CfAttribut attr : attributList) {
+            if (attr.getAutoincrementor()) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "boolean":
+                    html.append("\t\t").append(label(attr.getName()).withFor(attr.getName())).append("\n");
+                    html.append("\t\t").append(input().withType("checkbox").withId(attr.getName())).append(br()).append("\n");
+                    break;
+                case "string":
+                case "htmltext":
+                case "markdown":
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName())).append("\n");
+                    html.append("\t\t").append(input().withType("text").withId(attr.getName())).append(br()).append("\n");
+                    break;
+                case "hashstring":
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName())).append("\n");
+                    html.append("\t\t").append(input().withType("password").withId(attr.getName())).append(br()).append("\n");
+                    break;
+                case "integer":
+                case "real":
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName())).append("\n");
+                    html.append("\t\t").append(input().withType("number").withId(attr.getName())).append(br());
+                    break;
+                case "assetref":
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName())).append(br()).append("\n");
+                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withMax(String.valueOf(
+                            cfassetlistService.findAll().stream().max(Comparator.comparing(CfAssetlist::getId)).get().getId()))).append(br()).append("\n");
+                case "media":
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName())).append("\n");
+                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withMax(String.valueOf(
+                            cfassetService.findAll().stream().max(Comparator.comparing(CfAsset::getId)).get().getId()))).append(br()).append("\n");
+                    break;
+                case "classref":
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName())).append("\n");
+                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withMax(String.valueOf(
+                            cfclassService.findAll().stream().max(Comparator.comparing(CfClass::getId)).get().getId()))).append(br()).append("\n");
+                    break;
+                case "datetime":
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName())).append("\n");
+                    html.append("\t\t").append(input().withType("date").withId(attr.getName()).withMax(String.valueOf(
+                            cfclassService.findAll().stream().max(Comparator.comparing(CfClass::getId)).get().getId()))).append(br()).append("\n");
+                    break;
+            }
+        }
+
+        html.append("\t</form>").append("\n");
+        html.append("\t").append(button("Add").attr("onclick", "add()")).append("\n");
+        html.append("\t").append(button("Update").attr("onclick", "update()")).append("\n");
+        html.append("\t").append(button("Delete").attr("onclick", "deleteI()")).append("\n");
+        html.append("</body>").append("\n");
+        html.append("</html>");
+
+        template.setName(clazz.getName() + "_Webform");
+        template.setScriptlanguage(2);
+        template.setCheckedoutby(BigInteger.ZERO);
+        template.setContent(html.toString());
+        //if (cfTemplateService.findByName(template.getName()) == null) {
+            cfTemplateService.create(template);
+//        } else {
+//            FacesMessage message = new FacesMessage("Template \"" + template.getName() + "\" already exists! Aborting...");
+//            FacesContext.getCurrentInstance().addMessage(null, message);
+//            return;
+//        }
+
+        js.setContent(
+                "//Add content \n" +
+                "function add() {\n" +
+                "\tvar attributmap = {\n" +
+                "\t\tapikey: \"+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=\",\n" +
+                "\t\tclassname: document.getElementById('classname').innerText,\n" +
+                "\t\tattributmap: getInputInformation(),\n" +
+                "\t\tcontentname: document.getElementById('contentname').value,\n" +
+                "\t};\n" +
+                "\n" +
+                "\taxios.post('http://localhost:9000/insertcontent',\n" +
+                "\t\t\tattributmap\n" +
+                "\t\t)\n" +
+                "\t\t.then(function(response) {\n" +
+                "\t\t\tconsole.log(response);\n" +
+                "\t\t})\n" +
+                "\t\t.catch(function(error) {\n" +
+                "\t\t\tconsole.log(error);\n" +
+                "\t\t});\n" +
+                "\n" +
+                "\tconsole.log(\"Add\");\n" +
+                "}\n" +
+                "\n" +
+                "//Update Content\n" +
+                "function update() {\n" +
+                "\tvar attributmap = {\n" +
+                "\t\tapikey: \"+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=\",\n" +
+                "\t\tclassname: document.getElementById('classname').innerText,\n" +
+                "\t\tcontentname: document.getElementById('contentname').value,\n" +
+                "\t\tattributmap: getInputInformation(),\n" +
+                "\t};\n" +
+                "\n" +
+                "\taxios.post('http://localhost:9000/updatecontent',\n" +
+                "\t\t\tattributmap\n" +
+                "\t\t)\n" +
+                "\t\t.then(function(response) {\n" +
+                "\t\t\tconsole.log(response);\n" +
+                "\t\t})\n" +
+                "\t\t.catch(function(error) {\n" +
+                "\t\t\tconsole.log(error);\n" +
+                "\t\t});\n" +
+                "\n" +
+                "\tconsole.log(\"Update\");\n" +
+                "}\n" +
+                "\n" +
+                "//Delete content\n" +
+                "function deleteI() {\n" +
+                "\t// \n" +
+                "\tvar attributmap = {\n" +
+                "\t\tapikey: \"+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=\",\n" +
+                "\t\tclassname: document.getElementById('classname').innerText,\n" +
+                "\t\tcontentname: document.getElementById('contentname').value,\n" +
+                "\t};\n" +
+                "\n" +
+                "\taxios.post('http://localhost:9000/deletecontent',\n" +
+                "\t\t\tattributmap\n" +
+                "\t\t)\n" +
+                "\t\t.then(function(response) {\n" +
+                "\t\t\tconsole.log(response);\n" +
+                "\t\t})\n" +
+                "\t\t.catch(function(error) {\n" +
+                "\t\t\tconsole.log(error);\n" +
+                "\t\t});\n" +
+                "\n" +
+                "\tconsole.log(\"Delete\");\n" +
+                "}\n" +
+                "\n" +
+                "//Give a List of the whole content\n" +
+                "function read() {\n" +
+                "\n" +
+                "}\n" +
+                "\n" +
+                "function getInputInformation() {\n" +
+                "        var formEl = document.forms.tester;\n" +
+                "        var kvpairs = [];\n" +
+                "        var form = document.forms.forms;\n" +
+                "\n" +
+                "        for (var i = 0; i < form.elements.length; i++) {\n" +
+                "            console.log(form.elements)\n" +
+                "            var e = form.elements[i];\n" +
+                "            var x = {};\n" +
+                "            if (e.type == \"checkbox\") {\n" +
+                "                x[e.id] = e.checked;\n" +
+                "            } else if (e.type == \"date\") {\n" +
+                "                var today = new Date();\n" +
+                "                var time = today.getHours() + \":\" + today.getMinutes() < 10 ? 0 + today.getMinutes().toString(): today.getMinutes()  + \":\" + today.getSeconds() < 10 ? 0 + today.getSeconds().toString(): today.getSeconds();\n" +
+                "\n" +
+                "                x[e.id] = e.value + \" \" + time;\n" +
+                "            } else {\n" +
+                "                x[e.id] = e.value;\n" +
+                "            }\n" +
+                "\n" +
+                "            kvpairs.push(x);\n" +
+                "        }\n" +
+                "        var attributemap = Object.assign({}, ...kvpairs);\n" +
+                "\n" +
+                "        console.log(attributemap);\n" +
+                "        return attributemap;\n" +
+                "}\n" +
+                "\n" +
+                "read();");
+        js.setName(clazz.getName() + "_Webform");
+        js.setCheckedoutby(BigInteger.ZERO);
+        //if (cfJavaScriptService.findByName(js.getName()) == null) {
+        cfJavaScriptService.create(js);
+
+        FileOutputStream fileStream = null;
+        try {
+            fileStream = new FileOutputStream(new File(folderUtil.getJs_folder()+ File.separator + js.getName() + ".js"));
+            OutputStreamWriter writer = new OutputStreamWriter(fileStream, StandardCharsets.UTF_8);
+            try {
+                writer.write(js.getContent());
+                writer.close();
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to create the destination file", e);
+            }
+        } catch (FileNotFoundException ex) {
+            LOGGER.error(ex.getMessage());
+        } finally {
+            try {
+                if (null != fileStream) {
+                    fileStream.close();
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }
+//        } else {
+//            FacesMessage message = new FacesMessage("JavaScript \"" + js.getName() + "\" already exists! Aborting...");
+//            FacesContext.getCurrentInstance().addMessage(null, message);
+//            return;
+//        }
+
+        site.setName(clazz.getName() + "_Webform");
+        site.setCharacterencoding("UTF-8");
+        site.setHitcounter(BigInteger.ZERO);
+        site.setTitle("");
+        site.setContenttype("text/html");
+        site.setSearchrelevant(false);
+        site.setHtmlcompression(0);
+        site.setGzip(0);
+        site.setLocale("");
+        site.setDescription("");
+        site.setAliaspath(site.getName());
+        site.setParentref(BigInteger.ZERO);
+        site.setTemplateref(BigInteger.valueOf(template.getId()));
+        site.setJavascriptref(BigInteger.valueOf(js.getId()));
+        //if (cfSiteService.findByName(site.getName()) == null) {
+            cfSiteService.create(site);
+            sitetree.loadTree();
+//        } else {
+//            FacesMessage message = new FacesMessage("Site \"" + site.getName() + "\" already exists! Aborting...");
+//            FacesContext.getCurrentInstance().addMessage(null, message);
+//        }
     }
     
     private String getAttributeJVMType(CfAttribut attribut, JVMLanguages language) {

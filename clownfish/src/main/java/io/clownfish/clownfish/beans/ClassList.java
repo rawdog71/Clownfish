@@ -272,4 +272,12 @@ public class ClassList implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
+
+    public void onGenerateHTMLForm(ActionEvent actionEvent) {
+        if (selectedClass != null) {
+            classutil.generateHTMLForm(selectedClass);
+            FacesMessage message = new FacesMessage("HTML Form template generated");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
 }
