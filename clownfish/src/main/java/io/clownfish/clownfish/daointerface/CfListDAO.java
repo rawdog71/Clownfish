@@ -31,6 +31,6 @@ public interface CfListDAO {
     CfList create(CfList entity);
     boolean delete(CfList entity);
     CfList edit(CfList entity);
-
-    public List<CfList> findByMaintenance(boolean b);
+    List<CfList> findByMaintenance(boolean b);
+    CfList findByClassrefAndName(CfClass ref, String name);
 }

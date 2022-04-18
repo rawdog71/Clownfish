@@ -102,4 +102,14 @@ public class CfListDAOImpl implements CfListDAO {
         List<CfList> cfcontentlist = query.getResultList();
         return cfcontentlist;
     }
+
+    @Override
+    public CfList findByClassrefAndName(CfClass ref, String name) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfList.findByClassrefAndName");  
+        query.setParameter("classref", ref);
+        query.setParameter("name", name);
+        CfList cflist = (CfList) query.getSingleResult();
+        return cflist;
+    }
 }

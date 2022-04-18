@@ -644,6 +644,48 @@ public class HibernateUtil implements Runnable {
         return outputmap;
     }
     
+    public Map getContent(String tablename, long contentid, String tablename_rel, long contentid_rel) {
+        Map contentmap = null;
+        Map outputmap = new HashMap();
+        Session session_relations = classsessions.get("relations").getSessionFactory().openSession();
+        Query query = null;
+        query = session_relations.createQuery("FROM " + tablename + "_" + tablename_rel + "c WHERE " + tablename + "_ref_ = " + contentid + " AND " + tablename_rel + "_ref_ = " + contentid_rel);
+        try {
+            contentmap = (Map) query.getSingleResult();
+            contentmap.forEach(
+                    (k, v) -> 
+                        {
+                            if ((!k.toString().startsWith("cf_")) && (0 != k.toString().compareToIgnoreCase("$type$"))) {
+                                if (0 == getClownfishType(tablename, k.toString()).compareToIgnoreCase("markdown")) {
+                                    markdownUtil.initOptions();
+                                    if (null != v) {
+                                        v = markdownUtil.parseMarkdown(v.toString(), markdownUtil.getMarkdownOptions());
+                                    } else {
+                                        v = markdownUtil.parseMarkdown("", markdownUtil.getMarkdownOptions());
+                                    }
+                                }
+                            }
+                            outputmap.put(k, v);
+                        }
+            );
+            session_relations.close();
+            /* add keywords  */
+            List<CfClasscontentkeyword> contentkeywordlist;
+            contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(contentid);
+            if (!contentkeywordlist.isEmpty()) {
+                ArrayList listcontentmap = new ArrayList();
+                contentkeywordlist.stream().forEach((contentkeyword) -> {
+                    listcontentmap.add(cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref()));
+                });
+                outputmap.put("keywords", listcontentmap);
+                return outputmap;
+            }
+        } catch (NoResultException ex) {
+            LOGGER.error("HIBERNATEUTIL: " + tablename + " is empty. Please use hibernate.init=1 in application.properties");
+        }
+        return outputmap;
+    }
+    
     private SearchValues getSearchValues(String searchvalue) {
         String comparator = "eq";
         // contains

@@ -77,4 +77,9 @@ public class CfListServiceImpl implements CfListService {
     public List<CfList> findByMaintenance(boolean b) {
         return this.cflistDAO.findByMaintenance(b);
     }
+
+    @Override
+    public CfList findByClassrefAndName(CfClass ref, String name) {
+        return this.cflistDAO.findByClassrefAndName(ref, name);
+    }
 }

@@ -21,11 +21,15 @@ import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfList;
+import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfContentversionService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.EncryptUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
@@ -52,6 +56,8 @@ public class GraphQLDataFetchers {
     @Autowired private CfClasscontentService cfclasscontentService;
     @Autowired private CfAttributcontentService cfattributcontentservice;
     @Autowired private CfContentversionService cfcontentversionService;
+    @Autowired private CfListService cflistService;
+    @Autowired private CfListcontentService cflistcontentService;
     @Autowired ContentUtil contentUtil;
     @Autowired private PropertyUtil propertyUtil;
     @Autowired HibernateUtil hibernateUtil;
@@ -214,6 +220,7 @@ public class GraphQLDataFetchers {
                             } else {
                                 contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
                             }
+                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
                             try {
                                 contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
                                 contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
@@ -229,6 +236,26 @@ public class GraphQLDataFetchers {
             }
             
             return result;
+        }
+    }
+    
+    private void setClassrefVals(HashMap hm, CfClass clazz) {
+        for (Object key : hm.keySet()) {
+            try {
+                CfAttribut attr = cfattributservice.findByNameAndClassref((String) key, clazz);
+                if (0 == attr.getAttributetype().getName().compareToIgnoreCase("classref")) {
+                    CfList contentlist = cflistService.findByClassrefAndName(attr.getRelationref(), (String) hm.get(key));
+                    System.out.println(contentlist.getName());
+                    List<CfListcontent> listcontent = cflistcontentService.findByListref(contentlist.getId());
+                    
+                    for (CfListcontent contentitem : listcontent) {
+                        Map output = hibernateUtil.getContent(clazz.getName(), contentitem.getCfListcontentPK().getListref(), attr.getName(), contentitem.getCfListcontentPK().getClasscontentref());
+                        System.out.println(output);
+                    }
+                }
+            } catch (Exception ex) {
+                
+            }
         }
     }
     
