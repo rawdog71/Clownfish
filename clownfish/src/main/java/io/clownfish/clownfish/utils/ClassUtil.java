@@ -560,9 +560,9 @@ public class ClassUtil implements Serializable {
                 meta().attr("charset", "UTF-8"),
                 meta().attr("http-equiv", "X-UA-Compatible").attr("content", "IE=edge"),
                 meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1.0"),
-                script().withSrc("https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"),
-                link().withHref("https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css").withRel("stylesheet"),
-                script().withSrc("https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"),
+                script().withSrc("resources/js/angularjs_1_8_2.js"),
+                link().withHref("resources/css/bootstrap5.css").withRel("stylesheet"),
+                script().withSrc("resources/js/bootstrap5.js"),
                 script().withSrc("resources/js/User_Webform.js"),
                 script().withSrc("resources/js/axios.js"),
                 title("Webform")).renderFormatted()).append("\n");
@@ -817,134 +817,6 @@ public class ClassUtil implements Serializable {
 //            FacesContext.getCurrentInstance().addMessage(null, message);
 //            return;
 //        }
-
-        js.setContent(
-                "//Add content \n" +
-                "function add() {\n" +
-                "\tvar attributmap = {\n" +
-                "\t\tapikey: \"+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=\",\n" +
-                "\t\tclassname: document.getElementById('classname').innerText,\n" +
-                "\t\tattributmap: getInputInformation(),\n" +
-                "\t\tcontentname: document.getElementById('contentname').value,\n" +
-                "\t};\n" +
-                "\n" +
-                "\taxios.post('http://localhost:9000/insertcontent',\n" +
-                "\t\t\tattributmap\n" +
-                "\t\t)\n" +
-                "\t\t.then(function(response) {\n" +
-                "\t\t\tconsole.log(response);\n" +
-                "\t\t})\n" +
-                "\t\t.catch(function(error) {\n" +
-                "\t\t\tconsole.log(error);\n" +
-                "\t\t});\n" +
-                "\n" +
-                "\tconsole.log(\"Add\");\n" +
-                "}\n" +
-                "\n" +
-                "//Update Content\n" +
-                "function update() {\n" +
-                "\tvar attributmap = {\n" +
-                "\t\tapikey: \"+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=\",\n" +
-                "\t\tclassname: document.getElementById('classname').innerText,\n" +
-                "\t\tcontentname: document.getElementById('contentname').value,\n" +
-                "\t\tattributmap: getInputInformation(),\n" +
-                "\t};\n" +
-                "\n" +
-                "\taxios.post('http://localhost:9000/updatecontent',\n" +
-                "\t\t\tattributmap\n" +
-                "\t\t)\n" +
-                "\t\t.then(function(response) {\n" +
-                "\t\t\tconsole.log(response);\n" +
-                "\t\t})\n" +
-                "\t\t.catch(function(error) {\n" +
-                "\t\t\tconsole.log(error);\n" +
-                "\t\t});\n" +
-                "\n" +
-                "\tconsole.log(\"Update\");\n" +
-                "}\n" +
-                "\n" +
-                "//Delete content\n" +
-                "function deleteI() {\n" +
-                "\t// \n" +
-                "\tvar attributmap = {\n" +
-                "\t\tapikey: \"+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=\",\n" +
-                "\t\tclassname: document.getElementById('classname').innerText,\n" +
-                "\t\tcontentname: document.getElementById('contentname').value,\n" +
-                "\t};\n" +
-                "\n" +
-                "\taxios.post('http://localhost:9000/deletecontent',\n" +
-                "\t\t\tattributmap\n" +
-                "\t\t)\n" +
-                "\t\t.then(function(response) {\n" +
-                "\t\t\tconsole.log(response);\n" +
-                "\t\t})\n" +
-                "\t\t.catch(function(error) {\n" +
-                "\t\t\tconsole.log(error);\n" +
-                "\t\t});\n" +
-                "\n" +
-                "\tconsole.log(\"Delete\");\n" +
-                "}\n" +
-                "\n" +
-                "//Give a List of the whole content\n" +
-                "function read() {\n" +
-                "\n" +
-                "}\n" +
-                "\n" +
-                "function getInputInformation() {\n" +
-                "        var formEl = document.forms.tester;\n" +
-                "        var kvpairs = [];\n" +
-                "        var form = document.forms.forms;\n" +
-                "\n" +
-                "        for (var i = 0; i < form.elements.length; i++) {\n" +
-                "            console.log(form.elements)\n" +
-                "            var e = form.elements[i];\n" +
-                "            var x = {};\n" +
-                "            if (e.type == \"checkbox\") {\n" +
-                "                x[e.id] = e.checked;\n" +
-                "            } else if (e.type == \"date\") {\n" +
-                "                var today = new Date();\n" +
-                "                var time = today.getHours() + \":\" + today.getMinutes() < 10 ? 0 + today.getMinutes().toString(): today.getMinutes()  + \":\" + today.getSeconds() < 10 ? 0 + today.getSeconds().toString(): today.getSeconds();\n" +
-                "\n" +
-                "                x[e.id] = e.value + \" \" + time;\n" +
-                "            } else {\n" +
-                "                x[e.id] = e.value;\n" +
-                "            }\n" +
-                "\n" +
-                "            kvpairs.push(x);\n" +
-                "        }\n" +
-                "        var attributemap = Object.assign({}, ...kvpairs);\n" +
-                "\n" +
-                "        console.log(attributemap);\n" +
-                "        return attributemap;\n" +
-                "}\n" +
-                "\n" +
-                "read();");
-        js.setName(clazz.getName() + "_Webform");
-        js.setCheckedoutby(BigInteger.ZERO);
-        //if (cfJavaScriptService.findByName(js.getName()) == null) {
-        cfJavaScriptService.create(js);
-
-        FileOutputStream fileStream = null;
-        try {
-            fileStream = new FileOutputStream(new File(folderUtil.getJs_folder()+ File.separator + js.getName() + ".js"));
-            OutputStreamWriter writer = new OutputStreamWriter(fileStream, StandardCharsets.UTF_8);
-            try {
-                writer.write(js.getContent());
-                writer.close();
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to create the destination file", e);
-            }
-        } catch (FileNotFoundException ex) {
-            LOGGER.error(ex.getMessage());
-        } finally {
-            try {
-                if (null != fileStream) {
-                    fileStream.close();
-                }
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage());
-            }
-        }
 //        } else {
 //            FacesMessage message = new FacesMessage("JavaScript \"" + js.getName() + "\" already exists! Aborting...");
 //            FacesContext.getCurrentInstance().addMessage(null, message);
@@ -964,7 +836,6 @@ public class ClassUtil implements Serializable {
         site.setAliaspath(site.getName());
         site.setParentref(BigInteger.ZERO);
         site.setTemplateref(BigInteger.valueOf(template.getId()));
-        site.setJavascriptref(BigInteger.valueOf(js.getId()));
         //if (cfSiteService.findByName(site.getName()) == null) {
             cfSiteService.create(site);
             sitetree.loadTree();
