@@ -2186,7 +2186,7 @@
                                 <h:outputText value="#{scrapyardattributcontent.attributref.attributetype}" />
                             </p:column>
                             <p:column headerText="Wert">
-                                <h:outputText value="#{scrapyardattributcontent}" rendered="#{not classcontentList.renderSelected(scrapyardattributcontent)}" />
+                                <h:outputText value="#{scrapyardList.toString(scrapyardattributcontent)}" rendered="#{not classcontentList.renderSelected(scrapyardattributcontent)}" />
                             </p:column>
                         </p:dataTable>
                     </h:panelGrid>

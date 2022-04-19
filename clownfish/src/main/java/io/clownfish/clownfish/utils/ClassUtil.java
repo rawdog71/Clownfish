@@ -560,8 +560,8 @@ public class ClassUtil implements Serializable {
                 meta().attr("charset", "UTF-8"),
                 meta().attr("http-equiv", "X-UA-Compatible").attr("content", "IE=edge"),
                 meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1.0"),
-                script().withSrc("https://unpkg.com/axios/dist/axios.min.js"),
-                script().withSrc("/js/User_Webform.js"),
+                script().withSrc("/resources/js/axios.js"),
+                script().withSrc("/resources/js/User_Webform.js"),
                 title("Document")).renderFormatted()).append("\n");
 
         html.append("<body>").append("\n");

@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.beans;
 
-import com.hazelcast.spring.cache.HazelcastCacheManager;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
@@ -38,6 +37,7 @@ import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
+import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.Serializable;
 import java.util.Date;
@@ -78,6 +78,7 @@ public class ScrapyardList implements Serializable {
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired HibernateUtil hibernateUtil;
+    @Autowired private ContentUtil contentUtil;
     
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter CfClasscontent selectedContent = null;
@@ -220,5 +221,9 @@ public class ScrapyardList implements Serializable {
     public void onRefreshContent() {
         classcontentlist.clear();
         classcontentlist = cfclasscontentService.findByScrapped(true);
+    }
+    
+    public String toString(CfAttributcontent attributcontent) {
+        return contentUtil.toString(attributcontent);
     }
 }
