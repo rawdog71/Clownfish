@@ -69,7 +69,11 @@ public class GraphQLUtil {
                 if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
                     sb.append("  ").append(attribut.getName()).append(": [").append(attribut.getRelationref().getName()).append("]\n");
                 } else {
-                    sb.append("  ").append(attribut.getName()).append(": ").append(getSchemaType(attribut.getAttributetype().getName())).append("\n");
+                    if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("assetref")) {
+                        sb.append("  ").append(attribut.getName()).append(": [Int]\n");
+                    } else {
+                        sb.append("  ").append(attribut.getName()).append(": ").append(getSchemaType(attribut.getAttributetype().getName())).append("\n");
+                    }
                 }
             }
             sb.append("}\n\n");
@@ -110,7 +114,11 @@ public class GraphQLUtil {
                 if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
                     sb.append("  ").append(attribut.getName()).append(": [").append(attribut.getRelationref().getName()).append("]\n");
                 } else {
-                    sb.append("  ").append(attribut.getName()).append(": ").append(getSchemaType(attribut.getAttributetype().getName())).append("\n");
+                    if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("assetref")) {
+                        sb.append("  ").append(attribut.getName()).append(": [Int]\n");
+                    } else {
+                        sb.append("  ").append(attribut.getName()).append(": ").append(getSchemaType(attribut.getAttributetype().getName())).append("\n");
+                    }
                 }
             }
             sb.append("}\n\n");
@@ -162,12 +170,4 @@ public class GraphQLUtil {
         classname = classname.substring(0, 1).toUpperCase() + classname.substring(1);
         return classname;
     }
-    
-    /*
-    public String getClassFromQuery(String query) {
-        return dataFetchingEnvironment -> {
-            
-        }
-
-    }*/
 }

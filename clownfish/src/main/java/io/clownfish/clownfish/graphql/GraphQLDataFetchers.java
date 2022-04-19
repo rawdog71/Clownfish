@@ -17,12 +17,16 @@ package io.clownfish.clownfish.graphql;
 
 import graphql.schema.DataFetcher;
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
+import io.clownfish.clownfish.dbentities.CfAssetlist;
+import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
@@ -57,7 +61,9 @@ public class GraphQLDataFetchers {
     @Autowired private CfAttributcontentService cfattributcontentservice;
     @Autowired private CfContentversionService cfcontentversionService;
     @Autowired private CfListService cflistService;
+    @Autowired private CfAssetlistService cfassetlistService;
     @Autowired private CfListcontentService cflistcontentService;
+    @Autowired CfAssetlistcontentService cfassetlistcontentService;
     @Autowired ContentUtil contentUtil;
     @Autowired private PropertyUtil propertyUtil;
     @Autowired HibernateUtil hibernateUtil;
@@ -159,6 +165,7 @@ public class GraphQLDataFetchers {
                                 contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
                             }
                             setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                            setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
                             try {
                                 contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
                                 contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
@@ -222,6 +229,7 @@ public class GraphQLDataFetchers {
                                 contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
                             }
                             setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                            setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
                             try {
                                 contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
                                 contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
@@ -261,6 +269,7 @@ public class GraphQLDataFetchers {
                                     contentdataoutput.setKeyvals(contentUtil.getContentMap(output));
                                 }
                                 setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                                setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
                                 try {
                                     contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
                                     contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
@@ -270,6 +279,26 @@ public class GraphQLDataFetchers {
                                 result.add(contentdataoutput.getKeyvals().get(0));
                             }
                         }
+                    }
+                    hm.put(attr.getName(), result);
+                }
+            } catch (Exception ex) {
+                
+            }
+        }
+    }
+    
+    private void setAssetrefVals(HashMap hm, CfClass clazz) {
+        for (Object key : hm.keySet()) {
+            try {
+                CfAttribut attr = cfattributservice.findByNameAndClassref((String) key, clazz);
+                if (0 == attr.getAttributetype().getName().compareToIgnoreCase("assetref")) {
+                    CfAssetlist assetlist = cfassetlistService.findByName((String)hm.get(key));
+                    List<CfAssetlistcontent> assetcontentlist = cfassetlistcontentService.findByAssetlistref(assetlist.getId());
+                    
+                    List<Long> result = new ArrayList<>();
+                    for (CfAssetlistcontent assetitem : assetcontentlist) {
+                        result.add(assetitem.getCfAssetlistcontentPK().getAssetref());
                     }
                     hm.put(attr.getName(), result);
                 }
