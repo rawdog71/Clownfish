@@ -13,7 +13,7 @@ webform.controller('WebformCtrl', function($scope, $http) {
             contentname: document.getElementById('contentname').value,
         };
 
-        axios.post('http://localhost:9000/insertcontent',
+        axios.post('/insertcontent',
                 attributmap
             )
             .then(function(response) {
@@ -37,7 +37,7 @@ webform.controller('WebformCtrl', function($scope, $http) {
             attributmap: $scope.getInputInformation('forms2'),
         };
 
-        axios.post('http://localhost:9000/updatecontent',
+        axios.post('/updatecontent',
                 attributmap
             )
             .then(function(response) {
@@ -72,7 +72,7 @@ webform.controller('WebformCtrl', function($scope, $http) {
             contentname: $scope.contentList[id].content.name,
         };
 
-        axios.post('http://localhost:9000/deletecontent',
+        axios.post('/deletecontent',
                 attributmap
             )
             .then(function(response) {
