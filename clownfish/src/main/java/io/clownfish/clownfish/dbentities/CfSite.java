@@ -53,7 +53,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfSite.findByLocale", query = "SELECT c FROM CfSite c WHERE c.locale = :locale"),
     @NamedQuery(name = "CfSite.findByAliaspath", query = "SELECT c FROM CfSite c WHERE c.aliaspath = :aliaspath"),
     @NamedQuery(name = "CfSite.findBySitemap", query = "SELECT c FROM CfSite c WHERE c.sitemap = :sitemap"),
-    @NamedQuery(name = "CfSite.findBySearchresult", query = "SELECT c FROM CfSite c WHERE c.searchresult = :searchresult")
+    @NamedQuery(name = "CfSite.findBySearchresult", query = "SELECT c FROM CfSite c WHERE c.searchresult = :searchresult"),
+    @NamedQuery(name = "CfSite.findByShorturl", query = "SELECT c FROM CfSite c WHERE c.shorturl = :shorturl")
 })
 public class CfSite implements Serializable {
 
@@ -113,6 +114,8 @@ public class CfSite implements Serializable {
     private boolean sitemap;
     @Column(name = "searchresult")
     private boolean searchresult;
+    @Column(name = "shorturl")
+    private String shorturl;
 
     public CfSite() {
     }
@@ -313,6 +316,14 @@ public class CfSite implements Serializable {
 
     public void setSearchresult(boolean searchresult) {
         this.searchresult = searchresult;
+    }
+
+    public String getShorturl() {
+        return shorturl;
+    }
+
+    public void setShorturl(String shorturl) {
+        this.shorturl = shorturl;
     }
 
     @Override

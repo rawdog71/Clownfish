@@ -540,6 +540,7 @@ public class Clownfish {
     @GetMapping(path = "/{name}/**")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         if (servicestatus.isOnline()) {
+            boolean alias = false;
             try {
                 ArrayList urlParams = new ArrayList();
                 // fetch site by name or aliasname
@@ -549,13 +550,26 @@ public class Clownfish {
                 } catch (Exception ex) {
                     try {
                         cfsite = cfsiteService.findByAliaspath(name);
+                        name = cfsite.getName();
+                        alias = true;
                     } catch (Exception e1) {
-                        throw new PageNotFoundException("PageNotFound Exception: " + name);
+                        try {
+                            cfsite = cfsiteService.findByShorturl(name);
+                            name = cfsite.getName();
+                            alias = true;
+                        } catch (Exception ey) {
+                            throw new PageNotFoundException("PageNotFound Exception: " + name);
+                        }
                     }
                 }
                 
                 if (!cfsite.isSearchresult()) {
-                    String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+                    String path = "";
+                    if (alias) {
+                        path = name;
+                    } else {
+                        path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+                    }
                     
                     if (path.contains("/")) {
                         String[] params = path.split("/");
@@ -680,6 +694,7 @@ public class Clownfish {
      */
     @PostMapping("/{name}/**")
     public void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) throws PageNotFoundException {
+        boolean alias = false;
         try {
             ArrayList urlParams = new ArrayList();
             String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
@@ -718,8 +733,16 @@ public class Clownfish {
                 } catch (Exception ex) {
                     try {
                         cfsite = cfsiteService.findByAliaspath(name);
+                        name = cfsite.getName();
+                        alias = true;
                     } catch (Exception e1) {
-                        throw new PageNotFoundException("PageNotFound Exception: " + name);
+                        try {
+                            cfsite = cfsiteService.findByShorturl(name);
+                            name = cfsite.getName();
+                            alias = true;
+                        } catch (Exception ey) {
+                            throw new PageNotFoundException("PageNotFound Exception: " + name);
+                        }
                     }
                 }
                 

@@ -41,6 +41,7 @@ import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitekeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
@@ -49,6 +50,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SiteUtil {
+    @Autowired CfSiteService cfsiteService;
     @Autowired CfSitelistService cfsitelistService;
     @Autowired CfClasscontentService cfclasscontentService;
     @Autowired CfClassService cfclassService;
@@ -249,5 +252,36 @@ public class SiteUtil {
         }
         sitecontentmap.put("KeywordLibrary", keywordlibraryMap);
         return sitecontentmap;
+    }
+    
+    public String generateShorturl() {
+        String shorturl = "";
+        boolean notfound = true;
+        while (notfound) {
+            for (int i = 1; i <= 5; i++) {
+                shorturl += getRandomChar();
+            }
+            try {
+                cfsiteService.findByShorturl(shorturl);
+                notfound = true;
+            } catch (Exception ex) {
+                notfound = false;
+            }
+        }
+        return shorturl;
+    }
+    
+    private char getRandomChar() {
+        Random rand = new Random();
+        int i = rand.nextInt(62);
+        int j = 0;
+        if (i < 10) {
+                j = i + 48;
+        } else if (i > 9 && i <= 35) {
+                j = i + 55;
+        } else {
+                j = i + 61;
+        }
+        return (char) j;
     }
 }

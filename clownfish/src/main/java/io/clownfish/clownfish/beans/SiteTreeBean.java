@@ -84,6 +84,7 @@ import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.JavascriptUtil;
+import io.clownfish.clownfish.utils.SiteUtil;
 import io.clownfish.clownfish.utils.StylesheetUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
 import java.io.File;
@@ -245,6 +246,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
     @Autowired private @Getter @Setter ClassUtil classUtility;
     @Autowired transient FolderUtil folderUtil;
+    @Autowired transient SiteUtil siteUtil;
     private SourceIndexer sourceindexer;
     private @Getter @Setter String iframeurl = "";
     @Autowired transient Clownfish clownfish;
@@ -783,7 +785,8 @@ public class SiteTreeBean implements Serializable {
             newsite.setSearchresult(searchresult);
             newsite.setSitemap(sitemap);
             newsite.setStaticsite(sitestatic);
-            cfsiteService.create(newsite);
+            newsite.setShorturl(siteUtil.generateShorturl());
+            selectedSite = cfsiteService.create(newsite);
             loadTree();
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
@@ -1246,6 +1249,16 @@ public class SiteTreeBean implements Serializable {
         previewKeywordlistOutput.clear();
         for (CfKeywordlistcontent keywordlistcontent : cfkeywordlistcontentService.findByKeywordlistref(selected_keywordlist.getId())) {
             previewKeywordlistOutput.add(cfkeywordService.findById(keywordlistcontent.getCfKeywordlistcontentPK().getKeywordref()));
+        }
+    }
+    
+    public void onGenerateShorturl() {
+        if (null != selectedSite) {
+            selectedSite.setShorturl(siteUtil.generateShorturl());
+            cfsiteService.edit(selectedSite);
+            loadTree();
+            FacesMessage message = new FacesMessage("Generated shorturl for " + selectedSite.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
 }

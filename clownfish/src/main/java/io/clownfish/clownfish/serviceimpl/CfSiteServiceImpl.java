@@ -96,4 +96,9 @@ public class CfSiteServiceImpl implements CfSiteService {
         return this.cfsiteDAO.findBySitemap(sitemap);
     }
 
+    @Override
+    public CfSite findByShorturl(String shorturl) {
+        return this.cfsiteDAO.findByShorturl(shorturl);
+    }
+
 }

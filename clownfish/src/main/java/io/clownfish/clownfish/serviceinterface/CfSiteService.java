@@ -30,6 +30,7 @@ public interface CfSiteService {
     CfSite findByTemplateref(Long ref);
     List<CfSite> findByParentref(Long ref);
     List<CfSite> findBySitemap(boolean sitemap);
+    CfSite findByShorturl(String shorturl);
     CfSite create(CfSite entity);
     boolean delete(CfSite entity);
     CfSite edit(CfSite entity);

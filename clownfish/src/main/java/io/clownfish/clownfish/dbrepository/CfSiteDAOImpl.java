@@ -121,4 +121,13 @@ public class CfSiteDAOImpl implements CfSiteDAO {
         List<CfSite> cfsitelist = query.getResultList();
         return cfsitelist;
     }
+
+    @Override
+    public CfSite findByShorturl(String shorturl) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfSite.findByShorturl");  
+        query.setParameter("shorturl", shorturl);
+        CfSite cfsite = (CfSite) query.getSingleResult();
+        return cfsite;
+    }
 }
