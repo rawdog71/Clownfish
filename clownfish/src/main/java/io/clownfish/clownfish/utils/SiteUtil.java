@@ -166,6 +166,9 @@ public class SiteUtil {
                 } else {
                     sitecontentmapdummy.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId()));
                 }
+                
+                // DECRYPT HERE :)
+                
             } else {
                 LOGGER.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + classcontent.getId());
             }

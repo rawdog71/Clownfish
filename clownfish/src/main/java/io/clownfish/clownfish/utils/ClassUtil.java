@@ -16,22 +16,15 @@
 package io.clownfish.clownfish.utils;
 
 import com.google.gson.Gson;
-import io.clownfish.clownfish.Main;
 import io.clownfish.clownfish.beans.JavaList;
-import io.clownfish.clownfish.beans.JavascriptList;
 import io.clownfish.clownfish.beans.SiteTreeBean;
 import io.clownfish.clownfish.compiler.JVMLanguages;
 import io.clownfish.clownfish.datamodels.RestContentParameter;
 import io.clownfish.clownfish.dbentities.*;
 import io.clownfish.clownfish.serviceinterface.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
@@ -44,8 +37,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
-
-import j2html.Config;
 import static j2html.TagCreator.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,10 +46,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import scala.language;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 
 /**
  *
