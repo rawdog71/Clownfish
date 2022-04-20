@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.rest;
 
 import com.github.openjson.JSONObject;
+import com.google.gson.Gson;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -57,7 +58,7 @@ public class RestGraphQL {
     @Autowired transient AuthTokenList authtokenlist;
 
     @RequestMapping(value = "/graphql", method = RequestMethod.POST)
-    public Map<String, Object> myGraphql(@RequestHeader("token") String token, @RequestBody String request) throws Exception {
+    public String myGraphql(@RequestHeader("token") String token, @RequestBody String request) throws Exception {
         if (authtokenlist.checkValidToken(token)) {
         
             JSONObject jsonRequest = new JSONObject(request);
@@ -70,7 +71,9 @@ public class RestGraphQL {
             GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
             ExecutionResult executionResult = build.execute(executionInput);
 
-            return executionResult.toSpecification();
+            Map<String, Object> toSpecificationResult = executionResult.toSpecification();
+            Gson gson = new Gson();
+            return gson.toJson(toSpecificationResult);
         } else {
             return null;
         }
