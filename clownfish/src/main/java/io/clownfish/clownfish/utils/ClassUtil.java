@@ -16,15 +16,22 @@
 package io.clownfish.clownfish.utils;
 
 import com.google.gson.Gson;
+import io.clownfish.clownfish.Main;
 import io.clownfish.clownfish.beans.JavaList;
+import io.clownfish.clownfish.beans.JavascriptList;
 import io.clownfish.clownfish.beans.SiteTreeBean;
 import io.clownfish.clownfish.compiler.JVMLanguages;
 import io.clownfish.clownfish.datamodels.RestContentParameter;
 import io.clownfish.clownfish.dbentities.*;
 import io.clownfish.clownfish.serviceinterface.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
@@ -37,6 +44,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
+
+import j2html.Config;
 import static j2html.TagCreator.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,6 +55,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import scala.language;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 
 /**
  *
@@ -540,7 +553,7 @@ public class ClassUtil implements Serializable {
         CfTemplate template = new CfTemplate();
         CfSite site = new CfSite();
         CfJavascript js = new CfJavascript();
-
+        
         html.append("<!DOCTYPE html>").append("\n");
         html.append("<html lang=\"en\" ng-app=\"webformApp\">").append("\n\n");
         html.append(head(
@@ -558,42 +571,42 @@ public class ClassUtil implements Serializable {
         html.append("\t").append(h1(clazz.getName()).withId("classname").withClass("text-center mt-3")).append("\n");
         
         html.append("\t").append(("<div class=\"mx-5\">")).append("\n");
-        html.append("\t").append(("<div class=\"d-flex flex-row-reverse\">")).append("\n");
-        html.append("\t").append((" <button class=\"btn btn-primary\" data-bs-toggle=\"modal\" data-bs-target=\"#exampleModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-plus-lg\" viewBox=\"0 0 16 16\">\n" +
+        html.append("\t\t").append(("<div class=\"d-flex flex-row-reverse\">")).append("\n");
+        html.append("\t\t\t").append(("<button class=\"btn btn-primary\" data-bs-toggle=\"modal\" data-bs-target=\"#exampleModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-plus-lg\" viewBox=\"0 0 16 16\">\n" +
 "                <path fill-rule=\"evenodd\" d=\"M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z\"/>\n" +
 "              </svg> Hinzufügen</button>")).append("\n");
-        html.append("\t").append(("</div>")).append("\n");
+        html.append("\t\t").append(("</div>")).append("\n");
         
         html.append("\t").append(("<table class=\"table\">")).append("\n");
-        html.append("\t").append(("<thead>")).append("\n");
-        html.append("\t").append(("<tr>")).append("\n");
-        html.append("\t").append("<th scope=\"col\">#</th>\n");
-        html.append("\t").append("<th scope=\"col\">Contentname</th>\n");
+        html.append("\t\t").append(("<thead>")).append("\n");
+        html.append("\t\t\t").append(("<tr>")).append("\n");
+        html.append("\t\t\t\t").append("<th scope=\"col\">#</th>\n");
+        html.append("\t\t\t\t").append("<th scope=\"col\">Contentname</th>\n");
         
         for (CfAttribut attr : attributList) {
             if (attr.getAutoincrementor()) {
                 continue;
             }
-            html.append("\t").append("<th scope=\"col\">").append(attr.getName()).append("</th>\n");
+            html.append("\t").append("<th scope=\"col\">").append(attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("</th>\n");
         }
-        html.append("\t").append("<th class=\"text-end\" scope=\"col\">Aktionen</th>\n");
-        html.append("\t").append(("</tr>")).append("\n");
-        html.append("\t").append(("</thead>")).append("\n");
+        html.append("\t\t\t\t").append("<th class=\"text-end\" scope=\"col\">Aktionen</th>\n");
+        html.append("\t\t\t").append(("</tr>")).append("\n");
+        html.append("\t\t").append(("</thead>")).append("\n");
         
-        html.append("\t").append(("<tbody>")).append("\n");
-        html.append("\t").append(("<tr ng-repeat=\"info in contentList track by $index\">")).append("\n");
-        html.append("\t").append("<th scope=\"row\">{{$index}}</th>\n");
-        html.append("\t").append("<td> {{info.content.name}} </td>").append("\n");
+        html.append("\t\t").append(("<tbody>")).append("\n");
+        html.append("\t\t\t").append(("<tr ng-repeat=\"info in contentList track by $index\">")).append("\n");
+        html.append("\t\t\t\t").append("<th scope=\"row\">{{$index}}</th>\n");
+        html.append("\t\t\t\t").append("<td> {{info.content.name}} </td>").append("\n");
         
         for (CfAttribut attr : attributList) {
             if (attr.getAutoincrementor()) {
                 continue;
             }
-            html.append("\t").append("<td> {{info.keyvals[0].").append(attr.getName()).append("}}").append("</td>\n");
+            html.append("\t\t\t\t").append("<td> {{info.keyvals[0].").append(attr.getName()).append("}}").append("</td>\n");
         }
         
-        html.append("\t").append(("<td class=\"text-end\">")).append("\n");
-        html.append("\t").
+        html.append("\t\t\t\t").append(("<td class=\"text-end\">")).append("\n");
+        html.append("\t\t\t\t\t").
                 append(("<button class=\"btn btn-primary\" ng-click=\"edit($index)\" data-bs-toggle=\"modal\" data-bs-target=\"#editModal\">\n" +
 "                            <div class=\"d-flex align-items-center\">\n" +
 "                                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-pencil-square\" viewBox=\"0 0 16 16\">\n" +
@@ -604,7 +617,7 @@ public class ClassUtil implements Serializable {
 "                            </div>\n" +
 "                        </button>")).append("\n");
         
-        html.append("\t").
+        html.append("\t\t\t\t\t").
                 append(("<button class=\"btn btn-danger\" ng-click=\"deleteI($index)\">\n" +
 "                            <div class=\"d-flex align-items-center\">\n" +
 "                                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-trash\" viewBox=\"0 0 16 16\">\n" +
@@ -614,9 +627,9 @@ public class ClassUtil implements Serializable {
 "                                <p class=\"m-0 ms-1\">Löschen</p>\n" +
 "                            </div>\n" +
 "                        </button>")).append("\n");
-        html.append("\t").append(("</td>")).append("\n");
-        html.append("\t").append(("</tr>")).append("\n");
-        html.append("\t").append(("</tbody>")).append("\n");
+        html.append("\t\t\t\t").append(("</td>")).append("\n");
+        html.append("\t\t\t").append(("</tr>")).append("\n");
+        html.append("\t\t").append(("</tbody>")).append("\n");
         html.append("\t").append(("</table>")).append("\n");
         html.append("\t").append(("</div>")).append("\n");
         
@@ -629,12 +642,12 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t").append(("</div>")).append("\n");
         
         html.append("\t\t\t\t").append(("<div class=\"modal-body\">")).append("\n");
-        html.append("\t\t\t\t").append(("<form id=\"forms\" class=\"row g-3\">")).append("\n");
+        html.append("\t\t\t\t\t").append(("<form id=\"forms\" class=\"row g-3\">")).append("\n");
         
-        html.append("\t\t\t\t").append(("<div class=\"col-md-12\">")).append("\n");
-        html.append("\t").append(label("Contentname").withFor("contentname").withClass("form-label")).append("\n");
-        html.append("\t").append(input().withId("contentname").withType("text").withClass("form-control")).append(br()).append("\n");
-        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-12\">")).append("\n");
+        html.append("\t\t\t\t\t\t\t").append(label("Contentname").withFor("contentname").withClass("form-label")).append("\n");
+        html.append("\t\t\t\t\t\t\t").append(input().withId("contentname").withType("text").withClass("form-control")).append("\n");
+        html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
         
         for (CfAttribut attr : attributList) {
             if (attr.getAutoincrementor()) {
@@ -642,63 +655,68 @@ public class ClassUtil implements Serializable {
             }
             switch (attr.getAttributetype().getName()) {
                 case "boolean":
-                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(attr.getName()).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("checkbox").withId(attr.getName()).withClass("form-control")).append(br()).append("\n");
-                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    html.append("\t\t").append(input().withType("checkbox").withId(attr.getName())).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "string":
                 case "htmltext":
                 case "markdown":
-                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
-                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("text").withId(attr.getName()).withClass("form-control")).append(br()).append("\n");
-                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(input().withType("text").withId(attr.getName()).withClass("form-control")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "hashstring":
-                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
-                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("password").withId(attr.getName()).withClass("form-control")).append(br()).append("\n");
-                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(input().withType("password").withId(attr.getName()).withClass("form-control")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "integer":
                 case "real":
-                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
-                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control")).append(br());
-                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control"));
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "assetref":
-                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
-                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append(br()).append("\n");
-                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control").withMax(String.valueOf(
-                            cfassetlistService.findAll().stream().max(Comparator.comparing(CfAssetlist::getId)).get().getId()))).append(br()).append("\n");
-                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t").append(("<option ng-repeat=\"name in libNames\" value=\"{{name.id}}\">{{name.name}}</option>")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(("</select>")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
+                    break;
                 case "media":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
-                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control").withMax(String.valueOf(
-                            cfassetService.findAll().stream().max(Comparator.comparing(CfAsset::getId)).get().getId()))).append(br()).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t").append("<option selected value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
+                    html.append("\t\t\t\t").append(("<option ng-repeat=\"media in mediaList\" value=\"{{media.id}}\">{{media.id}}. {{media.name}}</option>")).append("\n");
+                    html.append("\t\t\t\t").append(("</select>")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "classref":
-                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
-                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control").withMax(String.valueOf(
-                            cfclassService.findAll().stream().max(Comparator.comparing(CfClass::getId)).get().getId()))).append(br()).append("\n");
-                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t").append(("<option ng-repeat=\"name in classNames\" value=\"{{name.id}}\">{{name.name}}</option>")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(("</select>")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "datetime":
-                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
-                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("date").withId(attr.getName()).withClass("form-control").withMax(String.valueOf(
-                            cfclassService.findAll().stream().max(Comparator.comparing(CfClass::getId)).get().getId()))).append(br()).append("\n");
-                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(input().withType("date").withId(attr.getName()).withClass("form-control").withMax(String.valueOf(
+                            cfclassService.findAll().stream().max(Comparator.comparing(CfClass::getId)).get().getId()))).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
                     break;
             }
         }
         
-        html.append("\t\t\t\t").append(("</form>")).append("\n");
+        html.append("\t\t\t\t\t").append(("</form>")).append("\n");
         html.append("\t\t\t\t").append(("</div>")).append("\n");
         
         html.append("\t\t\t\t").append(("<div class=\"modal-footer\">")).append("\n");
@@ -728,7 +746,7 @@ public class ClassUtil implements Serializable {
                 case "boolean":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(attr.getName()).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("checkbox").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}")).append(br()).append("\n");
+                    html.append("\t\t\t\t").append(("<input type=\"checkbox\" id=\"" + attr.getName() + "\" ng-checked=\"{{info." + attr.getName() + "}}\">")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "string":
@@ -736,48 +754,54 @@ public class ClassUtil implements Serializable {
                 case "markdown":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("text").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}")).append(br()).append("\n");
+                    html.append("\t\t").append(input().withType("text").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "hashstring":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("password").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}")).append(br()).append("\n");
+                    html.append("\t\t").append(input().withType("password").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "integer":
                 case "real":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}")).append(br());
+                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}"));
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "assetref":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
-                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append(br()).append("\n");
-                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}").withMax(String.valueOf(
-                            cfassetlistService.findAll().stream().max(Comparator.comparing(CfAssetlist::getId)).get().getId()))).append(br()).append("\n");
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t").append("<option selected value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
+                    html.append("\t\t\t\t").append(("<option ng-repeat=\"name in libNames\" value=\"{{name.id}}\">{{name.name}}</option>")).append("\n");
+                    html.append("\t\t\t\t").append(("</select>")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "media":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
-                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}").withMax(String.valueOf(
-                            cfassetService.findAll().stream().max(Comparator.comparing(CfAsset::getId)).get().getId()))).append(br()).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t").append("<option selected value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
+                    html.append("\t\t\t\t").append(("<option ng-repeat=\"media in mediaList\" value=\"{{media.id}}\">{{media.id}}. {{media.name}}</option>")).append("\n");
+                    html.append("\t\t\t\t").append(("</select>")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "classref":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}").withMax(String.valueOf(
-                            cfclassService.findAll().stream().max(Comparator.comparing(CfClass::getId)).get().getId()))).append(br()).append("\n");
+                    html.append("\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t").append("<option selected value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
+                    html.append("\t\t\t\t").append(("<option ng-repeat=\"name in classNames\" value=\"{{name.id}}\">{{name.name}}</option>")).append("\n");
+                    html.append("\t\t\t\t").append(("</select>")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "datetime":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t").append(input().withType("date").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}").withMax(String.valueOf(
-                            cfclassService.findAll().stream().max(Comparator.comparing(CfClass::getId)).get().getId()))).append(br()).append("\n");
+                            cfclassService.findAll().stream().max(Comparator.comparing(CfClass::getId)).get().getId()))).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
             }
