@@ -818,42 +818,36 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t").append(("</html>")).append("\n");
         
         template.setName(clazz.getName() + "_Webform");
-        template.setScriptlanguage(2);
-        template.setCheckedoutby(BigInteger.ZERO);
-        template.setContent(html.toString());
-        //if (cfTemplateService.findByName(template.getName()) == null) {
+        CfTemplate dummytemplate = cfTemplateService.findByName(template.getName());
+        
+        if (null == dummytemplate) {
+            template.setScriptlanguage(2);
+            template.setCheckedoutby(BigInteger.ZERO);
+            template.setContent(html.toString());
             cfTemplateService.create(template);
-//        } else {
-//            FacesMessage message = new FacesMessage("Template \"" + template.getName() + "\" already exists! Aborting...");
-//            FacesContext.getCurrentInstance().addMessage(null, message);
-//            return;
-//        }
-//        } else {
-//            FacesMessage message = new FacesMessage("JavaScript \"" + js.getName() + "\" already exists! Aborting...");
-//            FacesContext.getCurrentInstance().addMessage(null, message);
-//            return;
-//        }
+        } else {
+            dummytemplate.setContent(html.toString());
+            cfTemplateService.edit(dummytemplate);
+        }
 
         site.setName(clazz.getName() + "_Webform");
-        site.setCharacterencoding("UTF-8");
-        site.setHitcounter(BigInteger.ZERO);
-        site.setTitle("");
-        site.setContenttype("text/html");
-        site.setSearchrelevant(false);
-        site.setHtmlcompression(0);
-        site.setGzip(0);
-        site.setLocale("");
-        site.setDescription("");
-        site.setAliaspath(site.getName());
-        site.setParentref(BigInteger.ZERO);
-        site.setTemplateref(BigInteger.valueOf(template.getId()));
-        //if (cfSiteService.findByName(site.getName()) == null) {
+        CfSite dummysite = cfSiteService.findByName(site.getName());
+        if (null == dummysite) {
+            site.setCharacterencoding("UTF-8");
+            site.setHitcounter(BigInteger.ZERO);
+            site.setTitle("");
+            site.setContenttype("text/html");
+            site.setSearchrelevant(false);
+            site.setHtmlcompression(0);
+            site.setGzip(0);
+            site.setLocale("");
+            site.setDescription("");
+            site.setAliaspath(site.getName());
+            site.setParentref(BigInteger.ZERO);
+            site.setTemplateref(BigInteger.valueOf(template.getId()));
             cfSiteService.create(site);
-            sitetree.loadTree();
-//        } else {
-//            FacesMessage message = new FacesMessage("Site \"" + site.getName() + "\" already exists! Aborting...");
-//            FacesContext.getCurrentInstance().addMessage(null, message);
-//        }
+        }
+        sitetree.loadTree();
     }
     
     private String getAttributeJVMType(CfAttribut attribut, JVMLanguages language) {
