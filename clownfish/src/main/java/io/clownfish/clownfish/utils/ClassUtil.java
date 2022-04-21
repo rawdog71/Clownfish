@@ -694,7 +694,7 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
                     html.append("\t\t").append("<option selected value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
-                    html.append("\t\t\t\t").append(("<option ng-repeat=\"media in mediaList\" value=\"{{media.id}}\">{{media.id}}. {{media.name}}</option>")).append("\n");
+                    html.append("\t\t\t\t").append(("<option ng-repeat=\"media in mediaList\" value=\"{{media.asset.id}}\">{{media.asset.id}}. {{media.asset.name}}</option>")).append("\n");
                     html.append("\t\t\t\t").append(("</select>")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
@@ -760,7 +760,7 @@ public class ClassUtil implements Serializable {
                 case "hashstring":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("password").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}")).append("\n");
+                    html.append("\t\t").append(input().withType("password").withId(attr.getName()).withClass("form-control")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "integer":
@@ -784,7 +784,7 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
                     html.append("\t\t").append("<option selected value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
-                    html.append("\t\t\t\t").append(("<option ng-repeat=\"media in mediaList\" value=\"{{media.id}}\">{{media.id}}. {{media.name}}</option>")).append("\n");
+                    html.append("\t\t\t\t").append(("<option ng-repeat=\"media in mediaList\" value=\"{{media.asset.id}}\">{{media.asset.id}}. {{media.asset.name}}</option>")).append("\n");
                     html.append("\t\t\t\t").append(("</select>")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
