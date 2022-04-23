@@ -80,6 +80,7 @@ public class SiteUtil {
     @Autowired CfKeywordlistcontentService cfkeywordlistcontentService;
     @Autowired ClassUtil classutil;
     @Autowired HibernateUtil hibernateutil;
+    @Autowired private PropertyUtil propertyUtil;
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteUtil.class);
     
     @Value("${hibernate.use:0}") int useHibernate;
@@ -168,7 +169,13 @@ public class SiteUtil {
                 }
                 
                 if (classcontent.getClassref().isEncrypted()) {
-                    // DECRYPT HERE :)
+                    HashMap contentmap = (HashMap) sitecontentmapdummy.get(classcontent.getName());
+                    for (Object key : contentmap.keySet()) {
+                        if (null != getAttributValue(attributcontentlist, key.toString())) {
+                            HashMap am = (HashMap) sitecontentmapdummy.get(classcontent.getName());
+                            am.put(key, getAttributValue(attributcontentlist, key.toString()));
+                        }
+                    }
                 }
                 
             } else {
@@ -257,6 +264,15 @@ public class SiteUtil {
         }
         sitecontentmap.put("KeywordLibrary", keywordlibraryMap);
         return sitecontentmap;
+    }
+    
+    private String getAttributValue(List<CfAttributcontent> attributcontentlist, String key) {
+        for (CfAttributcontent ac : attributcontentlist) {
+            if ((0 == ac.getAttributref().getName().compareToIgnoreCase(key)) && (!ac.getAttributref().getIdentity()) && (0 == ac.getAttributref().getAttributetype().getName().compareToIgnoreCase("string"))) {
+                return EncryptUtil.decrypt(ac.getContentString(), propertyUtil.getPropertyValue("aes_key")) ;
+            }
+        }
+        return null;
     }
     
     public String generateShorturl() {

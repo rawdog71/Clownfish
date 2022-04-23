@@ -75,7 +75,7 @@ public class ContentIndexer implements Runnable {
                 case "string":
                     if (null != attributcontent.getContentString()) {
                         if ((attributcontent.getClasscontentref().getClassref().isEncrypted()) && (!attributcontent.getAttributref().getIdentity())) {
-                            document.add(new TextField(LuceneConstants.CONTENT_STRING, EncryptUtil.decrypt(attributcontent.getContentString(), propertyUtil.getPropertyValue("aes_key")) , Field.Store.YES));
+                            document.add(new TextField(LuceneConstants.CONTENT_STRING, EncryptUtil.decrypt(attributcontent.getContentString(), propertyUtil.getPropertyValue("aes_key")), Field.Store.YES));
                         } else {
                             document.add(new TextField(LuceneConstants.CONTENT_STRING, attributcontent.getContentString(), Field.Store.YES));
                         }
