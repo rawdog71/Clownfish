@@ -82,6 +82,7 @@ import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.ClownfishUtil;
+import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.JavascriptUtil;
 import io.clownfish.clownfish.utils.SiteUtil;
@@ -247,6 +248,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired private @Getter @Setter ClassUtil classUtility;
     @Autowired transient FolderUtil folderUtil;
     @Autowired transient SiteUtil siteUtil;
+    @Autowired private ContentUtil contentUtil;
     private SourceIndexer sourceindexer;
     private @Getter @Setter String iframeurl = "";
     @Autowired transient Clownfish clownfish;
@@ -992,7 +994,7 @@ public class SiteTreeBean implements Serializable {
             attributcontentlist = cfattributcontentService.findByClasscontentref(current_classcontent);
             String output = current_classcontent.getClassref().getTemplateref().getContent();
             for (CfAttributcontent attributcontent : attributcontentlist) {
-                output = output.replaceAll("#" + attributcontent.getAttributref().getName() + "#", attributcontent.toString());
+                output = output.replaceAll("#" + attributcontent.getAttributref().getName() + "#", contentUtil.toString(attributcontent));
             }
             previewContentOutput = output;
         }
