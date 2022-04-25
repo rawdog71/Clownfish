@@ -53,19 +53,23 @@ public class EncryptUtil {
     }
     
     public static String decrypt(String source, String key) {
-        try {
-            Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
-            byte[] bb = new byte[source.length()];
-            for (int i=0; i<source.length(); i++) {
-                bb[i] = (byte) source.charAt(i);
+        if (null != source) {
+            try {
+                Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
+                byte[] bb = new byte[source.length()];
+                for (int i=0; i<source.length(); i++) {
+                    bb[i] = (byte) source.charAt(i);
+                }
+
+                Cipher cipher = Cipher.getInstance("AES");
+                cipher.init(Cipher.DECRYPT_MODE, aesKey);
+                String decrypted = new String(cipher.doFinal(bb));
+                return decrypted;
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
+                Logger.getLogger(EncryptUtil.class.getName()).log(Level.SEVERE, null, ex);
+                return null;
             }
-            
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, aesKey);
-            String decrypted = new String(cipher.doFinal(bb));
-            return decrypted;
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
-            Logger.getLogger(EncryptUtil.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
             return null;
         }
     }

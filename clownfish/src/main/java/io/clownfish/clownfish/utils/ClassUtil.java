@@ -838,8 +838,9 @@ public class ClassUtil implements Serializable {
         }
 
         site.setName(clazz.getName() + "_Webform");
-        CfSite dummysite = cfSiteService.findByName(site.getName());
-        if (null == dummysite) {
+        try {
+            CfSite dummysite = cfSiteService.findByName(site.getName());
+        } catch (Exception ex) {
             site.setCharacterencoding("UTF-8");
             site.setHitcounter(BigInteger.ZERO);
             site.setTitle("");
