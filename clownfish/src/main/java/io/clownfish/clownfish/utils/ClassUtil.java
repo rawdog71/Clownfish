@@ -784,18 +784,18 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
                     html.append("\t\t").append("<option selected value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
-                    html.append("\t\t\t\t").append(("<option ng-repeat=\"media in mediaList\" value=\"{{media.asset.id}}\">{{media.asset.id}}. {{media.asset.name}}</option>")).append("\n");
-                    html.append("\t\t\t\t").append(("</select>")).append("\n");
-                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    html.append("\t\t\t\t").append("<option ng-repeat=\"media in mediaList\" value=\"{{media.asset.id}}\">{{media.asset.id}}. {{media.asset.name}}</option>").append("\n");
+                    html.append("\t\t\t\t").append("</select>").append("\n");
+                    html.append("\t\t\t\t").append("</div>").append("\n");
                     break;
                 case "classref":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
-                    html.append("\t\t").append("<option selected value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
-                    html.append("\t\t\t\t").append(("<option ng-repeat=\"name in classNames\" value=\"{{name.id}}\">{{name.name}}</option>")).append("\n");
-                    html.append("\t\t\t\t").append(("</select>")).append("\n");
-                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    html.append("\t\t").append("<option ng-selected=\"{{info.salesteamuser === 'undefined'}}\" value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
+                    html.append("\t\t\t\t").append("<option ng-repeat=\"name in classNames\" value=\"{{name.id}}\" ng-selected=\"{{info.").append(attr.getName()).append(" === name.name}}\">{{name.name}}</option>").append("\n");
+                    html.append("\t\t\t\t").append("</select>").append("\n");
+                    html.append("\t\t\t\t").append("</div>").append("\n");
                     break;
                 case "datetime":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
@@ -818,16 +818,23 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t").append(("</html>")).append("\n");
         
         template.setName(clazz.getName() + "_Webform");
-        CfTemplate dummytemplate = cfTemplateService.findByName(template.getName());
-        
-        if (null == dummytemplate) {
+        try {
+            CfTemplate dummytemplate = cfTemplateService.findByName(template.getName());
+
+            if (null == dummytemplate) {
+                template.setScriptlanguage(2);
+                template.setCheckedoutby(BigInteger.ZERO);
+                template.setContent(html.toString());
+                cfTemplateService.create(template);
+            } else {
+                dummytemplate.setContent(html.toString());
+                cfTemplateService.edit(dummytemplate);
+            }
+        } catch (Exception ex) {
             template.setScriptlanguage(2);
             template.setCheckedoutby(BigInteger.ZERO);
             template.setContent(html.toString());
             cfTemplateService.create(template);
-        } else {
-            dummytemplate.setContent(html.toString());
-            cfTemplateService.edit(dummytemplate);
         }
 
         site.setName(clazz.getName() + "_Webform");

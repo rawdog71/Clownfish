@@ -120,8 +120,9 @@ webform.controller('WebformCtrl', function($scope, $http) {
 
         for (var i = 0; i < form.elements.length; i++) {
             var e = form.elements[i];
-            if(e.value === "NOVALUE") {
-                continue;
+            
+            if ((e.type === "select-one") && (e.value === "NOVALUE")) {
+                e.value = null;
             }
             if(e.type === "password") {
                 if(e.value === undefined || e.value === null || e.value.length < 3) {

@@ -256,14 +256,26 @@ public class ContentUtil implements IVersioningInterface {
                     break;    
                 case "classref":
                     if (null != editContent) {
-                        CfList list_ref = cflistService.findById(Long.parseLong(editContent));
-                        selectedAttribut.setClasscontentlistref(list_ref);
+                        try {
+                            CfList list_ref = cflistService.findById(Long.parseLong(editContent));
+                            selectedAttribut.setClasscontentlistref(list_ref);
+                        } catch (Exception ex1) {
+                            selectedAttribut.setClasscontentlistref(null);
+                        }
+                    } else {
+                        selectedAttribut.setClasscontentlistref(null);
                     }
                     break;
                 case "assetref":
                     if (null != editContent) {
-                        CfAssetlist assetlist_ref = cfassetlistService.findById(Long.parseLong(editContent));
-                        selectedAttribut.setAssetcontentlistref(assetlist_ref);
+                        try {
+                            CfAssetlist assetlist_ref = cfassetlistService.findById(Long.parseLong(editContent));
+                            selectedAttribut.setAssetcontentlistref(assetlist_ref);
+                        } catch (Exception ex1) {
+                            selectedAttribut.setAssetcontentlistref(null);
+                        }
+                    } else {
+                        selectedAttribut.setAssetcontentlistref(null);
                     }
                     break;    
             }
