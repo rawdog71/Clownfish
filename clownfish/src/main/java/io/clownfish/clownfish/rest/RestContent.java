@@ -93,12 +93,12 @@ public class RestContent {
                     //System.out.println(clazz.isSearchrelevant());
 
                     try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname().trim().replaceAll("\\s+", "_"));
+                        CfClasscontent classcontent = cfclasscontentService.findByName(clazz.getName().toUpperCase() + "_" + icp.getContentname().trim().replaceAll("\\s+", "_"));
                         LOGGER.warn("Duplicate Classcontent");
                         icp.setReturncode("Duplicate Classcontent");
                     } catch (javax.persistence.NoResultException ex) {
                         CfClasscontent newclasscontent = new CfClasscontent();
-                        newclasscontent.setName(icp.getContentname().trim().replaceAll("\\s+", "_"));
+                        newclasscontent.setName(clazz.getName().toUpperCase() + "_" + icp.getContentname().trim().replaceAll("\\s+", "_"));
                         newclasscontent.setCheckedoutby(BigInteger.valueOf(icp.getCheckedoutby()));
                         newclasscontent.setClassref(clazz);
                         CfClasscontent newclasscontent2 = cfclasscontentService.create(newclasscontent);
