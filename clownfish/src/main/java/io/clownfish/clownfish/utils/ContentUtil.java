@@ -209,10 +209,14 @@ public class ContentUtil implements IVersioningInterface {
                     selectedAttribut.setSalt(salt);
                     break;    
                 case "integer":
-                    selectedAttribut.setContentInteger(BigInteger.valueOf(Long.parseLong(editContent)));
+                    if (!editContent.isBlank()) {
+                        selectedAttribut.setContentInteger(BigInteger.valueOf(Long.parseLong(editContent)));
+                    }
                     break;
                 case "real":
-                    selectedAttribut.setContentReal(Double.parseDouble(editContent));
+                    if (!editContent.isBlank()) {
+                        selectedAttribut.setContentReal(Double.parseDouble(editContent));
+                    }
                     break;
                 case "htmltext":
                     selectedAttribut.setContentText(editContent);

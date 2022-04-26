@@ -769,8 +769,8 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
-                    html.append("\t\t").append("<option selected value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
-                    html.append("\t\t\t\t").append("<option ng-repeat=\"media in mediaList\" value=\"{{media.asset.id}}\">{{media.asset.id}}. {{media.asset.name}}</option>").append("\n");
+                    html.append("\t\t").append("<option ng-selected=\"{{info['").append(attr.getName()).append("'] === 'undefined'}}\" value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
+                    html.append("\t\t\t\t").append("<option ng-repeat=\"media in mediaList\" value=\"{{media.asset.id}}\" ng-selected=\"{{media.asset.id === info['").append(attr.getName()).append("']}}\">{{media.asset.id}}. {{media.asset.name}}</option>").append("\n");
                     html.append("\t\t\t\t").append("</select>").append("\n");
                     html.append("\t\t\t\t").append("</div>").append("\n");
                     break;
