@@ -33,10 +33,12 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
@@ -90,131 +92,139 @@ public class HibernateUtil implements Runnable {
     }
     
     public static synchronized void generateTablesDatamodel(int initHibernate) {
-        serviceStatus.setMessage("Generating dynamic tables");
-        serviceStatus.setOnline(false);
-        Document xmldoc = DocumentHelper.createDocument();
-        xmldoc.setName("tables");
-        Element root = xmldoc.addElement("hibernate-mapping");
-        List<CfClass> classlist = cfclassservice.findAll();
-        for (CfClass clazz : classlist) {
-            Element elementclass = root.addElement("class");
-            elementclass.addAttribute("entity-name", clazz.getName());
-            elementclass.addAttribute("table", "usr_" + clazz.getName());
-
-            List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
-            int idCount = hasIdentifier(attributlist);
-            // Set the primary key
-            Element elementid = elementclass.addElement("id");
-            elementid.addAttribute("name", "cf_id");
-            elementid.addAttribute("column", "CF_ID__");
-            elementid.addAttribute("type", "long");
-            Element elementgenerator = elementid.addElement("generator");
-            elementgenerator.addAttribute("class", "native");
-            makePrimaryKey(attributlist, elementclass, idCount);
-            // Set the properties
-            for (CfAttribut attribut : attributlist) {
-                if (!attribut.getIdentity()) {
-                    Element elementproperty = elementclass.addElement("property");
-                    elementproperty.addAttribute("name", attribut.getName());
-                    elementproperty.addAttribute("column", attribut.getName() + "_");
-                    elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
-                    elementproperty.addAttribute("not-null", "false");
-                    if (attribut.getIsindex()) {
-                        elementproperty.addAttribute("index", "idx_" + attribut.getName());
+        try {
+            serviceStatus.setMessage("Generating dynamic tables");
+            serviceStatus.setOnline(false);
+            Document xmldoc = DocumentHelper.createDocument();
+            xmldoc.setName("tables");
+            Element root = xmldoc.addElement("hibernate-mapping");
+            List<CfClass> classlist = cfclassservice.findAll();
+            for (CfClass clazz : classlist) {
+                Element elementclass = root.addElement("class");
+                elementclass.addAttribute("entity-name", clazz.getName());
+                elementclass.addAttribute("table", "usr_" + clazz.getName());
+                
+                List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
+                int idCount = hasIdentifier(attributlist);
+                // Set the primary key
+                Element elementid = elementclass.addElement("id");
+                elementid.addAttribute("name", "cf_id");
+                elementid.addAttribute("column", "CF_ID__");
+                elementid.addAttribute("type", "long");
+                Element elementgenerator = elementid.addElement("generator");
+                elementgenerator.addAttribute("class", "native");
+                makePrimaryKey(attributlist, elementclass, idCount);
+                // Set the properties
+                for (CfAttribut attribut : attributlist) {
+                    if (!attribut.getIdentity()) {
+                        Element elementproperty = elementclass.addElement("property");
+                        elementproperty.addAttribute("name", attribut.getName());
+                        elementproperty.addAttribute("column", attribut.getName() + "_");
+                        elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
+                        elementproperty.addAttribute("not-null", "false");
+                        if (attribut.getIsindex()) {
+                            elementproperty.addAttribute("index", "idx_" + attribut.getName());
+                        }
                     }
                 }                
+                Element elementproperty = elementclass.addElement("property");
+                elementproperty.addAttribute("name", "cf_contentref");
+                elementproperty.addAttribute("column", "CF__CONTENTREF__");
+                elementproperty.addAttribute("type", "long");
+                elementproperty.addAttribute("not-null", "true");
+                elementproperty.addAttribute("index", "idx_cf_contentref");
             }
-            Element elementproperty = elementclass.addElement("property");
-            elementproperty.addAttribute("name", "cf_contentref");
-            elementproperty.addAttribute("column", "CF__CONTENTREF__");
-            elementproperty.addAttribute("type", "long");
-            elementproperty.addAttribute("not-null", "true");
-            elementproperty.addAttribute("index", "idx_cf_contentref");
-        }
-        //System.out.println(xmldoc.asXML());
-        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
-        SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
-        Session session_tables = sessionFactory.openSession();
-        classsessions.put("tables", session_tables);
-        for (CfClass clazz : classlist) {
-            if (initHibernate > 0) {
-                fillTable(clazz.getName(), session_tables);
+            //System.out.println(xmldoc.asXML());
+            ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
+            SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes("UTF-8"))).buildMetadata().buildSessionFactory();
+            Session session_tables = sessionFactory.openSession();
+            classsessions.put("tables", session_tables);
+            for (CfClass clazz : classlist) {
+                if (initHibernate > 0) {
+                    fillTable(clazz.getName(), session_tables);
+                }
             }
+            session_tables.close();
+            
+            LOGGER.info("Data Model created");
+            serviceStatus.setMessage("online");
+            serviceStatus.setOnline(true);
+        } catch (UnsupportedEncodingException ex) {
+            java.util.logging.Logger.getLogger(HibernateUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
-        session_tables.close();
-
-        LOGGER.info("Data Model created");
-        serviceStatus.setMessage("online");
-        serviceStatus.setOnline(true);
     }
     
     public static synchronized void generateTablesDatamodel(String classname, int initHibernate) {
-        serviceStatus.setMessage("Regenerating dynamic tables");
-        serviceStatus.setOnline(false);
-        Session session_tables_drop = classsessions.get("tables").getSessionFactory().openSession();
         try {
-            Query q = session_tables_drop.createSQLQuery("DROP TABLE usr_" + classname);
-            Transaction tx = session_tables_drop.beginTransaction();
-            int count = q.executeUpdate();
-            tx.commit();
-        } catch (Exception ex) {
-            LOGGER.warn("DROP TABLE " + classname + " NOT POSSIBLE.");
-        }
-        session_tables_drop.close();
-        Document xmldoc = DocumentHelper.createDocument();
-        xmldoc.setName("tables");
-        Element root = xmldoc.addElement("hibernate-mapping");
-        List<CfClass> classlist = cfclassservice.findAll();
-        for (CfClass clazz : classlist) {
-            Element elementclass = root.addElement("class");
-            elementclass.addAttribute("entity-name", clazz.getName());
-            elementclass.addAttribute("table", "usr_" + clazz.getName());
-
-            List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
-            int idCount = hasIdentifier(attributlist);
-            // Set the primary key
-            Element elementid = elementclass.addElement("id");
-            elementid.addAttribute("name", "cf_id");
-            elementid.addAttribute("column", "CF_ID__");
-            elementid.addAttribute("type", "long");
-            Element elementgenerator = elementid.addElement("generator");
-            elementgenerator.addAttribute("class", "native");
-            makePrimaryKey(attributlist, elementclass, idCount);
-            // Set the properties
-            for (CfAttribut attribut : attributlist) {
-                if (!attribut.getIdentity()) {
-                    Element elementproperty = elementclass.addElement("property");
-                    elementproperty.addAttribute("name", attribut.getName());
-                    elementproperty.addAttribute("column", attribut.getName() + "_");
-                    elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
-                    elementproperty.addAttribute("not-null", "false");
-                    if (attribut.getIsindex()) {
-                        elementproperty.addAttribute("index", "idx_" + attribut.getName());
+            serviceStatus.setMessage("Regenerating dynamic tables");
+            serviceStatus.setOnline(false);
+            Session session_tables_drop = classsessions.get("tables").getSessionFactory().openSession();
+            try {
+                Query q = session_tables_drop.createSQLQuery("DROP TABLE usr_" + classname);
+                Transaction tx = session_tables_drop.beginTransaction();
+                int count = q.executeUpdate();
+                tx.commit();
+            } catch (Exception ex) {
+                LOGGER.warn("DROP TABLE " + classname + " NOT POSSIBLE.");
+            }
+            session_tables_drop.close();
+            Document xmldoc = DocumentHelper.createDocument();
+            xmldoc.setName("tables");
+            Element root = xmldoc.addElement("hibernate-mapping");
+            List<CfClass> classlist = cfclassservice.findAll();
+            for (CfClass clazz : classlist) {
+                Element elementclass = root.addElement("class");
+                elementclass.addAttribute("entity-name", clazz.getName());
+                elementclass.addAttribute("table", "usr_" + clazz.getName());
+                
+                List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
+                int idCount = hasIdentifier(attributlist);
+                // Set the primary key
+                Element elementid = elementclass.addElement("id");
+                elementid.addAttribute("name", "cf_id");
+                elementid.addAttribute("column", "CF_ID__");
+                elementid.addAttribute("type", "long");
+                Element elementgenerator = elementid.addElement("generator");
+                elementgenerator.addAttribute("class", "native");
+                makePrimaryKey(attributlist, elementclass, idCount);
+                // Set the properties
+                for (CfAttribut attribut : attributlist) {
+                    if (!attribut.getIdentity()) {
+                        Element elementproperty = elementclass.addElement("property");
+                        elementproperty.addAttribute("name", attribut.getName());
+                        elementproperty.addAttribute("column", attribut.getName() + "_");
+                        elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
+                        elementproperty.addAttribute("not-null", "false");
+                        if (attribut.getIsindex()) {
+                            elementproperty.addAttribute("index", "idx_" + attribut.getName());
+                        }
                     }
                 }                
+                Element elementproperty = elementclass.addElement("property");
+                elementproperty.addAttribute("name", "cf_contentref");
+                elementproperty.addAttribute("column", "CF__CONTENTREF__");
+                elementproperty.addAttribute("type", "long");
+                elementproperty.addAttribute("not-null", "true");
+                elementproperty.addAttribute("index", "idx_cf_contentref");
             }
-            Element elementproperty = elementclass.addElement("property");
-            elementproperty.addAttribute("name", "cf_contentref");
-            elementproperty.addAttribute("column", "CF__CONTENTREF__");
-            elementproperty.addAttribute("type", "long");
-            elementproperty.addAttribute("not-null", "true");
-            elementproperty.addAttribute("index", "idx_cf_contentref");
-        }
-        //System.out.println(xmldoc.asXML());
-        ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
-        SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
-        Session session_tables = sessionFactory.openSession();
-        classsessions.put("tables", session_tables);
-        for (CfClass clazz : classlist) {
-            if ((initHibernate > 0) && (0 == clazz.getName().compareToIgnoreCase(classname))) {
-                fillTable(clazz.getName(), session_tables);
+            //System.out.println(xmldoc.asXML());
+            ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
+            SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes("UTF-8"))).buildMetadata().buildSessionFactory();
+            Session session_tables = sessionFactory.openSession();
+            classsessions.put("tables", session_tables);
+            for (CfClass clazz : classlist) {
+                if ((initHibernate > 0) && (0 == clazz.getName().compareToIgnoreCase(classname))) {
+                    fillTable(clazz.getName(), session_tables);
+                }
             }
+            session_tables.close();
+            
+            LOGGER.info("Data Model recreated");
+            serviceStatus.setMessage("online");
+            serviceStatus.setOnline(true);
+        } catch (UnsupportedEncodingException ex) {
+            java.util.logging.Logger.getLogger(HibernateUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
-        session_tables.close();
-
-        LOGGER.info("Data Model recreated");
-        serviceStatus.setMessage("online");
-        serviceStatus.setOnline(true);
     }
 
     private static void fillTable(String classname, Session session) {

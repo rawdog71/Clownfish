@@ -204,7 +204,7 @@ public class ClassList implements Serializable {
             classListe = cfclassService.findAll();
             contentlist.init();
             datalist.init();
-            hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
+            HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
             FacesMessage message = new FacesMessage("Content changed");
             FacesContext.getCurrentInstance().addMessage(null, message);
         } catch (ConstraintViolationException ex) {
@@ -236,7 +236,7 @@ public class ClassList implements Serializable {
                 cfattributcontentService.create(newattributcontent);
             }
             
-            hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
+            HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
             FacesMessage message = new FacesMessage("Attribute created");
             FacesContext.getCurrentInstance().addMessage(null, message);
         } catch (ConstraintViolationException ex) {
@@ -253,7 +253,7 @@ public class ClassList implements Serializable {
             selectedAttribut.setIsindex(isindex);
             selectedAttribut.setRelationref(selectedClassRef);
             cfattributService.edit(selectedAttribut);
-            hibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
+            HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
             
             FacesMessage message = new FacesMessage("Attribute changed");
             FacesContext.getCurrentInstance().addMessage(null, message);
