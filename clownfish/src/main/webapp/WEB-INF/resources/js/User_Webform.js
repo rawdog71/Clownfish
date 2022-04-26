@@ -113,6 +113,16 @@ webform.controller('WebformCtrl', function($scope, $http) {
         $scope.recordEdit.push(x);
     };
 
+    $scope.formatDate = (dateToFormat, action) => {
+        var date = new Date(dateToFormat)
+        return `${date.getFullYear()}-${(date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1)}-${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}`;
+    }
+
+    $scope.getTodaysDate = () => {
+        var date = new Date()
+        return `${date.getFullYear()}-${(date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1)}-${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}`;
+    }
+
     $scope.getInputInformation = (formID) => {
         var formEl = document.forms.tester;
         var kvpairs = [];
@@ -141,7 +151,7 @@ webform.controller('WebformCtrl', function($scope, $http) {
 
                     date = new Date(e.value);
                     var newDate = (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) 
-                            + "." + (date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth()) 
+                            + "." + ((date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1)) 
                             + "." + (date.getFullYear() < 10 ? "0" + date.getFullYear() : date.getFullYear());
 
                     x[e.id] = newDate + " " + time;

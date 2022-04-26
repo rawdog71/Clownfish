@@ -709,8 +709,7 @@ public class ClassUtil implements Serializable {
                 case "datetime":
                     html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t\t\t\t\t\t").append(input().withType("date").withId(attr.getName()).withClass("form-control").withMax(String.valueOf(
-                            cfclassService.findAll().stream().max(Comparator.comparing(CfClass::getId)).get().getId()))).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(input().withType("date").withId(attr.getName()).withValue("{{getTodaysDate()}}").withClass("form-control"));
                     html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
                     break;
             }
@@ -774,8 +773,8 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
-                    html.append("\t\t").append("<option selected value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
-                    html.append("\t\t\t\t").append(("<option ng-repeat=\"name in libNames\" value=\"{{name.id}}\">{{name.name}}</option>")).append("\n");
+                    html.append("\t\t").append("<option ng-selected=\"{{info.salesteamuser === 'undefined'}}\" value=\"NOVALUE\">Klicken um zu ändern</option>").append("\n");
+                    html.append("\t\t\t\t").append("<option ng-repeat=\"name in libNames\" value=\"{{name.id}}\" ng-selected=\"{{info.").append(attr.getName()).append(" === name.name}}\">{{name.name}}</option>").append("\n");
                     html.append("\t\t\t\t").append(("</select>")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
@@ -800,8 +799,7 @@ public class ClassUtil implements Serializable {
                 case "datetime":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("date").withId(attr.getName()).withClass("form-control").withValue("{{info." + attr.getName() + "}}").withMax(String.valueOf(
-                            cfclassService.findAll().stream().max(Comparator.comparing(CfClass::getId)).get().getId()))).append("\n");
+                    html.append("\t\t").append(input().withType("date").withId(attr.getName()).withClass("form-control").withValue("{{formatDate(info." + attr.getName() + ")}}"));
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
             }
