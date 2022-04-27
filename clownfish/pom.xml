@@ -331,21 +331,21 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>8.10.0</version>
+            <version>9.1.0</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>8.10.0</version>
+            <version>9.1.0</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-backward-codecs</artifactId>
-            <version>8.10.0</version>
+            <version>9.1.0</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -358,7 +358,7 @@
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
-            <version>6.19.0</version>
+            <version>6.19.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -440,7 +440,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
-            <version>3.8.4</version>
+            <version>3.8.5</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
