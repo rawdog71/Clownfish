@@ -648,6 +648,7 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "string":
+                case "text":
                 case "htmltext":
                 case "markdown":
                     html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
@@ -736,6 +737,7 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "string":
+                case "text":
                 case "htmltext":
                 case "markdown":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");

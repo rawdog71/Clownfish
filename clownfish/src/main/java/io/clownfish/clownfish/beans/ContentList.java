@@ -464,13 +464,25 @@ public class ContentList implements Serializable {
                 selectedAttribut.setContentReal(Double.parseDouble(editContent));
                 break;
             case "htmltext":
-                selectedAttribut.setContentText(editContent);
+                if (selectedAttribut.getClasscontentref().getClassref().isEncrypted()) {
+                    selectedAttribut.setContentText(EncryptUtil.encrypt(editContent, propertyUtil.getPropertyValue("aes_key")));
+                } else {
+                    selectedAttribut.setContentText(editContent);
+                }
                 break;    
             case "text":
-                selectedAttribut.setContentText(editContent);
+                if (selectedAttribut.getClasscontentref().getClassref().isEncrypted()) {
+                    selectedAttribut.setContentText(EncryptUtil.encrypt(editContent, propertyUtil.getPropertyValue("aes_key")));
+                } else {
+                    selectedAttribut.setContentText(editContent);
+                }
                 break;
             case "markdown":
-                selectedAttribut.setContentText(editContent);
+                if (selectedAttribut.getClasscontentref().getClassref().isEncrypted()) {
+                    selectedAttribut.setContentText(EncryptUtil.encrypt(editContent, propertyUtil.getPropertyValue("aes_key")));
+                } else {
+                    selectedAttribut.setContentText(editContent);
+                }
                 break;    
             case "datetime":
                 selectedAttribut.setContentDate(editCalendar);

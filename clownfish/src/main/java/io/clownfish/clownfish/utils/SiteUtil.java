@@ -18,6 +18,7 @@ package io.clownfish.clownfish.utils;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
+import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfKeyword;
@@ -268,11 +269,23 @@ public class SiteUtil {
     
     private String getAttributValue(List<CfAttributcontent> attributcontentlist, String key) {
         for (CfAttributcontent ac : attributcontentlist) {
-            if ((0 == ac.getAttributref().getName().compareToIgnoreCase(key)) && (!ac.getAttributref().getIdentity()) && (0 == ac.getAttributref().getAttributetype().getName().compareToIgnoreCase("string"))) {
+            if ((0 == ac.getAttributref().getName().compareToIgnoreCase(key)) && (!ac.getAttributref().getIdentity()) && (isEncryptable(ac.getAttributref()))) {
                 return EncryptUtil.decrypt(ac.getContentString(), propertyUtil.getPropertyValue("aes_key")) ;
             }
         }
         return null;
+    }
+    
+    private boolean isEncryptable(CfAttribut attribut) {
+        switch (attribut.getAttributetype().getName()) {
+            case "string":
+            case "text":
+            case "htmltext":
+            case "markdown":
+                return true;
+            default:
+                return false;
+        }
     }
     
     public String generateShorturl() {

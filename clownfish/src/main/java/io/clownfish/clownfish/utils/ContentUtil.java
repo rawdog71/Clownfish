@@ -219,13 +219,25 @@ public class ContentUtil implements IVersioningInterface {
                     }
                     break;
                 case "htmltext":
-                    selectedAttribut.setContentText(editContent);
+                    if (selectedAttribut.getClasscontentref().getClassref().isEncrypted()) {
+                        selectedAttribut.setContentText(EncryptUtil.encrypt(editContent, propertyUtil.getPropertyValue("aes_key")));
+                    } else {
+                        selectedAttribut.setContentText(editContent);
+                    }
                     break;    
                 case "text":
-                    selectedAttribut.setContentText(editContent);
+                    if (selectedAttribut.getClasscontentref().getClassref().isEncrypted()) {
+                        selectedAttribut.setContentText(EncryptUtil.encrypt(editContent, propertyUtil.getPropertyValue("aes_key")));
+                    } else {
+                        selectedAttribut.setContentText(editContent);
+                    }
                     break;
                 case "markdown":
-                    selectedAttribut.setContentText(editContent);
+                    if (selectedAttribut.getClasscontentref().getClassref().isEncrypted()) {
+                        selectedAttribut.setContentText(EncryptUtil.encrypt(editContent, propertyUtil.getPropertyValue("aes_key")));
+                    } else {
+                        selectedAttribut.setContentText(editContent);
+                    }
                     break;
                 case "datetime":
                     Date datum;
@@ -240,8 +252,13 @@ public class ContentUtil implements IVersioningInterface {
                             selectedAttribut.setContentDate(datum);
                         } catch (IllegalArgumentException ex2) {
                             fmt = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZone(DateTimeZone.forID("Europe/Berlin"));
-                            datum = DateTime.parse(editContent, fmt).toDate();
-                            selectedAttribut.setContentDate(datum);
+                            try {
+                                datum = DateTime.parse(editContent, fmt).toDate();
+                                selectedAttribut.setContentDate(datum);
+                            } catch (IllegalArgumentException ex3) {
+                                datum = null;
+                                selectedAttribut.setContentDate(datum);
+                            }
                         }
                     }
                     break;
@@ -299,7 +316,7 @@ public class ContentUtil implements IVersioningInterface {
             long attributtypeid = knattribut.getAttributetype().getId();
             AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
             if (attributdef.getType().compareToIgnoreCase("hashstring") != 0) {
-                if (((knattribut.getClassref().isEncrypted()) && (!knattribut.getIdentity())) && (0 == knattribut.getAttributetype().getName().compareToIgnoreCase("string"))) {
+                if (((knattribut.getClassref().isEncrypted()) && (!knattribut.getIdentity())) && (isEncryptable(knattribut))) {
                     dummyoutputmap.put(knattribut.getName(), EncryptUtil.decrypt(attributdef.getValue(), propertyUtil.getPropertyValue("aes_key")));
                 } else {
                     dummyoutputmap.put(knattribut.getName(), attributdef.getValue());
@@ -411,7 +428,7 @@ public class ContentUtil implements IVersioningInterface {
         List<CfAttribut> attributlist = cfattributService.findByClassref(classref);
         HashMap<String, String> contentMap = new HashMap<>(content);
         for (CfAttribut attribut : attributlist) {
-            if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("string")) && (!attribut.getIdentity())) {
+            if ((isEncryptable(attribut)) && (!attribut.getIdentity())) {
                 contentMap.put(attribut.getName(), EncryptUtil.decrypt(contentMap.get(attribut.getName()), propertyUtil.getPropertyValue("aes_key")));
             }
         }
@@ -452,7 +469,11 @@ public class ContentUtil implements IVersioningInterface {
                 }    
             case 5: // htmltext (formatted)
                 if (null != attributcontent.getContentText()) {
-                    return attributcontent.getContentText();
+                    if ((!attributcontent.getAttributref().getClassref().isEncrypted()) || (attributcontent.getAttributref().getIdentity())) {
+                        return attributcontent.getContentText();
+                    } else {
+                        return EncryptUtil.decrypt(attributcontent.getContentText(), propertyUtil.getPropertyValue("aes_key"));
+                    }
                 } else {
                     return "";
                 }
@@ -482,23 +503,31 @@ public class ContentUtil implements IVersioningInterface {
                 }
             case 9: // text (unformatted)
                 if (null != attributcontent.getContentText()) {
-                    return attributcontent.getContentText();
+                    if ((!attributcontent.getAttributref().getClassref().isEncrypted()) || (attributcontent.getAttributref().getIdentity())) {
+                        return attributcontent.getContentText();
+                    } else {
+                        return EncryptUtil.decrypt(attributcontent.getContentText(), propertyUtil.getPropertyValue("aes_key"));
+                    }
                 } else {
                     return "";
                 }
             case 10: // text (markdown formatted)
                 if (null != attributcontent.getContentText()) {
-                    return attributcontent.getContentText();
+                    if ((!attributcontent.getAttributref().getClassref().isEncrypted()) || (attributcontent.getAttributref().getIdentity())) {
+                        return attributcontent.getContentText();
+                    } else {
+                        return EncryptUtil.decrypt(attributcontent.getContentText(), propertyUtil.getPropertyValue("aes_key"));
+                    }
                 } else {
                     return "";
                 } 
-            case 11: // 
+            case 11: // classref
                 if (null != attributcontent.getClasscontentlistref()) {
                     return attributcontent.getClasscontentlistref().getName();
                 } else {
                     return "";
                 }
-            case 12: // 
+            case 12: // assetref
                 if (null != attributcontent.getAssetcontentlistref()) {
                     return attributcontent.getAssetcontentlistref().getName();
                 } else {
@@ -506,5 +535,17 @@ public class ContentUtil implements IVersioningInterface {
                 }     
         }
         return "?";
+    }
+    
+    private boolean isEncryptable(CfAttribut attribut) {
+        switch (attribut.getAttributetype().getName()) {
+            case "string":
+            case "text":
+            case "htmltext":
+            case "markdown":
+                return true;
+            default:
+                return false;
+        }
     }
 }

@@ -314,12 +314,14 @@ public class GraphQLDataFetchers {
             if ((!found) && (0 == ac.getAttributref().getName().compareToIgnoreCase(attributname))) {
                 switch (ac.getAttributref().getAttributetype().getName()) {
                     case "string":
+                    case "text":
+                    case "htmltext":
+                    case "markdown":
                         if ((ac.getClasscontentref().getClassref().isEncrypted()) && (!ac.getAttributref().getIdentity())) {
                             if (0 == EncryptUtil.decrypt(ac.getContentString(), propertyUtil.getPropertyValue("aes_key")).compareTo((String) attributvalue)) {
                                 found = true;
                             }
                         } else {
-                            
                             if ((null != ac.getContentString()) && (0 == ac.getContentString().compareTo((String) attributvalue))) {
                                 found = true;
                             }

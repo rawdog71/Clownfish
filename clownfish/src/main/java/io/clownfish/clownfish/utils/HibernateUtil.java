@@ -758,7 +758,7 @@ public class HibernateUtil implements Runnable {
                 if (clazz.isEncrypted()) {
                     List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
                     for (CfAttribut attribut : attributlist) {
-                        if (((0 == attribut.getAttributetype().getName().compareToIgnoreCase("string")) && (!attribut.getIdentity())) && (0 == attribut.getName().compareToIgnoreCase(searchcontentval))) {
+                        if (((isEncryptable(attribut)) && (!attribut.getIdentity())) && (0 == attribut.getName().compareToIgnoreCase(searchcontentval))) {
                             searchvalue = EncryptUtil.encrypt(searchvalue, propertyUtil.getPropertyValue("aes_key"));
                         }
                     }
@@ -803,6 +803,17 @@ public class HibernateUtil implements Runnable {
         return query;
     }
     
+    private boolean isEncryptable(CfAttribut attribut) {
+        switch (attribut.getAttributetype().getName()) {
+            case "string":
+            case "text":
+            case "htmltext":
+            case "markdown":
+                return true;
+            default:
+                return false;
+        }
+    }
 
     @Override
     public void run() {

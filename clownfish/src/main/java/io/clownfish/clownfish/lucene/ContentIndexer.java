@@ -82,18 +82,14 @@ public class ContentIndexer implements Runnable {
                     }
                     break;
                 case "text":
-                    if (null != attributcontent.getContentText()) {
-                        document.add(new TextField(LuceneConstants.CONTENT_TEXT, attributcontent.getContentText(), Field.Store.YES));
-                    }
-                    break;
                 case "htmltext":
-                    if (null != attributcontent.getContentText()) {
-                        document.add(new TextField(LuceneConstants.CONTENT_TEXT, attributcontent.getContentText(), Field.Store.YES));
-                    }
-                    break;
                 case "markdown":
                     if (null != attributcontent.getContentText()) {
-                        document.add(new TextField(LuceneConstants.CONTENT_TEXT, attributcontent.getContentText(), Field.Store.YES));
+                        if ((attributcontent.getClasscontentref().getClassref().isEncrypted()) && (!attributcontent.getAttributref().getIdentity())) {
+                            document.add(new TextField(LuceneConstants.CONTENT_TEXT, EncryptUtil.decrypt(attributcontent.getContentText(), propertyUtil.getPropertyValue("aes_key")), Field.Store.YES));
+                        } else {
+                            document.add(new TextField(LuceneConstants.CONTENT_TEXT, attributcontent.getContentText(), Field.Store.YES));
+                        }
                     }
                     break;
             }
