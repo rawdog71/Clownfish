@@ -92,11 +92,15 @@ public class QuartzJob implements Job {
     
     @PostConstruct
     public void init() {
-        String libloaderpath = propertyUtil.getPropertyValue("folder_libs");
-        if (beanUtil == null) {
-            beanUtil = new BeanUtil();
-            if ((!libloaderpath.isBlank()) && (null != libloaderpath)) 
-                beanUtil.init(libloaderpath);
+        try {
+            String libloaderpath = propertyUtil.getPropertyValue("folder_libs");
+            if (beanUtil == null) {
+                beanUtil = new BeanUtil();
+                if ((!libloaderpath.isBlank()) && (null != libloaderpath)) 
+                    beanUtil.init(libloaderpath);
+            }
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
         }
     }
 
