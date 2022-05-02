@@ -268,8 +268,13 @@ public class ContentUtil implements IVersioningInterface {
                             CfAsset asset = cfassetService.findById(Long.parseLong(editContent));
                             selectedAttribut.setContentInteger(BigInteger.valueOf(asset.getId()));
                         } catch (Exception ex) {
-                            selectedAttribut.setContentInteger(null);
-                            LOGGER.error("INSERTCONTENT: Media " + editContent + " not found!");
+                            try {
+                                CfAsset asset = cfassetService.findByName(editContent);
+                                selectedAttribut.setContentInteger(BigInteger.valueOf(asset.getId()));
+                            } catch (Exception ex1) {
+                                selectedAttribut.setContentInteger(null);
+                                LOGGER.error("INSERTCONTENT: Media " + editContent + " not found!");
+                            }
                         }
                     } else {
                         selectedAttribut.setContentInteger(null);
@@ -280,8 +285,13 @@ public class ContentUtil implements IVersioningInterface {
                         try {
                             CfList list_ref = cflistService.findById(Long.parseLong(editContent));
                             selectedAttribut.setClasscontentlistref(list_ref);
-                        } catch (Exception ex1) {
-                            selectedAttribut.setClasscontentlistref(null);
+                        } catch (Exception ex) {
+                            try {
+                                CfList list_ref = cflistService.findByName(editContent);
+                                selectedAttribut.setClasscontentlistref(list_ref);
+                            } catch (Exception ex1) {
+                                selectedAttribut.setClasscontentlistref(null);
+                            }
                         }
                     } else {
                         selectedAttribut.setClasscontentlistref(null);
@@ -292,8 +302,13 @@ public class ContentUtil implements IVersioningInterface {
                         try {
                             CfAssetlist assetlist_ref = cfassetlistService.findById(Long.parseLong(editContent));
                             selectedAttribut.setAssetcontentlistref(assetlist_ref);
-                        } catch (Exception ex1) {
-                            selectedAttribut.setAssetcontentlistref(null);
+                        } catch (Exception ex) {
+                            try {
+                                CfAssetlist assetlist_ref = cfassetlistService.findByName(editContent);
+                                selectedAttribut.setAssetcontentlistref(assetlist_ref);
+                            } catch (Exception ex1) {
+                                selectedAttribut.setAssetcontentlistref(null);
+                            }
                         }
                     } else {
                         selectedAttribut.setAssetcontentlistref(null);
