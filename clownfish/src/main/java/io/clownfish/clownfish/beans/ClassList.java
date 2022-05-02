@@ -204,8 +204,8 @@ public class ClassList implements Serializable {
             classListe = cfclassService.findAll();
             contentlist.init();
             datalist.init();
-            HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
-            FacesMessage message = new FacesMessage("Content changed");
+            HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 0);
+            FacesMessage message = new FacesMessage("Datamodel recreated");
             FacesContext.getCurrentInstance().addMessage(null, message);
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
@@ -236,7 +236,7 @@ public class ClassList implements Serializable {
                 cfattributcontentService.create(newattributcontent);
             }
             
-            HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
+            //HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 0);
             FacesMessage message = new FacesMessage("Attribute created");
             FacesContext.getCurrentInstance().addMessage(null, message);
         } catch (ConstraintViolationException ex) {
@@ -253,7 +253,7 @@ public class ClassList implements Serializable {
             selectedAttribut.setIsindex(isindex);
             selectedAttribut.setRelationref(selectedClassRef);
             cfattributService.edit(selectedAttribut);
-            HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
+            //HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
             
             FacesMessage message = new FacesMessage("Attribute changed");
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -263,7 +263,7 @@ public class ClassList implements Serializable {
     public void onRecreateDatamodel(ActionEvent actionEvent) {
         if (null != selectedClass) {
             HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
-            FacesMessage message = new FacesMessage("Datamodel recreated");
+            FacesMessage message = new FacesMessage("Datamodel recreated with data init");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
