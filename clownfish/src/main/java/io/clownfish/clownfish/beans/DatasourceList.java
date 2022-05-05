@@ -22,6 +22,7 @@ import io.clownfish.clownfish.dbentities.CfSitedatasource;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
+import io.clownfish.clownfish.utils.DatabaseUtil;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.util.List;
@@ -56,6 +57,7 @@ import org.springframework.stereotype.Component;
 public class DatasourceList implements Serializable {
     @Autowired transient CfDatasourceService cfdatasourceService;
     @Autowired transient CfSitedatasourceService cfsitedatasourceService;
+    @Autowired transient DatabaseUtil databaseUtil;
     
     private transient @Getter @Setter List<CfDatasource> datasourcelist = null;
     private @Getter @Setter CfDatasource selectedDatasource = null;
@@ -163,6 +165,12 @@ public class DatasourceList implements Serializable {
     public void onTableSelect(SelectEvent event) {
         selectedTable = (TableData) event.getObject();
 
+    }
+     
+    public void onGenerateHTML() {
+        if (null != selectedTable) {
+            databaseUtil.generateHTMLForm(selectedTable);
+        }
     }
     
     /**

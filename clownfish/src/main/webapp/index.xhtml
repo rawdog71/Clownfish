@@ -1309,7 +1309,7 @@
                         </p:panelGrid>
                     </div>
 
-                    <p:panelGrid columns="3">
+                    <p:panelGrid columns="5">
                         <p:commandButton id="newdatasource" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{datasourceList.onCreateContent}" update=":form:msgs :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist" disabled="#{datasourceList.newContentButtonDisabled}">
                             <f:actionListener binding="#{sitetree.initDatasources()}" />
                         </p:commandButton>
@@ -1319,6 +1319,7 @@
                             <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                         </p:commandButton>
                         <p:commandButton id="checkdatasource" process="form" value="Check connection" actionListener="#{datasourceList.onConnectionCheck}" update=":form:msgs" />
+                        <p:commandButton id="generatehtml" process="form" value="Generate HTML" actionListener="#{datasourceList.onGenerateHTML}" update=":form:msgs" />
                     </p:panelGrid>
 
                 </p:tab>

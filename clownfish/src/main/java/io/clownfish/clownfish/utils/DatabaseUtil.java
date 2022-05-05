@@ -15,8 +15,14 @@
  */
 package io.clownfish.clownfish.utils;
 
+import io.clownfish.clownfish.beans.SiteTreeBean;
+import io.clownfish.clownfish.datamodels.ColumnData;
+import io.clownfish.clownfish.datamodels.TableData;
 import io.clownfish.clownfish.dbentities.CfDatasource;
+import io.clownfish.clownfish.dbentities.CfJavascript;
+import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
+import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.jdbc.DatatableCondition;
 import io.clownfish.clownfish.jdbc.DatatableDeleteProperties;
 import io.clownfish.clownfish.jdbc.DatatableNewProperties;
@@ -26,6 +32,18 @@ import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.TableField;
 import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
+import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import static j2html.TagCreator.h1;
+import static j2html.TagCreator.h5;
+import static j2html.TagCreator.head;
+import static j2html.TagCreator.input;
+import static j2html.TagCreator.label;
+import static j2html.TagCreator.link;
+import static j2html.TagCreator.meta;
+import static j2html.TagCreator.script;
+import static j2html.TagCreator.title;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -34,18 +52,26 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
+@Scope("singleton")
 @Component
 public class DatabaseUtil {
     @Autowired CfDatasourceService cfdatasourceService;
+    @Autowired CfTemplateService cfTemplateService;
+    @Autowired CfSiteService cfSiteService;
+    private @Getter @Setter SiteTreeBean sitetree;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(DatabaseUtil.class);
 
@@ -563,6 +589,7 @@ public class DatabaseUtil {
                         tf = new TableField(columnName, "LONG", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
                         break;
+                    case "-6":      // bit
                     case "-7":      // bit
                         tf = new TableField(columnName, "BOOLEAN", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                         tableFieldsList.add(tf);
@@ -693,5 +720,252 @@ public class DatabaseUtil {
             }
         }
         return null;
+    }
+    
+    public void generateHTMLForm(TableData tabledata) {
+        StringBuilder html = new StringBuilder();
+        CfTemplate template = new CfTemplate();
+        CfSite site = new CfSite();
+        CfJavascript js = new CfJavascript();
+        
+        html.append("<!DOCTYPE html>").append("\n");
+        html.append("<html lang=\"en\" ng-app=\"webformApp\">").append("\n\n");
+        html.append(head(
+                meta().attr("charset", "UTF-8"),
+                meta().attr("http-equiv", "X-UA-Compatible").attr("content", "IE=edge"),
+                meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1.0"),
+                script().withSrc("resources/js/angularjs_1_8_2.js"),
+                link().withHref("resources/css/bootstrap5.css").withRel("stylesheet"),
+                script().withSrc("resources/js/bootstrap5.js"),
+                script().withSrc("resources/js/User_Webform.js"),
+                script().withSrc("resources/js/axios.js"),
+                title("Webform")).renderFormatted()).append("\n");
+
+        html.append("<body ng-controller=\"WebformCtrl\">").append("\n");
+        html.append("\t").append(h1(tabledata.getName()).withId("classname").withClass("text-center mt-3")).append("\n");
+        
+        html.append("\t").append(("<div class=\"mx-5\">")).append("\n");
+        html.append("\t\t").append(("<div class=\"d-flex flex-row-reverse\">")).append("\n");
+        html.append("\t\t\t").append(("<button class=\"btn btn-primary\" data-bs-toggle=\"modal\" data-bs-target=\"#exampleModal\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-plus-lg\" viewBox=\"0 0 16 16\">\n" +
+"                <path fill-rule=\"evenodd\" d=\"M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z\"/>\n" +
+"              </svg> Hinzufügen</button>")).append("\n");
+        html.append("\t\t").append(("</div>")).append("\n");
+        
+        html.append("\t").append(("<table class=\"table\">")).append("\n");
+        html.append("\t\t").append(("<thead>")).append("\n");
+        html.append("\t\t\t").append(("<tr>")).append("\n");
+        html.append("\t\t\t\t").append("<th scope=\"col\">#</th>\n");
+        html.append("\t\t\t\t").append("<th scope=\"col\">Contentname</th>\n");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            if (0 == attr.getAutoinc().compareToIgnoreCase("yes")) {
+                continue;
+            }
+            html.append("\t").append("<th scope=\"col\">").append(attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("</th>\n");
+        }
+        html.append("\t\t\t\t").append("<th class=\"text-end\" scope=\"col\">Aktionen</th>\n");
+        html.append("\t\t\t").append(("</tr>")).append("\n");
+        html.append("\t\t").append(("</thead>")).append("\n");
+        
+        html.append("\t\t").append(("<tbody>")).append("\n");
+        html.append("\t\t\t").append(("<tr ng-repeat=\"info in contentList track by $index\">")).append("\n");
+        html.append("\t\t\t\t").append("<th scope=\"row\">{{$index}}</th>\n");
+        html.append("\t\t\t\t").append("<td> {{info.content.name}} </td>").append("\n");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            if (0 == attr.getAutoinc().compareToIgnoreCase("yes")) {
+                continue;
+            }
+            html.append("\t\t\t\t").append("<td> {{info.keyvals[0][\"").append(attr.getName()).append("\"]}}").append("</td>\n");
+        }
+        
+        html.append("\t\t\t\t").append(("<td class=\"text-end\">")).append("\n");
+        html.append("\t\t\t\t\t").
+                append(("<button class=\"btn btn-primary\" ng-click=\"edit($index)\" data-bs-toggle=\"modal\" data-bs-target=\"#editModal\">\n" +
+"                            <div class=\"d-flex align-items-center\">\n" +
+"                                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-pencil-square\" viewBox=\"0 0 16 16\">\n" +
+"                                    <path d=\"M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z\"/>\n" +
+"                                    <path fill-rule=\"evenodd\" d=\"M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z\"/>\n" +
+"                                </svg>\n" +
+"                                <p class=\"m-0 ms-1\">Editieren</p>\n" +
+"                            </div>\n" +
+"                        </button>")).append("\n");
+        
+        html.append("\t\t\t\t\t").
+                append(("<button class=\"btn btn-danger\" ng-click=\"deleteI($index)\">\n" +
+"                            <div class=\"d-flex align-items-center\">\n" +
+"                                <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-trash\" viewBox=\"0 0 16 16\">\n" +
+"                                    <path d=\"M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z\"/>\n" +
+"                                    <path fill-rule=\"evenodd\" d=\"M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z\"/>\n" +
+"                                </svg>\n" +
+"                                <p class=\"m-0 ms-1\">Löschen</p>\n" +
+"                            </div>\n" +
+"                        </button>")).append("\n");
+        html.append("\t\t\t\t").append(("</td>")).append("\n");
+        html.append("\t\t\t").append(("</tr>")).append("\n");
+        html.append("\t\t").append(("</tbody>")).append("\n");
+        html.append("\t").append(("</table>")).append("\n");
+        html.append("\t").append(("</div>")).append("\n");
+        
+        html.append("\t").append(("<div class=\"modal fade\" id=\"exampleModal\" tabindex=\"-1\" aria-labelledby=\"exampleModalLabel\" aria-hidden=\"true\">")).append("\n");
+        html.append("\t\t").append(("<div class=\"modal-dialog\">")).append("\n");
+        html.append("\t\t\t").append(("<div class=\"modal-content\">")).append("\n");
+        html.append("\t\t\t\t").append(("<div class=\"modal-header\">")).append("\n");
+        html.append("\t\t\t\t\t").append(h5(tabledata.getName()).withId("exampleModalLabel").withClass("modal-title")).append("\n");
+        html.append("\t\t\t\t\t").append(("<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Close\"></button>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        
+        html.append("\t\t\t\t").append(("<div class=\"modal-body\">")).append("\n");
+        html.append("\t\t\t\t\t").append(("<form id=\"forms\" class=\"row g-3\">")).append("\n");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            if (0 == attr.getAutoinc().compareToIgnoreCase("yes")) {
+                continue;
+            }
+            switch (attr.getType()) {
+                case -6:
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t").append(label(attr.getName()).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t").append(input().withType("checkbox").withId(attr.getName())).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
+                    break;
+                case -1:
+                case 1:
+                case 12:
+                case 2005:
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(input().withType("text").withId(attr.getName()).withClass("form-control")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
+                    break;
+                case 2:
+                case 4:
+                case 5:
+                case 7:
+                case 8:
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control"));
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
+                    break;
+                case 93:
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(input().withType("date").withId(attr.getName()).withValue("{{getTodaysDate()}}").withClass("form-control"));
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
+                    break;
+            }
+        }
+        
+        html.append("\t\t\t\t\t").append(("</form>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        
+        html.append("\t\t\t\t").append(("<div class=\"modal-footer\">")).append("\n");
+        html.append("\t\t\t\t").append(("<button class=\"btn btn-primary w-100\" data-bs-dismiss=\"modal\" ng-click=\"add()\">Hinzufügen</button>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        
+        
+        html.append("\t\t\t\t").append(("<div class=\"modal fade\" id=\"editModal\" tabindex=\"-1\" aria-labelledby=\"editModalLabel\" aria-hidden=\"true\">")).append("\n");
+        html.append("\t\t\t\t").append(("<div class=\"modal-dialog\">")).append("\n");
+        html.append("\t\t\t\t").append(("<div class=\"modal-content\" ng-repeat=\"info in recordEdit\">")).append("\n");
+        html.append("\t\t\t\t").append(("<div class=\"modal-header\">")).append("\n");
+        html.append("\t\t\t\t\t").append(h5(tabledata.getName()).withId("exampleModalLabel").withClass("modal-title")).append("\n");
+        html.append("\t\t\t\t").append(("<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Close\"></button>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        html.append("\t\t\t\t").append(("<div class=\"modal-body\">")).append("\n");
+        html.append("\t\t\t\t").append(("<form id=\"forms2\" class=\"row g-3\">")).append("\n");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            if (0 == attr.getAutoinc().compareToIgnoreCase("yes")) {
+                continue;
+            }
+            
+            switch (attr.getType()) {
+                case -6:
+                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t").append(label(attr.getName()).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t").append(("<input type=\"checkbox\" id=\"" + attr.getName() + "\" ng-checked=\"{{info['" + attr.getName() + "']}}\">")).append("\n");
+                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    break;
+                case -1:
+                case 1:
+                case 12:
+                case 2005:
+                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t").append(input().withType("text").withId(attr.getName()).withClass("form-control").withValue("{{info['" + attr.getName() + "']}}")).append("\n");
+                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    break;
+                case 2:
+                case 4:
+                case 5:
+                case 7:
+                case 8:
+                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control").withValue("{{info['" + attr.getName() + "']}}"));
+                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    break;
+                case 93:
+                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t").append(input().withType("date").withId(attr.getName()).withClass("form-control").withValue("{{formatDate(info['" + attr.getName() + "'])}}"));
+                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    break;
+            }
+        }
+        html.append("\t\t\t\t").append(("</form>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        html.append("\t\t\t\t").append(("<div class=\"modal-footer\">")).append("\n");
+        html.append("\t\t\t\t").append(("<button class=\"btn btn-primary w-100\" data-bs-dismiss=\"modal\" ng-click=\"update(info['contentname'])\">Editieren</button>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        html.append("\t\t\t\t").append(("</div>")).append("\n");
+        html.append("\t\t\t\t").append(("</body>")).append("\n");
+        html.append("\t\t\t\t").append(("</html>")).append("\n");
+        
+        template.setName(tabledata.getName() + "_Webform");
+        try {
+            CfTemplate dummytemplate = cfTemplateService.findByName(template.getName());
+
+            if (null == dummytemplate) {
+                template.setScriptlanguage(2);
+                template.setCheckedoutby(BigInteger.ZERO);
+                template.setContent(html.toString());
+                cfTemplateService.create(template);
+            } else {
+                dummytemplate.setContent(html.toString());
+                cfTemplateService.edit(dummytemplate);
+            }
+        } catch (Exception ex) {
+            template.setScriptlanguage(2);
+            template.setCheckedoutby(BigInteger.ZERO);
+            template.setContent(html.toString());
+            cfTemplateService.create(template);
+        }
+
+        site.setName(tabledata.getName() + "_Webform");
+        try {
+            CfSite dummysite = cfSiteService.findByName(site.getName());
+        } catch (Exception ex) {
+            site.setCharacterencoding("UTF-8");
+            site.setHitcounter(BigInteger.ZERO);
+            site.setTitle("");
+            site.setContenttype("text/html");
+            site.setSearchrelevant(false);
+            site.setHtmlcompression(0);
+            site.setGzip(0);
+            site.setLocale("");
+            site.setDescription("");
+            site.setAliaspath(site.getName());
+            site.setParentref(BigInteger.ZERO);
+            site.setTemplateref(BigInteger.valueOf(template.getId()));
+            cfSiteService.create(site);
+        }
+        sitetree.loadTree();
     }
 }

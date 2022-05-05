@@ -83,6 +83,7 @@ import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.DatabaseUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.JavascriptUtil;
 import io.clownfish.clownfish.utils.SiteUtil;
@@ -246,6 +247,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;
     @Autowired private @Getter @Setter ClassUtil classUtility;
+    @Autowired private @Getter @Setter DatabaseUtil databaseUtility;
     @Autowired transient FolderUtil folderUtil;
     @Autowired transient SiteUtil siteUtil;
     @Autowired private ContentUtil contentUtil;
@@ -310,6 +312,7 @@ public class SiteTreeBean implements Serializable {
         javascriptlist.setSitetree(this);
         stylesheetlist.setSitetree(this);
         classUtility.setSitetree(this);
+        databaseUtility.setSitetree(this);
         LOGGER.info("INIT SITETREE END");
     }
     
