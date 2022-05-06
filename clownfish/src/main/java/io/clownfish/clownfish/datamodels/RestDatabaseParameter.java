@@ -33,6 +33,7 @@ public class RestDatabaseParameter {
     private @Getter @Setter String orderdir;
     private @Getter @Setter int pagination;
     private @Getter @Setter int page;
+    private @Getter @Setter int count;
     private @Getter @Setter HashMap<String, String> attributmap;
     private @Getter @Setter HashMap<String, HashMap> result;
 

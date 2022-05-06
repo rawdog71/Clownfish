@@ -126,68 +126,48 @@ public class RestDatabase {
         return icp;
     }
 
-    /*    
     @PostMapping("/insertdb")
-    public RestDatabaseParameter restInsertContent(@RequestBody RestDatabaseParameter icp) {
-        return insertContent(icp);
+    public String restInsertContent(@RequestBody RestDatabaseParameter icp) {
+        Gson gson = new Gson();
+        return gson.toJson(insertContent(icp));
     }
     
     private RestDatabaseParameter insertContent(RestDatabaseParameter icp) {
+        HashMap<String, HashMap> dbexport = new HashMap<>();
         try {
             String token = icp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = icp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
-                    CfClass clazz = cfclassService.findByName(icp.getClassname());
-                    //System.out.println(clazz.isSearchrelevant());
+                    CfDatasource datasource = cfdatasourceService.findByName(icp.getDatasource());
 
-                    try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(clazz.getName().toUpperCase() + "_" + icp.getContentname().trim().replaceAll("\\s+", "_"));
-                        LOGGER.warn("Duplicate Classcontent");
-                        icp.setReturncode("Duplicate Classcontent");
-                    } catch (javax.persistence.NoResultException ex) {
-                        CfClasscontent newclasscontent = new CfClasscontent();
-                        newclasscontent.setName(clazz.getName().toUpperCase() + "_" + icp.getContentname().trim().replaceAll("\\s+", "_"));
-                        newclasscontent.setCheckedoutby(BigInteger.valueOf(icp.getCheckedoutby()));
-                        newclasscontent.setClassref(clazz);
-                        CfClasscontent newclasscontent2 = cfclasscontentService.create(newclasscontent);
-                        hibernateUtil.insertContent(newclasscontent);
-                        List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent2.getClassref());
-                        attributlist.stream().forEach((attribut) -> {
-                            if (attribut.getAutoincrementor() == true) {
-                                List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent2.getClassref());
-                                long max = 0;
-                                int last = classcontentlist2.size();
-                                if (1 == last) {
-                                    max = 0;
-                                } else {
-                                    CfClasscontent classcontent = classcontentlist2.get(last - 2);
-                                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
-                                    if (attributcontent.getContentInteger().longValue() > max) {
-                                        max = attributcontent.getContentInteger().longValue();
-                                    }
+                    JDBCUtil jdbcutil = new JDBCUtil(datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword());
+                    Connection con = jdbcutil.getConnection();
+                    if (null != con) {
+                        try {
+                            DatabaseMetaData dmd = con.getMetaData();
+                            DatatableProperties datatableproperties = new DatatableProperties();
+                            datatableproperties.setTablename(icp.getTablename());
+                            ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
+                            HashMap<String, ArrayList> dbtables = new HashMap<>();
+                            HashMap<String, Object> dbvalues = new HashMap<>();
+                            while(resultSetTables.next())
+                            {
+                                String tablename = resultSetTables.getString("TABLE_NAME");
+                                //System.out.println(tablename);
+                                if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
+                                    int count = manageTableInsert(con, dmd, tablename, icp.getAttributmap());
+                                    icp.setCount(count);
                                 }
-                                CfAttributcontent newcontent = new CfAttributcontent();
-                                newcontent.setAttributref(attribut);
-                                newcontent.setClasscontentref(newclasscontent);
-                                newcontent.setContentInteger(BigInteger.valueOf(max+1));
-                                CfAttributcontent newcontent2 = cfattributcontentService.create(newcontent);
-                                icp.getAttributmap().put(attribut.getName(), newcontent2.getContentInteger().toString());
-                                icp.setReturncode("OK");
-                            } else {
-                                CfAttributcontent newcontent = new CfAttributcontent();
-                                newcontent.setAttributref(attribut);
-                                newcontent.setClasscontentref(newclasscontent);
-                                newcontent = contentUtil.setAttributValue(newcontent, icp.getAttributmap().get(attribut.getName()));
-
-                                cfattributcontentService.create(newcontent);
-                                if (icp.isIndexing()) {
-                                    contentUtil.indexContent();
-                                }
-                                icp.setReturncode("OK");
                             }
-                        });
-                        hibernateUtil.updateContent(newclasscontent);
+
+                            dbvalues.put("table", dbtables);
+                            dbexport.put(datasource.getDatabasename(), dbvalues);
+                        } catch (SQLException ex) {
+                            LOGGER.error(ex.getMessage());
+                        }
+                    } else {
+                        return null;
                     }
                 } else {
                     icp.setReturncode("Wrong API KEY");
@@ -202,6 +182,7 @@ public class RestDatabase {
         return icp;
     }
 
+    /*
     @PostMapping("/deletecontent")
     public RestDatabaseParameter restDeleteContent(@RequestBody RestDatabaseParameter ucp) {
         return deleteContent(ucp);
@@ -649,5 +630,45 @@ public class RestDatabase {
             }
         }
         return sql_condition;
+    }
+    
+    private int manageTableInsert(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, String> attributmap) {
+        Statement stmt = null;
+        int count = 0;
+        try {
+            TableFieldStructure tfs = getTableFieldsList(dmd, tablename, "", attributmap);
+            StringBuilder sql_insert = new StringBuilder();
+            sql_insert.append("INSERT INTO ");
+            sql_insert.append(tablename);
+            sql_insert.append(" (");
+            for (TableField tf : tfs.getTableFieldsList()) {
+                sql_insert.append("`").append(tf.getName()).append("`, ");
+            }
+            sql_insert.delete(sql_insert.length()-2, sql_insert.length());
+            sql_insert.append(" ) VALUES (");
+            for (TableField tf : tfs.getTableFieldsList()) {
+                if ((0 == tf.getType().compareToIgnoreCase("string")) || (0 == tf.getType().compareToIgnoreCase("date"))) {
+                    sql_insert.append("'").append(attributmap.get((String) tf.getName())).append("', ");
+                } else {
+                    sql_insert.append(attributmap.get((String) tf.getName())).append(", ");
+                }
+            }
+            sql_insert.delete(sql_insert.length()-2, sql_insert.length());
+            sql_insert.append(" )");
+            
+            stmt = con.createStatement();
+            count = stmt.executeUpdate(sql_insert.toString());
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getMessage());
+        } finally {
+            if (null != stmt) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+            }
+        }
+        return count;
     }
 }
