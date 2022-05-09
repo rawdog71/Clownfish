@@ -305,6 +305,7 @@ public class RestDatabase {
             TableFieldStructure tfs = getTableFieldsList(dmd, tablename, default_order, attributmap);
             default_order = tfs.getDefault_order();
             
+            
             String default_direction = "ASC";
             if (dtp != null) {
                 if (dtp.getOrderby() != null) {
@@ -326,7 +327,9 @@ public class RestDatabase {
             StringBuilder sql_outer = new StringBuilder();
             StringBuilder sql_inner = new StringBuilder();
             
+            int sqlmode = 0;
             if (con.getMetaData().getDriverName().contains("MS SQL")) {
+                sqlmode = 1;
                 sql_outer.append("SELECT ");
                 sql_inner.append("SELECT ");
                 sql_count.append("SELECT COUNT(*) AS count FROM ");
@@ -335,12 +338,12 @@ public class RestDatabase {
                     sql_outer.append("count(*) AS groupbycount, ");
                     tfs.getTableFieldsList().stream().filter((tf) -> (dtp.getGroupbylist().contains(tf.getName()))).map((tf) -> {
                         //sql_outer.append(tf.getName());
-                        sql_outer.append("`").append(tf.getName()).append("`");
+                        sql_outer.append("[").append(tf.getName()).append("]");
                         return tf;
                     }).map((tf) -> {
                         sql_outer.append(", ");
                         //sql_inner.append(tf.getName());
-                        sql_inner.append("`").append(tf.getName()).append("`");
+                        sql_inner.append("[").append(tf.getName()).append("]");
                         return tf;
                     }).forEach((_item) -> {
                         sql_inner.append(", ");
@@ -348,12 +351,12 @@ public class RestDatabase {
                 } else {
                     tfs.getTableFieldsList().stream().map((tf) -> {
                         //sql_outer.append(tf.getName());
-                        sql_outer.append("`").append(tf.getName()).append("`");
+                        sql_outer.append("[").append(tf.getName()).append("]");
                         return tf;
                     }).map((tf) -> {
                         sql_outer.append(", ");
                         //sql_inner.append(tf.getName());
-                        sql_inner.append("`").append(tf.getName()).append("`");
+                        sql_inner.append("[").append(tf.getName()).append("]");
                         return tf;
                     }).forEach((_item) -> {
                         sql_inner.append(", ");
@@ -371,7 +374,7 @@ public class RestDatabase {
                 StringBuilder sql_condition = null;
 
                 if (null != attributmap) {
-                    sql_condition = buildCondition(attributmap, tfs.getTableFieldsList());
+                    sql_condition = buildCondition(attributmap, tfs.getTableFieldsList(), sqlmode);
                 }
                 if (null != sql_condition) {
                     sql_inner.append(sql_condition);
@@ -406,6 +409,7 @@ public class RestDatabase {
                 }
             } 
             if (con.getMetaData().getDriverName().contains("MySQL")) {
+                sqlmode = 0;
                 sql_outer.append("SELECT ");
                 sql_count.append("SELECT COUNT(*) AS count FROM ");
                 
@@ -434,7 +438,7 @@ public class RestDatabase {
                 sql_outer.append(tablename);
                 StringBuilder sql_condition = null;
                 if (null != attributmap) {
-                    sql_condition = buildCondition(attributmap, tfs.getTableFieldsList());
+                    sql_condition = buildCondition(attributmap, tfs.getTableFieldsList(), sqlmode);
                 }
                 if (null != sql_condition) {
                     sql_outer.append(sql_condition);
@@ -622,7 +626,7 @@ public class RestDatabase {
         }
     }
     
-    private StringBuilder buildCondition(HashMap<String, String> attributmap, ArrayList<TableField> tableFieldsList) {
+    private StringBuilder buildCondition(HashMap<String, String> attributmap, ArrayList<TableField> tableFieldsList, int sqlmode) {
         StringBuilder sql_condition = new StringBuilder();
         if (!attributmap.isEmpty()) {
             sql_condition.append(" WHERE ");
@@ -631,7 +635,11 @@ public class RestDatabase {
                 if (!attributmap.get(key).isBlank()) {
                     added = true;
                     sql_condition.append("(");
-                    sql_condition.append("`").append((String) key).append("`");
+                    if (0 == sqlmode) {
+                        sql_condition.append("`").append((String) key).append("`");
+                    } else {
+                        sql_condition.append("[").append((String) key).append("]");
+                    }
                     String fieldType = getFieldType(tableFieldsList, (String) key);
                     
                     sql_condition.append(" = ");
@@ -654,14 +662,18 @@ public class RestDatabase {
         return sql_condition;
     }
     
-    private StringBuilder buildSet(HashMap<String, String> attributmap, ArrayList<TableField> tableFieldsList) {
+    private StringBuilder buildSet(HashMap<String, String> attributmap, ArrayList<TableField> tableFieldsList, int sqlmode) {
         StringBuilder sql_set = new StringBuilder();
         if (!attributmap.isEmpty()) {
             boolean added = false;
             for (Object key : attributmap.keySet().toArray()) {
                 if (!attributmap.get(key).isBlank()) {
                     added = true;
-                    sql_set.append("`").append((String) key).append("`");
+                    if (0 == sqlmode) {
+                        sql_set.append("`").append((String) key).append("`");
+                    } else {
+                        sql_set.append("[").append((String) key).append("]");
+                    }
                     String fieldType = getFieldType(tableFieldsList, (String) key);
                     
                     sql_set.append(" = ");
@@ -688,13 +700,24 @@ public class RestDatabase {
         Statement stmt = null;
         int count = 0;
         try {
+            int sqlmode = 0;
+            if (con.getMetaData().getDriverName().contains("MS SQL")) {
+                sqlmode = 1;
+            } else {
+                sqlmode = 0;
+            }
+            
             TableFieldStructure tfs = getTableFieldsList(dmd, tablename, "", attributmap);
             StringBuilder sql_insert = new StringBuilder();
             sql_insert.append("INSERT INTO ");
             sql_insert.append(tablename);
             sql_insert.append(" (");
             for (TableField tf : tfs.getTableFieldsList()) {
-                sql_insert.append("`").append(tf.getName()).append("`, ");
+                if (0 == sqlmode) {
+                    sql_insert.append("`").append(tf.getName()).append("`, ");
+                } else {
+                    sql_insert.append("[").append(tf.getName()).append("], ");
+                }
             }
             sql_insert.delete(sql_insert.length()-2, sql_insert.length());
             sql_insert.append(" ) VALUES (");
@@ -728,13 +751,19 @@ public class RestDatabase {
         Statement stmt = null;
         int count = 0;
         try {
+            int sqlmode = 0;
+            if (con.getMetaData().getDriverName().contains("MS SQL")) {
+                sqlmode = 1;
+            } else {
+                sqlmode = 0;
+            }
             TableFieldStructure tfs = getTableFieldsList(dmd, tablename, "", attributmap);
             StringBuilder sql_delete = new StringBuilder();
             sql_delete.append("DELETE FROM ");
             sql_delete.append(tablename);
             StringBuilder sql_condition = null;
             if (null != attributmap) {
-                sql_condition = buildCondition(attributmap, tfs.getTableFieldsList());
+                sql_condition = buildCondition(attributmap, tfs.getTableFieldsList(), sqlmode);
             }
             if (null != sql_condition) {
                 sql_delete.append(sql_condition);
@@ -760,6 +789,12 @@ public class RestDatabase {
         Statement stmt = null;
         int count = 0;
         try {
+            int sqlmode = 0;
+            if (con.getMetaData().getDriverName().contains("MS SQL")) {
+                sqlmode = 1;
+            } else {
+                sqlmode = 0;
+            }
             TableFieldStructure tfs = getTableFieldsList(dmd, tablename, "", updatemap);
             StringBuilder sql_update = new StringBuilder();
             sql_update.append("UPDATE ");
@@ -768,7 +803,7 @@ public class RestDatabase {
             
             StringBuilder sql_set = null;
             if (null != attributmap) {
-                sql_set = buildSet(updatemap, tfs.getTableFieldsList());
+                sql_set = buildSet(updatemap, tfs.getTableFieldsList(), sqlmode);
             }
             if (null != sql_set) {
                 sql_update.append(sql_set);
@@ -778,7 +813,7 @@ public class RestDatabase {
 
             StringBuilder sql_condition = null;
             if (null != attributmap) {
-                sql_condition = buildCondition(attributmap, tfs.getTableFieldsList());
+                sql_condition = buildCondition(attributmap, tfs.getTableFieldsList(), sqlmode);
             }
             if (null != sql_condition) {
                 sql_update.append(sql_condition);
