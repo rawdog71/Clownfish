@@ -89,7 +89,7 @@ public class RestDatabase {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
                                 //System.out.println(tablename);
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                                    manageTableRead(con, dmd, tablename, datatableproperties, icp.getAttributmap(), dbtables, dbvalues);
+                                    manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), dbtables, dbvalues);
                                 }
                                 
                             }
@@ -100,7 +100,7 @@ public class RestDatabase {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
                                 //System.out.println(tablename);
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                                    manageTableRead(con, dmd, tablename, datatableproperties, icp.getAttributmap(), dbtables, dbvalues);
+                                    manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), dbtables, dbvalues);
                                 }
                             }
 
@@ -156,7 +156,7 @@ public class RestDatabase {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
                                 //System.out.println(tablename);
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                                    int count = manageTableInsert(con, dmd, tablename, icp.getAttributmap());
+                                    int count = manageTableInsert(con, dmd, tablename, icp.getConditionmap());
                                     icp.setCount(count);
                                 }
                             }
@@ -182,42 +182,48 @@ public class RestDatabase {
         return icp;
     }
 
-    /*
-    @PostMapping("/deletecontent")
-    public RestDatabaseParameter restDeleteContent(@RequestBody RestDatabaseParameter ucp) {
-        return deleteContent(ucp);
+    @PostMapping("/deletedb")
+    public String restDeleteContent(@RequestBody RestDatabaseParameter ucp) {
+        Gson gson = new Gson();
+        return gson.toJson(deleteContent(ucp));
     }
     
     private RestDatabaseParameter deleteContent(RestDatabaseParameter ucp) {
+        HashMap<String, HashMap> dbexport = new HashMap<>();
         try {
             String token = ucp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ucp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
-                    CfClass clazz = cfclassService.findByName(ucp.getClassname());
+                    CfDatasource datasource = cfdatasourceService.findByName(ucp.getDatasource());
 
-                    try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
-                        classcontent.setScrapped(true);
-                        
-                        // Delete from Listcontent - consistency
-                        List<CfListcontent> listcontent = cflistcontentService.findByClasscontentref(classcontent.getId());
-                        for (CfListcontent lc : listcontent) {
-                            cflistcontentService.delete(lc);
-                            hibernateUtil.deleteRelation(cflistService.findById(lc.getCfListcontentPK().getListref()), cfclasscontentService.findById(lc.getCfListcontentPK().getClasscontentref()));
-                        }
+                    JDBCUtil jdbcutil = new JDBCUtil(datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword());
+                    Connection con = jdbcutil.getConnection();
+                    if (null != con) {
+                        try {
+                            DatabaseMetaData dmd = con.getMetaData();
+                            DatatableProperties datatableproperties = new DatatableProperties();
+                            datatableproperties.setTablename(ucp.getTablename());
+                            ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
+                            HashMap<String, ArrayList> dbtables = new HashMap<>();
+                            HashMap<String, Object> dbvalues = new HashMap<>();
+                            while(resultSetTables.next())
+                            {
+                                String tablename = resultSetTables.getString("TABLE_NAME");
+                                //System.out.println(tablename);
+                                if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
+                                    int count = manageTableDelete(con, dmd, tablename, ucp.getConditionmap());
+                                    ucp.setCount(count);
+                                }
+                            }
 
-                        // Delete from Sitecontent - consistency
-                        List<CfSitecontent> sitecontent = cfsitecontentService.findByClasscontentref(classcontent.getId());
-                        for (CfSitecontent sc : sitecontent) {
-                            cfsitecontentService.delete(sc);
+                            dbvalues.put("table", dbtables);
+                            dbexport.put(datasource.getDatabasename(), dbvalues);
+                        } catch (SQLException ex) {
+                            LOGGER.error(ex.getMessage());
                         }
-                        
-                        cfclasscontentService.edit(classcontent);
-                        ucp.setReturncode("OK");
-                        hibernateUtil.updateContent(classcontent);
-                    } catch (javax.persistence.NoResultException ex) {
-                        ucp.setReturncode("Classcontent not found");
+                    } else {
+                        return null;
                     }
                 } else {
                     ucp.setReturncode("Wrong API KEY");
@@ -231,37 +237,48 @@ public class RestDatabase {
         return ucp;
     }
 
-    @PostMapping("/updatecontent")
-    public RestDatabaseParameter restUpdateContent(@RequestBody RestDatabaseParameter ucp) {
-        return updateContent(ucp);
+    @PostMapping("/updatedb")
+    public String restUpdateContent(@RequestBody RestDatabaseParameter ucp) {
+        Gson gson = new Gson();
+        return gson.toJson(updateContent(ucp));
     }
     
     private RestDatabaseParameter updateContent(RestDatabaseParameter ucp) {
+        HashMap<String, HashMap> dbexport = new HashMap<>();
         try {
             String token = ucp.getToken();
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ucp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
-                    CfClass clazz = cfclassService.findByName(ucp.getClassname());
+                    CfDatasource datasource = cfdatasourceService.findByName(ucp.getDatasource());
 
-                    try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
-                        List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
-                        for (CfAttributcontent attributcontent : attributcontentlist) {
-                            CfAttribut attribut = attributcontent.getAttributref();
-                            // Check, if attribut exists in attributmap
-                            if (ucp.getAttributmap().containsKey(attribut.getName())) {
-                                contentUtil.setAttributValue(attributcontent, ucp.getAttributmap().get(attribut.getName()));
-                                cfattributcontentService.edit(attributcontent);
-                                if (ucp.isIndexing()) {
-                                    contentUtil.indexContent();
+                    JDBCUtil jdbcutil = new JDBCUtil(datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword());
+                    Connection con = jdbcutil.getConnection();
+                    if (null != con) {
+                        try {
+                            DatabaseMetaData dmd = con.getMetaData();
+                            DatatableProperties datatableproperties = new DatatableProperties();
+                            datatableproperties.setTablename(ucp.getTablename());
+                            ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
+                            HashMap<String, ArrayList> dbtables = new HashMap<>();
+                            HashMap<String, Object> dbvalues = new HashMap<>();
+                            while(resultSetTables.next())
+                            {
+                                String tablename = resultSetTables.getString("TABLE_NAME");
+                                //System.out.println(tablename);
+                                if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
+                                    int count = manageTableUpdate(con, dmd, tablename, ucp.getConditionmap(), ucp.getUpdatemap());
+                                    ucp.setCount(count);
                                 }
-                                ucp.setReturncode("OK");
                             }
+
+                            dbvalues.put("table", dbtables);
+                            dbexport.put(datasource.getDatabasename(), dbvalues);
+                        } catch (SQLException ex) {
+                            LOGGER.error(ex.getMessage());
                         }
-                        hibernateUtil.updateContent(classcontent);
-                    } catch (javax.persistence.NoResultException ex) {
-                        ucp.setReturncode("Classcontent not found");
+                    } else {
+                        return null;
                     }
                 } else {
                     ucp.setReturncode("Wrong API KEY");
@@ -274,7 +291,6 @@ public class RestDatabase {
         }
         return ucp;
     }
-    */
     
     private void manageTableRead(Connection con, DatabaseMetaData dmd, String tablename, DatatableProperties dtp, HashMap<String, String> attributmap, HashMap<String, ArrayList> dbtables, HashMap<String, Object> dbvalues) {
         Statement stmt = null;
@@ -318,22 +334,26 @@ public class RestDatabase {
                 if ((dtp != null) && (!dtp.getGroupbylist().isEmpty())) {
                     sql_outer.append("count(*) AS groupbycount, ");
                     tfs.getTableFieldsList().stream().filter((tf) -> (dtp.getGroupbylist().contains(tf.getName()))).map((tf) -> {
-                        sql_outer.append(tf.getName());
+                        //sql_outer.append(tf.getName());
+                        sql_outer.append("`").append(tf.getName()).append("`");
                         return tf;
                     }).map((tf) -> {
                         sql_outer.append(", ");
-                        sql_inner.append(tf.getName());
+                        //sql_inner.append(tf.getName());
+                        sql_inner.append("`").append(tf.getName()).append("`");
                         return tf;
                     }).forEach((_item) -> {
                         sql_inner.append(", ");
                     });
                 } else {
                     tfs.getTableFieldsList().stream().map((tf) -> {
-                        sql_outer.append(tf.getName());
+                        //sql_outer.append(tf.getName());
+                        sql_outer.append("`").append(tf.getName()).append("`");
                         return tf;
                     }).map((tf) -> {
                         sql_outer.append(", ");
-                        sql_inner.append(tf.getName());
+                        //sql_inner.append(tf.getName());
+                        sql_inner.append("`").append(tf.getName()).append("`");
                         return tf;
                     }).forEach((_item) -> {
                         sql_inner.append(", ");
@@ -392,14 +412,16 @@ public class RestDatabase {
                 if ((dtp != null) && (!dtp.getGroupbylist().isEmpty())) {
                     sql_outer.append("count(*) AS groupbycount, ");
                     tfs.getTableFieldsList().stream().filter((tf) -> (dtp.getGroupbylist().contains(tf.getName()))).map((tf) -> {
-                        sql_outer.append(tf.getName());
+                        //sql_outer.append(tf.getName());
+                        sql_outer.append("`").append(tf.getName()).append("`");
                         return tf;
                     }).forEach((_item) -> {
                         sql_outer.append(", ");
                     });
                 } else {
                     tfs.getTableFieldsList().stream().map((tf) -> {
-                        sql_outer.append(tf.getName());
+                        //sql_outer.append(tf.getName());
+                        sql_outer.append("`").append(tf.getName()).append("`");
                         return tf;
                     }).forEach((_item) -> {
                         sql_outer.append(", ");
@@ -609,7 +631,7 @@ public class RestDatabase {
                 if (!attributmap.get(key).isBlank()) {
                     added = true;
                     sql_condition.append("(");
-                    sql_condition.append((String) key);
+                    sql_condition.append("`").append((String) key).append("`");
                     String fieldType = getFieldType(tableFieldsList, (String) key);
                     
                     sql_condition.append(" = ");
@@ -630,6 +652,36 @@ public class RestDatabase {
             }
         }
         return sql_condition;
+    }
+    
+    private StringBuilder buildSet(HashMap<String, String> attributmap, ArrayList<TableField> tableFieldsList) {
+        StringBuilder sql_set = new StringBuilder();
+        if (!attributmap.isEmpty()) {
+            boolean added = false;
+            for (Object key : attributmap.keySet().toArray()) {
+                if (!attributmap.get(key).isBlank()) {
+                    added = true;
+                    sql_set.append("`").append((String) key).append("`");
+                    String fieldType = getFieldType(tableFieldsList, (String) key);
+                    
+                    sql_set.append(" = ");
+                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                        sql_set.append("'");
+                    }
+                    sql_set.append((String) attributmap.get(key));
+                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                        sql_set.append("'");
+                    }
+                    sql_set.append(", ");
+                }
+            }
+            if (added) {
+                sql_set.delete(sql_set.length()-2, sql_set.length());
+            } else {
+                sql_set.delete(0, sql_set.length());
+            }
+        }
+        return sql_set;
     }
     
     private int manageTableInsert(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, String> attributmap) {
@@ -658,6 +710,82 @@ public class RestDatabase {
             
             stmt = con.createStatement();
             count = stmt.executeUpdate(sql_insert.toString());
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getMessage());
+        } finally {
+            if (null != stmt) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+            }
+        }
+        return count;
+    }
+    
+    private int manageTableDelete(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, String> attributmap) {
+        Statement stmt = null;
+        int count = 0;
+        try {
+            TableFieldStructure tfs = getTableFieldsList(dmd, tablename, "", attributmap);
+            StringBuilder sql_delete = new StringBuilder();
+            sql_delete.append("DELETE FROM ");
+            sql_delete.append(tablename);
+            StringBuilder sql_condition = null;
+            if (null != attributmap) {
+                sql_condition = buildCondition(attributmap, tfs.getTableFieldsList());
+            }
+            if (null != sql_condition) {
+                sql_delete.append(sql_condition);
+            }
+            
+            stmt = con.createStatement();
+            count = stmt.executeUpdate(sql_delete.toString());
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getMessage());
+        } finally {
+            if (null != stmt) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+            }
+        }
+        return count;
+    }
+    
+    private int manageTableUpdate(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, String> attributmap, HashMap<String, String> updatemap) {
+        Statement stmt = null;
+        int count = 0;
+        try {
+            TableFieldStructure tfs = getTableFieldsList(dmd, tablename, "", updatemap);
+            StringBuilder sql_update = new StringBuilder();
+            sql_update.append("UPDATE ");
+            sql_update.append(tablename);
+            sql_update.append(" SET ");
+            
+            StringBuilder sql_set = null;
+            if (null != attributmap) {
+                sql_set = buildSet(updatemap, tfs.getTableFieldsList());
+            }
+            if (null != sql_set) {
+                sql_update.append(sql_set);
+            }
+            
+            tfs = getTableFieldsList(dmd, tablename, "", attributmap);
+
+            StringBuilder sql_condition = null;
+            if (null != attributmap) {
+                sql_condition = buildCondition(attributmap, tfs.getTableFieldsList());
+            }
+            if (null != sql_condition) {
+                sql_update.append(sql_condition);
+            }
+            
+            stmt = con.createStatement();
+            count = stmt.executeUpdate(sql_update.toString());
         } catch (SQLException ex) {
             LOGGER.error(ex.getMessage());
         } finally {

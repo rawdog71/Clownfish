@@ -34,10 +34,12 @@ public class RestDatabaseParameter {
     private @Getter @Setter int pagination;
     private @Getter @Setter int page;
     private @Getter @Setter int count;
-    private @Getter @Setter HashMap<String, String> attributmap;
+    private @Getter @Setter HashMap<String, String> conditionmap;
+    private @Getter @Setter HashMap<String, String> updatemap;
     private @Getter @Setter HashMap<String, HashMap> result;
 
     public RestDatabaseParameter() {
-        attributmap = new HashMap<>();
+        conditionmap = new HashMap<>();
+        updatemap = new HashMap<>();
     }
 }
