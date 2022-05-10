@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -37,8 +38,8 @@ import org.springframework.context.annotation.Scope;
 @Scope("singleton")
 @Component
 public class BeanUtil implements Serializable {
-    private Set<Class> templatebeans = null;
-    private @Getter @Setter ArrayList<Class> loadabletemplatebeans = new ArrayList<>();
+    private Set<Class<?>> templatebeans = null;
+    private @Getter @Setter ArrayList<Class<?>> loadabletemplatebeans = new ArrayList<>();
     
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BeanUtil.class);
     
@@ -62,31 +63,34 @@ public class BeanUtil implements Serializable {
         }
     }
     
-    private Set<Class> findAllClassesInLibfolder(String libdir) throws IOException {
+    private Set<Class<?>> findAllClassesInLibfolder(String libdir) throws IOException {
         try {
             File dependencyDirectory = new File(libdir);
             File[] files = dependencyDirectory.listFiles();
-            ArrayList<URL> urls = new ArrayList();
-            for (File file : files) {
-                if (file.getName().endsWith(".jar")) {
-                    urls.add(file.toURI().toURL());
+            ArrayList<URL> urls = new ArrayList<>();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.getName().endsWith(".jar")) {
+                        urls.add(file.toURI().toURL());
+                    }
                 }
+
+                URL[] urlArr = new URL[urls.size()];
+                urlArr = urls.toArray(urlArr);
+
+                URLClassLoader cl = new URLClassLoader(urlArr);
+                return ClassPath.from(cl)
+                        .getTopLevelClasses()
+                        .stream()
+                        .filter(clazz -> clazz.getPackageName()
+                                .startsWith("io.clownfish.ext"))
+                        .filter(clazz -> isClassLoadable(clazz))
+                        .map(clazz -> clazz.load())
+                        .collect(Collectors.toSet());
             }
-
-            URL[] urlArr = new URL[urls.size()];
-            urlArr = urls.toArray(urlArr);
-
-            URLClassLoader cl = new URLClassLoader(urlArr);
-            return ClassPath.from(cl)
-                    .getTopLevelClasses()
-                    .stream()
-                    .filter(clazz -> clazz.getPackageName()
-                    .startsWith("io.clownfish.ext"))
-                    .filter(clazz -> isClassLoadable(clazz))
-                    .map(clazz -> clazz.load())
-                    .collect(Collectors.toSet());
+            return Collections.emptySet();
         } catch (IOException ex) {
-            return null;
+            return Collections.emptySet();
         }
     }
     
