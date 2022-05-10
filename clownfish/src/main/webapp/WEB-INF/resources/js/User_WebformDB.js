@@ -9,21 +9,22 @@ webform.controller('WebformCtrl', function($scope, $http) {
     $scope.libNames = [];
     $scope.changedPw = false;
     
-    $scope.init = function(datasourcename, tablename, page, limit, attributlist) {
+    $scope.init = function(datasourcename, tablename, page, limit, attributlist, pklist) {
         $scope.datasourcename = datasourcename;
         $scope.tablename = tablename;
         $scope.page = page;
         $scope.limit = limit;
         $scope.attributlist = attributlist;
+        $scope.primarykeylist = pklist;
         $scope.getList();
     };
 
     $scope.add = () => {
         var attributmap = {
             apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
-            classname: document.getElementById('classname').innerText,
-            attributmap: $scope.getInputInformation('forms'),
-            contentname: document.getElementById('contentname').value
+            datasource: $scope.datasourcename,
+            tablename: $scope.tablename,
+            updatemap: $scope.getInputInformation('forms')
         };
 
         axios.post('/insertdb',
@@ -38,12 +39,14 @@ webform.controller('WebformCtrl', function($scope, $http) {
     };
 
     //Update Content
-    $scope.update = (name) => {
+    $scope.update = (id) => {
+        console.log("UPD: " + id);
         var attributmap = {
             apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
-            classname: document.getElementById('classname').innerText,
-            contentname: name,
-            attributmap: $scope.getInputInformation('forms2')
+            datasource: $scope.datasourcename,
+            tablename: $scope.tablename,
+            updatemap: $scope.getInputInformation('forms2'),
+            conditionmap: $scope.getInputInformation('forms2')
         };
 
         axios.post('/updatedb',
@@ -72,10 +75,12 @@ webform.controller('WebformCtrl', function($scope, $http) {
 
     //Delete content
     $scope.deleteI = (id) => {
+        console.log(id);
         var attributmap = {
             apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
-            classname: document.getElementById('classname').innerText,
-            contentname: $scope.contentList[id].content.name
+            datasource: $scope.datasourcename,
+            tablename: $scope.tablename,
+            conditionmap: $scope.attributlist
         };
 
         axios.post('/deletedb',
@@ -91,7 +96,6 @@ webform.controller('WebformCtrl', function($scope, $http) {
 
     //Give a List of the whole content
     $scope.getList = async () => {
-        //var classname = document.getElementById("classname").innerText;
         var req = {
             method: "POST",
             url: "/readdb",
@@ -122,8 +126,9 @@ webform.controller('WebformCtrl', function($scope, $http) {
 
     $scope.edit = (id) => {
         $scope.recordEdit = [];
-        var x = $scope.contentList[id].keyvals[0];
-        x.contentname = $scope.contentList[id].content.name;
+        console.log($scope);
+        var x = $scope.contentList[id];
+        x.id = id;
         $scope.recordEdit.push(x);
     };
 

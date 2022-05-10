@@ -1300,7 +1300,7 @@
                         <p:panelGrid columns="1">
                             <p:dataTable lazy="true" id="columnlist" size="small" scrollable="true" scrollHeight="250" var="column" value="#{datasourceList.selectedTable.columns}" selectionMode="single" selection="#{datasourceList.selectedColumn}" rowKey="#{column.name}">
                                 <p:column headerText="Name" filterBy="#{column.name}" filterMatchMode="contains">
-                                    <h:outputText value="#{column.name}" />
+                                    <h:outputText value="#{column.name} #{datasourceList.showPrimaryKey(column.primarykey)}" />
                                 </p:column>
                                 <p:column headerText="Type" filterBy="#{column.typename}" filterMatchMode="contains">
                                     <h:outputText value="#{column.typename}" />

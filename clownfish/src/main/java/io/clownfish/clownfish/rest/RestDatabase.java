@@ -33,6 +33,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +67,6 @@ public class RestDatabase {
                 String apikey = icp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfDatasource datasource = cfdatasourceService.findByName(icp.getDatasource());
-                    //System.out.println(datasource.getDatabasename());
-
                     JDBCUtil jdbcutil = new JDBCUtil(datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword());
                     Connection con = jdbcutil.getConnection();
                     
@@ -83,29 +83,22 @@ public class RestDatabase {
                             ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
 
                             ArrayList<HashMap> resultlist = new ArrayList<>();
-                            //HashMap<String, Object> dbvalues = new HashMap<>();
                             while(resultSetTables.next())
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
-                                //System.out.println(tablename);
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
                                     icp.setCount(manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), resultlist));
                                 }
                                 
                             }
-
                             resultSetTables = dmd.getTables(null, null, null, new String[]{"VIEW"});
                             while(resultSetTables.next())
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
-                                //System.out.println(tablename);
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
                                     icp.setCount(manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), resultlist));
                                 }
                             }
-
-                            //dbvalues.put("table", dbtables);
-                            //dbexport.put(datasource.getDatabasename(), dbvalues);
                             icp.setResult(resultlist);
                         } catch (SQLException ex) {
                             LOGGER.error(ex.getMessage());
@@ -133,7 +126,7 @@ public class RestDatabase {
     }
     
     private RestDatabaseParameter insertContent(RestDatabaseParameter icp) {
-        HashMap<String, HashMap> dbexport = new HashMap<>();
+        //HashMap<String, HashMap> dbexport = new HashMap<>();
         try {
             String token = icp.getToken();
             if (authtokenlist.checkValidToken(token)) {
@@ -149,20 +142,19 @@ public class RestDatabase {
                             DatatableProperties datatableproperties = new DatatableProperties();
                             datatableproperties.setTablename(icp.getTablename());
                             ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
-                            HashMap<String, ArrayList> dbtables = new HashMap<>();
-                            HashMap<String, Object> dbvalues = new HashMap<>();
+                            //HashMap<String, ArrayList> dbtables = new HashMap<>();
+                            //HashMap<String, Object> dbvalues = new HashMap<>();
                             while(resultSetTables.next())
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
-                                //System.out.println(tablename);
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                                    int count = manageTableInsert(con, dmd, tablename, icp.getConditionmap());
+                                    int count = manageTableInsert(con, dmd, tablename, icp.getUpdatemap());
                                     icp.setCount(count);
                                 }
                             }
 
-                            dbvalues.put("table", dbtables);
-                            dbexport.put(datasource.getDatabasename(), dbvalues);
+                            //dbvalues.put("table", dbtables);
+                            //dbexport.put(datasource.getDatabasename(), dbvalues);
                         } catch (SQLException ex) {
                             LOGGER.error(ex.getMessage());
                         }
@@ -189,7 +181,6 @@ public class RestDatabase {
     }
     
     private RestDatabaseParameter deleteContent(RestDatabaseParameter ucp) {
-        HashMap<String, HashMap> dbexport = new HashMap<>();
         try {
             String token = ucp.getToken();
             if (authtokenlist.checkValidToken(token)) {
@@ -205,20 +196,14 @@ public class RestDatabase {
                             DatatableProperties datatableproperties = new DatatableProperties();
                             datatableproperties.setTablename(ucp.getTablename());
                             ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
-                            HashMap<String, ArrayList> dbtables = new HashMap<>();
-                            HashMap<String, Object> dbvalues = new HashMap<>();
                             while(resultSetTables.next())
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
-                                //System.out.println(tablename);
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
                                     int count = manageTableDelete(con, dmd, tablename, ucp.getConditionmap());
                                     ucp.setCount(count);
                                 }
                             }
-
-                            dbvalues.put("table", dbtables);
-                            dbexport.put(datasource.getDatabasename(), dbvalues);
                         } catch (SQLException ex) {
                             LOGGER.error(ex.getMessage());
                         }
@@ -244,7 +229,6 @@ public class RestDatabase {
     }
     
     private RestDatabaseParameter updateContent(RestDatabaseParameter ucp) {
-        HashMap<String, HashMap> dbexport = new HashMap<>();
         try {
             String token = ucp.getToken();
             if (authtokenlist.checkValidToken(token)) {
@@ -260,20 +244,14 @@ public class RestDatabase {
                             DatatableProperties datatableproperties = new DatatableProperties();
                             datatableproperties.setTablename(ucp.getTablename());
                             ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
-                            HashMap<String, ArrayList> dbtables = new HashMap<>();
-                            HashMap<String, Object> dbvalues = new HashMap<>();
                             while(resultSetTables.next())
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
-                                //System.out.println(tablename);
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
                                     int count = manageTableUpdate(con, dmd, tablename, ucp.getConditionmap(), ucp.getUpdatemap());
                                     ucp.setCount(count);
                                 }
                             }
-
-                            dbvalues.put("table", dbtables);
-                            dbexport.put(datasource.getDatabasename(), dbvalues);
                         } catch (SQLException ex) {
                             LOGGER.error(ex.getMessage());
                         }
@@ -300,12 +278,9 @@ public class RestDatabase {
             long low_limit = 1;
             long high_limit = 50;
             
-            //System.out.println(con.getMetaData().getDriverName());
-
             String default_order = "";
             TableFieldStructure tfs = getTableFieldsList(dmd, tablename, default_order, attributmap);
             default_order = tfs.getDefault_order();
-            
             
             String default_direction = "ASC";
             if (dtp != null) {
@@ -338,12 +313,10 @@ public class RestDatabase {
                 if ((dtp != null) && (!dtp.getGroupbylist().isEmpty())) {
                     sql_outer.append("count(*) AS groupbycount, ");
                     tfs.getTableFieldsList().stream().filter((tf) -> (dtp.getGroupbylist().contains(tf.getName()))).map((tf) -> {
-                        //sql_outer.append(tf.getName());
                         sql_outer.append("[").append(tf.getName()).append("]");
                         return tf;
                     }).map((tf) -> {
                         sql_outer.append(", ");
-                        //sql_inner.append(tf.getName());
                         sql_inner.append("[").append(tf.getName()).append("]");
                         return tf;
                     }).forEach((_item) -> {
@@ -351,12 +324,10 @@ public class RestDatabase {
                     });
                 } else {
                     tfs.getTableFieldsList().stream().map((tf) -> {
-                        //sql_outer.append(tf.getName());
                         sql_outer.append("[").append(tf.getName()).append("]");
                         return tf;
                     }).map((tf) -> {
                         sql_outer.append(", ");
-                        //sql_inner.append(tf.getName());
                         sql_inner.append("[").append(tf.getName()).append("]");
                         return tf;
                     }).forEach((_item) -> {
@@ -417,7 +388,6 @@ public class RestDatabase {
                 if ((dtp != null) && (!dtp.getGroupbylist().isEmpty())) {
                     sql_outer.append("count(*) AS groupbycount, ");
                     tfs.getTableFieldsList().stream().filter((tf) -> (dtp.getGroupbylist().contains(tf.getName()))).map((tf) -> {
-                        //sql_outer.append(tf.getName());
                         sql_outer.append("`").append(tf.getName()).append("`");
                         return tf;
                     }).forEach((_item) -> {
@@ -425,7 +395,6 @@ public class RestDatabase {
                     });
                 } else {
                     tfs.getTableFieldsList().stream().map((tf) -> {
-                        //sql_outer.append(tf.getName());
                         sql_outer.append("`").append(tf.getName()).append("`");
                         return tf;
                     }).forEach((_item) -> {
@@ -490,7 +459,6 @@ public class RestDatabase {
             
             stmt = con.createStatement();
             result = stmt.executeQuery(sql_outer.toString());
-            //ArrayList<HashMap> tablevalues = new ArrayList<>();
             while (result.next()) {
                 HashMap<String, String> dbexportvalues = new HashMap<>();
                 for (TableField tf : tfs.getTableFieldsList()) {
@@ -503,21 +471,17 @@ public class RestDatabase {
                 }
                 tablevalues.add(dbexportvalues);
             }
-            //dbtables.put(tablename, tablevalues);
             try {
                 result.close();
             } catch (SQLException ex) {
                 LOGGER.error(ex.getMessage());
             }
             result = stmt.executeQuery(sql_count.toString());
-            //HashMap<String, String> dbexportvalues = new HashMap<>();
             
             while (result.next()) {
                 String value = result.getString("count");
                 count = Long.parseLong(value);
-                //dbexportvalues.put("count", value);
             }
-            //dbvalues.put(tablename, dbexportvalues);
         } catch (SQLException ex) {
             LOGGER.error(ex.getMessage());
         } finally {
@@ -727,7 +691,13 @@ public class RestDatabase {
             sql_insert.append(" ) VALUES (");
             for (TableField tf : tfs.getTableFieldsList()) {
                 if ((0 == tf.getType().compareToIgnoreCase("string")) || (0 == tf.getType().compareToIgnoreCase("date"))) {
-                    sql_insert.append("'").append(attributmap.get((String) tf.getName())).append("', ");
+                    if (0 == tf.getType().compareToIgnoreCase("date")) {
+                        String pattern = "dd.MM.yyyy HH:mm:ss";
+                        DateTime dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
+                        sql_insert.append("'").append(dt.toString()).append("', ");
+                    } else {
+                        sql_insert.append("'").append(attributmap.get((String) tf.getName())).append("', ");
+                    }
                 } else {
                     sql_insert.append(attributmap.get((String) tf.getName())).append(", ");
                 }

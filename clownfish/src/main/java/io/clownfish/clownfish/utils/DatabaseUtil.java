@@ -741,7 +741,7 @@ public class DatabaseUtil {
                 script().withSrc("resources/js/axios.js"),
                 title("Webform")).renderFormatted()).append("\n");
 
-        html.append("<body ng-controller=\"WebformCtrl\" ng-init=\"init('").append(datasource.getName()).append("', '").append(tabledata.getName()).append("', 1, 50, ").append(makeFieldlist(tabledata.getColumns())).append(")\">").append("\n");
+        html.append("<body ng-controller=\"WebformCtrl\" ng-init=\"init('").append(datasource.getName()).append("', '").append(tabledata.getName()).append("', 1, 50, ").append(makeFieldlist(tabledata.getColumns())).append(", ").append(makePKlist(tabledata.getColumns())).append(")\">").append("\n");
         html.append("\t").append(h1(tabledata.getName()).withId("classname").withClass("text-center mt-3")).append("\n");
         
         html.append("\t").append(("<div class=\"mx-5\">")).append("\n");
@@ -754,12 +754,12 @@ public class DatabaseUtil {
         html.append("\t").append(("<table class=\"table\">")).append("\n");
         html.append("\t\t").append(("<thead>")).append("\n");
         html.append("\t\t\t").append(("<tr>")).append("\n");
-        html.append("\t\t\t\t").append("<th scope=\"col\">#</th>\n");
+        //html.append("\t\t\t\t").append("<th scope=\"col\">#</th>\n");
         
         for (ColumnData attr : tabledata.getColumns()) {
-            if (0 == attr.getAutoinc().compareToIgnoreCase("yes")) {
-                continue;
-            }
+            //if (0 == attr.getAutoinc().compareToIgnoreCase("yes")) {
+            //    continue;
+            //}
             html.append("\t").append("<th scope=\"col\">").append(attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("</th>\n");
         }
         html.append("\t\t\t\t").append("<th class=\"text-end\" scope=\"col\">Aktionen</th>\n");
@@ -768,12 +768,12 @@ public class DatabaseUtil {
         
         html.append("\t\t").append(("<tbody>")).append("\n");
         html.append("\t\t\t").append(("<tr ng-repeat=\"info in contentList track by $index\">")).append("\n");
-        html.append("\t\t\t\t").append("<th scope=\"row\">{{$index}}</th>\n");
+        //html.append("\t\t\t\t").append("<th scope=\"row\">{{$index}}</th>\n");
         
         for (ColumnData attr : tabledata.getColumns()) {
-            if (0 == attr.getAutoinc().compareToIgnoreCase("yes")) {
-                continue;
-            }
+            //if (0 == attr.getAutoinc().compareToIgnoreCase("yes")) {
+            //    continue;
+            //}
             html.append("\t\t\t\t").append("<td> {{info[\"").append(attr.getName()).append("\"]}}").append("</td>\n");
         }
         
@@ -918,7 +918,7 @@ public class DatabaseUtil {
         html.append("\t\t\t\t").append(("</form>")).append("\n");
         html.append("\t\t\t\t").append(("</div>")).append("\n");
         html.append("\t\t\t\t").append(("<div class=\"modal-footer\">")).append("\n");
-        html.append("\t\t\t\t").append(("<button class=\"btn btn-primary w-100\" data-bs-dismiss=\"modal\" ng-click=\"update(info['contentname'])\">Editieren</button>")).append("\n");
+        html.append("\t\t\t\t").append(("<button class=\"btn btn-primary w-100\" data-bs-dismiss=\"modal\" ng-click=\"update(info['id'])\">Editieren</button>")).append("\n");
         html.append("\t\t\t\t").append(("</div>")).append("\n");
         html.append("\t\t\t\t").append(("</div>")).append("\n");
         html.append("\t\t\t\t").append(("</div>")).append("\n");
@@ -974,6 +974,21 @@ public class DatabaseUtil {
             fieldlist.append("'");
             fieldlist.append(attr.getName());
             fieldlist.append("' : '', ");
+        }
+        fieldlist.delete(fieldlist.length()-2, fieldlist.length());
+        fieldlist.append("}");
+        return fieldlist.toString();
+    }
+
+    private String makePKlist(ArrayList<ColumnData> columns) {
+        StringBuilder fieldlist = new StringBuilder();
+        fieldlist.append("{");
+        for (ColumnData attr : columns) {
+            if (attr.isPrimarykey()) {
+                fieldlist.append("'");
+                fieldlist.append(attr.getName());
+                fieldlist.append("' : '', ");
+            }
         }
         fieldlist.delete(fieldlist.length()-2, fieldlist.length());
         fieldlist.append("}");

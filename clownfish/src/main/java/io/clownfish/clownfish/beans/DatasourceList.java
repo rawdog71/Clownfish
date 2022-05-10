@@ -142,9 +142,16 @@ public class DatasourceList implements Serializable {
                                     cd.setNullable(crs.getInt("NULLABLE"));
                                     cd.setDefaultvalue(crs.getString("COLUMN_DEF"));
                                     cd.setAutoinc(crs.getString("IS_AUTOINCREMENT"));
+                                    cd.setPrimarykey(false);
                                     //cd.setGenerated(crs.getString("IS_GENERATEDCOLUMN"));
                                 } catch (Exception e) {
                                     LOGGER.error(e.getMessage());
+                                }
+                                ResultSet pkrs = selectedDdbmd.getPrimaryKeys(datasourceDatabasename, null, tables.getString("TABLE_NAME"));
+                                while (pkrs.next()) {
+                                    if (0 == cd.getName().compareToIgnoreCase(pkrs.getString("COLUMN_NAME"))) {
+                                        cd.setPrimarykey(true);
+                                    }
                                 }
                                 td.getColumns().add(cd);
                             }
@@ -262,6 +269,14 @@ public class DatasourceList implements Serializable {
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Connection check", "Connection check error");
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }
+        }
+    }
+    
+    public String showPrimaryKey(boolean pk) {
+        if (pk) {
+            return " *";
+        } else {
+            return "";
         }
     }
 }

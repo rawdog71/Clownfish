@@ -33,4 +33,5 @@ public class ColumnData {
     private @Getter @Setter String defaultvalue;
     private @Getter @Setter String autoinc;
     private @Getter @Setter String generated;
+    private @Getter @Setter boolean primarykey;
 }
