@@ -64,11 +64,11 @@ public class CfClassCompiler implements Runnable
             compileOut = new StringWriter();
         }
     }
-    
+
     public void setClownfish(Clownfish clownfish) {
         this.clownfish = clownfish;
     }
-    
+
     public void init(CfClassLoader cfclassLoader_, PropertyUtil propertyUtil_, CfJavaService cfjavaService_)
     {
         classesList = new ArrayList<>();
@@ -80,7 +80,7 @@ public class CfClassCompiler implements Runnable
         editorOptions.setTheme(ETheme.VS_DARK);
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
     }
-    
+
     public CfCompilerLanguages getcompilerlanguages() {
         return compilerlanguages;
     }
@@ -98,7 +98,7 @@ public class CfClassCompiler implements Runnable
             }
         }
         setCompileOut(new StringWriter());
-        
+
         for (JVMLanguages language : compilerlanguages.getJvm_languages().keySet()) {
             if (compilerlanguages.getJvm_languages().get(language)) {
                 switch (language) {
@@ -171,7 +171,7 @@ public class CfClassCompiler implements Runnable
                 }
             }
         }
-        
+
         if (!classesList.isEmpty()) {
             classMethodMap.clear();
             for (Class<?> clazz : classesList)
@@ -194,6 +194,10 @@ public class CfClassCompiler implements Runnable
     public String constructClasspath() throws IOException
     {
         StringBuilder classPath = new StringBuilder(System.getProperty("java.class.path"));
+
+        if (System.getProperty("cfJar") != null) {
+            classPath.append(ClownfishUtil.classpathDelim()).append(System.getProperty("cfJar"));
+        }
 
         // $CLOWNFISH_DIR/cache/src/io/clownfish/internal
         classPath.append(ClownfishUtil.classpathDelim()).append(getTmpdir().toString());
@@ -219,7 +223,7 @@ public class CfClassCompiler implements Runnable
             libs.stream().filter(file -> file.getName().endsWith(".jar")).collect(Collectors.toList())
                     .forEach(jar -> classPath.append(ClownfishUtil.classpathDelim()).append(jar.getAbsolutePath()));
         }
-        LOGGER.info("CLASSPATH: " + classPath.toString());
+        LOGGER.info("CLASSPATH: " + classPath);
         return classPath.toString();
     }
 
@@ -230,11 +234,11 @@ public class CfClassCompiler implements Runnable
         FacesMessage message = new FacesMessage("Compiled class(es) successfully");
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
-    
+
     public void initClasspath() {
         clownfish.initClasspath();
     }
-    
+
     public void compileAll(boolean withMessage) {
         if (getTmpdir() == null)
         {
@@ -303,7 +307,7 @@ public class CfClassCompiler implements Runnable
         });
         Runtime.getRuntime().addShutdownHook(deleteHook);
     }
-    
+
     private String getClassExtension(CfJava java) {
         String extension = "";
         for (JVMLanguages language : compilerlanguages.getJvm_languages().keySet()) {
@@ -316,7 +320,7 @@ public class CfClassCompiler implements Runnable
         }
         return extension;
     }
-    
+
     private void compile(JVMLanguages language, boolean withMessage) {
         if (!language.getFilelist().isEmpty()) {
             try {
