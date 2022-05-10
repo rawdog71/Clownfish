@@ -648,7 +648,13 @@ public class RestDatabase {
                     if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
                         sql_set.append("'");
                     }
-                    sql_set.append((String) attributmap.get(key));
+                    if (0 == fieldType.compareToIgnoreCase("date")) {
+                        String pattern = "dd.MM.yyyy HH:mm:ss";
+                        DateTime dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                        sql_set.append(dt.toString());
+                    } else {
+                        sql_set.append((String) attributmap.get(key));
+                    }
                     if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
                         sql_set.append("'");
                     }
