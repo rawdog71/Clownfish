@@ -128,6 +128,60 @@ public class DatabaseTemplateBean implements Serializable {
         //LOGGER.info("END dbread");
         return contentmap;
     }
+
+    public Map<String, HashMap<String, ArrayList<HashMap<String, String>>>> dbread(CfDatasource cfdatasource, String catalog, String tablename, String sqlstatement) throws SQLException {
+        //LOGGER.info("START dbread");
+        HashMap<String, ArrayList<HashMap<String, String>>> dbtables = new HashMap<>();
+        JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
+        Connection con = jdbcutil.getConnection();
+        if (null != con) {
+            try {
+                String catalogname;
+                if (cfdatasource.getDriverclass().contains("oracle")) {     // Oracle driver
+                    catalogname = con.getSchema();
+                } else {                                                    // other drivers
+                    catalogname = con.getCatalog();
+                }
+                if (catalogname.compareToIgnoreCase(catalog) == 0) {
+                    Statement stmt = con.createStatement();
+                    ResultSet result = stmt.executeQuery(sqlstatement);
+                    ResultSetMetaData rmd = result.getMetaData();
+                    TableFieldStructure tfs = getTableFieldsList(rmd);
+                    ArrayList<HashMap<String, String>> tablevalues = new ArrayList<>();
+                    while (result.next()) {
+                        HashMap<String, String> dbexportvalues = new HashMap<>();
+                        tfs.getTableFieldsList().stream().forEach((tf) -> {
+                            try {
+                                String value = result.getString(tf.getName());
+                                dbexportvalues.put(tf.getName(), value);
+                            } catch (java.sql.SQLException ex) {
+                                LOGGER.warn(ex.getMessage());
+                            }
+                        });
+                        tablevalues.add(dbexportvalues);
+                    }
+                    dbtables.put(tablename, tablevalues);
+                }
+                contentmap.put("db", dbtables);
+                con.close();
+            } catch (SQLException ex1) {
+                LOGGER.error(ex1.getMessage());
+                con.close();
+            }
+            finally {
+                try {
+                    con.close();
+                }
+                catch (SQLException e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+        } else {
+            LOGGER.warn("Connection to database not established");
+        }
+        //LOGGER.info("END dbread");
+        return contentmap;
+    }
     
     public boolean dbexecute(String catalog, String sqlstatement) {
         boolean ok = false;
