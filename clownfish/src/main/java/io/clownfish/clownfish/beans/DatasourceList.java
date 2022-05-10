@@ -169,7 +169,7 @@ public class DatasourceList implements Serializable {
      
     public void onGenerateHTML() {
         if (null != selectedTable) {
-            databaseUtil.generateHTMLForm(selectedTable);
+            databaseUtil.generateHTMLForm(selectedDatasource, selectedTable);
         }
     }
     

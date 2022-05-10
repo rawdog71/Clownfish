@@ -82,14 +82,14 @@ public class RestDatabase {
 
                             ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
 
-                            HashMap<String, ArrayList> dbtables = new HashMap<>();
-                            HashMap<String, Object> dbvalues = new HashMap<>();
+                            ArrayList<HashMap> resultlist = new ArrayList<>();
+                            //HashMap<String, Object> dbvalues = new HashMap<>();
                             while(resultSetTables.next())
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
                                 //System.out.println(tablename);
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                                    manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), dbtables, dbvalues);
+                                    icp.setCount(manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), resultlist));
                                 }
                                 
                             }
@@ -100,13 +100,13 @@ public class RestDatabase {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
                                 //System.out.println(tablename);
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                                    manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), dbtables, dbvalues);
+                                    icp.setCount(manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), resultlist));
                                 }
                             }
 
-                            dbvalues.put("table", dbtables);
-                            dbexport.put(datasource.getDatabasename(), dbvalues);
-                            icp.setResult(dbexport);
+                            //dbvalues.put("table", dbtables);
+                            //dbexport.put(datasource.getDatabasename(), dbvalues);
+                            icp.setResult(resultlist);
                         } catch (SQLException ex) {
                             LOGGER.error(ex.getMessage());
                         }
@@ -292,9 +292,10 @@ public class RestDatabase {
         return ucp;
     }
     
-    private void manageTableRead(Connection con, DatabaseMetaData dmd, String tablename, DatatableProperties dtp, HashMap<String, String> attributmap, HashMap<String, ArrayList> dbtables, HashMap<String, Object> dbvalues) {
+    private long manageTableRead(Connection con, DatabaseMetaData dmd, String tablename, DatatableProperties dtp, HashMap<String, String> attributmap, ArrayList<HashMap> tablevalues) {
         Statement stmt = null;
         ResultSet result = null;
+        long count = -1;
         try {
             long low_limit = 1;
             long high_limit = 50;
@@ -489,7 +490,7 @@ public class RestDatabase {
             
             stmt = con.createStatement();
             result = stmt.executeQuery(sql_outer.toString());
-            ArrayList<HashMap> tablevalues = new ArrayList<>();
+            //ArrayList<HashMap> tablevalues = new ArrayList<>();
             while (result.next()) {
                 HashMap<String, String> dbexportvalues = new HashMap<>();
                 for (TableField tf : tfs.getTableFieldsList()) {
@@ -502,19 +503,21 @@ public class RestDatabase {
                 }
                 tablevalues.add(dbexportvalues);
             }
-            dbtables.put(tablename, tablevalues);
+            //dbtables.put(tablename, tablevalues);
             try {
                 result.close();
             } catch (SQLException ex) {
                 LOGGER.error(ex.getMessage());
             }
             result = stmt.executeQuery(sql_count.toString());
-            HashMap<String, String> dbexportvalues = new HashMap<>();
+            //HashMap<String, String> dbexportvalues = new HashMap<>();
+            
             while (result.next()) {
                 String value = result.getString("count");
-                dbexportvalues.put("count", value);
+                count = Long.parseLong(value);
+                //dbexportvalues.put("count", value);
             }
-            dbvalues.put(tablename, dbexportvalues);
+            //dbvalues.put(tablename, dbexportvalues);
         } catch (SQLException ex) {
             LOGGER.error(ex.getMessage());
         } finally {
@@ -533,6 +536,7 @@ public class RestDatabase {
                 }
             }
         }
+        return count;
     }
     
     private String getFieldType(ArrayList<TableField> tableFieldsList, String fieldname) {

@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.datamodels;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,10 +34,10 @@ public class RestDatabaseParameter {
     private @Getter @Setter String orderdir;
     private @Getter @Setter int pagination;
     private @Getter @Setter int page;
-    private @Getter @Setter int count;
+    private @Getter @Setter long count;
     private @Getter @Setter HashMap<String, String> conditionmap;
     private @Getter @Setter HashMap<String, String> updatemap;
-    private @Getter @Setter HashMap<String, HashMap> result;
+    private @Getter @Setter ArrayList<HashMap> result;
 
     public RestDatabaseParameter() {
         conditionmap = new HashMap<>();

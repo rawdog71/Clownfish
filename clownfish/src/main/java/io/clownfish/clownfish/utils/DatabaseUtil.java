@@ -722,7 +722,7 @@ public class DatabaseUtil {
         return null;
     }
     
-    public void generateHTMLForm(TableData tabledata) {
+    public void generateHTMLForm(CfDatasource datasource, TableData tabledata) {
         StringBuilder html = new StringBuilder();
         CfTemplate template = new CfTemplate();
         CfSite site = new CfSite();
@@ -737,11 +737,11 @@ public class DatabaseUtil {
                 script().withSrc("resources/js/angularjs_1_8_2.js"),
                 link().withHref("resources/css/bootstrap5.css").withRel("stylesheet"),
                 script().withSrc("resources/js/bootstrap5.js"),
-                script().withSrc("resources/js/User_Webform.js"),
+                script().withSrc("resources/js/User_WebformDB.js"),
                 script().withSrc("resources/js/axios.js"),
                 title("Webform")).renderFormatted()).append("\n");
 
-        html.append("<body ng-controller=\"WebformCtrl\">").append("\n");
+        html.append("<body ng-controller=\"WebformCtrl\" ng-init=\"init('").append(datasource.getName()).append("', '").append(tabledata.getName()).append("', 1, 50, ").append(makeFieldlist(tabledata.getColumns())).append(")\">").append("\n");
         html.append("\t").append(h1(tabledata.getName()).withId("classname").withClass("text-center mt-3")).append("\n");
         
         html.append("\t").append(("<div class=\"mx-5\">")).append("\n");
@@ -755,7 +755,6 @@ public class DatabaseUtil {
         html.append("\t\t").append(("<thead>")).append("\n");
         html.append("\t\t\t").append(("<tr>")).append("\n");
         html.append("\t\t\t\t").append("<th scope=\"col\">#</th>\n");
-        html.append("\t\t\t\t").append("<th scope=\"col\">Contentname</th>\n");
         
         for (ColumnData attr : tabledata.getColumns()) {
             if (0 == attr.getAutoinc().compareToIgnoreCase("yes")) {
@@ -770,13 +769,12 @@ public class DatabaseUtil {
         html.append("\t\t").append(("<tbody>")).append("\n");
         html.append("\t\t\t").append(("<tr ng-repeat=\"info in contentList track by $index\">")).append("\n");
         html.append("\t\t\t\t").append("<th scope=\"row\">{{$index}}</th>\n");
-        html.append("\t\t\t\t").append("<td> {{info.content.name}} </td>").append("\n");
         
         for (ColumnData attr : tabledata.getColumns()) {
             if (0 == attr.getAutoinc().compareToIgnoreCase("yes")) {
                 continue;
             }
-            html.append("\t\t\t\t").append("<td> {{info.keyvals[0][\"").append(attr.getName()).append("\"]}}").append("</td>\n");
+            html.append("\t\t\t\t").append("<td> {{info[\"").append(attr.getName()).append("\"]}}").append("</td>\n");
         }
         
         html.append("\t\t\t\t").append(("<td class=\"text-end\">")).append("\n");
@@ -967,5 +965,18 @@ public class DatabaseUtil {
             cfSiteService.create(site);
         }
         sitetree.loadTree();
+    }
+
+    private String makeFieldlist(ArrayList<ColumnData> columns) {
+        StringBuilder fieldlist = new StringBuilder();
+        fieldlist.append("{");
+        for (ColumnData attr : columns) {
+            fieldlist.append("'");
+            fieldlist.append(attr.getName());
+            fieldlist.append("' : '', ");
+        }
+        fieldlist.delete(fieldlist.length()-2, fieldlist.length());
+        fieldlist.append("}");
+        return fieldlist.toString();
     }
 }
