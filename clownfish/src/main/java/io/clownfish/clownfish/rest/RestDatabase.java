@@ -75,8 +75,6 @@ public class RestDatabase {
                             DatabaseMetaData dmd = con.getMetaData();
                             DatatableProperties datatableproperties = new DatatableProperties();
                             datatableproperties.setTablename(icp.getTablename());
-                            //datatableproperties.setOrderby(icp.getOrderby());
-                            //datatableproperties.setOrderdir(icp.getOrderdir());
                             datatableproperties.setPagination(icp.getPagination());
                             datatableproperties.setPage(icp.getPage());
 
@@ -126,7 +124,6 @@ public class RestDatabase {
     }
     
     private RestDatabaseParameter insertContent(RestDatabaseParameter icp) {
-        //HashMap<String, HashMap> dbexport = new HashMap<>();
         try {
             String token = icp.getToken();
             if (authtokenlist.checkValidToken(token)) {
@@ -142,8 +139,6 @@ public class RestDatabase {
                             DatatableProperties datatableproperties = new DatatableProperties();
                             datatableproperties.setTablename(icp.getTablename());
                             ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
-                            //HashMap<String, ArrayList> dbtables = new HashMap<>();
-                            //HashMap<String, Object> dbvalues = new HashMap<>();
                             while(resultSetTables.next())
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
@@ -152,9 +147,6 @@ public class RestDatabase {
                                     icp.setCount(count);
                                 }
                             }
-
-                            //dbvalues.put("table", dbtables);
-                            //dbexport.put(datasource.getDatabasename(), dbvalues);
                         } catch (SQLException ex) {
                             LOGGER.error(ex.getMessage());
                         }
@@ -1012,13 +1004,23 @@ public class RestDatabase {
                 order_builder.append(" ");
                 order_builder.append(default_direction);
             } else {
+                boolean added = false;
                 for (String key : ordermap.keySet()) {
-                    order_builder.append("[").append((String) key).append("]");
-                    order_builder.append(" ");
-                    order_builder.append(ordermap.get(key));
-                    order_builder.append(", ");
+                    if (!ordermap.get(key).isBlank()) {
+                        added = true;
+                        order_builder.append("[").append((String) key).append("]");
+                        order_builder.append(" ");
+                        order_builder.append(ordermap.get(key));
+                        order_builder.append(", ");
+                    }
                 }
-                order_builder.delete(order_builder.length()-2, order_builder.length());
+                if (added) {
+                    order_builder.delete(order_builder.length()-2, order_builder.length());
+                } else {
+                    order_builder.append("`").append(default_order).append("`");
+                    order_builder.append(" ");
+                    order_builder.append(default_direction);
+                }
             }
             order_builder.append(" ) AS rownumber FROM ");
                 
@@ -1029,13 +1031,23 @@ public class RestDatabase {
                 order_builder.append(" ");
                 order_builder.append(default_direction);
             } else {
+                boolean added = false;
                 for (String key : ordermap.keySet()) {
-                    order_builder.append("`").append((String) key).append("`");
-                    order_builder.append(" ");
-                    order_builder.append(ordermap.get(key));
-                    order_builder.append(", ");
+                    if (!ordermap.get(key).isBlank()) {
+                        added = true;
+                        order_builder.append("`").append((String) key).append("`");
+                        order_builder.append(" ");
+                        order_builder.append(ordermap.get(key));
+                        order_builder.append(", ");
+                    }
                 }
-                order_builder.delete(order_builder.length()-2, order_builder.length());
+                if (added) {
+                    order_builder.delete(order_builder.length()-2, order_builder.length());
+                } else {
+                    order_builder.append("`").append(default_order).append("`");
+                    order_builder.append(" ");
+                    order_builder.append(default_direction);
+                }
             }
         }
         return order_builder;

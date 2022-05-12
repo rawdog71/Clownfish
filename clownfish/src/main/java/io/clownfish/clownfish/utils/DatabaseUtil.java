@@ -741,7 +741,7 @@ public class DatabaseUtil {
                 script().withSrc("resources/js/axios.js"),
                 title("Webform")).renderFormatted()).append("\n");
 
-        html.append("<body ng-controller=\"WebformCtrl\" ng-init=\"init('").append(datasource.getName()).append("', '").append(tabledata.getName()).append("', 1, 50, ").append(makeFieldlist(tabledata.getColumns())).append(", ").append(makePKlist(tabledata.getColumns())).append(", ").append(makeFieldlist(tabledata.getColumns())).append(")\">").append("\n");
+        html.append("<body ng-controller=\"WebformCtrl\" ng-init=\"init('").append(datasource.getName()).append("', '").append(tabledata.getName()).append("', 1, 50, ").append(makeFieldlist(tabledata.getColumns())).append(", ").append(makePKlist(tabledata.getColumns())).append(", ").append(makeOrderlist(tabledata.getColumns())).append(")\">").append("\n");
         html.append("\t").append(h1(tabledata.getName()).withId("classname").withClass("text-center mt-3")).append("\n");
         
         html.append("\t").append(("<div class=\"mx-5\">")).append("\n");
@@ -989,6 +989,19 @@ public class DatabaseUtil {
                 fieldlist.append(attr.getName());
                 fieldlist.append("' : '', ");
             }
+        }
+        fieldlist.delete(fieldlist.length()-2, fieldlist.length());
+        fieldlist.append("}");
+        return fieldlist.toString();
+    }
+
+    private String makeOrderlist(ArrayList<ColumnData> columns) {
+        StringBuilder fieldlist = new StringBuilder();
+        fieldlist.append("{");
+        for (ColumnData attr : columns) {
+            fieldlist.append("'");
+            fieldlist.append(attr.getName());
+            fieldlist.append("' : '', ");
         }
         fieldlist.delete(fieldlist.length()-2, fieldlist.length());
         fieldlist.append("}");
