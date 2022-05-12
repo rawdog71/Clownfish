@@ -139,6 +139,7 @@ public class CfClassCompiler implements Runnable
                                         String className = file.getName().replaceFirst("[.][^.]+$", "");
                                         LOGGER.info("LOADING " + className + "...");
                                         classesList.add(cfclassLoader.loadClass("io.clownfish.java." + className));
+                                        Class.forName("io.clownfish.java." + className, true, cfclassLoader);
                                     }
                                     LOGGER.info(compileOut.toString());
                                     if (withMessage)
@@ -373,6 +374,7 @@ public class CfClassCompiler implements Runnable
                     compileOut.append("LOADING " + className + "...\n");
                     compileOut.flush();
                     classesList.add(cfclassLoader.loadClass("io.clownfish." + language.getName().toLowerCase() + "." + className));
+                    Class.forName("io.clownfish." + language.getName().toLowerCase() + "." + className, true, cfclassLoader);
                 }
             } catch (IOException | ClassNotFoundException ex) {
                 LOGGER.error(ex.getMessage());
