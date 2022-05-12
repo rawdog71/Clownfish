@@ -34,6 +34,7 @@ import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
 import org.primefaces.extensions.model.monacoeditor.ETheme;
 import org.primefaces.extensions.model.monacoeditor.EditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 @Named("javaCompiler")
 @Scope("singleton")
@@ -271,6 +272,8 @@ public class CfClassCompiler implements Runnable
             }
         }
         compileClasses(javas, withMessage);
+        AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
+        ctx.scan("io.clownfish.*");
     }
 
     public void createTempDir() throws IOException
