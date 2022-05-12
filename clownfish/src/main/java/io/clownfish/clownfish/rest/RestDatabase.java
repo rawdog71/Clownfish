@@ -298,7 +298,9 @@ public class RestDatabase {
             int sqlmode = 0;
             if (con.getMetaData().getDriverName().contains("MS SQL")) {
                 sqlmode = 1;
-                sql_outer.append("SELECT ");
+                sql_outer.append("SELECT TOP ");
+                sql_outer.append(high_limit);
+                sql_outer.append(" ");
                 sql_inner.append("SELECT ");
                 sql_count.append("SELECT COUNT(*) AS count FROM ");
                 
@@ -329,15 +331,7 @@ public class RestDatabase {
                 sql_count.append(tablename);
                 sql_outer.delete(sql_outer.length()-2, sql_outer.length());
                 sql_outer.append(" FROM (");
-                
-                sql_outer.append(makeOrderBy(ordermap, default_order, default_direction, sqlmode));
-                
-                sql_inner.append("ROW_NUMBER() OVER (ORDER BY ");
-                sql_inner.append(default_order);
-                sql_inner.append(" ");
-                sql_inner.append(default_direction);
-                sql_inner.append(" ) AS rownumber FROM ");
-                
+                sql_inner.append(makeOrderBy(ordermap, default_order, default_direction, sqlmode));
                 sql_inner.append(tablename);
                 StringBuilder sql_condition = null;
 
@@ -368,10 +362,8 @@ public class RestDatabase {
                 }
                 
                 sql_outer.append(sql_inner);
-                sql_outer.append(") orderedselection WHERE rownumber between ");
+                sql_outer.append(") dummy WHERE rownumber >= ");
                 sql_outer.append(low_limit);
-                sql_outer.append(" AND ");
-                sql_outer.append(high_limit);
                 if (null != sql_groupby) {
                     sql_outer.append(sql_groupby);
                 }
@@ -412,13 +404,6 @@ public class RestDatabase {
                 }
                 
                 sql_outer.append(makeOrderBy(ordermap, default_order, default_direction, sqlmode));
-                /*
-                sql_outer.append(" ORDER BY ");
-                sql_outer.append(default_order);
-                sql_outer.append(" ");
-                sql_outer.append(default_direction);
-                */
-                
                 StringBuilder sql_groupby = null;
                 /*
                 if (dtp != null) {
@@ -1017,7 +1002,7 @@ public class RestDatabase {
                 if (added) {
                     order_builder.delete(order_builder.length()-2, order_builder.length());
                 } else {
-                    order_builder.append("`").append(default_order).append("`");
+                    order_builder.append("[").append(default_order).append("]");
                     order_builder.append(" ");
                     order_builder.append(default_direction);
                 }
