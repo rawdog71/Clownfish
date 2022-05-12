@@ -75,8 +75,8 @@ public class RestDatabase {
                             DatabaseMetaData dmd = con.getMetaData();
                             DatatableProperties datatableproperties = new DatatableProperties();
                             datatableproperties.setTablename(icp.getTablename());
-                            datatableproperties.setOrderby(icp.getOrderby());
-                            datatableproperties.setOrderdir(icp.getOrderdir());
+                            //datatableproperties.setOrderby(icp.getOrderby());
+                            //datatableproperties.setOrderdir(icp.getOrderdir());
                             datatableproperties.setPagination(icp.getPagination());
                             datatableproperties.setPage(icp.getPage());
 
@@ -87,7 +87,7 @@ public class RestDatabase {
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                                    icp.setCount(manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), resultlist));
+                                    icp.setCount(manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), icp.getValuemap(), resultlist));
                                 }
                                 
                             }
@@ -96,7 +96,7 @@ public class RestDatabase {
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                                    icp.setCount(manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), resultlist));
+                                    icp.setCount(manageTableRead(con, dmd, tablename, datatableproperties, icp.getConditionmap(), icp.getValuemap(), resultlist));
                                 }
                             }
                             icp.setResult(resultlist);
@@ -148,7 +148,7 @@ public class RestDatabase {
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                                    int count = manageTableInsert(con, dmd, tablename, icp.getUpdatemap());
+                                    int count = manageTableInsert(con, dmd, tablename, icp.getValuemap());
                                     icp.setCount(count);
                                 }
                             }
@@ -248,7 +248,7 @@ public class RestDatabase {
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                                    int count = manageTableUpdate(con, dmd, tablename, ucp.getConditionmap(), ucp.getUpdatemap());
+                                    int count = manageTableUpdate(con, dmd, tablename, ucp.getConditionmap(), ucp.getValuemap());
                                     ucp.setCount(count);
                                 }
                             }
@@ -270,7 +270,7 @@ public class RestDatabase {
         return ucp;
     }
     
-    private long manageTableRead(Connection con, DatabaseMetaData dmd, String tablename, DatatableProperties dtp, HashMap<String, String> attributmap, ArrayList<HashMap> tablevalues) {
+    private long manageTableRead(Connection con, DatabaseMetaData dmd, String tablename, DatatableProperties dtp, HashMap<String, String[]> attributmap, HashMap<String, String> ordermap, ArrayList<HashMap> tablevalues) {
         Statement stmt = null;
         ResultSet result = null;
         long count = -1;
@@ -337,11 +337,15 @@ public class RestDatabase {
                 sql_count.append(tablename);
                 sql_outer.delete(sql_outer.length()-2, sql_outer.length());
                 sql_outer.append(" FROM (");
+                
+                sql_outer.append(makeOrderBy(ordermap, default_order, default_direction, sqlmode));
+                
                 sql_inner.append("ROW_NUMBER() OVER (ORDER BY ");
                 sql_inner.append(default_order);
                 sql_inner.append(" ");
                 sql_inner.append(default_direction);
                 sql_inner.append(" ) AS rownumber FROM ");
+                
                 sql_inner.append(tablename);
                 StringBuilder sql_condition = null;
 
@@ -415,10 +419,13 @@ public class RestDatabase {
                     sql_count.append(sql_condition);
                 }
                 
+                sql_outer.append(makeOrderBy(ordermap, default_order, default_direction, sqlmode));
+                /*
                 sql_outer.append(" ORDER BY ");
                 sql_outer.append(default_order);
                 sql_outer.append(" ");
                 sql_outer.append(default_direction);
+                */
                 
                 StringBuilder sql_groupby = null;
                 /*
@@ -512,7 +519,7 @@ public class RestDatabase {
         return null;
     }
     
-    private TableFieldStructure getTableFieldsList(DatabaseMetaData dmd, String tablename, String default_order, HashMap<String, String> attributmap) {
+    private TableFieldStructure getTableFieldsList(DatabaseMetaData dmd, String tablename, String default_order, HashMap<String, String[]> attributmap) {
         try {
             TableFieldStructure tfs = new TableFieldStructure();
             List<String> pkList = new ArrayList<>();
@@ -594,13 +601,96 @@ public class RestDatabase {
         }
     }
     
-    private StringBuilder buildCondition(HashMap<String, String> attributmap, ArrayList<TableField> tableFieldsList, int sqlmode) {
+    private TableFieldStructure getTableFieldsList2(DatabaseMetaData dmd, String tablename, String default_order, HashMap<String, String> attributmap) {
+        try {
+            TableFieldStructure tfs = new TableFieldStructure();
+            List<String> pkList = new ArrayList<>();
+            ResultSet resultSetPK = dmd.getPrimaryKeys(null, null, tablename);
+            int counter = 0;
+            while(resultSetPK.next())
+            {
+                pkList.add(resultSetPK.getString("COLUMN_NAME"));
+                if (counter == 0) {
+                    default_order = resultSetPK.getString("COLUMN_NAME");
+                }
+                counter++;
+            }
+            
+            ArrayList<TableField> tableFieldsList = new ArrayList<>();
+            ResultSet columns = dmd.getColumns(null, null, tablename, null);
+            while(columns.next())
+            {
+                String columnName = columns.getString("COLUMN_NAME");
+                if (attributmap.containsKey(columnName)) {
+                    String datatype = columns.getString("DATA_TYPE");
+                    String colomuntypename = columns.getString("TYPE_NAME");
+                    String columnsize = columns.getString("COLUMN_SIZE");
+                    String decimaldigits = columns.getString("DECIMAL_DIGITS");
+                    if (decimaldigits == null) {
+                        decimaldigits = "0";
+                    }
+                    String isNullable = columns.getString("IS_NULLABLE");
+                    //String is_autoIncrment = columns.getString("IS_AUTOINCREMENT");
+                    String is_autoIncrment = "";
+
+                    if ((default_order.isEmpty()) && (counter == 0)) {
+                        default_order = columnName;
+                    }
+                    TableField tf;
+                    switch (datatype) {
+                        case "1":      // varchar -> String
+                        case "12":
+                        case "2005":    
+                            tf = new TableField(columnName, "STRING", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                            tableFieldsList.add(tf);
+                            break;
+                        case "2":       // int
+                        case "4":
+                        case "5":    
+                            tf = new TableField(columnName, "INT", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                            tableFieldsList.add(tf);
+                            break;
+                        case "7":       // real
+                            tf = new TableField(columnName, "REAL", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                            tableFieldsList.add(tf);
+                            break;            
+                        case "8":       // float
+                            tf = new TableField(columnName, "FLOAT", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                            tableFieldsList.add(tf);
+                            break;    
+                        case "-5":      // long
+                            tf = new TableField(columnName, "LONG", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                            tableFieldsList.add(tf);
+                            break;
+                        case "-6":      // bit
+                        case "-7":      // bit
+                            tf = new TableField(columnName, "BOOLEAN", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                            tableFieldsList.add(tf);
+                            break;    
+                        case "93":      // Date
+                            tf = new TableField(columnName, "DATE", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                            tableFieldsList.add(tf);
+                            break;
+                    }
+                }
+            }
+            tfs.setDefault_order(default_order);
+            tfs.setTableFieldsList(tableFieldsList);
+            return tfs;
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getMessage());
+            return null;
+        }
+    }
+    
+    private StringBuilder buildCondition(HashMap<String, String[]> attributmap, ArrayList<TableField> tableFieldsList, int sqlmode) {
         StringBuilder sql_condition = new StringBuilder();
         if (!attributmap.isEmpty()) {
             sql_condition.append(" WHERE ");
             boolean added = false;
             for (Object key : attributmap.keySet().toArray()) {
-                if (!attributmap.get(key).isBlank()) {
+                String[] values = attributmap.get(key);
+                if ((values.length > 0) && (!values[0].isBlank())) {
                     added = true;
                     sql_condition.append("(");
                     if (0 == sqlmode) {
@@ -609,15 +699,7 @@ public class RestDatabase {
                         sql_condition.append("[").append((String) key).append("]");
                     }
                     String fieldType = getFieldType(tableFieldsList, (String) key);
-                    
-                    sql_condition.append(" = ");
-                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                        sql_condition.append("'");
-                    }
-                    sql_condition.append((String) attributmap.get(key));
-                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                        sql_condition.append("'");
-                    }
+                    sql_condition.append(buildWhere(values, fieldType));
                     sql_condition.append(") AND ");
                 }
             }
@@ -681,7 +763,7 @@ public class RestDatabase {
                 sqlmode = 0;
             }
             
-            TableFieldStructure tfs = getTableFieldsList(dmd, tablename, "", attributmap);
+            TableFieldStructure tfs = getTableFieldsList2(dmd, tablename, "", attributmap);
             StringBuilder sql_insert = new StringBuilder();
             sql_insert.append("INSERT INTO ");
             sql_insert.append(tablename);
@@ -727,7 +809,7 @@ public class RestDatabase {
         return count;
     }
     
-    private int manageTableDelete(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, String> attributmap) {
+    private int manageTableDelete(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, String[]> attributmap) {
         Statement stmt = null;
         int count = 0;
         try {
@@ -765,7 +847,7 @@ public class RestDatabase {
         return count;
     }
     
-    private int manageTableUpdate(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, String> attributmap, HashMap<String, String> updatemap) {
+    private int manageTableUpdate(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, String[]> attributmap, HashMap<String, String> updatemap) {
         Statement stmt = null;
         int count = 0;
         try {
@@ -775,7 +857,7 @@ public class RestDatabase {
             } else {
                 sqlmode = 0;
             }
-            TableFieldStructure tfs = getTableFieldsList(dmd, tablename, "", updatemap);
+            TableFieldStructure tfs = getTableFieldsList2(dmd, tablename, "", updatemap);
             StringBuilder sql_update = new StringBuilder();
             sql_update.append("UPDATE ");
             sql_update.append(tablename);
@@ -813,5 +895,149 @@ public class RestDatabase {
             }
         }
         return count;
+    }
+
+    private StringBuilder buildWhere(String[] values, String fieldType) {
+        StringBuilder sql_where = new StringBuilder();
+        String comparator = "";
+        String val1 = "";
+        String val2 = "";
+        
+        switch (values.length) {
+            case 1:
+                comparator = "=";
+                val1 = values[0];
+                break;
+            case 2:
+                comparator = values[0];
+                val1 = values[1];
+                break;
+            case 3:
+                comparator = values[0];
+                val1 = values[1];
+                val2 = values[2];
+                break;
+            default:
+                comparator = "";
+        }
+        
+        switch (comparator) {
+            case "eq":
+                comparator = "=";
+                break;
+            case "gt":
+                comparator = ">";
+                break;
+            case "lt":
+                comparator = "<";
+                break;
+            case "ge":
+                comparator = ">=";
+                break;
+            case "le":
+                comparator = "<=";
+                break;
+            case "ne":
+                comparator = "<>";
+                break;
+            case "lk":
+                comparator = "like";
+                break;
+            case "bt":
+                comparator = "between";
+                break;
+        }
+        
+        switch (comparator) {
+            case "=":
+            case ">":
+            case "<":
+            case ">=":
+            case "<=":
+            case "<>":
+            case "like":
+                sql_where.append(" ");
+                sql_where.append(comparator);
+                sql_where.append(" ");
+                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                    sql_where.append("'");
+                }
+                if (0 == comparator.compareToIgnoreCase("like")) {
+                    sql_where.append("%").append(val1).append("%");
+                } else {
+                    sql_where.append(val1);
+                }
+                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                    sql_where.append("'");
+                }
+                break;
+            case "between":
+                sql_where.append(" ");
+                sql_where.append(comparator);
+                sql_where.append(" ");
+                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                    sql_where.append("'");
+                }
+                if (0 == comparator.compareToIgnoreCase("like")) {
+                    sql_where.append("%").append(val1).append("%");
+                } else {
+                    sql_where.append(val1);
+                }
+                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                    sql_where.append("'");
+                }
+                sql_where.append(" AND ");
+                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                    sql_where.append("'");
+                }
+                if (0 == comparator.compareToIgnoreCase("like")) {
+                    sql_where.append("%").append(val2).append("%");
+                } else {
+                    sql_where.append(val2);
+                }
+                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                    sql_where.append("'");
+                }
+                break;
+        }
+        return sql_where;
+    }
+
+    private StringBuilder makeOrderBy(HashMap<String, String> ordermap, String default_order, String default_direction, int sqlmode) {
+        StringBuilder order_builder = new StringBuilder();
+        if (1 == sqlmode) {
+            order_builder.append("ROW_NUMBER() OVER (ORDER BY ");
+            if (ordermap.isEmpty()) {
+                order_builder.append("[").append(default_order).append("]");
+                order_builder.append(" ");
+                order_builder.append(default_direction);
+            } else {
+                for (String key : ordermap.keySet()) {
+                    order_builder.append("[").append((String) key).append("]");
+                    order_builder.append(" ");
+                    order_builder.append(ordermap.get(key));
+                    order_builder.append(", ");
+                }
+                order_builder.delete(order_builder.length()-2, order_builder.length());
+            }
+            order_builder.append(" ) AS rownumber FROM ");
+                
+        } else {
+            order_builder.append(" ORDER BY ");
+            if (ordermap.isEmpty()) {
+                order_builder.append("`").append(default_order).append("`");
+                order_builder.append(" ");
+                order_builder.append(default_direction);
+            } else {
+                for (String key : ordermap.keySet()) {
+                    order_builder.append("`").append((String) key).append("`");
+                    order_builder.append(" ");
+                    order_builder.append(ordermap.get(key));
+                    order_builder.append(", ");
+                }
+                order_builder.delete(order_builder.length()-2, order_builder.length());
+            }
+        }
+        return order_builder;
     }
 }

@@ -9,13 +9,14 @@ webform.controller('WebformCtrl', function($scope, $http) {
     $scope.libNames = [];
     $scope.changedPw = false;
     
-    $scope.init = function(datasourcename, tablename, page, limit, attributlist, pklist) {
+    $scope.init = function(datasourcename, tablename, page, limit, attributlist, pklist, orderlist) {
         $scope.datasourcename = datasourcename;
         $scope.tablename = tablename;
         $scope.page = page;
         $scope.limit = limit;
         $scope.attributlist = attributlist;
         $scope.primarykeylist = pklist;
+        $scope.orderlist = orderlist;
         $scope.getList();
     };
 
@@ -24,7 +25,7 @@ webform.controller('WebformCtrl', function($scope, $http) {
             apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
             datasource: $scope.datasourcename,
             tablename: $scope.tablename,
-            updatemap: $scope.getInputInformation('forms')
+            valuemap: $scope.getInputInformation('forms')
         };
 
         axios.post('/insertdb',
@@ -45,7 +46,7 @@ webform.controller('WebformCtrl', function($scope, $http) {
             apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
             datasource: $scope.datasourcename,
             tablename: $scope.tablename,
-            updatemap: $scope.getInputInformation('forms2'),
+            valuemap: $scope.getInputInformation('forms2'),
             conditionmap: $scope.getInputInformation('forms2')
         };
 
@@ -108,7 +109,8 @@ webform.controller('WebformCtrl', function($scope, $http) {
                 page: $scope.page,
                 pagination: $scope.limit,
                 tablename: $scope.tablename,
-                conditionmap: $scope.attributlist
+                conditionmap: $scope.attributlist,
+                valuemap: $scope.orderlist
             }
         };
 

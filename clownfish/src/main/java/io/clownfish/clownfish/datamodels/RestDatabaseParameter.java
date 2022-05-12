@@ -30,17 +30,15 @@ public class RestDatabaseParameter {
     private @Getter @Setter String token;
     private @Getter @Setter String datasource;
     private @Getter @Setter String tablename;
-    private @Getter @Setter String orderby;
-    private @Getter @Setter String orderdir;
     private @Getter @Setter int pagination;
     private @Getter @Setter int page;
     private @Getter @Setter long count;
-    private @Getter @Setter HashMap<String, String> conditionmap;
-    private @Getter @Setter HashMap<String, String> updatemap;
+    private @Getter @Setter HashMap<String, String[]> conditionmap;
+    private @Getter @Setter HashMap<String, String> valuemap;
     private @Getter @Setter ArrayList<HashMap> result;
 
     public RestDatabaseParameter() {
         conditionmap = new HashMap<>();
-        updatemap = new HashMap<>();
+        valuemap = new HashMap<>();
     }
 }
