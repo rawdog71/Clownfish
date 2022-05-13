@@ -648,12 +648,17 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "string":
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(input().withType("text").withId(attr.getName()).withClass("form-control")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
+                    break;
                 case "text":
                 case "htmltext":
                 case "markdown":
                     html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t\t\t\t\t\t").append(input().withType("text").withId(attr.getName()).withClass("form-control")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(textarea().withId(attr.getName()).withClass("form-control")).append("\n");
                     html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "hashstring":
@@ -737,12 +742,17 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "string":
+                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t").append(input().withType("text").withId(attr.getName()).withClass("form-control").withValue("{{info['" + attr.getName() + "']}}")).append("\n");
+                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    break;
                 case "text":
                 case "htmltext":
                 case "markdown":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t").append(input().withType("text").withId(attr.getName()).withClass("form-control").withValue("{{info['" + attr.getName() + "']}}")).append("\n");
+                    html.append("\t\t").append(textarea().withId(attr.getName()).withClass("form-control").withText("{{info['" + attr.getName() + "']}}")).append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "hashstring":
