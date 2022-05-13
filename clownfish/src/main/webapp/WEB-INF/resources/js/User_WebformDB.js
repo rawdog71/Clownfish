@@ -10,12 +10,14 @@ webform.controller('WebformCtrl', function($scope, $http) {
     $scope.changedPw = false;
     
     $scope.init = function(datasourcename, tablename, page, limit, attributlist, pklist, orderlist) {
+        $scope.attributlistinit = attributlist;
+        
         $scope.datasourcename = datasourcename;
         $scope.tablename = tablename;
         $scope.page = page;
         $scope.limit = limit;
         $scope.attributlist = attributlist;
-        $scope.primarykeylist = pklist;
+        $scope.pklist = pklist;
         $scope.orderlist = orderlist;
         $scope.getList();
     };
@@ -41,19 +43,20 @@ webform.controller('WebformCtrl', function($scope, $http) {
 
     //Update Content
     $scope.update = (id) => {
-        console.log("UPD: " + id);
         var attributmap = {
             apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
             datasource: $scope.datasourcename,
             tablename: $scope.tablename,
             valuemap: $scope.getInputInformation('forms2'),
-            conditionmap: $scope.getInputInformation('forms2')
+            conditionmap: $scope.attributlist
         };
+        //console.log("UPD: " + attributmap);
 
         axios.post('/updatedb',
                 attributmap
             )
             .then(function(response) {
+                $scope.attributlist = $scope.attributlistinit;
                 $scope.getList();
             })
             .catch(function(error) {
@@ -77,6 +80,14 @@ webform.controller('WebformCtrl', function($scope, $http) {
     //Delete content
     $scope.deleteI = (id) => {
         console.log(id);
+        var x = $scope.contentList[id];
+        $scope.attributlist = $scope.pklist;
+        for (var key in $scope.pklist) {
+            var liste = [];
+            liste.push(x[key]);
+            $scope.attributlist[key] = liste;
+        }
+        
         var attributmap = {
             apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
             datasource: $scope.datasourcename,
@@ -88,6 +99,7 @@ webform.controller('WebformCtrl', function($scope, $http) {
                 attributmap
             )
             .then(function(response) {
+                $scope.attributlist = $scope.attributlistinit;
                 $scope.getList();
             })
             .catch(function(error) {
@@ -128,10 +140,21 @@ webform.controller('WebformCtrl', function($scope, $http) {
 
     $scope.edit = (id) => {
         $scope.recordEdit = [];
-        console.log($scope);
         var x = $scope.contentList[id];
-        x.id = id;
         $scope.recordEdit.push(x);
+        $scope.attributlist = $scope.pklist;
+        for (var key in $scope.pklist) {
+            var liste = [];
+            liste.push(x[key]);
+            $scope.attributlist[key] = liste;
+        }
+    };
+    
+    $scope.delete = (id) => {
+        $scope.recordDelete = $scope.contentList[id];
+        console.log($scope.recordDelete);
+        console.log($scope.primarykeylist);
+        $scope.attributlist = [];
     };
 
     $scope.formatDate = (dateToFormat, action) => {
