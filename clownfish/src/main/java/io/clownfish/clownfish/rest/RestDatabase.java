@@ -533,7 +533,8 @@ public class RestDatabase {
                     }
                     TableField tf;
                     switch (datatype) {
-                        case "1":      // varchar -> String
+                        case "-1":      // varchar -> String
+                        case "1":
                         case "12":
                         case "2005":    
                             tf = new TableField(columnName, "STRING", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
@@ -615,7 +616,8 @@ public class RestDatabase {
                     }
                     TableField tf;
                     switch (datatype) {
-                        case "1":      // varchar -> String
+                        case "-1":      // varchar -> String
+                        case "1":
                         case "12":
                         case "2005":    
                             tf = new TableField(columnName, "STRING", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);

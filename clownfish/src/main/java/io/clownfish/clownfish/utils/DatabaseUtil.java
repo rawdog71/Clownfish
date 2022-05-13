@@ -43,6 +43,7 @@ import static j2html.TagCreator.link;
 import static j2html.TagCreator.meta;
 import static j2html.TagCreator.script;
 import static j2html.TagCreator.title;
+import static j2html.TagCreator.textarea;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -828,6 +829,11 @@ public class DatabaseUtil {
                     html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case -1:
+                    html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t\t\t\t\t\t").append(textarea().withId(attr.getName()).withClass("form-control")).append("\n");
+                    html.append("\t\t\t\t\t\t").append(("</div>")).append("\n");
+                    break;
                 case 1:
                 case 12:
                 case 2005:
@@ -889,6 +895,11 @@ public class DatabaseUtil {
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case -1:
+                    html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
+                    html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
+                    html.append("\t\t").append(textarea().withId(attr.getName()).withClass("form-control").withText("{{info['" + attr.getName() + "']}}")).append("\n");
+                    html.append("\t\t\t\t").append(("</div>")).append("\n");
+                    break;
                 case 1:
                 case 12:
                 case 2005:
