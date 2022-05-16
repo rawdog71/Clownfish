@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 sulzbachr.
+ * Copyright 2022 SulzbachR.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,14 @@
  */
 package io.clownfish.clownfish.datamodels;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  *
- * @author sulzbachr
+ * @author SulzbachR
  */
-public class RestDatabaseParameter {
-    private @Getter @Setter String returncode;
-    private @Getter @Setter String apikey;
-    private @Getter @Setter String token;
-    private @Getter @Setter String datasource;
-    private @Getter @Setter String tablename;
-    private @Getter @Setter int pagination;
-    private @Getter @Setter int page;
+public class RestDatabaseInsert {
     private @Getter @Setter long count;
     private @Getter @Setter long generatedid;
-    private @Getter @Setter HashMap<String, String[]> conditionmap;
-    private @Getter @Setter HashMap<String, String> valuemap;
-    private @Getter @Setter ArrayList<HashMap> result;
-
-    public RestDatabaseParameter() {
-        conditionmap = new HashMap<>();
-        valuemap = new HashMap<>();
-    }
 }

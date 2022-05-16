@@ -17,6 +17,7 @@ package io.clownfish.clownfish.rest;
 
 import com.google.gson.Gson;
 import io.clownfish.clownfish.datamodels.AuthTokenList;
+import io.clownfish.clownfish.datamodels.RestDatabaseInsert;
 import io.clownfish.clownfish.datamodels.RestDatabaseParameter;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,8 +145,9 @@ public class RestDatabase {
                             {
                                 String tablename = resultSetTables.getString("TABLE_NAME");
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                                    int count = manageTableInsert(con, dmd, tablename, icp.getValuemap());
-                                    icp.setCount(count);
+                                    RestDatabaseInsert rdbi = manageTableInsert(con, dmd, tablename, icp.getValuemap());
+                                    icp.setCount(rdbi.getCount());
+                                    icp.setGeneratedid(rdbi.getGeneratedid());
                                 }
                             }
                         } catch (SQLException ex) {
@@ -712,7 +715,8 @@ public class RestDatabase {
                     if (0 == fieldType.compareToIgnoreCase("date")) {
                         String pattern = "dd.MM.yyyy HH:mm:ss";
                         DateTime dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                        sql_set.append(dt.toString());
+                        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+                        sql_set.append(dt.toString(dtf));
                     } else {
                         sql_set.append((String) attributmap.get(key));
                     }
@@ -731,8 +735,9 @@ public class RestDatabase {
         return sql_set;
     }
     
-    private int manageTableInsert(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, String> attributmap) {
+    private RestDatabaseInsert manageTableInsert(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, String> attributmap) {
         Statement stmt = null;
+        RestDatabaseInsert rdbi = new RestDatabaseInsert();
         int count = 0;
         try {
             int sqlmode = 0;
@@ -761,7 +766,8 @@ public class RestDatabase {
                     if (0 == tf.getType().compareToIgnoreCase("date")) {
                         String pattern = "dd.MM.yyyy HH:mm:ss";
                         DateTime dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
-                        sql_insert.append("'").append(dt.toString()).append("', ");
+                        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+                        sql_insert.append("'").append(dt.toString(dtf)).append("', ");
                     } else {
                         sql_insert.append("'").append(attributmap.get((String) tf.getName())).append("', ");
                     }
@@ -774,6 +780,15 @@ public class RestDatabase {
             
             stmt = con.createStatement();
             count = stmt.executeUpdate(sql_insert.toString());
+            rdbi.setCount(count);
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    rdbi.setGeneratedid(generatedKeys.getLong(1));
+                }
+                else {
+                    throw new SQLException("Creating user failed, no ID obtained.");
+                }
+            }
         } catch (SQLException ex) {
             LOGGER.error(ex.getMessage());
         } finally {
@@ -785,7 +800,7 @@ public class RestDatabase {
                 }
             }
         }
-        return count;
+        return rdbi;
     }
     
     private int manageTableDelete(Connection con, DatabaseMetaData dmd, String tablename, HashMap<String, String[]> attributmap) {
