@@ -714,7 +714,13 @@ public class RestDatabase {
                     }
                     if (0 == fieldType.compareToIgnoreCase("date")) {
                         String pattern = "dd.MM.yyyy HH:mm:ss";
-                        DateTime dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                        DateTime dt = null;
+                        try {
+                            dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                        } catch (Exception ex) {
+                            pattern = "yyyy-MM-dd HH:mm:ss";
+                            dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                        }
                         DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
                         sql_set.append(dt.toString(dtf));
                     } else {
@@ -765,7 +771,13 @@ public class RestDatabase {
                 if ((0 == tf.getType().compareToIgnoreCase("string")) || (0 == tf.getType().compareToIgnoreCase("date"))) {
                     if (0 == tf.getType().compareToIgnoreCase("date")) {
                         String pattern = "dd.MM.yyyy HH:mm:ss";
-                        DateTime dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
+                        DateTime dt = null;
+                        try {
+                            dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
+                        } catch (Exception ex) {
+                            pattern = "yyyy-MM-dd HH:mm:ss";
+                            dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
+                        }
                         DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
                         sql_insert.append("'").append(dt.toString(dtf)).append("', ");
                     } else {
@@ -779,7 +791,7 @@ public class RestDatabase {
             sql_insert.append(" )");
             
             stmt = con.createStatement();
-            count = stmt.executeUpdate(sql_insert.toString());
+            count = stmt.executeUpdate(sql_insert.toString(), Statement.RETURN_GENERATED_KEYS);
             rdbi.setCount(count);
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
