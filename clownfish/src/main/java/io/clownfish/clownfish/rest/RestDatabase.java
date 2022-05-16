@@ -148,6 +148,7 @@ public class RestDatabase {
                                     RestDatabaseInsert rdbi = manageTableInsert(con, dmd, tablename, icp.getValuemap());
                                     icp.setCount(rdbi.getCount());
                                     icp.setGeneratedid(rdbi.getGeneratedid());
+                                    icp.setReturncode("OK");
                                 }
                             }
                         } catch (SQLException ex) {
@@ -197,6 +198,7 @@ public class RestDatabase {
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
                                     int count = manageTableDelete(con, dmd, tablename, ucp.getConditionmap());
                                     ucp.setCount(count);
+                                    ucp.setReturncode("OK");
                                 }
                             }
                         } catch (SQLException ex) {
@@ -245,6 +247,7 @@ public class RestDatabase {
                                 if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
                                     int count = manageTableUpdate(con, dmd, tablename, ucp.getConditionmap(), ucp.getValuemap());
                                     ucp.setCount(count);
+                                    ucp.setReturncode("OK");
                                 }
                             }
                         } catch (SQLException ex) {
