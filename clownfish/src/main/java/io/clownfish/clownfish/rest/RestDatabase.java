@@ -338,7 +338,7 @@ public class RestDatabase {
                 sql_count.append(tablename);
                 sql_outer.delete(sql_outer.length()-2, sql_outer.length());
                 sql_outer.append(" FROM (");
-                sql_inner.append(makeOrderBy(ordermap, default_order, default_direction, sqlmode));
+                sql_inner.append(makeOrderBy(ordermap, default_order, default_direction, sqlmode, true));
                 sql_inner.append(tablename);
                 StringBuilder sql_condition = null;
 
@@ -374,6 +374,7 @@ public class RestDatabase {
                 if (null != sql_groupby) {
                     sql_outer.append(sql_groupby);
                 }
+                sql_outer.append(makeOrderBy(ordermap, default_order, default_direction, sqlmode, false));
             } 
             if (con.getMetaData().getDriverName().contains("MySQL")) {
                 sqlmode = 0;
@@ -410,7 +411,7 @@ public class RestDatabase {
                     sql_count.append(sql_condition);
                 }
                 
-                sql_outer.append(makeOrderBy(ordermap, default_order, default_direction, sqlmode));
+                sql_outer.append(makeOrderBy(ordermap, default_order, default_direction, sqlmode, false));
                 StringBuilder sql_groupby = null;
                 /*
                 if (dtp != null) {
@@ -1013,10 +1014,14 @@ public class RestDatabase {
         return sql_where;
     }
 
-    private StringBuilder makeOrderBy(HashMap<String, String> ordermap, String default_order, String default_direction, int sqlmode) {
+    private StringBuilder makeOrderBy(HashMap<String, String> ordermap, String default_order, String default_direction, int sqlmode, boolean inner) {
         StringBuilder order_builder = new StringBuilder();
         if (1 == sqlmode) {
-            order_builder.append("ROW_NUMBER() OVER (ORDER BY ");
+            if (inner) {
+                order_builder.append("ROW_NUMBER() OVER (ORDER BY ");
+            } else {
+                order_builder.append(" ORDER BY ");
+            }
             if (ordermap.isEmpty()) {
                 order_builder.append("[").append(default_order).append("]");
                 order_builder.append(" ");
@@ -1040,8 +1045,9 @@ public class RestDatabase {
                     order_builder.append(default_direction);
                 }
             }
-            order_builder.append(" ) AS rownumber FROM ");
-                
+            if (inner) {
+                order_builder.append(" ) AS rownumber FROM ");
+            }
         } else {
             order_builder.append(" ORDER BY ");
             if (ordermap.isEmpty()) {
