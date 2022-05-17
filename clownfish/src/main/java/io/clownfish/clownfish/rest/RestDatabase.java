@@ -100,6 +100,7 @@ public class RestDatabase {
                                 }
                             }
                             icp.setResult(resultlist);
+                            icp.setReturncode("OK");
                         } catch (SQLException ex) {
                             LOGGER.error(ex.getMessage());
                         }
