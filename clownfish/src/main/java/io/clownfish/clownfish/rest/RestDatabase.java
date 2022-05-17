@@ -676,7 +676,7 @@ public class RestDatabase {
             boolean added = false;
             for (Object key : attributmap.keySet().toArray()) {
                 String[] values = attributmap.get(key);
-                if ((values.length > 0) && (!values[0].isBlank())) {
+                if ((null != values) && (values.length > 0) && (!values[0].isBlank())) {
                     added = true;
                     sql_condition.append("(");
                     if (0 == sqlmode) {
