@@ -496,14 +496,24 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.2.2</version>
-                <configuration>
+		<configuration>
+		    <classifier>classes</classifier>
                     <archive>                   
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
-                </configuration>
+	        </configuration>
+            	<executions>
+		    <execution>
+		    	<id>package-jar</id>
+		    	<phase>package</phase>
+		    	<goals>
+		            <goal>jar</goal>
+		    	</goals>
+			</execution>
+	    	</executions>
             </plugin>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
