@@ -823,6 +823,7 @@ public class DatabaseUtil {
             }
             switch (attr.getType()) {
                 case -6:
+                case -7:
                     html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(attr.getName()).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t").append(input().withType("checkbox").withId(attr.getName())).append("\n");
@@ -847,6 +848,7 @@ public class DatabaseUtil {
                 case 5:
                 case 7:
                 case 8:
+                case -5:
                     html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t\t\t\t\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control"));
@@ -889,6 +891,7 @@ public class DatabaseUtil {
             
             switch (attr.getType()) {
                 case -6:
+                case -7:
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(attr.getName()).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t\t\t").append(("<input type=\"checkbox\" id=\"" + attr.getName() + "\" ng-checked=\"{{info['" + attr.getName() + "']}}\">")).append("\n");
@@ -913,6 +916,7 @@ public class DatabaseUtil {
                 case 5:
                 case 7:
                 case 8:
+                case -5:
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t").append(input().withType("number").withId(attr.getName()).withClass("form-control").withValue("{{info['" + attr.getName() + "']}}"));
