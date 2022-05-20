@@ -704,38 +704,38 @@ public class RestDatabase {
         if (!attributmap.isEmpty()) {
             boolean added = false;
             for (Object key : attributmap.keySet().toArray()) {
-                if (!attributmap.get(key).isBlank()) {
-                    added = true;
-                    if (0 == sqlmode) {
-                        sql_set.append("`").append((String) key).append("`");
-                    } else {
-                        sql_set.append("[").append((String) key).append("]");
-                    }
-                    String fieldType = getFieldType(tableFieldsList, (String) key);
-                    
-                    sql_set.append(" = ");
-                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                        sql_set.append("'");
-                    }
-                    if (0 == fieldType.compareToIgnoreCase("date")) {
-                        String pattern = "dd.MM.yyyy HH:mm:ss";
-                        DateTime dt = null;
-                        try {
-                            dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                        } catch (Exception ex) {
-                            pattern = "yyyy-MM-dd HH:mm:ss";
-                            dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                        }
-                        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-                        sql_set.append(dt.toString(dtf));
-                    } else {
-                        sql_set.append((String) attributmap.get(key));
-                    }
-                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                        sql_set.append("'");
-                    }
-                    sql_set.append(", ");
+                //if (!attributmap.get(key).isBlank()) {
+                added = true;
+                if (0 == sqlmode) {
+                    sql_set.append("`").append((String) key).append("`");
+                } else {
+                    sql_set.append("[").append((String) key).append("]");
                 }
+                String fieldType = getFieldType(tableFieldsList, (String) key);
+
+                sql_set.append(" = ");
+                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                    sql_set.append("'");
+                }
+                if (0 == fieldType.compareToIgnoreCase("date")) {
+                    String pattern = "dd.MM.yyyy HH:mm:ss";
+                    DateTime dt = null;
+                    try {
+                        dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                    } catch (Exception ex) {
+                        pattern = "yyyy-MM-dd HH:mm:ss";
+                        dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                    }
+                    DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+                    sql_set.append(dt.toString(dtf));
+                } else {
+                    sql_set.append((String) attributmap.get(key));
+                }
+                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                    sql_set.append("'");
+                }
+                sql_set.append(", ");
+                //}
             }
             if (added) {
                 sql_set.delete(sql_set.length()-2, sql_set.length());
