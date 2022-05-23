@@ -101,8 +101,17 @@ public class RestDatabase {
                             }
                             icp.setResult(resultlist);
                             icp.setReturncode("OK");
+                            con.close();
                         } catch (SQLException ex) {
                             LOGGER.error(ex.getMessage());
+                        }
+                        finally {
+                            try {
+                                con.close();
+                            }
+                            catch (SQLException e) {
+                                LOGGER.error(e.getMessage());
+                            }
                         }
                     } else {
                         return null;
@@ -152,8 +161,17 @@ public class RestDatabase {
                                     icp.setReturncode("OK");
                                 }
                             }
+                            con.close();
                         } catch (SQLException ex) {
                             LOGGER.error(ex.getMessage());
+                        }
+                        finally {
+                            try {
+                                con.close();
+                            }
+                            catch (SQLException e) {
+                                LOGGER.error(e.getMessage());
+                            }
                         }
                     } else {
                         return null;
@@ -202,8 +220,17 @@ public class RestDatabase {
                                     ucp.setReturncode("OK");
                                 }
                             }
+                            con.close();
                         } catch (SQLException ex) {
                             LOGGER.error(ex.getMessage());
+                        }
+                        finally {
+                            try {
+                                con.close();
+                            }
+                            catch (SQLException e) {
+                                LOGGER.error(e.getMessage());
+                            }
                         }
                     } else {
                         return null;
@@ -251,8 +278,17 @@ public class RestDatabase {
                                     ucp.setReturncode("OK");
                                 }
                             }
+                            con.close();
                         } catch (SQLException ex) {
                             LOGGER.error(ex.getMessage());
+                        }
+                        finally {
+                            try {
+                                con.close();
+                            }
+                            catch (SQLException e) {
+                                LOGGER.error(e.getMessage());
+                            }
                         }
                     } else {
                         return null;
