@@ -30,8 +30,8 @@ public class RestDatabaseParameter {
     private @Getter @Setter String token;
     private @Getter @Setter String datasource;
     private @Getter @Setter String tablename;
-    private @Getter @Setter int pagination;
-    private @Getter @Setter int page;
+    private @Getter @Setter long pagination;
+    private @Getter @Setter long page;
     private @Getter @Setter long count;
     private @Getter @Setter long generatedid;
     private @Getter @Setter HashMap<String, String[]> conditionmap;
