@@ -27,8 +27,8 @@ public class DatatableProperties {
     private @Getter @Setter String tablename;
     private @Getter @Setter String orderby;
     private @Getter @Setter String orderdir;
-    private @Getter @Setter int pagination;
-    private @Getter @Setter int page;
+    private @Getter @Setter long pagination;
+    private @Getter @Setter long page;
     private @Getter @Setter ArrayList<DatatableCondition> conditionlist;
     private @Getter @Setter ArrayList<String> groupbylist;
     private @Getter @Setter String groupbycount;
