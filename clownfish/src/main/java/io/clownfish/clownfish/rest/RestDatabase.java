@@ -751,26 +751,37 @@ public class RestDatabase {
 
                 sql_set.append(" = ");
                 if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                    sql_set.append("'");
-                }
-                if (0 == fieldType.compareToIgnoreCase("date")) {
-                    String pattern = "dd.MM.yyyy HH:mm:ss";
-                    DateTime dt = null;
-                    try {
-                        dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                    } catch (Exception ex) {
-                        pattern = "yyyy-MM-dd HH:mm:ss";
-                        dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                    if (0 == fieldType.compareToIgnoreCase("date")) {
+                        String pattern = "dd.MM.yyyy HH:mm:ss";
+                        DateTime dt = null;
+                        try {
+                            dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                        } catch (Exception ex) {
+                            try {
+                                pattern = "yyyy-MM-dd HH:mm:ss";
+                                dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                            } catch (Exception ex1) {
+
+                            }
+                        }
+                        if (null != dt) {
+                            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+                            sql_set.append("'").append(dt.toString(dtf)).append("'");
+                        } else {
+                            sql_set.append(dt);
+                        }
+                    } else {
+                        if (null != (String) attributmap.get(key)) {
+                            sql_set.append("'").append((String) attributmap.get(key)).append("'");
+                        } else {
+                            sql_set.append((String) attributmap.get(key));
+                        }
                     }
-                    DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-                    sql_set.append(dt.toString(dtf));
+                    sql_set.append(", ");
                 } else {
                     sql_set.append((String) attributmap.get(key));
+                    sql_set.append(", ");
                 }
-                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                    sql_set.append("'");
-                }
-                sql_set.append(", ");
                 //}
             }
             if (added) {
@@ -816,13 +827,25 @@ public class RestDatabase {
                         try {
                             dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
                         } catch (Exception ex) {
-                            pattern = "yyyy-MM-dd HH:mm:ss";
-                            dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
+                            try {
+                                pattern = "yyyy-MM-dd HH:mm:ss";
+                                dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
+                            } catch (Exception ex1) {
+                                
+                            }
                         }
-                        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-                        sql_insert.append("'").append(dt.toString(dtf)).append("', ");
+                        if (null != dt) {
+                            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+                            sql_insert.append("'").append(dt.toString(dtf)).append("', ");
+                        } else {
+                            sql_insert.append(dt).append(", ");
+                        }
                     } else {
-                        sql_insert.append("'").append(attributmap.get((String) tf.getName())).append("', ");
+                        if (null != attributmap.get((String) tf.getName())) {
+                            sql_insert.append("'").append(attributmap.get((String) tf.getName())).append("', ");
+                        } else {
+                            sql_insert.append(attributmap.get((String) tf.getName())).append(", ");
+                        }
                     }
                 } else {
                     sql_insert.append(attributmap.get((String) tf.getName())).append(", ");
