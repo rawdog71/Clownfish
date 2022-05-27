@@ -95,8 +95,8 @@ public class ClassPathUtil implements Serializable {
                 try
                 {
                     Class<?> c = cfclassLoader.loadClass(className);
-                    System.out.println(c.getCanonicalName() + ": Class loader " + c.getClassLoader());
-                    System.out.println(c.getCanonicalName() + " package: " + c.getPackageName());
+                    //System.out.println(c.getCanonicalName() + ": Class loader " + c.getClassLoader());
+                    //System.out.println(c.getCanonicalName() + " package: " + c.getPackageName());
 
                     class_set.add(c);
                 }

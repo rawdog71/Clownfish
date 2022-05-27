@@ -88,6 +88,7 @@ public class CfClassCompiler implements Runnable
 
     public ArrayList<Class<?>> compileClasses(ArrayList<File> srcfiles, boolean withMessage)
     {
+        classesList.clear();
         compilerlanguages.clearFilelist();
         for (File f : srcfiles) {
             for (JVMLanguages language : compilerlanguages.getJvm_languages().keySet()) {
