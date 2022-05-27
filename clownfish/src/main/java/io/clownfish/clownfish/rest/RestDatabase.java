@@ -772,7 +772,9 @@ public class RestDatabase {
                         }
                     } else {
                         if (null != (String) attributmap.get(key)) {
-                            sql_set.append("'").append((String) attributmap.get(key)).append("'");
+                            String value = (String) attributmap.get(key);
+                            value = value.replace("'", "''");
+                            sql_set.append("'").append(value).append("'");
                         } else {
                             sql_set.append((String) attributmap.get(key));
                         }
@@ -842,7 +844,9 @@ public class RestDatabase {
                         }
                     } else {
                         if (null != attributmap.get((String) tf.getName())) {
-                            sql_insert.append("'").append(attributmap.get((String) tf.getName())).append("', ");
+                            String value = attributmap.get((String) tf.getName());
+                            value = value.replace("'", "''");
+                            sql_insert.append("'").append(value).append("', ");
                         } else {
                             sql_insert.append(attributmap.get((String) tf.getName())).append(", ");
                         }
