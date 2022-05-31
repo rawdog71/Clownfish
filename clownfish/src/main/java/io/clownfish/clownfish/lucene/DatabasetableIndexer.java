@@ -19,6 +19,7 @@ import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfSearchdatabase;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
+import io.clownfish.clownfish.jdbc.TableField;
 import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfSearchdatabaseService;
@@ -28,7 +29,11 @@ import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import org.apache.lucene.index.IndexWriter;
@@ -126,6 +131,8 @@ public class DatabasetableIndexer implements Runnable {
     */
 
     public long createIndex(CfSearchdatabase searchdb) throws IOException {
+        Statement stmt = null;
+        ResultSet result = null;
         CfDatasource cfdatasource = cfdatasourceService.findById(searchdb.getCfSearchdatabsePK().getDatasourceRef());
         JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
         Connection con = jdbcutil.getConnection();
@@ -135,11 +142,22 @@ public class DatabasetableIndexer implements Runnable {
                 DatabaseMetaData dmd = con.getMetaData();
 
                 TableFieldStructure tfs = databaseUtil.getTableFieldsList(dmd, searchdb.getCfSearchdatabsePK().getTablename(), "");
-                /*
-                for (CfAttributcontent attributcontent : attributcontentlist) {
-                    indexAttributContent(attributcontent);
+                String statement = databaseUtil.getSQLSelect(con, dmd, searchdb.getCfSearchdatabsePK().getTablename(), tfs);
+                stmt = con.createStatement();
+                result = stmt.executeQuery(statement);
+                ArrayList<HashMap> tablevalues = new ArrayList<>();
+                while (result.next()) {
+                    HashMap<String, String> dbexportvalues = new HashMap<>();
+                    for (TableField tf : tfs.getTableFieldsList()) {
+                        try {
+                            String value = result.getString(tf.getName());
+                            dbexportvalues.put(tf.getName(), value);
+                        } catch (java.sql.SQLException ex) {
+
+                        }
+                    }
+                    tablevalues.add(dbexportvalues);
                 }
-                */
                 writer.commit();
                 writer.forceMerge(10);
                 return writer.numRamDocs();

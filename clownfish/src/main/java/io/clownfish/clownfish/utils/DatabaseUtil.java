@@ -53,6 +53,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
@@ -608,6 +609,45 @@ public class DatabaseUtil {
         } catch (SQLException ex) {
             LOGGER.error(ex.getMessage());
             return null;
+        }
+    }
+    
+    public String getSQLSelect(Connection con, DatabaseMetaData dmd, String tablename, TableFieldStructure tfs) {
+        try {
+            StringBuilder sql_outer = new StringBuilder();
+            int sqlmode = 0;
+            if (con.getMetaData().getDriverName().contains("MS SQL")) {
+                sqlmode = 1;
+                sql_outer.append("SELECT ");
+                tfs.getTableFieldsList().stream().map((tf) -> {
+                    sql_outer.append("[").append(tf.getName()).append("]");
+                    return tf;
+                }).map((tf) -> {
+                    sql_outer.append(", ");
+                    return tf;
+                });
+                sql_outer.delete(sql_outer.length()-2, sql_outer.length());
+                sql_outer.append(" FROM ");
+                sql_outer.append(tablename);
+            }
+            if (con.getMetaData().getDriverName().contains("MySQL")) {
+                sqlmode = 0;
+                sql_outer.append("SELECT ");
+                tfs.getTableFieldsList().stream().map((tf) -> {
+                    sql_outer.append("`").append(tf.getName()).append("`");
+                    return tf;
+                }).forEach((_item) -> {
+                    sql_outer.append(", ");
+                });
+                
+                sql_outer.delete(sql_outer.length()-2, sql_outer.length());
+                sql_outer.append(" FROM ");
+                sql_outer.append(tablename);
+            }
+            return sql_outer.toString();
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getMessage());
+            return "";
         }
     }
     
