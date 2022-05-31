@@ -1256,7 +1256,7 @@
                     </f:facet>
 
                     <p:dataTable id="datasourcelist" size="small" scrollable="true" scrollHeight="250" var="datasource" value="#{datasourceList.datasourcelist}" selectionMode="single" selection="#{datasourceList.selectedDatasource}" rowKey="#{datasource.id}">
-                        <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver :form:tabview:tablelist" />
+                        <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver :form:tabview:tablelist :form:tabview:checksearchdatabase" />
                         <p:column headerText="Name" filterBy="#{datasource.name}" filterMatchMode="contains">
                             <h:outputText value="#{datasource.name}" />
                         </p:column>
@@ -1296,7 +1296,7 @@
                         </p:panelGrid>
                         <p:panelGrid columns="1">
                             <p:dataTable id="tablelist" size="small" scrollable="true" scrollHeight="250" var="table" value="#{datasourceList.tablelist}" selectionMode="single" selection="#{datasourceList.selectedTable}" rowKey="#{table.name}">
-                                <p:ajax event="rowSelect" listener="#{datasourceList.onTableSelect}" update=":form:tabview:columnlist" />
+                                <p:ajax event="rowSelect" listener="#{datasourceList.onTableSelect}" update=":form:tabview:columnlist :form:tabview:checksearchdatabase" />
                                 <p:column headerText="Name" filterBy="#{table.name}" filterMatchMode="contains">
                                     <h:outputText value="#{table.name}" />
                                 </p:column>
@@ -1317,7 +1317,7 @@
                         </p:panelGrid>
                     </div>
 
-                    <p:panelGrid columns="5">
+                    <p:panelGrid columns="7">
                         <p:commandButton id="newdatasource" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{datasourceList.onCreateContent}" update=":form:msgs :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist" disabled="#{datasourceList.newContentButtonDisabled}">
                             <f:actionListener binding="#{sitetree.initDatasources()}" />
                         </p:commandButton>
@@ -1328,6 +1328,10 @@
                         </p:commandButton>
                         <p:commandButton id="checkdatasource" process="form" value="Check connection" actionListener="#{datasourceList.onConnectionCheck}" update=":form:msgs" />
                         <p:commandButton id="generatehtml" process="form" value="Generate HTML" actionListener="#{datasourceList.onGenerateHTML}" update=":form:msgs" />
+                        <p:outputLabel for="checksearchdatabase" value="Use in Lucene searchengine:" />
+                        <p:selectBooleanCheckbox id="checksearchdatabase" value="#{datasourceList.searchdatabseflag}">
+                            <p:ajax listener="#{datasourceList.onSetSearchdatabse}" />
+                        </p:selectBooleanCheckbox>
                     </p:panelGrid>
 
                 </p:tab>

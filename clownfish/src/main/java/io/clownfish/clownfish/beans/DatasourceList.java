@@ -18,9 +18,12 @@ package io.clownfish.clownfish.beans;
 import io.clownfish.clownfish.datamodels.ColumnData;
 import io.clownfish.clownfish.datamodels.TableData;
 import io.clownfish.clownfish.dbentities.CfDatasource;
+import io.clownfish.clownfish.dbentities.CfSearchdatabase;
+import io.clownfish.clownfish.dbentities.CfSearchdatabasePK;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfSearchdatabaseService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
 import io.clownfish.clownfish.utils.DatabaseUtil;
 import java.io.Serializable;
@@ -34,6 +37,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.math.BigInteger;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -58,6 +62,7 @@ public class DatasourceList implements Serializable {
     @Autowired transient CfDatasourceService cfdatasourceService;
     @Autowired transient CfSitedatasourceService cfsitedatasourceService;
     @Autowired transient DatabaseUtil databaseUtil;
+    @Autowired transient CfSearchdatabaseService cfsearchdatabaseService;
     
     private transient @Getter @Setter List<CfDatasource> datasourcelist = null;
     private @Getter @Setter CfDatasource selectedDatasource = null;
@@ -75,6 +80,7 @@ public class DatasourceList implements Serializable {
     private @Getter @Setter JDBCUtil selectedJdbcutil = null;
     private @Getter @Setter DatabaseMetaData selectedDdbmd = null;
     private @Getter @Setter ColumnData selectedColumn = null;
+    private @Getter @Setter boolean searchdatabseflag = false;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(DatasourceList.class);
 
@@ -108,6 +114,7 @@ public class DatasourceList implements Serializable {
         datasourceUser = selectedDatasource.getUser();
         
         newContentButtonDisabled = true;
+        searchdatabseflag = false;
 
         tablelist.clear();
         try {
@@ -171,12 +178,34 @@ public class DatasourceList implements Serializable {
      */
     public void onTableSelect(SelectEvent event) {
         selectedTable = (TableData) event.getObject();
-
+        //System.out.println(selectedDatasource.getId() + " " + selectedTable.getName());
+        try {
+            CfSearchdatabase searchdatabase = cfsearchdatabaseService.findByDatasourceRefAndTable(selectedDatasource.getId(), selectedTable.getName());
+            searchdatabseflag = true;
+        } catch (Exception ex) {
+            searchdatabseflag = false;
+            System.out.println("NOT FOUND " + selectedDatasource.getId() + " " + selectedTable.getName());
+        }
     }
      
     public void onGenerateHTML() {
         if (null != selectedTable) {
             databaseUtil.generateHTMLForm(selectedDatasource, selectedTable);
+        }
+    }
+    
+    public void onSetSearchdatabse() {
+        if (null != selectedTable) {
+            CfSearchdatabase sdb = new CfSearchdatabase();
+            CfSearchdatabasePK sdbpk = new CfSearchdatabasePK();
+            sdbpk.setDatasourceRef(selectedDatasource.getId());
+            sdbpk.setTablename(selectedTable.getName());
+            sdb.setCfSearchdatabsePK(sdbpk);
+            if (searchdatabseflag) {
+                cfsearchdatabaseService.create(sdb);
+            } else {
+                cfsearchdatabaseService.delete(sdb);
+            }
         }
     }
     

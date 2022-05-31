@@ -30,5 +30,9 @@ public class LuceneConstants {
     public static final String ASSET_DESCRIPTION = "asset_description";
     public static final String ASSET_AUTHOR = "asset_author";
     public static final String ASSET_DATE = "asset_date";
+    public static final String DBTABLE_STRING = "table_string";
+    public static final String DBTABLE_TEXT = "table_text";
+    public static final String DBTABLE_NUMBER = "table_number";
+    public static final String DBTABLE_DATE = "table_date";
     public static final int MAX_SEARCH = 10;
 }

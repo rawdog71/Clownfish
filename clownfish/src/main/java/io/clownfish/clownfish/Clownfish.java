@@ -151,6 +151,7 @@ public class Clownfish {
     @Autowired HibernateUtil hibernateUtil;
     @Autowired ServiceStatus servicestatus;
     @Autowired SearchUtil searchUtil;
+    @Autowired CfSearchdatabaseService cfsearchdatabaseService;
     
     DatabaseTemplateBean databasebean;
     EmailTemplateBean emailbean;
@@ -194,6 +195,7 @@ public class Clownfish {
     private @Getter @Setter MarkdownUtil markdownUtil;
     private @Getter @Setter ContentIndexer contentIndexer;
     private @Getter @Setter AssetIndexer assetIndexer;
+    private @Getter @Setter DatabasetableIndexer databasetableIndexer;
     private @Getter @Setter int searchlimit;
     private @Getter @Setter Map<String, String> metainfomap;
     private static HibernateInit hibernateInitializer = null;
@@ -465,6 +467,15 @@ public class Clownfish {
                 Thread assetindexer_thread = new Thread(assetIndexer);
                 assetindexer_thread.start();
                 LOGGER.info("ASSETINDEXER RUN");
+                
+                if (null == databasetableIndexer) {
+                    databasetableIndexer = new DatabasetableIndexer(cfsearchdatabaseService, cfdatasourceService, databaseUtil, indexService);
+                }
+                Thread databasetableIndexer_thread = new Thread(databasetableIndexer);
+                databasetableIndexer_thread.start();
+                LOGGER.info("DATABASETABLEINDEXER RUN");
+                
+                
                 indexService.getWriter().commit();
             }
            

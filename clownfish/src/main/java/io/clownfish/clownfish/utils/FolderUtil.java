@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.utils;
 
+import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -42,7 +43,7 @@ public class FolderUtil {
     
     @Autowired private PropertyUtil propertyUtil;
 
-    //@PostConstruct
+    @PostConstruct
     public void init() {
         setCache_folder(propertyUtil.getPropertyValue("folder_cache"));
         setStatic_folder(propertyUtil.getPropertyValue("folder_static"));

@@ -46,6 +46,7 @@
     <class>io.clownfish.clownfish.dbentities.CfMaven</class>
     <class>io.clownfish.clownfish.dbentities.CfLayoutcontent</class>
     <class>io.clownfish.clownfish.dbentities.CfContentversion</class>
+    <class>io.clownfish.clownfish.dbentities.CfSearchdatabase</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/clownfish?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.user" value="clownfish"/>
