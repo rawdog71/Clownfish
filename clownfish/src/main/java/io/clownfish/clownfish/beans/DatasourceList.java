@@ -22,6 +22,7 @@ import io.clownfish.clownfish.dbentities.CfSearchdatabase;
 import io.clownfish.clownfish.dbentities.CfSearchdatabasePK;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
+import io.clownfish.clownfish.lucene.DatabasetableIndexer;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfSearchdatabaseService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
@@ -37,11 +38,12 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
-import java.math.BigInteger;
+import java.io.IOException;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
@@ -63,6 +65,7 @@ public class DatasourceList implements Serializable {
     @Autowired transient CfSitedatasourceService cfsitedatasourceService;
     @Autowired transient DatabaseUtil databaseUtil;
     @Autowired transient CfSearchdatabaseService cfsearchdatabaseService;
+    @Autowired DatabasetableIndexer dbtableIndexer;
     
     private transient @Getter @Setter List<CfDatasource> datasourcelist = null;
     private @Getter @Setter CfDatasource selectedDatasource = null;
@@ -202,7 +205,12 @@ public class DatasourceList implements Serializable {
             sdbpk.setTablename(selectedTable.getName());
             sdb.setCfSearchdatabsePK(sdbpk);
             if (searchdatabseflag) {
-                cfsearchdatabaseService.create(sdb);
+                try {
+                    cfsearchdatabaseService.create(sdb);
+                    dbtableIndexer.createIndex(sdb);
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(DatasourceList.class.getName()).log(Level.SEVERE, null, ex);
+                }
             } else {
                 cfsearchdatabaseService.delete(sdb);
             }

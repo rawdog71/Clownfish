@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.lucene;
 
-import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfSearchdatabase;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
@@ -24,7 +23,6 @@ import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfSearchdatabaseService;
 import io.clownfish.clownfish.utils.DatabaseUtil;
-import io.clownfish.clownfish.utils.EncryptUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.sql.Connection;
@@ -32,10 +30,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
 import org.apache.lucene.index.IndexWriter;
 import javax.inject.Named;
 import org.apache.lucene.document.Document;
@@ -83,52 +79,34 @@ public class DatabasetableIndexer implements Runnable {
         content-type (always Clownfish/DBContent)
         content
     */
-    private Document getDocument(CfAttributcontent attributcontent) throws IOException {
-        if (attributcontent.getClasscontentref().getClassref().isSearchrelevant()) {
-            Document document = new Document();
-            document.add(new StoredField(LuceneConstants.CONTENT_TYPE, "Clownfish/DBContent"));
-            document.add(new StoredField(LuceneConstants.ID, attributcontent.getId()));
-            document.add(new StoredField(LuceneConstants.CLASSCONTENT_REF, attributcontent.getClasscontentref().getId()));
-            switch (attributcontent.getAttributref().getAttributetype().getName()) {
+    
+    private Document getDocument(TableFieldStructure tfs, HashMap<String, String> values) throws IOException {
+        Document document = new Document();
+        document.add(new StoredField(LuceneConstants.CONTENT_TYPE, "Clownfish/DBContent"));
+        if (values.containsKey("id")) {
+            document.add(new StoredField(LuceneConstants.ID, values.get("id")));
+        }
+        for (TableField tf : tfs.getTableFieldsList()) {
+            switch (tf.getType().toLowerCase()) {
                 case "string":
-                    if (null != attributcontent.getContentString()) {
-                        if ((attributcontent.getClasscontentref().getClassref().isEncrypted()) && (!attributcontent.getAttributref().getIdentity())) {
-                            document.add(new TextField(LuceneConstants.CONTENT_STRING, EncryptUtil.decrypt(attributcontent.getContentString(), propertyUtil.getPropertyValue("aes_key")), Field.Store.YES));
-                        } else {
-                            document.add(new TextField(LuceneConstants.CONTENT_STRING, attributcontent.getContentString(), Field.Store.YES));
-                        }
+                    if (null != values.get(tf.getName())) {
+                        document.add(new TextField(tf.getName(), values.get(tf.getName()), Field.Store.YES));
                     }
                     break;
-                case "text":
-                case "htmltext":
-                case "markdown":
-                    if (null != attributcontent.getContentText()) {
-                        if ((attributcontent.getClasscontentref().getClassref().isEncrypted()) && (!attributcontent.getAttributref().getIdentity())) {
-                            document.add(new TextField(LuceneConstants.CONTENT_TEXT, EncryptUtil.decrypt(attributcontent.getContentText(), propertyUtil.getPropertyValue("aes_key")), Field.Store.YES));
-                        } else {
-                            document.add(new TextField(LuceneConstants.CONTENT_TEXT, attributcontent.getContentText(), Field.Store.YES));
-                        }
+                case "long":
+                    if ((null != values.get(tf.getName())) && (0 != tf.getName().compareToIgnoreCase("id"))) {
+                        document.add(new TextField(tf.getName(), values.get(tf.getName()), Field.Store.YES));
+                    }
+                    break;
+                case "date":
+                    if (null != values.get(tf.getName())) {
+                        document.add(new TextField(tf.getName(), values.get(tf.getName()), Field.Store.YES));
                     }
                     break;
             }
-            return document;
-        } else {
-            return null;
         }
+        return document;
     }
-
-    /*
-    private void indexAttributContent(CfAttributcontent attributcontent) throws IOException {
-        if (attributcontent.getAttributref().getAttributetype().isSearchrelevant()) {
-            attributcontent.setIndexed(true);
-            cfattributcontentService.edit(attributcontent);
-            Document document = getDocument(attributcontent);
-            if (null != document) {
-                writer.addDocument(document);
-            }
-        }
-    }
-    */
 
     public long createIndex(CfSearchdatabase searchdb) throws IOException {
         Statement stmt = null;
@@ -145,9 +123,9 @@ public class DatabasetableIndexer implements Runnable {
                 String statement = databaseUtil.getSQLSelect(con, dmd, searchdb.getCfSearchdatabsePK().getTablename(), tfs);
                 stmt = con.createStatement();
                 result = stmt.executeQuery(statement);
-                ArrayList<HashMap> tablevalues = new ArrayList<>();
+                HashMap<String, String> dbexportvalues = new HashMap<>();
                 while (result.next()) {
-                    HashMap<String, String> dbexportvalues = new HashMap<>();
+                    dbexportvalues.clear();
                     for (TableField tf : tfs.getTableFieldsList()) {
                         try {
                             String value = result.getString(tf.getName());
@@ -156,7 +134,7 @@ public class DatabasetableIndexer implements Runnable {
 
                         }
                     }
-                    tablevalues.add(dbexportvalues);
+                    writer.addDocument(getDocument(tfs, dbexportvalues));
                 }
                 writer.commit();
                 writer.forceMerge(10);
