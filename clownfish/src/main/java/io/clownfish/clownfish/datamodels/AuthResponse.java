@@ -17,6 +17,7 @@ package io.clownfish.clownfish.datamodels;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -25,4 +26,5 @@ import lombok.Setter;
 public class AuthResponse {
     private @Getter @Setter boolean status;
     private @Getter @Setter String token;
+    private @Getter @Setter DateTime validuntil;
 }

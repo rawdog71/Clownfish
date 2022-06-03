@@ -74,6 +74,7 @@ public class ClownfishLoginServlet extends HttpServlet {
         AuthResponse ar = new AuthResponse();
         ar.setStatus(false);
         ar.setToken("");
+        ar.setValiduntil(null);
         try {
             Map<String, String[]> parameters = request.getParameterMap();
 
@@ -118,6 +119,7 @@ public class ClownfishLoginServlet extends HttpServlet {
                                 if (ar.isStatus()) {
                                     ar.setToken(AuthTokenClasscontent.generateToken(inst_clearTextPw, salt));
                                     AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(60), classcontent1);      // Tokens valid for 60 minutes
+                                    ar.setValiduntil(at.getValiduntil());
                                     authtokenlist.getAuthtokens().put(ar.getToken(), at);
                                     break;
                                 }
@@ -129,6 +131,7 @@ public class ClownfishLoginServlet extends HttpServlet {
         } catch (Exception ex) {
             ar.setStatus(false);
             ar.setToken("");
+            ar.setValiduntil(null);
             LOGGER.error(ex.getMessage());
         }
 
