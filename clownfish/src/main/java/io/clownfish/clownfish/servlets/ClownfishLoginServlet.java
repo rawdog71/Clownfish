@@ -15,6 +15,10 @@
  */
 package io.clownfish.clownfish.servlets;
 
+import com.google.gson.Gson;
+import io.clownfish.clownfish.datamodels.AuthResponse;
+import io.clownfish.clownfish.datamodels.AuthTokenClasscontent;
+import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfAttribut;
@@ -33,6 +37,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,18 +60,20 @@ public class ClownfishLoginServlet extends HttpServlet {
     @Autowired
     transient CfAttributService cfattributService;
     String klasse, id, pw_field, id_field, clearPw;
+    @Autowired transient AuthTokenListClasscontent authtokenlist;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ClownfishLoginServlet.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
-
         String inst_klasse;
         String inst_identifier;
         String inst_passwordField;
         String salt;
         String inst_clearTextPw;
         String inst_identifierField;
-        boolean success = false;
+        AuthResponse ar = new AuthResponse();
+        ar.setStatus(false);
+        ar.setToken("");
         try {
             Map<String, String[]> parameters = request.getParameterMap();
 
@@ -107,8 +114,11 @@ public class ClownfishLoginServlet extends HttpServlet {
                         if (null != salt) {
                             String test = PasswordUtil.generateSecurePassword(inst_clearTextPw, salt);
                             if ((attributContent1.getContentString().compareTo(test) == 0) && (attributContent1.getClasscontentref().getId() == cref)) {
-                                success = PasswordUtil.verifyUserPassword(inst_clearTextPw, PasswordUtil.generateSecurePassword(inst_clearTextPw, salt), salt);
-                                if (success) {
+                                ar.setStatus(PasswordUtil.verifyUserPassword(inst_clearTextPw, PasswordUtil.generateSecurePassword(inst_clearTextPw, salt), salt));
+                                if (ar.isStatus()) {
+                                    ar.setToken(AuthTokenClasscontent.generateToken(inst_clearTextPw, salt));
+                                    AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(60), classcontent1);      // Tokens valid for 60 minutes
+                                    authtokenlist.getAuthtokens().put(ar.getToken(), at);
                                     break;
                                 }
                             }
@@ -117,12 +127,14 @@ public class ClownfishLoginServlet extends HttpServlet {
                 }
             }
         } catch (Exception ex) {
-            success = false;
+            ar.setStatus(false);
+            ar.setToken("");
             LOGGER.error(ex.getMessage());
         }
 
         try (PrintWriter out = response.getWriter()) {
-            out.print(success);
+            Gson gson = new Gson();
+            out.print(gson.toJson(ar));
         } catch (IOException ex) {
             //LOGGER.error(ex.getMessage());
         }

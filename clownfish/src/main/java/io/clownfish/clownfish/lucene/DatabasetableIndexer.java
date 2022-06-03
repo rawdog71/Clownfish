@@ -80,11 +80,11 @@ public class DatabasetableIndexer implements Runnable {
         content
     */
     
-    private Document getDocument(TableFieldStructure tfs, HashMap<String, String> values) throws IOException {
+    private Document getDocument(CfSearchdatabase searchdb, TableFieldStructure tfs, HashMap<String, String> values) throws IOException {
         Document document = new Document();
         document.add(new StoredField(LuceneConstants.CONTENT_TYPE, "Clownfish/DBContent"));
         if (values.containsKey("id")) {
-            document.add(new StoredField(LuceneConstants.ID, values.get("id")));
+            document.add(new StoredField(LuceneConstants.ID, String.valueOf(searchdb.getCfSearchdatabsePK().getDatasourceRef()) + "-" + searchdb.getCfSearchdatabsePK().getTablename() + "-" + values.get("id")));
         }
         for (TableField tf : tfs.getTableFieldsList()) {
             switch (tf.getType().toLowerCase()) {
@@ -134,7 +134,7 @@ public class DatabasetableIndexer implements Runnable {
 
                         }
                     }
-                    writer.addDocument(getDocument(tfs, dbexportvalues));
+                    writer.addDocument(getDocument(searchdb, tfs, dbexportvalues));
                 }
                 writer.commit();
                 writer.forceMerge(10);
