@@ -87,6 +87,8 @@ import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
+import io.clownfish.clownfish.websocket.WebSocketServer;
+import java.util.logging.Level;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -211,6 +213,8 @@ public class Clownfish {
     @Value("${check.consistency:0}") int checkConsistency;
     @Value("${hibernate.init:0}") int hibernateInit;
     @Value("${sapconnection.file}") String SAPCONNECTION;
+    @Value("${websocket.use:0}") int websocketUse;
+    @Value("${websocket.port:9001}") int websocketPort;
     String libloaderpath;
     String mavenpath;
     private @Getter @Setter boolean initmessage = false;
@@ -542,6 +546,17 @@ public class Clownfish {
         servicestatus.setMessage("Clownfish is online");
         servicestatus.setOnline(true);
         LOGGER.info("INIT CLOWNFISH END");
+        
+        if (1 == websocketUse) {
+            WebSocketServer wss = new WebSocketServer(this);
+            wss.setPort(websocketPort);
+            try {
+                Thread websocketserver_thread = new Thread(wss);
+                websocketserver_thread.start();
+            } catch (Exception ex) {
+                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     public Clownfish() {
@@ -1419,10 +1434,12 @@ public class Clownfish {
      * 
      */
     private void writeSessionVariables(Map parametermap) {
-        Collections.list(userSession.getAttributeNames()).stream().filter((key) -> (key.startsWith("session"))).forEach((key) -> {
-            String attributevalue = (String) userSession.getAttribute(key);
-            parametermap.put(key, attributevalue);
-        });
+        if (null != userSession) {
+            Collections.list(userSession.getAttributeNames()).stream().filter((key) -> (key.startsWith("session"))).forEach((key) -> {
+                String attributevalue = (String) userSession.getAttribute(key);
+                parametermap.put(key, attributevalue);
+            });
+        }
     }
 
     /**

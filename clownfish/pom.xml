@@ -482,6 +482,16 @@
             <version>1.0.12</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+            <version>4.1.76.Final</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
