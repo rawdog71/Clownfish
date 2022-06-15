@@ -25,7 +25,6 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Future;
 
 /**
