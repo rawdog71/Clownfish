@@ -18,6 +18,7 @@ package io.clownfish.clownfish.websocket;
 import io.clownfish.clownfish.Clownfish;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -27,6 +28,8 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.Getter;
@@ -39,9 +42,11 @@ import lombok.Setter;
 public class WebSocketServer implements Runnable {
     private Clownfish clownfish;
     private @Getter @Setter int port;
+    private static Set<ChannelHandlerContext> sessions = null;
 
     public WebSocketServer(Clownfish clownfish) {
         this.clownfish = clownfish;
+        sessions = new CopyOnWriteArraySet<>();
     }
 
     @Override
@@ -60,7 +65,7 @@ public class WebSocketServer implements Runnable {
                         new HttpObjectAggregator(65536),
                         new HttpResponseEncoder(),
                         new WebSocketServerProtocolHandler("/websocket"),
-                        new CustomTextFrameHandler(clownfish));
+                        new CustomTextFrameHandler(clownfish, sessions));
                 }
             });
 

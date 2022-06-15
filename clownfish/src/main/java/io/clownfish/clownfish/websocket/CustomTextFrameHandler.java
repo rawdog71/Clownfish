@@ -24,6 +24,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Future;
 
 /**
@@ -32,17 +34,28 @@ import java.util.concurrent.Future;
  */
 public class CustomTextFrameHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
     private final Clownfish clownfish;
-    
-    public CustomTextFrameHandler(Clownfish clownfish) {
+    private static Set<ChannelHandlerContext> sessions = null;
+
+    public CustomTextFrameHandler(Clownfish clownfish, Set<ChannelHandlerContext> sessions) {
+        this.sessions = sessions;
         this.clownfish = clownfish;
     }
     
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) {
+        sessions.add(ctx);
+    }
+    
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) {
+        sessions.remove(ctx);
+    }
     
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame frame) throws Exception {
         String request = frame.text();
         
-        WebSocketBroadcastMessage wsbm = new Gson().fromJson(request, WebSocketBroadcastMessage.class);
+        WebSocketMessage wsbm = new Gson().fromJson(request, WebSocketMessage.class);
         List<JsonFormParameter> postmap = new ArrayList<>();
         wsbm.getInput().forEach((key, value) -> {
             JsonFormParameter jfp = new JsonFormParameter();
@@ -52,6 +65,14 @@ public class CustomTextFrameHandler extends SimpleChannelInboundHandler<TextWebS
         });
         Future<ClownfishResponse> cfResponse = clownfish.makeResponse(wsbm.getWebservice(), postmap, new ArrayList<>(), false);
         
-        ctx.channel().writeAndFlush(new TextWebSocketFrame(cfResponse.get().getOutput()));
+        if (wsbm.isBroadcast()) {
+            for (ChannelHandlerContext session : sessions) {
+                if (!session.isRemoved()) {
+                    session.channel().writeAndFlush(new TextWebSocketFrame(cfResponse.get().getOutput()));
+                }
+            }
+        } else {
+            ctx.channel().writeAndFlush(new TextWebSocketFrame(cfResponse.get().getOutput()));
+        }
     }
 }

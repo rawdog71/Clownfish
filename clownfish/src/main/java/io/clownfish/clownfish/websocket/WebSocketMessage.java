@@ -23,7 +23,8 @@ import lombok.Setter;
  *
  * @author SulzbachR
  */
-public class WebSocketBroadcastMessage {
+public class WebSocketMessage {
     private @Getter @Setter String webservice;
+    private @Getter @Setter boolean broadcast;
     private @Getter @Setter HashMap<String, String> input;
 }
