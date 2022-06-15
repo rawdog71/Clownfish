@@ -4,7 +4,7 @@
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
     <version>0.7.13-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
@@ -489,7 +489,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http</artifactId>
-            <version>4.1.76.Final</version>
+            <version>4.1.77.Final</version>
             <type>jar</type>
         </dependency>
     </dependencies>
