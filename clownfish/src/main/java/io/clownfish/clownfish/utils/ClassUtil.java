@@ -547,7 +547,7 @@ public class ClassUtil implements Serializable {
                 meta().attr("charset", "UTF-8"),
                 meta().attr("http-equiv", "X-UA-Compatible").attr("content", "IE=edge"),
                 meta().attr("name", "viewport").attr("content", "width=device-width, initial-scale=1.0"),
-                script().withSrc("resources/js/angularjs_1_8_2.js"),
+                script().withSrc("resources/js/angular.js"),
                 link().withHref("resources/css/bootstrap5.css").withRel("stylesheet"),
                 script().withSrc("resources/js/bootstrap5.js"),
                 script().withSrc("resources/js/User_Webform.js"),
