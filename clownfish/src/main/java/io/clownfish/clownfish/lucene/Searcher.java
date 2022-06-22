@@ -127,83 +127,85 @@ public class Searcher implements Serializable {
     
     public SearchResult search(String searchQuery, int searchlimit) throws IOException, ParseException {
         SearchResult searchresult = new SearchResult();
-        foundSites.clear();
-        foundAssets.clear();
-        query = queryParser.parse(searchQuery);
-        TopDocs hits = indexSearcher.search(query, searchlimit);
-        foundClasscontent.clear();
-        foundAssetMetadata.clear();
-        HashMap searchclasscontentmap = new HashMap<>();       
-        for (ScoreDoc scoreDoc : hits.scoreDocs) {
-            Document doc = getDocument(scoreDoc);
-            String contenttype = doc.get(LuceneConstants.CONTENT_TYPE);           
-            if (0 == contenttype.compareToIgnoreCase("Clownfish/Content")) {
-                long classcontentref = Long.parseLong(doc.get(LuceneConstants.CLASSCONTENT_REF));
-                // Search directly in site
-                List<CfSitecontent> sitelist = sitecontentservice.findByClasscontentref(classcontentref);
-                sitelist.stream().map((sitecontent) -> siteservice.findById(sitecontent.getCfSitecontentPK().getSiteref())).filter((foundsite) -> ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant()))).forEach((foundsite) -> {
-                    foundSites.add(foundsite);
-                });
-                // Search in sitelists
-                List<CfListcontent> listcontent = sitelistservice.findByClasscontentref(classcontentref);
-                listcontent.stream().map((listcontententry) -> cflistservice.findById(listcontententry.getCfListcontentPK().getListref())).map((foundlist) -> cfsitelistservice.findByListref(foundlist.getId())).forEach((foundsitelist) -> {
-                    foundsitelist.stream().map((sitelistentry) -> siteservice.findById(sitelistentry.getCfSitelistPK().getSiteref())).filter((foundsite) -> ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant()))).forEach((foundsite) -> {
+        if (!searchQuery.isBlank()) {
+            foundSites.clear();
+            foundAssets.clear();
+            query = queryParser.parse(searchQuery);
+            TopDocs hits = indexSearcher.search(query, searchlimit);
+            foundClasscontent.clear();
+            foundAssetMetadata.clear();
+            HashMap searchclasscontentmap = new HashMap<>();       
+            for (ScoreDoc scoreDoc : hits.scoreDocs) {
+                Document doc = getDocument(scoreDoc);
+                String contenttype = doc.get(LuceneConstants.CONTENT_TYPE);           
+                if (0 == contenttype.compareToIgnoreCase("Clownfish/Content")) {
+                    long classcontentref = Long.parseLong(doc.get(LuceneConstants.CLASSCONTENT_REF));
+                    // Search directly in site
+                    List<CfSitecontent> sitelist = sitecontentservice.findByClasscontentref(classcontentref);
+                    sitelist.stream().map((sitecontent) -> siteservice.findById(sitecontent.getCfSitecontentPK().getSiteref())).filter((foundsite) -> ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant()))).forEach((foundsite) -> {
                         foundSites.add(foundsite);
                     });
-                });                
-                addClasscontentMap(classcontentref, searchclasscontentmap);
-            } else {
-                try {
-                    String assetid = doc.getField(LuceneConstants.ID).stringValue();
-                    CfAsset asset = cfassetservice.findById(Long.parseLong(assetid));
-                    if (!foundAssets.contains(asset)) {
-                        foundAssets.add(asset);
-                        if (getAssetMetadata) {
-                            HashMap<String, String> metamap = new HashMap<>();
-                            assetutil.getMetadata(asset, metamap);
-                            foundAssetMetadata.put(asset.getName(), metamap);
+                    // Search in sitelists
+                    List<CfListcontent> listcontent = sitelistservice.findByClasscontentref(classcontentref);
+                    listcontent.stream().map((listcontententry) -> cflistservice.findById(listcontententry.getCfListcontentPK().getListref())).map((foundlist) -> cfsitelistservice.findByListref(foundlist.getId())).forEach((foundsitelist) -> {
+                        foundsitelist.stream().map((sitelistentry) -> siteservice.findById(sitelistentry.getCfSitelistPK().getSiteref())).filter((foundsite) -> ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant()))).forEach((foundsite) -> {
+                            foundSites.add(foundsite);
+                        });
+                    });                
+                    addClasscontentMap(classcontentref, searchclasscontentmap);
+                } else {
+                    try {
+                        String assetid = doc.getField(LuceneConstants.ID).stringValue();
+                        CfAsset asset = cfassetservice.findById(Long.parseLong(assetid));
+                        if (!foundAssets.contains(asset)) {
+                            foundAssets.add(asset);
+                            if (getAssetMetadata) {
+                                HashMap<String, String> metamap = new HashMap<>();
+                                assetutil.getMetadata(asset, metamap);
+                                foundAssetMetadata.put(asset.getName(), metamap);
+                            }
                         }
+                    } catch (IOException | NumberFormatException ex) {
+                        LOGGER.warn(ex.getMessage());
                     }
-                } catch (IOException | NumberFormatException ex) {
-                    LOGGER.warn(ex.getMessage());
                 }
             }
-        }
-        
-        String[] searchtermlist = searchQuery.split(" ");
-        for (String searchterm : searchtermlist) {
-            try {
-                CfKeyword keyword = cfkeywordservice.findByName(searchterm);
-                // Search in classcontent associations
-                List<CfClasscontentkeyword> classcontentlist = cfclasscontentkeywordservice.findByKeywordRef(keyword.getId());
-                classcontentlist.stream().forEach((cck) -> {
-                    addClasscontentMap(cck.getCfClasscontentkeywordPK().getClasscontentref(), searchclasscontentmap);
-                });
-                
-                // Search in asset associations
-                List<CfAssetkeyword> assetlist = cfassetkeywordservice.findByKeywordRef(keyword.getId());
-                assetlist.stream().map((ask) -> cfassetservice.findById(ask.getCfAssetkeywordPK().getAssetref())).filter((asset) -> (!foundAssets.contains(asset))).forEach((asset) -> {
-                    foundAssets.add(asset);
-                    if (getAssetMetadata) {
-                        try {
-                            HashMap<String, String> metamap = new HashMap<>();
-                            assetutil.getMetadata(asset, metamap);
-                            foundAssetMetadata.put(asset.getName(), metamap);
-                        } catch (IOException ex) {
-                            LOGGER.error(ex.getMessage());
+
+            String[] searchtermlist = searchQuery.split(" ");
+            for (String searchterm : searchtermlist) {
+                try {
+                    CfKeyword keyword = cfkeywordservice.findByName(searchterm);
+                    // Search in classcontent associations
+                    List<CfClasscontentkeyword> classcontentlist = cfclasscontentkeywordservice.findByKeywordRef(keyword.getId());
+                    classcontentlist.stream().forEach((cck) -> {
+                        addClasscontentMap(cck.getCfClasscontentkeywordPK().getClasscontentref(), searchclasscontentmap);
+                    });
+
+                    // Search in asset associations
+                    List<CfAssetkeyword> assetlist = cfassetkeywordservice.findByKeywordRef(keyword.getId());
+                    assetlist.stream().map((ask) -> cfassetservice.findById(ask.getCfAssetkeywordPK().getAssetref())).filter((asset) -> (!foundAssets.contains(asset))).forEach((asset) -> {
+                        foundAssets.add(asset);
+                        if (getAssetMetadata) {
+                            try {
+                                HashMap<String, String> metamap = new HashMap<>();
+                                assetutil.getMetadata(asset, metamap);
+                                foundAssetMetadata.put(asset.getName(), metamap);
+                            } catch (IOException ex) {
+                                LOGGER.error(ex.getMessage());
+                            }
                         }
-                    }
-                });
-                
-            } catch (Exception ex) {
-                // Is not a keyword...do nothing at all
+                    });
+
+                } catch (Exception ex) {
+                    // Is not a keyword...do nothing at all
+                }
             }
+
+            searchresult.foundSites = foundSites;
+            searchresult.foundAssets = foundAssets;
+            searchresult.foundClasscontent = searchclasscontentmap;
+            searchresult.foundAssetsMetadata = foundAssetMetadata;
         }
-        
-        searchresult.foundSites = foundSites;
-        searchresult.foundAssets = foundAssets;
-        searchresult.foundClasscontent = searchclasscontentmap;
-        searchresult.foundAssetsMetadata = foundAssetMetadata;
         
         return searchresult;
     }

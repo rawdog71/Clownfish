@@ -621,48 +621,57 @@ public class Clownfish {
                         }
                     }
                 } else {
-                    if (searchmetadata.isEmpty()) {
-                        String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-                        String query = "";
-                        if (path.contains("/")) {
-                            String[] params = path.split("/");
-                            for (int i = 1; i < params.length; i++) {
-                                if (1 == i) {
-                                    path = params[i];
-                                } else {
-                                    query += params[i];
-                                }
+                    searchmetadata.clear();
+                    String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+                    String query = "";
+                    if (path.contains("/")) {
+                        String[] params = path.split("/");
+                        for (int i = 1; i < params.length; i++) {
+                            if (1 == i) {
+                                path = params[i];
+                            } else {
+                                query += params[i];
                             }
                         }
-                        
-                        String[] searchexpressions = query.split(" ");
-                        searchUtil.updateSearchhistory(searchexpressions);
+                    }
 
-                        searcher.setIndexPath(folderUtil.getIndex_folder());
-                        long startTime = System.currentTimeMillis();
-                        SearchResult searchresult = searcher.search(query, searchlimit);
-                        long endTime = System.currentTimeMillis();
+                    String[] searchexpressions = query.split(" ");
+                    searchUtil.updateSearchhistory(searchexpressions);
 
-                        LOGGER.info("Search Time :" + (endTime - startTime));
-                        searchmetadata.clear();
-                        searchmetadata.put("cfSearchQuery", query);
-                        searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
-                        searchcontentmap.clear();
-                        searchresult.getFoundSites().stream().forEach((site) -> {
-                            searchcontentmap.put(site.getName(), site);
-                        });
+                    searcher.setIndexPath(folderUtil.getIndex_folder());
+                    long startTime = System.currentTimeMillis();
+                    SearchResult searchresult = searcher.search(query, searchlimit);
+                    long endTime = System.currentTimeMillis();
+
+                    LOGGER.info("Search Time :" + (endTime - startTime));
+                    searchmetadata.clear();
+                    searchmetadata.put("cfSearchQuery", query);
+                    searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
+                    searchcontentmap.clear();
+                    if (null != searchresult) {
+                        if (null != searchresult.getFoundSites()) {
+                            searchresult.getFoundSites().stream().forEach((site) -> {
+                                searchcontentmap.put(site.getName(), site);
+                            });
+                        }
                         searchassetmap.clear();
-                        searchresult.getFoundAssets().stream().forEach((asset) -> {
-                            searchassetmap.put(asset.getName(), asset);
-                        });
+                        if (null != searchresult.getFoundAssets()) {
+                            searchresult.getFoundAssets().stream().forEach((asset) -> {
+                                searchassetmap.put(asset.getName(), asset);
+                            });
+                        }
                         searchassetmetadatamap.clear();
-                        searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
-                            searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
-                        });
+                        if (null != searchresult.getFoundAssetsMetadata()) {
+                            searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
+                                searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
+                            });
+                        }
                         searchclasscontentmap.clear();
-                        searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
-                            searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
-                        });
+                        if (null != searchresult.getFoundClasscontent()) {
+                            searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
+                                searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
+                            });
+                        }
                     }
                 }
 
