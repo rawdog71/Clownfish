@@ -120,26 +120,26 @@
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>primefaces-extensions</artifactId>
-            <version>11.0.3</version>
+            <version>11.0.4</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>resources-monacoeditor</artifactId>
-            <version>11.0.3</version>
+            <version>11.0.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>primeflex</artifactId>
-            <version>3.2.0</version>
+            <version>3.2.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>font-awesome</artifactId>
-            <version>6.1.0</version>
+            <version>6.1.1</version>
         </dependency>
         <!--
         <dependency>
@@ -209,6 +209,7 @@
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
+            <version>2.3.31</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
