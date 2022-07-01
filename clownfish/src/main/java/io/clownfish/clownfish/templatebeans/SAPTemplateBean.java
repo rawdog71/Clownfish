@@ -55,8 +55,8 @@ public class SAPTemplateBean implements Serializable {
     private transient @Getter @Setter Map contentmap;
     static SAPConnection sapc = null;
     private transient RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
-    private HashMap<String, JCoFunction> jcofunctiontable = null;
-    private HashMap<String, List<RpyTableRead>> rpyMap = null;
+    private static HashMap<String, JCoFunction> jcofunctiontable = null;
+    private static HashMap<String, List<RpyTableRead>> rpyMap = null;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SAPTemplateBean.class);
 
@@ -69,14 +69,18 @@ public class SAPTemplateBean implements Serializable {
         this.rpytableread = rpytableread;
         this.postmap = postmap;
         rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapc);
-        jcofunctiontable = new HashMap();
-        rpyMap = new HashMap();
+        if (null == jcofunctiontable) {
+            jcofunctiontable = new HashMap();
+        }
+        if (null == rpyMap) {
+            rpyMap = new HashMap();
+        }
         contentmap.clear();
     }
     
     public Map executeAsync(String rfcFunction, Map parametermap) {
         try {
-            //LOGGER.info("START SAP execute");
+            LOGGER.info("START SAP execute");
             JCoTable functions_table;
             HashMap<String, HashMap> sapexport = new HashMap<>();
             HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
@@ -117,9 +121,9 @@ public class SAPTemplateBean implements Serializable {
                     }
                 }
                 // SAP RFC ausführen
-                //LOGGER.info("START SAP RFC execute");
+                LOGGER.info("START SAP RFC execute");
                 function.execute(sapc.getDestination());
-                //LOGGER.info("STOP SAP RFC execute");
+                LOGGER.info("STOP SAP RFC execute");
                 HashMap<String, ArrayList> saptables = new HashMap<>();
                 for (RfcFunctionParam rfcfunctionparam : paramlist) {    
                     String paramclass = rfcfunctionparam.getParamclass().toLowerCase();
@@ -177,7 +181,7 @@ public class SAPTemplateBean implements Serializable {
                 LOGGER.error(ex.getMessage());
             }
             contentmap.put("sap", sapexport);
-            //LOGGER.info("STOP SAP execute");
+            LOGGER.info("STOP SAP execute");
             return contentmap;
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
