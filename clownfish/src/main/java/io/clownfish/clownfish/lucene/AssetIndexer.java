@@ -127,20 +127,10 @@ public class AssetIndexer implements Runnable {
         document.add(new StoredField(LuceneConstants.CONTENT_TYPE, metamap.get("Content-Type")));
         switch (metamap.get("Content-Type")) {
             case "application/xml":
-                document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
-                break;
             case "application/pdf":
-                document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
-                break;
             case "application/msword":
-                document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
-                break;    
             case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
-                break;
             case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
-                break;
             case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
                 document.add(new TextField(LuceneConstants.ASSET_TEXT, handler.toString(), Field.Store.YES));
                 break;    

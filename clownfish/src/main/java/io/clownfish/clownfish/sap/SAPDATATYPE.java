@@ -31,4 +31,7 @@ public class SAPDATATYPE {
     public static final String INT8 = "INT8";
     public static final String QUAN = "QUAN";
     public static final String UNIT = "UNIT";
+    public static final String DEC = "DEC";
+    public static final String CURR = "CURR";
+    public static final String CUKY = "CUKY";
 }

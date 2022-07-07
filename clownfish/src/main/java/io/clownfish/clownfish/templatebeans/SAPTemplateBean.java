@@ -290,50 +290,58 @@ public class SAPTemplateBean implements Serializable {
     }
     
     private void setTableValues(JCoTable functions_table, List<RpyTableRead> rpytablereadlist, ArrayList<HashMap> tablevalues) {
-        for (int i = 0; i < functions_table.getNumRows(); i++) {
-            HashMap<String, String> sapexportvalues = new HashMap<>();
-            functions_table.setRow(i);
-            for (RpyTableRead rpytablereadentry : rpytablereadlist) {
-                if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CHAR) == 0) || 
-                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CLNT) == 0) ||
-                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.NUMC) == 0) ||
-                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.UNIT) == 0)) {
-                    String value = functions_table.getString(rpytablereadentry.getFieldname());
-                    sapexportvalues.put(rpytablereadentry.getFieldname(), value);
-                    continue;
-                }
-                if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) || 
-                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.TIMS) == 0)) {
-                    Date value = functions_table.getDate(rpytablereadentry.getFieldname());
-                    String datum = "";
-                    if (null != value) {
-                        if (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) {
-                            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-                            datum = sdf.format(value);
-                        } else {
-                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                            datum = sdf.format(value);
-                        }
+        try {
+            for (int i = 0; i < functions_table.getNumRows(); i++) {
+                HashMap<String, String> sapexportvalues = new HashMap<>();
+                functions_table.setRow(i);
+                for (RpyTableRead rpytablereadentry : rpytablereadlist) {
+                    if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CHAR) == 0) || 
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CLNT) == 0) ||
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.NUMC) == 0) ||
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DEC) == 0) ||    
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CURR) == 0) ||
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CUKY) == 0) ||
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.UNIT) == 0)) {
+                        String value = functions_table.getString(rpytablereadentry.getFieldname());
+                        sapexportvalues.put(rpytablereadentry.getFieldname(), value);
+                        continue;
                     }
-                    sapexportvalues.put(rpytablereadentry.getFieldname(), datum);
-                    continue;
+                    if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) || 
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.TIMS) == 0)) {
+                        Date value = functions_table.getDate(rpytablereadentry.getFieldname());
+                        String datum = "";
+                        if (null != value) {
+                            if (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+                                datum = sdf.format(value);
+                            } else {
+                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                                datum = sdf.format(value);
+                            }
+                        }
+                        sapexportvalues.put(rpytablereadentry.getFieldname(), datum);
+                        continue;
+                    }
+                    if (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.QUAN) == 0) {
+                        double value = functions_table.getDouble(rpytablereadentry.getFieldname());
+                        sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
+                        continue;
+                    }
+                    if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT1) == 0) || 
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT2) == 0) || 
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT4) == 0) || 
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT8) == 0)) {
+                        int value = functions_table.getInt(rpytablereadentry.getFieldname());
+                        sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
+                        continue;
+                    }
+                    if (!rpytablereadentry.getDatatype().isBlank()) 
+                        System.out.println("SAP_FIELD = " + rpytablereadentry.getFieldname() + " - SAP_DATA_TYPE = " + rpytablereadentry.getDatatype());
                 }
-                if (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.QUAN) == 0) {
-                    double value = functions_table.getDouble(rpytablereadentry.getFieldname());
-                    sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
-                    continue;
-                }
-                if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT1) == 0) || 
-                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT2) == 0) || 
-                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT4) == 0) || 
-                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT8) == 0)) {
-                    int value = functions_table.getInt(rpytablereadentry.getFieldname());
-                    sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
-                    continue;
-                }
-                System.out.println("SAP_DATA_TYPE = " + rpytablereadentry.getDatatype());
+                tablevalues.add(sapexportvalues);
             }
-            tablevalues.add(sapexportvalues);
+        } catch(Exception ex) {
+            LOGGER.error(ex.getMessage());
         }
     }
     
