@@ -89,6 +89,7 @@ public class SAPUtility {
                             functions_table.setRow(i);
                             for (RpyTableRead rpytablereadentry : rpytablereadlist) {
                                 if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CHAR) == 0) || 
+                                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CLNT) == 0) ||
                                     (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.NUMC) == 0) ||
                                     (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.UNIT) == 0)) {
                                     String value = functions_table.getString(rpytablereadentry.getFieldname());

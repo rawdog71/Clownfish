@@ -295,6 +295,7 @@ public class SAPTemplateBean implements Serializable {
             functions_table.setRow(i);
             for (RpyTableRead rpytablereadentry : rpytablereadlist) {
                 if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CHAR) == 0) || 
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CLNT) == 0) ||
                     (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.NUMC) == 0) ||
                     (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.UNIT) == 0)) {
                     String value = functions_table.getString(rpytablereadentry.getFieldname());
@@ -328,7 +329,9 @@ public class SAPTemplateBean implements Serializable {
                     (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT8) == 0)) {
                     int value = functions_table.getInt(rpytablereadentry.getFieldname());
                     sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
+                    continue;
                 }
+                System.out.println("SAP_DATA_TYPE = " + rpytablereadentry.getDatatype());
             }
             tablevalues.add(sapexportvalues);
         }

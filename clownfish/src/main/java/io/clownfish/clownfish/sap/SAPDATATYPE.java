@@ -21,6 +21,7 @@ package io.clownfish.clownfish.sap;
  */
 public class SAPDATATYPE {
     public static final String CHAR = "CHAR";
+    public static final String CLNT = "CLNT";
     public static final String NUMC = "NUMC";
     public static final String DATS = "DATS";
     public static final String TIMS = "TIMS";
