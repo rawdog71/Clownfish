@@ -34,4 +34,5 @@ public class SAPDATATYPE {
     public static final String DEC = "DEC";
     public static final String CURR = "CURR";
     public static final String CUKY = "CUKY";
+    public static final String RAW = "RAW";
 }

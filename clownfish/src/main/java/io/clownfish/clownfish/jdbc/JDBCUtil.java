@@ -31,7 +31,7 @@ public class JDBCUtil {
     private final String url;
     private final String user;
     private final String password;
-    private Connection connection;
+    private static Connection connection;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(JDBCUtil.class);
     
@@ -53,7 +53,9 @@ public class JDBCUtil {
         }
         //get the connection
         try {
-            connection = DriverManager.getConnection(url, user, password);
+            if (null == connection) {
+                connection = DriverManager.getConnection(url, user, password);
+            }
         } catch (SQLException ex) {
             LOGGER.error(ex.getMessage());
             return null;

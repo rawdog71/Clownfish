@@ -89,6 +89,8 @@ import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.websocket.WebSocketServer;
 import java.util.logging.Level;
+import javax.servlet.ServletException;
+import javax.servlet.http.Part;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -97,6 +99,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
+import org.springframework.web.bind.ServletRequestUtils;
 
 /**
  *
@@ -757,8 +760,10 @@ public class Clownfish {
             }
             
             userSession = request.getSession();
+            LOGGER.info("CONTENTTYPE: " + request.getContentType());
             if (request.getContentType().startsWith("multipart/form-data")) {
-                Map rqMap = request.getParameterMap();
+                Map<String, String[]> parameterMap = request.getParameterMap();
+                LOGGER.info(String.valueOf(parameterMap.size()));
                 LOGGER.info("MULTIPART");
             } else {
                 String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
@@ -1004,6 +1009,13 @@ public class Clownfish {
                                 break;
                         }
 
+                        long currentTemplateVersion;
+                        try {
+                            currentTemplateVersion = cftemplateversionService.findMaxVersion(cftemplate.getId());
+                        } catch (NullPointerException ex) {
+                            currentTemplateVersion = 0;
+                        }
+                        
                         String gzip = propertyUtil.getPropertySwitch("html_gzip", cfsite.getGzip());
                         if (gzip.compareToIgnoreCase("on") == 0) {
                             gzipswitch.setGzipon(true);
@@ -1139,6 +1151,7 @@ public class Clownfish {
                         metainfomap.put("contenttype", cfsite.getContenttype());
                         metainfomap.put("locale", cfsite.getLocale());
                         metainfomap.put("alias", cfsite.getAliaspath());
+                        metainfomap.put("version", String.valueOf(currentTemplateVersion));
                         
                         // instantiate Template Beans
                         networkbean = new NetworkTemplateBean();
