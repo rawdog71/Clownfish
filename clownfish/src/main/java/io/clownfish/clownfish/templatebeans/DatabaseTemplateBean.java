@@ -123,6 +123,7 @@ public class DatabaseTemplateBean implements Serializable {
                 }
             } catch (SQLException ex) {
                 LOGGER.error(ex.getMessage());
+                LOGGER.error(catalog + " - " + tablename + " - " + sqlstatement);
             }
         });
         //LOGGER.info("END dbread");

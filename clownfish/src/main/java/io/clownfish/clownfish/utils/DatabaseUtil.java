@@ -140,8 +140,14 @@ public class DatabaseUtil {
 
                     dbvalues.put("table", dbtables);
                     dbexport.put(cfdatasource.getDatabasename(), dbvalues);
+                    con.close();
                 } catch (SQLException ex) {
                     LOGGER.error(ex.getMessage());
+                    try {
+                        con.close();
+                    } catch (SQLException ex1) {
+                        LOGGER.error(ex1.getMessage());
+                    }
                 }
             } else {
                 return null;

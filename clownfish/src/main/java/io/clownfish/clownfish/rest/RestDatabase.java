@@ -494,7 +494,8 @@ public class RestDatabase {
                         String value = result.getString(tf.getName());
                         dbexportvalues.put(tf.getName(), value);
                     } catch (java.sql.SQLException ex) {
-                        
+                        LOGGER.error(ex.getMessage());
+                        LOGGER.error("Statement: " + stmt.toString());
                     }
                 }
                 tablevalues.add(dbexportvalues);

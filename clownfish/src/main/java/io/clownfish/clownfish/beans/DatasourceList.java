@@ -169,6 +169,7 @@ public class DatasourceList implements Serializable {
                         }
                     }
                 }
+                con.close();
             }
         } catch (SQLException ex) {
             LOGGER.error(ex.getMessage());
@@ -297,14 +298,19 @@ public class DatasourceList implements Serializable {
      */
     public void onConnectionCheck(ActionEvent actionEvent) {
         if (selectedDatasource != null) {
-            JDBCUtil jdbcutil = new JDBCUtil(selectedDatasource.getDriverclass(), selectedDatasource.getUrl(), selectedDatasource.getUser(), selectedDatasource.getPassword());
-            Connection con = jdbcutil.getConnection();
-            if (null != con) {
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Connection check", "Connection check successfully");
-                FacesContext.getCurrentInstance().addMessage(null, message);
-            } else {
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Connection check", "Connection check error");
-                FacesContext.getCurrentInstance().addMessage(null, message);
+            try {
+                JDBCUtil jdbcutil = new JDBCUtil(selectedDatasource.getDriverclass(), selectedDatasource.getUrl(), selectedDatasource.getUser(), selectedDatasource.getPassword());
+                Connection con = jdbcutil.getConnection();
+                if (null != con) {
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Connection check", "Connection check successfully");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                } else {
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Connection check", "Connection check error");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                }
+                con.close();
+            } catch (SQLException ex) {
+                java.util.logging.Logger.getLogger(DatasourceList.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

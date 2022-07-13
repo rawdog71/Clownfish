@@ -145,6 +145,7 @@ public class ScriptRunner {
                 runScript(connection, reader);
             } finally {
                 connection.setAutoCommit(originalAutoCommit);
+                connection.close();
             }
         } catch (IOException | SQLException e) {
             throw new RuntimeException("Error running script.  Cause: " + e, e);

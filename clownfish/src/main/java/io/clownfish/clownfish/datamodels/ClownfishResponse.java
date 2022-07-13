@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.datamodels;
 
+import java.io.ByteArrayOutputStream;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,6 +26,7 @@ import lombok.Setter;
 public class ClownfishResponse {
     private @Getter @Setter String output;
     private @Getter @Setter int errorcode;
+    private @Getter @Setter ByteArrayOutputStream outputstream;
 
     public ClownfishResponse() {
     }
