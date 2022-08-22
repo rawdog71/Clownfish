@@ -1151,7 +1151,7 @@ public class Clownfish {
                         metainfomap.put("contenttype", cfsite.getContenttype());
                         metainfomap.put("locale", cfsite.getLocale());
                         metainfomap.put("alias", cfsite.getAliaspath());
-                        metainfomap.put("version", String.valueOf(currentTemplateVersion));
+                        metainfomap.put("templateversion", String.valueOf(currentTemplateVersion));
                         
                         // instantiate Template Beans
                         networkbean = new NetworkTemplateBean();
