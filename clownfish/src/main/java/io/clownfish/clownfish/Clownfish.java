@@ -90,6 +90,7 @@ import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.websocket.WebSocketServer;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.Part;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
@@ -100,6 +101,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import org.springframework.web.bind.ServletRequestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -733,6 +735,7 @@ public class Clownfish {
      * 
      * @param name
      * @param request
+     * @param file
      * @param response
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException
      */
@@ -763,8 +766,30 @@ public class Clownfish {
             LOGGER.info("CONTENTTYPE: " + request.getContentType());
             if (request.getContentType().startsWith("multipart/form-data")) {
                 Map<String, String[]> parameterMap = request.getParameterMap();
+                int partsize = request.getParts().size();
+                Part filepart = request.getPart("file");
+                //Collection filesparts = request.getParts().size();
                 LOGGER.info(String.valueOf(parameterMap.size()));
                 LOGGER.info("MULTIPART");
+                
+                List<JsonFormParameter> map = new ArrayList<>();
+                for (String key : parameterMap.keySet()) {
+                    map.add(new JsonFormParameter(key, parameterMap.get(key)[0]));
+                }
+                
+                addHeader(response, clownfishutil.getVersion());
+                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false);
+                if (cfResponse.get().getErrorcode() == 0) {
+                    response.setContentType(this.contenttype);
+                    response.setCharacterEncoding(this.characterencoding);
+                    ServletOutputStream out = response.getOutputStream();
+                    out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
+                } else {
+                    response.setContentType("text/html");
+                    response.setCharacterEncoding("UTF-8");
+                    ServletOutputStream out = response.getOutputStream();
+                    out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
+                }
             } else {
                 String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 
@@ -847,6 +872,8 @@ public class Clownfish {
             }
         } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException | IllegalStateException | ParseException ex) {
             LOGGER.error(ex.getMessage());
+        } catch (ServletException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

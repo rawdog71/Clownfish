@@ -28,4 +28,9 @@ public class JsonFormParameter {
 
     public JsonFormParameter() {
     }
+
+    public JsonFormParameter(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
 }
