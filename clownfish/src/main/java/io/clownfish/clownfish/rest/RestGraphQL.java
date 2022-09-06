@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,7 +58,7 @@ public class RestGraphQL {
     @Autowired private CfAttributService cfattributservice;
     @Autowired transient AuthTokenList authtokenlist;
 
-    @RequestMapping(value = "/graphql", method = RequestMethod.POST)
+    @RequestMapping(value = "/graphql", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public String myGraphql(@RequestHeader("token") String token, @RequestBody String request) throws Exception {
         if (authtokenlist.checkValidToken(token)) {
         
