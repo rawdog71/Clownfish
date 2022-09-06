@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.rest;
 
+import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import com.google.gson.Gson;
 import graphql.ExecutionInput;
@@ -35,6 +36,7 @@ import io.clownfish.clownfish.graphql.GraphQLUtil;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +65,12 @@ public class RestGraphQL {
         if (authtokenlist.checkValidToken(token)) {
         
             JSONObject jsonRequest = new JSONObject(request);
-            ExecutionInput executionInput = ExecutionInput.newExecutionInput().query(jsonRequest.getString("query")).build();
+            JSONObject jsonVariables = jsonRequest.getJSONObject("variables");
+            Map<String, Object> variables = new LinkedHashMap<>();
+            for (String key : jsonVariables.keySet()) {
+                variables.put(key, jsonVariables.opt(key));
+            }
+            ExecutionInput executionInput = ExecutionInput.newExecutionInput().query(jsonRequest.getString("query")).variables(variables).build();
 
             CfClass clazz = cfclassservice.findByName(graphQLUtil.getClassnameFromQuery(jsonRequest.getString("query")));
             String sdl = graphQLUtil.generateSchema(clazz.getName());
