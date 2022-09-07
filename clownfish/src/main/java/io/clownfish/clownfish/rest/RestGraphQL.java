@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.rest;
 
 import com.github.openjson.JSONArray;
+import com.github.openjson.JSONException;
 import com.github.openjson.JSONObject;
 import com.google.gson.Gson;
 import graphql.ExecutionInput;
@@ -65,10 +66,17 @@ public class RestGraphQL {
         if (authtokenlist.checkValidToken(token)) {
         
             JSONObject jsonRequest = new JSONObject(request);
-            JSONObject jsonVariables = jsonRequest.getJSONObject("variables");
+            JSONObject jsonVariables = null;
+            try {
+                jsonVariables = jsonRequest.getJSONObject("variables");
+            } catch (JSONException jex) {
+                
+            }
             Map<String, Object> variables = new LinkedHashMap<>();
-            for (String key : jsonVariables.keySet()) {
-                variables.put(key, jsonVariables.opt(key));
+            if (null != jsonVariables) {
+                for (String key : jsonVariables.keySet()) {
+                    variables.put(key, jsonVariables.opt(key));
+                }
             }
             ExecutionInput executionInput = ExecutionInput.newExecutionInput().query(jsonRequest.getString("query")).variables(variables).build();
 
