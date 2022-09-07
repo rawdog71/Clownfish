@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.beans;
 
 import io.clownfish.clownfish.compiler.JVMLanguages;
+import io.clownfish.clownfish.datamodels.ClassImport;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;

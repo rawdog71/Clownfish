@@ -25,7 +25,7 @@ import lombok.Setter;
 public class FieldImport {
     private @Getter @Setter String fieldname;
     private @Getter @Setter String fieldtype;
-    private @Getter @Setter boolean filedisidentity;
-    private @Getter @Setter boolean filedisautoinc;
-    private @Getter @Setter boolean filedisindex;
+    private @Getter @Setter boolean fieldisidentity;
+    private @Getter @Setter boolean fieldisautoinc;
+    private @Getter @Setter boolean fieldisindex;
 }

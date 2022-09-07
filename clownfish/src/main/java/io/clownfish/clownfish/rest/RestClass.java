@@ -19,6 +19,7 @@ import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.ClassImport;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.utils.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RestClass {
     @Autowired transient CfClassService cfclassService;
+    @Autowired transient ClassUtil classutil;
     @Autowired transient AuthTokenList authtokenlist;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestClass.class);
 
@@ -47,9 +49,12 @@ public class RestClass {
             if (authtokenlist.checkValidToken(token)) {
                 //String apikey = icp.getApikey();
                 //if (apikeyutil.checkApiKey(apikey, "RestService")) {
+                try {
                     CfClass clazz = cfclassService.findByName(ci.getClassname());
-                    //System.out.println(clazz.isSearchrelevant());
-
+                    LOGGER.error("Class exists");
+                } catch (Exception ex) {
+                    classutil.createClass(ci);
+                }
                 //} else {
                 //    icp.setReturncode("Wrong API KEY");
                 //}

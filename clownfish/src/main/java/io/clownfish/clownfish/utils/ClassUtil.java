@@ -19,6 +19,8 @@ import com.google.gson.Gson;
 import io.clownfish.clownfish.beans.JavaList;
 import io.clownfish.clownfish.beans.SiteTreeBean;
 import io.clownfish.clownfish.compiler.JVMLanguages;
+import io.clownfish.clownfish.datamodels.ClassImport;
+import io.clownfish.clownfish.datamodels.FieldImport;
 import io.clownfish.clownfish.datamodels.RestContentParameter;
 import io.clownfish.clownfish.dbentities.*;
 import io.clownfish.clownfish.serviceinterface.*;
@@ -80,6 +82,29 @@ public class ClassUtil implements Serializable {
     final transient Logger LOGGER = LoggerFactory.getLogger(ClassUtil.class);
     
     public ClassUtil() {
+    }
+    
+    public void createClass(ClassImport ci) {
+        CfClass newclass = new CfClass();
+        newclass.setName(ci.getClassname());
+        newclass.setSearchrelevant(ci.isSearchenginerelevant());
+        newclass.setMaintenance(ci.isBackendmaintenance());
+        newclass.setEncrypted(ci.isEncrypted());
+        newclass.setTemplateref(null);
+        newclass = cfclassService.create(newclass);
+        
+        for (FieldImport fi : ci.getFields()) {
+            CfAttribut newattribut = new CfAttribut();
+            newattribut.setClassref(newclass);
+            newattribut.setName(fi.getFieldname());
+            newattribut.setIdentity(fi.isFieldisidentity());
+            newattribut.setAutoincrementor(fi.isFieldisautoinc());
+            newattribut.setIsindex(fi.isFieldisindex());
+            newattribut.setAttributetype(cfattributetypeService.findByName(fi.getFieldtype()));
+            newattribut.setRelationref(null);
+            
+            cfattributService.create(newattribut);
+        }
     }
     
     public Map getattributmap (CfClasscontent classcontent) {
