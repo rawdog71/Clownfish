@@ -103,6 +103,11 @@ public class ClassUtil implements Serializable {
             newattribut.setAttributetype(cfattributetypeService.findByName(fi.getFieldtype()));
             if (0 == fi.getFieldtype().compareToIgnoreCase("classref")) {
                 newattribut.setRelationref(cfclassService.findByName(fi.getClassref()));
+                if (0 == fi.getRelationtype().compareToIgnoreCase("1:n")) {
+                    newattribut.setRelationtype(1);
+                } else {
+                    newattribut.setRelationtype(0);
+                }
             } else {
                 newattribut.setRelationref(null);
             }

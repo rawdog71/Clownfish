@@ -37,9 +37,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  *

@@ -29,4 +29,5 @@ public class FieldImport {
     private @Getter @Setter boolean fieldisautoinc;
     private @Getter @Setter boolean fieldisindex;
     private @Getter @Setter String classref;
+    private @Getter @Setter String relationtype;
 }

@@ -132,6 +132,7 @@ public class ContentList implements Serializable {
     private @Getter @Setter long selectedAttributId;
     private @Getter @Setter CfAsset selectedMedia;
     private @Getter @Setter List<CfList> selectedList;
+    private @Getter @Setter List<CfClasscontent> selectedContentList;
     private @Getter @Setter List<CfAssetlist> selectedAssetList;
     private @Getter @Setter String editContent;
     private @Getter @Setter Date editCalendar;
@@ -297,10 +298,19 @@ public class ContentList implements Serializable {
                 isClassrefType = true;
                 editDatalist = null;
                 CfClass ref = selectedAttribut.getAttributref().getRelationref();
-                selectedList = cflistService.findByClassref(ref);
-                if (selectedAttribut.getClasscontentlistref() != null) {
-                    editDatalist = cflistService.findById(selectedAttribut.getClasscontentlistref().getId());
-                    memoryeditDatalist = editDatalist;
+                if (0 == selectedAttribut.getAttributref().getRelationtype()) {
+                    selectedList = cflistService.findByClassref(ref);
+                    if (selectedAttribut.getClasscontentlistref() != null) {
+                        editDatalist = cflistService.findById(selectedAttribut.getClasscontentlistref().getId());
+                        memoryeditDatalist = editDatalist;
+                    }
+                } else {
+                    selectedContentList = cfclasscontentService.findByClassref(ref);
+                    
+                    if (selectedAttribut.getClasscontentlistref() != null) {
+                        editDatalist = cflistService.findById(selectedAttribut.getClasscontentlistref().getId());
+                        memoryeditDatalist = editDatalist;
+                    }
                 }
                 break;
             case "assetref":
