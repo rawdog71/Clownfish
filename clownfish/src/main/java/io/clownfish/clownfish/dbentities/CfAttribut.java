@@ -117,7 +117,7 @@ public class CfAttribut implements Serializable {
     
     public String getAttributetypeString() {
         if (0 == attributetype.getName().compareToIgnoreCase("classref")) {
-            return attributetype.getName() + " " + getRelationtypeFull();
+            return attributetype.getName() + " [" + getRelationtypeFull() + "]";
         } else {
             return attributetype.getName();
         }
