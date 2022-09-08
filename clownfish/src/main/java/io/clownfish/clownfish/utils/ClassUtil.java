@@ -101,7 +101,11 @@ public class ClassUtil implements Serializable {
             newattribut.setAutoincrementor(fi.isFieldisautoinc());
             newattribut.setIsindex(fi.isFieldisindex());
             newattribut.setAttributetype(cfattributetypeService.findByName(fi.getFieldtype()));
-            newattribut.setRelationref(null);
+            if (0 == fi.getFieldtype().compareToIgnoreCase("classref")) {
+                newattribut.setRelationref(cfclassService.findByName(fi.getClassref()));
+            } else {
+                newattribut.setRelationref(null);
+            }
             
             cfattributService.create(newattribut);
         }
