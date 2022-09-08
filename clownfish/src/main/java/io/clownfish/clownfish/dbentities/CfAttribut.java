@@ -77,6 +77,9 @@ public class CfAttribut implements Serializable {
     @JoinColumn(name = "relationref", referencedColumnName = "id")
     @ManyToOne(optional = true)
     private CfClass relationref;
+    @Column(name = "relationtype")
+    private int relationtype;
+    
 
     public CfAttribut() {
     }
@@ -110,6 +113,14 @@ public class CfAttribut implements Serializable {
 
     public CfAttributetype getAttributetype() {
         return attributetype;
+    }
+    
+    public String getAttributetypeString() {
+        if (0 == attributetype.getName().compareToIgnoreCase("classref")) {
+            return attributetype.getName() + " " + getRelationtypeFull();
+        } else {
+            return attributetype.getName();
+        }
     }
 
     public void setAttributetype(CfAttributetype attributetype) {
@@ -154,6 +165,25 @@ public class CfAttribut implements Serializable {
 
     public void setRelationref(CfClass relationref) {
         this.relationref = relationref;
+    }
+
+    public int getRelationtype() {
+        return relationtype;
+    }
+
+    public void setRelationtype(int relationtype) {
+        this.relationtype = relationtype;
+    }
+    
+    public String getRelationtypeFull() {
+        if (0 == attributetype.getName().compareToIgnoreCase("classref")) {
+            if (0 == relationtype)
+                return "n:m";
+            else
+                return "1:n";
+        } else {
+            return "";
+        }
     }
 
     @Override

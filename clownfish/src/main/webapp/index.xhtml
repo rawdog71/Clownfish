@@ -989,6 +989,9 @@
                         <p:column headerText="Class">
                             <h:outputText value="#{attribut.relationref}" />
                         </p:column>
+                        <p:column headerText="Relation">
+                            <h:outputText value="#{attribut.relationtypeFull}" />
+                        </p:column>
                     </p:dataTable>
 
                     <p:panel id="classeditor">
@@ -1003,6 +1006,7 @@
                             <div class="flex align-items-center pr-2">
                                 <p:outputLabel for="attributtype" value="Typ:" style="margin-right: 0.5rem" />
                                 <p:selectOneMenu id="attributtype" value="#{classList.selectedAttributeType}" required="true" converter="#{attributetypeConverterBean}">
+                                    <p:ajax listener="#{classList.onChangeAttributtype}" update=":form:tabview:classeditor" />
                                     <f:selectItems value="#{classList.attributetypelist}" />
                                 </p:selectOneMenu>
                             </div>
@@ -1027,6 +1031,14 @@
                                 <p:selectOneMenu id="relationclass" value="#{classList.selectedClassRef}" required="false" converter="#{classConverterBean}" rendered="#{classList.renderClass}">
                                     <f:selectItem itemValue="#{null}" itemLabel="--select--" />
                                     <f:selectItems value="#{classList.classListeRef}" />
+                                </p:selectOneMenu>
+                            </div>
+                            
+                            <div class="flex align-items-center pr-2">
+                                <p:outputLabel for="relationtype" value="Relation:" rendered="#{classList.renderClass}" style="margin-right: 0.5rem" />
+                                <p:selectOneMenu id="relationtype" value="#{classList.selectedRelType}" required="false" rendered="#{classList.renderClass}">
+                                    <f:selectItem itemValue="0" itemLabel="n:m" />
+                                    <f:selectItem itemValue="1" itemLabel="1:m" />
                                 </p:selectOneMenu>
                             </div>
 
@@ -1138,7 +1150,7 @@
                                 <h:outputText value="#{attributcontent.attributref.name}" />
                             </p:column>
                             <p:column headerText="Typ" style="width: 200px;">
-                                <h:outputText value="#{attributcontent.attributref.attributetype}" />
+                                <h:outputText value="#{attributcontent.attributref.attributetypeString}" />
                             </p:column>
                             <p:column headerText="Wert">
                                     <p:inputText id="attributvalueString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.stringType}" />

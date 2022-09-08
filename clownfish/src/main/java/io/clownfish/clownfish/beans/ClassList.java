@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.beans;
 
 import io.clownfish.clownfish.compiler.JVMLanguages;
-import io.clownfish.clownfish.datamodels.ClassImport;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
@@ -85,6 +84,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean isindex;
     private @Getter @Setter List<CfClass> classListeRef;
     private @Getter @Setter CfClass selectedClassRef = null;
+    private @Getter @Setter int selectedRelType = -1;
     private @Getter @Setter CfTemplate selectedTemplateRef = null;
     private @Getter @Setter boolean newButtonDisabled;
     private @Getter @Setter boolean newAttributButtonDisabled;
@@ -138,9 +138,11 @@ public class ClassList implements Serializable {
         if (selectedAttributeType.getName().compareToIgnoreCase("classref") == 0) {
             renderClass = true;
             selectedClassRef = selectedAttribut.getRelationref();
+            selectedRelType = selectedAttribut.getRelationtype();
         } else {
             selectedClassRef = null;
             renderClass = false;
+            selectedRelType = -1;
         }
         identity = selectedAttribut.getIdentity();
         autoinc = selectedAttribut.getAutoincrementor();
@@ -223,6 +225,7 @@ public class ClassList implements Serializable {
             newattribut.setIsindex(isindex);
             newattribut.setAttributetype(selectedAttributeType);
             newattribut.setRelationref(selectedClassRef);
+            newattribut.setRelationtype(selectedRelType);
             
             cfattributService.create(newattribut);
             selectedAttributList = attributlist.init(selectedClass);
@@ -252,12 +255,28 @@ public class ClassList implements Serializable {
             selectedAttribut.setIdentity(identity);
             selectedAttribut.setAutoincrementor(autoinc);
             selectedAttribut.setIsindex(isindex);
-            selectedAttribut.setRelationref(selectedClassRef);
+            if (0 == selectedAttributeType.getName().compareToIgnoreCase("classref")) {
+                selectedAttribut.setRelationref(selectedClassRef);
+                selectedAttribut.setRelationtype(selectedRelType);
+            } else {
+                selectedAttribut.setRelationref(null);
+                selectedAttribut.setRelationtype(0);
+            }
             cfattributService.edit(selectedAttribut);
             //HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
             
             FacesMessage message = new FacesMessage("Attribute changed");
             FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public void onChangeAttributtype() {
+        if (null != selectedAttributeType) {
+            if (0 == selectedAttributeType.getName().compareToIgnoreCase("classref")) {
+                renderClass = true;
+            } else {
+                renderClass = false;
+            }
         }
     }
     
