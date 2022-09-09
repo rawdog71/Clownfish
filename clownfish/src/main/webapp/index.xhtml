@@ -1172,9 +1172,13 @@
                                         #{mp.name}
                                         </p:column>
                                     </p:selectOneMenu>
-                                    <p:selectOneMenu dynamic="true" id="classref" value="#{classcontentList.editDatalist}" converter="#{sitelistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType}">
+                                    <p:selectOneMenu dynamic="true" id="classref_1" value="#{classcontentList.editDatalist}" converter="#{sitelistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType and (attributcontent.attributref.relationtype==0)}">
                                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />
                                         <f:selectItems value="#{classcontentList.selectedList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu dynamic="true" id="classref_2" value="#{classcontentList.editDataContentlist}" converter="#{classcontentConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType and (attributcontent.attributref.relationtype==1)}">
+                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                        <f:selectItems value="#{classcontentList.selectedContentList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
                                     </p:selectOneMenu>
                                     <p:selectOneMenu dynamic="true" id="assetref" value="#{classcontentList.editAssetlist}" converter="#{assetlistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.assetrefType}">
                                         <f:selectItem itemValue="#{null}" itemLabel="--select--" />

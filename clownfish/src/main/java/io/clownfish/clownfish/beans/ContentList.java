@@ -138,6 +138,8 @@ public class ContentList implements Serializable {
     private @Getter @Setter Date editCalendar;
     private @Getter @Setter CfList editDatalist;
     private @Getter @Setter CfList memoryeditDatalist;
+    private @Getter @Setter CfClasscontent editDataContentlist;
+    private @Getter @Setter CfClasscontent memoryeditDataContentlist;
     private @Getter @Setter CfAssetlist editAssetlist;
     private @Getter @Setter boolean isBooleanType;
     private @Getter @Setter boolean isStringType;
@@ -306,9 +308,8 @@ public class ContentList implements Serializable {
                     }
                 } else {
                     selectedContentList = cfclasscontentService.findByClassref(ref);
-                    
-                    if (selectedAttribut.getClasscontentlistref() != null) {
-                        editDatalist = cflistService.findById(selectedAttribut.getClasscontentlistref().getId());
+                    if (selectedAttribut.getContentInteger() != null) {
+                        editDataContentlist = cfclasscontentService.findById(selectedAttribut.getContentInteger().longValue()); //cflistService.findById(selectedAttribut.getClasscontentlistref().getId());
                         memoryeditDatalist = editDatalist;
                     }
                 }
@@ -505,8 +506,12 @@ public class ContentList implements Serializable {
                 }
                 break;
             case "classref":
-                selectedAttribut.setClasscontentlistref(editDatalist);
-                updateClassref = true;
+                if (0 == selectedAttribut.getAttributref().getRelationtype()) {
+                    selectedAttribut.setClasscontentlistref(editDatalist);
+                    updateClassref = true;
+                } else {
+                    selectedAttribut.setContentInteger(BigInteger.valueOf(editDataContentlist.getId()));
+                }
                 break;
             case "assetref":
                 selectedAttribut.setAssetcontentlistref(editAssetlist);

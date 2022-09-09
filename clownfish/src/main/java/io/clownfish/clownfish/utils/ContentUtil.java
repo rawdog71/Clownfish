@@ -537,10 +537,18 @@ public class ContentUtil implements IVersioningInterface {
                     return "";
                 } 
             case 11: // classref
-                if (null != attributcontent.getClasscontentlistref()) {
-                    return attributcontent.getClasscontentlistref().getName();
+                if (0 == attributcontent.getAttributref().getRelationtype()) {
+                    if (null != attributcontent.getClasscontentlistref()) {
+                        return attributcontent.getClasscontentlistref().getName();
+                    } else {
+                        return "";
+                    }
                 } else {
-                    return "";
+                    if (null != attributcontent.getContentInteger()) {
+                        return cfclasscontentService.findById(attributcontent.getContentInteger().longValue()).getName(); //attributcontent.getClasscontentlistref().getName();
+                    } else {
+                        return "";
+                    }
                 }
             case 12: // assetref
                 if (null != attributcontent.getAssetcontentlistref()) {
