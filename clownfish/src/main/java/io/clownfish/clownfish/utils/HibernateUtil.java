@@ -111,19 +111,44 @@ public class HibernateUtil implements Runnable {
                 elementid.addAttribute("name", "cf_id");
                 elementid.addAttribute("column", "CF_ID__");
                 elementid.addAttribute("type", "long");
+                //elementid.addAttribute("insert", "false");
+                //elementid.addAttribute("update", "false");
                 Element elementgenerator = elementid.addElement("generator");
                 elementgenerator.addAttribute("class", "native");
                 makePrimaryKey(attributlist, elementclass, idCount);
                 // Set the properties
                 for (CfAttribut attribut : attributlist) {
                     if (!attribut.getIdentity()) {
-                        Element elementproperty = elementclass.addElement("property");
-                        elementproperty.addAttribute("name", attribut.getName());
-                        elementproperty.addAttribute("column", attribut.getName() + "_");
-                        elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
-                        elementproperty.addAttribute("not-null", "false");
-                        if (attribut.getIsindex()) {
-                            elementproperty.addAttribute("index", "idx_" + attribut.getName());
+                        if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == attribut.getRelationtype())) {
+                            Element elementmanytoone = elementclass.addElement("many-to-one");
+                            elementmanytoone.addAttribute("name", attribut.getName() + "_ref_");
+                            elementmanytoone.addAttribute("class", attribut.getRelationref().getName());
+                            CfClass foreignclass = cfclassservice.findByName(attribut.getRelationref().getName());
+                            List<CfAttribut> foreignattributlist = cfattributservice.findByClassref(foreignclass);
+                            for (CfAttribut foreignattribut : foreignattributlist) {
+                                if (foreignattribut.getIdentity()) {
+                                    Element elementcolumn = elementmanytoone.addElement("column");
+                                    elementcolumn.addAttribute("name", foreignattribut.getName());
+                                    elementcolumn.addAttribute("not-null", "false");
+                                }
+                            }
+                        } else {
+                            Element elementproperty = elementclass.addElement("property");
+                            elementproperty.addAttribute("name", attribut.getName());
+                            if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
+                                //if (0 == attribut.getRelationtype()) {
+                                    elementproperty.addAttribute("column", attribut.getName() + "_ref_n_m_");
+                                //} else {
+                                //    elementproperty.addAttribute("column", attribut.getName() + "_ref_1_n_");
+                                //}
+                            } else {
+                                elementproperty.addAttribute("column", attribut.getName() + "_");
+                            }
+                            elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
+                            elementproperty.addAttribute("not-null", "false");
+                            if (attribut.getIsindex()) {
+                                elementproperty.addAttribute("index", "idx_" + attribut.getName());
+                            }
                         }
                     }
                 }                
@@ -134,7 +159,7 @@ public class HibernateUtil implements Runnable {
                 elementproperty.addAttribute("not-null", "true");
                 elementproperty.addAttribute("index", "idx_cf_contentref");
             }
-            //System.out.println(xmldoc.asXML());
+            System.out.println(xmldoc.asXML());
             ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
             SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes("UTF-8"))).buildMetadata().buildSessionFactory();
             Session session_tables = sessionFactory.openSession();
@@ -184,6 +209,8 @@ public class HibernateUtil implements Runnable {
                 elementid.addAttribute("name", "cf_id");
                 elementid.addAttribute("column", "CF_ID__");
                 elementid.addAttribute("type", "long");
+                //elementid.addAttribute("insert", "false");
+                //elementid.addAttribute("update", "false");
                 Element elementgenerator = elementid.addElement("generator");
                 elementgenerator.addAttribute("class", "native");
                 makePrimaryKey(attributlist, elementclass, idCount);
@@ -192,8 +219,16 @@ public class HibernateUtil implements Runnable {
                     if (!attribut.getIdentity()) {
                         Element elementproperty = elementclass.addElement("property");
                         elementproperty.addAttribute("name", attribut.getName());
-                        elementproperty.addAttribute("column", attribut.getName() + "_");
-                        elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
+                        if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
+                            if (0 == attribut.getRelationtype()) {
+                                elementproperty.addAttribute("column", attribut.getName() + "_ref_n_m_");
+                            } else {
+                                elementproperty.addAttribute("column", attribut.getName() + "_ref_1_n_");
+                            }
+                        } else {
+                            elementproperty.addAttribute("column", attribut.getName() + "_");
+                        }
+                        elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
                         elementproperty.addAttribute("not-null", "false");
                         if (attribut.getIsindex()) {
                             elementproperty.addAttribute("index", "idx_" + attribut.getName());
@@ -303,7 +338,7 @@ public class HibernateUtil implements Runnable {
         }
     }
 
-    private static String getHibernateType(String clownfishtype) {
+    private static String getHibernateType(String clownfishtype, int relationtype) {
         switch (clownfishtype) {
             case "boolean":
                 return "boolean";
@@ -326,7 +361,11 @@ public class HibernateUtil implements Runnable {
             case "text":
                 return "text";
             case "classref":
-                return "string";
+                if (0 == relationtype) {
+                    return "string";
+                } else {
+                    return "long";
+                }
             case "assetref":
                 return "string";
             default:
@@ -358,8 +397,10 @@ public class HibernateUtil implements Runnable {
                     Element elementproperty = elementclass.addElement("property");
                     elementproperty.addAttribute("name", attribut.getName());
                     elementproperty.addAttribute("column", attribut.getName() + "_");
-                    elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
+                    elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
                     elementproperty.addAttribute("index", "idx_" + attribut.getName());
+                    //elementproperty.addAttribute("insert", "false");
+                    //elementproperty.addAttribute("update", "false");
                 }
             }
         } else {
@@ -368,8 +409,10 @@ public class HibernateUtil implements Runnable {
                     Element elementkeyproperty = elementclass.addElement("property");
                     elementkeyproperty.addAttribute("name", attribut.getName());
                     elementkeyproperty.addAttribute("column", attribut.getName() + "_");
-                    elementkeyproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
+                    elementkeyproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
                     elementkeyproperty.addAttribute("index", "idx_" + attribut.getName());
+                    //elementkeyproperty.addAttribute("insert", "false");
+                    //elementkeyproperty.addAttribute("update", "false");
                 }
             }
         }
@@ -385,34 +428,36 @@ public class HibernateUtil implements Runnable {
             for (CfAttribut attribut : attributlist) {
                 switch (attribut.getAttributetype().getName()) {
                     case "classref":
-                        Element elementclass = root.addElement("class");
-                        elementclass.addAttribute("entity-name", clazz.getName() + "_" + attribut.getName());
-                        elementclass.addAttribute("table", "usr_rel_" + clazz.getName() + "_" + attribut.getName());
-                        
-                        Element elementproperty = elementclass.addElement("composite-id");
-                        elementproperty.addAttribute("name", "id_");
-                        
-                        Element elementkeyproperty1 = elementproperty.addElement("key-property");
-                        elementkeyproperty1.addAttribute("name", clazz.getName() + "_ref");
-                        elementkeyproperty1.addAttribute("column", clazz.getName() + "_ref_");
-                        elementkeyproperty1.addAttribute("type", "long");
-                        
-                        Element elementkeyproperty2 = elementproperty.addElement("key-property");
-                        elementkeyproperty2.addAttribute("name", attribut.getName() + "_ref");
-                        elementkeyproperty2.addAttribute("column", attribut.getName() + "_ref_");
-                        elementkeyproperty2.addAttribute("type", "long");
-                        
-                        Element elementproperty3 = elementclass.addElement("property");
-                        elementproperty3.addAttribute("name", clazz.getName() + "_usr_ref");
-                        elementproperty3.addAttribute("column", clazz.getName() + "_usr_ref_");
-                        elementproperty3.addAttribute("type", "long");
-                        elementproperty3.addAttribute("not-null", "false");
-                        
-                        Element elementproperty4 = elementclass.addElement("property");
-                        elementproperty4.addAttribute("name", attribut.getName() + "_usr_ref");
-                        elementproperty4.addAttribute("column", attribut.getName() + "_usr_ref_");
-                        elementproperty4.addAttribute("type", "long");
-                        elementproperty4.addAttribute("not-null", "false");
+                        if (0 == attribut.getRelationtype()) {
+                            Element elementclass = root.addElement("class");
+                            elementclass.addAttribute("entity-name", clazz.getName() + "_" + attribut.getName());
+                            elementclass.addAttribute("table", "usr_rel_" + clazz.getName() + "_" + attribut.getName());
+
+                            Element elementproperty = elementclass.addElement("composite-id");
+                            elementproperty.addAttribute("name", "id_");
+
+                            Element elementkeyproperty1 = elementproperty.addElement("key-property");
+                            elementkeyproperty1.addAttribute("name", clazz.getName() + "_ref");
+                            elementkeyproperty1.addAttribute("column", clazz.getName() + "_ref_");
+                            elementkeyproperty1.addAttribute("type", "long");
+
+                            Element elementkeyproperty2 = elementproperty.addElement("key-property");
+                            elementkeyproperty2.addAttribute("name", attribut.getName() + "_ref");
+                            elementkeyproperty2.addAttribute("column", attribut.getName() + "_ref_");
+                            elementkeyproperty2.addAttribute("type", "long");
+
+                            Element elementproperty3 = elementclass.addElement("property");
+                            elementproperty3.addAttribute("name", clazz.getName() + "_usr_ref");
+                            elementproperty3.addAttribute("column", clazz.getName() + "_usr_ref_");
+                            elementproperty3.addAttribute("type", "long");
+                            elementproperty3.addAttribute("not-null", "false");
+
+                            Element elementproperty4 = elementclass.addElement("property");
+                            elementproperty4.addAttribute("name", attribut.getName() + "_usr_ref");
+                            elementproperty4.addAttribute("column", attribut.getName() + "_usr_ref_");
+                            elementproperty4.addAttribute("type", "long");
+                            elementproperty4.addAttribute("not-null", "false");
+                        }
                         break;
                     case "assetref":
                         break;            
@@ -422,6 +467,7 @@ public class HibernateUtil implements Runnable {
         //System.out.println(xmldoc.asXML());
         ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().applySetting("hibernate.connection.url", datasourceURL).build();
         SessionFactory sessionFactory = new MetadataSources(standardRegistry).addInputStream(new ByteArrayInputStream(xmldoc.asXML().getBytes())).buildMetadata().buildSessionFactory();
+        System.out.println(xmldoc.asXML());
         Session session_relations = sessionFactory.openSession();
         Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
         classsessions.put("relations", session_relations);       
@@ -429,9 +475,11 @@ public class HibernateUtil implements Runnable {
             List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
             for (CfAttribut attribut : attributlist) {
                 switch (attribut.getAttributetype().getName()) {
-                    case "classref":        
-                        if (initHibernate > 0) {
-                            fillRelation(clazz.getName(), attribut.getName(), session_tables, session_relations);
+                    case "classref":
+                        if (0 == attribut.getRelationtype()) {
+                            if (initHibernate > 0) {
+                                fillRelation(clazz.getName(), attribut.getName(), session_tables, session_relations);
+                            }
                         }
                         break;
                 }
@@ -602,7 +650,7 @@ public class HibernateUtil implements Runnable {
                         }
                     } else {
                         if (null != attributcontent.getContentInteger()) {
-                            entity.put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger());
+                            entity.put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().longValue());
                         } else {
                             entity.put(attributcontent.getAttributref().getName(), null);
                         }
