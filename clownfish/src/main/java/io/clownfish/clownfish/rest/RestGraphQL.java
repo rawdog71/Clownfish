@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.rest;
 
-import com.github.openjson.JSONArray;
 import com.github.openjson.JSONException;
 import com.github.openjson.JSONObject;
 import com.google.gson.Gson;
@@ -116,6 +115,8 @@ public class RestGraphQL {
         for (CfClass clazz : classlist) {
             String fetchername = clazz.getName()+"All";
             dataFetchersMap.put(fetchername, graphQLDataFetchers.getDataByField(clazz.getName(), ""));
+            fetchername = clazz.getName()+"ByFilter";
+            dataFetchersMap.put(fetchername, graphQLDataFetchers.getDataByFilter(clazz.getName(), "input"));
             List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
             for (CfAttribut attribut : attributlist) {
                 if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
@@ -132,6 +133,8 @@ public class RestGraphQL {
         Map<String, DataFetcher> dataFetchersMap = new HashMap();
         String fetchername = clazz.getName()+"All";
         dataFetchersMap.put(fetchername, graphQLDataFetchers.getDataByField(clazz.getName(), ""));
+        fetchername = clazz.getName()+"ByFilter";
+        dataFetchersMap.put(fetchername, graphQLDataFetchers.getDataByFilter(clazz.getName(), "input"));
         List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
         for (CfAttribut attribut : attributlist) {
             if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {

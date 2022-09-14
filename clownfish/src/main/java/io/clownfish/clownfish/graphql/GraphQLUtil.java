@@ -42,9 +42,21 @@ public class GraphQLUtil {
         CfClass clazz = cfclassservice.findByName(classname);
         StringBuilder sb = new StringBuilder();
         
+        sb.append("input GeneralFilter {\n");
+        sb.append("   field : String\n");
+        sb.append("   op : String\n");
+        sb.append("   value : String\n");
+        sb.append("}\n\n");
+        
+        sb.append("input GeneralInput {\n");
+        sb.append("   filter: [GeneralFilter]\n");
+        sb.append("}\n\n");
+        
         sb.append("type Query {\n");
         List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
         sb.append("  ").append(clazz.getName()).append("All")
+                    .append(": [").append(clazz.getName()).append("]\n");
+        sb.append("  ").append(clazz.getName()).append("ByFilter(input: ").append("GeneralInput)")
                     .append(": [").append(clazz.getName()).append("]\n");
         for (CfAttribut attribut : attributlist) {
             if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {

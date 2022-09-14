@@ -127,6 +127,26 @@ public class GraphQLDataFetchers {
         };
     }
     
+    public DataFetcher getDataByFilter(String classname, String fieldname) {
+        return dataFetchingEnvironment -> {
+            CfClass clazz = cfclassservice.findByName(classname);
+            
+            if (!fieldname.isEmpty()) {
+                
+                Map<String, ArrayList> input_values = dataFetchingEnvironment.getArgument(fieldname);
+                List<HashMap<String, String>> filter_list = input_values.get("filter");
+                List<Map<String, String>> resultlist = null;
+                resultlist = getList(clazz, filter_list);
+                
+                return resultlist;
+            } else {
+                List<Map<String, String>> resultlist = null;
+                resultlist = getList(clazz, "", null);
+                return resultlist;
+            }
+        };
+    }
+    
     private Map<String, String> getSingle(CfClass clazz, String attributname, Object attributvalue) {
         if (0 == useHibernate) {
             Map<String, String> result = new HashMap<>();
@@ -211,6 +231,84 @@ public class GraphQLDataFetchers {
             HashMap searchmap = new HashMap<>();
             if (null != attributvalue) {
                 searchmap.put(attributname+"_1", (String) attributvalue.toString());
+            }
+            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
+            try {
+                List<Map> contentliste = (List<Map>) query.getResultList();
+
+                session_tables.close();
+                for (Map content : contentliste) {
+                    CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
+                    if (null != cfclasscontent) {
+                        if (!cfclasscontent.isScrapped()) {
+                            ContentDataOutput contentdataoutput = new ContentDataOutput();
+                            contentdataoutput.setContent(cfclasscontent);
+                            if (cfclasscontent.getClassref().isEncrypted()) {
+                                contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                            } else {
+                                contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
+                            }
+                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                            setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                            try {
+                                contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
+                                contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                            } catch (Exception ex) {
+
+                            }
+                            result.add(contentdataoutput.getKeyvals().get(0));
+                        }
+                    }
+                }
+            } catch (NoResultException ex) {
+                session_tables.close();
+            }
+            
+            return result;
+        }
+    }
+    
+    private List<Map<String, String>> getList(CfClass clazz, List<HashMap<String, String>> filter_list) {
+        if (0 == useHibernate) {
+            List<Map<String, String>> result = new ArrayList<>();
+            List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(clazz);
+            for (CfClasscontent cc : classcontentList) {
+                if (!cc.isScrapped()) {
+                    HashMap<String, String> attributmap = new HashMap<>();
+                    
+                    for (HashMap<String, String> filter : filter_list) {
+                        String field = filter.get("field");
+                        String op = filter.get("op");
+                        String value = filter.get("value");
+
+                        CfAttribut attribut = cfattributservice.findByNameAndClassref(field, clazz);
+                        if (!field.isEmpty()) {
+                            List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
+                            if (checkCompare(aclist, cc, field, value)) {
+                                List keyvals = contentUtil.getContentOutputKeyval(aclist);
+                                result.add((Map)keyvals.get(0));
+                            }
+                        } else {
+                            List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
+                            List keyvals = contentUtil.getContentOutputKeyval(aclist);
+                            result.add((Map)keyvals.get(0));
+                        }
+
+                    }
+                }
+            }
+            return result;
+        } else {
+            List<Map<String, String>> result = new ArrayList<>();
+            Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+            HashMap searchmap = new HashMap<>();
+            for (HashMap<String, String> filter : filter_list) {
+                String field = filter.get("field");
+                String op = filter.get("op");
+                String value = filter.get("value");
+                if (null != field) {
+                    searchmap.put(field+"_1", ":" + op + ":" + (String) value.toString());
+                }
             }
             Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
             try {
