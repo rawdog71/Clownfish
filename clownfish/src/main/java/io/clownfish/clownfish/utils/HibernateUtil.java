@@ -120,7 +120,7 @@ public class HibernateUtil implements Runnable {
                         Element elementproperty = elementclass.addElement("property");
                         elementproperty.addAttribute("name", attribut.getName());
                         elementproperty.addAttribute("column", attribut.getName() + "_");
-                        elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
+                        elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
                         elementproperty.addAttribute("not-null", "false");
                         if (attribut.getIsindex()) {
                             elementproperty.addAttribute("index", "idx_" + attribut.getName());
@@ -193,7 +193,7 @@ public class HibernateUtil implements Runnable {
                         Element elementproperty = elementclass.addElement("property");
                         elementproperty.addAttribute("name", attribut.getName());
                         elementproperty.addAttribute("column", attribut.getName() + "_");
-                        elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
+                        elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
                         elementproperty.addAttribute("not-null", "false");
                         if (attribut.getIsindex()) {
                             elementproperty.addAttribute("index", "idx_" + attribut.getName());
@@ -303,7 +303,7 @@ public class HibernateUtil implements Runnable {
         }
     }
 
-    private static String getHibernateType(String clownfishtype) {
+    private static String getHibernateType(String clownfishtype, int relationtype) {
         switch (clownfishtype) {
             case "boolean":
                 return "boolean";
@@ -326,7 +326,11 @@ public class HibernateUtil implements Runnable {
             case "text":
                 return "text";
             case "classref":
-                return "string";
+                if (0 == relationtype) {
+                    return "string";
+                } else {
+                    return "long";
+                }
             case "assetref":
                 return "string";
             default:
@@ -358,7 +362,7 @@ public class HibernateUtil implements Runnable {
                     Element elementproperty = elementclass.addElement("property");
                     elementproperty.addAttribute("name", attribut.getName());
                     elementproperty.addAttribute("column", attribut.getName() + "_");
-                    elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
+                    elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
                     elementproperty.addAttribute("index", "idx_" + attribut.getName());
                 }
             }
@@ -368,7 +372,7 @@ public class HibernateUtil implements Runnable {
                     Element elementkeyproperty = elementclass.addElement("property");
                     elementkeyproperty.addAttribute("name", attribut.getName());
                     elementkeyproperty.addAttribute("column", attribut.getName() + "_");
-                    elementkeyproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName()));
+                    elementkeyproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
                     elementkeyproperty.addAttribute("index", "idx_" + attribut.getName());
                 }
             }
@@ -602,7 +606,7 @@ public class HibernateUtil implements Runnable {
                         }
                     } else {
                         if (null != attributcontent.getContentInteger()) {
-                            entity.put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger());
+                            entity.put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().longValue());
                         } else {
                             entity.put(attributcontent.getAttributref().getName(), null);
                         }
