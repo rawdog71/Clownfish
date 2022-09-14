@@ -594,18 +594,10 @@ public class HibernateUtil implements Runnable {
                     entity.put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
                     break;
                 case "classref":
-                    if (0 == attributcontent.getAttributref().getRelationtype()) {
-                        if (null != attributcontent.getClasscontentlistref()) {
-                            entity.put(attributcontent.getAttributref().getName(), attributcontent.getClasscontentlistref().getName());
-                        } else {
-                            entity.put(attributcontent.getAttributref().getName(), null);
-                        }
+                    if (null != attributcontent.getClasscontentlistref()) {
+                        entity.put(attributcontent.getAttributref().getName(), attributcontent.getClasscontentlistref().getName());
                     } else {
-                        if (null != attributcontent.getContentInteger()) {
-                            entity.put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger());
-                        } else {
-                            entity.put(attributcontent.getAttributref().getName(), null);
-                        }
+                        entity.put(attributcontent.getAttributref().getName(), null);
                     }
                     break;
                 case "assetref":
