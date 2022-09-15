@@ -50,7 +50,7 @@ public class AssetlistConverter implements Converter, Serializable {
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        if (value == null) {
+        if (null == value) {
             return "-1";
         } else {
             String returnname = ((CfAssetlist) value).getId().toString();

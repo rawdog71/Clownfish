@@ -96,7 +96,7 @@ public class ClownfishUtil {
             for (JsonFormParameter jfp : postmap) {
                 // Datenbank READ Parameter
                 if (jfp.getName().compareToIgnoreCase("db$table") == 0) {
-                    if (datatableproperties.get(jfp.getValue()) == null ) {
+                    if (null == datatableproperties.get(jfp.getValue())) {
                         DatatableProperties dtp = new DatatableProperties();
                         dtp.setTablename(jfp.getValue());
                         datatableproperties.put(jfp.getValue(), dtp);
@@ -270,19 +270,19 @@ public class ClownfishUtil {
             for (JsonFormParameter jfp : postmap) {
                 // EMAIL Parameter
                 if (jfp.getName().compareToIgnoreCase("email$to") == 0) {
-                    if (emailproperties == null) {
+                    if (null == emailproperties) {
                         emailproperties = new EmailProperties();
                     }
                     emailproperties.setSendto(jfp.getValue());
                 }
                 if (jfp.getName().compareToIgnoreCase("email$subject") == 0) {
-                    if (emailproperties == null) {
+                    if (null == emailproperties) {
                         emailproperties = new EmailProperties();
                     }
                     emailproperties.setSubject(jfp.getValue());
                 }
                 if (jfp.getName().compareToIgnoreCase("email$body") == 0) {
-                    if (emailproperties == null) {
+                    if (null == emailproperties) {
                         emailproperties = new EmailProperties();
                     }
                     emailproperties.setBody(jfp.getValue());

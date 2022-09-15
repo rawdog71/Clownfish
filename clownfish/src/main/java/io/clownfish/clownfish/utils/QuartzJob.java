@@ -94,7 +94,7 @@ public class QuartzJob implements Job {
     public void init() {
         try {
             String libloaderpath = propertyUtil.getPropertyValue("folder_libs");
-            if (beanUtil == null) {
+            if (null == beanUtil) {
                 beanUtil = new BeanUtil();
                 if ((!libloaderpath.isBlank()) && (null != libloaderpath)) 
                     beanUtil.init(libloaderpath);

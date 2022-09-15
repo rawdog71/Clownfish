@@ -566,7 +566,7 @@ public class RestDatabase {
                     String colomuntypename = columns.getString("TYPE_NAME");
                     String columnsize = columns.getString("COLUMN_SIZE");
                     String decimaldigits = columns.getString("DECIMAL_DIGITS");
-                    if (decimaldigits == null) {
+                    if (null == decimaldigits) {
                         decimaldigits = "0";
                     }
                     String isNullable = columns.getString("IS_NULLABLE");
@@ -649,7 +649,7 @@ public class RestDatabase {
                     String colomuntypename = columns.getString("TYPE_NAME");
                     String columnsize = columns.getString("COLUMN_SIZE");
                     String decimaldigits = columns.getString("DECIMAL_DIGITS");
-                    if (decimaldigits == null) {
+                    if (null == decimaldigits) {
                         decimaldigits = "0";
                     }
                     String isNullable = columns.getString("IS_NULLABLE");

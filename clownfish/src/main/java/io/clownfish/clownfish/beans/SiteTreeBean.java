@@ -274,7 +274,7 @@ public class SiteTreeBean implements Serializable {
         }
         propertymap = propertylist.fillPropertyMap();
         String sapSupportProp = propertymap.get("sap_support");
-        if (sapSupportProp == null) {
+        if (null == sapSupportProp) {
             sapSupport = false;
         } else {
             if (sapSupportProp.compareToIgnoreCase("TRUE") == 0) {

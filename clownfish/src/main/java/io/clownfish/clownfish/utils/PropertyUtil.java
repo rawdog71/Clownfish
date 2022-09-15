@@ -40,7 +40,7 @@ public class PropertyUtil {
     }
    
     public PropertyUtil(PropertyList propertylist) {
-        if (propertymap == null) {
+        if (null == propertymap) {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
         }
@@ -48,7 +48,7 @@ public class PropertyUtil {
     
     public String getPropertySwitch(String property, int propertyfield) {
         String propertySwitch = getPropertymap().get(property);
-        if (propertySwitch == null) {
+        if (null == propertySwitch) {
             propertySwitch = "off";
         }
         switch (propertyfield) {

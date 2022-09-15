@@ -316,7 +316,7 @@ public class GetContentHibernate extends HttpServlet {
 
         String range;
 
-        range = gcp.getRange() == null ? "" : gcp.getRange();
+        range = null == gcp.getRange() ? "" : gcp.getRange();
 
         if (!range.isEmpty()) {
             if (range.contains("-")) {

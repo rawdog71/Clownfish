@@ -243,7 +243,7 @@ public class CfClassCompiler implements Runnable
     }
 
     public void compileAll(boolean withMessage) {
-        if (getTmpdir() == null)
+        if (null == getTmpdir())
         {
             try
             {

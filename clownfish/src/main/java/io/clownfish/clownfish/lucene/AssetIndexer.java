@@ -88,7 +88,7 @@ public class AssetIndexer implements Runnable {
         date
     */
     private Document getDocument(CfAsset assetcontent) throws IOException {
-        if (propertymap == null) {
+        if (null == propertymap) {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
         }

@@ -51,7 +51,7 @@ public class AssetUtil {
     }
     
     public HashMap<String, String> getMetadata(CfAsset assetcontent, HashMap metamap) throws IOException {
-        if (propertymap == null) {
+        if (null == propertymap ) {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
         }

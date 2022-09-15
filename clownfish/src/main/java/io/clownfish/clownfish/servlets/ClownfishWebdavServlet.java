@@ -298,7 +298,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
 
         final String depthStr = req.getHeader("Depth");
         
-        if (depthStr == null) {
+        if (null == depthStr) {
             depth = this.maxDepth;
         } else {
             switch (depthStr) {
@@ -780,7 +780,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
         // Propfind depth
         int depth = this.maxDepth;
         
-        if (depthStr == null) {
+        if (null == depthStr) {
             depth = this.maxDepth;
         } else {
             switch (depthStr) {

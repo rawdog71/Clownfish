@@ -168,7 +168,7 @@ public class ScriptRunner {
             LineNumberReader lineReader = new LineNumberReader(reader);
             String line;
             while ((line = lineReader.readLine()) != null) {
-                if (command == null) {
+                if (null == command) {
                     command = new StringBuffer();
                 }
                 String trimmedLine = line.trim();

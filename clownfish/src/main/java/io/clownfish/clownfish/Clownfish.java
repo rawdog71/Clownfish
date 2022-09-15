@@ -295,7 +295,7 @@ public class Clownfish {
         mavenpath = propertyUtil.getPropertyValue("folder_maven");
         
         if ((!mavenpath.isBlank()) && (null != mavenpath)) {
-            if (classpathUtil == null) {
+            if (null == classpathUtil) {
                 classpathUtil = new ClassPathUtil();
                 classpathUtil.init(cfclassLoader);
             }
@@ -425,10 +425,10 @@ public class Clownfish {
                 defaultUtil = new DefaultUtil();
             }
 
-            if (mailUtil == null)
+            if (null == mailUtil)
                 mailUtil = new MailUtil(propertyUtil);
 
-            if (pdfUtil == null)
+            if (null == pdfUtil)
                 pdfUtil = new PDFUtil(cftemplateService, cftemplateversionService, cfsitedatasourceService, cfdatasourceService, cfsiteService, propertyUtil, templateUtil);
 
             // Set default values

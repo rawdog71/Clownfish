@@ -84,7 +84,7 @@ public class RfcGroupConverter implements Converter, Serializable {
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        if (value == null) {
+        if (null == value) {
             return "-1";
         } else {
             return ((RfcGroup) value).getName();

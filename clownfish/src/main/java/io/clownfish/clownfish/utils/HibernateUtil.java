@@ -119,7 +119,15 @@ public class HibernateUtil implements Runnable {
                     if (!attribut.getIdentity()) {
                         Element elementproperty = elementclass.addElement("property");
                         elementproperty.addAttribute("name", attribut.getName());
-                        elementproperty.addAttribute("column", attribut.getName() + "_");
+                        if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
+                            if (0 == attribut.getRelationtype()) {
+                                elementproperty.addAttribute("column", attribut.getName() + "_ref_" + attribut.getRelationref().getName() + "_n_m_");
+                            } else {
+                                elementproperty.addAttribute("column", attribut.getName() + "_ref_" + attribut.getRelationref().getName() + "_1_n_");
+                            }
+                        } else {
+                            elementproperty.addAttribute("column", attribut.getName() + "_");
+                        }
                         elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
                         elementproperty.addAttribute("not-null", "false");
                         if (attribut.getIsindex()) {
@@ -192,7 +200,15 @@ public class HibernateUtil implements Runnable {
                     if (!attribut.getIdentity()) {
                         Element elementproperty = elementclass.addElement("property");
                         elementproperty.addAttribute("name", attribut.getName());
-                        elementproperty.addAttribute("column", attribut.getName() + "_");
+                        if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
+                            if (0 == attribut.getRelationtype()) {
+                                elementproperty.addAttribute("column", attribut.getName() + "_ref_" + attribut.getRelationref().getName() + "_n_m_");
+                            } else {
+                                elementproperty.addAttribute("column", attribut.getName() + "_ref_" + attribut.getRelationref().getName() + "_1_n_");
+                            }
+                        } else {
+                            elementproperty.addAttribute("column", attribut.getName() + "_");
+                        }
                         elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
                         elementproperty.addAttribute("not-null", "false");
                         if (attribut.getIsindex()) {
@@ -465,21 +481,26 @@ public class HibernateUtil implements Runnable {
                         //System.out.println(contentclassref.getName());
                         List<CfListcontent> listcontentlist = cflistcontentService.findByListref(contentclassref.getId());
                         for (CfListcontent listcontent : listcontentlist) {
-                            Map content = (Map) session_tables.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + classcontent.getId()).getSingleResult();
-                            Map referenz = (Map) session_tables.createQuery("FROM " + attributcontent.getAttributref().getRelationref().getName() + " c WHERE c.cf_contentref = " + listcontent.getCfListcontentPK().getClasscontentref()).getSingleResult();
-                            Map entity = new HashMap();
-                            Map id = new HashMap();
-                            id.put(classname + "_ref", classcontent.getId());
-                            id.put(attributname + "_ref", listcontent.getCfListcontentPK().getClasscontentref());
-                            entity.put("id_", id);
-                            entity.put(classname + "_usr_ref", content.get("cf_id"));
-                            entity.put(attributname + "_usr_ref", referenz.get("cf_id"));
                             try {
-                                Transaction tx = session_relations.beginTransaction();
-                                session_relations.save(classname + "_" + attributname, entity);
-                                tx.commit();
-                            } catch (Exception ex) {
-                                LOGGER.error(ex.getMessage());
+                                Map content = (Map) session_tables.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + classcontent.getId()).getSingleResult();
+                                Map referenz = (Map) session_tables.createQuery("FROM " + attributcontent.getAttributref().getRelationref().getName() + " c WHERE c.cf_contentref = " + listcontent.getCfListcontentPK().getClasscontentref()).getSingleResult();
+                                Map entity = new HashMap();
+                                Map id = new HashMap();
+                                id.put(classname + "_ref", classcontent.getId());
+                                id.put(attributname + "_ref", listcontent.getCfListcontentPK().getClasscontentref());
+                                entity.put("id_", id);
+                                entity.put(classname + "_usr_ref", content.get("cf_id"));
+                                entity.put(attributname + "_usr_ref", referenz.get("cf_id"));
+                                try {
+                                    Transaction tx = session_relations.beginTransaction();
+                                    session_relations.save(classname + "_" + attributname, entity);
+                                    tx.commit();
+                                } catch (Exception ex) {
+                                    LOGGER.error(ex.getMessage());
+                                }
+                            } catch (javax.persistence.NoResultException ex2) {
+                                LOGGER.error(ex2.getMessage());
+                                LOGGER.error(listcontent.toString());
                             }
                         }
                     }

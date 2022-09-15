@@ -88,10 +88,10 @@ public class BarcodeServlet extends HttpServlet {
                         if (dpi != null) {
                             barcodeDpi = Integer.parseInt(dpi);
                         }
-                        if (type == null) {
+                        if (null == type) {
                             type = "Code128";
                         }
-                        if (message == null) {
+                        if (null == message) {
                             message = "yes";
                         }
                         if (type.compareToIgnoreCase("code128") == 0) {

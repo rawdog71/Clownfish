@@ -60,7 +60,7 @@ public class KeywordList {
         LOGGER.info("INIT KEYWORDLIST START");
         keywordlist = cfkeywordService.findAll();
         
-        if (propertymap == null) {
+        if (null == propertymap) {
             // read all System Properties of the property table
             propertymap = propertylist.fillPropertyMap();
         }
