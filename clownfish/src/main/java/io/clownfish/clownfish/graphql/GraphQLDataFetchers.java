@@ -351,11 +351,38 @@ public class GraphQLDataFetchers {
             try {
                 CfAttribut attr = cfattributservice.findByNameAndClassref((String) key, clazz);
                 if (0 == attr.getAttributetype().getName().compareToIgnoreCase("classref")) {
-                    CfList contentlist = cflistService.findByClassrefAndName(attr.getRelationref(), (String) hm.get(key));
-                    List<CfListcontent> listcontent = cflistcontentService.findByListref(contentlist.getId());
-                    List<Map<String, String>> result = new ArrayList<>();
-                    for (CfListcontent contentitem : listcontent) {
-                        Map output = hibernateUtil.getContent(attr.getRelationref().getName(), contentitem.getCfListcontentPK().getClasscontentref());
+                    if (0 == attr.getRelationtype()) {
+                        CfList contentlist = cflistService.findByClassrefAndName(attr.getRelationref(), (String) hm.get(key));
+                        List<CfListcontent> listcontent = cflistcontentService.findByListref(contentlist.getId());
+                        List<Map<String, String>> result = new ArrayList<>();
+                        for (CfListcontent contentitem : listcontent) {
+                            Map output = hibernateUtil.getContent(attr.getRelationref().getName(), contentitem.getCfListcontentPK().getClasscontentref());
+                            CfClasscontent cfclasscontent = cfclasscontentService.findById((long)output.get("cf_contentref"));
+                            if (null != cfclasscontent) {
+                                if (!cfclasscontent.isScrapped()) {
+                                    ContentDataOutput contentdataoutput = new ContentDataOutput();
+                                    contentdataoutput.setContent(cfclasscontent);
+                                    if (cfclasscontent.getClassref().isEncrypted()) {
+                                        contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(output, cfclasscontent.getClassref()));
+                                    } else {
+                                        contentdataoutput.setKeyvals(contentUtil.getContentMap(output));
+                                    }
+                                    setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                                    setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                                    try {
+                                        contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
+                                        contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                                    } catch (Exception ex) {
+
+                                    }
+                                    result.add(contentdataoutput.getKeyvals().get(0));
+                                }
+                            }
+                        }
+                        hm.put(attr.getName(), result);
+                    } else {
+                        List<Map<String, String>> result = new ArrayList<>();
+                        Map output = hibernateUtil.getContent(attr.getRelationref().getName(), (long) hm.get(key));
                         CfClasscontent cfclasscontent = cfclasscontentService.findById((long)output.get("cf_contentref"));
                         if (null != cfclasscontent) {
                             if (!cfclasscontent.isScrapped()) {
@@ -366,8 +393,8 @@ public class GraphQLDataFetchers {
                                 } else {
                                     contentdataoutput.setKeyvals(contentUtil.getContentMap(output));
                                 }
-                                setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
-                                setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                                setClassrefVals(contentdataoutput.getKeyvals().get(0), cfclassservice.findByName(cfclasscontent.getClassref().getName()));
+                                setAssetrefVals(contentdataoutput.getKeyvals().get(0), cfclassservice.findByName(cfclasscontent.getClassref().getName()));
                                 try {
                                     contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
                                     contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
@@ -377,11 +404,11 @@ public class GraphQLDataFetchers {
                                 result.add(contentdataoutput.getKeyvals().get(0));
                             }
                         }
+                        hm.put(attr.getName(), result);
                     }
-                    hm.put(attr.getName(), result);
                 }
             } catch (Exception ex) {
-                
+                //System.out.println(ex.getMessage());
             }
         }
     }
