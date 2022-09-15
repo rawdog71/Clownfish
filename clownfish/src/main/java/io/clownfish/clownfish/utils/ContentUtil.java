@@ -150,10 +150,18 @@ public class ContentUtil implements IVersioningInterface {
                     return new AttributDef(null, "text");
                 }
             case "classref":
-                if (null != attributcontent.getClasscontentlistref()) {
-                    return new AttributDef(attributcontent.getClasscontentlistref().getName(), "classref");
+                if (0 == attributcontent.getAttributref().getRelationtype()) {
+                    if (null != attributcontent.getClasscontentlistref()) {
+                        return new AttributDef(attributcontent.getClasscontentlistref().getName(), "classref");
+                    } else {
+                        return new AttributDef(null, "classref");
+                    }
                 } else {
-                    return new AttributDef(null, "classref");
+                    if (null != attributcontent.getContentInteger()) {
+                        return new AttributDef(attributcontent.getContentInteger().toString(), "classref");
+                    } else {
+                        return new AttributDef(null, "classref");
+                    }
                 }
             case "assetref":
                 if (null != attributcontent.getAssetcontentlistref()) {

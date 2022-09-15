@@ -135,7 +135,7 @@ public class ClassList implements Serializable {
         selectedAttribut = (CfAttribut) event.getObject();
         attributName = selectedAttribut.getName();
         selectedAttributeType = selectedAttribut.getAttributetype();
-        if (selectedAttributeType.getName().compareToIgnoreCase("classref") == 0) {
+        if (0 == selectedAttributeType.getName().compareToIgnoreCase("classref")) {
             renderClass = true;
             selectedClassRef = selectedAttribut.getRelationref();
             selectedRelType = selectedAttribut.getRelationtype();
