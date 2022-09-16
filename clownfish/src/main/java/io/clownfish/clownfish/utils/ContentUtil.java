@@ -290,19 +290,34 @@ public class ContentUtil implements IVersioningInterface {
                     break;    
                 case "classref":
                     if (null != editContent) {
-                        try {
-                            CfList list_ref = cflistService.findById(Long.parseLong(editContent));
-                            selectedAttribut.setClasscontentlistref(list_ref);
-                        } catch (Exception ex) {
+                        if (0 == selectedAttribut.getAttributref().getRelationtype()) {                 // n:m relation
                             try {
-                                CfList list_ref = cflistService.findByName(editContent);
+                                CfList list_ref = cflistService.findById(Long.parseLong(editContent));
                                 selectedAttribut.setClasscontentlistref(list_ref);
-                            } catch (Exception ex1) {
-                                selectedAttribut.setClasscontentlistref(null);
+                            } catch (Exception ex) {
+                                try {
+                                    CfList list_ref = cflistService.findByName(editContent);
+                                    selectedAttribut.setClasscontentlistref(list_ref);
+                                } catch (Exception ex1) {
+                                    selectedAttribut.setClasscontentlistref(null);
+                                }
+                            }
+                        } else {                                                                        // 1:n relation
+                            try {
+                                CfClasscontent classcontent = cfclasscontentService.findById(Long.parseLong(editContent));
+                                selectedAttribut.setContentInteger(BigInteger.valueOf(classcontent.getId()));
+                            } catch (Exception ex) {
+                                try {
+                                    CfClasscontent classcontent = cfclasscontentService.findByName(editContent);
+                                    selectedAttribut.setContentInteger(BigInteger.valueOf(classcontent.getId()));
+                                } catch (Exception ex1) {
+                                    selectedAttribut.setContentInteger(null);
+                                }
                             }
                         }
                     } else {
                         selectedAttribut.setClasscontentlistref(null);
+                        selectedAttribut.setContentInteger(null);
                     }
                     break;
                 case "assetref":
