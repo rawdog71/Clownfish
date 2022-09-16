@@ -351,7 +351,7 @@ public class GraphQLDataFetchers {
             try {
                 CfAttribut attr = cfattributservice.findByNameAndClassref((String) key, clazz);
                 if (0 == attr.getAttributetype().getName().compareToIgnoreCase("classref")) {
-                    if (0 == attr.getRelationtype()) {
+                    if (0 == attr.getRelationtype()) {          // n:m
                         CfList contentlist = cflistService.findByClassrefAndName(attr.getRelationref(), (String) hm.get(key));
                         List<CfListcontent> listcontent = cflistcontentService.findByListref(contentlist.getId());
                         List<Map<String, String>> result = new ArrayList<>();
@@ -380,7 +380,7 @@ public class GraphQLDataFetchers {
                             }
                         }
                         hm.put(attr.getName(), result);
-                    } else {
+                    } else {                                    // 1:n
                         Map output = hibernateUtil.getContent(attr.getRelationref().getName(), (long) hm.get(key));
                         hm.put(attr.getName(), output);
                     }

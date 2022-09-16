@@ -101,7 +101,7 @@ public class GetAsset extends HttpServlet {
                     }
                     String mediaid = acontext.getRequest().getParameter("mediaid");
                     if (mediaid != null) {
-                        asset = cfassetService.findById(Long.parseLong(mediaid));
+                        asset = cfassetService.findById(Long.parseLong(mediaid.replaceAll("\\.", "")));
                         if (null != asset) {
                             imagefilename = asset.getName();
                         }

@@ -79,9 +79,9 @@ public class GraphQLUtil {
             attributlist = cfattributservice.findByClassref(clazzitem);
             for (CfAttribut attribut : attributlist) {
                 if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
-                    if (0 == attribut.getRelationtype()) {
+                    if (0 == attribut.getRelationtype()) {          // n:m
                         sb.append("  ").append(attribut.getName()).append(": [").append(attribut.getRelationref().getName()).append("]\n");
-                    } else {
+                    } else {                                        // 1:n                        
                         sb.append("  ").append(attribut.getName()).append(": ").append(attribut.getRelationref().getName()).append("\n");
                     }
                 } else {
@@ -128,9 +128,9 @@ public class GraphQLUtil {
             List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
             for (CfAttribut attribut : attributlist) {
                 if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
-                    if (0 == attribut.getRelationtype()) {
+                    if (0 == attribut.getRelationtype()) {  // n:m
                         sb.append("  ").append(attribut.getName()).append(": [").append(attribut.getRelationref().getName()).append("]\n");
-                    } else {
+                    } else {                                // 1:n
                         sb.append("  ").append(attribut.getName()).append(": ").append(attribut.getRelationref().getName()).append("\n");
                     }
                     

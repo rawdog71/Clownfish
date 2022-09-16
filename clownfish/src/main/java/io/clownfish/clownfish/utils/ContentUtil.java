@@ -150,10 +150,10 @@ public class ContentUtil implements IVersioningInterface {
                     return new AttributDef(null, "text");
                 }
             case "classref":
-                if (0 == attributcontent.getAttributref().getRelationtype()) {
+                if (0 == attributcontent.getAttributref().getRelationtype()) {  // n:m
                     if (null != attributcontent.getClasscontentlistref()) {
                         return new AttributDef(attributcontent.getClasscontentlistref().getName(), "classref");
-                    } else {
+                    } else {                                                    // 1:n
                         return new AttributDef(null, "classref");
                     }
                 } else {
@@ -560,10 +560,10 @@ public class ContentUtil implements IVersioningInterface {
                     return "";
                 } 
             case 11: // classref
-                if (0 == attributcontent.getAttributref().getRelationtype()) {
+                if (0 == attributcontent.getAttributref().getRelationtype()) {  // n:m
                     if (null != attributcontent.getClasscontentlistref()) {
                         return attributcontent.getClasscontentlistref().getName();
-                    } else {
+                    } else {                                                    // 1:n
                         return "";
                     }
                 } else {

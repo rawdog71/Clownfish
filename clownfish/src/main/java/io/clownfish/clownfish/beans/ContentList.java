@@ -300,13 +300,13 @@ public class ContentList implements Serializable {
                 isClassrefType = true;
                 editDatalist = null;
                 CfClass ref = selectedAttribut.getAttributref().getRelationref();
-                if (0 == selectedAttribut.getAttributref().getRelationtype()) {
+                if (0 == selectedAttribut.getAttributref().getRelationtype()) {     // n:m
                     selectedList = cflistService.findByClassref(ref);
                     if (selectedAttribut.getClasscontentlistref() != null) {
                         editDatalist = cflistService.findById(selectedAttribut.getClasscontentlistref().getId());
                         memoryeditDatalist = editDatalist;
                     }
-                } else {
+                } else {                                                            // 1:n
                     selectedContentList = cfclasscontentService.findByClassref(ref);
                     if (selectedAttribut.getContentInteger() != null) {
                         editDataContentlist = cfclasscontentService.findById(selectedAttribut.getContentInteger().longValue()); //cflistService.findById(selectedAttribut.getClasscontentlistref().getId());
@@ -506,10 +506,10 @@ public class ContentList implements Serializable {
                 }
                 break;
             case "classref":
-                if (0 == selectedAttribut.getAttributref().getRelationtype()) {
+                if (0 == selectedAttribut.getAttributref().getRelationtype()) {             // n:m
                     selectedAttribut.setClasscontentlistref(editDatalist);
                     updateClassref = true;
-                } else {
+                } else {                                                                    // 1:n
                     selectedAttribut.setContentInteger(BigInteger.valueOf(editDataContentlist.getId()));
                 }
                 break;

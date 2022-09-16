@@ -103,9 +103,9 @@ public class ClassUtil implements Serializable {
             newattribut.setAttributetype(cfattributetypeService.findByName(fi.getFieldtype()));
             if (0 == fi.getFieldtype().compareToIgnoreCase("classref")) {
                 newattribut.setRelationref(cfclassService.findByName(fi.getClassref()));
-                if (0 == fi.getRelationtype().compareToIgnoreCase("1:n")) {
+                if (0 == fi.getRelationtype().compareToIgnoreCase("1:n")) {     // 1:n
                     newattribut.setRelationtype(1);
-                } else {
+                } else {                                                        // n:m
                     newattribut.setRelationtype(0);
                 }
             } else {
@@ -162,24 +162,33 @@ public class ClassUtil implements Serializable {
                     }
                     break;
                 case "classref":
-                    if (null != attributcontent.getClasscontentlistref()) {
-                        Map listcontentmap = new LinkedHashMap();
-                        List<CfListcontent> selectedcontent = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
-                        List<CfClasscontent> selectedListcontent = new ArrayList<>();
-                        selectedListcontent.clear();
-                        if (!selectedcontent.isEmpty()) {
-                            selectedcontent.stream().map((listcontent) -> cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref())).forEach((selectedContent) -> {
-                                if (null != selectedContent) {
-                                    selectedListcontent.add(selectedContent);
-                                }
+                    if (0 == attributcontent.getAttributref().getRelationtype()) {      // n:m
+                        if (null != attributcontent.getClasscontentlistref()) {
+                            Map listcontentmap = new LinkedHashMap();
+                            List<CfListcontent> selectedcontent = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
+                            List<CfClasscontent> selectedListcontent = new ArrayList<>();
+                            selectedListcontent.clear();
+                            if (!selectedcontent.isEmpty()) {
+                                selectedcontent.stream().map((listcontent) -> cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref())).forEach((selectedContent) -> {
+                                    if (null != selectedContent) {
+                                        selectedListcontent.add(selectedContent);
+                                    }
+                                });
+                            }
+                            selectedListcontent.stream().forEach((cc) -> {
+                                Map dummy_attributcontentmap = new LinkedHashMap();
+                                dummy_attributcontentmap = getattributmap(cc);
+                                listcontentmap.put(cc.getName(), dummy_attributcontentmap);
                             });
+                            attributcontentmap.put(attributcontent.getAttributref().getName(), listcontentmap);
                         }
-                        selectedListcontent.stream().forEach((cc) -> {
-                            Map dummy_attributcontentmap = new LinkedHashMap();
-                            dummy_attributcontentmap = getattributmap(cc);
-                            listcontentmap.put(cc.getName(), dummy_attributcontentmap);
-                        });
-                        attributcontentmap.put(attributcontent.getAttributref().getName(), listcontentmap);
+                    } else {                                                            // 1:n
+                        CfClasscontent selclasscontent = cfclasscontentService.findById(attributcontent.getContentInteger().longValue());
+                        //Map dummy_attributcontentmap = new LinkedHashMap();
+                        Map dummy_attributcontentmap = getattributmap(selclasscontent);
+                        //Map listcontentmap = new LinkedHashMap();
+                        //listcontentmap.put(selclasscontent.getName(), dummy_attributcontentmap);
+                        attributcontentmap.put(attributcontent.getAttributref().getName(), dummy_attributcontentmap);
                     }
                     break;
                 case "assetref":
@@ -275,11 +284,11 @@ public class ClassUtil implements Serializable {
                     }
                     break;
                 case "classref":
-                    if (0 == attributcontent.getAttributref().getRelationtype()) {
+                    if (0 == attributcontent.getAttributref().getRelationtype()) {      // n:m
                         if (null != attributcontent.getClasscontentlistref()) {
                             contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getClasscontentlistref().getName());
                         }
-                    } else {
+                    } else {                                                            // 1:n
                         if (null != attributcontent.getContentInteger()) {
                             contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
                         }

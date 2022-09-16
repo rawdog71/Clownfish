@@ -120,9 +120,9 @@ public class HibernateUtil implements Runnable {
                         Element elementproperty = elementclass.addElement("property");
                         elementproperty.addAttribute("name", attribut.getName());
                         if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
-                            if (0 == attribut.getRelationtype()) {
+                            if (0 == attribut.getRelationtype()) {              // n:m
                                 elementproperty.addAttribute("column", attribut.getName() + "_ref_" + attribut.getRelationref().getName() + "_n_m_");
-                            } else {
+                            } else {                                            // 1:n
                                 elementproperty.addAttribute("column", attribut.getName() + "_ref_" + attribut.getRelationref().getName() + "_1_n_");
                             }
                         } else {
@@ -201,9 +201,9 @@ public class HibernateUtil implements Runnable {
                         Element elementproperty = elementclass.addElement("property");
                         elementproperty.addAttribute("name", attribut.getName());
                         if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
-                            if (0 == attribut.getRelationtype()) {
+                            if (0 == attribut.getRelationtype()) {              // n:m
                                 elementproperty.addAttribute("column", attribut.getName() + "_ref_" + attribut.getRelationref().getName() + "_n_m_");
-                            } else {
+                            } else {                                            // 1:n
                                 elementproperty.addAttribute("column", attribut.getName() + "_ref_" + attribut.getRelationref().getName() + "_1_n_");
                             }
                         } else {
@@ -619,13 +619,13 @@ public class HibernateUtil implements Runnable {
                     entity.put(attributcontent.getAttributref().getName(), attributcontent.getContentText());
                     break;
                 case "classref":
-                    if (0 == attributcontent.getAttributref().getRelationtype()) {
+                    if (0 == attributcontent.getAttributref().getRelationtype()) {      // n:m
                         if (null != attributcontent.getClasscontentlistref()) {
                             entity.put(attributcontent.getAttributref().getName(), attributcontent.getClasscontentlistref().getName());
                         } else {
                             entity.put(attributcontent.getAttributref().getName(), null);
                         }
-                    } else {
+                    } else {                                                            // 1:n
                         if (null != attributcontent.getContentInteger()) {
                             entity.put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().longValue());
                         } else {
