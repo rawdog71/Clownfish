@@ -184,10 +184,7 @@ public class ClassUtil implements Serializable {
                         }
                     } else {                                                            // 1:n
                         CfClasscontent selclasscontent = cfclasscontentService.findById(attributcontent.getContentInteger().longValue());
-                        //Map dummy_attributcontentmap = new LinkedHashMap();
                         Map dummy_attributcontentmap = getattributmap(selclasscontent);
-                        //Map listcontentmap = new LinkedHashMap();
-                        //listcontentmap.put(selclasscontent.getName(), dummy_attributcontentmap);
                         attributcontentmap.put(attributcontent.getAttributref().getName(), dummy_attributcontentmap);
                     }
                     break;
@@ -349,6 +346,7 @@ public class ClassUtil implements Serializable {
                     attributcontent.setContentInteger(BigInteger.valueOf(asset.getId()));
                     break;
                 case "classref":
+                    // ToDo: 1:n - n:m logic
                     try {
                         CfList list = cflistService.findByName(contentparameter.getAttributmap().get(key));
                         attributcontent.setClasscontentlistref(list);
@@ -741,6 +739,7 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "classref":
+                    // ToDo: 1:n - n:m logic
                     html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t\t\t\t\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t\t\t\t\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
@@ -836,6 +835,7 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t").append("</div>").append("\n");
                     break;
                 case "classref":
+                    // ToDo: 1:n - n:m logic
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(StringUtils.capitalise(attr.getName())).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t").append("<select class=\"form-select\" id=\"").append(attr.getName()).append("\">").append("\n");
