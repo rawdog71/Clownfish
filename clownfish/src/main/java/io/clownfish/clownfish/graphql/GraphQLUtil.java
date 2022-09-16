@@ -128,7 +128,12 @@ public class GraphQLUtil {
             List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
             for (CfAttribut attribut : attributlist) {
                 if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) {
-                    sb.append("  ").append(attribut.getName()).append(": [").append(attribut.getRelationref().getName()).append("]\n");
+                    if (0 == attribut.getRelationtype()) {
+                        sb.append("  ").append(attribut.getName()).append(": [").append(attribut.getRelationref().getName()).append("]\n");
+                    } else {
+                        sb.append("  ").append(attribut.getName()).append(": ").append(attribut.getRelationref().getName()).append("\n");
+                    }
+                    
                 } else {
                     if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("assetref")) {
                         sb.append("  ").append(attribut.getName()).append(": [Int]\n");
