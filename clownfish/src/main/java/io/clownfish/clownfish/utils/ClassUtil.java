@@ -275,8 +275,14 @@ public class ClassUtil implements Serializable {
                     }
                     break;
                 case "classref":
-                    if (null != attributcontent.getClasscontentlistref()) {
-                        contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getClasscontentlistref().getName());
+                    if (0 == attributcontent.getAttributref().getRelationtype()) {
+                        if (null != attributcontent.getClasscontentlistref()) {
+                            contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getClasscontentlistref().getName());
+                        }
+                    } else {
+                        if (null != attributcontent.getContentInteger()) {
+                            contentparameter.getAttributmap().put(attributcontent.getAttributref().getName(), attributcontent.getContentInteger().toString());
+                        }
                     }
                     break;
                 case "assetref":
