@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.NoResultException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,7 +54,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class RestGraphQL {
-    private GraphQL graphQL;
     @Autowired GraphQLDataFetchers graphQLDataFetchers;
     @Autowired GraphQLUtil graphQLUtil;
     @Autowired private CfClassService cfclassservice;
@@ -79,16 +79,20 @@ public class RestGraphQL {
             }
             ExecutionInput executionInput = ExecutionInput.newExecutionInput().query(jsonRequest.getString("query")).variables(variables).build();
 
-            CfClass clazz = cfclassservice.findByName(graphQLUtil.getClassnameFromQuery(jsonRequest.getString("query")));
-            String sdl = graphQLUtil.generateSchema(clazz.getName());
+            try {
+                CfClass clazz = cfclassservice.findByName(graphQLUtil.getClassnameFromQuery(jsonRequest.getString("query")));
+                String sdl = graphQLUtil.generateSchema(clazz.getName());
 
-            GraphQLSchema graphQLSchema = buildSchema(clazz, sdl);
-            GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
-            ExecutionResult executionResult = build.execute(executionInput);
+                GraphQLSchema graphQLSchema = buildSchema(clazz, sdl);
+                GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
+                ExecutionResult executionResult = build.execute(executionInput);
 
-            Map<String, Object> toSpecificationResult = executionResult.toSpecification();
-            Gson gson = new Gson();
-            return gson.toJson(toSpecificationResult);
+                Map<String, Object> toSpecificationResult = executionResult.toSpecification();
+                Gson gson = new Gson();
+                return gson.toJson(toSpecificationResult);
+            } catch (NoResultException ex) {
+                return null;
+            }
         } else {
             return null;
         }

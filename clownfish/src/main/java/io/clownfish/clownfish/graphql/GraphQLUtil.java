@@ -188,7 +188,9 @@ public class GraphQLUtil {
         if (queryname.contains("All")) {
             classname = queryname.substring(0, queryname.indexOf("All"));
         }
-        classname = classname.substring(0, 1).toUpperCase() + classname.substring(1);
+        if (!classname.isBlank()) {
+            classname = classname.substring(0, 1).toUpperCase() + classname.substring(1);
+        }
         return classname;
     }
 }
