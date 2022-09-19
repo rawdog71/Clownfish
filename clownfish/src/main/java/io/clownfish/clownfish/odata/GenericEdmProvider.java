@@ -20,7 +20,6 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
@@ -43,42 +42,28 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class GenericEdmProvider extends CsdlAbstractEdmProvider {
-
     // Service Namespace
     public static final String NAMESPACE = "OData.Generic";
-
     // EDM Container
     public static final String CONTAINER_NAME = "Container";
     public static final FullQualifiedName CONTAINER = new FullQualifiedName(NAMESPACE, CONTAINER_NAME);
 
-    // Entity Types Names
-    //public static final String ET_PRODUCT_NAME = "Product";
-    //public static final FullQualifiedName ET_PRODUCT_FQN = new FullQualifiedName(NAMESPACE, ET_PRODUCT_NAME);
-
-    // Entity Set Names
-    public static final String ES_PRODUCTS_NAME = "Products";
-    
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfAttributService cfattributservice;
 
     @Override
     public List<CsdlSchema> getSchemas() throws ODataException {
-        // create Schema
         CsdlSchema schema = new CsdlSchema();
         schema.setNamespace(NAMESPACE);
-
         // add EntityTypes
         List<CsdlEntityType> entityTypes = new ArrayList<>();
         for (CfClass clazz : cfclassservice.findAll()) {
             entityTypes.add(getEntityType(new FullQualifiedName(NAMESPACE, clazz.getName())));
         }
         schema.setEntityTypes(entityTypes);
-
         // add EntityContainer
         schema.setEntityContainer(getEntityContainer());
-
-        // finally
-        List<CsdlSchema> schemas = new ArrayList<CsdlSchema>();
+        List<CsdlSchema> schemas = new ArrayList<>();
         schemas.add(schema);
 
         return schemas;
@@ -91,8 +76,6 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         for (CfClass clazz : cfclassservice.findAll()) {
             entitySets.add(getEntitySet(CONTAINER, clazz.getName()));
         }
-        //entitySets.add(getEntitySet(CONTAINER, ES_PRODUCTS_NAME));
-
         // create EntityContainer
         CsdlEntityContainer entityContainer = new CsdlEntityContainer();
         entityContainer.setName(CONTAINER_NAME);
@@ -119,7 +102,11 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         entityType.setProperties(propsList);
         entityType.setKey(Collections.singletonList(propertyRef));
 
-        return entityType;
+        if (null != propertyRef) {
+            return entityType;
+        } else {
+            return null;
+        }
     }
 
     @Override

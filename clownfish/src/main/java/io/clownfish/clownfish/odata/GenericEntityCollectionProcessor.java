@@ -103,6 +103,7 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
 
        EntityCollection productsCollection = new EntityCollection();
        // check for which EdmEntitySet the data is requested
+       /*
        if(GenericEdmProvider.ES_PRODUCTS_NAME.equals(edmEntitySet.getName())) {
            List<Entity> productList = productsCollection.getEntities();
 
@@ -133,6 +134,8 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
        }
 
        return productsCollection;
+       */
+       return null;
     }
     
     private URI createId(String entitySetName, Object id) {
