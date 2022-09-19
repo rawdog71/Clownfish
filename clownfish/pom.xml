@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
-    <version>0.7.15-SNAPSHOT</version>
+    <version>0.7.16-SNAPSHOT</version>
     <packaging>war</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
         <developerConnection>scm:git:https://github.com/rawdog71/Clownfish.git</developerConnection>
-        <tag>v0.7.15</tag>
+        <tag>v0.7.16</tag>
     </scm>
     <developers>
         <developer>
@@ -200,6 +200,29 @@
             <version>5.4.3.Final</version>
             <scope>compile</scope>
         </dependency>
+        <!-- ODATA -->
+        <dependency>
+          <groupId>org.apache.olingo</groupId>
+          <artifactId>odata-server-api</artifactId>
+          <version>4.8.0</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.olingo</groupId>
+          <artifactId>odata-server-core</artifactId>
+          <version>4.8.0</version>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.olingo</groupId>
+          <artifactId>odata-commons-api</artifactId>
+          <version>4.8.0</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.olingo</groupId>
+          <artifactId>odata-commons-core</artifactId>
+          <version>4.8.0</version>
+        </dependency>
+        
         <dependency>
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
