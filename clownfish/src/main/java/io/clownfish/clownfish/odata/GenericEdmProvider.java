@@ -33,6 +33,8 @@ import org.apache.olingo.commons.api.edm.provider.CsdlProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlPropertyRef;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
 import org.apache.olingo.commons.api.ex.ODataException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,14 +44,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class GenericEdmProvider extends CsdlAbstractEdmProvider {
-    // Service Namespace
     public static final String NAMESPACE = "OData.Generic";
-    // EDM Container
     public static final String CONTAINER_NAME = "Container";
     public static final FullQualifiedName CONTAINER = new FullQualifiedName(NAMESPACE, CONTAINER_NAME);
 
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfAttributService cfattributservice;
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenericEdmProvider.class);
 
     @Override
     public List<CsdlSchema> getSchemas() throws ODataException {
@@ -74,7 +76,10 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         // create EntitySets
         List<CsdlEntitySet> entitySets = new ArrayList<>();
         for (CfClass clazz : cfclassservice.findAll()) {
-            entitySets.add(getEntitySet(CONTAINER, clazz.getName()));
+            CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName());
+            if (null != es) {
+                entitySets.add(es);
+            }
         }
         // create EntityContainer
         CsdlEntityContainer entityContainer = new CsdlEntityContainer();
@@ -88,34 +93,37 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
     public CsdlEntityType getEntityType(FullQualifiedName entityTypeName) throws ODataException {
         System.out.println(entityTypeName.getFullQualifiedNameAsString());
         CfClass classref = cfclassservice.findByName(entityTypeName.getName());
-        CsdlPropertyRef propertyRef = new CsdlPropertyRef();
         List propsList = new ArrayList();
+        List keysList = new ArrayList();
         for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
             CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut.getAttributetype().getName()));
             propsList.add(prop);
             if (attribut.getIdentity()) {
+                CsdlPropertyRef propertyRef = new CsdlPropertyRef();
                 propertyRef.setName(attribut.getName());
+                keysList.add(propertyRef);
             }
         }
         CsdlEntityType entityType = new CsdlEntityType();
         entityType.setName(entityTypeName.getName());
         entityType.setProperties(propsList);
-        entityType.setKey(Collections.singletonList(propertyRef));
+        entityType.setKey(keysList);
 
-        if (null != propertyRef) {
+        if (keysList.size() > 0) {
             return entityType;
         } else {
+            LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
             return null;
         }
     }
 
     @Override
     public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, String entitySetName) throws ODataException {
-        if (entityContainer.equals(CONTAINER)) {
+        if (entityContainer.equals(CONTAINER) && (0 == entitySetName.compareTo("Product"))) {
             CsdlEntitySet entitySet = new CsdlEntitySet();
             entitySet.setName(entitySetName + "Set");
             entitySet.setType(new FullQualifiedName(NAMESPACE, entitySetName));
-
+            
             return entitySet;
         }
 
