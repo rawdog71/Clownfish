@@ -76,7 +76,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         // create EntitySets
         List<CsdlEntitySet> entitySets = new ArrayList<>();
         for (CfClass clazz : cfclassservice.findAll()) {
-            CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName());
+            CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName()+"Set");
             if (null != es) {
                 entitySets.add(es);
             }
@@ -91,7 +91,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
 
     @Override
     public CsdlEntityType getEntityType(FullQualifiedName entityTypeName) throws ODataException {
-        System.out.println(entityTypeName.getFullQualifiedNameAsString());
+        //System.out.println(entityTypeName.getFullQualifiedNameAsString());
         CfClass classref = cfclassservice.findByName(entityTypeName.getName());
         List propsList = new ArrayList();
         List keysList = new ArrayList();
@@ -119,10 +119,10 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
 
     @Override
     public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, String entitySetName) throws ODataException {
-        if (entityContainer.equals(CONTAINER) && (0 == entitySetName.compareTo("Product"))) {
+        if (entityContainer.equals(CONTAINER)) {
             CsdlEntitySet entitySet = new CsdlEntitySet();
-            entitySet.setName(entitySetName + "Set");
-            entitySet.setType(new FullQualifiedName(NAMESPACE, entitySetName));
+            entitySet.setName(entitySetName);
+            entitySet.setType(new FullQualifiedName(NAMESPACE, entitySetName.substring(0, entitySetName.length()-3)));
             
             return entitySet;
         }
