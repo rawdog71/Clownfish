@@ -31,6 +31,7 @@ import org.apache.olingo.commons.api.edm.provider.CsdlEntityType;
 import org.apache.olingo.commons.api.edm.provider.CsdlProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlPropertyRef;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
+import org.apache.olingo.commons.api.edm.provider.CsdlSingleton;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,17 +75,21 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
     public CsdlEntityContainer getEntityContainer() throws ODataException {
         // create EntitySets
         List<CsdlEntitySet> entitySets = new ArrayList<>();
+        List<CsdlSingleton> singletons = new ArrayList<>();
         for (CfClass clazz : cfclassservice.findAll()) {
+            CsdlSingleton si = getSingleton(CONTAINER, clazz.getName());
             CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName()+"Set");
             if (null != es) {
+                singletons.add(si);
                 entitySets.add(es);
             }
         }
         // create EntityContainer
         CsdlEntityContainer entityContainer = new CsdlEntityContainer();
         entityContainer.setName(CONTAINER_NAME);
+        entityContainer.setSingletons(singletons);
         entityContainer.setEntitySets(entitySets);
-
+        
         return entityContainer;
     }
 
@@ -116,6 +121,18 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         }
     }
 
+    @Override
+    public CsdlSingleton getSingleton(FullQualifiedName entityContainer, String singletonName) throws ODataException {
+        if (entityContainer.equals(CONTAINER)) {
+            CsdlSingleton singleton = new CsdlSingleton();
+            singleton.setName(singletonName);
+            singleton.setType(new FullQualifiedName(NAMESPACE, singletonName));
+            
+            return singleton;
+        }
+        return null;
+    }
+    
     @Override
     public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, String entitySetName) throws ODataException {
         if (entityContainer.equals(CONTAINER)) {

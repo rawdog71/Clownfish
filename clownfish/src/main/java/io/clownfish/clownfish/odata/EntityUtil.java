@@ -52,6 +52,13 @@ public class EntityUtil {
                         prop.setName(attribut.getName());
                         prop.setValue(ValueType.PRIMITIVE, hm.get(attributname));
                         entity.addProperty(prop);
+                    } else {
+                        if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == attribut.getRelationtype())) {
+                            Property prop = new Property();
+                            prop.setName(attribut.getName());
+                            prop.setValue(ValueType.PRIMITIVE, hm.get(attributname));
+                            entity.addProperty(prop);
+                        }
                     }
                 } catch (Exception ex) {
                     

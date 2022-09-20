@@ -92,7 +92,7 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
     @Override
     public void readEntityCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
         List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-        UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0); // in our example, the first segment is the EntitySet
+        UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
         EntityCollection entitySet = getData(edmEntitySet);
