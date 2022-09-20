@@ -20,7 +20,6 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
