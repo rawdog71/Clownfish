@@ -53,6 +53,7 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceSingleton;
+import org.apache.olingo.server.core.uri.UriParameterImpl;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,14 +104,20 @@ public class GenericSingletonProcessor implements EntityProcessor {
     }
     
     private EntityCollection getData(EdmEntitySet edmEntitySet, List keypredicates) {
+        HashMap searchmap = new HashMap<>();
+        for (Object entry : keypredicates) {
+            String attributname = ((UriParameterImpl) entry).getName();
+            String attributvalue = ((UriParameterImpl) entry).getText();
+            searchmap.put(attributname+"_1", ":eq:" + attributvalue);
+        }
         String classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
         EntityCollection genericCollection = new EntityCollection();
-        getList(cfclassservice.findByName(classname), genericCollection);
+        getList(cfclassservice.findByName(classname), searchmap, genericCollection);
        
        return genericCollection;
     }
     
-    private void getList(CfClass clazz, EntityCollection genericCollection) {
+    private void getList(CfClass clazz, HashMap searchmap, EntityCollection genericCollection) {
         List<Entity> genericList = genericCollection.getEntities();
         if (0 == useHibernate) {
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(clazz);
@@ -125,7 +132,7 @@ public class GenericSingletonProcessor implements EntityProcessor {
             }
         } else {
             Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
-            HashMap searchmap = new HashMap<>();
+            //HashMap searchmap = new HashMap<>();
             Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
             try {
                 List<Map> contentliste = (List<Map>) query.getResultList();
