@@ -731,53 +731,14 @@ public class HibernateUtil implements Runnable {
     
     private SearchValues getSearchValues(String searchvalue) {
         String comparator = "eq";
-        // contains
-        if (searchvalue.startsWith(":co:")) {
-            comparator = "co";
-            searchvalue = searchvalue.substring(4);
+        String[] values = searchvalue.split(":");
+        comparator = values[1];
+        String searchvalue1 = values[2];
+        String searchvalue2 = "";
+        if (values.length > 3) {
+            searchvalue2 = values[3];
         }
-        // equals
-        if (searchvalue.startsWith(":eq:")) {
-            comparator = "eq";
-            searchvalue = searchvalue.substring(4);
-        }
-        // ends with
-        if (searchvalue.startsWith(":ew:")) {
-            comparator = "ew";
-            searchvalue = searchvalue.substring(4);
-        }
-        // starts with
-        if (searchvalue.startsWith(":sw:")) {
-            comparator = "sw";
-            searchvalue = searchvalue.substring(4);
-        }
-        // not equals
-        if (searchvalue.startsWith(":ne:")) {
-            comparator = "ne";
-            searchvalue = searchvalue.substring(4);
-        }
-        // greater than
-        if (searchvalue.startsWith(":gt:")) {
-            comparator = "gt";
-            searchvalue = searchvalue.substring(4);
-        }
-        // less than
-        if (searchvalue.startsWith(":lt:")) {
-            comparator = "lt";
-            searchvalue = searchvalue.substring(4);
-        }
-        // greater than or equal
-        if (searchvalue.startsWith(":gte:")) {
-            comparator = "gte";
-            searchvalue = searchvalue.substring(4);
-        }
-        // less than or equal
-        if (searchvalue.startsWith(":lte:")) {
-            comparator = "lte";
-            searchvalue = searchvalue.substring(4);
-        }
-        searchvalue = searchvalue.toLowerCase();
-        return new SearchValues(comparator, searchvalue);
+        return new SearchValues(comparator, searchvalue1.toLowerCase(), searchvalue2.toLowerCase());
     }
     
     public Query getQuery(Session session_tables, HashMap<String, String> searchmap, String inst_klasse) {
@@ -797,33 +758,36 @@ public class HibernateUtil implements Runnable {
                     }
                 }
                 SearchValues sv = getSearchValues(searchvalue);
-                switch (sv.getComparartor()) {
+                switch (sv.getComparator()) {
                     case "eq":
-                        whereclause += searchcontentval + " = '" + sv.getSearchvalue() + "' AND ";
+                        whereclause += searchcontentval + " = '" + sv.getSearchvalue1() + "' AND ";
                         break;
                     case "sw":
-                        whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue() + "%' AND ";
+                        whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue1() + "%' AND ";
                         break;
                     case "ew":
-                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "' AND ";
+                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue1() + "' AND ";
                         break;
                     case "co":
-                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue() + "%' AND ";
+                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue1() + "%' AND ";
                         break;
                     case "gt":
-                        whereclause += searchcontentval + " > '" + sv.getSearchvalue() + "' AND ";
+                        whereclause += searchcontentval + " > '" + sv.getSearchvalue1() + "' AND ";
                         break;
                     case "lt":
-                        whereclause += searchcontentval + " < '" + sv.getSearchvalue() + "' AND ";
+                        whereclause += searchcontentval + " < '" + sv.getSearchvalue1() + "' AND ";
                         break;
                     case "gte":
-                        whereclause += searchcontentval + " >= '" + sv.getSearchvalue() + "' AND ";
+                        whereclause += searchcontentval + " >= '" + sv.getSearchvalue1() + "' AND ";
                         break;
                     case "lte":
-                        whereclause += searchcontentval + " <= '" + sv.getSearchvalue() + "' AND ";
+                        whereclause += searchcontentval + " <= '" + sv.getSearchvalue1() + "' AND ";
                         break;
                     case "ne":
-                        whereclause += searchcontentval + " <> '" + sv.getSearchvalue() + "' AND ";
+                        whereclause += searchcontentval + " <> '" + sv.getSearchvalue1() + "' AND ";
+                        break;
+                    case "bt":
+                        whereclause += searchcontentval + " BETWEEN '" + sv.getSearchvalue1() + "%' AND '" + sv.getSearchvalue2() + "%' AND ";
                         break;
                 }
 

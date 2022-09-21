@@ -23,11 +23,13 @@ import lombok.Setter;
  * @author raine
  */
 public class SearchValues {
-    private @Getter @Setter String comparartor;
-    private @Getter @Setter String searchvalue;
+    private @Getter @Setter String comparator;
+    private @Getter @Setter String searchvalue1;
+    private @Getter @Setter String searchvalue2;
 
-    public SearchValues(String comparator, String searchvalue) {
-        this.comparartor = comparator;
-        this.searchvalue = searchvalue;
+    public SearchValues(String comparator, String searchvalue1, String searchvalue2) {
+        this.comparator = comparator;
+        this.searchvalue1 = searchvalue1;
+        this.searchvalue2 = searchvalue2;
     }
 }
