@@ -60,7 +60,10 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         // add EntityTypes
         List<CsdlEntityType> entityTypes = new ArrayList<>();
         for (CfClass clazz : cfclassservice.findAll()) {
-            entityTypes.add(getEntityType(new FullQualifiedName(NAMESPACE, clazz.getName())));
+            CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE, clazz.getName()));
+            if (null != et) {
+                entityTypes.add(et);
+            }
         }
         schema.setEntityTypes(entityTypes);
         // add EntityContainer

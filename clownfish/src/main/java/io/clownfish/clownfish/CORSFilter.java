@@ -62,13 +62,14 @@ public class CORSFilter implements Filter {
     }
     
     private boolean isAllowedOrigin(String origin){
-        return true;
-        /*
-        for (String allowedOrigin : allowedOrigins) {
-            if(origin.equals(allowedOrigin)) return true;
+        if (null == origin) {
+            return true;
+        } else {
+            for (String allowedOrigin : allowedOrigins) {
+                if(origin.equals(allowedOrigin)) return true;
+            }
         }
         return false;
-        */
     }
     
 }
