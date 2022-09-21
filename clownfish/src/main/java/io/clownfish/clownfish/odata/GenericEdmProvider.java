@@ -116,7 +116,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         entityType.setProperties(propsList);
         entityType.setKey(keysList);
 
-        if (keysList.size() > 0) {
+        if (!keysList.isEmpty()) {
             return entityType;
         } else {
             LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
@@ -130,6 +130,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             CsdlSingleton singleton = new CsdlSingleton();
             singleton.setName(singletonName);
             singleton.setType(new FullQualifiedName(NAMESPACE, singletonName));
+            //singleton.setNavigationPropertyBindings(navigationPropertyBindings);
             
             return singleton;
         }

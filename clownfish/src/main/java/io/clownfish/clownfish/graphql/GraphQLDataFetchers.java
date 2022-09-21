@@ -172,7 +172,7 @@ public class GraphQLDataFetchers {
             Map<String, String> result = new HashMap<>();
             Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
             HashMap searchmap = new HashMap<>();
-            searchmap.put(attributname+"_1", (String) attributvalue.toString());
+            searchmap.put(attributname+"_1", ":eq:" + (String) attributvalue.toString());
             Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
             try {
                 List<Map> contentliste = (List<Map>) query.getResultList();
