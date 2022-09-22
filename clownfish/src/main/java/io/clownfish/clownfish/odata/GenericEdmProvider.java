@@ -105,7 +105,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         List propsList = new ArrayList();
         List keysList = new ArrayList();
         for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
-            CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut.getAttributetype().getName()));
+            CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
             propsList.add(prop);
             if (attribut.getIdentity()) {
                 CsdlPropertyRef propertyRef = new CsdlPropertyRef();
@@ -162,8 +162,8 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         return null;
     }
     
-    private FullQualifiedName getODataType(String attributetype) {
-        switch (attributetype) {
+    private FullQualifiedName getODataType(CfAttribut attribut) {
+        switch (attribut.getAttributetype().getName()) {
             case "string":
             case "hashstring":
             case "htmltext":
@@ -173,13 +173,20 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                 return EdmPrimitiveTypeKind.String.getFullQualifiedName();
             case "integer":
             case "media":
-            case "classref":
             case "assetref":
                 return EdmPrimitiveTypeKind.Int32.getFullQualifiedName();
             case "real":
                 return EdmPrimitiveTypeKind.Double.getFullQualifiedName();
             case "boolean":
                 return EdmPrimitiveTypeKind.Boolean.getFullQualifiedName();
+            case "classref":
+                if (0 == attribut.getRelationtype()) {                          // n:m
+                    //return EdmPrimitiveTypeKind.String.getFullQualifiedName();
+                    return new FullQualifiedName(NAMESPACE, attribut.getRelationref().getName());
+                } else {                                                        // 1:n
+                    //return EdmPrimitiveTypeKind.String.getFullQualifiedName();
+                    return new FullQualifiedName(NAMESPACE, attribut.getRelationref().getName());
+                }
             default:
                 return null;
         }
@@ -195,5 +202,9 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             }
         }
         return keysList;
+    }
+
+    private boolean getODataCollection(CfAttribut attribut) {
+        return (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 == attribut.getRelationtype());
     }
 }
