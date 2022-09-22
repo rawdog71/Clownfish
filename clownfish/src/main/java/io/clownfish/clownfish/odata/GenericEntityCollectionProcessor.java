@@ -183,7 +183,7 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
     
     private HashMap getSearchMap(Expression filterExpression) {
         HashMap searchmap = new HashMap<>();
-        
+
         return searchmap;
     }
 }

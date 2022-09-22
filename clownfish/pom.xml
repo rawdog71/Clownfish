@@ -204,23 +204,23 @@
         <dependency>
           <groupId>org.apache.olingo</groupId>
           <artifactId>odata-server-api</artifactId>
-          <version>4.8.0</version>
+          <version>4.9.0</version>
         </dependency>
         <dependency>
           <groupId>org.apache.olingo</groupId>
           <artifactId>odata-server-core</artifactId>
-          <version>4.8.0</version>
-          <scope>runtime</scope>
+          <version>4.9.0</version>
+            <type>jar</type>
         </dependency>
         <dependency>
           <groupId>org.apache.olingo</groupId>
           <artifactId>odata-commons-api</artifactId>
-          <version>4.8.0</version>
+          <version>4.9.0</version>
         </dependency>
         <dependency>
           <groupId>org.apache.olingo</groupId>
           <artifactId>odata-commons-core</artifactId>
-          <version>4.8.0</version>
+          <version>4.9.0</version>
         </dependency>
         
         <dependency>
