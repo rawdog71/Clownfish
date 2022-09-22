@@ -80,11 +80,13 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         List<CsdlEntitySet> entitySets = new ArrayList<>();
         List<CsdlSingleton> singletons = new ArrayList<>();
         for (CfClass clazz : cfclassservice.findAll()) {
-            CsdlSingleton si = getSingleton(CONTAINER, clazz.getName());
-            CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName()+"Set");
-            if (null != es) {
-                singletons.add(si);
-                entitySets.add(es);
+            if (!getKeys(clazz).isEmpty()) {
+                CsdlSingleton si = getSingleton(CONTAINER, clazz.getName());
+                CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName()+"Set");
+                if (null != es) {
+                    singletons.add(si);
+                    entitySets.add(es);
+                }
             }
         }
         // create EntityContainer
@@ -143,7 +145,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             CsdlEntitySet entitySet = new CsdlEntitySet();
             entitySet.setName(entitySetName);
             entitySet.setType(new FullQualifiedName(NAMESPACE, entitySetName.substring(0, entitySetName.length()-3)));
-            
+
             return entitySet;
         }
 
@@ -181,5 +183,17 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             default:
                 return null;
         }
+    }
+    
+    private List getKeys(CfClass classref) {
+        List keysList = new ArrayList();
+        for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
+            if (attribut.getIdentity()) {
+                CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+                propertyRef.setName(attribut.getName());
+                keysList.add(propertyRef);
+            }
+        }
+        return keysList;
     }
 }

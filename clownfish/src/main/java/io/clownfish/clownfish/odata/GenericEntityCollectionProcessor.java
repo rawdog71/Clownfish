@@ -50,7 +50,8 @@ import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
-import org.apache.olingo.server.api.uri.UriResourceSingleton;
+import org.apache.olingo.server.api.uri.queryoption.FilterOption;
+import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +97,12 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
-        EntityCollection entitySet = getData(edmEntitySet);
+        Expression filterExpression = null;
+        FilterOption filterOption = uriInfo.getFilterOption();
+        if (filterOption != null) {
+            filterExpression = filterOption.getExpression();
+        }
+        EntityCollection entitySet = getData(edmEntitySet, filterExpression);
 
         ODataSerializer serializer = odata.createSerializer(responseFormat);
 
@@ -113,15 +119,16 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
     }
 
-    private EntityCollection getData(EdmEntitySet edmEntitySet){
+    private EntityCollection getData(EdmEntitySet edmEntitySet, Expression filterExpression) {
         String classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        HashMap searchMap = getSearchMap(filterExpression);
         EntityCollection genericCollection = new EntityCollection();
-        getList(cfclassservice.findByName(classname), genericCollection);
+        getList(cfclassservice.findByName(classname), genericCollection, searchMap);
        
        return genericCollection;
     }
     
-    private void getList(CfClass clazz, EntityCollection genericCollection) {
+    private void getList(CfClass clazz, EntityCollection genericCollection, HashMap searchmap) {
         List<Entity> genericList = genericCollection.getEntities();
         if (0 == useHibernate) {
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(clazz);
@@ -136,7 +143,7 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
             }
         } else {
             Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
-            HashMap searchmap = new HashMap<>();
+            //HashMap searchmap = new HashMap<>();
             Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
             try {
                 List<Map> contentliste = (List<Map>) query.getResultList();
@@ -172,5 +179,11 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
                 session_tables.close();
             }
         }
+    }
+    
+    private HashMap getSearchMap(Expression filterExpression) {
+        HashMap searchmap = new HashMap<>();
+        
+        return searchmap;
     }
 }
