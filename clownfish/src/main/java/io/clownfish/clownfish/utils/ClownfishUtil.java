@@ -293,7 +293,7 @@ public class ClownfishUtil {
     }
 
     public void addUrlParams(Map parametermap, List urlParams) {
-        if (!urlParams.isEmpty()) {
+        if ((null != urlParams) && (!urlParams.isEmpty())) {
             int counter = 0;
             String key = "";
             String value = "";

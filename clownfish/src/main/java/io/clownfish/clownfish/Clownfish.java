@@ -1540,6 +1540,15 @@ public class Clownfish {
             br.close();
             return cfResponse;
         } catch (IOException ex) {
+            CfSite cfsite = cfsiteService.findByName(sitename);
+            String aliasname = cfsite.getAliaspath();
+            Future<ClownfishResponse> cfStaticResponse = null;
+            try {
+                cfStaticResponse = makeResponse(sitename, null, null, true);
+                StaticSiteUtil.generateStaticSite(sitename, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+            } catch (PageNotFoundException | InterruptedException | ExecutionException ex1) {
+                LOGGER.error(ex.getMessage());
+            }
             LOGGER.error(ex.getMessage());
             cfResponse.setOutput("Static site not found");
             cfResponse.setErrorcode(1);
