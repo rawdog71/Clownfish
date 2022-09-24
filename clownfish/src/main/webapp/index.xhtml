@@ -375,10 +375,10 @@
                             
                             <p:column colspan="4" style="vertical-align: top;">
                                 <p:panelGrid id="layoutcontentedit" columns="1"> 
-                                    <p:dataTable id="layouttemplatelist" style="width:200px;" size="small" var="layouttemplate" value="#{sitetree.layout.divs}" selectionMode="single" selection="#{sitetree.selectedDiv}" rowKey="#{layouttemplate.name}" rendered="${sitetree.contenteditable}">
+                                    <p:dataTable id="layouttemplatelist" style="width:200px;" size="small" var="layouttemplate" value="#{sitetree.layout.divs}" selectionMode="single" selection="#{sitetree.selectedDiv}" rowKey="#{layouttemplate.id}" rendered="${sitetree.contenteditable}">
                                         <p:ajax event="rowSelect" listener="#{sitetree.onDivSelect}" update=":form:msgs :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection" />
                                         <p:column headerText="DIV Template">
-                                            <h:outputText value="#{layouttemplate.name}" />
+                                            <h:outputText value="#{layouttemplate.id}" />
                                         </p:column>
                                         <p:column width="25px">
                                             <p:commandButton icon="pi #{layouttemplate.showIcon()}" styleClass="rounded-button ui-button-flat ui-button-plain" actionListener="#{sitetree.invertShow(layouttemplate)}" update=":form:tabview:layoutcontentedit :form:tabview:preview" />
