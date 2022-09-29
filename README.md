@@ -25,3 +25,4 @@ Work in progress
 - Supports business logic coded in Java, Kotlin, Groovy and Scala
 - Dynamic GraphQL support
 - Websocket server
+- Dynamic OData support
