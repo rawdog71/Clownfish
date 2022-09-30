@@ -25,6 +25,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -32,10 +33,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebFilter(asyncSupported = true, urlPatterns = { "/*" })
 public class CORSFilter implements Filter {
-    
-    private static final String[] allowedOrigins = {
-            "http://localhost:4200"
-    };
+    @Value("${cors.allow}") String corsallow;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -61,7 +59,8 @@ public class CORSFilter implements Filter {
         filterChain.doFilter(request, servletResponse);
     }
     
-    private boolean isAllowedOrigin(String origin){
+    private boolean isAllowedOrigin(String origin) {
+        String[] allowedOrigins = corsallow.split(";");
         if (null == origin) {
             return true;
         } else {
