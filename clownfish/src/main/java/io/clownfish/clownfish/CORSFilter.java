@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
  */
 @WebFilter(asyncSupported = true, urlPatterns = { "/*" })
 public class CORSFilter implements Filter {
-    @Value("${cors.allow}") String corsallow;
+    @Value("${cors.allow:}") String corsallow;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
