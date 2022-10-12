@@ -656,13 +656,17 @@ public class Clownfish {
                     if (null != searchresult) {
                         if (null != searchresult.getFoundSites()) {
                             searchresult.getFoundSites().stream().forEach((site) -> {
-                                searchcontentmap.put(site.getName(), site);
+                                if (null != site) {
+                                    searchcontentmap.put(site.getName(), site);
+                                }
                             });
                         }
                         searchassetmap.clear();
                         if (null != searchresult.getFoundAssets()) {
                             searchresult.getFoundAssets().stream().forEach((asset) -> {
-                                searchassetmap.put(asset.getName(), asset);
+                                if (null != asset) {
+                                    searchassetmap.put(asset.getName(), asset);
+                                }
                             });
                         }
                         searchassetmetadatamap.clear();

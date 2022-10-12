@@ -43,10 +43,15 @@ public class CfAssetDAOImpl implements CfAssetDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findById");  
         query.setParameter("id", id);
-        CfAsset cfasset = (CfAsset) query.getSingleResult();
-        if (!cfasset.isScrapped()) {
-            return cfasset;
-        } else {
+        try {
+            CfAsset cfasset = (CfAsset) query.getSingleResult();
+            if (!cfasset.isScrapped()) {
+                return cfasset;
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
+            System.out.println("Asset-ID not found: " + id);
             return null;
         }
     }

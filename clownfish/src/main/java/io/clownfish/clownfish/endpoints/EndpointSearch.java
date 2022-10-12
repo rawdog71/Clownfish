@@ -167,11 +167,15 @@ public class EndpointSearch {
             clownfish.getSearchmetadata().put("cfSearchTime", String.valueOf(endTime - startTime));
             clownfish.getSearchcontentmap().clear();
             searchresult.getFoundSites().stream().forEach((site) -> {
-                clownfish.getSearchcontentmap().put(site.getName(), site);
+                if (null != site) {
+                    clownfish.getSearchcontentmap().put(site.getName(), site);
+                }
             });
             clownfish.getSearchassetmap().clear();
             searchresult.getFoundAssets().stream().forEach((asset) -> {
-                clownfish.getSearchassetmap().put(asset.getName(), asset);
+                if (null != asset) {
+                    clownfish.getSearchassetmap().put(asset.getName(), asset);
+                }
             });
             clownfish.getSearchassetmetadatamap().clear();
             searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
