@@ -639,6 +639,10 @@ public class Clownfish {
                             }
                         }
                     }
+                    if (query.isEmpty()) {
+                        Map<String, String[]> parammap = request.getParameterMap();
+                        query = parammap.get("query")[0];
+                    }
 
                     String[] searchexpressions = query.split(" ");
                     searchUtil.updateSearchhistory(searchexpressions);
