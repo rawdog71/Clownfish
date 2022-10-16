@@ -360,23 +360,23 @@ public class SiteTreeBean implements Serializable {
         }
     }
 
-    private void fillChildren(long parentid, TreeNode node) {
+    private void fillChildren(CfSite parentid, TreeNode node) {
         List<CfSite> sitelist = cfsiteService.findByParentref(parentid);
                 
         for (CfSite site : sitelist) {
             TreeNode tn = new DefaultTreeNode(site);
             node.getChildren().add(tn);
-            fillChildren(site.getId(), tn);
+            fillChildren(site, tn);
         }
     }
     
     public void loadTree() {
         root = new DefaultTreeNode("Root", null);
-        List<CfSite> sitelist = cfsiteService.findByParentref(0L);
+        List<CfSite> sitelist = cfsiteService.findByParentref(null);
         for (CfSite site : sitelist) {
             TreeNode tn = new DefaultTreeNode(site);
             root.getChildren().add(tn);
-            fillChildren(site.getId(), tn);
+            fillChildren(site, tn);
         }
     }
  
@@ -415,10 +415,10 @@ public class SiteTreeBean implements Serializable {
         CfSite dragsite = (CfSite) dragNode.getData();
         if (dropNode.getParent() != null) {
             CfSite dropsite = (CfSite) dropNode.getData();
-            dragsite.setParentref(BigInteger.valueOf(dropsite.getId()));
+            dragsite.setParentref(dropsite);
             cfsiteService.edit(dragsite);
         } else {
-            dragsite.setParentref(BigInteger.ZERO);
+            dragsite.setParentref(null);
             cfsiteService.edit(dragsite);
         }
         
@@ -471,7 +471,7 @@ public class SiteTreeBean implements Serializable {
         selectedSite = (CfSite) selectedNode.getData();
         classcontentlist = cfclasscontentService.findByMaintenance(true);
         if (null != selectedSite.getTemplateref()) {
-            CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().longValue());
+            CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().getId());
             int idx = templatelist.getTemplateListe().indexOf(template);
             selectedTemplate = templatelist.getTemplateListe().get(idx);
             
@@ -530,14 +530,14 @@ public class SiteTreeBean implements Serializable {
             selectedTemplate = null;
         }
         if (null != selectedSite.getStylesheetref()) {
-            CfStylesheet styleshet = cfstylesheetService.findById(selectedSite.getStylesheetref().longValue());
+            CfStylesheet styleshet = cfstylesheetService.findById(selectedSite.getStylesheetref().getId());
             int idx = stylesheetlist.getStylesheetListe().indexOf(styleshet);
             selectedStylesheet = stylesheetlist.getStylesheetListe().get(idx);
         } else {
             selectedStylesheet = null;
         }
         if (null != selectedSite.getJavascriptref()) {
-            CfJavascript javascript = cfjavascriptService.findById(selectedSite.getJavascriptref().longValue());
+            CfJavascript javascript = cfjavascriptService.findById(selectedSite.getJavascriptref().getId());
             int idx = javascriptlist.getJavascriptListe().indexOf(javascript);
             selectedJavascript = javascriptlist.getJavascriptListe().get(idx);
         } else {
@@ -611,17 +611,17 @@ public class SiteTreeBean implements Serializable {
     public void onChange(ActionEvent actionEvent) {
         if (null != selectedSite) {
             if (null != selectedStylesheet) {
-                selectedSite.setStylesheetref(BigInteger.valueOf(selectedStylesheet.getId().intValue()));
+                selectedSite.setStylesheetref(selectedStylesheet);
             } else {
                 selectedSite.setStylesheetref(null);
             }
             if (null != selectedTemplate) {
-                selectedSite.setTemplateref(BigInteger.valueOf(selectedTemplate.getId().intValue()));
+                selectedSite.setTemplateref(selectedTemplate);
             } else {
                 selectedSite.setTemplateref(null);
             }
             if (null != selectedJavascript) {
-                selectedSite.setJavascriptref(BigInteger.valueOf(selectedJavascript.getId().intValue()));
+                selectedSite.setJavascriptref(selectedJavascript);
             } else {
                 selectedSite.setJavascriptref(null);
             }
@@ -765,18 +765,19 @@ public class SiteTreeBean implements Serializable {
             newsite.setHitcounter(BigInteger.ZERO);
             newsite.setName(siteName);
             if (null != selectedSite) {
-                newsite.setParentref(BigInteger.valueOf(selectedSite.getId()));
+                newsite.setParentref(selectedSite);
             } else {
-                newsite.setParentref(BigInteger.ZERO);
+                newsite.setParentref(null);
             }
             if (null != selectedTemplate) {
-                newsite.setTemplateref(BigInteger.valueOf(selectedTemplate.getId()));
+                //newsite.setTemplateref(BigInteger.valueOf(selectedTemplate.getId()));
+                newsite.setTemplateref(selectedTemplate);
             }
             if (null != selectedStylesheet) {
-                newsite.setStylesheetref(BigInteger.valueOf(selectedStylesheet.getId()));
+                newsite.setStylesheetref(selectedStylesheet);
             }
             if (null != selectedJavascript) {
-                newsite.setJavascriptref(BigInteger.valueOf(selectedJavascript.getId()));
+                newsite.setJavascriptref(selectedJavascript);
             }
             newsite.setHtmlcompression(sitehtmlcompression);
             newsite.setContenttype(contentType);

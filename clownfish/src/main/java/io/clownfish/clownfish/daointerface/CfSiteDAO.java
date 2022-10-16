@@ -28,7 +28,7 @@ public interface CfSiteDAO {
     CfSite findByName(String name);
     CfSite findByAliaspath(String alias);
     CfSite findByTemplateref(Long ref);
-    List<CfSite> findByParentref(Long ref);
+    List<CfSite> findByParentref(CfSite ref);
     List<CfSite> findBySitemap(boolean sitemap);
     CfSite findByShorturl(String shorturl);
     CfSite create(CfSite entity);

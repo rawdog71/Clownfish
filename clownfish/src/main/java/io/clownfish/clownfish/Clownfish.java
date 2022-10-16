@@ -999,7 +999,7 @@ public class Clownfish {
                     }
 
                     try {
-                        CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
+                        CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().getId());
                         // fetch the dependend template
                         boolean isScripted = false;
                         switch (cftemplate.getScriptlanguage()) {
@@ -1064,7 +1064,7 @@ public class Clownfish {
                         // fetch the dependend stylesheet, if available
                         String cfstylesheet = "";
                         if (cfsite.getStylesheetref() != null) {
-                            cfstylesheet = ((CfStylesheet) cfstylesheetService.findById(cfsite.getStylesheetref().longValue())).getContent();
+                            cfstylesheet = ((CfStylesheet) cfstylesheetService.findById(cfsite.getStylesheetref().getId())).getContent();
                             if (htmlcompression.compareToIgnoreCase("on") == 0) {
                                 htmlcompressor.setCompressCss(true);
                                 cfstylesheet = htmlcompressor.compress(cfstylesheet);
@@ -1074,7 +1074,7 @@ public class Clownfish {
                         // fetch the dependend javascript, if available
                         String cfjavascript = "";
                         if (cfsite.getJavascriptref() != null) {
-                            cfjavascript = ((CfJavascript) cfjavascriptService.findById(cfsite.getJavascriptref().longValue())).getContent();
+                            cfjavascript = ((CfJavascript) cfjavascriptService.findById(cfsite.getJavascriptref().getId())).getContent();
                             if (htmlcompression.compareToIgnoreCase("on") == 0) {
                                 htmlcompressor.setCompressJavaScript(true);
                                 cfjavascript = htmlcompressor.compress(cfjavascript);

@@ -82,7 +82,7 @@ public class PDFUtil implements Serializable {
         // Get the current template content
         long currentTemplateVersion;
         try {
-            cfTemplate = cfTemplateService.findById(site.getTemplateref().longValue());
+            cfTemplate = cfTemplateService.findById(site.getTemplateref().getId());
             currentTemplateVersion = cfTemplateversionService.findMaxVersion(cfTemplate.getId());
         } catch (NullPointerException ex) {
             currentTemplateVersion = 0;
