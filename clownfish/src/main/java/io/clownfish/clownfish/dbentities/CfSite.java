@@ -340,10 +340,14 @@ public class CfSite implements Serializable {
             if (null == templateref) {
                 return "pi-minus";
             } else {
-                if (templateref.isLayout()) {
-                    return "pi-table";
+                if (0 == templateref.getScriptLanguageTxt().compareToIgnoreCase("jrxml")) {
+                    return "pi-file-pdf";
                 } else {
-                    return "pi-stop";
+                    if (templateref.isLayout()) {
+                        return "pi-table";
+                    } else {
+                        return "pi-stop";
+                    }
                 }
             }
         }
