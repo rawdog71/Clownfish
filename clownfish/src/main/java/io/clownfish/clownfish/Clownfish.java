@@ -373,7 +373,7 @@ public class Clownfish {
         try {
             AnsiConsole.systemInstall();
             System.out.println(ansi().fg(GREEN));
-            System.out.println("INIT CLOWNFISH CMS Version " + clownfishutil.getVersion() + " on Tomcat " + clownfishutil.getVersionTomcat()+ " with Mojarra " + clownfishutil.getVersionMojarra());
+            System.out.println("INIT CLOWNFISH CMS");
             System.out.println(ansi().fg(RED));
             System.out.println("                               ...                                             ");
             System.out.println("                            &@@@@@@@                                           ");
@@ -402,7 +402,7 @@ public class Clownfish {
             System.out.println("              /####%%#@& *#(((//(/(%@   *@@@@%#%&@@                             ");
             System.out.println("              %#%&&@&*    *((((///(@@&     .##/*                                ");
             System.out.println("                  ,,***,   *((/(#@@@@@,                                         ");
-            System.out.println("                            *@@@@@@@@%                                          ");
+            System.out.println("                            *@@@@@@@@%          [" + clownfishutil.getVersion() + "] on Tomcat " + clownfishutil.getVersionTomcat()+ " with Mojarra " + clownfishutil.getVersionMojarra());
             System.out.println(ansi().reset());
             
             // Check Consistence
