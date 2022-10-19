@@ -1202,7 +1202,7 @@ public class Clownfish {
                             sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
                         }
 
-                        databasebean = new DatabaseTemplateBean();
+                        databasebean = new DatabaseTemplateBean(propertyUtil);
                         importbean = new ImportTemplateBean();
                         pdfbean = new PDFTemplateBean();
                         pdfbean.init(pdfUtil);
