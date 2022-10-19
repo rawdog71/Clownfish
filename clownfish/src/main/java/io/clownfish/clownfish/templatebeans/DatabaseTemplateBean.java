@@ -21,6 +21,14 @@ import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.TableField;
 import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
+import io.clownfish.clownfish.utils.PropertyUtil;
+import lombok.Getter;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -32,12 +40,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
-import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  *
@@ -47,12 +49,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatabaseTemplateBean implements Serializable {
     private CfDatasourceService cfdatasourceService;
+    private PropertyUtil propertyUtil;
     private transient @Getter @Setter Map contentmap;
     private List<CfSitedatasource> sitedatasourcelist;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(DatabaseTemplateBean.class);
     
-    public DatabaseTemplateBean() {
+    public DatabaseTemplateBean(PropertyUtil propertyUtil) {
+        this.propertyUtil = propertyUtil;
         contentmap = new HashMap<>();
     }
     
@@ -69,7 +73,13 @@ public class DatabaseTemplateBean implements Serializable {
     }
     
     public Map dbread(String catalog, String tablename, String sqlstatement) {
-        //LOGGER.info("START dbread");
+        if (sitedatasourcelist == null) {
+            LOGGER.error("ERROR: Template has no datasources!");
+            return null;
+        }
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("START dbread\nQuery: " + sqlstatement);
+        }
         HashMap<String, ArrayList> dbtables = new HashMap<>();
         sitedatasourcelist.stream().forEach((sitedatasource) -> {
             try {
@@ -131,7 +141,13 @@ public class DatabaseTemplateBean implements Serializable {
     }
 
     public Map<String, HashMap<String, ArrayList<HashMap<String, String>>>> dbread(CfDatasource cfdatasource, String catalog, String tablename, String sqlstatement) throws SQLException {
-        //LOGGER.info("START dbread");
+        if (sitedatasourcelist == null) {
+            LOGGER.error("ERROR: Template has no datasources!");
+            return null;
+        }
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("START dbread\nQuery: " + sqlstatement);
+        }
         HashMap<String, ArrayList<HashMap<String, String>>> dbtables = new HashMap<>();
         JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
         Connection con = jdbcutil.getConnection();
@@ -186,7 +202,13 @@ public class DatabaseTemplateBean implements Serializable {
     
     public boolean dbexecute(String catalog, String sqlstatement) {
         boolean ok = false;
-        //LOGGER.info("START dbexecute: " + sqlstatement);
+        if (sitedatasourcelist == null) {
+            LOGGER.error("ERROR: Template has no datasources!");
+            return ok;
+        }
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("START dbexecute\nQuery: " + sqlstatement);
+        }
         for (CfSitedatasource sitedatasource : sitedatasourcelist) {
             CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
             JDBCUtil jdbcutil = new JDBCUtil(cfdatasource.getDriverclass(), cfdatasource.getUrl(), cfdatasource.getUser(), cfdatasource.getPassword());
@@ -240,11 +262,16 @@ public class DatabaseTemplateBean implements Serializable {
 
     public Map dbexecute(String[] params)
     {
+        if (sitedatasourcelist == null) {
+            LOGGER.error("ERROR: Template has no datasources!");
+            return null;
+        }
         Map map = new HashMap<>();
         String catalog = params[0];
         String sqlStatement = params[1];
-        //LOGGER.info("START dbexecute:\n" + sqlStatement);
-
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("START dbexecute\nQuery: " + sqlStatement);
+        }
         for (CfSitedatasource sitedatasource : sitedatasourcelist)
         {
             CfDatasource cfdatasource = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
@@ -266,7 +293,7 @@ public class DatabaseTemplateBean implements Serializable {
                         {
                             if (stmt.execute(sqlStatement)) // Statement has one or potentially multiple result sets
                             {
-                                LOGGER.info("START dbexecute TRUE (Statement type: Result set");
+                                LOGGER.info("START dbexecute TRUE (Statement type: Result set)");
                                 ResultSet resultSet = stmt.getResultSet();
                                 ResultSetMetaData rmd = resultSet.getMetaData();
                                 TableFieldStructure tfs = getTableFieldsList(rmd);
@@ -334,8 +361,8 @@ public class DatabaseTemplateBean implements Serializable {
             int columncount = dmd.getColumnCount();
             for (int i = 1; i <= columncount; i++) {
                 String columnName = dmd.getColumnName(i);
-                int colomuntype = dmd.getColumnType(i);
-                String colomuntypename = dmd.getColumnTypeName(i);
+                int columnType = dmd.getColumnType(i);
+                String columnTypeName = dmd.getColumnTypeName(i);
                 int columnsize = dmd.getColumnDisplaySize(i);
                 int decimaldigits = dmd.getPrecision(i);
                 /*
@@ -347,42 +374,32 @@ public class DatabaseTemplateBean implements Serializable {
                 //String is_autoIncrment = columns.getString("IS_AUTOINCREMENT");
                 String is_autoIncrment = "";
 
-                switch (colomuntype) {
-                    case -1:      // TEXT -> String
-                        tableFieldsList.add(new TableField(columnName, "STRING", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                switch (columnType) {
+                    case -1:      // TEXT, varchar -> String
+                    case 1:
+                    case 12:
+                    case 2005:
+                        tableFieldsList.add(new TableField(columnName, "STRING", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
-                    case 1:      // varchar -> String
-                        tableFieldsList.add(new TableField(columnName, "STRING", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 2:       // int
-                        tableFieldsList.add(new TableField(columnName, "INT", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 4:       // int
-                        tableFieldsList.add(new TableField(columnName, "INT", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 5:       // smallint
-                        tableFieldsList.add(new TableField(columnName, "INT", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                    case 2:       // int, smallint
+                    case 4:
+                    case 5:
+                        tableFieldsList.add(new TableField(columnName, "INT", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case 7:       // real
-                        tableFieldsList.add(new TableField(columnName, "REAL", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "REAL", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;            
                     case 8:       // float
-                        tableFieldsList.add(new TableField(columnName, "FLOAT", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 12:      // varchar -> String
-                        tableFieldsList.add(new TableField(columnName, "STRING", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "FLOAT", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case -5:      // long
-                        tableFieldsList.add(new TableField(columnName, "LONG", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "LONG", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case -7:      // bit
-                        tableFieldsList.add(new TableField(columnName, "BOOLEAN", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;    
-                    case 2005:    // text -> String
-                        tableFieldsList.add(new TableField(columnName, "STRING", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "BOOLEAN", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case 93:      // Date
-                        tableFieldsList.add(new TableField(columnName, "DATE", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        tableFieldsList.add(new TableField(columnName, "DATE", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                 }
             }
