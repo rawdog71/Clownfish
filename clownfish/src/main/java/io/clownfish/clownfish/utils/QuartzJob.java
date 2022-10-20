@@ -212,7 +212,7 @@ public class QuartzJob implements Job {
                 sapbean.init(sapc, sitesaprfclist, rpytableread, null);
             }
             NetworkTemplateBean networkbean = new NetworkTemplateBean();
-            DatabaseTemplateBean databasebean = new DatabaseTemplateBean();
+            DatabaseTemplateBean databasebean = new DatabaseTemplateBean(propertyUtil);
             databasebean.initjob(sitedatasourcelist, cfdatasourceService);
             ImportTemplateBean importBean = new ImportTemplateBean();
             importBean.initjob(sitedatasourcelist, cfdatasourceService);
