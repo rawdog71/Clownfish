@@ -503,6 +503,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
             try {
                 CfAsset newasset = new CfAsset();
                 newasset.setName(filename);
+                newasset.setPublicuse(true);
                 newasset.setFileextension(fileextension.toLowerCase());
                 newasset.setMimetype(metamap.get("Content-Type"));
                 if (newasset.getMimetype().contains("jpeg")) {

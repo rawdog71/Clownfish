@@ -45,7 +45,8 @@ public class GraphQLUtil {
         sb.append("input GeneralFilter {\n");
         sb.append("   field : String\n");
         sb.append("   op : String\n");
-        sb.append("   value : String\n");
+        sb.append("   value1 : String\n");
+        sb.append("   value2 : String\n");
         sb.append("}\n\n");
         
         sb.append("input GeneralInput {\n");

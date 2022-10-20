@@ -786,7 +786,7 @@ public class ClassUtil implements Serializable {
                 case "boolean":
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(attr.getName()).withFor(attr.getName()).withClass("form-label")).append("\n");
-                    html.append("\t\t\t\t").append(("<input type=\"checkbox\" id=\"" + attr.getName() + "\" ng-checked=\"{{info['" + attr.getName() + "']}}\">")).append("\n");
+                    html.append("\t\t\t\t").append("<input type=\"checkbox\" id=\"").append(attr.getName()).append("\" ng-checked=\"{{info['").append(attr.getName()).append("']}}\">").append("\n");
                     html.append("\t\t\t\t").append(("</div>")).append("\n");
                     break;
                 case "string":
@@ -897,8 +897,8 @@ public class ClassUtil implements Serializable {
             site.setLocale("");
             site.setDescription("");
             site.setAliaspath(site.getName());
-            site.setParentref(BigInteger.ZERO);
-            site.setTemplateref(BigInteger.valueOf(template.getId()));
+            site.setParentref(null);
+            site.setTemplateref(template);
             cfSiteService.create(site);
         }
         sitetree.loadTree();

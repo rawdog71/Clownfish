@@ -263,7 +263,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
                 System.out.println("BOOTSTRAPPING I");
                 System.out.println(ansi().reset());
                 JDBCUtil jdbcutil = new JDBCUtil(dbclass, dburl, dbuser, dbpassword);
-                ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), true, false);
+                ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), false, false);
                 String file = "sql-bootstrap.sql";
                 runner.runScript(new BufferedReader(new FileReader(file)));
             }

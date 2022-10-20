@@ -135,6 +135,11 @@ public class GraphQLDataFetchers {
                 
                 Map<String, ArrayList> input_values = dataFetchingEnvironment.getArgument(fieldname);
                 List<HashMap<String, String>> filter_list = input_values.get("filter");
+                for (HashMap<String, String> dummy_filter : filter_list) {
+                    if (0 != dummy_filter.get("op").compareToIgnoreCase("bt")) {
+                        dummy_filter.put("value2", "");
+                    }
+                }
                 List<Map<String, String>> resultlist = null;
                 resultlist = getList(clazz, filter_list);
                 
@@ -167,7 +172,7 @@ public class GraphQLDataFetchers {
             Map<String, String> result = new HashMap<>();
             Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
             HashMap searchmap = new HashMap<>();
-            searchmap.put(attributname+"_1", (String) attributvalue.toString());
+            searchmap.put(attributname+"_1", ":eq:" + (String) attributvalue.toString());
             Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
             try {
                 List<Map> contentliste = (List<Map>) query.getResultList();
@@ -279,12 +284,13 @@ public class GraphQLDataFetchers {
                     for (HashMap<String, String> filter : filter_list) {
                         String field = filter.get("field");
                         String op = filter.get("op");
-                        String value = filter.get("value");
+                        String value1 = filter.get("value1");
+                        String value2 = filter.get("value2");
 
                         CfAttribut attribut = cfattributservice.findByNameAndClassref(field, clazz);
                         if (!field.isEmpty()) {
                             List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
-                            if (checkCompare(aclist, cc, field, value)) {
+                            if (checkCompare(aclist, cc, field, value1)) {
                                 List keyvals = contentUtil.getContentOutputKeyval(aclist);
                                 result.add((Map)keyvals.get(0));
                             }
@@ -305,9 +311,14 @@ public class GraphQLDataFetchers {
             for (HashMap<String, String> filter : filter_list) {
                 String field = filter.get("field");
                 String op = filter.get("op");
-                String value = filter.get("value");
+                String value1 = filter.get("value1");
+                String value2 = filter.get("value2");
                 if (null != field) {
-                    searchmap.put(field+"_1", ":" + op + ":" + (String) value.toString());
+                    if ((!value2.isEmpty()) && (0 == op.compareToIgnoreCase("bt"))) {
+                        searchmap.put(field+"_1", ":" + op + ":" + value1 + ":" + value2);
+                    } else {
+                        searchmap.put(field+"_1", ":" + op + ":" + value1);
+                    }
                 }
             }
             Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());

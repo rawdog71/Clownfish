@@ -20,14 +20,12 @@ import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import io.clownfish.clownfish.datamodels.CfDiv;
-import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfKeywordlist;
 import io.clownfish.clownfish.dbentities.CfLayoutcontent;
 import io.clownfish.clownfish.dbentities.CfList;
-import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.dbentities.CfTemplateversion;
 import io.clownfish.clownfish.dbentities.CfTemplateversionPK;
@@ -46,7 +44,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
@@ -57,10 +54,6 @@ import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -197,6 +190,10 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                     if (null != cfcontent) {
                         content = content.replaceAll(replacefilter, cfcontent.getName());
                     }
+                    replacefilter = "#C:" + c.split(":")[0] + ":\\*#";
+                    if (null != cfcontent) {
+                        content = content.replaceAll(replacefilter, cfcontent.getName());
+                    }
                 }
             }
         }
@@ -217,6 +214,10 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                 String[] cs = c.split(":");
                 if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
                     String replacefilter = "#DL:" + c + "#";
+                    if (null != cflist) {
+                        content = content.replaceAll(replacefilter, cflist.getName());
+                    }
+                    replacefilter = "#DL:" + c.split(":")[0] + ":\\*#";
                     if (null != cflist) {
                         content = content.replaceAll(replacefilter, cflist.getName());
                     }
@@ -242,6 +243,10 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                 if (null != cfasset) {
                     content = content.replaceAll(replacefilter, cfasset.getId().toString());
                 }
+                replacefilter = "#A:" + c.split(":")[0] + ":\\*#";
+                if (null != cfasset) {
+                    content = content.replaceAll(replacefilter, cfasset.getId().toString());
+                }
             }
         }
         // replace Assetlists
@@ -261,6 +266,10 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                 String[] cs = c.split(":");
                 if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
                     String replacefilter = "#AL:" + c + "#";
+                    if (null != cfassetlist) {
+                        content = content.replaceAll(replacefilter, cfassetlist.getName());
+                    }
+                    replacefilter = "#AL:" + c.split(":")[0] + ":\\*#";
                     if (null != cfassetlist) {
                         content = content.replaceAll(replacefilter, cfassetlist.getName());
                     }
@@ -284,6 +293,10 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                 String[] cs = c.split(":");
                 if (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(cs[1])) {
                     String replacefilter = "#KL:" + c + "#";
+                    if (null != cfkeywordlist) {
+                        content = content.replaceAll(replacefilter, cfkeywordlist.getName());
+                    }
+                    replacefilter = "#KL:" + c.split(":")[0] + ":\\*#";
                     if (null != cfkeywordlist) {
                         content = content.replaceAll(replacefilter, cfkeywordlist.getName());
                     }

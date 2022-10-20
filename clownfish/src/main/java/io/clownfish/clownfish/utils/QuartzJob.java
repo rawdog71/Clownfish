@@ -142,7 +142,7 @@ public class QuartzJob implements Job {
         CfSite cfsite;
         cfsite = cfsiteService.findById(siteref);
 
-        CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
+        CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().getId());
         // fetch the dependend template 
         switch (cftemplate.getScriptlanguage()) {
             case 0:

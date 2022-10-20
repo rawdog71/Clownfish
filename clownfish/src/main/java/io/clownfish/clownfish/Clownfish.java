@@ -373,7 +373,7 @@ public class Clownfish {
         try {
             AnsiConsole.systemInstall();
             System.out.println(ansi().fg(GREEN));
-            System.out.println("INIT CLOWNFISH CMS Version " + clownfishutil.getVersion() + " on Tomcat " + clownfishutil.getVersionTomcat()+ " with Mojarra " + clownfishutil.getVersionMojarra());
+            System.out.println("INIT CLOWNFISH CMS");
             System.out.println(ansi().fg(RED));
             System.out.println("                               ...                                             ");
             System.out.println("                            &@@@@@@@                                           ");
@@ -402,7 +402,7 @@ public class Clownfish {
             System.out.println("              /####%%#@& *#(((//(/(%@   *@@@@%#%&@@                             ");
             System.out.println("              %#%&&@&*    *((((///(@@&     .##/*                                ");
             System.out.println("                  ,,***,   *((/(#@@@@@,                                         ");
-            System.out.println("                            *@@@@@@@@%                                          ");
+            System.out.println("                            *@@@@@@@@%          [" + clownfishutil.getVersion() + "] on Tomcat " + clownfishutil.getVersionTomcat()+ " with Mojarra " + clownfishutil.getVersionMojarra());
             System.out.println(ansi().reset());
             
             // Check Consistence
@@ -639,6 +639,10 @@ public class Clownfish {
                             }
                         }
                     }
+                    if (query.isEmpty()) {
+                        Map<String, String[]> parammap = request.getParameterMap();
+                        query = parammap.get("query")[0];
+                    }
 
                     String[] searchexpressions = query.split(" ");
                     searchUtil.updateSearchhistory(searchexpressions);
@@ -656,13 +660,17 @@ public class Clownfish {
                     if (null != searchresult) {
                         if (null != searchresult.getFoundSites()) {
                             searchresult.getFoundSites().stream().forEach((site) -> {
-                                searchcontentmap.put(site.getName(), site);
+                                if (null != site) {
+                                    searchcontentmap.put(site.getName(), site);
+                                }
                             });
                         }
                         searchassetmap.clear();
                         if (null != searchresult.getFoundAssets()) {
                             searchresult.getFoundAssets().stream().forEach((asset) -> {
-                                searchassetmap.put(asset.getName(), asset);
+                                if (null != asset) {
+                                    searchassetmap.put(asset.getName(), asset);
+                                }
                             });
                         }
                         searchassetmetadatamap.clear();
@@ -991,7 +999,7 @@ public class Clownfish {
                     }
 
                     try {
-                        CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().longValue());
+                        CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().getId());
                         // fetch the dependend template
                         boolean isScripted = false;
                         switch (cftemplate.getScriptlanguage()) {
@@ -1056,7 +1064,7 @@ public class Clownfish {
                         // fetch the dependend stylesheet, if available
                         String cfstylesheet = "";
                         if (cfsite.getStylesheetref() != null) {
-                            cfstylesheet = ((CfStylesheet) cfstylesheetService.findById(cfsite.getStylesheetref().longValue())).getContent();
+                            cfstylesheet = ((CfStylesheet) cfstylesheetService.findById(cfsite.getStylesheetref().getId())).getContent();
                             if (htmlcompression.compareToIgnoreCase("on") == 0) {
                                 htmlcompressor.setCompressCss(true);
                                 cfstylesheet = htmlcompressor.compress(cfstylesheet);
@@ -1066,7 +1074,7 @@ public class Clownfish {
                         // fetch the dependend javascript, if available
                         String cfjavascript = "";
                         if (cfsite.getJavascriptref() != null) {
-                            cfjavascript = ((CfJavascript) cfjavascriptService.findById(cfsite.getJavascriptref().longValue())).getContent();
+                            cfjavascript = ((CfJavascript) cfjavascriptService.findById(cfsite.getJavascriptref().getId())).getContent();
                             if (htmlcompression.compareToIgnoreCase("on") == 0) {
                                 htmlcompressor.setCompressJavaScript(true);
                                 cfjavascript = htmlcompressor.compress(cfjavascript);
@@ -1540,6 +1548,15 @@ public class Clownfish {
             br.close();
             return cfResponse;
         } catch (IOException ex) {
+            CfSite cfsite = cfsiteService.findByName(sitename);
+            String aliasname = cfsite.getAliaspath();
+            Future<ClownfishResponse> cfStaticResponse = null;
+            try {
+                cfStaticResponse = makeResponse(sitename, null, null, true);
+                StaticSiteUtil.generateStaticSite(sitename, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+            } catch (PageNotFoundException | InterruptedException | ExecutionException ex1) {
+                LOGGER.error(ex.getMessage());
+            }
             LOGGER.error(ex.getMessage());
             cfResponse.setOutput("Static site not found");
             cfResponse.setErrorcode(1);

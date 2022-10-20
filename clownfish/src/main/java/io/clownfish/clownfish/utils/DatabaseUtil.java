@@ -1022,8 +1022,8 @@ public class DatabaseUtil {
             site.setLocale("");
             site.setDescription("");
             site.setAliaspath(site.getName());
-            site.setParentref(BigInteger.ZERO);
-            site.setTemplateref(BigInteger.valueOf(template.getId()));
+            site.setParentref(null);
+            site.setTemplateref(template);
             cfSiteService.create(site);
         }
         sitetree.loadTree();

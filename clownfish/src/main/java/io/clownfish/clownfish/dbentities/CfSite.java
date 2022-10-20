@@ -29,6 +29,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -45,6 +47,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfSite.findByName", query = "SELECT c FROM CfSite c WHERE c.name = :name"),
     @NamedQuery(name = "CfSite.findByTemplateref", query = "SELECT c FROM CfSite c WHERE c.templateref = :templateref"),
     @NamedQuery(name = "CfSite.findByParentref", query = "SELECT c FROM CfSite c WHERE c.parentref = :parentref"),
+    @NamedQuery(name = "CfSite.findByParentrefNull", query = "SELECT c FROM CfSite c WHERE c.parentref IS NULL"),
     @NamedQuery(name = "CfSite.findByStylesheetref", query = "SELECT c FROM CfSite c WHERE c.stylesheetref = :stylesheetref"),
     @NamedQuery(name = "CfSite.findByJavascriptref", query = "SELECT c FROM CfSite c WHERE c.javascriptref = :javascriptref"),
     @NamedQuery(name = "CfSite.findByHtmlcompression", query = "SELECT c FROM CfSite c WHERE c.htmlcompression = :htmlcompression"),
@@ -57,7 +60,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfSite.findByShorturl", query = "SELECT c FROM CfSite c WHERE c.shorturl = :shorturl")
 })
 public class CfSite implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,14 +72,18 @@ public class CfSite implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
-    @Column(name = "templateref")
-    private BigInteger templateref;
-    @Column(name = "parentref")
-    private BigInteger parentref;
-    @Column(name = "stylesheetref")
-    private BigInteger stylesheetref;
-    @Column(name = "javascriptref")
-    private BigInteger javascriptref;
+    @JoinColumn(name = "templateref", referencedColumnName = "id")
+    @ManyToOne(optional = true)
+    private CfTemplate templateref;
+    @JoinColumn(name = "parentref", referencedColumnName = "id")
+    @ManyToOne(optional = true)
+    private CfSite parentref;
+    @JoinColumn(name = "stylesheetref", referencedColumnName = "id")
+    @ManyToOne(optional = true)
+    private CfStylesheet stylesheetref;
+    @JoinColumn(name = "javascriptref", referencedColumnName = "id")
+    @ManyToOne(optional = true)
+    private CfJavascript javascriptref;
     @Basic(optional = false)
     @NotNull
     @Column(name = "htmlcompression")
@@ -116,7 +123,7 @@ public class CfSite implements Serializable {
     private boolean searchresult;
     @Column(name = "shorturl")
     private String shorturl;
-
+    
     public CfSite() {
     }
 
@@ -150,38 +157,38 @@ public class CfSite implements Serializable {
         this.name = name;
     }
 
-    public BigInteger getTemplateref() {
+    public CfTemplate getTemplateref() {
         return templateref;
     }
 
-    public void setTemplateref(BigInteger templateref) {
+    public void setTemplateref(CfTemplate templateref) {
         this.templateref = templateref;
     }
 
-    public BigInteger getParentref() {
+    public CfSite getParentref() {
         return parentref;
     }
 
-    public void setParentref(BigInteger parentref) {
+    public void setParentref(CfSite parentref) {
         this.parentref = parentref;
     }
 
-    public BigInteger getStylesheetref() {
+    public CfStylesheet getStylesheetref() {
         return stylesheetref;
     }
 
-    public void setStylesheetref(BigInteger stylesheetref) {
+    public void setStylesheetref(CfStylesheet stylesheetref) {
         this.stylesheetref = stylesheetref;
     }
 
-    public BigInteger getJavascriptref() {
+    public CfJavascript getJavascriptref() {
         return javascriptref;
     }
 
-    public void setJavascriptref(BigInteger javascriptref) {
+    public void setJavascriptref(CfJavascript javascriptref) {
         this.javascriptref = javascriptref;
     }
-
+    
     public int getHtmlcompression() {
         return htmlcompression;
     }
@@ -324,6 +331,26 @@ public class CfSite implements Serializable {
 
     public void setShorturl(String shorturl) {
         this.shorturl = shorturl;
+    }
+    
+    public String getIcon() {
+        if (job) {
+            return "pi-clock";
+        } else {
+            if (null == templateref) {
+                return "pi-minus";
+            } else {
+                if (0 == templateref.getScriptLanguageTxt().compareToIgnoreCase("jrxml")) {
+                    return "pi-file-pdf";
+                } else {
+                    if (templateref.isLayout()) {
+                        return "pi-table";
+                    } else {
+                        return "pi-stop";
+                    }
+                }
+            }
+        }
     }
 
     @Override

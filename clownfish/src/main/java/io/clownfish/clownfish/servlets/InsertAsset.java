@@ -18,9 +18,13 @@ package io.clownfish.clownfish.servlets;
 import com.google.gson.Gson;
 import io.clownfish.clownfish.beans.ContentList;
 import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfAssetkeyword;
+import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
+import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
@@ -66,6 +70,8 @@ public class InsertAsset extends HttpServlet {
     @Autowired AssetIndexer assetIndexer;
     @Autowired IndexService indexService;
     @Autowired ContentList classcontentlist;
+    @Autowired CfKeywordService cfkeywordService;
+    @Autowired CfAssetKeywordService cfassetkeywordService;
     @Autowired FolderUtil folderUtil;
     @Autowired ApiKeyUtil apikeyutil;
     
@@ -88,6 +94,12 @@ public class InsertAsset extends HttpServlet {
                 HashMap<String, String> metamap = new HashMap<>();
                 List<Part> fileParts = request.getParts().stream().filter(part -> "file".equals(part.getName()) && part.getSize() > 0).collect(Collectors.toList()); // Retrieves <input type="file" name="file" multiple="true">
 
+                String keywords = request.getParameter("keywords");
+                String[] keywordlist = null;
+                if (null != keywords) {
+                    keywordlist = keywords.split(";");
+                }
+                
                 for (Part filePart : fileParts) {
                     String filename = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
                     InputStream inputStream = filePart.getInputStream();
@@ -142,6 +154,12 @@ public class InsertAsset extends HttpServlet {
                         if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
                             Thread assetindexer_thread = new Thread(assetIndexer);
                             assetindexer_thread.start();
+                        }
+                        if (null != keywordlist) {
+                            for (String keyword : keywordlist) {
+                                CfAssetkeyword assetkeyword = new CfAssetkeyword(newasset.getId(), cfkeywordService.findByName(keyword).getId());
+                                cfassetkeywordService.create(assetkeyword);
+                            }
                         }
                     } catch (PersistenceException ex) {
                         newasset = cfassetService.findByName(filename);

@@ -138,7 +138,8 @@ public class StaticSiteUtil {
                 }
                 if (param.startsWith("mediaid")) {
                     String[] media_params = param.split("=");
-                    asset = cfassetService.findById(Long.parseLong(media_params[1]));
+                    String mediaid = media_params[1].replaceAll("\\.", "");
+                    asset = cfassetService.findById(Long.parseLong(mediaid));
                 }
                 if (param.startsWith("width")) {
                     String[] width_params = param.split("=");

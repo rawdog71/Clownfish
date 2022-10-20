@@ -81,7 +81,7 @@ public class CfSiteServiceImpl implements CfSiteService {
 
     //@Cacheable(value = "site", key = "#ref")
     @Override
-    public List<CfSite> findByParentref(Long ref) {
+    public List<CfSite> findByParentref(CfSite ref) {
         return this.cfsiteDAO.findByParentref(ref);
     }
 

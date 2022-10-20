@@ -10,8 +10,8 @@
         <title>Clownfish CMS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <h:outputStylesheet library="webjars" name="primeflex/3.2.1/primeflex.min.css" />
-        <h:outputStylesheet library="webjars" name="font-awesome/6.1.1/css/all.min-jsf.css" />
-        <h:outputStylesheet library="webjars" name="font-awesome/6.1.1/css/v4-shims.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="font-awesome/6.1.2/css/all.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="font-awesome/6.1.2/css/v4-shims.min-jsf.css" />
         <script src="resources/js/main.js"></script>
         <f:facet name="last">
             <link rel="stylesheet" type="text/css" href="resources/css/main.css" />
@@ -94,8 +94,8 @@
                                         <p:ajax event="dragdrop" listener="#{sitetree.onDragDrop}" update=":form:msgs" />
                                         <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup" />
                                         <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup" />
-                                        <p:treeNode>
-                                            <h:outputText value="#{node}" />
+                                        <p:treeNode icon="pi #{node.icon}">
+                                            <h:outputText value="#{node.name}" />
                                         </p:treeNode>
                                     </p:tree>
                                 </p:scrollPanel>
@@ -375,10 +375,10 @@
                             
                             <p:column colspan="4" style="vertical-align: top;">
                                 <p:panelGrid id="layoutcontentedit" columns="1"> 
-                                    <p:dataTable id="layouttemplatelist" style="width:200px;" size="small" var="layouttemplate" value="#{sitetree.layout.divs}" selectionMode="single" selection="#{sitetree.selectedDiv}" rowKey="#{layouttemplate.name}" rendered="${sitetree.contenteditable}">
+                                    <p:dataTable id="layouttemplatelist" style="width:200px;" size="small" var="layouttemplate" value="#{sitetree.layout.divs}" selectionMode="single" selection="#{sitetree.selectedDiv}" rowKey="#{layouttemplate.id}" rendered="${sitetree.contenteditable}">
                                         <p:ajax event="rowSelect" listener="#{sitetree.onDivSelect}" update=":form:msgs :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection" />
                                         <p:column headerText="DIV Template">
-                                            <h:outputText value="#{layouttemplate.name}" />
+                                            <h:outputText value="#{layouttemplate.id}" />
                                         </p:column>
                                         <p:column width="25px">
                                             <p:commandButton icon="pi #{layouttemplate.showIcon()}" styleClass="rounded-button ui-button-flat ui-button-plain" actionListener="#{sitetree.invertShow(layouttemplate)}" update=":form:tabview:layoutcontentedit :form:tabview:preview" />
@@ -1364,7 +1364,7 @@
                             <p:ajax listener="#{assetList.onChangePublicusage}"/>
                         </p:selectBooleanCheckbox>
                         <p:fileUpload listener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true" 
-                                      update="messages :form:tabview:assetlist" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|svg|ppt|pptx|xls|xlsx|zip|jar|xml)$/i" >
+                                      update="messages :form:tabview:assetlist" maxChunkSize="1000000000" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|dotx|svg|ppt|potx|pptx|xls|xlsx|zip|jar|xml)$/i" >
                         </p:fileUpload>
                         <p:growl id="messages" showDetail="true" />
                     </h:form>

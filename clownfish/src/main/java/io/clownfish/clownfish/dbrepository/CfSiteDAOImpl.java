@@ -96,10 +96,15 @@ public class CfSiteDAOImpl implements CfSiteDAO {
     }
 
     @Override
-    public List<CfSite> findByParentref(Long ref) {
+    public List<CfSite> findByParentref(CfSite ref) {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfSite.findByParentref");  
-        query.setParameter("parentref", BigInteger.valueOf(ref));
+        TypedQuery query = null;
+        if (null == ref) {
+            query = (TypedQuery) session.getNamedQuery("CfSite.findByParentrefNull");
+        } else {
+            query = (TypedQuery) session.getNamedQuery("CfSite.findByParentref");
+            query.setParameter("parentref", ref);
+        }
         List<CfSite> cfsitelist = query.getResultList();
         return cfsitelist;
     }
