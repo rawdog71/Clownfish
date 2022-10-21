@@ -319,7 +319,8 @@ public class SAPTemplateBean implements Serializable {
                         sapexportvalues.put(rpytablereadentry.getFieldname(), datum);
                         continue;
                     }
-                    if (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.QUAN) == 0) {
+                    if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.QUAN) == 0) ||
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.FLTP) == 0)) {
                         double value = functions_table.getDouble(rpytablereadentry.getFieldname());
                         sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
                         continue;
