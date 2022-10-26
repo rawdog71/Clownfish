@@ -24,6 +24,7 @@ import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfKeywordlist;
 import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
+import io.clownfish.clownfish.dbentities.CfLayoutcontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSite;
@@ -31,7 +32,6 @@ import io.clownfish.clownfish.dbentities.CfSiteassetlist;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.dbentities.CfSitekeywordlist;
 import io.clownfish.clownfish.dbentities.CfSitelist;
-import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
@@ -41,19 +41,24 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
+import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitekeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
-import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,9 +86,11 @@ public class SiteUtil {
     @Autowired CfSitekeywordlistService cfsitekeywordlistService;
     @Autowired CfKeywordlistService cfkeywordlistService;
     @Autowired CfKeywordlistcontentService cfkeywordlistcontentService;
+    @Autowired CfLayoutcontentService cflayoutcontentService;
     @Autowired ClassUtil classutil;
     @Autowired HibernateUtil hibernateutil;
     @Autowired private PropertyUtil propertyUtil;
+    @Autowired transient FolderUtil folderUtil;
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteUtil.class);
     
     @Value("${hibernate.use:0}") int useHibernate;
@@ -319,5 +326,30 @@ public class SiteUtil {
                 j = i + 61;
         }
         return (char) j;
+    }
+    
+    public void publishSite(CfSite site, boolean feedback) {
+        if (null != folderUtil.getStatic_folder()) {
+            File file = new File(folderUtil.getStatic_folder() + File.separator + site.getName());
+            try {
+                Files.deleteIfExists(file.toPath());
+                if (feedback) {
+                    FacesMessage message = new FacesMessage("Deleted static site for " + site.getName());
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }
+        
+        List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiteref(site.getId());
+        for (CfLayoutcontent layoutcontent : layoutcontentlist) {
+            layoutcontent.setContentref(layoutcontent.getPreview_contentref());
+            cflayoutcontentService.edit(layoutcontent);
+        }
+        if (feedback) {
+            FacesMessage message = new FacesMessage("Published " + site.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
     }
 }

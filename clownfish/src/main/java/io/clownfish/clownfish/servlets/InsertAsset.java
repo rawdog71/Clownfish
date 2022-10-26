@@ -19,15 +19,17 @@ import com.google.gson.Gson;
 import io.clownfish.clownfish.beans.ContentList;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetkeyword;
-import io.clownfish.clownfish.dbentities.CfKeyword;
+import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.lucene.AssetIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
+import io.clownfish.clownfish.utils.SiteUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -67,12 +69,14 @@ import org.xml.sax.SAXException;
 @MultipartConfig
 public class InsertAsset extends HttpServlet {
     @Autowired CfAssetService cfassetService;
+    @Autowired CfSiteService cfsiteService;
     @Autowired AssetIndexer assetIndexer;
     @Autowired IndexService indexService;
     @Autowired ContentList classcontentlist;
     @Autowired CfKeywordService cfkeywordService;
     @Autowired CfAssetKeywordService cfassetkeywordService;
     @Autowired FolderUtil folderUtil;
+    @Autowired transient SiteUtil siteUtil;
     @Autowired ApiKeyUtil apikeyutil;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(InsertAsset.class);
@@ -100,8 +104,14 @@ public class InsertAsset extends HttpServlet {
                     keywordlist = keywords.split(";");
                 }
                 
+                String publishsites = request.getParameter("publishsites");
+                String[] publishsiteslist = null;
+                if (null != publishsites) {
+                    publishsiteslist = publishsites.split(";");
+                }
+                
                 for (Part filePart : fileParts) {
-                    String filename = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
+                    String filename = Paths.get(filePart.getSubmittedFileName()).getFileName().toString().toLowerCase(); // MSIE fix.
                     InputStream inputStream = filePart.getInputStream();
 
                     File result = new File(folderUtil.getMedia_folder() + File.separator + filename);
@@ -176,6 +186,13 @@ public class InsertAsset extends HttpServlet {
                         LOGGER.error(ex.getMessage());
                     }
                 }
+                if (null != publishsiteslist) {
+                    for (String sitename : publishsiteslist) {
+                        CfSite site = cfsiteService.findByName(sitename);
+                        siteUtil.publishSite(site, false);
+                    }
+                }
+                
             }
         } catch (IOException | PersistenceException e) {
             LOGGER.error(e.getMessage());

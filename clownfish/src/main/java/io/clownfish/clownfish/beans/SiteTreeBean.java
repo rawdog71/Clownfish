@@ -800,25 +800,8 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onPublish(ActionEvent actionEvent) {
-        if (null != folderUtil.getStatic_folder()) {
-            File file = new File(folderUtil.getStatic_folder() + File.separator + selectedSite.getName());
-            try {
-                Files.deleteIfExists(file.toPath());
-                FacesMessage message = new FacesMessage("Deleted static site for " + selectedSite.getName());
-                FacesContext.getCurrentInstance().addMessage(null, message);
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage());
-            }
-        }
-        
         if (null != selectedSite) {
-            List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiteref(selectedSite.getId());
-            for (CfLayoutcontent layoutcontent : layoutcontentlist) {
-                layoutcontent.setContentref(layoutcontent.getPreview_contentref());
-                cflayoutcontentService.edit(layoutcontent);
-            }
-            FacesMessage message = new FacesMessage("Published " + selectedSite.getName());
-            FacesContext.getCurrentInstance().addMessage(null, message);
+            siteUtil.publishSite(selectedSite, true);
         }
     }
     
