@@ -731,12 +731,18 @@ public class HibernateUtil implements Runnable {
     
     private SearchValues getSearchValues(String searchvalue) {
         String comparator = "eq";
-        String[] values = searchvalue.split(":");
-        comparator = values[1];
-        String searchvalue1 = values[2];
+        String searchvalue1 = "";
         String searchvalue2 = "";
-        if (values.length > 3) {
-            searchvalue2 = values[3];
+        String[] values = searchvalue.split(":");
+        if (values.length < 2) {
+            searchvalue1 = values[0];
+        } else {
+            comparator = values[1];
+            searchvalue1 = values[2];
+            searchvalue2 = "";
+            if (values.length > 3) {
+                searchvalue2 = values[3];
+            }
         }
         return new SearchValues(comparator, searchvalue1.toLowerCase(), searchvalue2.toLowerCase());
     }
