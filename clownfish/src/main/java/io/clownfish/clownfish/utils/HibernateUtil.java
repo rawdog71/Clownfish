@@ -733,18 +733,24 @@ public class HibernateUtil implements Runnable {
         String comparator = "eq";
         String searchvalue1 = "";
         String searchvalue2 = "";
-        String[] values = searchvalue.split(":");
-        if (values.length < 2) {
-            searchvalue1 = values[0];
-        } else {
-            comparator = values[1];
-            searchvalue1 = values[2];
-            searchvalue2 = "";
-            if (values.length > 3) {
-                searchvalue2 = values[3];
+        if (searchvalue.startsWith(":")) {
+            String[] values = searchvalue.split(":");
+            if (values.length < 2) {
+                searchvalue1 = values[0];
+            } else {
+                comparator = values[1];
+                searchvalue1 = values[2];
+                searchvalue2 = "";
+                if (values.length > 3) {
+                    searchvalue2 = values[3];
+                }
             }
+            return new SearchValues(comparator, searchvalue1.toLowerCase(), searchvalue2.toLowerCase());
+        } else {
+            searchvalue1 = searchvalue;
+            return new SearchValues(comparator, searchvalue1.toLowerCase(), searchvalue2.toLowerCase());
         }
-        return new SearchValues(comparator, searchvalue1.toLowerCase(), searchvalue2.toLowerCase());
+        
     }
     
     public Query getQuery(Session session_tables, HashMap<String, String> searchmap, String inst_klasse) {
