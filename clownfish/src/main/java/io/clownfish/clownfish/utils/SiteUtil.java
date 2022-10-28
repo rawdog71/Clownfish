@@ -115,7 +115,7 @@ public class SiteUtil {
                     if (0 == useHibernate) {
                         listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
                     } else {
-                        listcontentmap.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId()));
+                        listcontentmap.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId(), null, null));
                     }
                 }
                 sitecontentmap.put(cflist.getName(), listcontentmap);
@@ -138,7 +138,7 @@ public class SiteUtil {
                     if (0 == useHibernate) {
                         listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
                     } else {
-                        listcontentmap.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId()));
+                        listcontentmap.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId(), null, null));
                     }
                 }
                 sitecontentmap.put(cflist.getName(), listcontentmap);
@@ -157,7 +157,7 @@ public class SiteUtil {
                 if (0 == useHibernate) {
                     sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
                 } else {
-                    sitecontentmapdummy.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId()));
+                    sitecontentmapdummy.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId(), null, null));
                 }
             } else {
                 LOGGER.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + sitecontent.getCfSitecontentPK().getClasscontentref());
@@ -175,7 +175,7 @@ public class SiteUtil {
                 if (0 == useHibernate) {
                     sitecontentmapdummy.put(classcontent.getName(), classutil.getattributmap(classcontent));
                 } else {
-                    sitecontentmapdummy.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId()));
+                    sitecontentmapdummy.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId(), null, null));
                 }
                 
                 if (classcontent.getClassref().isEncrypted()) {

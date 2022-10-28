@@ -35,6 +35,8 @@ import io.clownfish.clownfish.graphql.GraphQLDataFetchers;
 import io.clownfish.clownfish.graphql.GraphQLUtil;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;

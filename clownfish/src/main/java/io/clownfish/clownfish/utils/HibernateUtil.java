@@ -645,12 +645,36 @@ public class HibernateUtil implements Runnable {
         return entity;
     }
     
-    public Map getContent(String tablename, long contentid) {
+    public Map getContent(String tablename, long contentid, String attribut, List<HashMap<String, String>> filter_list) {
         Map contentmap = null;
         Map outputmap = new HashMap();
         Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
         Query query = null;
-        query = session_tables.createQuery("FROM " + tablename + " c WHERE cf_contentref = " + contentid);
+        if (null != filter_list) {
+            HashMap searchmap = new HashMap<>();
+            for (HashMap<String, String> filter : filter_list) {
+                String field = filter.get("field");
+                String op = filter.get("op");
+                String value1 = filter.get("value1");
+                String value2 = filter.get("value2");
+                if ((null != field) && (field.contains("."))) {
+                    String[] fieldlist = field.split("\\.");
+                    if (0 == attribut.compareToIgnoreCase(fieldlist[0])) {
+                        if ((!value2.isEmpty()) && (0 == op.compareToIgnoreCase("bt"))) {
+                            searchmap.put(fieldlist[1]+"_1", ":" + op + ":" + value1 + ":" + value2);
+                        } else {
+                            searchmap.put(fieldlist[1]+"_1", ":" + op + ":" + value1);
+                        }
+                    }
+                }
+            }
+            query = getQuery(session_tables, searchmap, tablename);
+        } else {
+            query = session_tables.createQuery("FROM " + tablename + " c WHERE cf_contentref = " + contentid);
+        }
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("Query: " + query.getQueryString());
+        }
         try {
             contentmap = (Map) query.getSingleResult();
             contentmap.forEach(
@@ -693,6 +717,9 @@ public class HibernateUtil implements Runnable {
         Session session_relations = classsessions.get("relations").getSessionFactory().openSession();
         Query query = null;
         query = session_relations.createQuery("FROM " + tablename + "_" + tablename_rel + "c WHERE " + tablename + "_ref_ = " + contentid + " AND " + tablename_rel + "_ref_ = " + contentid_rel);
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("Query: " + query.getQueryString());
+        }
         try {
             contentmap = (Map) query.getSingleResult();
             contentmap.forEach(

@@ -45,6 +45,8 @@ import java.util.Map;
 import javax.persistence.NoResultException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -69,6 +71,8 @@ public class GraphQLDataFetchers {
     @Autowired HibernateUtil hibernateUtil;
     
     @Value("${hibernate.use:0}") int useHibernate;
+    
+    final transient Logger LOGGER = LoggerFactory.getLogger(GraphQLDataFetchers.class);
     
     public DataFetcher getDataByField(String classname, String fieldname) {
         return dataFetchingEnvironment -> {
@@ -174,6 +178,9 @@ public class GraphQLDataFetchers {
             HashMap searchmap = new HashMap<>();
             searchmap.put(attributname+"_1", ":eq:" + (String) attributvalue.toString());
             Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
+            if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+                LOGGER.info("Query: " + query.getQueryString());
+            }
             try {
                 List<Map> contentliste = (List<Map>) query.getResultList();
 
@@ -189,7 +196,7 @@ public class GraphQLDataFetchers {
                             } else {
                                 contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
                             }
-                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, null);
                             setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
                             try {
                                 contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
@@ -238,6 +245,9 @@ public class GraphQLDataFetchers {
                 searchmap.put(attributname+"_1", (String) attributvalue.toString());
             }
             Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
+            if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+                LOGGER.info("Query: " + query.getQueryString());
+            }
             try {
                 List<Map> contentliste = (List<Map>) query.getResultList();
 
@@ -253,7 +263,7 @@ public class GraphQLDataFetchers {
                             } else {
                                 contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
                             }
-                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, null);
                             setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
                             try {
                                 contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
@@ -313,7 +323,7 @@ public class GraphQLDataFetchers {
                 String op = filter.get("op");
                 String value1 = filter.get("value1");
                 String value2 = filter.get("value2");
-                if (null != field) {
+                if ((null != field) && (!field.contains("."))) {
                     if ((!value2.isEmpty()) && (0 == op.compareToIgnoreCase("bt"))) {
                         searchmap.put(field+"_1", ":" + op + ":" + value1 + ":" + value2);
                     } else {
@@ -322,6 +332,9 @@ public class GraphQLDataFetchers {
                 }
             }
             Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
+            if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+                LOGGER.info("Query: " + query.getQueryString());
+            }
             try {
                 List<Map> contentliste = (List<Map>) query.getResultList();
 
@@ -337,7 +350,7 @@ public class GraphQLDataFetchers {
                             } else {
                                 contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
                             }
-                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
                             setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
                             try {
                                 contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
@@ -357,7 +370,7 @@ public class GraphQLDataFetchers {
         }
     }
     
-    private void setClassrefVals(HashMap hm, CfClass clazz) {
+    private void setClassrefVals(HashMap hm, CfClass clazz, List<HashMap<String, String>> filter_list) {
         for (Object key : hm.keySet()) {
             try {
                 CfAttribut attr = cfattributservice.findByNameAndClassref((String) key, clazz);
@@ -367,7 +380,7 @@ public class GraphQLDataFetchers {
                         List<CfListcontent> listcontent = cflistcontentService.findByListref(contentlist.getId());
                         List<Map<String, String>> result = new ArrayList<>();
                         for (CfListcontent contentitem : listcontent) {
-                            Map output = hibernateUtil.getContent(attr.getRelationref().getName(), contentitem.getCfListcontentPK().getClasscontentref());
+                            Map output = hibernateUtil.getContent(attr.getRelationref().getName(), contentitem.getCfListcontentPK().getClasscontentref(), attr.getName(), filter_list);
                             CfClasscontent cfclasscontent = cfclasscontentService.findById((long)output.get("cf_contentref"));
                             if (null != cfclasscontent) {
                                 if (!cfclasscontent.isScrapped()) {
@@ -378,7 +391,7 @@ public class GraphQLDataFetchers {
                                     } else {
                                         contentdataoutput.setKeyvals(contentUtil.getContentMap(output));
                                     }
-                                    setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                                    setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
                                     setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
                                     try {
                                         contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
@@ -392,7 +405,7 @@ public class GraphQLDataFetchers {
                         }
                         hm.put(attr.getName(), result);
                     } else {                                    // 1:n
-                        Map output = hibernateUtil.getContent(attr.getRelationref().getName(), (long) hm.get(key));
+                        Map output = hibernateUtil.getContent(attr.getRelationref().getName(), (long) hm.get(key), attr.getName(), filter_list);
                         hm.put(attr.getName(), output);
                     }
                 }
