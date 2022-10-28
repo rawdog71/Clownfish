@@ -652,6 +652,7 @@ public class HibernateUtil implements Runnable {
         Query query = null;
         if (null != filter_list) {
             HashMap searchmap = new HashMap<>();
+            boolean filterfound = false;
             for (HashMap<String, String> filter : filter_list) {
                 String field = filter.get("field");
                 String op = filter.get("op");
@@ -660,6 +661,7 @@ public class HibernateUtil implements Runnable {
                 if ((null != field) && (field.contains("."))) {
                     String[] fieldlist = field.split("\\.");
                     if (0 == attribut.compareToIgnoreCase(fieldlist[0])) {
+                        filterfound = true;
                         if ((!value2.isEmpty()) && (0 == op.compareToIgnoreCase("bt"))) {
                             searchmap.put(fieldlist[1]+"_1", ":" + op + ":" + value1 + ":" + value2);
                         } else {
@@ -668,7 +670,11 @@ public class HibernateUtil implements Runnable {
                     }
                 }
             }
-            query = getQuery(session_tables, searchmap, tablename);
+            if (filterfound) {
+                query = getQueryRel(session_tables, searchmap, tablename, contentid);
+            } else {
+                query = session_tables.createQuery("FROM " + tablename + " c WHERE cf_contentref = " + contentid);
+            }
         } else {
             query = session_tables.createQuery("FROM " + tablename + " c WHERE cf_contentref = " + contentid);
         }
@@ -785,6 +791,65 @@ public class HibernateUtil implements Runnable {
         if (!searchmap.isEmpty()) {
             CfClass clazz = cfclassservice.findByName(inst_klasse);
             String whereclause = " WHERE ";
+            for (String searchcontent : searchmap.keySet()) {
+                String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
+                String searchvalue = searchmap.get(searchcontent);
+                if (clazz.isEncrypted()) {
+                    List<CfAttribut> attributlist = cfattributservice.findByClassref(clazz);
+                    for (CfAttribut attribut : attributlist) {
+                        if (((isEncryptable(attribut)) && (!attribut.getIdentity())) && (0 == attribut.getName().compareToIgnoreCase(searchcontentval))) {
+                            searchvalue = EncryptUtil.encrypt(searchvalue, propertyUtil.getPropertyValue("aes_key"));
+                        }
+                    }
+                }
+                SearchValues sv = getSearchValues(searchvalue);
+                switch (sv.getComparator()) {
+                    case "eq":
+                        whereclause += searchcontentval + " = '" + sv.getSearchvalue1() + "' AND ";
+                        break;
+                    case "sw":
+                        whereclause += searchcontentval + " LIKE '" + sv.getSearchvalue1() + "%' AND ";
+                        break;
+                    case "ew":
+                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue1() + "' AND ";
+                        break;
+                    case "co":
+                        whereclause += searchcontentval + " LIKE '%" + sv.getSearchvalue1() + "%' AND ";
+                        break;
+                    case "gt":
+                        whereclause += searchcontentval + " > '" + sv.getSearchvalue1() + "' AND ";
+                        break;
+                    case "lt":
+                        whereclause += searchcontentval + " < '" + sv.getSearchvalue1() + "' AND ";
+                        break;
+                    case "gte":
+                        whereclause += searchcontentval + " >= '" + sv.getSearchvalue1() + "' AND ";
+                        break;
+                    case "lte":
+                        whereclause += searchcontentval + " <= '" + sv.getSearchvalue1() + "' AND ";
+                        break;
+                    case "ne":
+                        whereclause += searchcontentval + " <> '" + sv.getSearchvalue1() + "' AND ";
+                        break;
+                    case "bt":
+                        whereclause += searchcontentval + " BETWEEN '" + sv.getSearchvalue1() + "%' AND '" + sv.getSearchvalue2() + "%' AND ";
+                        break;
+                }
+
+            }
+            whereclause = whereclause.substring(0, whereclause.length()-5);
+            query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
+        } else {
+            query = session_tables.createQuery("FROM " + inst_klasse + " c ");
+        }
+        return query;
+    }
+    
+    public Query getQueryRel(Session session_tables, HashMap<String, String> searchmap, String inst_klasse, long contentid) {
+        Query query = null;
+        if (!searchmap.isEmpty()) {
+            CfClass clazz = cfclassservice.findByName(inst_klasse);
+            String whereclause = " WHERE cf_contentref = " + contentid + " AND ";
             for (String searchcontent : searchmap.keySet()) {
                 String searchcontentval = searchcontent.substring(0, searchcontent.length()-2);
                 String searchvalue = searchmap.get(searchcontent);

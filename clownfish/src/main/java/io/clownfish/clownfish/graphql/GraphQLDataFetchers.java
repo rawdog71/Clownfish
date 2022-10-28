@@ -343,6 +343,7 @@ public class GraphQLDataFetchers {
                     CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
                     if (null != cfclasscontent) {
                         if (!cfclasscontent.isScrapped()) {
+                            boolean found = false;
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
                             contentdataoutput.setContent(cfclasscontent);
                             if (cfclasscontent.getClassref().isEncrypted()) {
@@ -350,7 +351,7 @@ public class GraphQLDataFetchers {
                             } else {
                                 contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
                             }
-                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
+                            found = setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
                             setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
                             try {
                                 contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
@@ -358,7 +359,8 @@ public class GraphQLDataFetchers {
                             } catch (Exception ex) {
 
                             }
-                            result.add(contentdataoutput.getKeyvals().get(0));
+                            if (found)
+                                result.add(contentdataoutput.getKeyvals().get(0));
                         }
                     }
                 }
@@ -370,7 +372,8 @@ public class GraphQLDataFetchers {
         }
     }
     
-    private void setClassrefVals(HashMap hm, CfClass clazz, List<HashMap<String, String>> filter_list) {
+    private boolean setClassrefVals(HashMap hm, CfClass clazz, List<HashMap<String, String>> filter_list) {
+        boolean found = true;
         for (Object key : hm.keySet()) {
             try {
                 CfAttribut attr = cfattributservice.findByNameAndClassref((String) key, clazz);
@@ -381,38 +384,43 @@ public class GraphQLDataFetchers {
                         List<Map<String, String>> result = new ArrayList<>();
                         for (CfListcontent contentitem : listcontent) {
                             Map output = hibernateUtil.getContent(attr.getRelationref().getName(), contentitem.getCfListcontentPK().getClasscontentref(), attr.getName(), filter_list);
-                            CfClasscontent cfclasscontent = cfclasscontentService.findById((long)output.get("cf_contentref"));
-                            if (null != cfclasscontent) {
-                                if (!cfclasscontent.isScrapped()) {
-                                    ContentDataOutput contentdataoutput = new ContentDataOutput();
-                                    contentdataoutput.setContent(cfclasscontent);
-                                    if (cfclasscontent.getClassref().isEncrypted()) {
-                                        contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(output, cfclasscontent.getClassref()));
-                                    } else {
-                                        contentdataoutput.setKeyvals(contentUtil.getContentMap(output));
-                                    }
-                                    setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
-                                    setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
-                                    try {
-                                        contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
-                                        contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
-                                    } catch (Exception ex) {
+                            if (!output.isEmpty()) {
+                                CfClasscontent cfclasscontent = cfclasscontentService.findById((long)output.get("cf_contentref"));
+                                if (null != cfclasscontent) {
+                                    if (!cfclasscontent.isScrapped()) {
+                                        ContentDataOutput contentdataoutput = new ContentDataOutput();
+                                        contentdataoutput.setContent(cfclasscontent);
+                                        if (cfclasscontent.getClassref().isEncrypted()) {
+                                            contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(output, cfclasscontent.getClassref()));
+                                        } else {
+                                            contentdataoutput.setKeyvals(contentUtil.getContentMap(output));
+                                        }
+                                        setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
+                                        setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                                        try {
+                                            contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
+                                            contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                                        } catch (Exception ex) {
 
+                                        }
+                                        result.add(contentdataoutput.getKeyvals().get(0));
                                     }
-                                    result.add(contentdataoutput.getKeyvals().get(0));
                                 }
                             }
                         }
                         hm.put(attr.getName(), result);
+                        if (result.isEmpty()) found = false;
                     } else {                                    // 1:n
                         Map output = hibernateUtil.getContent(attr.getRelationref().getName(), (long) hm.get(key), attr.getName(), filter_list);
                         hm.put(attr.getName(), output);
+                        if (output.isEmpty()) found = false;
                     }
                 }
             } catch (Exception ex) {
                 //System.out.println(ex.getMessage());
             }
         }
+        return found;
     }
     
     private void setAssetrefVals(HashMap hm, CfClass clazz) {
