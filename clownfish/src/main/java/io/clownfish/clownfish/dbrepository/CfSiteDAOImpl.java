@@ -17,7 +17,6 @@ package io.clownfish.clownfish.dbrepository;
 
 import io.clownfish.clownfish.daointerface.CfSiteDAO;
 import io.clownfish.clownfish.dbentities.CfSite;
-import java.math.BigInteger;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;

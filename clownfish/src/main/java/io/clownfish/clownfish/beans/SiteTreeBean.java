@@ -371,12 +371,16 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void loadTree() {
-        root = new DefaultTreeNode("Root", null);
-        List<CfSite> sitelist = cfsiteService.findByParentref(null);
-        for (CfSite site : sitelist) {
-            TreeNode tn = new DefaultTreeNode(site);
-            root.getChildren().add(tn);
-            fillChildren(site, tn);
+        try {
+            root = new DefaultTreeNode("Root", null);
+            List<CfSite> sitelist = cfsiteService.findByParentref(null);
+            for (CfSite site : sitelist) {
+                TreeNode tn = new DefaultTreeNode(site);
+                root.getChildren().add(tn);
+                fillChildren(site, tn);
+            }
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
         }
     }
  
