@@ -209,6 +209,8 @@ public class Clownfish {
     private @Getter @Setter Map<String, String> metainfomap;
     private static HibernateInit hibernateInitializer = null;
     
+    private WebSocketServer wss;
+    
     final transient Logger LOGGER = LoggerFactory.getLogger(Clownfish.class);
     @Value("${bootstrap}") int bootstrap;
     @Value("${app.datasource.username}") String dbuser;
@@ -553,13 +555,15 @@ public class Clownfish {
         LOGGER.info("INIT CLOWNFISH END");
         
         if (1 == websocketUse) {
-            WebSocketServer wss = new WebSocketServer(this);
-            wss.setPort(websocketPort);
-            try {
-                Thread websocketserver_thread = new Thread(wss);
-                websocketserver_thread.start();
-            } catch (Exception ex) {
-                java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+            if (null == wss) {
+                wss = new WebSocketServer(this);
+                wss.setPort(websocketPort);
+                try {
+                    Thread websocketserver_thread = new Thread(wss);
+                    websocketserver_thread.start();
+                } catch (Exception ex) {
+                    java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }
