@@ -29,6 +29,7 @@ public interface CfAssetDAO {
     List<CfAsset> findByIndexed(boolean indexed);
     List<CfAsset> findByScrapped(boolean scrapped);
     List<CfAsset> findByPublicuse(boolean publicuse);
+    List<CfAsset> findByFilesize(long filesize);
     CfAsset create(CfAsset entity);
     boolean delete(CfAsset entity);
     CfAsset edit(CfAsset entity);

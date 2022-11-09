@@ -81,4 +81,9 @@ public class CfAssetServiceImpl implements CfAssetService {
     public List<CfAsset> findByPublicuse(boolean publicuse) {
         return this.cfassetDAO.findByPublicuse(publicuse);
     }
+
+    @Override
+    public List<CfAsset> findByFilesize(long filesize) {
+        return this.cfassetDAO.findByFilesize(filesize);
+    }
 }

@@ -121,4 +121,13 @@ public class CfAssetDAOImpl implements CfAssetDAO {
         return cfassetlist;
     }
 
+    @Override
+    public List<CfAsset> findByFilesize(long filesize) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findByFilesize");
+        query.setParameter("filesize", filesize);
+        List<CfAsset> cfassetlist = query.getResultList();
+        return cfassetlist;
+    }
+
 }
