@@ -176,6 +176,7 @@ public class AssetList {
             newasset.setImageheight(metamap.get("Image Height"));
             newasset.setPublicuse(publicusage);
             newasset.setUploadtime(new DateTime().toDate());
+            newasset.setFilesize(result.length());
             cfassetService.create(newasset);
             assetlist = cfassetService.findAll();
             

@@ -158,6 +158,7 @@ public class InsertAsset extends HttpServlet {
                     newasset.setImageheight(metamap.get("Image Height"));
                     newasset.setPublicuse(publicuse);
                     newasset.setUploadtime(new DateTime().toDate());
+                    newasset.setFilesize(result.length());
                     try {
                         newasset = cfassetService.create(newasset);
                         // Index the uploaded assets and merge the Index files
