@@ -57,6 +57,7 @@ import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 
 /**
@@ -92,6 +93,8 @@ public class AssetList {
     
     private List<CfAssetkeyword> assetkeywordlist;
     
+    @Value("${assetfilesize:0}") int assetfilesize;
+    
     final transient Logger LOGGER = LoggerFactory.getLogger(AssetList.class);
 
     /**
@@ -106,10 +109,13 @@ public class AssetList {
         assetName = "";
         assetlist = cfassetService.findAll();
         
-        for (CfAsset asset : assetlist) {
-            File f1 = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + asset.getName());
-            asset.setFilesize(f1.length());
-            cfassetService.edit(asset);
+        if (1 == assetfilesize) {
+            for (CfAsset asset : assetlist) {
+                File f1 = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + asset.getName());
+                asset.setFilesize(f1.length());
+                cfassetService.edit(asset);
+                LOGGER.info("Set asset filesize (" + asset.getName() + ") -> " + asset.getFilesize());
+            }
         }
         
         publicusage = true;
