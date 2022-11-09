@@ -24,6 +24,7 @@ import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.utils.FolderUtil;
+import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -73,6 +74,7 @@ public class AssetList {
     @Autowired AssetIndexer assetIndexer;
     @Autowired FolderUtil folderUtil;
     @Autowired ContentList classcontentlist;
+    @Autowired transient PropertyUtil propertyUtil;
     
     private @Getter @Setter List<CfAsset> assetlist;
     private @Getter @Setter CfAsset selectedAsset;
@@ -103,6 +105,13 @@ public class AssetList {
         renderDetail = false;
         assetName = "";
         assetlist = cfassetService.findAll();
+        
+        for (CfAsset asset : assetlist) {
+            File f1 = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + asset.getName());
+            asset.setFilesize(f1.length());
+            cfassetService.edit(asset);
+        }
+        
         publicusage = true;
         
         keywordSource = cfkeywordService.findAll();
