@@ -167,13 +167,23 @@ public class InsertAsset extends HttpServlet {
                         }
                         if (null != keywordlist) {
                             for (String keyword : keywordlist) {
-                                CfAssetkeyword assetkeyword = new CfAssetkeyword(newasset.getId(), cfkeywordService.findByName(keyword).getId());
-                                cfassetkeywordService.create(assetkeyword);
+                                if (!keyword.isBlank()) {
+                                    CfAssetkeyword assetkeyword = new CfAssetkeyword(newasset.getId(), cfkeywordService.findByName(keyword).getId());
+                                    cfassetkeywordService.create(assetkeyword);
+                                }
                             }
                         }
                     } catch (PersistenceException ex) {
                         newasset = cfassetService.findByName(filename);
                         LOGGER.info("DUPLICATE FOUND " + filename);
+                        Gson gson = new Gson(); 
+                        String json = gson.toJson("DUPLICATE FOUND " + filename);
+                        response.setContentType("application/json;charset=UTF-8");
+                        try (PrintWriter out = response.getWriter()) {
+                            out.print(json);
+                        } catch (IOException ex1) {
+                            LOGGER.error(ex1.getMessage());
+                        }
                     }
 
                     classcontentlist.initAssetlist();
@@ -196,6 +206,14 @@ public class InsertAsset extends HttpServlet {
             }
         } catch (IOException | PersistenceException e) {
             LOGGER.error(e.getMessage());
+            Gson gson = new Gson(); 
+            String json = gson.toJson("ERROR");
+            response.setContentType("application/json;charset=UTF-8");
+            try (PrintWriter out = response.getWriter()) {
+                out.print(json);
+            } catch (IOException ex1) {
+                LOGGER.error(ex1.getMessage());
+            }
         }
     }
 }
