@@ -80,14 +80,14 @@ public class UserList implements Serializable {
         backendListcontent = cfbackendService.findAll();
         selectedbackendListcontent = new ArrayList<>();
         // only show assets for internal usage
-        // assetlist = cfassetService.findByPublicuse(false);
+        assetlist = cfassetService.findByAvatars();
         LOGGER.info("INIT USER END");
     }
     
     public void onSelect(SelectEvent event) {
         selectedUser = (CfUser) event.getObject();
         // only show assets for internal usage
-        assetlist = cfassetService.findByPublicuse(false);
+        assetlist = cfassetService.findByAvatars();
         
         email = selectedUser.getEmail();
         vorname = selectedUser.getVorname();

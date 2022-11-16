@@ -130,4 +130,12 @@ public class CfAssetDAOImpl implements CfAssetDAO {
         return cfassetlist;
     }
 
+    @Override
+    public List<CfAsset> findByAvatars() {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findByAvatars");
+        List<CfAsset> cfassetlist = query.getResultList();
+        return cfassetlist;
+    }
+
 }

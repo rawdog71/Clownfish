@@ -86,4 +86,9 @@ public class CfAssetServiceImpl implements CfAssetService {
     public List<CfAsset> findByFilesize(long filesize) {
         return this.cfassetDAO.findByFilesize(filesize);
     }
+
+    @Override
+    public List<CfAsset> findByAvatars() {
+        return this.cfassetDAO.findByAvatars();
+    }
 }
