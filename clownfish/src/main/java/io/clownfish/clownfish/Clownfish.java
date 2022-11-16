@@ -187,6 +187,7 @@ public class Clownfish {
     private HttpSession userSession;
     private ClownfishConst.ViewModus modus = STAGING;
     private boolean preview = false;
+    private boolean cf_job = false;
     private ClownfishUtil clownfishutil;
     private PropertyUtil propertyUtil;
     private MailUtil mailUtil;
@@ -933,6 +934,13 @@ public class Clownfish {
                 }
             }
             
+            cf_job = false;
+            if (parametermap.containsKey("cf_job")) {    // check mode for job call
+                if (parametermap.get("cf_job").toString().compareToIgnoreCase("true") == 0) {
+                    cf_job = true;
+                }
+            }
+            
             // fetch site by name or aliasname
             CfSite cfsite = null;
             try {
@@ -945,7 +953,7 @@ public class Clownfish {
                 }
             }
             // Site has not job flag
-            if (!cfsite.isJob()) {
+            if ((!cfsite.isJob()) || cf_job) {
                 // increment site hitcounter
                 if ((!preview) && (modus == STAGING)) {
                     long hitcounter = cfsite.getHitcounter().longValue();
