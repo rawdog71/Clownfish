@@ -776,7 +776,7 @@ public class Clownfish {
             }
             
             userSession = request.getSession();
-            LOGGER.info("CONTENTTYPE: " + request.getContentType());
+            //LOGGER.info("CONTENTTYPE: " + request.getContentType());
             if (request.getContentType().startsWith("multipart/form-data")) {
                 Map<String, String[]> parameterMap = request.getParameterMap();
                 int partsize = request.getParts().size();

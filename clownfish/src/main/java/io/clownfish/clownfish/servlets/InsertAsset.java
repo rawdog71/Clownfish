@@ -94,6 +94,7 @@ public class InsertAsset extends HttpServlet {
             String apikey = request.getParameter("apikey");
             if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 boolean publicuse = ClownfishUtil.getBoolean(request.getParameter("publicuse"), false);
+                boolean overwrite = ClownfishUtil.getBoolean(request.getParameter("overwrite"), false);
             
                 HashMap<String, String> metamap = new HashMap<>();
                 List<Part> fileParts = request.getParts().stream().filter(part -> "file".equals(part.getName()) && part.getSize() > 0).collect(Collectors.toList()); // Retrieves <input type="file" name="file" multiple="true">
@@ -115,18 +116,21 @@ public class InsertAsset extends HttpServlet {
                     InputStream inputStream = filePart.getInputStream();
 
                     File result = new File(folderUtil.getMedia_folder() + File.separator + filename);
-                    try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
-                        byte[] buffer = new byte[64535];
-                        int bulk;
-                        while (true) {
-                            bulk = inputStream.read(buffer);
-                            if (bulk < 0) {
-                                break;
+                    boolean fileexists = result.exists();
+                    if ((!fileexists) || (overwrite)) {
+                        try (FileOutputStream fileOutputStream = new FileOutputStream(result, false)) {
+                            byte[] buffer = new byte[64535];
+                            int bulk;
+                            while (true) {
+                                bulk = inputStream.read(buffer);
+                                if (bulk < 0) {
+                                    break;
+                                }
+                                fileOutputStream.write(buffer, 0, bulk);
+                                fileOutputStream.flush();
                             }
-                            fileOutputStream.write(buffer, 0, bulk);
-                            fileOutputStream.flush();
+                            fileOutputStream.close();
                         }
-                        fileOutputStream.close();
                     }
                     inputStream.close();
 
@@ -149,41 +153,55 @@ public class InsertAsset extends HttpServlet {
                         metamap.put(name, metadata.get(name));
                     }
 
-                    // Persist the asset data
-                    CfAsset newasset = new CfAsset();
-                    newasset.setName(filename);
-                    newasset.setFileextension(fileextension.toLowerCase());
-                    newasset.setMimetype(metamap.get("Content-Type"));
-                    newasset.setImagewidth(metamap.get("Image Width"));
-                    newasset.setImageheight(metamap.get("Image Height"));
-                    newasset.setPublicuse(publicuse);
-                    newasset.setUploadtime(new DateTime().toDate());
-                    newasset.setFilesize(result.length());
-                    try {
-                        newasset = cfassetService.create(newasset);
-                        // Index the uploaded assets and merge the Index files
-                        if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
-                            Thread assetindexer_thread = new Thread(assetIndexer);
-                            assetindexer_thread.start();
+                    CfAsset newasset = null;
+                    if (!fileexists) {
+                        newasset = new CfAsset();
+                    } else {
+                        if (overwrite) {
+                            newasset = cfassetService.findByName(filename);
                         }
-                        if (null != keywordlist) {
-                            for (String keyword : keywordlist) {
-                                if (!keyword.isBlank()) {
-                                    CfAssetkeyword assetkeyword = new CfAssetkeyword(newasset.getId(), cfkeywordService.findByName(keyword).getId());
-                                    cfassetkeywordService.create(assetkeyword);
+                    }
+                    if (null != newasset) {
+                        newasset.setName(filename);
+                        newasset.setFileextension(fileextension.toLowerCase());
+                        newasset.setMimetype(metamap.get("Content-Type"));
+                        newasset.setImagewidth(metamap.get("Image Width"));
+                        newasset.setImageheight(metamap.get("Image Height"));
+                        newasset.setPublicuse(publicuse);
+                        newasset.setUploadtime(new DateTime().toDate());
+                        newasset.setFilesize(result.length());
+                        try {
+                            if (!fileexists) {
+                                newasset = cfassetService.create(newasset);
+                            } else {
+                                if (overwrite) {
+                                    newasset = cfassetService.edit(newasset);
                                 }
                             }
-                        }
-                    } catch (PersistenceException ex) {
-                        newasset = cfassetService.findByName(filename);
-                        LOGGER.info("DUPLICATE FOUND " + filename);
-                        Gson gson = new Gson(); 
-                        String json = gson.toJson("DUPLICATE FOUND " + filename);
-                        response.setContentType("application/json;charset=UTF-8");
-                        try (PrintWriter out = response.getWriter()) {
-                            out.print(json);
-                        } catch (IOException ex1) {
-                            LOGGER.error(ex1.getMessage());
+                            // Index the uploaded assets and merge the Index files
+                            if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
+                                Thread assetindexer_thread = new Thread(assetIndexer);
+                                assetindexer_thread.start();
+                            }
+                            if (null != keywordlist) {
+                                for (String keyword : keywordlist) {
+                                    if (!keyword.isBlank()) {
+                                        CfAssetkeyword assetkeyword = new CfAssetkeyword(newasset.getId(), cfkeywordService.findByName(keyword).getId());
+                                        cfassetkeywordService.create(assetkeyword);
+                                    }
+                                }
+                            }
+                        } catch (PersistenceException ex) {
+                            newasset = cfassetService.findByName(filename);
+                            LOGGER.info("DUPLICATE FOUND " + filename);
+                            Gson gson = new Gson(); 
+                            String json = gson.toJson("DUPLICATE FOUND " + filename);
+                            response.setContentType("application/json;charset=UTF-8");
+                            try (PrintWriter out = response.getWriter()) {
+                                out.print(json);
+                            } catch (IOException ex1) {
+                                LOGGER.error(ex1.getMessage());
+                            }
                         }
                     }
 
