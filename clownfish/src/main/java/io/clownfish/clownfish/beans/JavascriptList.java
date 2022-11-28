@@ -67,7 +67,7 @@ import org.springframework.context.annotation.Scope;
  * @author sulzbachr
  */
 @Named("javascriptList")
-@Scope("singleton")
+@Scope("session")
 @Component
 public class JavascriptList implements ISourceContentInterface {
     @Inject
@@ -134,6 +134,7 @@ public class JavascriptList implements ISourceContentInterface {
         } catch (IOException ex) {
             
         }
+        showDiff = false;
         javascriptName = "";
         javascriptListe = cfjavascriptService.findAll();
         javascriptUtility.setJavascriptContent("");

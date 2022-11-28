@@ -67,7 +67,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("stylesheetList")
-@Scope("singleton")
+@Scope("session")
 @Component
 public class StylesheetList implements ISourceContentInterface {
     @Inject
@@ -134,6 +134,7 @@ public class StylesheetList implements ISourceContentInterface {
         } catch (IOException ex) {
             
         }
+        showDiff = false;
         stylesheetName = "";
         stylesheetListe = cfstylesheetService.findAll();
         stylesheetUtility.setStyelsheetContent("");

@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @author raine
  */
 @Named("tabBean")
-@Scope("singleton")
+@Scope("session")
 @Component
 public class TabBean {
     private TabView tabView;

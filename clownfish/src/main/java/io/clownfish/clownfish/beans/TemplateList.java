@@ -61,7 +61,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("templateList")
-@Scope("singleton")
+@Scope("session")
 @Component
 public class TemplateList implements ISourceContentInterface {
     @Inject
@@ -131,6 +131,7 @@ public class TemplateList implements ISourceContentInterface {
         } catch (IOException ex) {
             
         }
+        showDiff = false;
         templateName = "";
         templateListe = cftemplateService.findAll();
         templateUtility.setTemplateContent("");

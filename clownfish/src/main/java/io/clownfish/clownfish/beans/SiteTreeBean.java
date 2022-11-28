@@ -240,9 +240,9 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
     @Autowired transient CfPropertyService cfpropertyService;
     @Autowired transient PropertyList propertylist;
-    @Autowired transient TemplateList templatelist;
-    @Autowired transient StylesheetList stylesheetlist;
-    @Autowired transient JavascriptList javascriptlist;
+    @Autowired private @Getter @Setter TemplateList templatelist;
+    @Autowired private @Getter @Setter StylesheetList stylesheetlist;
+    @Autowired private @Getter @Setter JavascriptList javascriptlist;
     @Autowired private @Getter @Setter TemplateUtil templateUtility;
     @Autowired private @Getter @Setter StylesheetUtil stylesheetUtility;
     @Autowired private @Getter @Setter JavascriptUtil javascriptUtility;

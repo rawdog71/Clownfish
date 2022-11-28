@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  * @author sulzbachr
  */
 @Named("backendBean")
-@Scope("singleton")
+@Scope("session")
 @Component
 public class Backend implements Serializable  {
     @Autowired ContentList contentlist;
