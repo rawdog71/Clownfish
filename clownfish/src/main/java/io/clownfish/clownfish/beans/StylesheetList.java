@@ -165,26 +165,7 @@ public class StylesheetList implements ISourceContentInterface {
     
     @Override
     public void onSelect(AjaxBehaviorEvent event) {
-        difference = false;
-        showDiff = false;
-        if (null != selectedStylesheet) {
-            stylesheetName = selectedStylesheet.getName();
-            stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
-            versionlist = cfstylesheetversionService.findByStylesheetref(selectedStylesheet.getId());
-            difference = stylesheetUtility.hasDifference(selectedStylesheet);
-            BigInteger co = selectedStylesheet.getCheckedoutby();
-            CheckoutUtil checkoutUtil = new CheckoutUtil();
-            checkoutUtil.getCheckoutAccess(co, loginbean);
-            checkedout = checkoutUtil.isCheckedout();
-            access = checkoutUtil.isAccess();
-            stylesheetversionMin = 1;
-            stylesheetversionMax = versionlist.size();
-            selectedstylesheetversion = stylesheetversionMax;
-        } else {
-            stylesheetName = "";
-            checkedout = false;
-            access = false;
-        }
+        selectStylesheet();
     }
     
     @Override
@@ -422,6 +403,29 @@ public class StylesheetList implements ISourceContentInterface {
             } catch (IOException ex) {
                 LOGGER.error(ex.getMessage());
             }
+        }
+    }
+    
+    public void selectStylesheet() {
+        difference = false;
+        showDiff = false;
+        if (null != selectedStylesheet) {
+            stylesheetName = selectedStylesheet.getName();
+            stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
+            versionlist = cfstylesheetversionService.findByStylesheetref(selectedStylesheet.getId());
+            difference = stylesheetUtility.hasDifference(selectedStylesheet);
+            BigInteger co = selectedStylesheet.getCheckedoutby();
+            CheckoutUtil checkoutUtil = new CheckoutUtil();
+            checkoutUtil.getCheckoutAccess(co, loginbean);
+            checkedout = checkoutUtil.isCheckedout();
+            access = checkoutUtil.isAccess();
+            stylesheetversionMin = 1;
+            stylesheetversionMax = versionlist.size();
+            selectedstylesheetversion = stylesheetversionMax;
+        } else {
+            stylesheetName = "";
+            checkedout = false;
+            access = false;
         }
     }
 }
