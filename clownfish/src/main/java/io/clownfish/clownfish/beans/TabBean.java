@@ -18,9 +18,9 @@ package io.clownfish.clownfish.beans;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfTemplate;
-import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.component.tabview.TabView;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -33,9 +33,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class TabBean {
     private TabView tabView;
-    @Inject TemplateList templatelist;
-    @Inject StylesheetList stylesheetlist;
-    @Inject JavascriptList javascriptlist;
+    @Autowired transient TemplateList templatelist;
+    @Autowired transient StylesheetList stylesheetlist;
+    @Autowired transient JavascriptList javascriptlist;
     
     public TabView getTabView() {
         return tabView;
