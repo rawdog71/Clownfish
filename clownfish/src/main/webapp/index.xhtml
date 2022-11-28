@@ -138,7 +138,7 @@
                                                     <p:autoComplete id="selectjavascript" dropdown="true" value="#{sitetree.selectedJavascript}" completeMethod="#{javascriptList.completeText}" converter="#{javascriptConverterBean}" scrollHeight="250">
                                                         <p:ajax listener="#{sitetree.onChangeJavascript}" />
                                                     </p:autoComplete>
-                                                    <p:commandButton id="showjavascript" icon="pi pi-pencil" action="#{tabBean.setTabViewJavascript(3, selectedJavascript)}" update=":form:tabview" disabled="">
+                                                    <p:commandButton id="showjavascript" icon="pi pi-pencil" action="#{tabBean.setTabViewJavascript(3, sitetree.selectedJavascript)}" update=":form:tabview" disabled="">
                                                     </p:commandButton>
                                                 </p:column>
                                             </p:row>
