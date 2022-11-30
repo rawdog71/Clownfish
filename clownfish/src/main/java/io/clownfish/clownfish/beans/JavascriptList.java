@@ -166,7 +166,26 @@ public class JavascriptList implements ISourceContentInterface {
     
     @Override
     public void onSelect(AjaxBehaviorEvent event) {
-        selectJavascript();
+        difference = false;
+        showDiff = false;
+        if (null != selectedJavascript) {
+            javascriptName = selectedJavascript.getName();
+            javascriptUtility.setJavascriptContent(selectedJavascript.getContent());
+            versionlist = cfjavascriptversionService.findByJavascriptref(selectedJavascript.getId());
+            difference = javascriptUtility.hasDifference(selectedJavascript);
+            BigInteger co = selectedJavascript.getCheckedoutby();
+            CheckoutUtil checkoutUtil = new CheckoutUtil();
+            checkoutUtil.getCheckoutAccess(co, loginbean);
+            javascriptversionMin = 1;
+            checkedout = checkoutUtil.isCheckedout();
+            access = checkoutUtil.isAccess();
+            javascriptversionMax = versionlist.size();
+            selectedjavascriptversion = javascriptversionMax;
+        } else {
+            javascriptName = "";
+            checkedout = false;
+            access = false;
+        }
     }
     
     @Override
@@ -404,29 +423,6 @@ public class JavascriptList implements ISourceContentInterface {
             } catch (IOException ex) {
                 LOGGER.error(ex.getMessage());
             }
-        }
-    }
-    
-    public void selectJavascript() {
-        difference = false;
-        showDiff = false;
-        if (null != selectedJavascript) {
-            javascriptName = selectedJavascript.getName();
-            javascriptUtility.setJavascriptContent(selectedJavascript.getContent());
-            versionlist = cfjavascriptversionService.findByJavascriptref(selectedJavascript.getId());
-            difference = javascriptUtility.hasDifference(selectedJavascript);
-            BigInteger co = selectedJavascript.getCheckedoutby();
-            CheckoutUtil checkoutUtil = new CheckoutUtil();
-            checkoutUtil.getCheckoutAccess(co, loginbean);
-            javascriptversionMin = 1;
-            checkedout = checkoutUtil.isCheckedout();
-            access = checkoutUtil.isAccess();
-            javascriptversionMax = versionlist.size();
-            selectedjavascriptversion = javascriptversionMax;
-        } else {
-            javascriptName = "";
-            checkedout = false;
-            access = false;
         }
     }
 }

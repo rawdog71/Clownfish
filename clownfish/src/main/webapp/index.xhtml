@@ -59,7 +59,7 @@
             
             <p:growl id="msgs" showDetail="true" />
             
-            <p:tabView id="tabview" orientation="left" dynamic="true" binding="#{tabBean.tabView}">
+            <p:tabView id="tabview" orientation="left" dynamic="true">
                 <p:tab title="Login" id="loginpanel" rendered="#{!loginBean.login}">
                     <f:facet name="title">
                         <i class="pi pi-user"></i><h:outputText value="&nbsp;"/>
@@ -118,8 +118,6 @@
                                                     <p:autoComplete id="selecttemplate" dropdown="true" value="#{sitetree.selectedTemplate}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
                                                         <p:ajax listener="#{sitetree.onChangeTemplate}" />
                                                     </p:autoComplete>
-                                                    <p:commandButton id="showtemplate" icon="pi pi-pencil" action="#{tabBean.setTabViewTemplate(1, sitetree.selectedTemplate)}" update=":form:tabview" disabled="" rendered="#{loginBean.hasRights(2)}">
-                                                    </p:commandButton>
                                                 </p:column>
                                             </p:row>
                                             <p:row>
@@ -128,8 +126,6 @@
                                                     <p:autoComplete id="selectstylesheet" dropdown="true" value="#{sitetree.selectedStylesheet}" completeMethod="#{stylesheetList.completeText}" converter="#{stylesheetConverterBean}" scrollHeight="250">
                                                         <p:ajax listener="#{sitetree.onChangeStylesheet}" />
                                                     </p:autoComplete>
-                                                    <p:commandButton id="showstylesheet" icon="pi pi-pencil" action="#{tabBean.setTabViewStylesheet(2, sitetree.selectedStylesheet)}" update=":form:tabview" disabled="" rendered="#{loginBean.hasRights(3)}">
-                                                    </p:commandButton>
                                                 </p:column>
                                             </p:row>
                                             <p:row>
@@ -138,8 +134,6 @@
                                                     <p:autoComplete id="selectjavascript" dropdown="true" value="#{sitetree.selectedJavascript}" completeMethod="#{javascriptList.completeText}" converter="#{javascriptConverterBean}" scrollHeight="250">
                                                         <p:ajax listener="#{sitetree.onChangeJavascript}" />
                                                     </p:autoComplete>
-                                                    <p:commandButton id="showjavascript" icon="pi pi-pencil" action="#{tabBean.setTabViewJavascript(3, sitetree.selectedJavascript)}" update=":form:tabview" disabled="" rendered="#{loginBean.hasRights(4)}">
-                                                    </p:commandButton>
                                                 </p:column>
                                             </p:row>
                                         </p:panelGrid>
