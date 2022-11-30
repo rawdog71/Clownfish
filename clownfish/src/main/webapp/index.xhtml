@@ -1386,7 +1386,7 @@
                                             <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
                                         </div>
                                         <div class="assets-list-buttons">
-                                            <p:commandButton icon="pi pi-trash" action="#{assetList.onScrapp}" update=":form:tabview:assetlist :form:msgs">
+                                            <p:commandButton icon="pi pi-trash" action="#{assetList.onScrap}" update=":form:tabview:assetlist :form:tabview:scrapassetlist :form:msgs">
                                                 <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
                                                 <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                             </p:commandButton>
@@ -2188,7 +2188,15 @@
                         <h:outputText value="Scrapyard"/>
                     </f:facet>
 
-                    <p:scrollPanel id="scrapyardpanel" style="height: 400px; border: none;" mode="native">
+                    <p:selectOneMenu id="scrapyardSelect" value="#{scrapyardList.menuStatus}">
+                        <f:selectItem itemLabel="Content" itemValue="Content"/>
+                        <f:selectItem itemLabel="Assets" itemValue="Assets"/>
+                        <p:ajax event="itemSelect" listener="#{scrapyardList.onSelectMenu}" update="@form"/>
+                    </p:selectOneMenu>
+
+                    <p:separator/>
+
+                    <p:scrollPanel id="scrapyardpanel" style="height: 400px; border: none;" mode="native" rendered="#{scrapyardList.renderContent}">
                         <p:dataTable id="scrapyardclasscontentlist" size="small" var="scrapyardclasscontent" value="#{scrapyardList.classcontentlist}" 
                                      paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                                      rowsPerPageTemplate="10,50,100"
@@ -2210,7 +2218,7 @@
                         </p:dataTable>
                     </p:scrollPanel>
 
-                    <p:panelGrid id="scrapyardcontentbtnpanel" columns="3">
+                    <p:panelGrid id="scrapyardcontentbtnpanel" columns="3" rendered="#{scrapyardList.renderContent}">
                         <p:commandButton id="refreshscrapyardcontent" icon="pi pi-refresh" process="form" value="Refresh" actionListener="#{scrapyardList.onRefreshContent}" update=":form:msgs :form:tabview:scrapyardclasscontentlist">
                         </p:commandButton>
                         <p:commandButton id="recyclecontent" icon="pi pi-sync" process="form" value="Recycle" actionListener="#{scrapyardList.onRecycle}" update=":form:msgs :form:tabview:scrapyardclasscontentlist" disabled="#{scrapyardlist.newContentButtonDisabled}">
@@ -2222,7 +2230,7 @@
                         </p:commandButton>
                     </p:panelGrid>
 
-                    <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
+                    <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail" rendered="#{scrapyardList.renderContent}">
                         <p:dataTable id="attributscrapyardcontentlist" size="small" var="scrapyardattributcontent" value="#{scrapyardList.attributcontentlist}" selectionMode="single" selection="#{scrapyardList.selectedAttributContent}" rowKey="#{scrapyardattributcontent.id}">
                             <p:column headerText="Name" style="width: 200px;">
                                 <h:outputText value="#{scrapyardattributcontent.attributref.name}" />
@@ -2234,6 +2242,80 @@
                                 <h:outputText value="#{scrapyardList.toString(scrapyardattributcontent)}" rendered="#{not classcontentList.renderSelected(scrapyardattributcontent)}" />
                             </p:column>
                         </p:dataTable>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail" rendered="#{not scrapyardList.renderContent}">
+                        <p:dataTable id="scrapassetlist" size="small" var="media" value="#{scrapyardList.assetlist}" paginator="true" rows="5"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                     rowsPerPageTemplate="5,10,25,50,100" rowKey="#{media.id}"
+                                     emptyMessage="No scrapped assets">
+                            <p:column headerText="Filename" filterBy="#{media.name}">
+                                <div style="display: flex; align-items: center">
+                                    <p:graphicImage url="GetAssetPreview?apikey=#{loginBean.apikey}&amp;mediaid=#{media.id}&amp;width=150" width="150" alt="#{media.name}" title="#{media.name}" />
+                                    <div align="right" style="display: flex; justify-content: end; align-items: center; width: 100%">
+                                        <h:outputText value="#{media.name}" />
+                                        <div class="assets-list-buttons">
+                                            <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
+                                        </div>
+                                        <div class="assets-list-buttons">
+                                            <p:commandButton icon="pi pi-trash" action="#{scrapyardList.onDeleteAsset}" update=":form:tabview:scrapassetlist :form:msgs">
+                                                <f:setPropertyActionListener value="#{media}" target="#{scrapyardList.selectedAsset}" />
+                                                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                            </p:commandButton>
+                                        </div>
+                                        <div class="assets-list-buttons">
+                                            <p:commandButton icon="pi pi-sync" action="#{scrapyardList.onRecycleAsset}" update=":form:tabview:scrapassetlist :form:tabview:assetlist :form:msgs">
+                                                <f:setPropertyActionListener value="#{media}" target="#{scrapyardList.selectedAsset}" />
+                                            </p:commandButton>
+                                        </div>
+                                        <div class="assets-list-buttons">
+                                            <p:commandButton update=":form:tabview:scrapassetDetail" icon="pi pi-info" action="#{scrapyardList.onAssetDetail}">
+                                                <f:setPropertyActionListener value="#{media}" target="#{scrapyardList.selectedAsset}" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:column>
+                            <p:ajax event="rowSelect" listener="#{scrapyardList.onSelectAsset}" update=":form:msgs :form:tabview:scrapassetlist" />
+                        </p:dataTable>
+                        <p:outputPanel id="scrapassetDetail">
+                            <p:graphicImage url="GetAssetPreview?apikey=#{loginBean.apikey}&amp;mediaid=#{scrapyardList.selectedAsset.id}&amp;width=500" width="500" alt="#{scrapyardList.selectedAsset.name}" title="#{scrapyardList.selectedAsset.name}" rendered="#{scrapyardList.renderDetail}" />
+                            <h:panelGrid columns="1" style="width:100%" columnClasses="detail">
+                                <p:outputPanel>
+                                    <h:panelGrid columns="2" cellpadding="5">
+                                        <h:outputText value="Id:" />
+                                        <h:outputText value="#{scrapyardList.selectedAsset.id}" style="font-weight: bold"/>
+
+                                        <h:outputText value="Name:" />
+                                        <h:outputText value="#{scrapyardList.selectedAsset.name}" style="font-weight: bold"/>
+
+                                        <h:outputText value="Description:" />
+                                        <h:outputText id="scrapassetDescription" value="#{scrapyardList.description}"/>
+
+                                        <h:outputText value="Public use:" />
+                                        <h:outputText id="scrapassetpublicuse" value="#{scrapyardList.assetpublicusage}"/>
+
+                                        <h:outputText value="Mimetype:" />
+                                        <h:outputText value="#{scrapyardList.selectedAsset.mimetype}" style="font-weight: bold"/>
+
+                                        <h:outputText value="Width:" rendered="#{scrapyardList.image}" />
+                                        <h:outputText value="#{scrapyardList.selectedAsset.imagewidth}" rendered="#{assetList.image}" style="font-weight: bold"/>
+
+                                        <h:outputText value="Height:" rendered="#{scrapyardList.image}" />
+                                        <h:outputText value="#{scrapyardList.selectedAsset.imageheight}" rendered="#{assetList.image}" style="font-weight: bold"/>
+
+                                        <h:outputText value="Size:"/>
+                                        <h:outputText value="#{scrapyardList.selectedAsset.filesize}" style="font-weight: bold"/>
+                                    </h:panelGrid>
+                                    <p:dataTable id="scrapassetkeywordlist" value="#{scrapyardList.keywords}" var="keyword">
+                                        <p:column headerText="Keywords">
+                                            <h:outputText value="#{keyword}"/>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:outputPanel>
+                            </h:panelGrid>
+                        </p:outputPanel>
+
                     </h:panelGrid>
 
                 </p:tab>

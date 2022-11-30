@@ -75,6 +75,7 @@ public class AssetList {
     @Autowired AssetIndexer assetIndexer;
     @Autowired FolderUtil folderUtil;
     @Autowired ContentList classcontentlist;
+    @Autowired ScrapyardList scrapyardList;
     @Autowired transient PropertyUtil propertyUtil;
     
     private @Getter @Setter List<CfAsset> assetlist;
@@ -236,10 +237,11 @@ public class AssetList {
      * Handles the file scrapping
      * Sets the scrapped flag to indicate the asset is on the scrapyard
      */
-    public void onScrapp() {
+    public void onScrap() {
         selectedAsset.setScrapped(true);
         cfassetService.edit(selectedAsset);
         assetlist = cfassetService.findAll();
+        scrapyardList.onRefreshAssets();
         FacesMessage message = new FacesMessage("Succesful", selectedAsset.getName() + " has been scrapped.");
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
