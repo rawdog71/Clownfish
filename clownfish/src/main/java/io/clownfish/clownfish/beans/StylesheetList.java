@@ -134,6 +134,7 @@ public class StylesheetList implements ISourceContentInterface {
         } catch (IOException ex) {
             
         }
+        difference = false;
         showDiff = false;
         stylesheetName = "";
         stylesheetListe = cfstylesheetService.findAll();
@@ -166,26 +167,7 @@ public class StylesheetList implements ISourceContentInterface {
     
     @Override
     public void onSelect(AjaxBehaviorEvent event) {
-        difference = false;
-        showDiff = false;
-        if (null != selectedStylesheet) {
-            stylesheetName = selectedStylesheet.getName();
-            stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
-            versionlist = cfstylesheetversionService.findByStylesheetref(selectedStylesheet.getId());
-            difference = stylesheetUtility.hasDifference(selectedStylesheet);
-            BigInteger co = selectedStylesheet.getCheckedoutby();
-            CheckoutUtil checkoutUtil = new CheckoutUtil();
-            checkoutUtil.getCheckoutAccess(co, loginbean);
-            checkedout = checkoutUtil.isCheckedout();
-            access = checkoutUtil.isAccess();
-            stylesheetversionMin = 1;
-            stylesheetversionMax = versionlist.size();
-            selectedstylesheetversion = stylesheetversionMax;
-        } else {
-            stylesheetName = "";
-            checkedout = false;
-            access = false;
-        }
+        selectStylesheet(selectedStylesheet);
     }
     
     @Override
@@ -423,6 +405,30 @@ public class StylesheetList implements ISourceContentInterface {
             } catch (IOException ex) {
                 LOGGER.error(ex.getMessage());
             }
+        }
+    }
+    
+    public void selectStylesheet(CfStylesheet stylesheet) {
+        selectedStylesheet = stylesheet;
+        difference = false;
+        showDiff = false;
+        if (null != selectedStylesheet) {
+            stylesheetName = selectedStylesheet.getName();
+            stylesheetUtility.setStyelsheetContent(selectedStylesheet.getContent());
+            versionlist = cfstylesheetversionService.findByStylesheetref(selectedStylesheet.getId());
+            difference = stylesheetUtility.hasDifference(selectedStylesheet);
+            BigInteger co = selectedStylesheet.getCheckedoutby();
+            CheckoutUtil checkoutUtil = new CheckoutUtil();
+            checkoutUtil.getCheckoutAccess(co, loginbean);
+            checkedout = checkoutUtil.isCheckedout();
+            access = checkoutUtil.isAccess();
+            stylesheetversionMin = 1;
+            stylesheetversionMax = versionlist.size();
+            selectedstylesheetversion = stylesheetversionMax;
+        } else {
+            stylesheetName = "";
+            checkedout = false;
+            access = false;
         }
     }
 }

@@ -111,6 +111,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.primefaces.component.tabview.TabView;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.SelectEvent;
@@ -135,6 +136,7 @@ public class SiteTreeBean implements Serializable {
     @Value("${sapconnection.file}") String SAPCONNECTION;
     private static SAPConnection sapc = null;
     
+    private transient @Getter @Setter TabView tabview;
     private transient @Getter @Setter TreeNode root;
     private transient @Getter @Setter TreeNode selectedNode = null;
     private @Getter @Setter String siteName;
@@ -1253,5 +1255,9 @@ public class SiteTreeBean implements Serializable {
             FacesMessage message = new FacesMessage("Generated shorturl for " + selectedSite.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
+    }
+    
+    public void setTab(int index) {
+        tabview.setActiveIndex(index);
     }
 }

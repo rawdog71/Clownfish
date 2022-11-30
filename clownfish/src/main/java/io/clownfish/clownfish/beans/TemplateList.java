@@ -131,6 +131,7 @@ public class TemplateList implements ISourceContentInterface {
         } catch (IOException ex) {
             
         }
+        difference = false;
         showDiff = false;
         templateName = "";
         templateListe = cftemplateService.findAll();
@@ -167,46 +168,7 @@ public class TemplateList implements ISourceContentInterface {
     
     @Override
     public void onSelect(AjaxBehaviorEvent event) {
-        difference = false;
-        showDiff = false;
-        if (null != selectedTemplate) {
-            templateName = selectedTemplate.getName();
-            templateUtility.setTemplateContent(selectedTemplate.getContent());
-            templateScriptLanguage = selectedTemplate.getScriptlanguage();
-            switch (selectedTemplate.getScriptlanguage()) {
-                case 0:
-                    selectedScriptlanguage = "freemarker";
-                    editorOptions.setLanguage("freemarker2");
-                    break;
-                case 1:
-                    selectedScriptlanguage = "velocity";
-                    editorOptions.setLanguage("html");
-                    break;
-                case 2:
-                    selectedScriptlanguage = "htmlmixed";
-                    editorOptions.setLanguage("html");
-                    break;
-                case 3:
-                    selectedScriptlanguage = "jrxml";
-                    editorOptions.setLanguage("xml");
-                    break;
-            }
-            versionlist = cftemplateversionService.findByTemplateref(selectedTemplate.getId());
-            difference = templateUtility.hasDifference(selectedTemplate);
-            BigInteger co = selectedTemplate.getCheckedoutby();
-            CheckoutUtil checkoutUtil = new CheckoutUtil();
-            checkoutUtil.getCheckoutAccess(co, loginbean);
-            checkedout = checkoutUtil.isCheckedout();
-            access = checkoutUtil.isAccess();
-            layout = selectedTemplate.isLayout();
-            templateversionMin = 1;
-            templateversionMax = versionlist.size();
-            selectedtemplateversion = templateversionMax;
-        } else {
-            templateName = "";
-            checkedout = false;
-            access = false;
-        }
+        selectTemplate(selectedTemplate);
     }
     
     @Override
@@ -426,6 +388,50 @@ public class TemplateList implements ISourceContentInterface {
         } else {
             FacesMessage message = new FacesMessage("No template selected. Nothing changed.");
             FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public void selectTemplate(CfTemplate template) {
+        selectedTemplate = template;
+        difference = false;
+        showDiff = false;
+        if (null != selectedTemplate) {
+            templateName = selectedTemplate.getName();
+            templateUtility.setTemplateContent(selectedTemplate.getContent());
+            templateScriptLanguage = selectedTemplate.getScriptlanguage();
+            switch (selectedTemplate.getScriptlanguage()) {
+                case 0:
+                    selectedScriptlanguage = "freemarker";
+                    editorOptions.setLanguage("freemarker2");
+                    break;
+                case 1:
+                    selectedScriptlanguage = "velocity";
+                    editorOptions.setLanguage("html");
+                    break;
+                case 2:
+                    selectedScriptlanguage = "htmlmixed";
+                    editorOptions.setLanguage("html");
+                    break;
+                case 3:
+                    selectedScriptlanguage = "jrxml";
+                    editorOptions.setLanguage("xml");
+                    break;
+            }
+            versionlist = cftemplateversionService.findByTemplateref(selectedTemplate.getId());
+            difference = templateUtility.hasDifference(selectedTemplate);
+            BigInteger co = selectedTemplate.getCheckedoutby();
+            CheckoutUtil checkoutUtil = new CheckoutUtil();
+            checkoutUtil.getCheckoutAccess(co, loginbean);
+            checkedout = checkoutUtil.isCheckedout();
+            access = checkoutUtil.isAccess();
+            layout = selectedTemplate.isLayout();
+            templateversionMin = 1;
+            templateversionMax = versionlist.size();
+            selectedtemplateversion = templateversionMax;
+        } else {
+            templateName = "";
+            checkedout = false;
+            access = false;
         }
     }
 }
