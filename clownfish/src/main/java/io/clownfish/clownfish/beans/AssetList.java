@@ -91,6 +91,7 @@ public class AssetList {
     private @Getter @Setter String description = "";
     private @Getter @Setter boolean assetpublicusage;
     private @Getter @Setter boolean publicusage;
+    private @Getter @Setter boolean overwrite;
     
     private List<CfAssetkeyword> assetkeywordlist;
     
@@ -148,20 +149,22 @@ public class AssetList {
         HashMap<String, String> metamap = new HashMap<>();
         try {
             File result = new File(folderUtil.getMedia_folder() + File.separator + filename);
-            InputStream inputStream;
-            try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
-                byte[] buffer = new byte[64535];
-                int bulk;
-                inputStream = event.getFile().getInputStream();
-                while (true) {
-                    bulk = inputStream.read(buffer);
-                    if (bulk < 0) {
-                        break;
+            boolean fileexists = result.exists();
+            InputStream inputStream = event.getFile().getInputStream();;
+            if ((!fileexists) || (overwrite)) {
+                try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
+                    byte[] buffer = new byte[64535];
+                    int bulk;
+                    while (true) {
+                        bulk = inputStream.read(buffer);
+                        if (bulk < 0) {
+                            break;
+                        }
+                        fileOutputStream.write(buffer, 0, bulk);
+                        fileOutputStream.flush();
                     }
-                    fileOutputStream.write(buffer, 0, bulk);
-                    fileOutputStream.flush();
+                    fileOutputStream.close();
                 }
-                fileOutputStream.close();
             }
             inputStream.close();
             
@@ -184,16 +187,32 @@ public class AssetList {
                 metamap.put(name, metadata.get(name));
             }
             
-            CfAsset newasset = new CfAsset();
-            newasset.setName(filename);
-            newasset.setFileextension(fileextension.toLowerCase());
-            newasset.setMimetype(metamap.get("Content-Type"));
-            newasset.setImagewidth(metamap.get("Image Width"));
-            newasset.setImageheight(metamap.get("Image Height"));
-            newasset.setPublicuse(publicusage);
-            newasset.setUploadtime(new DateTime().toDate());
-            newasset.setFilesize(result.length());
-            cfassetService.create(newasset);
+            CfAsset newasset = null;
+            if (!fileexists) {
+                newasset = new CfAsset();
+            } else {
+                if (overwrite) {
+                    newasset = cfassetService.findByName(filename);
+                }
+            }
+            if (null != newasset) {
+                newasset.setName(filename);
+                newasset.setFileextension(fileextension.toLowerCase());
+                newasset.setMimetype(metamap.get("Content-Type"));
+                newasset.setImagewidth(metamap.get("Image Width"));
+                newasset.setImageheight(metamap.get("Image Height"));
+                newasset.setPublicuse(publicusage);
+                newasset.setUploadtime(new DateTime().toDate());
+                newasset.setFilesize(result.length());
+
+                if (!fileexists) {
+                    newasset = cfassetService.create(newasset);
+                } else {
+                    if (overwrite) {
+                        newasset = cfassetService.edit(newasset);
+                    }
+                }
+            }
             assetlist = cfassetService.findAll();
             
             // Index the uploaded assets and merge the Index files
@@ -296,4 +315,8 @@ public class AssetList {
         System.out.println(publicusage);
     }
     
+    public void onChangeOverwrite() {
+        System.out.println(overwrite);
+    }
+        
 }

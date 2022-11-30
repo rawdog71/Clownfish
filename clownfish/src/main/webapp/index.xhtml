@@ -1363,7 +1363,11 @@
                         <p:selectBooleanCheckbox id="uploadpublicuse" value="#{assetList.publicusage}">
                             <p:ajax listener="#{assetList.onChangePublicusage}"/>
                         </p:selectBooleanCheckbox>
-                        <p:fileUpload listener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true"
+                        <p:outputLabel for="uploadoverwrite" value="Overwrite existing file:" />
+                        <p:selectBooleanCheckbox id="uploadoverwrite" value="#{assetList.overwrite}">
+                            <p:ajax listener="#{assetList.onChangeOverwrite}"/>
+                        </p:selectBooleanCheckbox>
+                        <p:fileUpload listener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true" 
                                       update="messages :form:tabview:assetlist" maxChunkSize="1000000000" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|dotx|svg|ppt|potx|pptx|xls|xlsx|zip|jar|xml)$/i" >
                         </p:fileUpload>
                         <p:growl id="messages" showDetail="true" />
