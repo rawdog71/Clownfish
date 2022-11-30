@@ -15,31 +15,14 @@
  */
 package io.clownfish.clownfish.beans;
 
-import io.clownfish.clownfish.dbentities.CfAsset;
-import io.clownfish.clownfish.dbentities.CfAssetlist;
-import io.clownfish.clownfish.dbentities.CfAttributcontent;
-import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.dbentities.CfClasscontent;
-import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
-import io.clownfish.clownfish.dbentities.CfList;
-import io.clownfish.clownfish.dbentities.CfListcontent;
-import io.clownfish.clownfish.dbentities.CfSitecontent;
+import io.clownfish.clownfish.dbentities.*;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
-import io.clownfish.clownfish.serviceinterface.CfAssetService;
-import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
-import io.clownfish.clownfish.serviceinterface.CfAttributService;
-import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
-import io.clownfish.clownfish.serviceinterface.CfClassService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
-import io.clownfish.clownfish.serviceinterface.CfKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfListService;
-import io.clownfish.clownfish.serviceinterface.CfListcontentService;
-import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
+import io.clownfish.clownfish.serviceinterface.*;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -47,6 +30,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
@@ -69,11 +53,13 @@ public class ScrapyardList implements Serializable {
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfAssetlistService cfassetlistService;
+    @Autowired CfAssetlistcontentService cfassetlistcontentService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired transient CfSitecontentService cfsitecontentService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
+    @Autowired CfAssetKeywordService cfassetkeywordService;
     @Autowired CfKeywordService cfkeywordService;
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
@@ -82,6 +68,7 @@ public class ScrapyardList implements Serializable {
     
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter CfClasscontent selectedContent = null;
+    private @Getter @Setter CfAsset selectedAsset = null;
     private transient @Getter @Setter List<CfAttributcontent> attributcontentlist = null;
     private @Getter @Setter CfAttributcontent selectedAttributContent = null;
     private @Getter @Setter List<CfClasscontent> filteredContent;
@@ -118,6 +105,16 @@ public class ScrapyardList implements Serializable {
     private @Getter @Setter boolean valueDatetimeRendered = false;
     private @Getter @Setter List<CfAsset> assetlist;
     private @Getter @Setter String contentJson;
+
+    private @Getter @Setter String menuStatus;
+    private @Getter @Setter boolean renderContent;
+    private @Getter @Setter boolean isImage;
+    private @Getter @Setter boolean isPdf;
+    private @Getter @Setter String assetpublicusage;
+    private @Getter @Setter List<String> keywords;
+    private @Getter @Setter List<CfAssetkeyword> assetkeywordlist;
+    private @Getter @Setter boolean renderDetail;
+    private @Getter @Setter String description = "";
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ScrapyardList.class);
 
@@ -136,10 +133,16 @@ public class ScrapyardList implements Serializable {
     @PostConstruct
     public void init() {
         LOGGER.info("INIT SCRAPYARDLIST START");
+        menuStatus = "Content";
+        renderContent = true;
         memoryeditDatalist = null;
         classcontentlist = cfclasscontentService.findByScrapped(true);
         classlist = cfclassService.findAll();
-        assetlist = cfassetService.findAll();
+
+        description = "Empty";
+        assetlist = cfassetService.findByScrapped(true);
+        keywords = new ArrayList<>();
+        renderDetail = false;
         selectedAssetList = cfassetlistService.findAll();
         editContent = "";
         LOGGER.info("INIT SCRAPYARDLIST END");
@@ -156,6 +159,27 @@ public class ScrapyardList implements Serializable {
         contentName = selectedContent.getName();
         selectedClass = selectedContent.getClassref();
         newContentButtonDisabled = true;
+    }
+
+    public void onSelectAsset(SelectEvent<CfAsset> event) {
+        selectedAsset = event.getObject();
+    }
+
+    public void onAssetDetail() {
+        if (selectedAsset == null)
+            return;
+        isImage = selectedAsset.getMimetype().contains("jpeg");
+        description = selectedAsset.getDescription() == null ? "Empty" : selectedAsset.getDescription();
+        keywords.clear();
+        renderDetail = true;
+        assetpublicusage = selectedAsset.isPublicuse() ? "Yes" : "No";
+        assetkeywordlist = cfassetkeywordService.findByAssetRef(selectedAsset.getId());
+        for (CfAssetkeyword assetkeyword : assetkeywordlist) {
+            CfKeyword kw = cfkeywordService.findById(assetkeyword.getCfAssetkeywordPK().getKeywordref());
+            keywords.add(kw.getName());
+        }
+        isImage = selectedAsset.getMimetype().contains("jpeg") || selectedAsset.getMimetype().contains("png");
+        isPdf = selectedAsset.getMimetype().contains("pdf") || selectedAsset.getMimetype().contains("octet-stream");
     }
         
     /**
@@ -174,7 +198,36 @@ public class ScrapyardList implements Serializable {
         FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been recycled.");
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
-    
+
+    public void onRecycleAsset() {
+        selectedAsset.setScrapped(false);
+        cfassetService.edit(selectedAsset);
+        assetlist = cfassetService.findByScrapped(true);
+        FacesMessage message = new FacesMessage("Succesful", selectedAsset.getName() + " has been recycled.");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
+
+    public void onDeleteAsset() {
+        if (selectedAsset != null) {
+            List<CfAssetlist> assetLibraries = cfassetlistService.findAll();
+            for (CfAssetlist assetLib : assetLibraries) {
+                List<CfAssetlistcontent> assets = cfassetlistcontentService.findByAssetlistref(assetLib.getId());
+                for (CfAssetlistcontent asset : assets) {
+                    if (cfassetService.findById(asset.getCfAssetlistcontentPK().getAssetref()).equals(selectedAsset)) {
+                        cfassetlistcontentService.delete(asset);
+                    }
+                }
+            }
+            String name = selectedAsset.getName();
+            cfassetService.delete(selectedAsset);
+            assetlist = cfassetService.findByScrapped(true);
+            renderDetail = false;
+            selectedAsset = null;
+            FacesMessage message = new FacesMessage("Succesful", name + " has been deleted.");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+
     public void onDeleteContent(ActionEvent actionEvent) {
         if (selectedContent != null) {
             // Delete corresponding attributcontent entries
@@ -214,13 +267,21 @@ public class ScrapyardList implements Serializable {
     public void onRefreshAll() {
         classcontentlist = cfclasscontentService.findByScrapped(true);
         classlist = cfclassService.findAll();
-        assetlist = cfassetService.findAll();
-        assetlist = cfassetService.findAll();
+        assetlist = cfassetService.findByScrapped(true);
+    }
+
+    public void onRefreshAssets() {
+        assetlist = cfassetService.findByScrapped(true);
     }
     
     public void onRefreshContent() {
         classcontentlist.clear();
         classcontentlist = cfclasscontentService.findByScrapped(true);
+    }
+
+    public void onSelectMenu(SelectEvent event) {
+        setMenuStatus((String) event.getObject());
+        setRenderContent(menuStatus.equalsIgnoreCase("Content"));
     }
     
     public String toString(CfAttributcontent attributcontent) {
