@@ -118,7 +118,7 @@
                                                     <p:autoComplete id="selecttemplate" dropdown="true" value="#{sitetree.selectedTemplate}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
                                                         <p:ajax listener="#{sitetree.onChangeTemplate()}" />
                                                     </p:autoComplete>
-                                                    <p:commandButton id="showtemplate" icon="pi pi-pencil" action="#{sitetree.templatelist.selectTemplate(sitetree.selectedTemplate)}" update=":form:tabview:edittemplatepanel :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:templatelayout" rendered="#{loginBean.login and loginBean.hasRights(2)}">
+                                                    <p:commandButton id="showtemplate" icon="pi pi-pencil" action="#{sitetree.templatelist.selectTemplate(sitetree.selectedTemplate)}" update=":form:tabview :form:tabview:edittemplatepanel :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:templatelayout" rendered="#{loginBean.login and loginBean.hasRights(2)}">
                                                         <f:actionListener binding="#{sitetree.setTab(1)}" />
                                                         <p:ajax listener="#{sitetree.onChangeTemplate()}" />
                                                     </p:commandButton>
@@ -130,7 +130,7 @@
                                                     <p:autoComplete id="selectstylesheet" dropdown="true" value="#{sitetree.selectedStylesheet}" completeMethod="#{stylesheetList.completeText}" converter="#{stylesheetConverterBean}" scrollHeight="250">
                                                         <p:ajax listener="#{sitetree.onChangeStylesheet()}" />
                                                     </p:autoComplete>
-                                                    <p:commandButton id="showstylesheet" icon="pi pi-pencil" action="#{sitetree.stylesheetlist.selectStylesheet(sitetree.selectedStylesheet)}" update=":form:tabview:editstylesheetpanel :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:selectedstylesheetversion :form:tabview:selectedstylesheetversionslider :form:tabview:diffstylesheetBtnGroup" rendered="#{loginBean.login and loginBean.hasRights(3)}">
+                                                    <p:commandButton id="showstylesheet" icon="pi pi-pencil" action="#{sitetree.stylesheetlist.selectStylesheet(sitetree.selectedStylesheet)}" update=":form:tabview :form:tabview:editstylesheetpanel :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:selectedstylesheetversion :form:tabview:selectedstylesheetversionslider :form:tabview:diffstylesheetBtnGroup" rendered="#{loginBean.login and loginBean.hasRights(3)}">
                                                         <f:actionListener binding="#{sitetree.setTab(2)}" />
                                                         <p:ajax listener="#{sitetree.onChangeStylesheet()}" />
                                                     </p:commandButton>
@@ -142,7 +142,7 @@
                                                     <p:autoComplete id="selectjavascript" dropdown="true" value="#{sitetree.selectedJavascript}" completeMethod="#{javascriptList.completeText}" converter="#{javascriptConverterBean}" scrollHeight="250">
                                                         <p:ajax listener="#{sitetree.onChangeJavascript()}" />
                                                     </p:autoComplete>
-                                                    <p:commandButton id="showjavascript" icon="pi pi-pencil" action="#{sitetree.javascriptlist.selectJavascript(sitetree.selectedJavascript)}" update=":form:tabview:editjavascriptpanel :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:selectedjavascriptversion :form:tabview:selectedjavascriptversionslider :form:tabview:diffjavascriptBtnGroup" rendered="#{loginBean.login and loginBean.hasRights(4)}">
+                                                    <p:commandButton id="showjavascript" icon="pi pi-pencil" action="#{sitetree.javascriptlist.selectJavascript(sitetree.selectedJavascript)}" update=":form:tabview :form:tabview:editjavascriptpanel :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:selectedjavascriptversion :form:tabview:selectedjavascriptversionslider :form:tabview:diffjavascriptBtnGroup" rendered="#{loginBean.login and loginBean.hasRights(4)}">
                                                         <f:actionListener binding="#{sitetree.setTab(3)}" />
                                                         <p:ajax listener="#{sitetree.onChangeJavascript()}" />
                                                     </p:commandButton>
