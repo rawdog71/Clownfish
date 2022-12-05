@@ -220,6 +220,8 @@ public class GetAsset extends HttpServlet {
                                     acontext.complete();
                                 }
                             }
+                            asset.setDownloads(asset.getDownloads() + 1);
+                            cfassetService.edit(asset);
                         }
                         acontext.complete();
                     } else {

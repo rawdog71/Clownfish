@@ -51,7 +51,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfAsset.findByScrapped", query = "SELECT c FROM CfAsset c WHERE c.scrapped = :scrapped"),
     @NamedQuery(name = "CfAsset.findByPublicuse", query = "SELECT c FROM CfAsset c WHERE c.publicuse = :publicuse"),
     @NamedQuery(name = "CfAsset.findByFilesize", query = "SELECT c FROM CfAsset c WHERE c.filesize = :filesize"),
-    @NamedQuery(name = "CfAsset.findByAvatars", query = "SELECT c FROM CfAsset c WHERE c.publicuse = 0 AND c.fileextension IN ('jpg', 'gif', 'png')")
+    @NamedQuery(name = "CfAsset.findByAvatars", query = "SELECT c FROM CfAsset c WHERE c.publicuse = 0 AND c.fileextension IN ('jpg', 'gif', 'png')"),
+    @NamedQuery(name = "CfAsset.findByDownloads", query = "SELECT c FROM CfAsset c WHERE c.downloads = :downloads")
 })
 public class CfAsset implements Serializable {
 
@@ -92,6 +93,8 @@ public class CfAsset implements Serializable {
     private Date uploadtime;
     @Column(name = "filesize")
     private long filesize;
+    @Column(name = "downloads")
+    private long downloads;
 
     public CfAsset() {
     }
@@ -207,6 +210,13 @@ public class CfAsset implements Serializable {
     }
     public void setFilesize(long filesize) {
         this.filesize = filesize;
+    }
+
+    public long getDownloads() {
+        return downloads;
+    }
+    public void setDownloads(long downloads) {
+        this.downloads = downloads;
     }
 
     @Override
