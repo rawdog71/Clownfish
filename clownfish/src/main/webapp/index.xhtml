@@ -1429,6 +1429,9 @@
                                         <h:outputText value="Size:"/>
                                         <h:outputText value="#{assetList.selectedAsset.filesize}" style="font-weight: bold"/>
 
+                                        <h:outputText value="Downloads:"/>
+                                        <h:outputText value="#{assetList.selectedAsset.downloads}" style="font-weight: bold"/>
+
                                         <p:commandButton id="editDescription" icon="pi pi-pencil" value="Edit" actionListener="#{assetList.editDescription}" update=":form:msgs" />
                                     </h:panelGrid>
                                 </p:outputPanel>
