@@ -116,9 +116,11 @@ public class QuartzJob implements Job {
 
     private Map<String, String> makeParamMap(String params) {
         Map<String, String> paramMap = new HashMap<>();
-        for (String param : params.split("&")) {
-            String[] val = param.split("=");
-            paramMap.put(val[0], val[1]);
+        if (!params.isBlank()) {
+            for (String param : params.split("&")) {
+                String[] val = param.split("=");
+                paramMap.put(val[0], val[1]);
+            }
         }
         return paramMap;
     }
