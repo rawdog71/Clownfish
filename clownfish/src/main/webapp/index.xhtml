@@ -1610,6 +1610,9 @@
                                 <f:selectItem itemValue="#{null}" itemLabel="--select--" />
                                 <f:selectItems value="#{quartzlist.sitelist}" />
                             </p:selectOneMenu>
+
+                            <p:outputLabel for="jobparameterlist" value="Parameters" />
+                            <p:inputText id="jobparameterlist" value="#{quartzlist.params}"/>
                         </p:panelGrid>
                         
                         <p:tabView>

@@ -28,6 +28,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import scala.compiletime.ops.string;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -42,7 +44,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfQuartz.findById", query = "SELECT c FROM CfQuartz c WHERE c.id = :id"),
     @NamedQuery(name = "CfQuartz.findByName", query = "SELECT c FROM CfQuartz c WHERE c.name = :name"),
     @NamedQuery(name = "CfQuartz.findBySchedule", query = "SELECT c FROM CfQuartz c WHERE c.schedule = :schedule"),
-    @NamedQuery(name = "CfQuartz.findBySiteRef", query = "SELECT c FROM CfQuartz c WHERE c.siteRef = :siteRef")})
+    @NamedQuery(name = "CfQuartz.findBySiteRef", query = "SELECT c FROM CfQuartz c WHERE c.siteRef = :siteRef"),
+    @NamedQuery(name = "CfQuartz.findByParameter", query = "SELECT c FROM CfQuartz c WHERE c.parameter = :parameter")})
 public class CfQuartz implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -63,6 +66,8 @@ public class CfQuartz implements Serializable {
     private BigInteger siteRef;
     @Column(name = "active")
     private boolean active;
+    @Column(name = "parameter")
+    private String parameter;
 
     public CfQuartz() {
     }
@@ -116,6 +121,10 @@ public class CfQuartz implements Serializable {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    public String getParameter() { return this.parameter; }
+
+    public void setParameter(String parameter) { this.parameter = parameter; }
 
     @Override
     public int hashCode() {
