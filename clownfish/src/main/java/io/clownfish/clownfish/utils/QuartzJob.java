@@ -45,6 +45,7 @@ import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -110,16 +111,24 @@ public class QuartzJob implements Job {
         joblist.stream().filter((quartz) -> (quartz.getName().compareToIgnoreCase(jec.getJobDetail().getKey().getName()) == 0)).map((quartz) -> {
             LOGGER.info("JOB CLOWNFISH CMS: " + quartz.getName() + " - " + quartz.getSiteRef());
             return quartz;
-        }).forEach((quartz) -> {
-            callJob(quartz.getSiteRef().longValue());
-        });
+        }).forEach((quartz) -> callJob(quartz, quartz.getSiteRef().longValue()));
+    }
+
+    private Map<String, String> makeParamMap(String params) {
+        Map<String, String> paramMap = new HashMap<>();
+        for (String param : params.split("&")) {
+            String[] val = param.split("=");
+            paramMap.put(val[0], val[1]);
+        }
+        return paramMap;
     }
     
-    private void callJob(long siteref) {
+    private void callJob(CfQuartz quartz, long siteref) {
         boolean canExecute = false;
         modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
         // read all System Properties of the property table
         propertymap = propertylist.fillPropertyMap();
+        Map<String, String> paramMap = makeParamMap(quartz.getParameter());
         //clownfishutil = new ClownfishUtil();
         String sapSupportProp = propertymap.get("sap_support");
         if (sapSupportProp.compareToIgnoreCase("true") == 0) {
@@ -240,6 +249,7 @@ public class QuartzJob implements Job {
                     fmRoot.put("pdfBean", pdfBean);
                     fmRoot.put("webserviceBean", webServiceBean);
                     fmRoot.put("property", propertymap);
+                    fmRoot.put("parameter", paramMap);
                     
                     for (Class tpbc : beanUtil.getLoadabletemplatebeans()) {
                         Constructor<?> ctor;
@@ -277,6 +287,7 @@ public class QuartzJob implements Job {
                     velContext.put("importBean", importBean);
                     velContext.put("webserviceBean", webServiceBean);
                     velContext.put("pdfBean", pdfBean);
+                    velContext.put("parameter", paramMap);
                     
                     for (Class tpbc : beanUtil.getLoadabletemplatebeans()) {
                         Constructor<?> ctor;

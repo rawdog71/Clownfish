@@ -55,6 +55,7 @@ public class QuartzList {
     private @Getter @Setter List<CfQuartz> quartzlist;
     private @Getter @Setter CfQuartz selectedQuartz;
     private @Getter @Setter List<CfQuartz> filteredQuartz;
+    private @Getter @Setter String params;
     private transient @Getter @Setter List<CfSite> sitelist = null;
     private @Getter @Setter boolean newJobButtonDisabled;
     private @Getter @Setter String jobname;
@@ -273,11 +274,12 @@ public class QuartzList {
         sitelist = cfsiteService.findAll();
     }
     
-    public void onSelect(SelectEvent event) {
-        selectedQuartz = (CfQuartz) event.getObject();
+    public void onSelect(SelectEvent<CfQuartz> event) {
+        selectedQuartz = event.getObject();
         jobname = selectedQuartz.getName();
         jobvalue = selectedQuartz.getSchedule();
         active = selectedQuartz.isActive();
+        params = selectedQuartz.getParameter();
         siteref = cfsiteService.findById(selectedQuartz.getSiteRef().longValue());
         newJobButtonDisabled = true;
     }
@@ -288,6 +290,7 @@ public class QuartzList {
             newquartz.setName(jobname);
             newquartz.setSchedule(jobvalue);
             newquartz.setActive(active);
+            newquartz.setParameter(params);
             newquartz.setSiteRef(BigInteger.valueOf(siteref.getId()));
             cfquartzService.create(newquartz);
 
@@ -307,6 +310,7 @@ public class QuartzList {
                 selectedQuartz.setSchedule(jobvalue);
                 selectedQuartz.setActive(active);
                 selectedQuartz.setSiteRef(BigInteger.valueOf(siteref.getId()));
+                selectedQuartz.setParameter(params);
                 cfquartzService.edit(selectedQuartz);
                 quartzlist = cfquartzService.findAll();
                 clownfish.setInitmessage(false);
