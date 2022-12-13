@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
-    <version>0.7.18-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <version>0.7.20-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
         <developerConnection>scm:git:https://github.com/rawdog71/Clownfish.git</developerConnection>
-        <tag>v0.7.18</tag>
+        <tag>v0.7.20</tag>
     </scm>
     <developers>
         <developer>
@@ -513,7 +513,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http</artifactId>
-            <version>4.1.77.Final</version>
+            <version>4.1.86.Final</version>
             <type>jar</type>
         </dependency>
     </dependencies>
