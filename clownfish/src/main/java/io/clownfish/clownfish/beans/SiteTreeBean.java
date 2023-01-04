@@ -478,6 +478,7 @@ public class SiteTreeBean implements Serializable {
     public void onSelect(NodeSelectEvent event) {
         selectedNode = event.getTreeNode();
         selectedSite = (CfSite) selectedNode.getData();
+        params = selectedSite.getTestparams();
         classcontentlist = cfclasscontentService.findByMaintenance(true);
         if (null != selectedSite.getTemplateref()) {
             CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().getId());
@@ -486,7 +487,11 @@ public class SiteTreeBean implements Serializable {
             
             iframeurl = selectedSite.getName() + "?preview=true";
             if (!params.isBlank()) {
-                iframeurl += params;
+                if (!params.startsWith("&")) {
+                    iframeurl += "&" + params;
+                } else {
+                    iframeurl += params;
+                }
             }
             
             selectedDiv = null;
@@ -736,6 +741,7 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setSearchresult(searchresult);
             selectedSite.setSitemap(sitemap);
             selectedSite.setStaticsite(sitestatic);
+            selectedSite.setTestparams(params);
             cfsiteService.edit(selectedSite);
             loadTree();
             
@@ -804,6 +810,7 @@ public class SiteTreeBean implements Serializable {
             newsite.setSitemap(sitemap);
             newsite.setStaticsite(sitestatic);
             newsite.setShorturl(siteUtil.generateShorturl());
+            newsite.setTestparams(params);
             selectedSite = cfsiteService.create(newsite);
             loadTree();
         } catch (ConstraintViolationException ex) {
@@ -1264,6 +1271,10 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onChangeParams() {
+        if (null != selectedSite) {
+            selectedSite.setTestparams(params);
+            cfsiteService.edit(selectedSite);
+        }
     }
     
     public void setTab(int index) {

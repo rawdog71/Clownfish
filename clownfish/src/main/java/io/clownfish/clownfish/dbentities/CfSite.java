@@ -123,6 +123,9 @@ public class CfSite implements Serializable {
     private boolean searchresult;
     @Column(name = "shorturl")
     private String shorturl;
+    @Size(max = 255)
+    @Column(name = "testparams")
+    private String testparams;
     
     public CfSite() {
     }
@@ -331,6 +334,14 @@ public class CfSite implements Serializable {
 
     public void setShorturl(String shorturl) {
         this.shorturl = shorturl;
+    }
+
+    public String getTestparams() {
+        return testparams;
+    }
+
+    public void setTestparams(String testparams) {
+        this.testparams = testparams;
     }
     
     public String getIcon() {
