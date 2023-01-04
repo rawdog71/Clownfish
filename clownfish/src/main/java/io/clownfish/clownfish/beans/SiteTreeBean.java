@@ -136,6 +136,8 @@ public class SiteTreeBean implements Serializable {
     @Value("${sapconnection.file}") String SAPCONNECTION;
     private static SAPConnection sapc = null;
     
+    private transient @Getter @Setter int tabIndex;
+    private @Getter @Setter String params;
     private transient @Getter @Setter TabView tabview;
     private transient @Getter @Setter TreeNode root;
     private transient @Getter @Setter TreeNode selectedNode = null;
@@ -274,6 +276,7 @@ public class SiteTreeBean implements Serializable {
         if (null == sourceindexer) {
             sourceindexer = new SourceIndexer();
         }
+        params = "&test=test";
         propertymap = propertylist.fillPropertyMap();
         String sapSupportProp = propertymap.get("sap_support");
         if (null == sapSupportProp) {
@@ -482,6 +485,9 @@ public class SiteTreeBean implements Serializable {
             selectedTemplate = templatelist.getTemplateListe().get(idx);
             
             iframeurl = selectedSite.getName() + "?preview=true";
+            if (!params.isBlank()) {
+                iframeurl += params;
+            }
             
             selectedDiv = null;
             showContent = false;
@@ -1257,7 +1263,10 @@ public class SiteTreeBean implements Serializable {
         }
     }
     
+    public void onChangeParams() {
+    }
+    
     public void setTab(int index) {
-        tabview.setActiveIndex(index);
+        tabIndex = index;
     }
 }
