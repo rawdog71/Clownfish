@@ -20,14 +20,18 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.edm.provider.CsdlAbstractEdmProvider;
+import org.apache.olingo.commons.api.edm.provider.CsdlComplexType;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainer;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainerInfo;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntitySet;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityType;
+import org.apache.olingo.commons.api.edm.provider.CsdlNavigationProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlPropertyRef;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
@@ -51,10 +55,13 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfAttributService cfattributservice;
     
+    private HashMap<String, CfClass> naviList = new HashMap<>();
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericEdmProvider.class);
 
     @Override
     public List<CsdlSchema> getSchemas() throws ODataException {
+        naviList.clear();
         CsdlSchema schema = new CsdlSchema();
         schema.setNamespace(NAMESPACE);
         // add EntityTypes
@@ -66,6 +73,19 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             }
         }
         schema.setEntityTypes(entityTypes);
+        
+        /*
+        // add ComplexTypes
+        List<CsdlComplexType> complexTypes = new ArrayList<>();
+        for (CfClass clazz : complexList.values()) {
+            CsdlComplexType ct = getComplexType(new FullQualifiedName(NAMESPACE, clazz.getName()));
+            if (null != ct) {
+                complexTypes.add(ct);
+            }
+        }
+        schema.setComplexTypes(complexTypes);
+        */
+        
         // add EntityContainer
         schema.setEntityContainer(getEntityContainer());
         List<CsdlSchema> schemas = new ArrayList<>();
@@ -103,19 +123,26 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         //System.out.println(entityTypeName.getFullQualifiedNameAsString());
         CfClass classref = cfclassservice.findByName(entityTypeName.getName());
         List propsList = new ArrayList();
+        List navpropsList = new ArrayList();
         List keysList = new ArrayList();
         for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
-            CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
-            propsList.add(prop);
-            if (attribut.getIdentity()) {
-                CsdlPropertyRef propertyRef = new CsdlPropertyRef();
-                propertyRef.setName(attribut.getName());
-                keysList.add(propertyRef);
+            if (!getODataCollection(attribut)) {
+                CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(false);
+                propsList.add(prop);
+                if (attribut.getIdentity()) {
+                    CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+                    propertyRef.setName(attribut.getName());
+                    keysList.add(propertyRef);
+                }
+            } else {
+                CsdlNavigationProperty prop = new CsdlNavigationProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
+                navpropsList.add(prop);
             }
         }
         CsdlEntityType entityType = new CsdlEntityType();
         entityType.setName(entityTypeName.getName());
         entityType.setProperties(propsList);
+        entityType.setNavigationProperties(navpropsList);
         entityType.setKey(keysList);
 
         if (!keysList.isEmpty()) {
@@ -162,6 +189,32 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         return null;
     }
     
+    /*
+    @Override
+    public CsdlComplexType getComplexType(FullQualifiedName complexTypeName) throws ODataException {
+        if (complexList.containsKey(complexTypeName.getName())) {
+            CfClass classref = cfclassservice.findByName(complexTypeName.getName());
+            List propsList = new ArrayList();
+            List keysList = new ArrayList();
+            for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
+                CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(false);
+                propsList.add(prop);
+                if (attribut.getIdentity()) {
+                    CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+                    propertyRef.setName(attribut.getName());
+                    keysList.add(propertyRef);
+                }
+            }
+            CsdlComplexType complexType = new CsdlComplexType();
+            complexType.setName(complexTypeName.getName());
+            complexType.setProperties(propsList);
+            return complexType;
+        } else {
+            return null;
+        }
+    }
+    */
+      
     private FullQualifiedName getODataType(CfAttribut attribut) {
         switch (attribut.getAttributetype().getName()) {
             case "string":
@@ -205,6 +258,9 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
     }
 
     private boolean getODataCollection(CfAttribut attribut) {
+        if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 == attribut.getRelationtype())) {
+            naviList.put(attribut.getRelationref().getName(), attribut.getRelationref());
+        }
         return (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 == attribut.getRelationtype());
     }
 }
