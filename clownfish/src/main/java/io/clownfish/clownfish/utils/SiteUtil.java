@@ -168,6 +168,7 @@ public class SiteUtil {
     
     public Map getClasscontentmapList(List<CfClasscontent> classcontentlist) {
         Map sitecontentmapdummy = new LinkedHashMap();
+        HashMap<String, Map> entry = new HashMap<>();
         for (CfClasscontent classcontent : classcontentlist) {
             if (null != classcontent) {
                 List<CfAttributcontent> attributcontentlist = new ArrayList<>();
@@ -187,10 +188,29 @@ public class SiteUtil {
                         }
                     }
                 }
-                
+                // Add entries for 1:n relations to extra hashmap
+                for (CfAttributcontent attributcontent : attributcontentlist) {
+                    if (1 == attributcontent.getAttributref().getRelationtype()) {
+                        CfClasscontent refcontent = cfclasscontentService.findById(attributcontent.getContentInteger().longValue());
+                        
+                        List<CfAttributcontent> refattributcontentlist = new ArrayList<>();
+                        refattributcontentlist.addAll(cfattributcontentService.findByClasscontentref(refcontent));
+                        
+                        if (0 == useHibernate) {
+                            entry.put("id_"+ refcontent.getId(), classutil.getattributmap(refcontent));
+                        } else {
+                            entry.put("id_"+ refcontent.getId(), hibernateutil.getContent(refcontent.getClassref().getName(), refcontent.getId(), null, null));
+                        }
+                    }
+                }
             } else {
                 LOGGER.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + classcontent.getId());
             }
+        }
+        if (!entry.isEmpty()) {
+            Map.Entry<String,Map> firstentry = entry.entrySet().iterator().next();
+            Map value = firstentry.getValue();
+            sitecontentmapdummy.put(value.get("$type$"), entry);
         }
         return sitecontentmapdummy;
     }
