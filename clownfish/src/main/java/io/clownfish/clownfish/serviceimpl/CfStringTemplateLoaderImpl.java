@@ -24,6 +24,7 @@ public class CfStringTemplateLoaderImpl extends StringTemplateLoader {
     @Autowired CfTemplateversionService cftemplateversionService;
     @Autowired TemplateUtil templateUtil;
     private @Getter @Setter String content;
+    private @Getter @Setter boolean importflag;
     
     private @Getter @Setter ClownfishConst.ViewModus modus = DEVELOPMENT;
 
@@ -32,9 +33,11 @@ public class CfStringTemplateLoaderImpl extends StringTemplateLoader {
 
     @Override
     public Object findTemplateSource(String name) {
+        importflag = false;
         try {
             if ((name.endsWith(".ftl")) || (name.endsWith(".vm"))) {
                 name = name.substring(0, name.lastIndexOf("."));
+                importflag = true;
             }
             CfTemplate cftemplate = cftemplateService.findByName(name);
             return cftemplate;
@@ -50,23 +53,25 @@ public class CfStringTemplateLoaderImpl extends StringTemplateLoader {
 
     @Override
     public Reader getReader(Object templateObject, String encoding) {
-        /*
-        if (DEVELOPMENT == modus) {
-            String content = ((CfTemplate) templateObject).getContent();
-            content = templateUtil.fetchIncludes(content, modus);
-            return new StringReader(content);
-        } else {
-            long currentTemplateVersion = 0;
-            try {
-                currentTemplateVersion = cftemplateversionService.findMaxVersion(((CfTemplate) templateObject).getId());
-            } catch (NullPointerException ex) {
-                currentTemplateVersion = 0;
+        if (importflag) {
+            if (DEVELOPMENT == modus) {
+                String content = ((CfTemplate) templateObject).getContent();
+                content = templateUtil.fetchIncludes(content, modus);
+                return new StringReader(content);
+            } else {
+                long currentTemplateVersion = 0;
+                try {
+                    currentTemplateVersion = cftemplateversionService.findMaxVersion(((CfTemplate) templateObject).getId());
+                } catch (NullPointerException ex) {
+                    currentTemplateVersion = 0;
+                }
+                String content = templateUtil.getVersion(((CfTemplate) templateObject).getId(), currentTemplateVersion);
+                content = templateUtil.fetchIncludes(content, modus);
+                return new StringReader(content);
             }
-            String content = templateUtil.getVersion(((CfTemplate) templateObject).getId(), currentTemplateVersion);
-            content = templateUtil.fetchIncludes(content, modus);
+        } else {
             return new StringReader(content);
-        }*/
-        return new StringReader(content);
+        }
     }
     
     @Override
