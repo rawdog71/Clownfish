@@ -87,10 +87,10 @@ import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
+import io.clownfish.clownfish.serviceimpl.CfStringTemplateLoaderImpl;
 import io.clownfish.clownfish.websocket.WebSocketServer;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.Part;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
@@ -100,8 +100,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
-import org.springframework.web.bind.ServletRequestUtils;
-import org.springframework.web.multipart.MultipartFile;
+
 
 /**
  *
@@ -140,6 +139,7 @@ public class Clownfish {
     @Autowired AssetList assetList;
     @Autowired QuartzList quartzlist;
     @Autowired CfTemplateLoaderImpl freemarkerTemplateloader;
+    @Autowired CfStringTemplateLoaderImpl freemarkerStringTemplateloader;
     @Autowired SiteUtil siteutil;
     @Autowired DatabaseUtil databaseUtil;
     @Autowired CfDatasourceService cfdatasourceService;
@@ -1617,6 +1617,20 @@ public class Clownfish {
             
             switch (cftemplate.getScriptlanguage()) {
                 case 0:
+                    freemarkerStringTemplateloader.setContent(templatecontent);
+                    freemarkerStringTemplateloader.putTemplate(cftemplate.getName(), templatecontent);
+                    fmRoot = new LinkedHashMap();
+                    freemarkerStringTemplateloader.setModus(modus);
+                    
+                    freemarkerCfg = new freemarker.template.Configuration();
+                    freemarkerCfg.setDefaultEncoding("UTF-8");
+                    freemarkerCfg.setTemplateLoader(freemarkerStringTemplateloader);
+                    freemarkerCfg.setLocalizedLookup(false);
+                    freemarkerCfg.setLocale(Locale.GERMANY);
+                    
+                    fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
+                    
+                    /*
                     StringTemplateLoader stringLoader = new StringTemplateLoader();
                     stringLoader.putTemplate(cftemplate.getName(), templatecontent);
                     fmRoot = new LinkedHashMap();
@@ -1629,6 +1643,7 @@ public class Clownfish {
                     freemarkerCfg.setLocale(Locale.GERMANY);
                     
                     fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
+                    */
                     break;
                 case 1:
                     velContext = new org.apache.velocity.VelocityContext();
