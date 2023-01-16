@@ -187,20 +187,33 @@ public class SiteUtil {
                         }
                     }
                 }
-                // Add entries for 1:n relations to sitecontentmap
+                // Add entries for 1:n and n:m relations to sitecontentmap
                 for (CfAttributcontent attributcontent : attributcontentlist) {
-                    if (1 == attributcontent.getAttributref().getRelationtype()) {
-                        CfClasscontent refcontent = cfclasscontentService.findById(attributcontent.getContentInteger().longValue());
-                        
-                        List<CfAttributcontent> refattributcontentlist = new ArrayList<>();
-                        refattributcontentlist.addAll(cfattributcontentService.findByClasscontentref(refcontent));
-                        
-                        if (0 == useHibernate) {
-                            HashMap entry2 = (HashMap) sitecontentmapdummy.get(classcontent.getName());
-                            entry2.put(attributcontent.getAttributref().getName(), classutil.getattributmap(refcontent));
+                    if (null != attributcontent.getAttributref().getRelationref()) {
+                        if (1 == attributcontent.getAttributref().getRelationtype()) {
+                            CfClasscontent refcontent = cfclasscontentService.findById(attributcontent.getContentInteger().longValue());
+
+                            if (0 == useHibernate) {
+                                HashMap entry2 = (HashMap) sitecontentmapdummy.get(classcontent.getName());
+                                entry2.put(attributcontent.getAttributref().getName(), classutil.getattributmap(refcontent));
+                            } else {
+                                HashMap entry2 = (HashMap) sitecontentmapdummy.get(classcontent.getName());
+                                entry2.put(attributcontent.getAttributref().getName(), hibernateutil.getContent(refcontent.getClassref().getName(), refcontent.getId(), null, null));
+                            }
                         } else {
+                            List<CfListcontent> attrlist = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
+                            ArrayList<Map> contentlist = new ArrayList<>();
+                            for (CfListcontent listcontent : attrlist) {
+                                if (0 == useHibernate) {
+                                    CfClasscontent cc = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                                    contentlist.add(classutil.getattributmap(cc));
+                                } else {
+                                    CfClasscontent cc = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                                    contentlist.add(hibernateutil.getContent(cc.getClassref().getName(), cc.getId(), null, null));
+                                }
+                            }
                             HashMap entry2 = (HashMap) sitecontentmapdummy.get(classcontent.getName());
-                            entry2.put(attributcontent.getAttributref().getName(), hibernateutil.getContent(refcontent.getClassref().getName(), refcontent.getId(), null, null));
+                            entry2.put(attributcontent.getAttributref().getName(), contentlist);
                         }
                     }
                 }
