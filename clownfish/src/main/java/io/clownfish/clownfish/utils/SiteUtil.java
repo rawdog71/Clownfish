@@ -168,7 +168,6 @@ public class SiteUtil {
     
     public Map getClasscontentmapList(List<CfClasscontent> classcontentlist) {
         Map sitecontentmapdummy = new LinkedHashMap();
-        HashMap<String, Map> entry = new HashMap<>();
         for (CfClasscontent classcontent : classcontentlist) {
             if (null != classcontent) {
                 List<CfAttributcontent> attributcontentlist = new ArrayList<>();
@@ -188,7 +187,7 @@ public class SiteUtil {
                         }
                     }
                 }
-                // Add entries for 1:n relations to extra hashmap
+                // Add entries for 1:n relations to sitecontentmap
                 for (CfAttributcontent attributcontent : attributcontentlist) {
                     if (1 == attributcontent.getAttributref().getRelationtype()) {
                         CfClasscontent refcontent = cfclasscontentService.findById(attributcontent.getContentInteger().longValue());
@@ -197,20 +196,17 @@ public class SiteUtil {
                         refattributcontentlist.addAll(cfattributcontentService.findByClasscontentref(refcontent));
                         
                         if (0 == useHibernate) {
-                            entry.put("id_"+ refcontent.getId(), classutil.getattributmap(refcontent));
+                            HashMap entry2 = (HashMap) sitecontentmapdummy.get(classcontent.getName());
+                            entry2.put(attributcontent.getAttributref().getName(), classutil.getattributmap(refcontent));
                         } else {
-                            entry.put("id_"+ refcontent.getId(), hibernateutil.getContent(refcontent.getClassref().getName(), refcontent.getId(), null, null));
+                            HashMap entry2 = (HashMap) sitecontentmapdummy.get(classcontent.getName());
+                            entry2.put(attributcontent.getAttributref().getName(), hibernateutil.getContent(refcontent.getClassref().getName(), refcontent.getId(), null, null));
                         }
                     }
                 }
             } else {
                 LOGGER.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + classcontent.getId());
             }
-        }
-        if (!entry.isEmpty()) {
-            Map.Entry<String,Map> firstentry = entry.entrySet().iterator().next();
-            Map value = firstentry.getValue();
-            sitecontentmapdummy.put(value.get("$type$"), entry);
         }
         return sitecontentmapdummy;
     }
