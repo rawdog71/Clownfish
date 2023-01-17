@@ -159,6 +159,47 @@ public class SiteUtil {
                 } else {
                     sitecontentmapdummy.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId(), null, null));
                 }
+                
+                if (classcontent.getClassref().isEncrypted()) {
+                    HashMap contentmap = (HashMap) sitecontentmapdummy.get(classcontent.getName());
+                    for (Object key : contentmap.keySet()) {
+                        if (null != getAttributValue(attributcontentlist, key.toString())) {
+                            HashMap am = (HashMap) sitecontentmapdummy.get(classcontent.getName());
+                            am.put(key, getAttributValue(attributcontentlist, key.toString()));
+                        }
+                    }
+                }
+                // Add entries for 1:n and n:m relations to sitecontentmap
+                for (CfAttributcontent attributcontent : attributcontentlist) {
+                    if (null != attributcontent.getAttributref().getRelationref()) {
+                        if (1 == attributcontent.getAttributref().getRelationtype()) {
+                            CfClasscontent refcontent = cfclasscontentService.findById(attributcontent.getContentInteger().longValue());
+
+                            if (0 == useHibernate) {
+                                HashMap entry2 = (HashMap) sitecontentmapdummy.get(classcontent.getName());
+                                entry2.put(attributcontent.getAttributref().getName(), classutil.getattributmap(refcontent));
+                            } else {
+                                HashMap entry2 = (HashMap) sitecontentmapdummy.get(classcontent.getName());
+                                entry2.put(attributcontent.getAttributref().getName(), hibernateutil.getContent(refcontent.getClassref().getName(), refcontent.getId(), null, null));
+                            }
+                        } else {
+                            List<CfListcontent> attrlist = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
+                            ArrayList<Map> contentlist = new ArrayList<>();
+                            for (CfListcontent listcontent : attrlist) {
+                                if (0 == useHibernate) {
+                                    CfClasscontent cc = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                                    contentlist.add(classutil.getattributmap(cc));
+                                } else {
+                                    CfClasscontent cc = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                                    contentlist.add(hibernateutil.getContent(cc.getClassref().getName(), cc.getId(), null, null));
+                                }
+                            }
+                            HashMap entry2 = (HashMap) sitecontentmapdummy.get(classcontent.getName());
+                            entry2.put(attributcontent.getAttributref().getName(), contentlist);
+                        }
+                    }
+                }
+                
             } else {
                 LOGGER.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + sitecontent.getCfSitecontentPK().getClasscontentref());
             }
