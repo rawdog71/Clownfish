@@ -263,6 +263,7 @@ public class AssetList {
      * Retrieves the metadata from the asset
      */
     public void onDetail() {
+        assetName = selectedAsset.getName();
         assetpublicusage = selectedAsset.isPublicuse();
         description = selectedAsset.getDescription();
         keywords.getTarget().clear();
@@ -304,6 +305,23 @@ public class AssetList {
      * @param actionEvent
      */
     public void editDescription(ActionEvent actionEvent) {
+        try {
+            CfAsset findasset = cfassetService.findByName(assetName);
+            if (findasset.getId() != selectedAsset.getId()) {
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Asset ", assetName + " already exists.");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                assetName = selectedAsset.getName();
+            }
+        } catch (Exception ex) {
+            File result = new File(folderUtil.getMedia_folder() + File.separator + selectedAsset.getName());
+            boolean fileexists = result.exists();
+            if (fileexists) {
+                File newfile = new File(folderUtil.getMedia_folder() + File.separator + assetName);
+                result.renameTo(newfile);
+                selectedAsset.setName(assetName);
+            }
+        }
+        
         selectedAsset.setDescription(description);
         selectedAsset.setPublicuse(assetpublicusage);
         cfassetService.edit(selectedAsset);

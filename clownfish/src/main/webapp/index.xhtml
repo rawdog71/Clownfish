@@ -1426,7 +1426,7 @@
                                         <h:outputText value="#{assetList.selectedAsset.id}" style="font-weight: bold"/>
 
                                         <h:outputText value="Name:" />
-                                        <h:outputText value="#{assetList.selectedAsset.name}" style="font-weight: bold"/>
+                                        <p:inputText id="assetName" value="#{assetList.assetName}" style="font-weight: bold"/>
 
                                         <h:outputText value="Description:" />
                                         <p:inputText id="assetDescription" value="#{assetList.description}"></p:inputText>
@@ -1449,7 +1449,7 @@
                                         <h:outputText value="Downloads:"/>
                                         <h:outputText value="#{assetList.selectedAsset.downloads}" style="font-weight: bold"/>
 
-                                        <p:commandButton id="editDescription" icon="pi pi-pencil" value="Edit" actionListener="#{assetList.editDescription}" update=":form:msgs" />
+                                        <p:commandButton id="editDescription" icon="pi pi-pencil" value="Edit" actionListener="#{assetList.editDescription}" update=":form:msgs :form:tabview:assetlist :form:tabview:assetName" />
                                     </h:panelGrid>
                                 </p:outputPanel>
                             </h:panelGrid>
