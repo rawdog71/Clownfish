@@ -36,4 +36,5 @@ public class SAPDATATYPE {
     public static final String CUKY = "CUKY";
     public static final String RAW = "RAW";
     public static final String FLTP = "FLTP";
+    public static final String LANG = "LANG";
 }
