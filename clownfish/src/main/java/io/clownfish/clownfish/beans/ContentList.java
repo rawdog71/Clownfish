@@ -374,6 +374,87 @@ public class ContentList implements Serializable {
         }
     }
     
+    public void onCopyContent(ActionEvent actionEvent) {
+        if (selectedContent != null) {
+            try {
+                CfClasscontent newclasscontent = new CfClasscontent();
+                String newname = getUniqueName(selectedContent.getName());
+                if (newname.startsWith(selectedClass.getName().toUpperCase() + "_")) {
+                    newname = newname.replaceAll("\\s+", "_");
+                } else {
+                    newname = selectedClass.getName().toUpperCase() + "_" + newname.replaceAll("\\s+", "_");
+                }
+                newclasscontent.setName(newname);
+                
+                newclasscontent.setClassref(selectedContent.getClassref());
+                cfclasscontentService.create(newclasscontent);
+
+                List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
+                attributlist.stream().forEach((attribut) -> {
+                    if (attribut.getAutoincrementor() == true) {
+                        List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
+                        long max = 0;
+                        int last = classcontentlist2.size();
+                        if (1 == last) {
+                            max = 0;
+                        } else {
+                            CfClasscontent classcontent = classcontentlist2.get(last - 2);
+                            CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
+                            if (attributcontent.getContentInteger().longValue() > max) {
+                                max = attributcontent.getContentInteger().longValue();
+                            }
+                        }
+                        CfAttributcontent newcontent = new CfAttributcontent();
+                        newcontent.setAttributref(attribut);
+                        newcontent.setClasscontentref(newclasscontent);
+                        newcontent.setContentInteger(BigInteger.valueOf(max+1));
+                        cfattributcontentService.create(newcontent);
+                    } else {
+                        CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, selectedContent); 
+                        
+                        CfAttributcontent newcontent = new CfAttributcontent();
+                        newcontent.setAttributref(attribut);
+                        newcontent.setClasscontentref(newclasscontent);
+                        newcontent.setAssetcontentlistref(attributcontent.getAssetcontentlistref());
+                        newcontent.setClasscontentlistref(attributcontent.getClasscontentlistref());
+                        newcontent.setContentBoolean(attributcontent.getContentBoolean());
+                        newcontent.setContentDate(attributcontent.getContentDate());
+                        newcontent.setContentInteger(attributcontent.getContentInteger());
+                        newcontent.setContentReal(attributcontent.getContentReal());
+                        newcontent.setContentString(attributcontent.getContentString());
+                        newcontent.setContentText(attributcontent.getContentText());
+                        newcontent.setIndexed(attributcontent.isIndexed());
+                        newcontent.setSalt(attributcontent.getSalt());
+                        cfattributcontentService.create(newcontent);
+                    }
+                });
+                hibernateUtil.insertContent(newclasscontent);
+                classcontentlist.clear();
+                classcontentlist = cfclasscontentService.findByMaintenance(true);
+                FacesMessage message = new FacesMessage("Content created");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            } catch (ConstraintViolationException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }
+    }
+    
+    public void onChangeContent(ActionEvent actionEvent) {
+        if (selectedContent != null) {
+            try {
+                CfClasscontent findcontent = cfclasscontentService.findByName(contentName);
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "WARNING", "Contentname already exists!");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                contentName = selectedContent.getName();
+            } catch (Exception ex) {
+                selectedContent.setName(contentName);
+                cfclasscontentService.edit(selectedContent);
+                FacesMessage message = new FacesMessage("Contentname changed!");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
+        }
+    }
+    
     /**
      * Handles the content scrapping
      * Sets the scrapped flag to indicate the content is on the scrapyard
@@ -735,5 +816,19 @@ public class ContentList implements Serializable {
     
     public String toString(CfAttributcontent attributcontent) {
         return contentUtil.toString(attributcontent);
+    }
+
+    private String getUniqueName(String name) {
+        int i = 1;
+        boolean found = false;
+        do {
+            try {
+                cfclasscontentService.findByName(name+"("+i+")");
+                i++;
+            } catch(Exception ex) {
+                found = true;
+            }
+        } while (!found);
+        return name+"("+i+")";
     }
 }
