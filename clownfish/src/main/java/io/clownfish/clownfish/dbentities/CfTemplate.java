@@ -42,6 +42,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "CfTemplate.findAll", query = "SELECT c FROM CfTemplate c"),
+    @NamedQuery(name = "CfTemplate.findNotPreview", query = "SELECT c FROM CfTemplate c WHERE c.type <> 2"),
+    @NamedQuery(name = "CfTemplate.findPreview", query = "SELECT c FROM CfTemplate c WHERE c.type = 2"),
     @NamedQuery(name = "CfTemplate.findById", query = "SELECT c FROM CfTemplate c WHERE c.id = :id"),
     @NamedQuery(name = "CfTemplate.findByName", query = "SELECT c FROM CfTemplate c WHERE c.name = :name"),
     @NamedQuery(name = "CfTemplate.findByScriptlanguage", query = "SELECT c FROM CfTemplate c WHERE c.scriptlanguage = :scriptlanguage"),
@@ -71,8 +73,8 @@ public class CfTemplate implements Serializable {
     private int scriptlanguage;
     @Column(name = "checkedoutby")
     private BigInteger checkedoutby;
-    @Column(name = "layout")
-    private boolean layout;
+    @Column(name = "type")
+    private int type;
 
     public CfTemplate() {
     }
@@ -128,19 +130,24 @@ public class CfTemplate implements Serializable {
         this.checkedoutby = checkedoutby;
     }
 
-    public boolean isLayout() {
-        return layout;
+    public int getType() {
+        return type;
     }
 
-    public void setLayout(boolean layout) {
-        this.layout = layout;
+    public void setType(int type) {
+        this.type = type;
     }
     
-    public String layoutflag() {
-        if (layout) {
-            return "th-large";
-        } else {
-            return "file";
+    public String typeflag() {
+        switch (type) {
+            case 0:
+                return "file";
+            case 1:
+                return "th-large";
+            case 2:
+                return "id-card";
+            default:
+                return "file";
         }
     }
 

@@ -70,6 +70,8 @@ public class TemplateList implements ISourceContentInterface {
     @Autowired CfTemplateversionService cftemplateversionService;
     
     private @Getter @Setter List<CfTemplate> templateListe;
+    private @Getter @Setter List<CfTemplate> notpreviewtemplateListe;
+    private @Getter @Setter List<CfTemplate> previewtemplateListe;
     private @Getter @Setter CfTemplate selectedTemplate = null;
     private @Getter @Setter String templateName = "";
     private @Getter @Setter boolean newButtonDisabled = true;
@@ -85,7 +87,7 @@ public class TemplateList implements ISourceContentInterface {
     private @Getter @Setter long checkedoutby = 0;
     private @Getter @Setter boolean checkedout;
     private @Getter @Setter boolean access;
-    private @Getter @Setter boolean layout;
+    private @Getter @Setter int type;
     private @Getter @Setter boolean showDiff;
     private @Getter @Setter EditorOptions editorOptions;
     private @Getter @Setter DiffEditorOptions editorOptionsDiff;
@@ -135,10 +137,12 @@ public class TemplateList implements ISourceContentInterface {
         showDiff = false;
         templateName = "";
         templateListe = cftemplateService.findAll();
+        notpreviewtemplateListe = cftemplateService.findNotPreview();
+        previewtemplateListe = cftemplateService.findPreview();
         templateUtility.setTemplateContent("");
         checkedout = false;
         access = false;
-        layout = false;
+        type = 0;
         editorOptions = new EditorOptions();
         editorOptions.setLanguage("");
         editorOptions.setTheme(ETheme.VS_DARK);
@@ -152,12 +156,26 @@ public class TemplateList implements ISourceContentInterface {
     @Override
     public void refresh() {
         templateListe = cftemplateService.findAll();
+        notpreviewtemplateListe = cftemplateService.findNotPreview();
+        previewtemplateListe = cftemplateService.findPreview();
         if (null != classlist) {
             classlist.onRefreshSelection();
         }
         if (null != sitetree) {
             sitetree.onRefreshSelection();
         }
+    }
+    
+    public List<CfTemplate> completeTextNoPreview(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return notpreviewtemplateListe.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
+    }
+    
+    public List<CfTemplate> completeTextPreview(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return previewtemplateListe.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
     }
     
     public List<CfTemplate> completeText(String query) {
@@ -176,7 +194,7 @@ public class TemplateList implements ISourceContentInterface {
         if (null != selectedTemplate) {
             selectedTemplate.setScriptlanguage(templateScriptLanguage);
             selectedTemplate.setContent(getContent());
-            selectedTemplate.setLayout(layout);
+            selectedTemplate.setType(type);
             cftemplateService.edit(selectedTemplate);
             difference = templateUtility.hasDifference(selectedTemplate);
             
@@ -298,7 +316,7 @@ public class TemplateList implements ISourceContentInterface {
                 newtemplate.setName(templateName);
                 newtemplate.setContent("//"+templateName);
                 newtemplate.setScriptlanguage(templateScriptLanguage);
-                newtemplate.setLayout(layout);
+                newtemplate.setType(type);
                 cftemplateService.create(newtemplate);
                 templateListe = cftemplateService.findAll();
                 templateName = "";
@@ -378,7 +396,7 @@ public class TemplateList implements ISourceContentInterface {
         if (null != selectedTemplate) {
             selectedTemplate.setScriptlanguage(templateScriptLanguage);
             selectedTemplate.setName(templateName);
-            selectedTemplate.setLayout(layout);
+            selectedTemplate.setType(type);
             cftemplateService.edit(selectedTemplate);
             difference = templateUtility.hasDifference(selectedTemplate);
             refresh();
@@ -424,7 +442,7 @@ public class TemplateList implements ISourceContentInterface {
             checkoutUtil.getCheckoutAccess(co, loginbean);
             checkedout = checkoutUtil.isCheckedout();
             access = checkoutUtil.isAccess();
-            layout = selectedTemplate.isLayout();
+            type = selectedTemplate.getType();
             templateversionMin = 1;
             templateversionMax = versionlist.size();
             selectedtemplateversion = templateversionMax;

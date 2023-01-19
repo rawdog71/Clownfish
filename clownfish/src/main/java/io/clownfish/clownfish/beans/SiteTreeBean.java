@@ -500,7 +500,7 @@ public class SiteTreeBean implements Serializable {
             showAsset = false;
             showAssetLibrary = false;
             showKeywordLibrary = false;
-            if (template.isLayout()) {
+            if (1 == template.getType()) {
                 contenteditable = true;
                 FacesMessage message = new FacesMessage("LAYOUT TEMPLATE");
                 FacesContext.getCurrentInstance().addMessage(null, message);

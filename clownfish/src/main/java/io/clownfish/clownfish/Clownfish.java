@@ -1093,7 +1093,7 @@ public class Clownfish {
                             }
                         }
                         
-                        if (!cftemplate.isLayout()) {                                                                        // NORMAL Template
+                        if (1 != cftemplate.getType()) {                                                                        // NORMAL or Preview Template
                             // fetch the dependend content
                             List<CfSitecontent> sitecontentlist = new ArrayList<>();
                             sitecontentlist.addAll(cfsitecontentService.findBySiteref(cfsite.getId()));
@@ -1319,7 +1319,7 @@ public class Clownfish {
 
                                         try {
                                             if (null != fmTemplate) {
-                                                if (cftemplate.isLayout()) {
+                                                if (1 == cftemplate.getType()) {
                                                     String output = manageLayout(cfsite, cftemplate.getName(), cftemplate.getContent(), cfstylesheet, cfjavascript, parametermap);
                                                     output = interpretscript(output, cftemplate, cfstylesheet, cfjavascript, parametermap);
                                                     out.write(output);
@@ -1416,7 +1416,7 @@ public class Clownfish {
                                         });
 
                                         if (null != velTemplate) {
-                                            if (cftemplate.isLayout()) {
+                                            if (1 == cftemplate.getType()) {
                                                 String output = manageLayout(cfsite, cftemplate.getName(), cftemplate.getContent(), cfstylesheet, cfjavascript, parametermap);
                                                 output = interpretscript(output, cftemplate, cfstylesheet, cfjavascript, parametermap);
                                                 out.write(output);
@@ -1430,7 +1430,7 @@ public class Clownfish {
                                 default:                                            // HTML
                             }
                         } else {                                                                                // LAYOUT Template
-                            if (cftemplate.isLayout()) {
+                            if (1 == cftemplate.getType()) {
                                 String output = manageLayout(cfsite, cftemplate.getName(), cftemplate.getContent(), cfstylesheet, cfjavascript, parametermap);
                                 out.write(output);
                                 out.flush();

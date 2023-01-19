@@ -84,4 +84,20 @@ public class CfTemplateDAOImpl implements CfTemplateDAO {
         CfTemplate cftemplate = (CfTemplate) query.getSingleResult();
         return cftemplate;
     }
+
+    @Override
+    public List<CfTemplate> findNotPreview() {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findNotPreview");
+        List<CfTemplate> cftempaltelist = query.getResultList();
+        return cftempaltelist;
+    }
+    
+    @Override
+    public List<CfTemplate> findPreview() {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findPreview");
+        List<CfTemplate> cftempaltelist = query.getResultList();
+        return cftempaltelist;
+    }
 }

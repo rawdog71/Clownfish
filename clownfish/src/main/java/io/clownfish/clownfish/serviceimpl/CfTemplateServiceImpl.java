@@ -67,4 +67,14 @@ public class CfTemplateServiceImpl implements CfTemplateService, Serializable {
     public List<CfTemplate> findAll() {
         return this.cftemplateDAO.findAll();
     }
+
+    @Override
+    public List<CfTemplate> findNotPreview() {
+        return this.cftemplateDAO.findNotPreview();
+    }
+    
+    @Override
+    public List<CfTemplate> findPreview() {
+        return this.cftemplateDAO.findPreview();
+    }
 }

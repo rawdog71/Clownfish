@@ -29,4 +29,6 @@ public interface CfTemplateService {
     CfTemplate create(CfTemplate entity);
     boolean delete(CfTemplate entity);
     CfTemplate edit(CfTemplate entity);
+    List<CfTemplate> findNotPreview();
+    List<CfTemplate> findPreview();
 }

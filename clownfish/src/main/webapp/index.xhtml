@@ -120,7 +120,7 @@
                                             <p:row>
                                                 <p:column>
                                                     <p:outputLabel value="Templates" for="@next"/>
-                                                    <p:autoComplete id="selecttemplate" dropdown="true" value="#{sitetree.selectedTemplate}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
+                                                    <p:autoComplete id="selecttemplate" dropdown="true" value="#{sitetree.selectedTemplate}" completeMethod="#{templateList.completeTextNoPreview}" converter="#{templateConverterBean}" scrollHeight="250">
                                                         <p:ajax listener="#{sitetree.onChangeTemplate()}" />
                                                     </p:autoComplete>
                                                     <p:commandButton id="showtemplate" icon="pi pi-pencil" action="#{sitetree.templatelist.selectTemplate(sitetree.selectedTemplate)}" update=":form:tabview :form:tabview:edittemplatepanel :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:templatelayout" rendered="#{loginBean.login and loginBean.hasRights(2)}">
@@ -557,7 +557,11 @@
                         
                         <div class="flex align-items-center pr-2">
                             <p:outputLabel for="templatelayout" style="margin-right: 0.5rem">Layout</p:outputLabel>
-                            <p:selectBooleanCheckbox id="templatelayout" value="#{templateList.layout}" />
+                            <p:selectOneMenu id="templatelayout" value="#{templateList.type}">
+                                <f:selectItem itemValue="0" itemLabel="Normal" />
+                                <f:selectItem itemValue="1" itemLabel="Layout" />
+                                <f:selectItem itemValue="2" itemLabel="Preview" />
+                            </p:selectOneMenu>
                         </div>
                         
                         <div class="flex align-items-center pr-2">
@@ -943,7 +947,7 @@
                         
                         <div class="flex align-items-center pr-2">
                             <p:outputLabel for="classtemplate" style="margin-right: 0.5rem">Preview Template: </p:outputLabel>
-                            <p:autoComplete id="classtemplate" dropdown="true" value="#{classList.selectedTemplateRef}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
+                            <p:autoComplete id="classtemplate" dropdown="true" value="#{classList.selectedTemplateRef}" completeMethod="#{templateList.completeTextPreview}" converter="#{templateConverterBean}" scrollHeight="250">
                             </p:autoComplete>
                         </div>
                         

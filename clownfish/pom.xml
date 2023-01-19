@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
-    <version>0.7.21-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <version>0.7.22-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
         <developerConnection>scm:git:https://github.com/rawdog71/Clownfish.git</developerConnection>
-        <tag>v0.7.21</tag>
+        <tag>v0.7.22</tag>
     </scm>
     <developers>
         <developer>
