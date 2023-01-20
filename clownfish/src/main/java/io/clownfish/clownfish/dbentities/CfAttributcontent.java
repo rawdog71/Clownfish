@@ -242,4 +242,24 @@ public class CfAttributcontent implements Serializable {
         }
         return true;
     }
+    
+    @Override
+    public String toString() {
+        switch (attributref.getAttributetype().getName()) {
+            case "string":
+                return getContentString();
+            case "int":
+                return getContentInteger().toString();
+            case "real":
+                return getContentReal().toString();
+            case "text":
+            case "htmltext":
+            case "markdown":
+                return getContentText();
+            case "datetime":
+                return getContentDate().toString();
+            default:
+                return "CfAttributcontent - TODO: " + attributref.getAttributetype().getName();
+        }
+    }
 }
