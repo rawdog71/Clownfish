@@ -409,6 +409,10 @@ public class TemplateList implements ISourceContentInterface {
         }
     }
     
+    public void selectDivTemplate(String template) {
+        selectTemplate(cftemplateService.findByName(template));
+    }
+    
     public void selectTemplate(CfTemplate template) {
         selectedTemplate = template;
         difference = false;
