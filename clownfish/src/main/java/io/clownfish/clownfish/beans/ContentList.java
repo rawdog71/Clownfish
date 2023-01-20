@@ -170,6 +170,7 @@ public class ContentList implements Serializable {
     private @Getter @Setter boolean access;
     private @Getter @Setter CfContentversion version = null;
     private @Getter @Setter List<CfContentversion> versionlist;
+    private @Getter @Setter String contentpreview;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ContentList.class);
 
@@ -194,6 +195,7 @@ public class ContentList implements Serializable {
         assetlist = cfassetService.findAll();
         selectedAssetList = cfassetlistService.findAll();
         editContent = "";
+        contentpreview = "";
         
         keywordSource = cfkeywordService.findAll();
         keywordTarget = new ArrayList<>();
@@ -239,6 +241,16 @@ public class ContentList implements Serializable {
         contentversionMin = 1;
         contentversionMax = versionlist.size();
         selectedcontentversion = contentversionMax;
+        
+        try {
+            String output = selectedContent.getClassref().getTemplateref().getContent();
+            for (CfAttributcontent attributcontent : attributcontentlist) {
+                output = output.replaceAll("#" + attributcontent.getAttributref().getName() + "#", contentUtil.toString(attributcontent));
+            }
+            contentpreview = output;
+        } catch (Exception ex) {
+            contentpreview = "";
+        }
     }
     
     public void onSelectAttribut(SelectEvent event) {
@@ -753,6 +765,17 @@ public class ContentList implements Serializable {
 
                 FacesMessage message = new FacesMessage("Could not commit " + selectedContent.getName() + " Version: " + 1);
                 FacesContext.getCurrentInstance().addMessage(null, message);
+            }
+            
+            try {
+                attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
+                String output = selectedContent.getClassref().getTemplateref().getContent();
+                for (CfAttributcontent attributcontent : attributcontentlist) {
+                    output = output.replaceAll("#" + attributcontent.getAttributref().getName() + "#", contentUtil.toString(attributcontent));
+                }
+                contentpreview = output;
+            } catch (Exception ex) {
+                contentpreview = "";
             }
         }
     }

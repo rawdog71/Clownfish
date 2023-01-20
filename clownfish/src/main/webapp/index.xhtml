@@ -1094,7 +1094,7 @@
                                          rowsPerPageTemplate="10,50,100"
                                          selectionMode="single" selection="#{classcontentList.selectedContent}" rowKey="#{classcontent.id}"
                                          emptyMessage="No content available" filteredValue="#{classcontentList.filteredContent}" widgetVar="classcontentlist">
-                                <p:ajax event="rowSelect" listener="#{classcontentList.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:contentbtnpanel :form:tabview:contentkeywordpicklist" />
+                                <p:ajax event="rowSelect" listener="#{classcontentList.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:contentbtnpanel :form:tabview:contentkeywordpicklist :form:tabview:contentpreview" />
                                 <p:column headerText="Name" filterBy="#{classcontent.name}" filterMatchMode="contains">
                                     <h:outputText value="#{classcontent.name}" />
                                 </p:column>
@@ -1165,7 +1165,7 @@
                                 <p:commandButton id="checkoutcontent" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!classcontentList.checkedout and classcontentList.access}" actionListener="#{classcontentList.onCheckOut}" update=":form:msgs :form:tabview:templateversion :form:tabview:contentbtnpanel :form:tabview:edittemplatepanel" />
                             </div>
                             <div class="flex align-items-center pr-2">
-                                <p:commandButton id="commitcontent" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{!classcontentList.checkedout and classcontentList.access and classcontentList.difference}" actionListener="#{classcontentList.onCommit}" update=":form:msgs :form:tabview:templateversion :form:tabview:contentbtnpanel :form:tabview:selectedtemplateversion">
+                                <p:commandButton id="commitcontent" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{!classcontentList.checkedout and classcontentList.access and classcontentList.difference}" actionListener="#{classcontentList.onCommit}" update=":form:msgs :form:tabview:templateversion :form:tabview:contentbtnpanel :form:tabview:selectedtemplateversion :form:tabview:contentpreview">
                                     <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                             </div>
@@ -1249,6 +1249,10 @@
                         <p:commandButton id="generateJsonContent" value="Json Export" actionListener="#{classcontentList.jsonExport}" update=":form:tabview:contentJson">
                         </p:commandButton>
                     </p:panel>  
+                    
+                    <p:panel id="contentpreview">
+                        <h:outputText value="#{classcontentList.contentpreview}" escape="false" />
+                    </p:panel>
                     
                 </p:tab>
 
