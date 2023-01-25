@@ -9,3 +9,4 @@ clownfish/sapconnection.props
 clownfish/sapconnection_ekn.props
 *.log
 *.trc
+clownfish/*.iml
