@@ -1,0 +1,46 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Clownfish Maven WAR build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: WAR
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out Repository
+      uses: actions/checkout@v3
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+    - name: Add SAPJCo dependency to Maven
+      run: mvn install:install-file -Dfile=${{github.workspace}}/lib/SAPJCo-3.8.jar -DgroupId=SAPJCo -DartifactId=SAPJCo -Dversion=3.8 -Dpackaging=jar -DgeneratePom=true
+    - name: Add ojdbc8 dependency to Maven
+      run: mvn install:install-file -Dfile=${{github.workspace}}/lib/ojdbc8-19.3.jar -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=19.3 -Dpackaging=jar -DgeneratePom=true
+    - name: Build with Maven
+      run: mvn package --file ${{github.workspace}}/clownfish/pom.xml
+    - name: Get package version
+      run: |
+          echo "REL_VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout --file ${{github.workspace}}/clownfish/pom.xml)" >> $GITHUB_ENV
+    - name: Copy files
+      run: mkdir staging && cp ${{github.workspace}}/clownfish/target/clownfish-${{env.REL_VERSION}}.war ${{github.workspace}}/clownfish/target/clownfish-${{env.REL_VERSION}}-classes.jar ${{github.workspace}}/clownfish/application.properties ${{github.workspace}}/clownfish/bootstrap* ${{github.workspace}}/clownfish/c3p0.properties ${{github.workspace}}/clownfish/sql-bootstrap.sql ${{github.workspace}}/clownfish/sql-bootstrap_* staging
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: clownfish-latest-war_${{github.sha}}
+        path: staging
