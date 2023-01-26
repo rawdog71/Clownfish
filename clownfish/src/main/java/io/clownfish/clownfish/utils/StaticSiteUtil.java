@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import org.jsoup.Jsoup;
+import org.jsoup.examples.HtmlToPlainText;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -41,6 +42,7 @@ public class StaticSiteUtil {
      * generateStaticSite
      * 
      * @param sitename
+     * @param aliasname
      * @param content
      * @param cfassetService
      * @param folderUtil
@@ -97,7 +99,9 @@ public class StaticSiteUtil {
             fileStream = new FileOutputStream(new File(folderUtil.getStatic_folder() + File.separator + sitename));
             OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
             try {
-                writer.write(doc.html());
+                doc.outputSettings(new Document.OutputSettings().prettyPrint(false));
+                String text = doc.toString();
+                writer.write(text);
                 writer.close();
             } catch (IOException e) {
                 throw new RuntimeException("Unable to create the destination file", e);

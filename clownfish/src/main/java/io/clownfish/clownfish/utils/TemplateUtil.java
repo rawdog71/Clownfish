@@ -317,14 +317,19 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     
     private String surroundInplaceDivs(String content, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
         Document doc = Jsoup.parseBodyFragment(content);
-        reworkElements(doc.body().children(), cfdiv, layoutcontent);
-        //Elements elements = doc.body().children();
-        return doc.body().children().toString();
+        if (null != doc.body().children()) {
+            reworkElements(doc.body().children(), cfdiv, layoutcontent);
+            return doc.childNode(0).childNode(1).childNode(0).toString();
+        } else {
+            String c = reworkContent(doc.childNode(0).childNode(1).childNode(0).toString(), cfdiv, layoutcontent);
+            return c;
+        }
     }
     
     private void reworkElements(Elements elements, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
+        int counter = 0;
         for (Element el : elements) {
-            if (el.childrenSize() > 0) {
+            if (null != el.children()) {
                 reworkElements(el.children(), cfdiv, layoutcontent);
             } else {
                 String outerhtml = el.outerHtml();
@@ -357,7 +362,11 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                     String attr = classname+":"+contentname+":"+attributname+":"+attributtype;
                     Attributes attributes = new Attributes();
                     attributes.put("cf_inplace",attr);
+                    
                     Element surrounddiv = new Element(Tag.valueOf("div"), "", attributes);
+                    surrounddiv.addClass("cf_inplace");
+                    counter++;
+                    surrounddiv.attr("id", "cf_id_" + cfdiv.getName()+"_"+counter);
                     
                     //System.out.println(surrounddiv.outerHtml());
                     el.wrap(surrounddiv.toString());
@@ -365,5 +374,38 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                 }
             }
         }
+    }
+
+    private String reworkContent(String html, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
+        Pattern pattern = Pattern.compile("\\$\\{sitecontent\\.#C:.+#\\..+\\}");
+        Matcher matcher = pattern.matcher(html);
+        boolean matchFound = matcher.find();
+        if (matchFound) {
+            String region = html.substring((matcher.start()+2), (matcher.end()-1));
+            String[] parts = region.split("\\.");
+            String classparts[] = parts[1].split(":");
+            String classname = classparts[1];
+            String attributname = parts[2];
+
+            CfClasscontent cfcontent = null;
+            for (String c : cfdiv.getContentArray()) {
+                List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
+                for (CfLayoutcontent lc : contentlist) {
+
+                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
+                        cfcontent = cfclasscontentService.findById(lc.getContentref().longValue());
+                    }
+                }
+            }
+            String contentname = "";
+            String attributtype = "";
+            if (null != cfcontent) {
+                contentname = cfcontent.getName();
+                attributtype = cfattributService.findByNameAndClassref(attributname, cfcontent.getClassref()).getAttributetypeString();
+            }
+            String attr = classname+":"+contentname+":"+attributname+":"+attributtype;
+            html = "<div id=\"cf_id_" + cfdiv.getName() + "\" class=\"cf_inplace\" cf_inplace=\"" + attr + "\">" + html + "</div>";
+        }
+        return html;
     }
 }

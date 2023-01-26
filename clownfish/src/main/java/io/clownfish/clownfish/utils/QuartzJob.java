@@ -166,6 +166,7 @@ public class QuartzJob implements Job {
                     freemarkerCfg.setTemplateLoader(freemarkerTemplateloader);
                     freemarkerCfg.setLocalizedLookup(false);
                     freemarkerCfg.setLocale(Locale.GERMANY);
+                    freemarkerCfg.setTagSyntax(freemarker.template.Configuration.AUTO_DETECT_TAG_SYNTAX);
 
                     fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
                     canExecute = true;

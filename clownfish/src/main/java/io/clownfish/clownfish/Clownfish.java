@@ -1024,6 +1024,7 @@ public class Clownfish {
                                 freemarkerCfg.setTemplateLoader(freemarkerTemplateloader);
                                 freemarkerCfg.setLocalizedLookup(false);
                                 freemarkerCfg.setLocale(Locale.GERMANY);
+                                freemarkerCfg.setTagSyntax(freemarker.template.Configuration.AUTO_DETECT_TAG_SYNTAX);
 
                                 fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
                                 isScripted = true;
@@ -1554,6 +1555,7 @@ public class Clownfish {
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line);
+                sb.append(System.lineSeparator());
             }
             cfResponse.setOutput(sb.toString());
             cfResponse.setErrorcode(0);
@@ -1627,6 +1629,7 @@ public class Clownfish {
                     freemarkerCfg.setTemplateLoader(freemarkerStringTemplateloader);
                     freemarkerCfg.setLocalizedLookup(false);
                     freemarkerCfg.setLocale(Locale.GERMANY);
+                    freemarkerCfg.setTagSyntax(freemarker.template.Configuration.AUTO_DETECT_TAG_SYNTAX);
                     
                     fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
                     
@@ -1927,8 +1930,11 @@ public class Clownfish {
             cflayout.getDivArray().put(div.attr("id"), cfdiv);
         }
         if (preview) {
+            doc.head().append("<script src=\"resources/js/axios.js\"></script>");
             doc.head().append("<link rel=\"stylesheet\" href=\"resources/css/cf_preview.css\">");
-            doc.head().append("<script async=\"\" defer=\"\" src=\"resources/js/cf_preview.js\"></script>");
+            doc.head().append("<link rel=\"stylesheet\" href=\"resources/css/preview_style.css\">");
+            doc.head().append("<script src=\"resources/js/cf_preview.js\"></script>");
+            doc.head().append("<script src=\"resources/js/preview_script.js\"></script>");
         }
         return doc.html();
     }
