@@ -138,4 +138,14 @@ public class CfAssetDAOImpl implements CfAssetDAO {
         return cfassetlist;
     }
 
+    @Override
+    public List<CfAsset> findByPublicuseAndScrapped(boolean publicuse, boolean scrapped) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findByPublicuseAndScrapped");
+        query.setParameter("publicuse", publicuse);
+        query.setParameter("scrapped", scrapped);
+        List<CfAsset> cfassetlist = query.getResultList();
+        return cfassetlist;
+    }
+
 }

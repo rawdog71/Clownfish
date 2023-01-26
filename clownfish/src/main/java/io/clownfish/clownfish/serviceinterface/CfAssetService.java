@@ -29,6 +29,7 @@ public interface CfAssetService {
     List<CfAsset> findByIndexed(boolean indexed);
     List<CfAsset> findByScrapped(boolean scrapped);
     List<CfAsset> findByPublicuse(boolean publicuse);
+    List<CfAsset> findByPublicuseAndScrapped(boolean publicuse, boolean scrapped);
     List<CfAsset> findByFilesize(long filesize);
     List<CfAsset> findByAvatars();
     CfAsset create(CfAsset entity);

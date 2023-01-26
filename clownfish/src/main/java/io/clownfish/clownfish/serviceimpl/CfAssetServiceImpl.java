@@ -91,4 +91,9 @@ public class CfAssetServiceImpl implements CfAssetService {
     public List<CfAsset> findByAvatars() {
         return this.cfassetDAO.findByAvatars();
     }
+
+    @Override
+    public List<CfAsset> findByPublicuseAndScrapped(boolean publicuse, boolean scrapped) {
+        return this.cfassetDAO.findByPublicuseAndScrapped(publicuse, scrapped);
+    }
 }
