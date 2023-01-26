@@ -70,6 +70,7 @@ public class RestAsset {
                     try {
                         CfAsset asset = cfassetService.findById(ikp.getId());
                         asset.setDescription(ikp.getDescription());
+                        // TODO: change asset name [asset.setName(ikp.getName());]
                         asset.setPublicuse(ikp.isPublicuse());
                         CfAsset newasset2 = cfassetService.edit(asset);
                         ikp.setReturncode("OK");

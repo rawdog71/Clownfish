@@ -28,6 +28,7 @@ public class RestAssetParameter {
     private @Getter @Setter String token;
     private @Getter @Setter long id;
     private @Getter @Setter String description;
+    // TODO: private @Getter @Setter String name;
     private @Getter @Setter boolean publicuse;
 
     public RestAssetParameter() {
