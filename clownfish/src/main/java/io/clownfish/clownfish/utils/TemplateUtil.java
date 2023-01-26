@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -178,7 +179,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     }
     
     public String replacePlaceholders(String content, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent, boolean preview) {
-        //content = surroundInplaceDivs(content, cfdiv, layoutcontent);
+        content = surroundInplaceDivs(content, cfdiv, layoutcontent);
         // replace Content
         for (String c : cfdiv.getContentArray()) {
             List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
@@ -317,9 +318,10 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     
     private String surroundInplaceDivs(String content, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
         Document doc = Jsoup.parseBodyFragment(content);
-        if (null != doc.body().children()) {
+        if (doc.body().children().size() > 0) {
             reworkElements(doc.body().children(), cfdiv, layoutcontent);
-            return doc.childNode(0).childNode(1).childNode(0).toString();
+            //return doc.childNode(0).childNode(1).childNode(0).toString();
+            return doc.body().html();
         } else {
             String c = reworkContent(doc.childNode(0).childNode(1).childNode(0).toString(), cfdiv, layoutcontent);
             return c;
@@ -329,15 +331,19 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     private void reworkElements(Elements elements, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
         int counter = 0;
         for (Element el : elements) {
-            if (null != el.children()) {
+            if (el.children().size() > 0) {
                 reworkElements(el.children(), cfdiv, layoutcontent);
             } else {
                 String outerhtml = el.outerHtml();
+                /*
                 Pattern pattern = Pattern.compile("\\$\\{sitecontent\\.#C:.+#\\..+\\}");
                 Matcher matcher = pattern.matcher(outerhtml);
                 boolean matchFound = matcher.find();
-                if (matchFound) {
-                    String region = outerhtml.substring((matcher.start()+2), (matcher.end()-1));
+                */
+                
+                Matcher m = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9]*:[0-9|*]*#\\.[a-zA-Z0-9]*\\}").matcher(outerhtml);
+                if (m.find()) {
+                    String region = outerhtml.substring((m.start()+2), (m.end()-1));
                     String[] parts = region.split("\\.");
                     String classparts[] = parts[1].split(":");
                     String classname = classparts[1];
