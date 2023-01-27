@@ -333,14 +333,14 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             } else {
                 if (0 != el.tagName().compareToIgnoreCase("script")) {
                     String outerhtml = el.outerHtml();
-                    Matcher matcher = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9]*:[0-9|*]*#\\.[a-zA-Z0-9]*\\}").matcher(outerhtml);
+                    Matcher matcher = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9]*:[0-9|*]*#\\.[a-zA-Z0-9_!]*\\}").matcher(outerhtml);
                     if (matcher.find()) {
                         String region = outerhtml.substring((matcher.start()+2), (matcher.end()-1));
                         String[] parts = region.split("\\.");
                         String classparts[] = parts[1].split(":");
                         String classname = classparts[1];
                         String index = classparts[2].replaceAll("#", "");
-                        String attributname = parts[2];
+                        String attributname = parts[2].replaceAll("!", "");
 
                         CfClasscontent cfcontent = null;
                         for (String c : cfdiv.getContentArray()) {
@@ -375,14 +375,14 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     }
 
     private String reworkContent(String html, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
-        Matcher matcher = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9]*:[0-9|*]*#\\.[a-zA-Z0-9]*\\}").matcher(html);
+        Matcher matcher = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9]*:[0-9|*]*#\\.[a-zA-Z0-9_!]*\\}").matcher(html);
         if (matcher.find()) {
             String region = html.substring((matcher.start()+2), (matcher.end()-1));
             String[] parts = region.split("\\.");
             String classparts[] = parts[1].split(":");
             String classname = classparts[1];
             String index = classparts[2].replaceAll("#", "");
-            String attributname = parts[2];
+            String attributname = parts[2].replaceAll("!", "");
 
             CfClasscontent cfcontent = null;
             for (String c : cfdiv.getContentArray()) {
