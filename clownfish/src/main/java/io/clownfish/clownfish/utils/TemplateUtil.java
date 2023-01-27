@@ -333,7 +333,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             } else {
                 if (0 != el.tagName().compareToIgnoreCase("script")) {
                     String outerhtml = el.outerHtml();
-                    Matcher matcher = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9]*:[0-9|*]*#\\.[a-zA-Z0-9_!]*\\}").matcher(outerhtml);
+                    Matcher matcher = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9_]*:[0-9|*]*#\\.[a-zA-Z0-9_!]*\\}").matcher(outerhtml);
                     if (matcher.find()) {
                         String region = outerhtml.substring((matcher.start()+2), (matcher.end()-1));
                         String[] parts = region.split("\\.");
@@ -375,7 +375,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     }
 
     private String reworkContent(String html, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
-        Matcher matcher = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9]*:[0-9|*]*#\\.[a-zA-Z0-9_!]*\\}").matcher(html);
+        Matcher matcher = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9_]*:[0-9|*]*#\\.[a-zA-Z0-9_!]*\\}").matcher(html);
         if (matcher.find()) {
             String region = html.substring((matcher.start()+2), (matcher.end()-1));
             String[] parts = region.split("\\.");
