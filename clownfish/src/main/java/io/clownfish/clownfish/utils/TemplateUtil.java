@@ -34,7 +34,6 @@ import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
-import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
@@ -42,7 +41,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -82,7 +80,6 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfAssetlistService cfassetlistService;
-    @Autowired transient CfLayoutcontentService cflayoutcontentService;
     
     private @Getter @Setter long currentVersion;
     private @Getter @Setter String templateContent = "";
@@ -151,7 +148,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             String templatename = content.substring((matcher.start()+3), (matcher.end()-3));
             String lastmatch = content.substring(matcher.start(), matcher.end());
             try {
-                // Hole das Template über den Namen
+                // fetch template by name
                 CfTemplate cftemplate = cftemplateService.findByName(templatename);
                 if (DEVELOPMENT == modus) {
                     content = content.replace(lastmatch, cftemplate.getContent());
@@ -179,6 +176,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     }
     
     public String replacePlaceholders(String content, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent, boolean preview) {
+        // prepare site for inplace edit
         content = surroundInplaceDivs(content, cfdiv, layoutcontent);
         // replace Content
         for (String c : cfdiv.getContentArray()) {
@@ -318,9 +316,8 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     
     private String surroundInplaceDivs(String content, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
         Document doc = Jsoup.parseBodyFragment(content);
-        if (doc.body().children().size() > 0) {
+        if (!doc.body().children().isEmpty()) {
             reworkElements(doc.body().children(), cfdiv, layoutcontent);
-            //return doc.childNode(0).childNode(1).childNode(0).toString();
             return doc.body().html();
         } else {
             String c = reworkContent(doc.childNode(0).childNode(1).childNode(0).toString(), cfdiv, layoutcontent);
@@ -331,71 +328,70 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     private void reworkElements(Elements elements, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
         int counter = 0;
         for (Element el : elements) {
-            if (el.children().size() > 0) {
+            if (!el.children().isEmpty()) {
                 reworkElements(el.children(), cfdiv, layoutcontent);
             } else {
-                String outerhtml = el.outerHtml();
-                Matcher m = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9]*:[0-9|*]*#\\.[a-zA-Z0-9]*\\}").matcher(outerhtml);
-                if (m.find()) {
-                    String region = outerhtml.substring((m.start()+2), (m.end()-1));
-                    String[] parts = region.split("\\.");
-                    String classparts[] = parts[1].split(":");
-                    String classname = classparts[1];
-                    String index = classparts[2].replaceAll("#", "");
-                    String attributname = parts[2];
-                    
-                    CfClasscontent cfcontent = null;
-                    for (String c : cfdiv.getContentArray()) {
-                        if (0 == c.compareToIgnoreCase(classname+":"+index)) {
-                            List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
-                            for (CfLayoutcontent lc : contentlist) {
-                                if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0) && (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(index))) {
-                                    cfcontent = cfclasscontentService.findById(lc.getContentref().longValue());
+                if (0 != el.tagName().compareToIgnoreCase("script")) {
+                    String outerhtml = el.outerHtml();
+                    Matcher matcher = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9]*:[0-9|*]*#\\.[a-zA-Z0-9]*\\}").matcher(outerhtml);
+                    if (matcher.find()) {
+                        String region = outerhtml.substring((matcher.start()+2), (matcher.end()-1));
+                        String[] parts = region.split("\\.");
+                        String classparts[] = parts[1].split(":");
+                        String classname = classparts[1];
+                        String index = classparts[2].replaceAll("#", "");
+                        String attributname = parts[2];
+
+                        CfClasscontent cfcontent = null;
+                        for (String c : cfdiv.getContentArray()) {
+                            if (0 == c.compareToIgnoreCase(classname+":"+index)) {
+                                List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
+                                for (CfLayoutcontent lc : contentlist) {
+                                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0) && (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(index))) {
+                                        cfcontent = cfclasscontentService.findById(lc.getContentref().longValue());
+                                    }
                                 }
                             }
                         }
+                        String contentname = "";
+                        String attributtype = "";
+                        if (null != cfcontent) {
+                            contentname = cfcontent.getName();
+                            attributtype = cfattributService.findByNameAndClassref(attributname, cfcontent.getClassref()).getAttributetypeString();
+                        }
+                        String attr = classname+":"+contentname+":"+attributname+":"+attributtype;
+                        Attributes attributes = new Attributes();
+                        attributes.put("cf_inplace",attr);
+
+                        Element surrounddiv = new Element(Tag.valueOf("div"), "", attributes);
+                        surrounddiv.addClass("cf_inplace");
+                        counter++;
+                        surrounddiv.attr("id", "cf_id_" + cfdiv.getName()+"_"+counter);
+                        el.wrap(surrounddiv.toString());
                     }
-                    String contentname = "";
-                    String attributtype = "";
-                    if (null != cfcontent) {
-                        contentname = cfcontent.getName();
-                        attributtype = cfattributService.findByNameAndClassref(attributname, cfcontent.getClassref()).getAttributetypeString();
-                    }
-                    String attr = classname+":"+contentname+":"+attributname+":"+attributtype;
-                    Attributes attributes = new Attributes();
-                    attributes.put("cf_inplace",attr);
-                    
-                    Element surrounddiv = new Element(Tag.valueOf("div"), "", attributes);
-                    surrounddiv.addClass("cf_inplace");
-                    counter++;
-                    surrounddiv.attr("id", "cf_id_" + cfdiv.getName()+"_"+counter);
-                    
-                    //System.out.println(surrounddiv.outerHtml());
-                    el.wrap(surrounddiv.toString());
-                    //System.out.println(el.parent().toString());
                 }
             }
         }
     }
 
     private String reworkContent(String html, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent) {
-        Pattern pattern = Pattern.compile("\\$\\{sitecontent\\.#C:.+#\\..+\\}");
-        Matcher matcher = pattern.matcher(html);
-        boolean matchFound = matcher.find();
-        if (matchFound) {
+        Matcher matcher = Pattern.compile("\\$\\{sitecontent\\.#C:[a-zA-Z0-9]*:[0-9|*]*#\\.[a-zA-Z0-9]*\\}").matcher(html);
+        if (matcher.find()) {
             String region = html.substring((matcher.start()+2), (matcher.end()-1));
             String[] parts = region.split("\\.");
             String classparts[] = parts[1].split(":");
             String classname = classparts[1];
+            String index = classparts[2].replaceAll("#", "");
             String attributname = parts[2];
 
             CfClasscontent cfcontent = null;
             for (String c : cfdiv.getContentArray()) {
-                List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
-                for (CfLayoutcontent lc : contentlist) {
-
-                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0)) {
-                        cfcontent = cfclasscontentService.findById(lc.getContentref().longValue());
+                if (0 == c.compareToIgnoreCase(classname+":"+index)) {
+                    List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
+                    for (CfLayoutcontent lc : contentlist) {
+                        if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0) && (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(index))) {
+                            cfcontent = cfclasscontentService.findById(lc.getContentref().longValue());
+                        }
                     }
                 }
             }
