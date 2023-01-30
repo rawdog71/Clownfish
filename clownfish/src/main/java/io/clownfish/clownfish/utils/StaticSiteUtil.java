@@ -228,7 +228,11 @@ public class StaticSiteUtil {
                     url = "url(\"" + url + "\"),";
                 }
             }
-            output += colon_split[0] + ": " + url.substring(0, url.length()-1) +"; ";
+            if (!url.isBlank()) {
+                output += colon_split[0] + ": " + url.substring(0, url.length()-1) +"; ";
+            } else {
+                output += colon_split[0] + ": " + colon_split[1] +"; ";
+            }
         }
         if (!output.isBlank()) {
             return output;
