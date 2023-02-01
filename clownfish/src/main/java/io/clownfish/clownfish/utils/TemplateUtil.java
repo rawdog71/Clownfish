@@ -339,15 +339,14 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                         String[] parts = region.split("\\.");
                         String classparts[] = parts[1].split(":");
                         String classname = classparts[1];
-                        String index = classparts[2].replaceAll("#", "");
                         String attributname = parts[2].replaceAll("!", "");
 
                         CfClasscontent cfcontent = null;
                         for (String c : cfdiv.getContentArray()) {
-                            if (0 == c.compareToIgnoreCase(classname+":"+index)) {
+                            if (0 == c.compareToIgnoreCase(classname+":"+c.split(":")[1])) {
                                 List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
                                 for (CfLayoutcontent lc : contentlist) {
-                                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0) && (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(index))) {
+                                    if ((null != lc.getContentref()) && (lc.getContentref().longValue() > 0) && (lc.getCfLayoutcontentPK().getLfdnr() == Integer.parseInt(c.split(":")[1]))) {
                                         cfcontent = cfclasscontentService.findById(lc.getContentref().longValue());
                                     }
                                 }
