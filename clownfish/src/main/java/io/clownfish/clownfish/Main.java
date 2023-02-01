@@ -91,6 +91,8 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     int serverPortHttp;
     @Value("${webdav.use:0}")
     int webdavuse;
+    @Value("${cachetime:2}")
+    int cachetime;
     
     @Autowired
     AutowireCapableBeanFactory beanFactory;
@@ -172,13 +174,13 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // Register resource handler for CSS and JS
         registry.addResourceHandler("resources/**").addResourceLocations("/WEB-INF/resources/")
-            .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+            .setCacheControl(CacheControl.maxAge(cachetime, TimeUnit.HOURS).cachePublic())
             .resourceChain(true)
             .addResolver(new PathResourceResolver());
 
         // Register resource handler for images
         registry.addResourceHandler("images/**").addResourceLocations("/WEB-INF/images/")
-            .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+            .setCacheControl(CacheControl.maxAge(cachetime, TimeUnit.HOURS).cachePublic())
             .resourceChain(true)
             .addResolver(new PathResourceResolver());
         
@@ -186,7 +188,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
         if (!propertyUtil.getPropertyValue("folder_cache").isBlank()) {
             // Register resource handler for cached_images
             registry.addResourceHandler("cache/**").addResourceLocations("file:///" + propertyUtil.getPropertyValue("folder_cache")+"/")
-                .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+                .setCacheControl(CacheControl.maxAge(cachetime, TimeUnit.HOURS).cachePublic())
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver());
         } else {
@@ -198,7 +200,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             propertyUtil = new PropertyUtil(propertylist);
             // Register resource handler for js files
             registry.addResourceHandler("js/**").addResourceLocations("file:///" + propertyUtil.getPropertyValue("folder_js")+"/")
-                .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+                .setCacheControl(CacheControl.maxAge(cachetime, TimeUnit.HOURS).cachePublic())
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver());
         } else {
@@ -210,7 +212,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             propertyUtil = new PropertyUtil(propertylist);
             // Register resource handler for css files
             registry.addResourceHandler("css/**").addResourceLocations("file:///" + propertyUtil.getPropertyValue("folder_css")+"/")
-                .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+                .setCacheControl(CacheControl.maxAge(cachetime, TimeUnit.HOURS).cachePublic())
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver());
         } else {
@@ -222,7 +224,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             propertyUtil = new PropertyUtil(propertylist);
             // Register resource handler for font files
             registry.addResourceHandler("fonts/**").addResourceLocations("file:///" + propertyUtil.getPropertyValue("folder_fonts")+"/")
-                .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic())
+                .setCacheControl(CacheControl.maxAge(cachetime, TimeUnit.HOURS).cachePublic())
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver());
         } else {
