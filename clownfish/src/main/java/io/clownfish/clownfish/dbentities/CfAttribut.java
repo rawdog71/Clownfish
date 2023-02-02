@@ -79,7 +79,16 @@ public class CfAttribut implements Serializable {
     private CfClass relationref;
     @Column(name = "relationtype")
     private int relationtype;
-    
+    @Column(name = "min_val")
+    private long min_val;
+    @Column(name = "max_val")
+    private long max_val;
+    @Column(name = "default_val")
+    private String default_val;
+    @Column(name = "mandatory")
+    private Boolean mandatory;
+    @Column(name = "description")
+    private String description;
 
     public CfAttribut() {
     }
@@ -184,6 +193,46 @@ public class CfAttribut implements Serializable {
         } else {
             return "";
         }
+    }
+
+    public long getMin_val() {
+        return min_val;
+    }
+
+    public void setMin_val(long min_val) {
+        this.min_val = min_val;
+    }
+
+    public long getMax_val() {
+        return max_val;
+    }
+
+    public void setMax_val(long max_val) {
+        this.max_val = max_val;
+    }
+
+    public String getDefault_val() {
+        return default_val;
+    }
+
+    public void setDefault_val(String default_val) {
+        this.default_val = default_val;
+    }
+
+    public Boolean getMandatory() {
+        return mandatory;
+    }
+
+    public void setMandatory(Boolean mandatory) {
+        this.mandatory = mandatory;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

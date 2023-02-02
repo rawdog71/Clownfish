@@ -63,7 +63,6 @@ public class ClassList implements Serializable {
     @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfClasscontentService cfclascontentService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
-    @Autowired transient CfTemplateService cftemplateService;
     @Autowired DataList datalist;
     @Autowired ContentList contentlist;
     @Autowired ClassUtil classutil;
@@ -82,6 +81,11 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean identity;
     private @Getter @Setter boolean autoinc;
     private @Getter @Setter boolean isindex;
+    private @Getter @Setter String defaultval;
+    private @Getter @Setter long minval;
+    private @Getter @Setter long maxval;
+    private @Getter @Setter boolean mandatory;
+    private @Getter @Setter String description;
     private @Getter @Setter List<CfClass> classListeRef;
     private @Getter @Setter CfClass selectedClassRef = null;
     private @Getter @Setter int selectedRelType = -1;
@@ -89,7 +93,6 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean newButtonDisabled;
     private @Getter @Setter boolean newAttributButtonDisabled;
     private @Getter @Setter boolean renderClass;
-    @Autowired HibernateUtil hibernateUtil;
     private @Getter @Setter int javaLanguage = 0;
     
     @Autowired transient private @Getter @Setter AttributList attributlist;
@@ -147,6 +150,11 @@ public class ClassList implements Serializable {
         identity = selectedAttribut.getIdentity();
         autoinc = selectedAttribut.getAutoincrementor();
         isindex = selectedAttribut.getIsindex();
+        defaultval = selectedAttribut.getDefault_val();
+        minval = selectedAttribut.getMin_val();
+        maxval = selectedAttribut.getMax_val();
+        mandatory = selectedAttribut.getMandatory();
+        description = selectedAttribut.getDescription();
         newAttributButtonDisabled = true;
     }
     
@@ -226,6 +234,11 @@ public class ClassList implements Serializable {
             newattribut.setAttributetype(selectedAttributeType);
             newattribut.setRelationref(selectedClassRef);
             newattribut.setRelationtype(selectedRelType);
+            newattribut.setDefault_val(defaultval);
+            newattribut.setMin_val(minval);
+            newattribut.setMax_val(maxval);
+            newattribut.setMandatory(mandatory);
+            newattribut.setDescription(description);
             
             cfattributService.create(newattribut);
             selectedAttributList = attributlist.init(selectedClass);
@@ -262,6 +275,11 @@ public class ClassList implements Serializable {
                 selectedAttribut.setRelationref(null);
                 selectedAttribut.setRelationtype(0);
             }
+            selectedAttribut.setDefault_val(defaultval);
+            selectedAttribut.setMin_val(minval);
+            selectedAttribut.setMax_val(maxval);
+            selectedAttribut.setMandatory(mandatory);
+            selectedAttribut.setDescription(description);
             cfattributService.edit(selectedAttribut);
             //HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
             
