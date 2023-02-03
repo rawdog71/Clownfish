@@ -16,8 +16,6 @@
 package io.clownfish.clownfish.beans;
 
 import io.clownfish.clownfish.dbentities.*;
-import io.clownfish.clownfish.lucene.ContentIndexer;
-import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.*;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
@@ -54,15 +52,11 @@ public class ScrapyardList implements Serializable {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired CfAssetlistcontentService cfassetlistcontentService;
-    @Autowired transient CfAttributService cfattributService;
-    @Autowired transient CfListService cflistService;
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired transient CfSitecontentService cfsitecontentService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired CfAssetKeywordService cfassetkeywordService;
     @Autowired CfKeywordService cfkeywordService;
-    @Autowired IndexService indexService;
-    @Autowired ContentIndexer contentIndexer;
     @Autowired HibernateUtil hibernateUtil;
     @Autowired private ContentUtil contentUtil;
     

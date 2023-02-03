@@ -136,7 +136,7 @@ public class ReefBean implements Serializable {
         inputStream = event.getFile().getInputStream();
         StringBuilder json = new StringBuilder();
         try (Reader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
-            int c = 0;
+            int c;
             while ((c = reader.read()) != -1) {
                 json.append((char) c);
             }

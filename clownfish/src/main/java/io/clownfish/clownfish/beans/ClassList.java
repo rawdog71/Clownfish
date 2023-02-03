@@ -27,7 +27,6 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
-import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.Serializable;

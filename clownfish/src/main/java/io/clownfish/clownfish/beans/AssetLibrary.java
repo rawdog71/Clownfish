@@ -128,7 +128,6 @@ public class AssetLibrary {
     public void onChangeContent(AjaxBehaviorEvent event) {
         // Delete listcontent first
         List<CfAssetlistcontent> assetList = cfassetlistcontentService.findByAssetlistref(selectedAssetlist.getId());
-        //List<CfAasset> assetList = cfassetlistService.findById(selectedAassetlist.getId());
         for (CfAssetlistcontent content : assetList) {
             cfassetlistcontentService.delete(content);
         }

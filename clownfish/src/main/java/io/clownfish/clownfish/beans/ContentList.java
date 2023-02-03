@@ -105,7 +105,6 @@ public class ContentList implements Serializable {
     @Autowired transient CfSitecontentService cfsitecontentService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired CfKeywordService cfkeywordService;
-    @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired FolderUtil folderUtil;
     @Autowired HibernateUtil hibernateUtil;
@@ -114,8 +113,6 @@ public class ContentList implements Serializable {
     @Autowired ClassUtil classutil;
     @Autowired private PropertyUtil propertyUtil;
     @Autowired private ContentUtil contentUtil;
-    
-    @Autowired private HazelcastCacheManager cacheManager;
     
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter CfClasscontent selectedContent = null;

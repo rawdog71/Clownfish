@@ -19,7 +19,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import de.destrukt.sapconnection.SAPConnection;
-import freemarker.cache.StringTemplateLoader;
 import freemarker.template.MalformedTemplateNameException;
 import io.clownfish.clownfish.beans.*;
 import io.clownfish.clownfish.compiler.CfClassCompiler;
@@ -119,24 +118,18 @@ public class Clownfish {
     @Autowired CfSitecontentService cfsitecontentService;
     @Autowired CfListcontentService cflistcontentService;
     @Autowired CfListService cflistService;
-    @Autowired CfSitelistService cfsitelistService;
     @Autowired @Getter @Setter CfAssetService cfassetService;
     @Autowired @Getter @Setter CfAttributcontentService cfattributcontentService;
     @Autowired CfSitedatasourceService cfsitedatasourceService;
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfTemplateversionService cftemplateversionService;
     @Autowired CfStylesheetService cfstylesheetService;
-    @Autowired CfStylesheetversionService cfstylesheetversionService;
     @Autowired CfJavascriptService cfjavascriptService;
-    @Autowired CfJavascriptversionService cfjavascriptversionService;
     @Autowired CfJavaService cfjavaService;
-    @Autowired CfJavaversionService cfjavaversionService;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired CfLayoutcontentService cflayoutcontentService;
     @Autowired TemplateUtil templateUtil;
     @Autowired PropertyList propertylist;
-    @Autowired AttributContentList attributContentList;
-    @Autowired AssetList assetList;
     @Autowired QuartzList quartzlist;
     @Autowired CfTemplateLoaderImpl freemarkerTemplateloader;
     @Autowired CfStringTemplateLoaderImpl freemarkerStringTemplateloader;
@@ -147,7 +140,6 @@ public class Clownfish {
     @Autowired CfClassService cfclassService;
     @Autowired CfAttributService cfattributService;
     @Autowired CfClasscontentService cfclasscontentService;
-    @Autowired CfSearchhistoryService cfsearchhistoryService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired CfKeywordService cfkeywordService;
     @Autowired CfAssetlistService cfassetlistService;
@@ -606,7 +598,7 @@ public class Clownfish {
                 }
                 
                 if (!cfsite.isSearchresult()) {
-                    String path = "";
+                    String path;
                     if (alias) {
                         path = name;
                     } else {
@@ -748,7 +740,6 @@ public class Clownfish {
      * 
      * @param name
      * @param request
-     * @param file
      * @param response
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException
      */
@@ -907,7 +898,7 @@ public class Clownfish {
             sitecontentmap.clear();
         }
         try {
-            List<CfSitedatasource> sitedatasourcelist = null;
+            List<CfSitedatasource> sitedatasourcelist;
             // Freemarker Template
             freemarker.template.Template fmTemplate = null;
             Map fmRoot = null;
@@ -1564,7 +1555,7 @@ public class Clownfish {
         } catch (IOException ex) {
             CfSite cfsite = cfsiteService.findByName(sitename);
             String aliasname = cfsite.getAliaspath();
-            Future<ClownfishResponse> cfStaticResponse = null;
+            Future<ClownfishResponse> cfStaticResponse;
             try {
                 cfStaticResponse = makeResponse(sitename, null, null, true);
                 StaticSiteUtil.generateStaticSite(sitename, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
@@ -1894,7 +1885,7 @@ public class Clownfish {
             if (!template.isEmpty()) {
                 CfTemplate cfdivtemplate = cftemplateService.findByName(template);
                 List<CfLayoutcontent> layoutcontent = cflayoutcontentService.findBySiterefAndTemplateref(cfsite.getId(), cfdivtemplate.getId());
-                long currentTemplateVersion = 0;
+                long currentTemplateVersion;
                 try {
                     currentTemplateVersion = cftemplateversionService.findMaxVersion((cfdivtemplate).getId());
                 } catch (NullPointerException ex) {

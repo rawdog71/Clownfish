@@ -47,7 +47,6 @@ import org.springframework.stereotype.Component;
 @Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class WebserviceAuthList implements Serializable {
-    @Autowired CfUserService cfuserService;
     @Autowired CfWebserviceauthService cfwebserviceauthService;
     @Autowired CfWebserviceService cfwebserviceService;
     
