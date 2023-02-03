@@ -45,6 +45,7 @@ import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
 import io.clownfish.clownfish.utils.ClassUtil;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.EncryptUtil;
@@ -104,7 +105,6 @@ public class ContentList implements Serializable {
     @Autowired transient CfSitecontentService cfsitecontentService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired CfKeywordService cfkeywordService;
-    @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired FolderUtil folderUtil;
     @Autowired HibernateUtil hibernateUtil;
@@ -113,8 +113,6 @@ public class ContentList implements Serializable {
     @Autowired ClassUtil classutil;
     @Autowired private PropertyUtil propertyUtil;
     @Autowired private ContentUtil contentUtil;
-    
-    @Autowired private HazelcastCacheManager cacheManager;
     
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter CfClasscontent selectedContent = null;
@@ -183,6 +181,48 @@ public class ContentList implements Serializable {
             }
         } else {
             return false;
+        }
+    }
+    
+    public boolean isRequired(CfAttributcontent attribut) {
+        if (selectedAttribut != null) {
+            return selectedAttribut.getAttributref().getMandatory();
+        } else {
+            return false;
+        }
+    }
+    
+    public long getMaxlength(CfAttributcontent attribut) {
+        if (selectedAttribut != null) {
+            if (selectedAttribut.getAttributref().getMax_val()>0) {
+                return selectedAttribut.getAttributref().getMax_val();
+            } else {
+                switch (selectedAttribut.getAttributref().getAttributetype().getName()) {
+                    case "string":
+                    case "hashstring":
+                        return 255;
+                    case "text":
+                    case "htmltext":
+                    case "markdown":
+                        return Long.MAX_VALUE;
+                    default:
+                        return 255;
+                }
+            }
+        } else {
+            return 0;
+        }
+    }
+    
+    public long getMinlength(CfAttributcontent attribut) {
+        if (selectedAttribut != null) {
+            if (selectedAttribut.getAttributref().getMin_val()>0) {
+                return selectedAttribut.getAttributref().getMin_val();
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
         }
     }
     
@@ -373,6 +413,28 @@ public class ContentList implements Serializable {
                     CfAttributcontent newcontent = new CfAttributcontent();
                     newcontent.setAttributref(attribut);
                     newcontent.setClasscontentref(newclasscontent);
+                    if ((null != attribut.getDefault_val()) && (!attribut.getDefault_val().isEmpty())) {
+                        switch (attribut.getAttributetype().getName()) {
+                            case "boolean":
+                                newcontent.setContentBoolean(ClownfishUtil.getBoolean(attribut.getDefault_val(), false));
+                                break;
+                            case "string":
+                                newcontent.setContentString(attribut.getDefault_val());
+                                break;
+                            case "integer":
+                                newcontent.setContentInteger(BigInteger.valueOf(Long.parseLong(attribut.getDefault_val())));
+                                break;
+                            case "real":
+                                newcontent.setContentReal(Double.parseDouble(attribut.getDefault_val()));
+                                break;
+                            case "text":
+                            case "htmltext":
+                            case "markdown":
+                                newcontent.setContentText(attribut.getDefault_val());
+                                break;
+                        }
+                        
+                    }
                     cfattributcontentService.create(newcontent);
                 }
             });

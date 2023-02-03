@@ -68,7 +68,6 @@ import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
-import io.clownfish.clownfish.serviceinterface.CfPropertyService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
@@ -242,7 +241,6 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfKeywordlistService cfkeywordlistService;
     @Autowired CfLayoutcontentService cflayoutcontentService;
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
-    @Autowired transient CfPropertyService cfpropertyService;
     @Autowired transient PropertyList propertylist;
     @Autowired private @Getter @Setter TemplateList templatelist;
     @Autowired private @Getter @Setter StylesheetList stylesheetlist;
@@ -1088,7 +1086,7 @@ public class SiteTreeBean implements Serializable {
             showAssetLibrary = false;
             showKeywordLibrary = false;
             String[] assetinfos = selected_asset.split(":");
-            String name = assetinfos[0];
+            //String name = assetinfos[0];
             int lfdnr = Integer.parseInt(assetinfos[1]);
             List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiterefAndTemplaterefAndContenttype(selectedSite.getId(), selectedDivTemplate.getId(), "A");
             long assetref = 0;
@@ -1147,7 +1145,7 @@ public class SiteTreeBean implements Serializable {
             showAssetLibrary = true;
             showKeywordLibrary = false;
             String[] assetlibraryinfos = selected_assetlist.split(":");
-            String assetlist = assetlibraryinfos[0];
+            //String assetlist = assetlibraryinfos[0];
             int lfdnr = Integer.parseInt(assetlibraryinfos[1]);
             List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiterefAndTemplaterefAndContenttype(selectedSite.getId(), selectedDivTemplate.getId(), "AL");
             long listref = 0;
@@ -1174,10 +1172,10 @@ public class SiteTreeBean implements Serializable {
      * @param event
      */
     public void onSelectLayoutAssetlibrary(SelectEvent event) {
-        CfAssetlist selected_assetlist = (CfAssetlist) event.getObject();
+        CfAssetlist lassetlist = (CfAssetlist) event.getObject();
         
         previewAssetlistOutput.clear();
-        for (CfAssetlistcontent assetlistcontent : cfassetlistcontentService.findByAssetlistref(selected_assetlist.getId())) {
+        for (CfAssetlistcontent assetlistcontent : cfassetlistcontentService.findByAssetlistref(lassetlist.getId())) {
             previewAssetlistOutput.add(cfassetService.findById(assetlistcontent.getCfAssetlistcontentPK().getAssetref()));
         }
     }
@@ -1208,7 +1206,7 @@ public class SiteTreeBean implements Serializable {
             showAssetLibrary = false;
             showKeywordLibrary = true;
             String[] keywordlibraryinfos = selected_keywordlist.split(":");
-            String keywordlist = keywordlibraryinfos[0];
+            //String keywordlist = keywordlibraryinfos[0];
             int lfdnr = Integer.parseInt(keywordlibraryinfos[1]);
             List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiterefAndTemplaterefAndContenttype(selectedSite.getId(), selectedDivTemplate.getId(), "KL");
             long listref = 0;
@@ -1252,10 +1250,10 @@ public class SiteTreeBean implements Serializable {
      * @param event
      */
     public void onSelectLayoutKeywordlibrary(SelectEvent event) {
-        CfKeywordlist selected_keywordlist = (CfKeywordlist) event.getObject();
+        CfKeywordlist lkeywordlist = (CfKeywordlist) event.getObject();
         
         previewKeywordlistOutput.clear();
-        for (CfKeywordlistcontent keywordlistcontent : cfkeywordlistcontentService.findByKeywordlistref(selected_keywordlist.getId())) {
+        for (CfKeywordlistcontent keywordlistcontent : cfkeywordlistcontentService.findByKeywordlistref(lkeywordlist.getId())) {
             previewKeywordlistOutput.add(cfkeywordService.findById(keywordlistcontent.getCfKeywordlistcontentPK().getKeywordref()));
         }
     }
