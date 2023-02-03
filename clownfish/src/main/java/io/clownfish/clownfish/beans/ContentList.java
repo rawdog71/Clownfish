@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.beans;
 
-import com.hazelcast.spring.cache.HazelcastCacheManager;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttribut;
@@ -30,7 +29,6 @@ import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.lucene.ContentIndexer;
-import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
@@ -255,6 +253,8 @@ public class ContentList implements Serializable {
     
     public void onSelect(SelectEvent event) {
         selectedContent = (CfClasscontent) event.getObject();
+        selectContent(selectedContent);
+        /*
         attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
        
         contentName = selectedContent.getName();
@@ -291,6 +291,7 @@ public class ContentList implements Serializable {
         } catch (Exception ex) {
             contentpreview = "";
         }
+        */
     }
     
     public void onSelectAttribut(SelectEvent event) {
@@ -915,5 +916,49 @@ public class ContentList implements Serializable {
             }
         } while (!found);
         return name+"("+i+")";
+    }
+    
+    public void selectDivContent(String contentname) {
+        selectContent(cfclasscontentService.findByName(contentname));
+    }
+    
+    public void selectContent(CfClasscontent content) {
+        selectedContent = content;
+        attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
+       
+        contentName = selectedContent.getName();
+        selectedClass = selectedContent.getClassref();
+        newContentButtonDisabled = true;
+        
+        keywords.getTarget().clear();
+        keywords.getSource().clear();
+        keywords.setSource(cfkeywordService.findAll());
+        contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(selectedContent.getId());
+        for (CfClasscontentkeyword contentkeyword : contentkeywordlist) {
+            CfKeyword kw = cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref());
+            keywords.getTarget().add(kw);
+            keywords.getSource().remove(kw);
+        }
+        
+        versionlist = cfcontentversionService.findByContentref(selectedContent.getId());
+        difference = contentUtility.hasDifference(selectedContent);
+        BigInteger co = selectedContent.getCheckedoutby();
+        CheckoutUtil checkoutUtil = new CheckoutUtil();
+        checkoutUtil.getCheckoutAccess(co, loginbean);
+        checkedout = checkoutUtil.isCheckedout();
+        access = checkoutUtil.isAccess();
+        contentversionMin = 1;
+        contentversionMax = versionlist.size();
+        selectedcontentversion = contentversionMax;
+        
+        try {
+            String output = selectedContent.getClassref().getTemplateref().getContent();
+            for (CfAttributcontent attributcontent : attributcontentlist) {
+                output = output.replaceAll("#" + attributcontent.getAttributref().getName() + "#", contentUtil.toString(attributcontent));
+            }
+            contentpreview = output;
+        } catch (Exception ex) {
+            contentpreview = "";
+        }
     }
 }

@@ -242,6 +242,8 @@ public class SiteTreeBean implements Serializable {
     @Autowired CfLayoutcontentService cflayoutcontentService;
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
     @Autowired transient PropertyList propertylist;
+    @Autowired private @Getter @Setter ContentList divcontentlist;
+    @Autowired private @Getter @Setter DataList divdatalist;
     @Autowired private @Getter @Setter TemplateList templatelist;
     @Autowired private @Getter @Setter StylesheetList stylesheetlist;
     @Autowired private @Getter @Setter JavascriptList javascriptlist;
@@ -745,6 +747,18 @@ public class SiteTreeBean implements Serializable {
             
             FacesMessage message = new FacesMessage("Changed " + selectedSite.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public void onChangeContent() {
+        if (null != selectedClasscontentlist) {
+            
+        }
+    }
+    
+    public void onChangeDatalist() {
+        if (null != selectedClasscontentlist) {
+            
         }
     }
     

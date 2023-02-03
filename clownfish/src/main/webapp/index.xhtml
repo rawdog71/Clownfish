@@ -453,6 +453,12 @@
                                                 <h:outputText value="#{classcontent.name}" />
                                             </p:column>
                                             <p:column width="25px">
+                                                <p:commandButton id="showcontenttemplate" icon="pi pi-pencil" styleClass="rounded-button ui-button-flat ui-button-plain" action="#{sitetree.divcontentlist.selectDivContent(classcontent.name)}" update=":form:msgs :form:tabview :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:contentbtnpanel :form:tabview:contentkeywordpicklist :form:tabview:contentpreview" rendered="#{loginBean.login and loginBean.hasRights(2)}">
+                                                    <f:actionListener binding="#{sitetree.setTab(6)}" />
+                                                    <p:ajax listener="#{sitetree.onChangeContent()}" />
+                                                </p:commandButton>
+                                            </p:column>
+                                            <p:column width="25px">
                                                 <p:commandButton icon="pi pi-save" styleClass="rounded-button ui-button-flat ui-button-plain" actionListener="#{sitetree.onSaveLayoutContent(classcontent)}" update=":form:tabview:layoutcontentedit :form:tabview:preview" />
                                             </p:column>
                                         </p:dataTable>
@@ -465,6 +471,12 @@
                                             <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutDatalist}" oncomplete="PF('datalistpreviewDlg').show()" update=":form:datalistpreviewDlg" />
                                             <p:column headerText="Datalist" filterBy="#{datalist.name}" filterMatchMode="contains">
                                                 <h:outputText value="#{datalist.name}" />
+                                            </p:column>
+                                            <p:column width="25px">
+                                                <p:commandButton id="showdatalisttemplate" icon="pi pi-pencil" styleClass="rounded-button ui-button-flat ui-button-plain" action="#{sitetree.divdatalist.selectDivDatalist(datalist.name)}" update=":form:msgs :form:tabview :form:tabview:datacontentname :form:tabview:datacontentclass :form:tabview:newcontentlist :form:tabview:datacontentlistbox" rendered="#{loginBean.login and loginBean.hasRights(2)}">
+                                                    <f:actionListener binding="#{sitetree.setTab(7)}" />
+                                                    <p:ajax listener="#{sitetree.onChangeDatalist()}" />
+                                                </p:commandButton>
                                             </p:column>
                                             <p:column width="25px">
                                                 <p:commandButton icon="pi pi-save" styleClass="rounded-button ui-button-flat ui-button-plain" actionListener="#{sitetree.onSaveLayoutDatalist(datalist)}" update=":form:tabview:layoutcontentedit :form:tabview:preview" />
