@@ -59,9 +59,11 @@ public class RestDatalist {
                 String apikey = idp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     if ((null == idp.getClassname()) || (idp.getClassname().isBlank())) {
+                        // ToDo: #95 check AccessManager
                         idp.setList(cflistService.findAll());
                         idp.setReturncode("OK");
                     } else {
+                        // ToDo: #95 check AccessManager
                         idp.setList(cflistService.findByClassref(cfclassService.findByName(idp.getClassname())));
                         idp.setReturncode("OK");
                     }

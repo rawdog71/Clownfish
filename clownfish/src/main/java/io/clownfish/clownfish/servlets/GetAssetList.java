@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
-import io.clownfish.clownfish.datamodels.AssetDataOutput;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetkeyword;
@@ -63,6 +62,7 @@ public class GetAssetList extends HttpServlet {
             String apikey = request.getParameter("apikey");
             if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 List<CfAsset> assetlist = cfassetService.findByPublicuseAndScrapped(true, false);
+                // ToDo: #95 check AccessManager
                 Gson gson = new Gson(); 
                 String json = gson.toJson(assetlist);
                 response.setContentType("application/json;charset=UTF-8");

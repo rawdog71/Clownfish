@@ -83,7 +83,7 @@ public class GetAssetLibraries extends HttpServlet {
                     if ((null == assetlistid) && (null == assetlistname)) {
                         assetlistList = cfassetlistService.findAll();
                     }
-
+                    // ToDo: #95 check AccessManager
                     ArrayList<AssetListOutput> assetlistoutputList = new ArrayList<>();
                     for (CfAssetlist assetlistItem : assetlistList) {
                         List<CfAsset> assetList = new ArrayList<>();

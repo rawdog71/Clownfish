@@ -99,6 +99,7 @@ public class GetAssetPreview extends HttpServlet {
                     }
                     if (null != asset) {
                         if (!asset.isScrapped()) {
+                            // ToDo: #95 check AccessManager
                             if (asset.getMimetype().contains("image")) {
                                 if (asset.getMimetype().contains("svg")) {
                                     acontext.getResponse().setContentType(asset.getMimetype());

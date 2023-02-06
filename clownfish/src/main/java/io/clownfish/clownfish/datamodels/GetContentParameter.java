@@ -15,6 +15,7 @@ import lombok.Setter;
 public class GetContentParameter {
     private @Getter @Setter String returncode;
     private @Getter @Setter String apikey;
+    private @Getter @Setter String token;
     private @Getter @Setter String classname;
     private @Getter @Setter String listname;
     private @Getter @Setter String identifier;

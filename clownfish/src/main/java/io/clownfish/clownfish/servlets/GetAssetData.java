@@ -80,6 +80,7 @@ public class GetAssetData extends HttpServlet {
 
                 if (null != asset) {
                     if (!asset.isScrapped()) {
+                        // ToDo: #95 check AccessManager
                         ArrayList<String> keywords = getAssetKeywords(asset, true);
                         AssetDataOutput assetdataoutput = new AssetDataOutput();
 

@@ -64,22 +64,14 @@ import org.springframework.stereotype.Component;
 @WebServlet(name = "GetContentHibernate", urlPatterns = {"/GetContentHibernate"})
 @Component
 public class GetContentHibernate extends HttpServlet {
-    @Autowired transient CfClassService cfclassService;
     @Autowired transient CfClasscontentService cfclasscontentService;
-    @Autowired transient CfAttributService cfattributService;
-    @Autowired transient CfAttributcontentService cfattributcontentService;
-    @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfListcontentService cflistcontentService;
-    @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
-    @Autowired transient CfKeywordService cfkeywordService;
-    @Autowired transient CfClasscontentKeywordService cfcontentkeywordService;
     @Autowired private CfContentversionService cfcontentversionService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired HibernateUtil hibernateUtil;
-    @Autowired private PropertyUtil propertyUtil;
-
+    
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter String identifier;
     private static transient @Getter @Setter String datalist;
@@ -216,6 +208,7 @@ public class GetContentHibernate extends HttpServlet {
                         CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
                         if (null != cfclasscontent) {
                             if (!cfclasscontent.isScrapped()) {
+                                // ToDo: #95 check AccessManager
 
                                 listcounter++;
                                 if (range_start > 0){

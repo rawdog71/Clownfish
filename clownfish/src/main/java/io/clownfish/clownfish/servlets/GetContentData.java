@@ -54,8 +54,6 @@ public class GetContentData extends HttpServlet {
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfClasscontentKeywordService cfcontentkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
-    @Autowired transient CfAttributetypeService cfattributetypeService;
-    @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired private CfContentversionService cfcontentversionService;
     @Autowired ContentUtil contentUtil;
@@ -99,6 +97,7 @@ public class GetContentData extends HttpServlet {
                 }
 
                 if (null != content) {
+                    // ToDo: #95 check AccessManager
                     ContentDataOutput contentdataoutput = new ContentDataOutput();
                     contentdataoutput.setContent(content);
                     ArrayList<String> keywords = getAssetKeywords(content, true);

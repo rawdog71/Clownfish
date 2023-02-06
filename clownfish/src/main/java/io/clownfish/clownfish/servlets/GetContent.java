@@ -16,15 +16,14 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CLASS;
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
-import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
-import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
@@ -34,11 +33,13 @@ import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.datamodels.GetContentParameter;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.serviceinterface.CfContentversionService;
+import io.clownfish.clownfish.utils.AccessManagerUtil;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,17 +65,15 @@ import org.springframework.stereotype.Component;
 public class GetContent extends HttpServlet {
     @Autowired transient CfClassService cfclassService;
     @Autowired transient CfClasscontentService cfclasscontentService;
-    @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
-    @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfListcontentService cflistcontentService;
-    @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
     @Autowired transient CfClasscontentKeywordService cfcontentkeywordService;
     @Autowired private CfContentversionService cfcontentversionService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired AccessManagerUtil accessmanager;
     
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter String identifier;
@@ -193,6 +192,7 @@ public class GetContent extends HttpServlet {
             boolean found = true;
             int listcounter = 0;
             for (CfClasscontent classcontent : classcontentList) {
+                // ToDo: #95 check AccessManager
                 boolean inList = true;
                 // Check if identifier is set and matches classcontent
                 if ((!inst_identifier.isEmpty()) && (0 != inst_identifier.compareToIgnoreCase(classcontent.getName()))) {
@@ -367,6 +367,10 @@ public class GetContent extends HttpServlet {
             boolean found = false;
             int listcounter = 0;
             for (CfClasscontent classcontent : classcontentList) {
+                // ToDo: #95 check AccessManager
+                if (!accessmanager.checkAccess(gcp.getToken(), TYPE_CLASS.getValue(), BigInteger.valueOf(classcontent.getClassref().getId()))) {
+                    continue;
+                }
                 boolean inList = true;
                 // Check if identifier is set and matches classcontent
                 if ((!inst_identifier.isEmpty()) && (0 != inst_identifier.compareToIgnoreCase(classcontent.getName()))) {

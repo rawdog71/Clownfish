@@ -55,7 +55,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class GetFilteredAssets extends HttpServlet {
     @Autowired transient CfAssetService cfassetService;
-    @Autowired transient PropertyUtil propertyUtil;
     @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
     @Autowired transient CfAssetKeywordService cfassetkeywordService;
@@ -100,6 +99,7 @@ public class GetFilteredAssets extends HttpServlet {
             if (null != inst_assetlibrary) {
                 CfAssetlist assetList = cfassetlistService.findByName(inst_assetlibrary);
                 assetlistcontent = cfassetlistcontentService.findByAssetlistref(assetList.getId());
+                // ToDo: #95 check AccessManager
             }
 
             searchkeywords = new ArrayList<>();
@@ -120,6 +120,7 @@ public class GetFilteredAssets extends HttpServlet {
                     CfAsset asset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
                     // Only assets that are for public use and not scrapped
                     if ((!asset.isScrapped()) && (asset.isPublicuse())) {
+                        // ToDo: #95 check AccessManager
                         // Check the keyword filter (at least one keyword must be found (OR))
                         if (!searchkeywords.isEmpty()) {
                             ArrayList contentkeywords = getContentOutputKeywords(asset, true);
@@ -153,6 +154,7 @@ public class GetFilteredAssets extends HttpServlet {
                                 CfAsset asset = cfassetService.findById(assetkeyword.getCfAssetkeywordPK().getAssetref());
                                 // Only assets that are for public use and not scrapped
                                 if ((!asset.isScrapped()) && (asset.isPublicuse())) {
+                                    // ToDo: #95 check AccessManager
                                     AssetDataOutput ao = new AssetDataOutput();
                                     ao.setAsset(asset);
                                     ao.setKeywords(getContentOutputKeywords(asset, false));
@@ -168,6 +170,7 @@ public class GetFilteredAssets extends HttpServlet {
                     for (CfAsset asset : assetlist) {
                         // Only assets that are for public
                         if (asset.isPublicuse()) {
+                            // ToDo: #95 check AccessManager
                             AssetDataOutput ao = new AssetDataOutput();
                             ao.setAsset(asset);
                             ao.setKeywords(getContentOutputKeywords(asset, false));

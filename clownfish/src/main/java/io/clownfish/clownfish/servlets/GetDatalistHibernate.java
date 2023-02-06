@@ -69,13 +69,8 @@ public class GetDatalistHibernate extends HttpServlet {
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
-    @Autowired transient CfAttributService cfattributService;
-    @Autowired transient CfAttributetypeService cfattributetypeService;
-    @Autowired transient CfKeywordService cfkeywordService;
-    @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
-    @Autowired HibernateUtil hibernateUtil;
     
     private static transient @Getter @Setter String name;
     private static transient @Getter @Setter String apikey;
@@ -164,6 +159,7 @@ public class GetDatalistHibernate extends HttpServlet {
             for (CfListcontent listcontent : listcontentList) {
                 CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
                 if (null != classcontent) {
+                    // ToDo: #95 check AccessManager
                     classcontentList.add(classcontent);
                 } else {
                     LOGGER.warn("Classcontent does not exist: " + inst_name + " - "  + listcontent.getCfListcontentPK().getClasscontentref());
@@ -252,6 +248,7 @@ public class GetDatalistHibernate extends HttpServlet {
             for (CfListcontent listcontent : listcontentList) {
                 CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
                 if (null != classcontent) {
+                    // ToDo: #95 check AccessManager
                     classcontentList.add(classcontent);
                 } else {
                     LOGGER.warn("Classcontent does not exist: " + inst_name + " - "  + listcontent.getCfListcontentPK().getClasscontentref());

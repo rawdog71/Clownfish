@@ -82,6 +82,7 @@ public class GetClasses extends HttpServlet {
                     if ((null == classid) && (null == classname)) {
                         classList = cfclassService.findAll();
                     }
+                    // ToDo: #95 check AccessManager
                     ArrayList<ClassDataOutput> classdataoutputList = new ArrayList<>();
                     for (CfClass classItem : classList) {
                         List<CfAttribut> attributList = cfattributService.findByClassref(classItem);

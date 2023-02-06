@@ -61,19 +61,10 @@ import org.springframework.stereotype.Component;
 @WebServlet(name = "GetContentCountHibernate", urlPatterns = {"/GetContentCountHibernate"})
 @Component
 public class GetContentCountHibernate extends HttpServlet {
-    @Autowired transient CfClassService cfclassService;
     @Autowired transient CfClasscontentService cfclasscontentService;
-    @Autowired transient CfAttributService cfattributService;
-    @Autowired transient CfAttributcontentService cfattributcontentService;
-    @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfListcontentService cflistcontentService;
-    @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
-    @Autowired transient CfKeywordService cfkeywordService;
-    @Autowired transient CfClasscontentKeywordService cfcontentkeywordService;
-    @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
-    @Autowired HibernateUtil hibernateUtil;
     
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter String identifier;
