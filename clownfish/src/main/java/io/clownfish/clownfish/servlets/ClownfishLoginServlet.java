@@ -135,6 +135,7 @@ public class ClownfishLoginServlet extends HttpServlet {
             LOGGER.error(ex.getMessage());
         }
 
+        response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
             out.print(gson.toJson(ar));
