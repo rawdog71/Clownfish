@@ -10,7 +10,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_bin;
 
-ALTER TABLE `clownfish`.`cf_accessmanager` 
-ADD INDEX `idx_type` (`type` ASC) VISIBLE;
-ALTER TABLE `clownfish`.`cf_accessmanager` 
-ADD INDEX `idx_ref` (`ref` ASC) VISIBLE;
+ALTER TABLE `clownfish`.`cf_accessmanager` ADD INDEX `idx_type` (`type` ASC);
+ALTER TABLE `clownfish`.`cf_accessmanager` ADD INDEX `idx_ref` (`ref` ASC);
+ALTER TABLE `clownfish`.`cf_accessmanager` ADD INDEX `idx_type_ref` (`type` ASC, `ref` ASC);
