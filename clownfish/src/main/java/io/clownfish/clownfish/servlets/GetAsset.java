@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.servlets;
 
 import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_ASSET;
-import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CLASS;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.utils.AccessManagerUtil;
@@ -114,7 +113,7 @@ public class GetAsset extends HttpServlet {
                     }
                     if (null != asset) {
                         if (!asset.isScrapped()) {
-                            // ToDo: #95 check AccessManager
+                            // !ToDo: #95 check AccessManager
                             if (accessmanager.checkAccess(token, TYPE_ASSET.getValue(), BigInteger.valueOf(asset.getId()))) {
                                 if (1 == inst_download) {
                                     response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(imagefilename, StandardCharsets.UTF_8.toString()));

@@ -16,14 +16,17 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_ASSET;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetkeyword;
 import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.utils.AccessManagerUtil;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
@@ -46,6 +49,7 @@ public class GetAssetList extends HttpServlet {
     @Autowired transient CfAssetKeywordService cfassetkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired AccessManagerUtil accessmanager;
         
     final transient Logger LOGGER = LoggerFactory.getLogger(GetAsset.class);
 
@@ -60,11 +64,18 @@ public class GetAssetList extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
+            String token = request.getParameter("token");
             if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 List<CfAsset> assetlist = cfassetService.findByPublicuseAndScrapped(true, false);
+                List<CfAsset> assetlistoutput = new ArrayList<>();
                 // ToDo: #95 check AccessManager
+                for (CfAsset asset : assetlist) {
+                    if (accessmanager.checkAccess(token, TYPE_ASSET.getValue(), BigInteger.valueOf(asset.getId()))) {
+                        assetlistoutput.add(cfassetService.findById(asset.getId()));
+                    }
+                }
                 Gson gson = new Gson(); 
-                String json = gson.toJson(assetlist);
+                String json = gson.toJson(assetlistoutput);
                 response.setContentType("application/json;charset=UTF-8");
                 try (PrintWriter out = response.getWriter()) {
                     out.print(json);

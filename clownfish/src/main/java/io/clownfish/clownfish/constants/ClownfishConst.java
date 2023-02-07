@@ -30,7 +30,8 @@ public class ClownfishConst {
         TYPE_CONTENTLIST(1),
         TYPE_CONTENT(2),
         TYPE_ASSETLIST(3),
-        TYPE_ASSET(4);
+        TYPE_ASSET(4),
+        TYPE_SITE(5);
         
         private final Integer value;
 

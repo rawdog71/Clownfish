@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,10 +41,14 @@ public class AccessManagerUtil {
         List<CfAccessmanager> acmlist = cfaccessmanagerService.findByTypeAndRef(type, ref);
         if (acmlist.size() > 0) {
             if (null != classcontent) {
-                CfAccessmanager acm = cfaccessmanagerService.findByTypeAndRefAndRefclasscontent(type, ref, BigInteger.valueOf(classcontent.getUser().getId()));
-                if (acm.getRefclasscontent().longValue() == classcontent.getUser().getId()) {
-                    return true;
-                } else {
+                try {
+                    CfAccessmanager acm = cfaccessmanagerService.findByTypeAndRefAndRefclasscontent(type, ref, BigInteger.valueOf(classcontent.getUser().getId()));
+                    if (acm.getRefclasscontent().longValue() == classcontent.getUser().getId()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (Exception ex) {
                     return false;
                 }
             } else {

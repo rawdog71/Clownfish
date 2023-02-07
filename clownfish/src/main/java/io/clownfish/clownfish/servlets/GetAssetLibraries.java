@@ -16,6 +16,8 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_ASSET;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_ASSETLIST;
 import io.clownfish.clownfish.datamodels.AssetListOutput;
 import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.dbentities.CfAsset;
@@ -24,9 +26,11 @@ import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
+import io.clownfish.clownfish.utils.AccessManagerUtil;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
@@ -50,6 +54,7 @@ public class GetAssetLibraries extends HttpServlet {
     @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired transient AuthTokenList authtokenlist;
+    @Autowired AccessManagerUtil accessmanager;
         
     final transient Logger LOGGER = LoggerFactory.getLogger(GetAssetLibraries.class);
 
@@ -83,18 +88,22 @@ public class GetAssetLibraries extends HttpServlet {
                     if ((null == assetlistid) && (null == assetlistname)) {
                         assetlistList = cfassetlistService.findAll();
                     }
-                    // ToDo: #95 check AccessManager
+                    // !ToDo: #95 check AccessManager
                     ArrayList<AssetListOutput> assetlistoutputList = new ArrayList<>();
                     for (CfAssetlist assetlistItem : assetlistList) {
-                        List<CfAsset> assetList = new ArrayList<>();
-                        List<CfAssetlistcontent> assetlistcontentList = cfassetlistcontentService.findByAssetlistref(assetlistItem.getId());
-                        for (CfAssetlistcontent assetlistcontent : assetlistcontentList) {
-                            assetList.add(cfassetService.findById(assetlistcontent.getCfAssetlistcontentPK().getAssetref()));
+                        if (accessmanager.checkAccess(token, TYPE_ASSETLIST.getValue(), BigInteger.valueOf(assetlistItem.getId()))) {
+                            List<CfAsset> assetList = new ArrayList<>();
+                            List<CfAssetlistcontent> assetlistcontentList = cfassetlistcontentService.findByAssetlistref(assetlistItem.getId());
+                            for (CfAssetlistcontent assetlistcontent : assetlistcontentList) {
+                                if (accessmanager.checkAccess(token, TYPE_ASSET.getValue(), BigInteger.valueOf(assetlistcontent.getCfAssetlistcontentPK().getAssetref()))) {
+                                    assetList.add(cfassetService.findById(assetlistcontent.getCfAssetlistcontentPK().getAssetref()));
+                                }
+                            }
+                            AssetListOutput assetlistoutput = new AssetListOutput();
+                            assetlistoutput.setAssetlist(assetlistItem);
+                            assetlistoutput.setAssets(assetList);
+                            assetlistoutputList.add(assetlistoutput);
                         }
-                        AssetListOutput assetlistoutput = new AssetListOutput();
-                        assetlistoutput.setAssetlist(assetlistItem);
-                        assetlistoutput.setAssets(assetList);
-                        assetlistoutputList.add(assetlistoutput);
                     }
 
                     Gson gson = new Gson(); 

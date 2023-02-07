@@ -13,3 +13,4 @@ COLLATE = utf8_bin;
 ALTER TABLE `clownfish`.`cf_accessmanager` ADD INDEX `idx_type` (`type` ASC);
 ALTER TABLE `clownfish`.`cf_accessmanager` ADD INDEX `idx_ref` (`ref` ASC);
 ALTER TABLE `clownfish`.`cf_accessmanager` ADD INDEX `idx_type_ref` (`type` ASC, `ref` ASC);
+ALTER TABLE `clownfish`.`cf_accessmanager` ADD INDEX `idx_type_ref_content` (`type` ASC, `ref` ASC, `refclasscontent` ASC);
