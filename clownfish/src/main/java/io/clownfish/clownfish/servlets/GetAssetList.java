@@ -68,7 +68,7 @@ public class GetAssetList extends HttpServlet {
             if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 List<CfAsset> assetlist = cfassetService.findByPublicuseAndScrapped(true, false);
                 List<CfAsset> assetlistoutput = new ArrayList<>();
-                // ToDo: #95 check AccessManager
+                // !ToDo: #95 check AccessManager
                 for (CfAsset asset : assetlist) {
                     if (accessmanager.checkAccess(token, TYPE_ASSET.getValue(), BigInteger.valueOf(asset.getId()))) {
                         assetlistoutput.add(cfassetService.findById(asset.getId()));

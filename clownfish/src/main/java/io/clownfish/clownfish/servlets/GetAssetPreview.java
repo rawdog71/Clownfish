@@ -15,8 +15,10 @@
  */
 package io.clownfish.clownfish.servlets;
 
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_ASSET;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.utils.AccessManagerUtil;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.awt.image.BufferedImage;
@@ -36,6 +38,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 import java.util.zip.GZIPOutputStream;
 import javax.servlet.ServletContext;
@@ -55,7 +58,8 @@ public class GetAssetPreview extends HttpServlet {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient PropertyUtil propertyUtil;
     @Autowired ApiKeyUtil apikeyutil;
-        
+    @Autowired AccessManagerUtil accessmanager;
+
     final transient Logger LOGGER = LoggerFactory.getLogger(GetAssetPreview.class);
     
     public GetAssetPreview() {
@@ -78,6 +82,7 @@ public class GetAssetPreview extends HttpServlet {
             try {
                 
                 String apikey = acontext.getRequest().getParameter("apikey");
+                String token = acontext.getRequest().getParameter("token");
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 
                     int width = 0;
@@ -99,32 +104,13 @@ public class GetAssetPreview extends HttpServlet {
                     }
                     if (null != asset) {
                         if (!asset.isScrapped()) {
-                            // ToDo: #95 check AccessManager
-                            if (asset.getMimetype().contains("image")) {
-                                if (asset.getMimetype().contains("svg")) {
-                                    acontext.getResponse().setContentType(asset.getMimetype());
-                                    InputStream in;
-                                    File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
-                                    try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
-                                        in = new FileInputStream(f);
-                                        IOUtils.copy(in, out);
-                                    } catch (IOException ex) {
-                                        LOGGER.error(ex.getMessage());
-                                        acontext.complete();
-                                    }
-                                } else {
-                                    String paramwidth = acontext.getRequest().getParameter("width");
-                                    if (paramwidth != null) {
-                                        width = Integer.parseInt(paramwidth);
-                                    }
-                                    String paramheight = acontext.getRequest().getParameter("height");
-                                    if (paramheight != null) {
-                                        height = Integer.parseInt(paramheight);
-                                    }
-                                    String cacheKey = "cache" + imagefilename + "W" + String.valueOf(width) + "H" + String.valueOf(height);
-                                    if (new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey).exists()) {
-                                        File f = new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey);
+                            // !ToDo: #95 check AccessManager
+                            if (accessmanager.checkAccess(token, TYPE_ASSET.getValue(), BigInteger.valueOf(asset.getId()))) {
+                                if (asset.getMimetype().contains("image")) {
+                                    if (asset.getMimetype().contains("svg")) {
+                                        acontext.getResponse().setContentType(asset.getMimetype());
                                         InputStream in;
+                                        File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
                                         try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                                             in = new FileInputStream(f);
                                             IOUtils.copy(in, out);
@@ -133,24 +119,18 @@ public class GetAssetPreview extends HttpServlet {
                                             acontext.complete();
                                         }
                                     } else {
-                                        acontext.getResponse().setContentType(asset.getMimetype());
-                                        InputStream in;
-                                        File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
-
-                                        if ((width > 0) || (height > 0)) {
-                                            BufferedImage result = AsyncScalr.resize(ImageIO.read(f), width).get();
-                                            ByteArrayOutputStream os = new ByteArrayOutputStream();
-                                            ImageIO.write(result, asset.getFileextension(), os);
-                                            ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey));
-
-                                            try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
-                                                in = new ByteArrayInputStream(os.toByteArray());
-                                                IOUtils.copy(in, out);
-                                            } catch (IOException ex) {
-                                                LOGGER.error(ex.getMessage());
-                                                acontext.complete();
-                                            }
-                                        } else {
+                                        String paramwidth = acontext.getRequest().getParameter("width");
+                                        if (paramwidth != null) {
+                                            width = Integer.parseInt(paramwidth);
+                                        }
+                                        String paramheight = acontext.getRequest().getParameter("height");
+                                        if (paramheight != null) {
+                                            height = Integer.parseInt(paramheight);
+                                        }
+                                        String cacheKey = "cache" + imagefilename + "W" + String.valueOf(width) + "H" + String.valueOf(height);
+                                        if (new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey).exists()) {
+                                            File f = new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey);
+                                            InputStream in;
                                             try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
                                                 in = new FileInputStream(f);
                                                 IOUtils.copy(in, out);
@@ -158,37 +138,64 @@ public class GetAssetPreview extends HttpServlet {
                                                 LOGGER.error(ex.getMessage());
                                                 acontext.complete();
                                             }
+                                        } else {
+                                            acontext.getResponse().setContentType(asset.getMimetype());
+                                            InputStream in;
+                                            File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
+
+                                            if ((width > 0) || (height > 0)) {
+                                                BufferedImage result = AsyncScalr.resize(ImageIO.read(f), width).get();
+                                                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                                                ImageIO.write(result, asset.getFileextension(), os);
+                                                ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey));
+
+                                                try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                                    in = new ByteArrayInputStream(os.toByteArray());
+                                                    IOUtils.copy(in, out);
+                                                } catch (IOException ex) {
+                                                    LOGGER.error(ex.getMessage());
+                                                    acontext.complete();
+                                                }
+                                            } else {
+                                                try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                                    in = new FileInputStream(f);
+                                                    IOUtils.copy(in, out);
+                                                } catch (IOException ex) {
+                                                    LOGGER.error(ex.getMessage());
+                                                    acontext.complete();
+                                                }
+                                            }
                                         }
                                     }
-                                }
-                            } else {
-                                acontext.getResponse().setContentType("image/svg+xml");
-                                InputStream in;
-                                File f;
-                                String iconfilename;
-
-                                String mimetype = asset.getMimetype();
-                                switch (mimetype) {
-                                    case "application/pdf":
-                                        iconfilename = "pdf.svg";
-                                        break;
-                                    default:
-                                        iconfilename = "document.svg";
-                                        break;
-                                }
-                                if (null != propertyUtil.getPropertyValue("folder_icon")) {
-                                    f = new File(propertyUtil.getPropertyValue("folder_icon") + File.separator + iconfilename);
                                 } else {
-                                    ServletContext servletContext = getServletContext();
-                                    String path = servletContext.getRealPath("/WEB-INF/images/" + iconfilename);
-                                    f = new File(path);
-                                }
-                                try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
-                                    in = new FileInputStream(f);
-                                    IOUtils.copy(in, out);
-                                } catch (IOException ex) {
-                                    LOGGER.error(ex.getMessage());
-                                    acontext.complete();
+                                    acontext.getResponse().setContentType("image/svg+xml");
+                                    InputStream in;
+                                    File f;
+                                    String iconfilename;
+
+                                    String mimetype = asset.getMimetype();
+                                    switch (mimetype) {
+                                        case "application/pdf":
+                                            iconfilename = "pdf.svg";
+                                            break;
+                                        default:
+                                            iconfilename = "document.svg";
+                                            break;
+                                    }
+                                    if (null != propertyUtil.getPropertyValue("folder_icon")) {
+                                        f = new File(propertyUtil.getPropertyValue("folder_icon") + File.separator + iconfilename);
+                                    } else {
+                                        ServletContext servletContext = getServletContext();
+                                        String path = servletContext.getRealPath("/WEB-INF/images/" + iconfilename);
+                                        f = new File(path);
+                                    }
+                                    try (OutputStream out = new GZIPOutputStream(acontext.getResponse().getOutputStream())) {
+                                        in = new FileInputStream(f);
+                                        IOUtils.copy(in, out);
+                                    } catch (IOException ex) {
+                                        LOGGER.error(ex.getMessage());
+                                        acontext.complete();
+                                    }
                                 }
                             }
                         }    
