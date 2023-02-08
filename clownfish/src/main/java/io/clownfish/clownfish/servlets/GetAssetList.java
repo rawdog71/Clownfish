@@ -17,6 +17,8 @@ package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
 import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_ASSET;
+import io.clownfish.clownfish.datamodels.AuthTokenClasscontent;
+import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetkeyword;
@@ -49,6 +51,7 @@ public class GetAssetList extends HttpServlet {
     @Autowired transient CfAssetKeywordService cfassetkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired transient AuthTokenListClasscontent authtokenlist;
     @Autowired AccessManagerUtil accessmanager;
         
     final transient Logger LOGGER = LoggerFactory.getLogger(GetAsset.class);
@@ -66,16 +69,17 @@ public class GetAssetList extends HttpServlet {
             String apikey = request.getParameter("apikey");
             String token = request.getParameter("token");
             if (apikeyutil.checkApiKey(apikey, "RestService")) {
-                List<CfAsset> assetlist = cfassetService.findByPublicuseAndScrapped(true, false);
-                List<CfAsset> assetlistoutput = new ArrayList<>();
+                List<CfAsset> assetlist;
                 // !ToDo: #95 check AccessManager
-                for (CfAsset asset : assetlist) {
-                    if (accessmanager.checkAccess(token, TYPE_ASSET.getValue(), BigInteger.valueOf(asset.getId()))) {
-                        assetlistoutput.add(cfassetService.findById(asset.getId()));
-                    }
+                if ((null != token) && (!token.isEmpty())) {
+                    AuthTokenClasscontent classcontent = authtokenlist.getAuthtokens().get(token);
+                    assetlist = cfassetService.findByPublicuseAndScrappedNotInList(true, false, BigInteger.valueOf(classcontent.getUser().getId()));
+                } else {
+                    assetlist = cfassetService.findByPublicuseAndScrappedNotInList(true, false, BigInteger.valueOf(0L));
                 }
+
                 Gson gson = new Gson(); 
-                String json = gson.toJson(assetlistoutput);
+                String json = gson.toJson(assetlist);
                 response.setContentType("application/json;charset=UTF-8");
                 try (PrintWriter out = response.getWriter()) {
                     out.print(json);

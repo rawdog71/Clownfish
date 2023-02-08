@@ -17,6 +17,7 @@ package io.clownfish.clownfish.dbrepository;
 
 import io.clownfish.clownfish.daointerface.CfAssetDAO;
 import io.clownfish.clownfish.dbentities.CfAsset;
+import java.math.BigInteger;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -144,6 +145,17 @@ public class CfAssetDAOImpl implements CfAssetDAO {
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findByPublicuseAndScrapped");
         query.setParameter("publicuse", publicuse);
         query.setParameter("scrapped", scrapped);
+        List<CfAsset> cfassetlist = query.getResultList();
+        return cfassetlist;
+    }
+
+    @Override
+    public List<CfAsset> findByPublicuseAndScrappedNotInList(boolean publicuse, boolean scrapped, BigInteger ref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findByPublicuseAndScrappedNotInList");
+        query.setParameter("publicuse", publicuse);
+        query.setParameter("scrapped", scrapped);
+        query.setParameter("refclasscontent", ref);
         List<CfAsset> cfassetlist = query.getResultList();
         return cfassetlist;
     }
