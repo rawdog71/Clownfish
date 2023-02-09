@@ -126,6 +126,9 @@ public class CfSite implements Serializable {
     @Size(max = 255)
     @Column(name = "testparams")
     private String testparams;
+    @Size(max = 255)
+    @Column(name = "loginsite")
+    private String loginsite;
     
     public CfSite() {
     }
@@ -342,6 +345,14 @@ public class CfSite implements Serializable {
 
     public void setTestparams(String testparams) {
         this.testparams = testparams;
+    }
+
+    public String getLoginsite() {
+        return loginsite;
+    }
+
+    public void setLoginsite(String loginsite) {
+        this.loginsite = loginsite;
     }
     
     public String getIcon() {

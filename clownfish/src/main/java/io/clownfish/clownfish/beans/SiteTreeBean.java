@@ -174,6 +174,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter String siteDescription;
     private @Getter @Setter String aliaspath;
     private @Getter @Setter String characterEncoding;
+    private @Getter @Setter String loginsite;
     private @Getter @Setter String contentType;
     private @Getter @Setter String locale;
     private transient @Getter @Setter Map<String, String> propertymap = null;
@@ -446,6 +447,7 @@ public class SiteTreeBean implements Serializable {
         siteTitle = "";
         siteDescription = "";
         aliaspath = "";
+        loginsite = "";
         sitehtmlcompression = 0;
         characterEncoding = "";
         contentType = "";
@@ -604,6 +606,7 @@ public class SiteTreeBean implements Serializable {
         sitestatic = selectedSite.isStaticsite();
         searchresult = selectedSite.isSearchresult();
         aliaspath = selectedSite.getAliaspath();
+        loginsite = selectedSite.getLoginsite();
         sitehtmlcompression = selectedSite.getHtmlcompression();
         characterEncoding = selectedSite.getCharacterencoding();
         contentType = selectedSite.getContenttype();
@@ -734,6 +737,7 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setContenttype(contentType);
             selectedSite.setLocale(locale);
             selectedSite.setAliaspath(aliaspath);
+            selectedSite.setLoginsite(loginsite);
             selectedSite.setTitle(siteTitle);
             selectedSite.setDescription(siteDescription);
             selectedSite.setJob(sitejob);
@@ -814,6 +818,7 @@ public class SiteTreeBean implements Serializable {
             newsite.setCharacterencoding(characterEncoding);
             newsite.setLocale(locale);
             newsite.setAliaspath(siteName);
+            newsite.setLoginsite(loginsite);
             newsite.setTitle(siteTitle);
             newsite.setDescription(siteDescription);
             newsite.setJob(sitejob);

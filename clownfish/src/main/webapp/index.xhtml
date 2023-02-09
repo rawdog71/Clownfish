@@ -282,6 +282,14 @@
                                             <p:row>
                                                 <p:column>
                                                     <div class="content-justify">
+                                                        <p:outputLabel for="loginsite" value="Login URL" />
+                                                        <p:inputText id="loginsite" value="#{sitetree.loginsite}" maxlength="255" />
+                                                    </div>
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>
+                                                    <div class="content-justify">
                                                         <p:outputLabel for="shorturl" value="Shorturl:" />
                                                         <p:inputText id="shorturl" value="#{sitetree.selectedSite.shorturl}" maxlength="5" readonly="true" />
                                                     </div>
