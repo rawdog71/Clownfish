@@ -17,6 +17,7 @@ package io.clownfish.clownfish.dbrepository;
 
 import io.clownfish.clownfish.daointerface.CfClassDAO;
 import io.clownfish.clownfish.dbentities.CfClass;
+import java.math.BigInteger;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -83,5 +84,14 @@ public class CfClassDAOImpl implements CfClassDAO {
         query.setParameter("name", name);
         CfClass cfclass = (CfClass) query.getSingleResult();
         return cfclass;
+    }
+
+    @Override
+    public List<CfClass> findNotInList(BigInteger ref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfClass.findNotInList");
+        query.setParameter("refclasscontent", ref);
+        List<CfClass> cfclasslist = query.getResultList();
+        return cfclasslist;
     }
 }

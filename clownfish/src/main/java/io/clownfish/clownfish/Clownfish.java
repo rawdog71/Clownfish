@@ -961,7 +961,7 @@ public class Clownfish {
                 }
             }
             
-            // ToDo: #95 check AccessManager
+            // !ToDo: #95 check AccessManager
             String token = "";
             if (parametermap.containsKey("cf_token")) {    // check token for access manager
                 token = parametermap.get("cf_token").toString();

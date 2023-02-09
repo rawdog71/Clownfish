@@ -16,6 +16,8 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CONTENT;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CONTENTLIST;
 import io.clownfish.clownfish.datamodels.ContentOutput;
 import io.clownfish.clownfish.datamodels.DatalistOutput;
 import io.clownfish.clownfish.datamodels.GetContentParameter;
@@ -32,11 +34,13 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.utils.AccessManagerUtil;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,9 +69,11 @@ public class GetDatalist extends HttpServlet {
     @Autowired transient CfAttributcontentService cfattributcontentService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired AccessManagerUtil accessmanager;
     
     private static transient @Getter @Setter String name;
     private static transient @Getter @Setter String apikey;
+    private static transient @Getter @Setter String token;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(GetDatalist.class);
     
@@ -134,12 +140,17 @@ public class GetDatalist extends HttpServlet {
         ArrayList<ContentOutput> outputlist = new ArrayList<>();
         String inst_apikey = "";
         String inst_name = "";
+        String inst_token = "";
         
         Map<String, String[]> parameters = request.getParameterMap();
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             apikey = values[0];
         });
         inst_apikey = apikey;
+        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("token") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+            token = values[0];
+        });
+        inst_token = token;
         if (apikeyutil.checkApiKey(inst_apikey, "RestService")) {
             name = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("name") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
@@ -147,37 +158,42 @@ public class GetDatalist extends HttpServlet {
             });
             inst_name = name;
             CfList cflist = cflistService.findByName(inst_name);
-            List<CfListcontent> listcontentList = cflistcontentService.findByListref(cflist.getId());
-            
-            List<CfClasscontent> classcontentList = new ArrayList<>();
-            for (CfListcontent listcontent : listcontentList) {
-                CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                if (null != classcontent) {
-                    // ToDo: #95 check AccessManager
-                    classcontentList.add(classcontent);
-                } else {
-                    LOGGER.warn("Classcontent does not exist: " + inst_name + " - " + listcontent.getCfListcontentPK().getClasscontentref());
-                }
-            }
-            
-            for (CfClasscontent classcontent : classcontentList) {    
-                List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
-                ContentOutput co = new ContentOutput();
-                co.setIdentifier(classcontent.getName());
-                co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
-                co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
-                outputlist.add(co);
-            }
+            // !ToDo: #95 check AccessManager
+            if (accessmanager.checkAccess(inst_token, TYPE_CONTENTLIST.getValue(), BigInteger.valueOf(cflist.getId()))) {
+                List<CfListcontent> listcontentList = cflistcontentService.findByListref(cflist.getId());
 
-            datalistoutput.setCflist(cflist);
-            datalistoutput.setOutputlist(outputlist);
-            Gson gson = new Gson(); 
-            String json = gson.toJson(datalistoutput);
-            response.setContentType("application/json;charset=UTF-8");
-            try (PrintWriter out = response.getWriter()) {
-                out.print(json);
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage());
+                List<CfClasscontent> classcontentList = new ArrayList<>();
+                for (CfListcontent listcontent : listcontentList) {
+                    CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                    if (null != classcontent) {
+                        // !ToDo: #95 check AccessManager
+                        if (accessmanager.checkAccess(inst_token, TYPE_CONTENT.getValue(), BigInteger.valueOf(classcontent.getId()))) {
+                            classcontentList.add(classcontent);
+                        }
+                    } else {
+                        LOGGER.warn("Classcontent does not exist: " + inst_name + " - " + listcontent.getCfListcontentPK().getClasscontentref());
+                    }
+                }
+
+                for (CfClasscontent classcontent : classcontentList) {    
+                    List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
+                    ContentOutput co = new ContentOutput();
+                    co.setIdentifier(classcontent.getName());
+                    co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                    co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
+                    outputlist.add(co);
+                }
+
+                datalistoutput.setCflist(cflist);
+                datalistoutput.setOutputlist(outputlist);
+                Gson gson = new Gson(); 
+                String json = gson.toJson(datalistoutput);
+                response.setContentType("application/json;charset=UTF-8");
+                try (PrintWriter out = response.getWriter()) {
+                    out.print(json);
+                } catch (IOException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
             }
         } else {
             PrintWriter out = null;

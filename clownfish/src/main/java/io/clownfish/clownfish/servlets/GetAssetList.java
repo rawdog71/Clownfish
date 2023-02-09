@@ -73,7 +73,11 @@ public class GetAssetList extends HttpServlet {
                 // !ToDo: #95 check AccessManager
                 if ((null != token) && (!token.isEmpty())) {
                     AuthTokenClasscontent classcontent = authtokenlist.getAuthtokens().get(token);
-                    assetlist = cfassetService.findByPublicuseAndScrappedNotInList(true, false, BigInteger.valueOf(classcontent.getUser().getId()));
+                    if (null != classcontent) {
+                        assetlist = cfassetService.findByPublicuseAndScrappedNotInList(true, false, BigInteger.valueOf(classcontent.getUser().getId()));
+                    } else {
+                        assetlist = cfassetService.findByPublicuseAndScrappedNotInList(true, false, BigInteger.valueOf(0L));
+                    }
                 } else {
                     assetlist = cfassetService.findByPublicuseAndScrappedNotInList(true, false, BigInteger.valueOf(0L));
                 }

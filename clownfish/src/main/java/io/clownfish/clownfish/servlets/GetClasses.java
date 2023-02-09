@@ -16,16 +16,20 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
-import io.clownfish.clownfish.datamodels.AuthTokenList;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CLASS;
+import io.clownfish.clownfish.datamodels.AuthTokenClasscontent;
+import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.datamodels.ClassDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.utils.AccessManagerUtil;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
@@ -45,10 +49,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class GetClasses extends HttpServlet {
     @Autowired transient CfClassService cfclassService;
-    @Autowired transient CfAttributetypeService cfattributetypeService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired ApiKeyUtil apikeyutil;
-    @Autowired transient AuthTokenList authtokenlist;
+    @Autowired transient AuthTokenListClasscontent authtokenlist;
+    @Autowired AccessManagerUtil accessmanager;
         
     final transient Logger LOGGER = LoggerFactory.getLogger(GetClasses.class);
 
@@ -71,18 +75,33 @@ public class GetClasses extends HttpServlet {
                     String classid = request.getParameter("id");
                     if (classid != null) {
                         clazz = cfclassService.findById(Long.parseLong(classid));
-                        classList.add(clazz);
+                        // !ToDo: #95 check AccessManager
+                        if (accessmanager.checkAccess(token, TYPE_CLASS.getValue(), BigInteger.valueOf(clazz.getId()))) {
+                            classList.add(clazz);
+                        }
                     }
                     String classname = request.getParameter("name");
                     if (classname != null) {
                         clazz = cfclassService.findByName(classname);
                         classList.clear();
-                        classList.add(clazz);
+                        // !ToDo: #95 check AccessManager
+                        if (accessmanager.checkAccess(token, TYPE_CLASS.getValue(), BigInteger.valueOf(clazz.getId()))) {
+                            classList.add(clazz);
+                        }
                     }
                     if ((null == classid) && (null == classname)) {
-                        classList = cfclassService.findAll();
+                        // !ToDo: #95 check AccessManager
+                        if ((null != token) && (!token.isEmpty())) {
+                            AuthTokenClasscontent classcontent = authtokenlist.getAuthtokens().get(token);
+                            if (null != classcontent) {
+                                classList = cfclassService.findNotInList(BigInteger.valueOf(classcontent.getUser().getId()));
+                            } else {
+                                classList = cfclassService.findNotInList(BigInteger.valueOf(0L));
+                            }
+                        } else {
+                            classList = cfclassService.findNotInList(BigInteger.valueOf(0L));
+                        }
                     }
-                    // ToDo: #95 check AccessManager
                     ArrayList<ClassDataOutput> classdataoutputList = new ArrayList<>();
                     for (CfClass classItem : classList) {
                         List<CfAttribut> attributList = cfattributService.findByClassref(classItem);
