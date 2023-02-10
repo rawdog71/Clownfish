@@ -19,6 +19,7 @@ import io.clownfish.clownfish.daointerface.CfListDAO;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.serviceinterface.CfListService;
+import java.math.BigInteger;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -81,5 +82,10 @@ public class CfListServiceImpl implements CfListService {
     @Override
     public CfList findByClassrefAndName(CfClass ref, String name) {
         return this.cflistDAO.findByClassrefAndName(ref, name);
+    }
+
+    @Override
+    public List<CfList> findNotInList(BigInteger ref) {
+        return this.cflistDAO.findNotInList(ref);
     }
 }
