@@ -202,11 +202,38 @@ public class ReefBean implements Serializable {
                     CfClass checkclass = cfclassService.findByName(cfclass.getName());
                     LOGGER.error("CLASS {} already exists.", cfclass.getName());
                 } catch (NoResultException ex) {
-                    long oldid = cfclass.getId();
+                    if (null != cfclass.getTemplateref()) {     // check if class has preview template
+                        try {
+                            CfTemplate checktemplate = cftemplateService.findByName(cfclass.getTemplateref().getName());
+                            cfclass.setTemplateref(checktemplate);
+                        } catch (NoResultException ex2) {
+                            // if preview template does not exist, create it
+                            CfTemplate newtemplate = new CfTemplate();
+                            newtemplate.setCheckedoutby(cfclass.getTemplateref().getCheckedoutby());
+                            newtemplate.setContent(cfclass.getTemplateref().getContent());
+                            newtemplate.setName(cfclass.getTemplateref().getName());
+                            newtemplate.setScriptlanguage(cfclass.getTemplateref().getScriptlanguage());
+                            newtemplate.setType(cfclass.getTemplateref().getType());
+                            cfclass.setTemplateref(cftemplateService.create(newtemplate));
+                        }
+                    }
                     cfclass.setId(null);
                     cfclassService.create(cfclass);
-                    reorgAttributs(importreef, oldid, cfclass);
                 }
+            }
+            cl.onRefreshAll();
+        }
+        
+        if (null != importreef.getAttributlist()) {
+            for (CfAttribut cfattribut : importreef.getAttributlist()) {
+                CfClass newclass = cfclassService.findByName(cfattribut.getClassref().getName());
+                cfattribut.setClassref(newclass);
+                if (null != cfattribut.getRelationref()) {
+                    CfClass newrefclass = cfclassService.findByName(cfattribut.getRelationref().getName());
+                    cfattribut.setRelationref(newrefclass);
+                }
+                cfattribut.setId(null);
+                cfattributService.create(cfattribut);
             }
             cl.onRefreshAll();
         }
@@ -326,16 +353,6 @@ public class ReefBean implements Serializable {
                 }
             }
             sl.refresh();
-        }
-    }
-
-    private void reorgAttributs(Reef importreef, Long oldid, CfClass newclass) {
-        for (CfAttribut cfattribut : importreef.getAttributlist()) {
-            if (cfattribut.getClassref().getId() == oldid) {
-                cfattribut.setClassref(newclass);
-                cfattribut.setId(null);
-                cfattributService.create(cfattribut);
-            }
         }
     }
 }
