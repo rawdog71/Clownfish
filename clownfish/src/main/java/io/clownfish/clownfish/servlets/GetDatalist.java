@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CLASS;
 import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CONTENT;
 import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CONTENTLIST;
 import io.clownfish.clownfish.datamodels.ContentOutput;
@@ -154,7 +155,7 @@ public class GetDatalist extends HttpServlet {
             inst_name = name;
             CfList cflist = cflistService.findByName(inst_name);
             // !ToDo: #95 check AccessManager
-            if (accessmanager.checkAccess(inst_token, TYPE_CONTENTLIST.getValue(), BigInteger.valueOf(cflist.getId()))) {
+            if ((accessmanager.checkAccess(inst_token, TYPE_CLASS.getValue(), BigInteger.valueOf(cflist.getClassref().getId()))) && (accessmanager.checkAccess(inst_token, TYPE_CONTENTLIST.getValue(), BigInteger.valueOf(cflist.getId())))) {
                 List<CfListcontent> listcontentList = cflistcontentService.findByListref(cflist.getId());
 
                 List<CfClasscontent> classcontentList = new ArrayList<>();
@@ -216,7 +217,6 @@ public class GetDatalist extends HttpServlet {
         ArrayList<ContentOutput> outputlist = new ArrayList<>();
         
         outputlist = new ArrayList<>();
-        //outputmap = new HashMap<>();
         apikey = gcp.getApikey();
         if (apikeyutil.checkApiKey(apikey, "RestService")) {
             String inst_name = "";
@@ -242,35 +242,44 @@ public class GetDatalist extends HttpServlet {
             name = gcp.getListname();
             inst_name = name;
             CfList cflist = cflistService.findByName(inst_name);
-            List<CfListcontent> listcontentList = cflistcontentService.findByListref(cflist.getId());
-            
-            List<CfClasscontent> classcontentList = new ArrayList<>();
-            for (CfListcontent listcontent : listcontentList) {
-                CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                if (null != classcontent) {
-                    // ToDo: #95 check AccessManager
-                    classcontentList.add(classcontent);
-                } else {
-                    LOGGER.warn("Classcontent does not exist: " + inst_name + " - " + listcontent.getCfListcontentPK().getClasscontentref());
-                }
-            }
-            
-            for (CfClasscontent classcontent : classcontentList) {    
-                List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
-                ContentOutput co = new ContentOutput();
-                co.setIdentifier(classcontent.getName());
-                co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
-                co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
-                outputlist.add(co);
-            }
+            // !ToDo: #95 check AccessManager
+            if ((accessmanager.checkAccess(gcp.getToken(), TYPE_CLASS.getValue(), BigInteger.valueOf(cflist.getClassref().getId()))) && (accessmanager.checkAccess(gcp.getToken(), TYPE_CONTENTLIST.getValue(), BigInteger.valueOf(cflist.getId())))) {
+                List<CfListcontent> listcontentList = cflistcontentService.findByListref(cflist.getId());
 
-            datalistoutput.setCflist(cflist);
-            datalistoutput.setOutputlist(outputlist);
-            Gson gson = new Gson();
-            String json = gson.toJson(datalistoutput);
-            gcp.setJson(json);
-            gcp.setReturncode("TRUE");
-            return gcp;
+                List<CfClasscontent> classcontentList = new ArrayList<>();
+                for (CfListcontent listcontent : listcontentList) {
+                    CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                    if (null != classcontent) {
+                        // !ToDo: #95 check AccessManager
+                        if (accessmanager.checkAccess(gcp.getToken(), TYPE_CONTENT.getValue(), BigInteger.valueOf(classcontent.getId()))) {
+                            classcontentList.add(classcontent);
+                        }
+                    } else {
+                        LOGGER.warn("Classcontent does not exist: " + inst_name + " - " + listcontent.getCfListcontentPK().getClasscontentref());
+                    }
+                }
+
+                for (CfClasscontent classcontent : classcontentList) {    
+                    List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
+                    ContentOutput co = new ContentOutput();
+                    co.setIdentifier(classcontent.getName());
+                    co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                    co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
+                    outputlist.add(co);
+                }
+
+                datalistoutput.setCflist(cflist);
+                datalistoutput.setOutputlist(outputlist);
+                Gson gson = new Gson();
+                String json = gson.toJson(datalistoutput);
+                gcp.setJson(json);
+                gcp.setReturncode("TRUE");
+                return gcp;
+            } else {
+                gcp.setReturncode("FALSE");
+                gcp.setJson("[]");
+                return gcp;
+            }
         } else {
             gcp.setReturncode("FALSE");
             gcp.setJson("[]");
