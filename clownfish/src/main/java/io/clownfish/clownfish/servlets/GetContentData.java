@@ -16,22 +16,24 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CLASS;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CONTENT;
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
-import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
-import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfContentversionService;
+import io.clownfish.clownfish.utils.AccessManagerUtil;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +61,7 @@ public class GetContentData extends HttpServlet {
     @Autowired ContentUtil contentUtil;
     @Autowired ClassUtil classutil;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired AccessManagerUtil accessmanager;
         
     final transient Logger LOGGER = LoggerFactory.getLogger(GetContentData.class);
 
@@ -73,6 +76,7 @@ public class GetContentData extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
+            String token = request.getParameter("token");
             if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 CfClasscontent content = null;
                 
@@ -97,34 +101,42 @@ public class GetContentData extends HttpServlet {
                 }
 
                 if (null != content) {
-                    // ToDo: #95 check AccessManager
-                    ContentDataOutput contentdataoutput = new ContentDataOutput();
-                    contentdataoutput.setContent(content);
-                    ArrayList<String> keywords = getAssetKeywords(content, true);
-                    
-                    if (lversion < maxversion) {
-                        String contentversion = contentUtil.getVersion(content.getId(), lversion);
-                        List<CfAttributcontent> attributcontentList = classutil.jsonImport(contentversion);
-                        ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
-                        contentdataoutput.setKeyvals(keyvals);
+                    // !ToDo: #95 check AccessManager
+                    if ((accessmanager.checkAccess(token, TYPE_CLASS.getValue(), BigInteger.valueOf(content.getClassref().getId()))) && (accessmanager.checkAccess(token, TYPE_CONTENT.getValue(), BigInteger.valueOf(content.getId())))) {
+                        ContentDataOutput contentdataoutput = new ContentDataOutput();
+                        contentdataoutput.setContent(content);
+                        ArrayList<String> keywords = getAssetKeywords(content, true);
+
+                        if (lversion < maxversion) {
+                            String contentversion = contentUtil.getVersion(content.getId(), lversion);
+                            List<CfAttributcontent> attributcontentList = classutil.jsonImport(contentversion);
+                            ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
+                            contentdataoutput.setKeyvals(keyvals);
+                        } else {
+                            List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(content);
+                            ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
+                            contentdataoutput.setKeyvals(keyvals);
+
+                        }
+                        contentdataoutput.setKeywords(keywords);
+                        contentdataoutput.setDifference(contentUtil.hasDifference(content));
+                        contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(content.getId()));
+
+                        Gson gson = new Gson(); 
+                        String json = gson.toJson(contentdataoutput);
+                        response.setContentType("application/json;charset=UTF-8");
+                        try (PrintWriter out = response.getWriter()) {
+                            out.print(json);
+                        } catch (IOException ex) {
+                            LOGGER.error(ex.getMessage());
+                        }
                     } else {
-                        List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(content);
-                        ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
-                        contentdataoutput.setKeyvals(keyvals);
-                        
+                        PrintWriter out = response.getWriter();
+                        out.print("Access denied");
                     }
-                    contentdataoutput.setKeywords(keywords);
-                    contentdataoutput.setDifference(contentUtil.hasDifference(content));
-                    contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(content.getId()));
-                    
-                    Gson gson = new Gson(); 
-                    String json = gson.toJson(contentdataoutput);
-                    response.setContentType("application/json;charset=UTF-8");
-                    try (PrintWriter out = response.getWriter()) {
-                        out.print(json);
-                    } catch (IOException ex) {
-                        LOGGER.error(ex.getMessage());
-                    }
+                } else {
+                    PrintWriter out = response.getWriter();
+                    out.print("Content not found");
                 }
             } else {
                 PrintWriter out = response.getWriter();
