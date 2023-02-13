@@ -90,4 +90,37 @@ public class RestAsset {
         }
         return ikp;
     }
+    
+    @PostMapping("/deleteasset")
+    public RestAssetParameter restDeleteAsset(@RequestBody RestAssetParameter ikp) {
+        return deleteAsset(ikp);
+    }
+    
+    private RestAssetParameter deleteAsset(RestAssetParameter ikp) {
+        try {
+            String token = ikp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = ikp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
+                    try {
+                        CfAsset asset = cfassetService.findById(ikp.getId());
+                        asset.setScrapped(true);
+                        CfAsset newasset2 = cfassetService.edit(asset);
+                        ikp.setReturncode("OK");
+                    } catch (javax.persistence.NoResultException ex) {
+                        LOGGER.warn("No Asset");
+                        ikp.setReturncode("No Asset");
+                    }
+                } else {
+                    ikp.setReturncode("Wrong API KEY");
+                }
+            } else {
+                ikp.setReturncode("Invalid token");
+            }
+        } catch (javax.persistence.NoResultException ex) {
+            LOGGER.error("NoResultException");
+            ikp.setReturncode("NoResultException");
+        }
+        return ikp;
+    }
 }
