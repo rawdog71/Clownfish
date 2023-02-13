@@ -107,7 +107,7 @@ public class ClownfishLoginServlet extends HttpServlet {
 
             for (CfClasscontent classcontent : classcontentList) {
                 CfAttributcontent attributContent = cfattributcontentService.findByAttributrefAndClasscontentref(attributField, classcontent);
-                if (attributContent.getContentString().equals(inst_identifier)) {
+                if ((null != attributContent) && (attributContent.getContentString().equals(inst_identifier))) {
                     long cref = attributContent.getClasscontentref().getId();
                     for (CfClasscontent classcontent1 : classcontentList) {
                         CfAttributcontent attributContent1 = cfattributcontentService.findByAttributrefAndClasscontentref(attributPassword, classcontent1);
