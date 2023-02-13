@@ -216,6 +216,16 @@ public class RestContent {
 
                     try {
                         CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
+                        try {
+                            if ((null != ucp.getUpdatecontentname()) && (!ucp.getUpdatecontentname().isEmpty())) {
+                                CfClasscontent updateclasscontent = cfclasscontentService.findByName(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                            }
+                        } catch (javax.persistence.NoResultException ex) {
+                            classcontent.setName(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                            ucp.setContentname(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                            cfclasscontentService.edit(classcontent);
+                        }
+                        
                         List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
                         for (CfAttributcontent attributcontent : attributcontentlist) {
                             CfAttribut attribut = attributcontent.getAttributref();

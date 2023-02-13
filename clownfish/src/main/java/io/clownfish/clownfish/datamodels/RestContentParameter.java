@@ -29,6 +29,7 @@ public class RestContentParameter {
     private @Getter @Setter String token;
     private @Getter @Setter String classname;
     private @Getter @Setter String contentname;
+    private @Getter @Setter String updatecontentname;
     private @Getter @Setter boolean indexing;
     private @Getter @Setter HashMap<String, String> attributmap;
     private @Getter @Setter long checkedoutby;
