@@ -594,4 +594,18 @@ public class ContentUtil implements IVersioningInterface {
                 return false;
         }
     }
+    
+    public String getUniqueName(String name) {
+        int i = 1;
+        boolean found = false;
+        do {
+            try {
+                cfclasscontentService.findByName(name+"("+i+")");
+                i++;
+            } catch(Exception ex) {
+                found = true;
+            }
+        } while (!found);
+        return name+"("+i+")";
+    }
 }
