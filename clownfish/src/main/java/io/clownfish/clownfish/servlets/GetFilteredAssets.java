@@ -67,6 +67,7 @@ public class GetFilteredAssets extends HttpServlet {
     private static transient @Getter @Setter String assetlibrary;
     private static transient @Getter @Setter String apikey;
     private static transient @Getter @Setter String token;
+    private static transient @Getter @Setter String keywords;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(GetFilteredAssets.class);
     
@@ -85,16 +86,19 @@ public class GetFilteredAssets extends HttpServlet {
         String inst_assetlibrary = null;
         String inst_apikey = "";
         String inst_token = "";
+        String inst_keywords = "";
         ArrayList<String> searchkeywords;
         List<CfAssetlistcontent> assetlistcontent = null;
         HashMap<String, String> outputmap;
         List<AssetDataOutput> outputlist = SetUniqueList.decorate(new ArrayList<AssetDataOutput>());
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
+        apikey = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             apikey = values[0];
         });
         inst_apikey = apikey;
+        token = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("token") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             token = values[0];
         });
@@ -112,16 +116,17 @@ public class GetFilteredAssets extends HttpServlet {
             }
 
             searchkeywords = new ArrayList<>();
-            parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("keywords"))).forEach((paramname) -> {
-                String[] keys = paramname.split("\\$");
-                int counter = 0;
-                for (String key : keys) {
-                    if (counter > 0) {
-                        searchkeywords.add(key);
-                    }
-                    counter++;
-                }
+            keywords = "";
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("keywords") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                keywords = values[0];
             });
+            inst_keywords = keywords;
+            if ((null != inst_keywords) && (!inst_keywords.isEmpty())) {
+                String[] keys = inst_keywords.split("\\$");
+                for (String key : keys) {
+                    searchkeywords.add(key);
+                }
+            };
 
             boolean found = true;
             if (null != assetlistcontent) {

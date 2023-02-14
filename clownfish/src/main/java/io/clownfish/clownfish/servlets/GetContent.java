@@ -122,10 +122,12 @@ public class GetContent extends HttpServlet {
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
+        apikey = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             apikey = values[0];
         });
         inst_apikey = apikey;
+        token = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("token") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             token = values[0];
         });
@@ -433,7 +435,7 @@ public class GetContent extends HttpServlet {
             boolean found = false;
             int listcounter = 0;
             for (CfClasscontent classcontent : classcontentList) {
-                // ToDo: #95 check AccessManager
+                // !ToDo: #95 check AccessManager
                 if (!accessmanager.checkAccess(gcp.getToken(), TYPE_CLASS.getValue(), BigInteger.valueOf(classcontent.getClassref().getId()))) {
                     continue;
                 }

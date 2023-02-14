@@ -104,6 +104,7 @@ public class GetContentHibernate extends HttpServlet {
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
+        apikey = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             apikey = values[0];
         });

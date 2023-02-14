@@ -52,12 +52,12 @@ public class BackendLoginServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         Map<String, String[]> parameters = request.getParameterMap();
-        
+        email = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("email") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             email = values[0];
         });
         String inst_email = email;
-        
+        password = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("password") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             password = values[0];
         });

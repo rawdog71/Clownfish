@@ -139,10 +139,12 @@ public class GetDatalist extends HttpServlet {
         String inst_token = "";
         
         Map<String, String[]> parameters = request.getParameterMap();
+        apikey = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             apikey = values[0];
         });
         inst_apikey = apikey;
+        token = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("token") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             token = values[0];
         });
