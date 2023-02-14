@@ -18,6 +18,7 @@ package io.clownfish.clownfish.dbrepository;
 import io.clownfish.clownfish.daointerface.CfClasscontentDAO;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import java.math.BigInteger;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -117,6 +118,25 @@ public class CfClasscontentDAOImpl implements CfClasscontentDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findByMaintenance");
         query.setParameter("maintenance", maintenance);
+        List<CfClasscontent> cfclasscontentlist = query.getResultList();
+        return cfclasscontentlist;
+    }
+
+    @Override
+    public List<CfClasscontent> findNotInList(BigInteger ref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findNotInList");
+        query.setParameter("refclasscontent", ref);
+        List<CfClasscontent> cfclasscontentlist = query.getResultList();
+        return cfclasscontentlist;
+    }
+
+    @Override
+    public List<CfClasscontent> findByClassrefNotInList(CfClass classref, BigInteger ref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findByClassrefNotInList");
+        query.setParameter("refclasscontent", ref);
+        query.setParameter("classref", classref);
         List<CfClasscontent> cfclasscontentlist = query.getResultList();
         return cfclasscontentlist;
     }

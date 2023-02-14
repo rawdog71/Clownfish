@@ -17,6 +17,7 @@ package io.clownfish.clownfish.daointerface;
 
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -29,6 +30,8 @@ public interface CfClasscontentDAO {
     CfClasscontent findById(Long id);
     CfClasscontent findByName(String name);
     List<CfClasscontent> findByScrapped(boolean scrapped);
+    List<CfClasscontent> findNotInList(BigInteger ref);
+    List<CfClasscontent> findByClassrefNotInList(CfClass classref, BigInteger ref);
     CfClasscontent create(CfClasscontent entity);
     boolean delete(CfClasscontent entity);
     CfClasscontent edit(CfClasscontent entity);

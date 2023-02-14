@@ -19,6 +19,7 @@ import io.clownfish.clownfish.daointerface.CfClasscontentDAO;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import java.math.BigInteger;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,5 +80,15 @@ public class CfClasscontentServiceImpl implements CfClasscontentService {
     @Override
     public List<CfClasscontent> findByMaintenance(boolean maintenance) {
         return this.cfclasscontentDAO.findByMaintenance(maintenance);
+    }
+
+    @Override
+    public List<CfClasscontent> findNotInList(BigInteger ref) {
+        return this.cfclasscontentDAO.findNotInList(ref);
+    }
+
+    @Override
+    public List<CfClasscontent> findByClassrefNotInList(CfClass classref, BigInteger ref) {
+        return this.cfclasscontentDAO.findByClassrefNotInList(classref, ref);
     }
 }

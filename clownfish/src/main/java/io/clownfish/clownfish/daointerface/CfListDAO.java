@@ -35,4 +35,6 @@ public interface CfListDAO {
     CfList edit(CfList entity);
     List<CfList> findByMaintenance(boolean b);
     CfList findByClassrefAndName(CfClass ref, String name);
+
+    public CfList findByNameNotInList(String name, BigInteger ref);
 }

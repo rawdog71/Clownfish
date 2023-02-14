@@ -17,6 +17,8 @@ package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
 import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CLASS;
+import io.clownfish.clownfish.datamodels.AuthTokenClasscontent;
+import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
@@ -74,11 +76,13 @@ public class GetContent extends HttpServlet {
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired AccessManagerUtil accessmanager;
+    @Autowired transient AuthTokenListClasscontent authtokenlist;
     
     private static transient @Getter @Setter String klasse;
     private static transient @Getter @Setter String identifier;
     private static transient @Getter @Setter String datalist;
     private static transient @Getter @Setter String apikey;
+    private static transient @Getter @Setter String token;
     private static transient @Getter @Setter String range;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(GetContent.class);
@@ -106,6 +110,7 @@ public class GetContent extends HttpServlet {
         String inst_datalist;
         String inst_range;
         String inst_apikey = "";
+        String inst_token = "";
         HashMap<String, String> searchmap;
         ArrayList<String> searchkeywords;
         HashMap<String, String> outputmap;
@@ -121,6 +126,10 @@ public class GetContent extends HttpServlet {
             apikey = values[0];
         });
         inst_apikey = apikey;
+        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("token") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+            token = values[0];
+        });
+        inst_token = token;
         if (apikeyutil.checkApiKey(inst_apikey, "RestService")) {
             klasse = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("class") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
@@ -162,7 +171,18 @@ public class GetContent extends HttpServlet {
             
             listcontent = null;
             if (!inst_datalist.isEmpty()) {
-                CfList dataList = cflistService.findByName(inst_datalist);
+                CfList dataList;                
+                if ((null != inst_token) && (!inst_token.isEmpty())) {
+                    // !ToDo: #95 check AccessManager
+                    AuthTokenClasscontent classcontent = authtokenlist.getAuthtokens().get(inst_token);
+                    if (null != classcontent) {
+                        dataList = cflistService.findByNameNotInList(inst_datalist, BigInteger.valueOf(classcontent.getUser().getId()));
+                    } else {
+                        dataList = cflistService.findByNameNotInList(inst_datalist, BigInteger.valueOf(0L));
+                    }
+                } else {
+                    dataList = cflistService.findByNameNotInList(inst_datalist, BigInteger.valueOf(0L));
+                }
                 listcontent = cflistcontentService.findByListref(dataList.getId());
             }
             searchmap = new HashMap<>();
@@ -188,11 +208,25 @@ public class GetContent extends HttpServlet {
                 }
             });
             CfClass cfclass = cfclassService.findByName(inst_klasse);
-            List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
+            List<CfClasscontent> classcontentList;
+            if ((null != inst_token) && (!inst_token.isEmpty())) {
+                // !ToDo: #95 check AccessManager
+                AuthTokenClasscontent classcontent = authtokenlist.getAuthtokens().get(inst_token);
+                if (null != classcontent) {
+                    classcontentList = cfclasscontentService.findByClassrefNotInList(cfclass, BigInteger.valueOf(classcontent.getUser().getId()));
+                } else {
+                    classcontentList = cfclasscontentService.findByClassrefNotInList(cfclass, BigInteger.valueOf(0L));
+                }
+            } else {
+                classcontentList = cfclasscontentService.findByClassrefNotInList(cfclass, BigInteger.valueOf(0L));
+            }
+            
             boolean found = true;
             int listcounter = 0;
             for (CfClasscontent classcontent : classcontentList) {
-                // ToDo: #95 check AccessManager
+                if (!accessmanager.checkAccess(inst_token, TYPE_CLASS.getValue(), BigInteger.valueOf(classcontent.getClassref().getId()))) {
+                    continue;
+                }
                 boolean inList = true;
                 // Check if identifier is set and matches classcontent
                 if ((!inst_identifier.isEmpty()) && (0 != inst_identifier.compareToIgnoreCase(classcontent.getName()))) {
@@ -245,7 +279,11 @@ public class GetContent extends HttpServlet {
                                 contentdataoutput.setKeywords(keywords);
                                 contentdataoutput.setKeyvals(keyvals);
                                 contentdataoutput.setDifference(contentUtil.hasDifference(classcontent));
-                                contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(classcontent.getId()));
+                                try {
+                                    contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(classcontent.getId()));
+                                } catch (Exception ex) {
+                                    contentdataoutput.setMaxversion(0);
+                                }
                                 outputlist.add(contentdataoutput);
                                 //System.out.println(inst_klasse + " - " + listcounter);
                             }
@@ -255,7 +293,11 @@ public class GetContent extends HttpServlet {
                             contentdataoutput.setKeywords(keywords);
                             contentdataoutput.setKeyvals(keyvals);
                             contentdataoutput.setDifference(contentUtil.hasDifference(classcontent));
-                            contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(classcontent.getId()));
+                            try {
+                                contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(classcontent.getId()));
+                            } catch (Exception ex) {
+                                contentdataoutput.setMaxversion(0);
+                            }
                             outputlist.add(contentdataoutput);
                             //System.out.println(inst_klasse + " - " + listcounter);
                         }
@@ -300,6 +342,7 @@ public class GetContent extends HttpServlet {
         String inst_identifier;
         String inst_datalist;
         String inst_apikey = "";
+        String inst_token = "";
         HashMap<String, String> searchmap;
         ArrayList<String> searchkeywords;
         HashMap<String, String> outputmap;
@@ -324,6 +367,7 @@ public class GetContent extends HttpServlet {
         }
         outputlist = new ArrayList<>();
         outputmap = new HashMap<>();
+        inst_token = gcp.getToken();
         inst_apikey = gcp.getApikey();
         if (apikeyutil.checkApiKey(inst_apikey, "RestService")) {
             inst_klasse = gcp.getClassname();
@@ -334,7 +378,18 @@ public class GetContent extends HttpServlet {
             inst_datalist = gcp.getListname();
             listcontent = null;
             if ((null != inst_datalist) && (!inst_datalist.isEmpty())) {
-                CfList dataList = cflistService.findByName(inst_datalist);
+                CfList dataList;                
+                if ((null != inst_token) && (!inst_token.isEmpty())) {
+                    // !ToDo: #95 check AccessManager
+                    AuthTokenClasscontent classcontent = authtokenlist.getAuthtokens().get(inst_token);
+                    if (null != classcontent) {
+                        dataList = cflistService.findByNameNotInList(inst_datalist, BigInteger.valueOf(classcontent.getUser().getId()));
+                    } else {
+                        dataList = cflistService.findByNameNotInList(inst_datalist, BigInteger.valueOf(0L));
+                    }
+                } else {
+                    dataList = cflistService.findByNameNotInList(inst_datalist, BigInteger.valueOf(0L));
+                }
                 listcontent = cflistcontentService.findByListref(dataList.getId());
             }
             searchmap = new HashMap<>();
@@ -363,7 +418,18 @@ public class GetContent extends HttpServlet {
             }
 
             CfClass cfclass = cfclassService.findByName(inst_klasse);
-            List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
+            List<CfClasscontent> classcontentList;
+            if ((null != inst_token) && (!inst_token.isEmpty())) {
+                // !ToDo: #95 check AccessManager
+                AuthTokenClasscontent classcontent = authtokenlist.getAuthtokens().get(inst_token);
+                if (null != classcontent) {
+                    classcontentList = cfclasscontentService.findByClassrefNotInList(cfclass, BigInteger.valueOf(classcontent.getUser().getId()));
+                } else {
+                    classcontentList = cfclasscontentService.findByClassrefNotInList(cfclass, BigInteger.valueOf(0L));
+                }
+            } else {
+                classcontentList = cfclasscontentService.findByClassrefNotInList(cfclass, BigInteger.valueOf(0L));
+            }
             boolean found = false;
             int listcounter = 0;
             for (CfClasscontent classcontent : classcontentList) {

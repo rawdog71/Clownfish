@@ -17,6 +17,7 @@ package io.clownfish.clownfish.serviceinterface;
 
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -29,6 +30,8 @@ public interface CfClasscontentService {
     CfClasscontent findById(Long id);
     CfClasscontent findByName(String name);
     List<CfClasscontent> findByScrapped(boolean scrapped);
+    List<CfClasscontent> findByClassrefNotInList(CfClass classref, BigInteger ref);
+    List<CfClasscontent> findNotInList(BigInteger ref);
     CfClasscontent create(CfClasscontent entity);
     boolean delete(CfClasscontent entity);
     CfClasscontent edit(CfClasscontent entity);

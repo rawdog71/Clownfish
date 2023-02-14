@@ -122,4 +122,14 @@ public class CfListDAOImpl implements CfListDAO {
         List<CfList> cfcontentlist = query.getResultList();
         return cfcontentlist;
     }
+
+    @Override
+    public CfList findByNameNotInList(String name, BigInteger ref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfList.findByNameNotInList");  
+        query.setParameter("name", name);
+        query.setParameter("refclasscontent", ref);
+        CfList cflist = (CfList) query.getSingleResult();
+        return cflist;
+    }
 }

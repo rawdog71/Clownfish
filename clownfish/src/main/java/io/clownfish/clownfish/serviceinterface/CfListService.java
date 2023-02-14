@@ -31,6 +31,7 @@ public interface CfListService {
     CfList findByClassrefAndName(CfClass ref, String name);
     List<CfList> findByClassref(CfClass ref);
     List<CfList> findNotInList(BigInteger ref);
+    CfList findByNameNotInList(String name, BigInteger ref);
     CfList create(CfList entity);
     boolean delete(CfList entity);
     CfList edit(CfList entity);
