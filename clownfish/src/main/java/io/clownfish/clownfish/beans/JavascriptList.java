@@ -76,6 +76,7 @@ public class JavascriptList implements ISourceContentInterface {
     @Autowired CfJavascriptversionService cfjavascriptversionService;
     
     private @Getter @Setter List<CfJavascript> javascriptListe;
+    private @Getter @Setter List<CfJavascript> invisJavascriptList;
     private @Getter @Setter CfJavascript selectedJavascript = null;
     private @Getter @Setter String javascriptName = "";
     private @Getter @Setter boolean newButtonDisabled = true;
@@ -98,6 +99,7 @@ public class JavascriptList implements ISourceContentInterface {
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
     @Autowired private FolderUtil folderUtil;
     private @Getter @Setter SiteTreeBean sitetree;
+    private @Getter @Setter boolean invisible;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(JavascriptList.class);
 
@@ -138,6 +140,8 @@ public class JavascriptList implements ISourceContentInterface {
         showDiff = false;
         javascriptName = "";
         javascriptListe = cfjavascriptService.findAll();
+        invisJavascriptList = cfjavascriptService.findAll().stream()
+                .filter((cfJavascript -> !cfJavascript.getInvisible())).collect(Collectors.toList());
         javascriptUtility.setJavascriptContent("");
         checkedout = false;
         access = false;
@@ -154,6 +158,8 @@ public class JavascriptList implements ISourceContentInterface {
     @Override
     public void refresh() {
         javascriptListe = cfjavascriptService.findAll();
+        invisJavascriptList = cfjavascriptService.findAll().stream()
+                .filter((cfJavascript -> !cfJavascript.getInvisible())).collect(Collectors.toList());
         if (null != sitetree) {
             sitetree.onRefreshSelection();
         }
@@ -164,16 +170,24 @@ public class JavascriptList implements ISourceContentInterface {
 
         return javascriptListe.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
     }
+
+    public List<CfJavascript> completeInvisText(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return invisJavascriptList.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
+    }
     
     @Override
     public void onSelect(AjaxBehaviorEvent event) {
         selectJavascript(selectedJavascript);
+        setInvisible(selectedJavascript.getInvisible());
     }
     
     @Override
     public void onSave(ActionEvent actionEvent) {
         if (null != selectedJavascript) {
             selectedJavascript.setContent(getContent());
+            selectedJavascript.setInvisible(invisible);
             cfjavascriptService.edit(selectedJavascript);
             difference = javascriptUtility.hasDifference(selectedJavascript);
             
@@ -295,8 +309,15 @@ public class JavascriptList implements ISourceContentInterface {
                 CfJavascript newjavascript = new CfJavascript();
                 newjavascript.setName(javascriptName);
                 newjavascript.setContent("//"+javascriptName);
+                if (loginbean.getCfuser().getSuperadmin()) {
+                    newjavascript.setInvisible(invisible);
+                } else {
+                    newjavascript.setInvisible(false);
+                }
                 cfjavascriptService.create(newjavascript);
                 javascriptListe = cfjavascriptService.findAll();
+                invisJavascriptList = cfjavascriptService.findAll().stream()
+                        .filter((cfJavascript -> !cfJavascript.getInvisible())).collect(Collectors.toList());
                 javascriptName = "";
                 selectedJavascript = newjavascript;
                 onSelect(null);
@@ -315,6 +336,8 @@ public class JavascriptList implements ISourceContentInterface {
         if (null != selectedJavascript) {
             cfjavascriptService.delete(selectedJavascript);
             javascriptListe = cfjavascriptService.findAll();
+            invisJavascriptList = cfjavascriptService.findAll().stream()
+                    .filter((cfJavascript -> !cfJavascript.getInvisible())).collect(Collectors.toList());
             
             FacesMessage message = new FacesMessage("Deleted " + selectedJavascript.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -425,6 +448,7 @@ public class JavascriptList implements ISourceContentInterface {
             access = checkoutUtil.isAccess();
             javascriptversionMax = versionlist.size();
             selectedjavascriptversion = javascriptversionMax;
+            setInvisible(selectedJavascript.getInvisible());
         } else {
             javascriptName = "";
             checkedout = false;

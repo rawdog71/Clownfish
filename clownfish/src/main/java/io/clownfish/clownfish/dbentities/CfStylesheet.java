@@ -44,7 +44,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfStylesheet.findAll", query = "SELECT c FROM CfStylesheet c"),
     @NamedQuery(name = "CfStylesheet.findById", query = "SELECT c FROM CfStylesheet c WHERE c.id = :id"),
     @NamedQuery(name = "CfStylesheet.findByName", query = "SELECT c FROM CfStylesheet c WHERE c.name = :name"),
-    @NamedQuery(name = "CfStylesheet.findByCheckedoutby", query = "SELECT c FROM CfStylesheet c WHERE c.checkedoutby = :checkedoutby")})
+    @NamedQuery(name = "CfStylesheet.findByCheckedoutby", query = "SELECT c FROM CfStylesheet c WHERE c.checkedoutby = :checkedoutby"),
+    @NamedQuery(name = "CfStylesheet.findByInvisible", query = "SELECT c FROM CfStylesheet c WHERE c.invisible = :invisible")
+})
 public class CfStylesheet implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -66,6 +68,8 @@ public class CfStylesheet implements Serializable {
     private String content;
     @Column(name = "checkedoutby")
     private BigInteger checkedoutby;
+    @Column(name = "invisible")
+    private boolean invisible;
 
     public CfStylesheet() {
     }
@@ -110,6 +114,13 @@ public class CfStylesheet implements Serializable {
 
     public void setCheckedoutby(BigInteger checkedoutby) {
         this.checkedoutby = checkedoutby;
+    }
+
+    public boolean getInvisible() {
+        return invisible;
+    }
+    public void setInvisible(boolean invis) {
+        invisible = invis;
     }
 
     @Override

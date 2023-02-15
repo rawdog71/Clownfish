@@ -27,6 +27,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jdk.jfr.Name;
+
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -45,7 +47,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfUser.findByNachname", query = "SELECT c FROM CfUser c WHERE c.nachname = :nachname"),
     @NamedQuery(name = "CfUser.findByEmail", query = "SELECT c FROM CfUser c WHERE c.email = :email"),
     @NamedQuery(name = "CfUser.findByPasswort", query = "SELECT c FROM CfUser c WHERE c.passwort = :passwort"),
-    @NamedQuery(name = "CfUser.findBySalt", query = "SELECT c FROM CfUser c WHERE c.salt = :salt")})
+    @NamedQuery(name = "CfUser.findBySalt", query = "SELECT c FROM CfUser c WHERE c.salt = :salt"),
+    @NamedQuery(name = "CfUser.findBySuperadmin", query = "SELECT c FROM CfUser c WHERE c.superadmin = :superadmin")
+})
 public class CfUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -81,6 +85,8 @@ public class CfUser implements Serializable {
     @JoinColumn(name = "assetref", referencedColumnName = "id")
     @ManyToOne(optional = true)
     private CfAsset assetref;
+    @Column(name = "superadmin")
+    private boolean superadmin;
 
     public CfUser() {
     }
@@ -151,6 +157,14 @@ public class CfUser implements Serializable {
 
     public void setAssetref(CfAsset assetref) {
         this.assetref = assetref;
+    }
+
+    public boolean getSuperadmin() {
+        return superadmin;
+    }
+
+    public void setSuperadmin(boolean superadm) {
+        superadmin = superadm;
     }
 
     @Override

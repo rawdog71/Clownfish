@@ -47,7 +47,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfTemplate.findById", query = "SELECT c FROM CfTemplate c WHERE c.id = :id"),
     @NamedQuery(name = "CfTemplate.findByName", query = "SELECT c FROM CfTemplate c WHERE c.name = :name"),
     @NamedQuery(name = "CfTemplate.findByScriptlanguage", query = "SELECT c FROM CfTemplate c WHERE c.scriptlanguage = :scriptlanguage"),
-    @NamedQuery(name = "CfTemplate.findByCheckedoutby", query = "SELECT c FROM CfTemplate c WHERE c.checkedoutby = :checkedoutby")})
+    @NamedQuery(name = "CfTemplate.findByCheckedoutby", query = "SELECT c FROM CfTemplate c WHERE c.checkedoutby = :checkedoutby"),
+    @NamedQuery(name = "CfTemplate.findByInvisible", query = "SELECT c FROM CfTemplate c WHERE c.invisible = :invisible")
+})
 public class CfTemplate implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -75,6 +77,8 @@ public class CfTemplate implements Serializable {
     private BigInteger checkedoutby;
     @Column(name = "type")
     private int type;
+    @Column(name = "invisible")
+    private boolean invisible;
 
     public CfTemplate() {
     }
@@ -136,6 +140,13 @@ public class CfTemplate implements Serializable {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public boolean getInvisible() {
+        return invisible;
+    }
+    public void setInvisible(boolean invis) {
+        invisible = invis;
     }
     
     public String typeflag() {

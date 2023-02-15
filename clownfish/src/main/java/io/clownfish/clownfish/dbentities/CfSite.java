@@ -57,7 +57,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfSite.findByAliaspath", query = "SELECT c FROM CfSite c WHERE c.aliaspath = :aliaspath"),
     @NamedQuery(name = "CfSite.findBySitemap", query = "SELECT c FROM CfSite c WHERE c.sitemap = :sitemap"),
     @NamedQuery(name = "CfSite.findBySearchresult", query = "SELECT c FROM CfSite c WHERE c.searchresult = :searchresult"),
-    @NamedQuery(name = "CfSite.findByShorturl", query = "SELECT c FROM CfSite c WHERE c.shorturl = :shorturl")
+    @NamedQuery(name = "CfSite.findByShorturl", query = "SELECT c FROM CfSite c WHERE c.shorturl = :shorturl"),
+    @NamedQuery(name = "CfSite.findByInvisible", query = "SELECT c FROM CfSite c WHERE c.invisible = :invisible")
 })
 public class CfSite implements Serializable {
     
@@ -126,6 +127,8 @@ public class CfSite implements Serializable {
     @Size(max = 255)
     @Column(name = "testparams")
     private String testparams;
+    @Column(name = "invisible")
+    private boolean invisible;
     
     public CfSite() {
     }
@@ -342,6 +345,13 @@ public class CfSite implements Serializable {
 
     public void setTestparams(String testparams) {
         this.testparams = testparams;
+    }
+
+    public boolean getInvisible() {
+        return invisible;
+    }
+    public void setInvisible(boolean invis) {
+        invisible = invis;
     }
     
     public String getIcon() {
