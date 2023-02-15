@@ -89,24 +89,7 @@ public class DataList implements Serializable {
     
     public void onSelect(SelectEvent event) {
         selectedList = (CfList) event.getObject();
-        contentName = selectedList.getName();
-        selectedClass = selectedList.getClassref();
-        newContentButtonDisabled = true;
-        
-        filteredclasscontentlist = cfclasscontentService.findByClassref(selectedList.getClassref());
-        List<CfListcontent> selectedcontent = cflistcontentService.findByListref(selectedList.getId());
-        
-        selectedListcontent.clear();
-        if (!selectedcontent.isEmpty()) {
-            for (CfListcontent listcontent : selectedcontent) {
-                CfClasscontent selectedContent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                if (null != selectedContent) {
-                    if (!selectedContent.isScrapped()) {
-                        selectedListcontent.add(selectedContent);
-                    }
-                }
-            }
-        }
+        selectDatalist(selectedList);
     }
     
     public void onCreateContent(ActionEvent actionEvent) {
@@ -166,5 +149,31 @@ public class DataList implements Serializable {
             }
         }
         hibernateUtil.updateRelation(selectedList);
+    }
+    
+    public void selectDivDatalist(String datalistname) {
+        selectDatalist(cflistService.findByName(datalistname));
+    }
+    
+    public void selectDatalist(CfList datalistist) {
+        selectedList = datalistist;
+        contentName = selectedList.getName();
+        selectedClass = selectedList.getClassref();
+        newContentButtonDisabled = true;
+        
+        filteredclasscontentlist = cfclasscontentService.findByClassref(selectedList.getClassref());
+        List<CfListcontent> selectedcontent = cflistcontentService.findByListref(selectedList.getId());
+        
+        selectedListcontent.clear();
+        if (!selectedcontent.isEmpty()) {
+            for (CfListcontent listcontent : selectedcontent) {
+                CfClasscontent selectedContent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                if (null != selectedContent) {
+                    if (!selectedContent.isScrapped()) {
+                        selectedListcontent.add(selectedContent);
+                    }
+                }
+            }
+        }
     }
 }

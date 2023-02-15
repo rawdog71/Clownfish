@@ -126,10 +126,18 @@ public class HibernateUtil implements Runnable {
                                 elementproperty.addAttribute("column", attribut.getName() + "_ref_" + attribut.getRelationref().getName() + "_1_n_");
                             }
                         } else {
-                            elementproperty.addAttribute("column", attribut.getName() + "_");
+                            Element elementcolumn = elementproperty.addElement("column");
+                            elementcolumn.addAttribute("name", attribut.getName() + "_");
+                            if ((null != attribut.getDefault_val()) && (!attribut.getDefault_val().isEmpty())) {
+                                elementcolumn.addAttribute("default", "'"+attribut.getDefault_val()+"'");
+                                if (attribut.getMandatory()) {
+                                    elementcolumn.addAttribute("not-null", "true");
+                                } else {
+                                    elementcolumn.addAttribute("not-null", "false");
+                                }
+                            }
                         }
                         elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
-                        elementproperty.addAttribute("not-null", "false");
                         if (attribut.getIsindex()) {
                             elementproperty.addAttribute("index", "idx_" + attribut.getName());
                         }
@@ -207,10 +215,18 @@ public class HibernateUtil implements Runnable {
                                 elementproperty.addAttribute("column", attribut.getName() + "_ref_" + attribut.getRelationref().getName() + "_1_n_");
                             }
                         } else {
-                            elementproperty.addAttribute("column", attribut.getName() + "_");
+                            Element elementcolumn = elementproperty.addElement("column");
+                            elementcolumn.addAttribute("name", attribut.getName() + "_");
+                            if ((null != attribut.getDefault_val()) && (!attribut.getDefault_val().isEmpty())) {
+                                elementcolumn.addAttribute("default", "'"+attribut.getDefault_val()+"'");
+                                if (attribut.getMandatory()) {
+                                    elementcolumn.addAttribute("not-null", "true");
+                                } else {
+                                    elementcolumn.addAttribute("not-null", "false");
+                                }
+                            }
                         }
                         elementproperty.addAttribute("type", getHibernateType(attribut.getAttributetype().getName(), attribut.getRelationtype()));
-                        elementproperty.addAttribute("not-null", "false");
                         if (attribut.getIsindex()) {
                             elementproperty.addAttribute("index", "idx_" + attribut.getName());
                         }

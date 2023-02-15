@@ -30,4 +30,9 @@ public class FieldImport {
     private @Getter @Setter boolean fieldisindex;
     private @Getter @Setter String classref;
     private @Getter @Setter String relationtype;
+    private @Getter @Setter String defaultval;
+    private @Getter @Setter long minval;
+    private @Getter @Setter long maxval;
+    private @Getter @Setter boolean mandatory;
+    private @Getter @Setter String description;
 }

@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.beans;
 
-import com.hazelcast.spring.cache.HazelcastCacheManager;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttribut;
@@ -30,7 +29,6 @@ import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.lucene.ContentIndexer;
-import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
@@ -45,6 +43,7 @@ import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
 import io.clownfish.clownfish.utils.ClassUtil;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.EncryptUtil;
@@ -104,7 +103,6 @@ public class ContentList implements Serializable {
     @Autowired transient CfSitecontentService cfsitecontentService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired CfKeywordService cfkeywordService;
-    @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired FolderUtil folderUtil;
     @Autowired HibernateUtil hibernateUtil;
@@ -113,8 +111,6 @@ public class ContentList implements Serializable {
     @Autowired ClassUtil classutil;
     @Autowired private PropertyUtil propertyUtil;
     @Autowired private ContentUtil contentUtil;
-    
-    @Autowired private HazelcastCacheManager cacheManager;
     
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter CfClasscontent selectedContent = null;
@@ -186,6 +182,48 @@ public class ContentList implements Serializable {
         }
     }
     
+    public boolean isRequired(CfAttributcontent attribut) {
+        if (selectedAttribut != null) {
+            return selectedAttribut.getAttributref().getMandatory();
+        } else {
+            return false;
+        }
+    }
+    
+    public long getMaxlength(CfAttributcontent attribut) {
+        if (selectedAttribut != null) {
+            if (selectedAttribut.getAttributref().getMax_val()>0) {
+                return selectedAttribut.getAttributref().getMax_val();
+            } else {
+                switch (selectedAttribut.getAttributref().getAttributetype().getName()) {
+                    case "string":
+                    case "hashstring":
+                        return 255;
+                    case "text":
+                    case "htmltext":
+                    case "markdown":
+                        return Long.MAX_VALUE;
+                    default:
+                        return 255;
+                }
+            }
+        } else {
+            return 0;
+        }
+    }
+    
+    public long getMinlength(CfAttributcontent attribut) {
+        if (selectedAttribut != null) {
+            if (selectedAttribut.getAttributref().getMin_val()>0) {
+                return selectedAttribut.getAttributref().getMin_val();
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+    
     @PostConstruct
     public void init() {
         LOGGER.info("INIT CONTENTLIST START");
@@ -215,6 +253,8 @@ public class ContentList implements Serializable {
     
     public void onSelect(SelectEvent event) {
         selectedContent = (CfClasscontent) event.getObject();
+        selectContent(selectedContent);
+        /*
         attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
        
         contentName = selectedContent.getName();
@@ -251,6 +291,7 @@ public class ContentList implements Serializable {
         } catch (Exception ex) {
             contentpreview = "";
         }
+        */
     }
     
     public void onSelectAttribut(SelectEvent event) {
@@ -373,6 +414,28 @@ public class ContentList implements Serializable {
                     CfAttributcontent newcontent = new CfAttributcontent();
                     newcontent.setAttributref(attribut);
                     newcontent.setClasscontentref(newclasscontent);
+                    if ((null != attribut.getDefault_val()) && (!attribut.getDefault_val().isEmpty())) {
+                        switch (attribut.getAttributetype().getName()) {
+                            case "boolean":
+                                newcontent.setContentBoolean(ClownfishUtil.getBoolean(attribut.getDefault_val(), false));
+                                break;
+                            case "string":
+                                newcontent.setContentString(attribut.getDefault_val());
+                                break;
+                            case "integer":
+                                newcontent.setContentInteger(BigInteger.valueOf(Long.parseLong(attribut.getDefault_val())));
+                                break;
+                            case "real":
+                                newcontent.setContentReal(Double.parseDouble(attribut.getDefault_val()));
+                                break;
+                            case "text":
+                            case "htmltext":
+                            case "markdown":
+                                newcontent.setContentText(attribut.getDefault_val());
+                                break;
+                        }
+                        
+                    }
                     cfattributcontentService.create(newcontent);
                 }
             });
@@ -853,5 +916,49 @@ public class ContentList implements Serializable {
             }
         } while (!found);
         return name+"("+i+")";
+    }
+    
+    public void selectDivContent(String contentname) {
+        selectContent(cfclasscontentService.findByName(contentname));
+    }
+    
+    public void selectContent(CfClasscontent content) {
+        selectedContent = content;
+        attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
+       
+        contentName = selectedContent.getName();
+        selectedClass = selectedContent.getClassref();
+        newContentButtonDisabled = true;
+        
+        keywords.getTarget().clear();
+        keywords.getSource().clear();
+        keywords.setSource(cfkeywordService.findAll());
+        contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(selectedContent.getId());
+        for (CfClasscontentkeyword contentkeyword : contentkeywordlist) {
+            CfKeyword kw = cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref());
+            keywords.getTarget().add(kw);
+            keywords.getSource().remove(kw);
+        }
+        
+        versionlist = cfcontentversionService.findByContentref(selectedContent.getId());
+        difference = contentUtility.hasDifference(selectedContent);
+        BigInteger co = selectedContent.getCheckedoutby();
+        CheckoutUtil checkoutUtil = new CheckoutUtil();
+        checkoutUtil.getCheckoutAccess(co, loginbean);
+        checkedout = checkoutUtil.isCheckedout();
+        access = checkoutUtil.isAccess();
+        contentversionMin = 1;
+        contentversionMax = versionlist.size();
+        selectedcontentversion = contentversionMax;
+        
+        try {
+            String output = selectedContent.getClassref().getTemplateref().getContent();
+            for (CfAttributcontent attributcontent : attributcontentlist) {
+                output = output.replaceAll("#" + attributcontent.getAttributref().getName() + "#", contentUtil.toString(attributcontent));
+            }
+            contentpreview = output;
+        } catch (Exception ex) {
+            contentpreview = "";
+        }
     }
 }

@@ -469,6 +469,12 @@
                                                 <h:outputText value="#{classcontent.name}" />
                                             </p:column>
                                             <p:column width="25px">
+                                                <p:commandButton id="showcontenttemplate" icon="pi pi-pencil" styleClass="rounded-button ui-button-flat ui-button-plain" action="#{sitetree.divcontentlist.selectDivContent(classcontent.name)}" update=":form:msgs :form:tabview :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:contentbtnpanel :form:tabview:contentkeywordpicklist :form:tabview:contentpreview" rendered="#{loginBean.login and loginBean.hasRights(2)}">
+                                                    <f:actionListener binding="#{sitetree.setTab(6)}" />
+                                                    <p:ajax listener="#{sitetree.onChangeContent()}" />
+                                                </p:commandButton>
+                                            </p:column>
+                                            <p:column width="25px">
                                                 <p:commandButton icon="pi pi-save" styleClass="rounded-button ui-button-flat ui-button-plain" actionListener="#{sitetree.onSaveLayoutContent(classcontent)}" update=":form:tabview:layoutcontentedit :form:tabview:preview" />
                                             </p:column>
                                         </p:dataTable>
@@ -481,6 +487,12 @@
                                             <p:ajax event="rowSelect" listener="#{sitetree.onSelectLayoutDatalist}" oncomplete="PF('datalistpreviewDlg').show()" update=":form:datalistpreviewDlg" />
                                             <p:column headerText="Datalist" filterBy="#{datalist.name}" filterMatchMode="contains">
                                                 <h:outputText value="#{datalist.name}" />
+                                            </p:column>
+                                            <p:column width="25px">
+                                                <p:commandButton id="showdatalisttemplate" icon="pi pi-pencil" styleClass="rounded-button ui-button-flat ui-button-plain" action="#{sitetree.divdatalist.selectDivDatalist(datalist.name)}" update=":form:msgs :form:tabview :form:tabview:datacontentname :form:tabview:datacontentclass :form:tabview:newcontentlist :form:tabview:datacontentlistbox" rendered="#{loginBean.login and loginBean.hasRights(2)}">
+                                                    <f:actionListener binding="#{sitetree.setTab(7)}" />
+                                                    <p:ajax listener="#{sitetree.onChangeDatalist()}" />
+                                                </p:commandButton>
                                             </p:column>
                                             <p:column width="25px">
                                                 <p:commandButton icon="pi pi-save" styleClass="rounded-button ui-button-flat ui-button-plain" actionListener="#{sitetree.onSaveLayoutDatalist(datalist)}" update=":form:tabview:layoutcontentedit :form:tabview:preview" />
@@ -1080,6 +1092,21 @@
                         <p:column headerText="Relation">
                             <h:outputText value="#{attribut.relationtypeFull}" />
                         </p:column>
+                        <p:column headerText="Default">
+                            <h:outputText value="#{attribut.default_val}" />
+                        </p:column>
+                        <p:column headerText="Mandatory">
+                            <h:outputText value="#{attribut.mandatory}" />
+                        </p:column>
+                        <p:column headerText="Min">
+                            <h:outputText value="#{attribut.min_val}" />
+                        </p:column>
+                        <p:column headerText="Max">
+                            <h:outputText value="#{attribut.max_val}" />
+                        </p:column>
+                        <p:column headerText="Description">
+                            <h:outputText value="#{attribut.description}" />
+                        </p:column>
                     </p:dataTable>
 
                     <p:panel id="classeditor">
@@ -1113,7 +1140,7 @@
                             <p:outputLabel for="attributisindex" value="Index:" style="margin-right: 0.5rem" />
                             <p:selectBooleanCheckbox id="attributisindex" value="#{classList.isindex}" />
                             </div>
-
+                            
                             <div class="flex align-items-center pr-2">
                                 <p:outputLabel for="relationclass" value="Class:" rendered="#{classList.renderClass}" style="margin-right: 0.5rem" />
                                 <p:selectOneMenu id="relationclass" value="#{classList.selectedClassRef}" required="false" converter="#{classConverterBean}" rendered="#{classList.renderClass}">
@@ -1129,7 +1156,34 @@
                                     <f:selectItem itemValue="1" itemLabel="1:n" />
                                 </p:selectOneMenu>
                             </div>
-
+                        </div>    
+                        <div class="flex flex-row pb-2">    
+                            <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="attributdefaultval" value="Default:" style="margin-right: 0.5rem" />
+                            <p:inputText id="attributdefaultval" value="#{classList.defaultval}" />
+                            </div>
+                            
+                            <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="attributmandatory" value="Mandatory:" style="margin-right: 0.5rem" />
+                            <p:selectBooleanCheckbox id="attributmandatory" value="#{classList.mandatory}" />
+                            </div>
+                            
+                            <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="attributminval" value="Min:" style="margin-right: 0.5rem" />
+                            <p:inputText id="attributminval" value="#{classList.minval}" />
+                            </div>
+                            
+                            <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="attributmaxval" value="Max:" style="margin-right: 0.5rem" />
+                            <p:inputText id="attributmaxval" value="#{classList.maxval}" />
+                            </div>
+                            
+                            <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="attributdescription" value="Description" style="margin-right: 0.5rem" />
+                            <p:inputText id="attributdescription" value="#{classList.description}" />
+                            </div>
+                        </div>    
+                        <div class="flex flex-row pb-2">
                             <div class="flex align-items-center pr-2">
                                 <p:commandButton id="newattribut" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{classList.onCreateAttribut}" update=":form:msgs :form:tabview:attributlist :form:tabview:classname" disabled="#{classlist.newAttributButtonDisabled}" />
                             </div>
@@ -1253,48 +1307,53 @@
                                 <h:outputText value="#{attributcontent.attributref.attributetypeString}" />
                             </p:column>
                             <p:column headerText="Wert">
-                                    <p:inputText id="attributvalueString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.stringType}" />
-                                    <p:password id="attributvalueHashString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.hashStringType}" />
-                                    <p:inputNumber id="attributvalueInt" value="#{classcontentList.editContent}" decimalPlaces="0" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.integerType}" />
-                                    <p:inputNumber id="attributvalueReal" value="#{classcontentList.editContent}" decimalPlaces="2" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.realType}" />
-                                    <pe:monacoEditor id="attributvalueHtmlText" disabled="false" widgetVar="editor1" editorOptions="#{classcontentList.editorOptions}" value="#{classcontentList.editContent}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.HTMLTextType}" />
-                                    <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px; width:100%" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.textType}" />
-                                    <pe:monacoEditor id="attributvalueMarkdown" disabled="false" widgetVar="editor13" editorOptions="#{classcontentList.editorOptions}" value="#{classcontentList.editContent}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.markdownType}" />
-                                    <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.booleanType}" />
-                                    <p:calendar id="attributvalueDatetime" value="#{classcontentList.editCalendar}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" />
-                                    <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" var="mp" converter="#{assetConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}">
-                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                        <f:selectItems value="#{classcontentList.assetlist}" var="media" itemLabel="#{media.name}" itemValue="#{media}" />
-                                        <p:column>
-                                        <p:graphicImage url="GetAssetPreview?apikey=#{loginBean.apikey}&amp;mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
-                                        </p:column>
-                                        <p:column>
-                                        #{mp.name}
-                                        </p:column>
-                                    </p:selectOneMenu>
-                                    <p:selectOneMenu dynamic="true" id="classref_1" value="#{classcontentList.editDatalist}" converter="#{sitelistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType and (attributcontent.attributref.relationtype==0)}">
-                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                        <f:selectItems value="#{classcontentList.selectedList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
-                                    </p:selectOneMenu>
-                                    <p:selectOneMenu dynamic="true" id="classref_2" value="#{classcontentList.editDataContentlist}" converter="#{classcontentConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType and (attributcontent.attributref.relationtype==1)}">
-                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                        <f:selectItems value="#{classcontentList.selectedContentList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
-                                    </p:selectOneMenu>
-                                    <p:selectOneMenu dynamic="true" id="assetref" value="#{classcontentList.editAssetlist}" converter="#{assetlistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.assetrefType}">
-                                        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
-                                        <f:selectItems value="#{classcontentList.selectedAssetList}" var="assetdatalist" itemLabel="#{assetdatalist.name}" itemValue="#{assetdatalist}" />
-                                    </p:selectOneMenu>
+                                <p:inputText id="attributvalueString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.stringType}" required="#{classcontentList.isRequired(attributcontent)}" maxlength="#{classcontentList.getMaxlength(attributcontent)}">
+                                    <f:validateLength minimum="#{classcontentList.getMinlength(attributcontent)}"></f:validateLength>
+                                </p:inputText>
+                                <p:password id="attributvalueHashString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.hashStringType}" required="#{classcontentList.isRequired(attributcontent)}" />
+                                <p:inputNumber id="attributvalueInt" value="#{classcontentList.editContent}" decimalPlaces="0" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.integerType}" required="#{classcontentList.isRequired(attributcontent)}" minValue="#{classcontentList.getMinlength(attributcontent)}" maxValue="#{classcontentList.getMaxlength(attributcontent)}" />
+                                <p:inputNumber id="attributvalueReal" value="#{classcontentList.editContent}" decimalPlaces="2" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.realType}" required="#{classcontentList.isRequired(attributcontent)}" minValue="#{classcontentList.getMinlength(attributcontent)}" maxValue="#{classcontentList.getMaxlength(attributcontent)}" />
+                                <pe:monacoEditor id="attributvalueHtmlText" disabled="false" widgetVar="editor1" editorOptions="#{classcontentList.editorOptions}" value="#{classcontentList.editContent}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.HTMLTextType}" required="#{classcontentList.isRequired(attributcontent)}" />
+                                <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px; width:100%" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.textType}" required="#{classcontentList.isRequired(attributcontent)}" maxlength="#{classcontentList.getMaxlength(attributcontent)}" />
+                                <pe:monacoEditor id="attributvalueMarkdown" disabled="false" widgetVar="editor13" editorOptions="#{classcontentList.editorOptions}" value="#{classcontentList.editContent}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.markdownType}" required="#{classcontentList.isRequired(attributcontent)}" />
+                                <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.booleanType}" required="#{classcontentList.isRequired(attributcontent)}" />
+                                <p:calendar id="attributvalueDatetime" value="#{classcontentList.editCalendar}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" required="#{classcontentList.isRequired(attributcontent)}" />
+                                <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" var="mp" converter="#{assetConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}" required="#{classcontentList.isRequired(attributcontent)}">
+                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                    <f:selectItems value="#{classcontentList.assetlist}" var="media" itemLabel="#{media.name}" itemValue="#{media}" />
+                                    <p:column>
+                                    <p:graphicImage url="GetAssetPreview?apikey=#{loginBean.apikey}&amp;mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
+                                    </p:column>
+                                    <p:column>
+                                    #{mp.name}
+                                    </p:column>
+                                </p:selectOneMenu>
+                                <p:selectOneMenu dynamic="true" id="classref_1" value="#{classcontentList.editDatalist}" converter="#{sitelistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType and (attributcontent.attributref.relationtype==0)}" required="#{classcontentList.isRequired(attributcontent)}">
+                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                    <f:selectItems value="#{classcontentList.selectedList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
+                                </p:selectOneMenu>
+                                <p:selectOneMenu dynamic="true" id="classref_2" value="#{classcontentList.editDataContentlist}" converter="#{classcontentConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType and (attributcontent.attributref.relationtype==1)}" required="#{classcontentList.isRequired(attributcontent)}">
+                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                    <f:selectItems value="#{classcontentList.selectedContentList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
+                                </p:selectOneMenu>
+                                <p:selectOneMenu dynamic="true" id="assetref" value="#{classcontentList.editAssetlist}" converter="#{assetlistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.assetrefType}" required="#{classcontentList.isRequired(attributcontent)}">
+                                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                    <f:selectItems value="#{classcontentList.selectedAssetList}" var="assetdatalist" itemLabel="#{assetdatalist.name}" itemValue="#{assetdatalist}" />
+                                </p:selectOneMenu>
 
-                                    <h:outputText value="#{classcontentList.toString(attributcontent)}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
-                                    <p:commandButton id="editattribut" icon="pi pi-pencil" process="form" value="Change" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.checkedout}" >
+                                <h:outputText value="#{classcontentList.toString(attributcontent)}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
+                                <p:commandButton id="editattribut" icon="pi pi-pencil" process="form" value="Change" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.checkedout}" >
 
-                                    </p:commandButton>
-                                    <p:focus for="attributvalueString" />
-                                    <p:focus for="attributvalueInt" />
-                                    <p:focus for="attributvalueReal" />
-                                    <p:focus for="attributvalueHtmlText" />
-                                    <p:focus for="attributvalueText" />
-                                    <p:focus for="attributvalueMarkdown" />
+                                </p:commandButton>
+                                <p:focus for="attributvalueString" />
+                                <p:focus for="attributvalueInt" />
+                                <p:focus for="attributvalueReal" />
+                                <p:focus for="attributvalueHtmlText" />
+                                <p:focus for="attributvalueText" />
+                                <p:focus for="attributvalueMarkdown" />
+                            </p:column>
+                            <p:column headerText="Description">
+                                <h:outputText value="#{attributcontent.attributref.description}" />
                             </p:column>
                         </p:dataTable>
                     </h:panelGrid>

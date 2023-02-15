@@ -177,7 +177,9 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     
     public String replacePlaceholders(String content, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent, boolean preview) {
         // prepare site for inplace edit
-        content = surroundInplaceDivs(content, cfdiv, layoutcontent);
+        if (preview) {
+            content = surroundInplaceDivs(content, cfdiv, layoutcontent);
+        }
         // replace Content
         for (String c : cfdiv.getContentArray()) {
             List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());

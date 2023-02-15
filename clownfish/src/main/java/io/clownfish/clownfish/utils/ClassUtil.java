@@ -111,7 +111,11 @@ public class ClassUtil implements Serializable {
             } else {
                 newattribut.setRelationref(null);
             }
-            
+            newattribut.setDefault_val(fi.getDefaultval());
+            newattribut.setMandatory(fi.isMandatory());
+            newattribut.setMin_val(fi.getMinval());
+            newattribut.setMax_val(fi.getMaxval());
+            newattribut.setDescription(fi.getDescription());
             cfattributService.create(newattribut);
         }
     }

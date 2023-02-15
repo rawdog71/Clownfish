@@ -150,7 +150,7 @@ public class AssetList {
         try {
             File result = new File(folderUtil.getMedia_folder() + File.separator + filename);
             boolean fileexists = result.exists();
-            InputStream inputStream = event.getFile().getInputStream();;
+            InputStream inputStream = event.getFile().getInputStream();
             if ((!fileexists) || (overwrite)) {
                 try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
                     byte[] buffer = new byte[64535];
