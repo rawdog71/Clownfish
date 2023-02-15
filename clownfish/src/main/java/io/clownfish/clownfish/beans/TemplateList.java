@@ -70,6 +70,7 @@ public class TemplateList implements ISourceContentInterface {
     @Autowired CfTemplateversionService cftemplateversionService;
     
     private @Getter @Setter List<CfTemplate> templateListe;
+    private @Getter @Setter List<CfTemplate> invisibleTemplateList;
     private @Getter @Setter List<CfTemplate> notpreviewtemplateListe;
     private @Getter @Setter List<CfTemplate> previewtemplateListe;
     private @Getter @Setter CfTemplate selectedTemplate = null;
@@ -97,6 +98,7 @@ public class TemplateList implements ISourceContentInterface {
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
     @Autowired private @Getter @Setter ClassList classlist;
     private @Getter @Setter SiteTreeBean sitetree;
+    private @Getter @Setter boolean invisible;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(TemplateList.class);
 
@@ -137,6 +139,8 @@ public class TemplateList implements ISourceContentInterface {
         showDiff = false;
         templateName = "";
         templateListe = cftemplateService.findAll();
+        invisibleTemplateList = cftemplateService.findAll().stream()
+                .filter((cfTemplate -> !cfTemplate.getInvisible())).collect(Collectors.toList());
         notpreviewtemplateListe = cftemplateService.findNotPreview();
         previewtemplateListe = cftemplateService.findPreview();
         templateUtility.setTemplateContent("");
@@ -156,6 +160,8 @@ public class TemplateList implements ISourceContentInterface {
     @Override
     public void refresh() {
         templateListe = cftemplateService.findAll();
+        invisibleTemplateList = cftemplateService.findAll().stream()
+                .filter((cfTemplate -> !cfTemplate.getInvisible())).collect(Collectors.toList());
         notpreviewtemplateListe = cftemplateService.findNotPreview();
         previewtemplateListe = cftemplateService.findPreview();
         if (null != classlist) {
@@ -183,10 +189,33 @@ public class TemplateList implements ISourceContentInterface {
 
         return templateListe.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
     }
+
+    public List<CfTemplate> completeInvisTextNoPreview(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return notpreviewtemplateListe.stream().filter(t -> {
+            return t.getName().toLowerCase().startsWith(queryLowerCase) && t.getInvisible();
+        }).collect(Collectors.toList());
+    }
+
+    public List<CfTemplate> completeInvisTextPreview(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return previewtemplateListe.stream().filter(t -> {
+            return t.getName().toLowerCase().startsWith(queryLowerCase) && t.getInvisible();
+        }).collect(Collectors.toList());
+    }
+
+    public List<CfTemplate> completeInvisText(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return invisibleTemplateList.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
+    }
     
     @Override
     public void onSelect(AjaxBehaviorEvent event) {
         selectTemplate(selectedTemplate);
+        setInvisible(selectedTemplate.getInvisible());
     }
     
     @Override
@@ -195,6 +224,7 @@ public class TemplateList implements ISourceContentInterface {
             selectedTemplate.setScriptlanguage(templateScriptLanguage);
             selectedTemplate.setContent(getContent());
             selectedTemplate.setType(type);
+            selectedTemplate.setInvisible(invisible);
             cftemplateService.edit(selectedTemplate);
             difference = templateUtility.hasDifference(selectedTemplate);
             
@@ -317,8 +347,15 @@ public class TemplateList implements ISourceContentInterface {
                 newtemplate.setContent("//"+templateName);
                 newtemplate.setScriptlanguage(templateScriptLanguage);
                 newtemplate.setType(type);
+                if (loginbean.getCfuser().getSuperadmin()) {
+                    newtemplate.setInvisible(invisible);
+                } else {
+                    newtemplate.setInvisible(false);
+                }
                 cftemplateService.create(newtemplate);
                 templateListe = cftemplateService.findAll();
+                invisibleTemplateList = cftemplateService.findAll().stream()
+                        .filter((cfTemplate -> !cfTemplate.getInvisible())).collect(Collectors.toList());
                 templateName = "";
                 selectedTemplate = newtemplate;
                 refresh();
@@ -338,6 +375,8 @@ public class TemplateList implements ISourceContentInterface {
         if (null != selectedTemplate) {
             cftemplateService.delete(selectedTemplate);
             templateListe = cftemplateService.findAll();
+            invisibleTemplateList = cftemplateService.findAll().stream()
+                    .filter((cfTemplate -> !cfTemplate.getInvisible())).collect(Collectors.toList());
             refresh();
             FacesMessage message = new FacesMessage("Deleted " + selectedTemplate.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);

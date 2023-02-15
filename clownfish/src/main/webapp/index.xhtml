@@ -90,7 +90,15 @@
                         <p:row>
                             <p:column colspan="4" style="vertical-align: top;">
                                 <p:scrollPanel style="height: 400px; border: none;" mode="native">
-                                    <p:tree id="sitetree" value="#{sitetree.root}" var="node" dynamic="true" selectionMode="single" draggable="true" droppable="true">
+                                    <p:tree id="sitetree" value="#{sitetree.root}" var="node" dynamic="true" selectionMode="single" draggable="true" droppable="true" rendered="#{loginBean.cfuser.superadmin}">
+                                        <p:ajax event="dragdrop" listener="#{sitetree.onDragDrop}" update=":form:msgs" />
+                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup :form:tabview:siteparameterlist" />
+                                        <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup" />
+                                        <p:treeNode icon="pi #{node.icon}">
+                                            <h:outputText value="#{node.name}" />
+                                        </p:treeNode>
+                                    </p:tree>
+                                    <p:tree id="invissitetree" value="#{sitetree.invisibleRoot}" var="node" dynamic="true" selectionMode="single" draggable="true" droppable="true" rendered="#{!loginBean.cfuser.superadmin}">
                                         <p:ajax event="dragdrop" listener="#{sitetree.onDragDrop}" update=":form:msgs" />
                                         <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup :form:tabview:siteparameterlist" />
                                         <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup" />
@@ -320,6 +328,14 @@
                                                     </div>
                                                 </p:column>
                                             </p:row>
+                                            <p:row rendered="#{loginBean.cfuser.superadmin}">
+                                                <p:column>
+                                                    <div class="content-justify">
+                                                        <p:outputLabel for="selectinvissite" value="Invisible:" />
+                                                        <p:selectBooleanCheckbox id="selectinvissite" value="#{sitetree.invisible}"/>
+                                                    </div>
+                                                </p:column>
+                                            </p:row>
                                             <p:row>
                                                 <p:column>
                                                     <div class="content-justify">
@@ -370,13 +386,13 @@
                                         <p:row>
                                             <p:column>
                                                 <div style="display: flex; justify-content: space-between">
-                                                    <p:commandButton id="newsite" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{sitetree.onCreate}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref" disabled="#{sitetree.newButtonDisabled}">
+                                                    <p:commandButton id="newsite" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{sitetree.onCreate}" update=":form:msgs :form:tabview:sitetree :form:tabview:invissitetree :form:tabview:jobsiteref" disabled="#{sitetree.newButtonDisabled}">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                     </p:commandButton>
-                                                    <p:commandButton id="changeSiteButton" icon="pi pi-pencil" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref :form:tabview:preview">
+                                                    <p:commandButton id="changeSiteButton" icon="pi pi-pencil" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs :form:tabview:sitetree :form:tabview:invissitetree :form:tabview:jobsiteref :form:tabview:preview">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                     </p:commandButton>
-                                                    <p:commandButton id="deleteSiteButton" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref">
+                                                    <p:commandButton id="deleteSiteButton" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree :form:tabview:invissitetree :form:tabview:jobsiteref">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                         <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                     </p:commandButton>
@@ -550,11 +566,18 @@
                     
                     <div class="flex flex-row pb-2">
                         <div class="flex align-items-center pr-2">
-                            <p:outputLabel value="Templates" for="@next" style="margin-right: 0.5rem" />
-                            <p:autoComplete id="templatelist" dropdown="true" value="#{templateList.selectedTemplate}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250">
-                                <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplatepanel :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:templatelayout" />
+                            <p:outputLabel value="Templates" for="@next" style="margin-right: 0.5rem" rendered="#{loginBean.cfuser.superadmin}"/>
+                            <p:autoComplete id="templatelist" dropdown="true" value="#{templateList.selectedTemplate}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250" rendered="#{loginBean.cfuser.superadmin}">
+                                <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplatepanel :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:templatelayout :form:tabview:template-invisible"/>
                             </p:autoComplete>
-                        </div>  
+                        </div>
+
+                        <div class="flex align-items-center pr-2">
+                            <p:outputLabel value="Templates" for="@next" style="margin-right: 0.5rem" rendered="#{!loginBean.cfuser.superadmin}"/>
+                            <p:autoComplete id="invistemplatelist" dropdown="true" value="#{templateList.selectedTemplate}" completeMethod="#{templateList.completeInvisText}" converter="#{templateConverterBean}" scrollHeight="250" rendered="#{!loginBean.cfuser.superadmin}">
+                                <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplatepanel :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:templatelayout :form:tabview:template-invisible"/>
+                            </p:autoComplete>
+                        </div>
 
                         <div class="flex align-items-center pr-2">
                             <p:outputLabel for="templatename" style="margin-right: 0.5rem">Name</p:outputLabel>
@@ -593,6 +616,10 @@
                                 <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
                         </div>
+                        <div class="flex align-items-center pr-2">
+                            <p:selectBooleanCheckbox id="template-invisible" value="#{templateList.invisible}" disabled="#{templateList.selectedTemplate == null}" rendered="#{loginBean.cfuser.superadmin}"/>
+                            <p:outputLabel for="template-invisible" value="Invisible" rendered="#{loginBean.cfuser.superadmin}"/>
+                        </div>
                     </div>
                     
                     <h:panelGroup id="edittemplatepanel">
@@ -630,9 +657,16 @@
                     
                     <div class="flex flex-row pb-2">
                         <div class="flex align-items-center pr-2">
-                            <p:outputLabel value="Stylesheets" for="@next" style="margin-right: 0.5rem"/>
-                            <p:autoComplete id="stylesheetlist" dropdown="true" value="#{stylesheetList.selectedStylesheet}" completeMethod="#{stylesheetList.completeText}" converter="#{stylesheetConverterBean}" scrollHeight="250">
-                                <p:ajax listener="#{stylesheetList.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheetpanel" />
+                            <p:outputLabel value="Stylesheets" for="@next" style="margin-right: 0.5rem" rendered="#{loginBean.cfuser.superadmin}"/>
+                            <p:autoComplete id="stylesheetlist" dropdown="true" value="#{stylesheetList.selectedStylesheet}" completeMethod="#{stylesheetList.completeText}" converter="#{stylesheetConverterBean}" scrollHeight="250" rendered="#{loginBean.cfuser.superadmin}">
+                                <p:ajax listener="#{stylesheetList.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheetpanel :form:tabview:stylesheet-invisible"/>
+                            </p:autoComplete>
+                        </div>
+
+                        <div class="flex align-items-center pr-2">
+                            <p:outputLabel value="Stylesheets" for="@next" style="margin-right: 0.5rem" rendered="#{!loginBean.cfuser.superadmin}"/>
+                            <p:autoComplete id="invis-stylesheetlist" dropdown="true" value="#{stylesheetList.selectedStylesheet}" completeMethod="#{stylesheetList.completeInvisText}" converter="#{stylesheetConverterBean}" scrollHeight="250" rendered="#{!loginBean.cfuser.superadmin}">
+                                <p:ajax listener="#{stylesheetList.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheetpanel :form:tabview:stylesheet-invisible"/>
                             </p:autoComplete>
                         </div>
                         
@@ -655,6 +689,10 @@
                             <p:commandButton id="deletestylesheetButton" icon="pi pi-trash" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:tabsiteview:selectstylesheet">
                                 <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
+                        </div>
+                        <div class="flex align-items-center pr-2">
+                            <p:selectBooleanCheckbox id="stylesheet-invisible" value="#{stylesheetList.invisible}" disabled="#{stylesheetList.selectedStylesheet == null}" rendered="#{loginBean.cfuser.superadmin}"/>
+                            <p:outputLabel for="stylesheet-invisible" value="Invisible" rendered="#{loginBean.cfuser.superadmin}"/>
                         </div>
                     </div>
                     
@@ -694,9 +732,16 @@
                     
                     <div class="flex flex-row pb-2">
                         <div class="flex align-items-center pr-2">
-                            <p:outputLabel value="Javascripts" for="@next" style="margin-right: 0.5rem"/>
-                            <p:autoComplete id="javascriptlist" dropdown="true" value="#{javascriptList.selectedJavascript}" completeMethod="#{javascriptList.completeText}" converter="#{javascriptConverterBean}" scrollHeight="250">
-                                <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascriptpanel" />
+                            <p:outputLabel value="Javascripts" for="@next" style="margin-right: 0.5rem" rendered="#{loginBean.cfuser.superadmin}"/>
+                            <p:autoComplete id="javascriptlist" dropdown="true" value="#{javascriptList.selectedJavascript}" completeMethod="#{javascriptList.completeText}" converter="#{javascriptConverterBean}" scrollHeight="250" rendered="#{loginBean.cfuser.superadmin}">
+                                <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascriptpanel :form:tabview:javascript-invisible"/>
+                            </p:autoComplete>
+                        </div>
+
+                        <div class="flex align-items-center pr-2">
+                            <p:outputLabel value="Javascripts" for="@next" style="margin-right: 0.5rem" rendered="#{!loginBean.cfuser.superadmin}"/>
+                            <p:autoComplete id="invis-javascriptlist" dropdown="true" value="#{javascriptList.selectedJavascript}" completeMethod="#{javascriptList.completeInvisText}" converter="#{javascriptConverterBean}" scrollHeight="250" rendered="#{!loginBean.cfuser.superadmin}">
+                                <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascriptpanel :form:tabview:javascript-invisible"/>
                             </p:autoComplete>
                         </div>
 
@@ -719,6 +764,10 @@
                             <p:commandButton id="deletejavascriptButton" icon="pi pi-trash" value="Delete" actionListener="#{javascriptList.onDelete}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:tabsiteview:selectjavascript">
                                 <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
+                        </div>
+                        <div class="flex align-items-center pr-2">
+                            <p:selectBooleanCheckbox id="javascript-invisible" value="#{javascriptList.invisible}" disabled="#{javascriptList.selectedJavascript == null}" rendered="#{loginBean.cfuser.superadmin}"/>
+                            <p:outputLabel for="javascript-invisible" value="Invisible" rendered="#{loginBean.cfuser.superadmin}"/>
                         </div>
                     </div>
 
@@ -760,9 +809,16 @@
                         <p:tab title="JVM Source" id="javasourcepanel">
                             <div class="flex flex-row pb-2">
                                 <div class="flex align-items-center pr-2">
-                                    <p:outputLabel value="JVM" for="@next" style="margin-right: 0.5rem"/>
-                                    <p:autoComplete id="javalist" dropdown="true" value="#{javaList.selectedJava}" completeMethod="#{javaList.completeText}" converter="#{javaConverterBean}" scrollHeight="250">
-                                        <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:javatabview:editjava :form:tabview:javatabview:javaname :form:tabview:javatabview:newjava :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjavapanel :form:tabview:javatabview:javalanguage" />
+                                    <p:outputLabel value="JVM" for="@next" style="margin-right: 0.5rem" rendered="#{loginBean.cfuser.superadmin}"/>
+                                    <p:autoComplete id="javalist" dropdown="true" value="#{javaList.selectedJava}" completeMethod="#{javaList.completeText}" converter="#{javaConverterBean}" scrollHeight="250" rendered="#{loginBean.cfuser.superadmin}">
+                                        <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:javatabview:editjava :form:tabview:javatabview:javaname :form:tabview:javatabview:newjava :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjavapanel :form:tabview:javatabview:javalanguage :form:tabview:javatabview:java-invisible"/>
+                                    </p:autoComplete>
+                                </div>
+
+                                <div class="flex align-items-center pr-2">
+                                    <p:outputLabel value="JVM" for="@next" style="margin-right: 0.5rem" rendered="#{!loginBean.cfuser.superadmin}"/>
+                                    <p:autoComplete id="invis-javalist" dropdown="true" value="#{javaList.selectedJava}" completeMethod="#{javaList.completeInvisText}" converter="#{javaConverterBean}" scrollHeight="250" rendered="#{!loginBean.cfuser.superadmin}">
+                                        <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:javatabview:editjava :form:tabview:javatabview:javaname :form:tabview:javatabview:newjava :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjavapanel :form:tabview:javatabview:javalanguage :form:tabview:javatabview:java-invisible"/>
                                     </p:autoComplete>
                                 </div>
 
@@ -791,6 +847,11 @@
                                     <p:commandButton id="deletejavaButton" icon="pi pi-trash" value="Delete" actionListener="#{javaList.onDelete}" update=":form:msgs :form:tabview:javatabview:javalist">
                                         <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                     </p:commandButton>
+                                </div>
+
+                                <div class="flex align-items-center pr-2">
+                                    <p:selectBooleanCheckbox id="java-invisible" value="#{javaList.invisible}" disabled="#{javaList.selectedJava == null}" rendered="#{loginBean.cfuser.superadmin}"/>
+                                    <p:outputLabel for="java-invisible" value="Invisible" rendered="#{loginBean.cfuser.superadmin}"/>
                                 </div>
                             </div>
                             
