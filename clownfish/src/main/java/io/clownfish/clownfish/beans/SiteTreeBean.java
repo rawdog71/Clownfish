@@ -488,7 +488,7 @@ public class SiteTreeBean implements Serializable {
             selectedTemplate = templatelist.getTemplateListe().get(idx);
             
             iframeurl = selectedSite.getName() + "?preview=true";
-            if (!params.isBlank()) {
+            if ((null != params) && (!params.isBlank())) {
                 if (!params.startsWith("&")) {
                     iframeurl += "&" + params;
                 } else {

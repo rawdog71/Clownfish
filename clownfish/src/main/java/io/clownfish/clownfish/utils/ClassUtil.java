@@ -903,6 +903,9 @@ public class ClassUtil implements Serializable {
             site.setAliaspath(site.getName());
             site.setParentref(null);
             site.setTemplateref(template);
+            site.setShorturl("");
+            site.setLoginsite("");
+            site.setTestparams("");
             cfSiteService.create(site);
         }
         sitetree.loadTree();
