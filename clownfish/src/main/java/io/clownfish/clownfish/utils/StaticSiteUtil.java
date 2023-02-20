@@ -50,6 +50,12 @@ public class StaticSiteUtil {
         FileOutputStream fileStream = null;
         try {
             Document doc = Jsoup.parse(content);
+            Elements elem_icon = doc.head().select("link");
+            for (Element icon : elem_icon) {
+                String href = icon.attr("href");
+                href = makeStaticImage(href, cfassetService);
+                icon.attr("href", href);
+            }
             Elements elem_images = doc.body().select("img");
             for (Element image : elem_images) {
                 String src = image.attr("src");
