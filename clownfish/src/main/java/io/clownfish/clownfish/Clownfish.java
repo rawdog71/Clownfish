@@ -165,7 +165,7 @@ public class Clownfish {
     ExternalClassProvider externalclassproviderbean;
     CfClassCompiler cfclassCompiler;
     CfClassLoader cfclassLoader;
-    AuthTokenList authtokenlist = null;
+    @Autowired AuthTokenList authtokenlist;
     AuthTokenListClasscontent authtokenlistclasscontent = null;
 
     private String contenttype;
@@ -577,6 +577,7 @@ public class Clownfish {
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         if (servicestatus.isOnline()) {
             String token = request.getHeader("cf_token");
+            String login_token = request.getHeader("cf_login_token");
             boolean alias = false;
             try {
                 ArrayList urlParams = new ArrayList();
@@ -696,6 +697,12 @@ public class Clownfish {
                     JsonFormParameter jfp = new JsonFormParameter();
                     jfp.setName("cf_token");
                     jfp.setValue(token);
+                    queryParams.add(jfp);
+                }
+                if ((null != login_token) && (!login_token.isEmpty())) {
+                    JsonFormParameter jfp = new JsonFormParameter();
+                    jfp.setName("cf_login_token");
+                    jfp.setValue(login_token);
                     queryParams.add(jfp);
                 }
                 querymap.keySet().stream().map((key) -> {
@@ -910,6 +917,7 @@ public class Clownfish {
      */
     @Async
     public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, List urlParams, boolean makestatic) throws PageNotFoundException {
+        authtokenlist.setPropertyUtil(propertyUtil);
         ClownfishResponse cfresponse = new ClownfishResponse();
         if (null != sitecontentmap) {
             sitecontentmap.clear();
@@ -961,6 +969,10 @@ public class Clownfish {
                 }
             }
             
+            String login_token = "";
+            if (parametermap.containsKey("cf_login_token")) {    // check token for access manager
+                login_token = parametermap.get("cf_login_token").toString();
+            }
             // !ToDo: #95 check AccessManager
             String token = "";
             if (parametermap.containsKey("cf_token")) {    // check token for access manager
@@ -1131,7 +1143,7 @@ public class Clownfish {
                                     List<CfLayoutcontent> contentlist = layoutcontentlist.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
                                     List<CfClasscontent> classcontentlist = new ArrayList<>();
                                     for (CfLayoutcontent layoutcontent : contentlist) {
-                                        if (preview) {
+                                        if ((preview) && (authtokenlist.checkValidToken(login_token))) {      // ToDo check accessmanager
                                             if (layoutcontent.getPreview_contentref().longValue() > 0) {
                                                 classcontentlist.add(cfclasscontentService.findById(layoutcontent.getPreview_contentref().longValue()));
                                             }
@@ -1147,7 +1159,7 @@ public class Clownfish {
                                     contentlist = layoutcontentlist.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("DL") == 0).collect(Collectors.toList());
                                     List<CfList> sitelist = new ArrayList<>();
                                     for (CfLayoutcontent layoutcontent : contentlist) {
-                                        if (preview) {
+                                        if ((preview) && (authtokenlist.checkValidToken(login_token))) {          // ToDo check accessmanager
                                             if (layoutcontent.getPreview_contentref().longValue() > 0) {
                                                 sitelist.add(cflistService.findById(layoutcontent.getPreview_contentref().longValue()));
                                             }
@@ -1163,7 +1175,7 @@ public class Clownfish {
                                     contentlist = layoutcontentlist.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("AL") == 0).collect(Collectors.toList());
                                     List<CfAssetlist> assetlibrary_list = new ArrayList<>();
                                     for (CfLayoutcontent layoutcontent : contentlist) {
-                                        if (preview) {
+                                        if ((preview) && (authtokenlist.checkValidToken(login_token))) {          // ToDo check accessmanager
                                             if (layoutcontent.getPreview_contentref().longValue() > 0) {
                                                 assetlibrary_list.add(cfassetlistService.findById(layoutcontent.getPreview_contentref().longValue()));
                                             }
@@ -1179,7 +1191,7 @@ public class Clownfish {
                                     contentlist = layoutcontentlist.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("KL") == 0).collect(Collectors.toList());
                                     List<CfKeywordlist> keywordlibrary_list = new ArrayList<>();
                                     for (CfLayoutcontent layoutcontent : contentlist) {
-                                        if (preview) {
+                                        if ((preview) && (authtokenlist.checkValidToken(login_token))) {          // ToDo check accessmanager
                                             if (layoutcontent.getPreview_contentref().longValue() > 0) {
                                                 keywordlibrary_list.add(cfkeywordlistService.findById(layoutcontent.getPreview_contentref().longValue()));
                                             }
@@ -1889,6 +1901,11 @@ public class Clownfish {
     }
     
     private String manageLayout(CfSite cfsite, String templatename, String templatecontent, String cfstylesheet, String cfjavascript, Map parametermap) {
+        String login_token = "";
+        if (parametermap.containsKey("cf_login_token")) {    // check token for access manager
+            login_token = parametermap.get("cf_login_token").toString();
+        }
+        
         CfLayout cflayout = new CfLayout(templatename);
         Document doc = Jsoup.parse(templatecontent);
         Elements divs = doc.getElementsByAttribute("template");
@@ -1939,10 +1956,10 @@ public class Clownfish {
                 div.removeAttr("assetlists");
                 div.removeAttr("keywordlists");
                 
-                if (preview) {
+                if ((preview) && (authtokenlist.checkValidToken(login_token))) {          // ToDo check accessmanager
                     div.addClass("cf_div");
                 }
-                if (preview) {
+                if ((preview) && (authtokenlist.checkValidToken(login_token))) {          // ToDo check accessmanager
                     if ((null != sitetree) && (null != sitetree.getLayout())) {
                         for (CfDiv comp_div : sitetree.getLayout().getDivs()) {
                             if ((0 == cfdiv.getName().compareToIgnoreCase(comp_div.getName())) && (comp_div.isVisible())) {
@@ -1956,7 +1973,7 @@ public class Clownfish {
             }
             cflayout.getDivArray().put(div.attr("id"), cfdiv);
         }
-        if (preview) {
+        if ((preview) && (authtokenlist.checkValidToken(login_token))) {          // ToDo check accessmanager
             doc.head().append("<script src=\"resources/js/axios.js\"></script>");
             doc.head().append("<link rel=\"stylesheet\" href=\"resources/css/cf_preview.css\">");
             doc.head().append("<link rel=\"stylesheet\" href=\"resources/css/preview_style.css\">");

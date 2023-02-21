@@ -104,6 +104,9 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import org.jsoup.Jsoup;
@@ -265,6 +268,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfAsset> previewAssetlistOutput = new ArrayList<>();
     private @Getter @Setter String previewDatalistOutput = "";
     private @Getter @Setter List<CfKeyword> previewKeywordlistOutput = new ArrayList<>();
+    @Inject LoginBean loginbean;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
@@ -487,6 +491,11 @@ public class SiteTreeBean implements Serializable {
             int idx = templatelist.getTemplateListe().indexOf(template);
             selectedTemplate = templatelist.getTemplateListe().get(idx);
             
+            String auth_token = "";
+            if (null != loginbean) {
+                auth_token = loginbean.getToken();
+            }
+            
             iframeurl = selectedSite.getName() + "?preview=true";
             if ((null != params) && (!params.isBlank())) {
                 if (!params.startsWith("&")) {
@@ -495,7 +504,14 @@ public class SiteTreeBean implements Serializable {
                     iframeurl += params;
                 }
             }
-            
+            if ((null != auth_token) && (!auth_token.isBlank())) {
+                if (!auth_token.startsWith("&")) {
+                    iframeurl += "&cf_login_token=" + URLEncoder.encode(auth_token, StandardCharsets.UTF_8);
+                } else {
+                    iframeurl += "cf_login_token=" + URLEncoder.encode(auth_token, StandardCharsets.UTF_8);
+                }
+            }
+                        
             selectedDiv = null;
             showContent = false;
             showDatalist = false;

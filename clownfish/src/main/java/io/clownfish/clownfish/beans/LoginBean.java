@@ -65,6 +65,7 @@ public class LoginBean implements Serializable {
     private @Getter @Setter CfUser cfuser;
     private @Getter @Setter String apikey = "";
     private @Getter @Setter List<CfBackend> userrights = null;
+    private @Getter @Setter String token = "";
 
     public LoginBean() {
         login = false;
@@ -100,7 +101,7 @@ public class LoginBean implements Serializable {
             String salt = cfuser.getSalt();
             String secure = PasswordUtil.generateSecurePassword(passwort, salt);
             if (secure.compareTo(cfuser.getPasswort()) == 0) {
-                String token = AuthToken.generateToken(passwort, salt);
+                token = AuthToken.generateToken(passwort, salt);
                 AuthToken at = new AuthToken(token, new DateTime().plusMinutes(60), cfuser);          // Tokens valid for 60 minutes
                 authtokenlist.getAuthtokens().put(token, at);
                 login = true;
@@ -116,11 +117,13 @@ public class LoginBean implements Serializable {
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Login", "Welcome " + cfuser.getVorname());
                 FacesContext.getCurrentInstance().addMessage(null, message);
             } else {
+                token = "";
                 login = false;
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Wrong password or wrong e-mail");
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }
         } catch (NoResultException ex) {
+            token = "";
             login = false;
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Wrong password or wrong e-mail");
             FacesContext.getCurrentInstance().addMessage(null, message);

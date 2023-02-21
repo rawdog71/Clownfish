@@ -177,7 +177,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     
     public String replacePlaceholders(String content, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent, boolean preview) {
         // prepare site for inplace edit
-        if (preview) {
+        if (preview) {          // ToDo check accessmanager
             content = surroundInplaceDivs(content, cfdiv, layoutcontent);
         }
         // replace Content
@@ -185,7 +185,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
             for (CfLayoutcontent lc : contentlist) {
                 CfClasscontent cfcontent = null;
-                if (preview) {
+                if (preview) {          // ToDo check accessmanager
                     if (lc.getPreview_contentref().longValue() > 0) {
                         cfcontent = cfclasscontentService.findById(lc.getPreview_contentref().longValue());
                     }
@@ -212,7 +212,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             List<CfLayoutcontent> datalist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("DL") == 0).collect(Collectors.toList());
             for (CfLayoutcontent lc : datalist) {
                 CfList cflist = null;
-                if (preview) {
+                if (preview) {          // ToDo check accessmanager
                     if (lc.getPreview_contentref().longValue() > 0) {
                         cflist = cflistService.findById(lc.getPreview_contentref().longValue());
                     }
@@ -240,7 +240,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             List<CfLayoutcontent> assets = layoutcontent.stream().filter(lc -> (lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("A") == 0) && (lc.getCfLayoutcontentPK().getLfdnr() == lfdnr)).collect(Collectors.toList());
             for (CfLayoutcontent lc : assets) {
                 CfAsset cfasset = null;
-                if (preview) {
+                if (preview) {          // ToDo check accessmanager
                     if (lc.getPreview_contentref().longValue() > 0) {
                         cfasset = cfassetService.findById(lc.getPreview_contentref().longValue());
                     }
@@ -264,7 +264,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             List<CfLayoutcontent> assetlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("AL") == 0).collect(Collectors.toList());
             for (CfLayoutcontent lc : assetlist) {
                 CfAssetlist cfassetlist = null;
-                if (preview) {
+                if (preview) {          // ToDo check accessmanager
                     if (lc.getPreview_contentref().longValue() > 0) {
                         cfassetlist = cfassetlistService.findById(lc.getPreview_contentref().longValue());
                     }
@@ -291,7 +291,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             List<CfLayoutcontent> keywordlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("KL") == 0).collect(Collectors.toList());
             for (CfLayoutcontent lc : keywordlist) {
                 CfKeywordlist cfkeywordlist = null;
-                if (preview) {
+                if (preview) {          // ToDo check accessmanager
                     if (lc.getPreview_contentref().longValue() > 0) {
                         cfkeywordlist = cfkeywordlistService.findById(lc.getPreview_contentref().longValue());
                     }
