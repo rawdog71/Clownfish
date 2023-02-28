@@ -15,11 +15,13 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.dbentities.CfTemplateversion;
 import io.clownfish.clownfish.dbentities.CfTemplateversionPK;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.lucene.SourceIndexer;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
@@ -68,6 +70,7 @@ public class TemplateList implements ISourceContentInterface {
     LoginBean loginbean;
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfTemplateversionService cftemplateversionService;
+    @Autowired transient CfSiteService cfsiteService;
     
     private @Getter @Setter List<CfTemplate> templateListe;
     private @Getter @Setter List<CfTemplate> notpreviewtemplateListe;
@@ -336,6 +339,12 @@ public class TemplateList implements ISourceContentInterface {
     @Override
     public void onDelete(ActionEvent actionEvent) {
         if (null != selectedTemplate) {
+            List<CfSite> sites = cfsiteService.findByTemplateref(selectedTemplate);
+            for (CfSite site : sites) {
+                site.setTemplateref(null);
+                cfsiteService.edit(site);
+            }
+            sitetree.loadTree();
             cftemplateService.delete(selectedTemplate);
             templateListe = cftemplateService.findAll();
             refresh();

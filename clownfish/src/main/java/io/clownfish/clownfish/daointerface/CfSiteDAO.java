@@ -15,7 +15,10 @@
  */
 package io.clownfish.clownfish.daointerface;
 
+import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfSite;
+import io.clownfish.clownfish.dbentities.CfStylesheet;
+import io.clownfish.clownfish.dbentities.CfTemplate;
 import java.util.List;
 
 /**
@@ -27,8 +30,10 @@ public interface CfSiteDAO {
     CfSite findById(Long id);
     CfSite findByName(String name);
     CfSite findByAliaspath(String alias);
-    CfSite findByTemplateref(Long ref);
+    List<CfSite> findByTemplateref(CfTemplate ref);
     List<CfSite> findByParentref(CfSite ref);
+    List<CfSite> findByStylesheetref(CfStylesheet ref);
+    List<CfSite> findByJavascriptref(CfJavascript ref);
     List<CfSite> findBySitemap(boolean sitemap);
     CfSite findByShorturl(String shorturl);
     CfSite create(CfSite entity);

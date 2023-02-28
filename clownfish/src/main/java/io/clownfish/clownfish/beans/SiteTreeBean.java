@@ -636,6 +636,11 @@ public class SiteTreeBean implements Serializable {
     
     public void onDelete(ActionEvent actionEvent) {
         if (null != selectedSite) {
+            List<CfSite> sites = cfsiteService.findByParentref(selectedSite);
+            for (CfSite site : sites) {
+                site.setParentref(null);
+                cfsiteService.edit(site);
+            }
             cfsiteService.delete(selectedSite);
             loadTree();
             

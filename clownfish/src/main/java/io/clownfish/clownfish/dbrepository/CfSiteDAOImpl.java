@@ -16,7 +16,10 @@
 package io.clownfish.clownfish.dbrepository;
 
 import io.clownfish.clownfish.daointerface.CfSiteDAO;
+import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfSite;
+import io.clownfish.clownfish.dbentities.CfStylesheet;
+import io.clownfish.clownfish.dbentities.CfTemplate;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -56,12 +59,12 @@ public class CfSiteDAOImpl implements CfSiteDAO {
     }
 
     @Override
-    public CfSite findByTemplateref(Long ref) {
+    public List<CfSite> findByTemplateref(CfTemplate ref) {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfSite.findByTemplateref");  
         query.setParameter("templateref", ref);
-        CfSite cfsite = (CfSite) query.getSingleResult();
-        return cfsite;
+        List<CfSite> cfsitelist = query.getResultList();
+        return cfsitelist;
     }
     
     @Override
@@ -133,5 +136,23 @@ public class CfSiteDAOImpl implements CfSiteDAO {
         query.setParameter("shorturl", shorturl);
         CfSite cfsite = (CfSite) query.getSingleResult();
         return cfsite;
+    }
+
+    @Override
+    public List<CfSite> findByStylesheetref(CfStylesheet ref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfSite.findByStylesheetref");  
+        query.setParameter("stylesheetref", ref);
+        List<CfSite> cfsitelist = query.getResultList();
+        return cfsitelist;
+    }
+
+    @Override
+    public List<CfSite> findByJavascriptref(CfJavascript ref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfSite.findByJavascriptref");  
+        query.setParameter("javascriptref", ref);
+        List<CfSite> cfsitelist = query.getResultList();
+        return cfsitelist;
     }
 }

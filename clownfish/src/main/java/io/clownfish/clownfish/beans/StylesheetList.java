@@ -15,11 +15,13 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfStylesheetversion;
 import io.clownfish.clownfish.dbentities.CfStylesheetversionPK;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.lucene.SourceIndexer;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
@@ -74,6 +76,7 @@ public class StylesheetList implements ISourceContentInterface {
     LoginBean loginbean;
     @Autowired CfStylesheetService cfstylesheetService;
     @Autowired CfStylesheetversionService cfstylesheetversionService;
+    @Autowired transient CfSiteService cfsiteService;
     
     private @Getter @Setter List<CfStylesheet> stylesheetListe;
     private @Getter @Setter CfStylesheet selectedStylesheet = null;
@@ -314,6 +317,12 @@ public class StylesheetList implements ISourceContentInterface {
     @Override
     public void onDelete(ActionEvent actionEvent) {
         if (null != selectedStylesheet) {
+            List<CfSite> sites = cfsiteService.findByStylesheetref(selectedStylesheet);
+            for (CfSite site : sites) {
+                site.setStylesheetref(null);
+                cfsiteService.edit(site);
+            }
+            sitetree.loadTree();
             cfstylesheetService.delete(selectedStylesheet);
             stylesheetListe = cfstylesheetService.findAll();
             FacesMessage message = new FacesMessage("Deleted " + selectedStylesheet.getName());

@@ -18,10 +18,12 @@ package io.clownfish.clownfish.beans;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfJavascriptversion;
 import io.clownfish.clownfish.dbentities.CfJavascriptversionPK;
+import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.lucene.SourceIndexer;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.FolderUtil;
@@ -74,6 +76,7 @@ public class JavascriptList implements ISourceContentInterface {
     LoginBean loginbean;
     @Autowired CfJavascriptService cfjavascriptService;
     @Autowired CfJavascriptversionService cfjavascriptversionService;
+    @Autowired transient CfSiteService cfsiteService;
     
     private @Getter @Setter List<CfJavascript> javascriptListe;
     private @Getter @Setter CfJavascript selectedJavascript = null;
@@ -313,6 +316,12 @@ public class JavascriptList implements ISourceContentInterface {
     @Override
     public void onDelete(ActionEvent actionEvent) {
         if (null != selectedJavascript) {
+            List<CfSite> sites = cfsiteService.findByJavascriptref(selectedJavascript);
+            for (CfSite site : sites) {
+                site.setJavascriptref(null);
+                cfsiteService.edit(site);
+            }
+            sitetree.loadTree();
             cfjavascriptService.delete(selectedJavascript);
             javascriptListe = cfjavascriptService.findAll();
             
