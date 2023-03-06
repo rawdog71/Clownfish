@@ -117,6 +117,7 @@ public class DatabaseTemplateBean implements Serializable {
                         contentmap.put("db", dbtables);
                         con.close();
                     } catch (SQLException ex1) {
+                        LOGGER.error("CATALOG: "+ catalog + " TABLE: " + tablename + " STATEMENT: " + sqlstatement);
                         LOGGER.error(ex1.getMessage());
                         con.close();
                     }
@@ -182,6 +183,7 @@ public class DatabaseTemplateBean implements Serializable {
                 contentmap.put("db", dbtables);
                 con.close();
             } catch (SQLException ex1) {
+                LOGGER.error("CATALOG: "+ catalog + " TABLE: " + tablename + " STATEMENT: " + sqlstatement);
                 LOGGER.error(ex1.getMessage());
                 con.close();
             }
@@ -244,6 +246,7 @@ public class DatabaseTemplateBean implements Serializable {
                     ok = true;
                 }
                 catch (SQLException ex) {
+                    LOGGER.error("CATALOG: "+ catalog + " STATEMENT: " + sqlstatement);
                     LOGGER.error(ex.getMessage());
                 } finally {
                     try {
@@ -339,6 +342,7 @@ public class DatabaseTemplateBean implements Serializable {
                     con.close();
                 } catch (SQLException ex)
                 {
+                    LOGGER.error("CATALOG: "+ catalog + " STATEMENT: " + sqlStatement);
                     LOGGER.error(ex.getMessage());
                     try {
                         con.close();
