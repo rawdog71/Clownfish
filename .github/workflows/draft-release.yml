@@ -1,0 +1,30 @@
+name: Draft Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Semver Bump Type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  cut-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bump Version and Push Tag
+        if: github.repository == 'hat-kid/clownfish'
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ github.token }}
+          tag_prefix: v
+          default_bump: ${{ github.event.inputs.bump }}
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: gh release create ${{ steps.tag_version.outputs.new_tag }} --generate-notes --draft --repo hat-kid/clownfish

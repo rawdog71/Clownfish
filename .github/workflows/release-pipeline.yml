@@ -1,0 +1,45 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  # Linux
+  build_linux:
+    name: "🐠 Linux"
+    uses: ./.github/workflows/linux-workflow.yaml
+    secrets: inherit
+
+  # Upload the Artifacts
+  upload_artifacts:
+    if: github.repository == 'hat-kid/clownfish'
+    needs:
+      - build_linux
+    name: "Upload Artifacts"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Prepare Artifact Folder
+        run: mkdir -p ./staging/final
+
+      - uses: actions/download-artifact@v3
+        name: Download all Artifacts
+        with:
+          path: ./staging/
+      - name: Display structure of downloaded files
+        run: ls -Rl ./staging/
+      - name: Upload Assets
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          TAG_VAL=$(echo ${{ github.REF }} | awk -F'refs/tags/' '{print $2}')
+          gh release upload "${TAG_VAL}" ${{ github.WORKSPACE }}/staging/* --repo hat-kid/clownfish --clobber
+      - name: Publish Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          TAG_VAL=$(echo ${{ github.REF }} | awk -F'refs/tags/' '{print $2}')
+          gh release edit ${TAG_VAL} --draft=false --repo hat-kid/clownfish
