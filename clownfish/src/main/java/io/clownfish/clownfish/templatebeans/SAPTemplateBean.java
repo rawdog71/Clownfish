@@ -148,12 +148,30 @@ public class SAPTemplateBean implements Serializable {
                             }
                             break;
                         case "t":
+                            if (exid.compareToIgnoreCase("h") == 0) {
+                                String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
+                                functions_table = function.getTableParameterList().getTable(paramname);
+                                if (!functions_table.isEmpty()) {
+                                    rpytablereadlist = getRpytablereadlist(param.trim());
+                                    setTableValues(functions_table, rpytablereadlist, tablevalues);
+                                    saptables.put(paramname, tablevalues);
+                                }
+                            } else {
+                                functions_table = function.getTableParameterList().getTable(paramname);
+                                if (!functions_table.isEmpty()) {
+                                    rpytablereadlist = getRpytablereadlist(tablename);
+                                    setTableValues(functions_table, rpytablereadlist, tablevalues);
+                                    saptables.put(paramname, tablevalues);
+                                }
+                            }
+                            /*
                             functions_table = function.getTableParameterList().getTable(paramname);
                             if (!functions_table.isEmpty()) {
                                 rpytablereadlist = getRpytablereadlist(tablename);
                                 setTableValues(functions_table, rpytablereadlist, tablevalues);
                                 saptables.put(paramname, tablevalues);
                             }
+                            */
                             break;
                         case "c":
                             String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
@@ -253,6 +271,23 @@ public class SAPTemplateBean implements Serializable {
                         }
                         break;
                     case "t":
+                        if (exid.compareToIgnoreCase("h") == 0) {
+                            String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
+                            functions_table = function.getTableParameterList().getTable(paramname);
+                            if (!functions_table.isEmpty()) {
+                                rpytablereadlist = getRpytablereadlist(param.trim());
+                                setTableValues(functions_table, rpytablereadlist, tablevalues);
+                                saptables.put(paramname, tablevalues);
+                            }
+                        } else {
+                            functions_table = function.getTableParameterList().getTable(paramname);
+                            if (!functions_table.isEmpty()) {
+                                rpytablereadlist = getRpytablereadlist(tablename);
+                                setTableValues(functions_table, rpytablereadlist, tablevalues);
+                                saptables.put(paramname, tablevalues);
+                            }
+                        }
+                        /*
                         functions_table = function.getTableParameterList().getTable(paramname);
                         if (!functions_table.isEmpty()) {
                             rpytablereadlist = getRpytablereadlist(tablename);
@@ -261,6 +296,7 @@ public class SAPTemplateBean implements Serializable {
                         }
                         setTableValues(functions_table, rpytablereadlist, tablevalues);
                         saptables.put(paramname, tablevalues);
+                        */
                         break;
                     case "c":
                         String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
