@@ -364,7 +364,7 @@ public class DatabaseTemplateBean implements Serializable {
             ArrayList<TableField> tableFieldsList = new ArrayList<>();
             int columncount = dmd.getColumnCount();
             for (int i = 1; i <= columncount; i++) {
-                String columnName = dmd.getColumnName(i);
+                String columnName = dmd.getColumnLabel(i);
                 int columnType = dmd.getColumnType(i);
                 String columnTypeName = dmd.getColumnTypeName(i);
                 int columnsize = dmd.getColumnDisplaySize(i);
