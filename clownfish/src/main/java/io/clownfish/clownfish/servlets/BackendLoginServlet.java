@@ -29,10 +29,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.Getter;
+import lombok.Setter;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,6 +44,7 @@ import org.springframework.stereotype.Component;
  * @author SulzbachR
  */
 @WebServlet(name = "BackendAuth", urlPatterns = {"/BackendAuth"})
+@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
 public class BackendLoginServlet extends HttpServlet {
     @Autowired transient CfUserService cfuserService;
@@ -47,39 +52,50 @@ public class BackendLoginServlet extends HttpServlet {
     
     String email;
     String password;
+    private @Getter @Setter int tries = 0;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(BackendLoginServlet.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
-        Map<String, String[]> parameters = request.getParameterMap();
-        email = "";
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("email") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            email = values[0];
-        });
-        String inst_email = email;
-        password = "";
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("password") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            password = values[0];
-        });
-        String inst_password = password;
-        AuthToken at = null;
-        if ((null != inst_email) && (null != inst_password)) {
-            try {
-                CfUser cfuser = cfuserService.findByEmail(inst_email);
-                String salt = cfuser.getSalt();
-                String secure = PasswordUtil.generateSecurePassword(inst_password, salt);
-                if (secure.compareTo(cfuser.getPasswort()) == 0) {
-                    String token = AuthToken.generateToken(inst_password, salt);
-                    at = new AuthToken(token, new DateTime().plusMinutes(60), cfuser);      // Tokens valid for 60 minutes
-                    authtokenlist.getAuthtokens().put(token, at);
-                } else {
-                    at = new AuthToken("", new DateTime(), null);      // Invalid token
+        if (tries > 3) {
+            AuthToken at = null;
+            writeResponse(response, at);
+        } else {
+            Map<String, String[]> parameters = request.getParameterMap();
+            email = "";
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("email") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                email = values[0];
+            });
+            String inst_email = email;
+            password = "";
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("password") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                password = values[0];
+            });
+            String inst_password = password;
+            AuthToken at = null;
+            if ((null != inst_email) && (null != inst_password)) {
+                try {
+                    CfUser cfuser = cfuserService.findByEmail(inst_email);
+                    String salt = cfuser.getSalt();
+                    String secure = PasswordUtil.generateSecurePassword(inst_password, salt);
+                    if (secure.compareTo(cfuser.getPasswort()) == 0) {
+                        String token = AuthToken.generateToken(inst_password, salt);
+                        at = new AuthToken(token, new DateTime().plusMinutes(60), cfuser);      // Tokens valid for 60 minutes
+                        authtokenlist.getAuthtokens().put(token, at);
+                    } else {
+                        at = null;      // Invalid token
+                        tries++;
+                    }
+                } catch (Exception ex) {
+                    at = null;      // Invalid token
+                    tries++;
                 }
-            } catch (Exception ex) {
-                at = new AuthToken("", new DateTime(), null);      // Invalid token
             }
+            writeResponse(response, at);
         }
-        
+    }
+    
+    private void writeResponse(HttpServletResponse response, AuthToken at) {
         Gson gson = new Gson();
         String json = gson.toJson(at);
         response.setContentType("application/json;charset=UTF-8");

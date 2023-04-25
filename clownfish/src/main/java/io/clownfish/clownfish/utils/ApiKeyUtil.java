@@ -22,6 +22,7 @@ import io.clownfish.clownfish.serviceinterface.CfWebserviceService;
 import io.clownfish.clownfish.serviceinterface.CfWebserviceauthService;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ public class ApiKeyUtil implements Serializable {
     
     public boolean checkApiKey(String apikey, String webservicename) {
         try {
+            apikey = apikey.toLowerCase().replace("%2b", "+");
             CfWebserviceauth webserviceauth = cfwebserviceauthService.findByHash(apikey);
             return webserviceauth.getCfWebserviceauthPK().getWebserviceRef().getName().compareToIgnoreCase(webservicename) == 0;
         } catch (Exception ex) {

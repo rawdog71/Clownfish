@@ -9,9 +9,9 @@
     <h:head>
         <title>Clownfish CMS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <h:outputStylesheet library="webjars" name="primeflex/3.2.1/primeflex.min.css" />
-        <h:outputStylesheet library="webjars" name="font-awesome/6.2.0/css/all.min-jsf.css" />
-        <h:outputStylesheet library="webjars" name="font-awesome/6.2.0/css/v4-shims.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="primeflex/3.3.0/primeflex.min.css" />
+        <h:outputStylesheet library="webjars" name="font-awesome/6.3.0/css/all.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="font-awesome/6.3.0/css/v4-shims.min-jsf.css" />
         <script src="resources/js/main.js"></script>
         <f:facet name="last">
             <link rel="stylesheet" type="text/css" href="resources/css/main.css" />
@@ -1479,7 +1479,7 @@
                             <p:ajax listener="#{assetList.onChangeOverwrite}"/>
                         </p:selectBooleanCheckbox>
                         <p:fileUpload listener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true" 
-                                      update="messages :form:tabview:assetlist" maxChunkSize="1000000000" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|dotx|svg|ppt|potx|pptx|xls|xlsx|zip|jar|xml)$/i" >
+                                      update="messages :form:tabview:assetlist" maxChunkSize="1000000000" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|webp|mov|mp4|pdf|doc|docx|dotx|svg|ppt|potx|pptx|xls|xlsx|zip|jar|xml)$/i" >
                         </p:fileUpload>
                         <p:growl id="messages" showDetail="true" />
                     </h:form>

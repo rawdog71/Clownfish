@@ -66,6 +66,7 @@ public class LoginBean implements Serializable {
     private @Getter @Setter String apikey = "";
     private @Getter @Setter List<CfBackend> userrights = null;
     private @Getter @Setter String token = "";
+    private @Getter @Setter int tries = 0;
 
     public LoginBean() {
         login = false;
@@ -75,6 +76,7 @@ public class LoginBean implements Serializable {
     public void init() {
         login = false;
         userrights = new ArrayList<>();
+        tries = 0;
     }
 
     public boolean isLogin() {
@@ -96,38 +98,48 @@ public class LoginBean implements Serializable {
     }
     
     public void onLogin(ActionEvent actionEvent) {
-        try {
-            cfuser = cfuserService.findByEmail(email);
-            String salt = cfuser.getSalt();
-            String secure = PasswordUtil.generateSecurePassword(passwort, salt);
-            if (secure.compareTo(cfuser.getPasswort()) == 0) {
-                token = AuthToken.generateToken(passwort, salt);
-                AuthToken at = new AuthToken(token, new DateTime().plusMinutes(60), cfuser);          // Tokens valid for 60 minutes
-                authtokenlist.getAuthtokens().put(token, at);
-                login = true;
-                List<CfUserbackend> selectedcontent = cfuserbackendService.findByUserRef(cfuser.getId());
-                userrights.clear();
-                if (!selectedcontent.isEmpty()) {
-                    for (CfUserbackend listcontent : selectedcontent) {
-                        CfBackend selectedContent = cfbackendService.findById(listcontent.getCfUserbackendPK().getBackendref());
-                        userrights.add(selectedContent);
+        if (tries > 3) {
+            token = "";
+            login = false;
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Too many trials");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        } else {
+            try {
+                //String remoteAddress = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest().getRemoteAddr();
+                cfuser = cfuserService.findByEmail(email);
+                String salt = cfuser.getSalt();
+                String secure = PasswordUtil.generateSecurePassword(passwort, salt);
+                if (secure.compareTo(cfuser.getPasswort()) == 0) {
+                    token = AuthToken.generateToken(passwort, salt);
+                    AuthToken at = new AuthToken(token, new DateTime().plusMinutes(60), cfuser);          // Tokens valid for 60 minutes
+                    authtokenlist.getAuthtokens().put(token, at);
+                    login = true;
+                    List<CfUserbackend> selectedcontent = cfuserbackendService.findByUserRef(cfuser.getId());
+                    userrights.clear();
+                    if (!selectedcontent.isEmpty()) {
+                        for (CfUserbackend listcontent : selectedcontent) {
+                            CfBackend selectedContent = cfbackendService.findById(listcontent.getCfUserbackendPK().getBackendref());
+                            userrights.add(selectedContent);
+                        }
                     }
+                    apikey = apikeyutil.getRestApikey(cfuser);
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Login", "Welcome " + cfuser.getVorname());
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                } else {
+                    token = "";
+                    login = false;
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Wrong password or wrong e-mail");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                    tries++;
                 }
-                apikey = apikeyutil.getRestApikey(cfuser);
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Login", "Welcome " + cfuser.getVorname());
-                FacesContext.getCurrentInstance().addMessage(null, message);
-            } else {
+            } catch (NoResultException ex) {
                 token = "";
                 login = false;
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Wrong password or wrong e-mail");
                 FacesContext.getCurrentInstance().addMessage(null, message);
+                tries++;
             }
-        } catch (NoResultException ex) {
-            token = "";
-            login = false;
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Wrong password or wrong e-mail");
-            FacesContext.getCurrentInstance().addMessage(null, message);
-        }          
+        }
     }
     
     public void onLogout() {

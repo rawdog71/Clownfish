@@ -57,7 +57,7 @@ import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
 import org.primefaces.extensions.model.monacoeditor.ETheme;
 import org.primefaces.extensions.model.monacoeditor.EditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
-import org.primefaces.extensions.model.monacoeditor.MonacoDiffEditorModel;
+import org.primefaces.extensions.model.monaco.MonacoDiffEditorModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

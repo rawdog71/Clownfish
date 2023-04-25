@@ -152,6 +152,7 @@ public class WebServiceTemplateBean implements Serializable {
     
     private Map getContentMap(String url) {
         try {
+            url = url.replace("+", "%2B");
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             ObjectMapper mapper = new ObjectMapper();
@@ -166,6 +167,7 @@ public class WebServiceTemplateBean implements Serializable {
     
     private Map getContentMap(String url, String user, String password) {
         try {
+            url = url.replace("+", "%2B");
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getInterceptors().add(
                 new BasicAuthorizationInterceptor(user, password));
@@ -182,6 +184,7 @@ public class WebServiceTemplateBean implements Serializable {
     
     private List getContentList(String url) {
         try {
+            url = url.replace("+", "%2B");
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             ObjectMapper mapper = new ObjectMapper();
@@ -196,6 +199,7 @@ public class WebServiceTemplateBean implements Serializable {
     
     private List getContentList(String url, String user, String password) {
         try {
+            url = url.replace("+", "%2B");
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getInterceptors().add(
                 new BasicAuthorizationInterceptor(user, password));

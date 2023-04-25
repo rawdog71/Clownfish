@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.primefaces.extensions.model.monaco.MonacoDiffEditorModel;
 
 @Named("javaList")
 @Scope("singleton")

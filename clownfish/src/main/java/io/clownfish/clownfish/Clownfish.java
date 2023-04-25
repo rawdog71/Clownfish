@@ -221,6 +221,8 @@ public class Clownfish {
     String mavenpath;
     private @Getter @Setter boolean initmessage = false;
     private @Getter @Setter SiteTreeBean sitetree;
+    @Value("${server.name:Clownfish Server Open Source}") String servername;
+    @Value("${server.x-powered:Clownfish Server Open Source by Rainer Sulzbach}") String serverxpowered;
     
     /**
      * Call of the "root" site
@@ -1556,8 +1558,10 @@ public class Clownfish {
      * 
      */
     private void addHeader(HttpServletResponse response, String version) {
-        response.addHeader("Server", "Clownfish Server Open Source Version " + version);
-        response.addHeader("X-Powered-By", "Clownfish Server Open Source Version " + version + " by Rainer Sulzbach");
+        String serverString = servername.replaceAll("#version#", version);
+        String serverxpowerdedString = serverxpowered.replaceAll("#version#", version);
+        response.addHeader("Server", serverString);
+        response.addHeader("X-Powered-By", serverxpowerdedString);
     }
 
     /**
