@@ -4,6 +4,38 @@ var oldTag;
 var counter = -1;
 var oldPicture;
 
+function createSaveToClownfishElement() {
+    const anchor = document.createElement('a');
+    anchor.classList.add('float');
+    anchor.setAttribute('onclick', 'saveToClownfish()');
+    anchor.style.position = 'fixed';
+    anchor.style.bottom = '20px';
+    anchor.style.right = '20px';
+    anchor.style.zIndex = '100';
+    anchor.style.backgroundColor = '#F44336';
+    anchor.style.color = 'white';
+    anchor.style.borderRadius = '50%';
+    anchor.style.width = '56px';
+    anchor.style.height = '56px';
+    anchor.style.display = 'flex';
+    anchor.style.justifyContent = 'center';
+    anchor.style.alignItems = 'center';
+    anchor.style.textDecoration = 'none';
+    anchor.style.cursor = 'pointer';
+    anchor.style.boxShadow = '0px 3px 5px rgba(0, 0, 0, 0.2)';
+
+    const icon = document.createElement('i');
+    icon.classList.add('fa', 'fa-save', 'my-float');
+
+    anchor.appendChild(icon);
+
+    document.body.appendChild(anchor);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    createSaveToClownfishElement();
+});
+
 // Switch from text to input
 // Add styling to the element so nothing get really changed on the frontend
 // height, width is the most important
@@ -134,23 +166,34 @@ function convertToOldElement(element) {
 }
 
 // Safe to clownish via updatecontent
-function saveToClownfish() {
-    console.log("test")
-        /*
+async function saveToClownfish() {
+    console.log(changesArray)
         for (let i = 0; i < changesArray.length; i++) {
-            axios.post('/updatecontent', {
+            await axios.post('/updatecontent', {
+                    apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
+                    token: new URL(window.location.href).searchParams.get("cf_login_token"),
                     classname: changesArray[i].classname,
                     contentname: changesArray[i].contentname,
-                    attributemap: changesArray[i].attributemap
+                    attributmap: changesArray[i].attributemap
                 })
-                .then(function(response) {
+                .then(async function(response) {
+                    await axios.post('/commitcontent', {
+                        apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
+                        token: new URL(window.location.href).searchParams.get("cf_login_token"),
+                        contentname: changesArray[i].contentname
+                    })
+                    .then(function(response) {
+                        console.log(response);
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
                     console.log(response);
                 })
                 .catch(function(error) {
                     console.log(error);
                 });
         }
-        */
 }
 
 /*
