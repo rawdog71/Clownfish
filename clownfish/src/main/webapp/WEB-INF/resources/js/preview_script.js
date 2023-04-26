@@ -4,6 +4,38 @@ var oldTag;
 var counter = -1;
 var oldPicture;
 
+
+
+function createSaveToClownfishElement() {
+    const anchor = document.createElement('a');
+    anchor.classList.add('float');
+    anchor.setAttribute('onclick', 'saveToClownfish()');
+    anchor.style.position = 'fixed';
+    anchor.style.bottom = '20px';
+    anchor.style.right = '20px';
+    anchor.style.zIndex = '100';
+    anchor.style.backgroundColor = '#F44336';
+    anchor.style.color = 'white';
+    anchor.style.borderRadius = '50%';
+    anchor.style.width = '56px';
+    anchor.style.height = '56px';
+    anchor.style.display = 'flex';
+    anchor.style.justifyContent = 'center';
+    anchor.style.alignItems = 'center';
+    anchor.style.textDecoration = 'none';
+    anchor.style.cursor = 'pointer';
+    anchor.style.boxShadow = '0px 3px 5px rgba(0, 0, 0, 0.2)';
+
+    const icon = document.createElement('i');
+    icon.classList.add('fa', 'fa-save', 'my-float');
+
+    anchor.appendChild(icon);
+
+    document.body.appendChild(anchor);
+}
+
+createSaveToClownfishElement();
+
 // Switch from text to input
 // Add styling to the element so nothing get really changed on the frontend
 // height, width is the most important
@@ -135,8 +167,7 @@ function convertToOldElement(element) {
 
 // Safe to clownish via updatecontent
 function saveToClownfish() {
-    console.log("test")
-        /*
+    console.log(changesArray)
         for (let i = 0; i < changesArray.length; i++) {
             axios.post('/updatecontent', {
                     classname: changesArray[i].classname,
@@ -150,7 +181,6 @@ function saveToClownfish() {
                     console.log(error);
                 });
         }
-        */
 }
 
 /*
