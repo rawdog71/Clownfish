@@ -27,10 +27,8 @@ import io.clownfish.clownfish.dbentities.CfContentversion;
 import io.clownfish.clownfish.dbentities.CfContentversionPK;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
-import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
-import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
@@ -51,6 +49,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -77,7 +76,7 @@ public class RestContent {
     @Autowired private CfContentversionService cfcontentversionService;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestContent.class);
 
-    @PostMapping("/insertcontent")
+    @PostMapping(value = "/insertcontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameter restInsertContent(@RequestBody RestContentParameter icp) {
         return insertContent(icp);
     }
@@ -152,7 +151,7 @@ public class RestContent {
         return icp;
     }
     
-    @PostMapping("/deletecontent")
+    @PostMapping(value = "/deletecontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameter restDeleteContent(@RequestBody RestContentParameter ucp) {
         return deleteContent(ucp);
     }
@@ -200,7 +199,7 @@ public class RestContent {
         return ucp;
     }
     
-    @PostMapping("/updatecontent")
+    @PostMapping(value = "/updatecontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameter restUpdateContent(@RequestBody RestContentParameter ucp) {
         return updateContent(ucp);
     }
@@ -254,7 +253,7 @@ public class RestContent {
         return ucp;
     }
     
-    @PostMapping("/destroycontent")
+    @PostMapping(value = "/destroycontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameter restDestroyContent(@RequestBody RestContentParameter ucp) {
         return destroyContent(ucp);
     }
@@ -315,7 +314,7 @@ public class RestContent {
         return ucp;
     }
     
-    @PostMapping("/copycontent")
+    @PostMapping(value = "/copycontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameter restCopyContent(@RequestBody RestContentParameter ucp) {
         return copyContent(ucp);
     }
@@ -398,7 +397,7 @@ public class RestContent {
         return ucp;
     }
 
-    @PostMapping("/checkoutcontent")
+    @PostMapping(value = "/checkoutcontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameterExt restCheckoutContent(@RequestBody RestContentParameterExt ucp) {
         return checkoutContent(ucp);
     }
@@ -434,7 +433,7 @@ public class RestContent {
         return ucp;
     }
 
-    @PostMapping("/checkincontent")
+    @PostMapping(value = "/checkincontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameterExt restCheckinContent(@RequestBody RestContentParameterExt ucp) {
         return checkinContent(ucp);
     }
@@ -505,7 +504,7 @@ public class RestContent {
         cfcontentversionService.create(cfcontentversion);
     }
     
-    @PostMapping("/commitcontent")
+    @PostMapping(value = "/commitcontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameterExt restCommitContent(@RequestBody RestContentParameterExt icp) {
         return commitContent(icp);
     }

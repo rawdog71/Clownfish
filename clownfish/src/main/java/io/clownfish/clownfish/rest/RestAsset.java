@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 
 /**
  *
@@ -56,7 +57,7 @@ public class RestAsset {
     }
     */
 
-    @PostMapping("/updateasset")
+    @PostMapping(value = "/updateasset", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestAssetParameter restUpdateAsset(@RequestBody RestAssetParameter ikp) {
         return updateAsset(ikp);
     }
@@ -91,7 +92,7 @@ public class RestAsset {
         return ikp;
     }
     
-    @PostMapping("/deleteasset")
+    @PostMapping(value = "/deleteasset", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestAssetParameter restDeleteAsset(@RequestBody RestAssetParameter ikp) {
         return deleteAsset(ikp);
     }

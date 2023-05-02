@@ -32,6 +32,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,17 +43,15 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class RestListcontent {
-    @Autowired transient CfClassService cfclassService;
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfListcontentService cflistcontentService;
-    @Autowired FolderUtil folderUtil;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired HibernateUtil hibernateutil;
     @Autowired transient AuthTokenList authtokenlist;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestListcontent.class);
 
-    @PostMapping("/insertlistcontent")
+    @PostMapping(value = "/insertlistcontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestListcontentParameter restInsertDatalist(@RequestBody RestListcontentParameter ilcp) {
         return insertListcontent(ilcp);
     }
@@ -90,7 +89,7 @@ public class RestListcontent {
         return ilcp;
     }
     
-    @PostMapping("/deletelistcontent")
+    @PostMapping(value = "/deletelistcontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestListcontentParameter restDeleteDatalist(@RequestBody RestListcontentParameter ilcp) {
         return deleteListcontent(ilcp);
     }

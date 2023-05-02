@@ -45,7 +45,7 @@ public class RestAssetlist {
     @Autowired transient AuthTokenList authtokenlist;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestAssetlist.class);
     
-    @PostMapping("/getassetlists")
+    @PostMapping(value = "/getassetlists", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestAssetlistParameter restGetAssetlists(@RequestBody RestAssetlistParameter idp) {
         return getAssetlists(idp);
     }
@@ -71,7 +71,7 @@ public class RestAssetlist {
         return idp;
     }
 
-    @PostMapping("/insertassetlist")
+    @PostMapping(value = "/insertassetlist", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestAssetlistParameter restInsertAssetlist(@RequestBody RestAssetlistParameter idp) {
         return insertDatalist(idp);
     }
@@ -105,7 +105,7 @@ public class RestAssetlist {
         return idp;
     }
     
-    @PostMapping("/deleteassetlist")
+    @PostMapping(value = "/deleteassetlist", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestAssetlistParameter restDeleteAssetlist(@RequestBody RestAssetlistParameter idp) {
         return deleteAssetlist(idp);
     }
