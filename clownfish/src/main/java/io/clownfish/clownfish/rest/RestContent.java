@@ -65,8 +65,6 @@ public class RestContent {
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
-    @Autowired transient CfAttributetypeService cfattributetypeService;
-    @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;

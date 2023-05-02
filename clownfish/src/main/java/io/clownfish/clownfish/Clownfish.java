@@ -1911,6 +1911,8 @@ public class Clownfish {
         }
         
         CfLayout cflayout = new CfLayout(templatename);
+        CfTemplate maintemplate = cftemplateService.findByName(templatename);
+        templateUtil.fetchLayout(maintemplate);
         Document doc = Jsoup.parse(templatecontent);
         Elements divs = doc.getElementsByAttribute("template");
         for (Element div : divs) {
@@ -1964,13 +1966,14 @@ public class Clownfish {
                     div.addClass("cf_div");
                 }
                 if ((preview) && (authtokenlist.checkValidToken(login_token))) {          // ToDo check accessmanager
-                    if ((null != sitetree) && (null != sitetree.getLayout())) {
-                        for (CfDiv comp_div : sitetree.getLayout().getDivs()) {
+                    //templateUtil.fetchLayout(maintemplate);
+                    //if ((null != sitetree) && (null != sitetree.getLayout())) {
+                        for (CfDiv comp_div : templateUtil.getLayout().getDivs()) {
                             if ((0 == cfdiv.getName().compareToIgnoreCase(comp_div.getName())) && (comp_div.isVisible())) {
                                 div.html(content);
                             }
                         }
-                    }
+                    //}
                 } else {
                     div.html(content);
                 }

@@ -523,35 +523,8 @@ public class SiteTreeBean implements Serializable {
                 FacesMessage message = new FacesMessage("LAYOUT TEMPLATE");
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 //List<CfLayoutcontent> layoutcontent = cflayoutcontentService.findBySiteref(selectedSite.getId());
-                layout = new CfLayout(template.getName());
-                Document doc = Jsoup.parse(template.getContent());
-                Elements divs = doc.getElementsByAttribute("template");
-                for (Element div : divs) {
-                    String contents = div.attr("contents");
-                    String datalists = div.attr("datalists");
-                    String assets = div.attr("assets");
-                    String assetlists = div.attr("assetlists");
-                    String keywordlists = div.attr("keywordlists");
-                    CfDiv cfdiv = new CfDiv();
-                    cfdiv.setId(div.attr("id"));
-                    cfdiv.setName(div.attr("template"));
-                    if (!contents.isEmpty()) {
-                        cfdiv.getContentArray().addAll(ClownfishUtil.toList(contents.split(",")));
-                    }
-                    if (!datalists.isEmpty()) {
-                        cfdiv.getContentlistArray().addAll(ClownfishUtil.toList(datalists.split(",")));
-                    }
-                    if (!assets.isEmpty()) {
-                        cfdiv.getAssetArray().addAll(ClownfishUtil.toList(assets.split(",")));
-                    }
-                    if (!assetlists.isEmpty()) {
-                        cfdiv.getAssetlistArray().addAll(ClownfishUtil.toList(assetlists.split(",")));
-                    }
-                    if (!keywordlists.isEmpty()) {
-                        cfdiv.getKeywordlistArray().addAll(ClownfishUtil.toList(keywordlists.split(",")));
-                    }
-                    layout.getDivArray().put(div.attr("id"), cfdiv);
-                }
+                templateUtility.fetchLayout(template);
+                layout = templateUtility.getLayout();
             } else {
                 contenteditable = false;
                 selected_contentclass = null;

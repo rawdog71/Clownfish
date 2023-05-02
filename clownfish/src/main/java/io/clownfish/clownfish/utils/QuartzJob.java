@@ -132,14 +132,6 @@ public class QuartzJob implements Job {
         propertymap = propertylist.fillPropertyMap();
         Map<String, String> paramMap = makeParamMap(quartz.getParameter());
         //clownfishutil = new ClownfishUtil();
-        String sapSupportProp = propertymap.get("sap_support");
-        if (sapSupportProp.compareToIgnoreCase("true") == 0) {
-            sapSupport = true;
-        }
-        if (sapSupport) {
-            sapc = new SAPConnection(SAPCONNECTION, "Clownfish5");
-            rpytableread = new RPY_TABLE_READ(sapc);
-        }
         
         // Freemarker Template
         freemarker.template.Template fmTemplate = null;
@@ -154,6 +146,16 @@ public class QuartzJob implements Job {
         cfsite = cfsiteService.findById(siteref);
 
         CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().getId());
+        
+        String sapSupportProp = propertymap.get("sap_support");
+        if (sapSupportProp.compareToIgnoreCase("true") == 0) {
+            sapSupport = true;
+        }
+        if (sapSupport) {
+            sapc = new SAPConnection(SAPCONNECTION, "Clownfish5_" + quartz.getName());
+            rpytableread = new RPY_TABLE_READ(sapc);
+        }
+        
         // fetch the dependend template 
         switch (cftemplate.getScriptlanguage()) {
             case 0:

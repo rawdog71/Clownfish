@@ -20,6 +20,7 @@ import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import io.clownfish.clownfish.datamodels.CfDiv;
+import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
@@ -86,6 +87,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     private transient @Getter @Setter Patch<String> patch = null;
     private transient @Getter @Setter List<String> source = null;
     private transient @Getter @Setter List<String> target = null;
+    private @Getter @Setter CfLayout layout;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(TemplateUtil.class);
 
@@ -139,6 +141,38 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             diff = true;
         }
         return diff;
+    }
+    
+    public void fetchLayout(CfTemplate template) {
+        layout = new CfLayout(template.getName());
+        Document doc = Jsoup.parse(template.getContent());
+        Elements divs = doc.getElementsByAttribute("template");
+        for (Element div : divs) {
+            String contents = div.attr("contents");
+            String datalists = div.attr("datalists");
+            String assets = div.attr("assets");
+            String assetlists = div.attr("assetlists");
+            String keywordlists = div.attr("keywordlists");
+            CfDiv cfdiv = new CfDiv();
+            cfdiv.setId(div.attr("id"));
+            cfdiv.setName(div.attr("template"));
+            if (!contents.isEmpty()) {
+                cfdiv.getContentArray().addAll(ClownfishUtil.toList(contents.split(",")));
+            }
+            if (!datalists.isEmpty()) {
+                cfdiv.getContentlistArray().addAll(ClownfishUtil.toList(datalists.split(",")));
+            }
+            if (!assets.isEmpty()) {
+                cfdiv.getAssetArray().addAll(ClownfishUtil.toList(assets.split(",")));
+            }
+            if (!assetlists.isEmpty()) {
+                cfdiv.getAssetlistArray().addAll(ClownfishUtil.toList(assetlists.split(",")));
+            }
+            if (!keywordlists.isEmpty()) {
+                cfdiv.getKeywordlistArray().addAll(ClownfishUtil.toList(keywordlists.split(",")));
+            }
+            layout.getDivArray().put(div.attr("id"), cfdiv);
+        }
     }
     
     public String fetchIncludes(String content, ClownfishConst.ViewModus modus) {
