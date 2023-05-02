@@ -404,6 +404,23 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                         surrounddiv.attr("id", "cf_id_" + cfdiv.getName()+"_"+counter);
                         el.wrap(surrounddiv.toString());
                     }
+                    matcher = Pattern.compile("#A:[a-zA-Z0-9_]*:[0-9]*#").matcher(outerhtml);
+                    if (matcher.find()) {
+                        String region = outerhtml.substring((matcher.start()+3), (matcher.end()-1));
+                        String[] parts = region.split(":");
+                        String name = parts[0];
+                        String number = parts[1].replaceAll("!", "");
+                        
+                        String attr = "asset:" + name + ":mediaid:" + number;
+                        Attributes attributes = new Attributes();
+                        attributes.put("cf_inplace",attr);
+
+                        Element surrounddiv = new Element(Tag.valueOf("div"), "", attributes);
+                        surrounddiv.addClass("cf_inplace");
+                        counter++;
+                        surrounddiv.attr("id", "cf_id_" + cfdiv.getName()+"_"+counter);
+                        el.wrap(surrounddiv.toString());
+                    }
                 }
             }
         }

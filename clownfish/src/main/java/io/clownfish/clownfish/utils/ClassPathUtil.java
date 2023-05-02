@@ -68,43 +68,47 @@ public class ClassPathUtil implements Serializable {
 
     public void loadClassesFromJar(File[] files) throws IOException
     {
-        //CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
-        JarFile[] jarFiles = new JarFile[files.length];
-        URL[] urls = new URL[jarFiles.length];
+        try {
+            //CfClassLoader cl = (CfClassLoader) ClassLoader.getSystemClassLoader();
+            JarFile[] jarFiles = new JarFile[files.length];
+            URL[] urls = new URL[jarFiles.length];
 
-        for (int i = 0; i < jarFiles.length; i++)
-        {
-            jarFiles[i] = new JarFile(files[i]);
-            urls[i] = new URL("jar:file:" + files[i].toString() + "!/");
-            cfclassLoader.add(urls[i]);
-        }
-
-        for (JarFile jar : jarFiles)
-        {
-            Enumeration<JarEntry> jarEntries = jar.entries();
-            while (jarEntries.hasMoreElements())
+            for (int i = 0; i < jarFiles.length; i++)
             {
-                JarEntry je = jarEntries.nextElement();
+                jarFiles[i] = new JarFile(files[i]);
+                urls[i] = new URL("jar:file:" + files[i].toString() + "!/");
+                cfclassLoader.add(urls[i]);
+            }
 
-                if (je.isDirectory() || !je.getName().endsWith(".class"))
-                    continue;
-
-                // -6 because of .class
-                String className = je.getName().substring(0, je.getName().length() - 6);
-                className = className.replace('/', '.');
-                try
+            for (JarFile jar : jarFiles)
+            {
+                Enumeration<JarEntry> jarEntries = jar.entries();
+                while (jarEntries.hasMoreElements())
                 {
-                    Class<?> c = cfclassLoader.loadClass(className);
-                    //System.out.println(c.getCanonicalName() + ": Class loader " + c.getClassLoader());
-                    //System.out.println(c.getCanonicalName() + " package: " + c.getPackageName());
+                    JarEntry je = jarEntries.nextElement();
 
-                    class_set.add(c);
-                }
-                catch (ClassNotFoundException | NoClassDefFoundError e)
-                {
-                    LOGGER.error(e.getMessage());
+                    if (je.isDirectory() || !je.getName().endsWith(".class"))
+                        continue;
+
+                    // -6 because of .class
+                    String className = je.getName().substring(0, je.getName().length() - 6);
+                    className = className.replace('/', '.');
+                    try
+                    {
+                        Class<?> c = cfclassLoader.loadClass(className);
+                        System.out.println(c.getCanonicalName() + ": Class loader " + c.getClassLoader());
+                        System.out.println(c.getCanonicalName() + " package: " + c.getPackageName());
+
+                        class_set.add(c);
+                    }
+                    catch (ClassNotFoundException | NoClassDefFoundError e)
+                    {
+                        LOGGER.error(e.getMessage());
+                    }
                 }
             }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
         }
     }
 }
