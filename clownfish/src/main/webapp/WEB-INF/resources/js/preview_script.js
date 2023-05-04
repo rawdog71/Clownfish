@@ -89,19 +89,19 @@ function changeElement(element) {
     parentDiv.insertBefore(para, parentDiv.children[position]);
 }
 
-/*
+
 function changeImage(element) {
-    console.log(element)
+    //console.log(element)
     $("#exampleModal").modal('show');
-    for (let i = 0; i < element.parentNode.children[i].length; i++) {
+    for (let i = 0; i < element.parentNode.children.length; i++) {
         if (element.parentNode.children[i].tagName == 'IMG') {
-            oldPicture = element.children[i];
+            oldPicture = element.parentNode.children[i];
         }
     }
 }
 
 function saveImage() {
-    console.log(oldPicture)
+    //console.log(oldPicture)
     var parentDiv = oldPicture.parentNode;
     // Get information from the parentdiv (classname, contentname, attributename)
     var cfInplace = parentDiv.getAttribute('cf_inplace').split(':');
@@ -119,12 +119,11 @@ function saveImage() {
     if (index == -1) {
         changesArray.push(newContent)
     } else {
-        changesArray[index] = newContent
+        Object.assign(changesArray[index].attributemap, newContent.attributemap)
     }
 
-    oldPicture.src = `http://localhost:9000/GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid=${document.getElementById('selectAsset').value}`
+    oldPicture.src = `/GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid=${document.getElementById('selectAsset').value}`
 }
-*/
 
 // Revert from input to text
 function convertToOldElement(element) {
@@ -167,7 +166,7 @@ function convertToOldElement(element) {
 
 // Safe to clownish via updatecontent
 async function saveToClownfish() {
-    console.log(changesArray)
+    //console.log(changesArray)
         for (let i = 0; i < changesArray.length; i++) {
             await axios.post('/updatecontent', {
                     apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
@@ -183,12 +182,12 @@ async function saveToClownfish() {
                         contentname: changesArray[i].contentname
                     })
                     .then(function(response) {
-                        console.log(response);
+                        //console.log(response);
                     })
                     .catch(function(error) {
                         console.log(error);
                     });
-                    console.log(response);
+                    //console.log(response);
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -215,15 +214,18 @@ function saveToArray(element) {
         'attributemap': {},
     }
     newContent.attributemap[`${cfInplace[2]}`] = element.innerText
-
+    //console.log(newContent);
     // Check if the changes are already in an array if not push
     // if they are replace
     var index = changesArray.findIndex(e => e.classname === cfInplace[0] && e.contentname === cfInplace[1])
     if (index == -1) {
         changesArray.push(newContent)
     } else {
-        changesArray[index] = newContent
+        Object.assign(changesArray[index].attributemap, newContent.attributemap)
+        //changesArray[index] = newContent
     }
+
+    //console.log(changesArray)
 }
 
 // If the user clicks outter the input he intended to edit
@@ -242,7 +244,7 @@ function getPosition(div, oldelement) {
     for (let i = 0; i < div.childElementCount; i++) {
         if (div.children[i] == oldelement) {
             position = i
-            console.log(div.children[i])
+            //console.log(div.children[i])
         }
     }
 
@@ -263,15 +265,18 @@ function detectKeyPressed(element) {
 function addFunctions() {
     var divList = document.getElementsByClassName('cf_inplace')
     for (let i = 0; i < divList.length; i++) {
-        console.log(divList[i].children.length)
+        //console.log(divList[i].children.length)
         for (let j = 0; j < divList[i].children.length; j++) {
-            divList[i].children[j].setAttribute("onmouseleave", "toggleEditButton(this)")
-            divList[i].children[j].setAttribute("onmouseenter", "toggleEditButton(this)")
+            if(divList[i].children[j].tagName == "IMG") {
+                divList[i].children[j].setAttribute('ondblclick', 'changeImage(this)')
+            } else {
+                divList[i].children[j].setAttribute('ondblclick', 'triggerChangeElement(this)')
+            }
         }
     }
 
     for (let i = 0; i < divList.length; i++) {
-        console.log("add")
+        //console.log("add")
         divList[i].appendChild(createEditButton(divList[i]))
     }
 }
@@ -323,10 +328,10 @@ function triggerChangeElement(element) {
     }
 }
 
-/*
 async function getAllAssets() {
     try {
-        const response = await axios.get('http://localhost:9000/asset_length');
+        const response = await axios.get('/GetAssetList?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=');
+
         let selectTag = document.getElementById('selectAsset')
         let optionElements = []
         let imageAssets = response.data.filter(asset => /\.(jpeg|jpg|png|svg)$/.test(asset.name))
@@ -336,17 +341,15 @@ async function getAllAssets() {
             opt.innerHTML = imageAssets[i].name;
             optionElements.push(opt)
         }
+        //console.log(selectTag);
         selectTag.append(...optionElements);
-        console.log(response.data);
+        //console.log(response.data);
     } catch (error) {
         console.error(error);
     }
 }
 
-getAllAssets()
-
-*/
-
 document.addEventListener("DOMContentLoaded", function(event) {
+    getAllAssets()
     addFunctions()
 });
