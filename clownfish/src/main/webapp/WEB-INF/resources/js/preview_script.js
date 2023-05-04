@@ -328,6 +328,75 @@ function triggerChangeElement(element) {
     }
 }
 
+function createModal() {
+    // Create elements
+    const modalDiv = document.createElement('div');
+    const modalDialog = document.createElement('div');
+    const modalContent = document.createElement('div');
+    const modalHeader = document.createElement('div');
+    const modalTitle = document.createElement('h1');
+    const closeButton = document.createElement('button');
+    const modalBody = document.createElement('div');
+    const modalBodyText = document.createElement('p');
+    const selectAsset = document.createElement('select');
+    const modalFooter = document.createElement('div');
+    const closeModalButton = document.createElement('button');
+    const saveImageButton = document.createElement('button');
+
+    // Set attributes and content
+    modalDiv.classList.add('modal', 'fade');
+    modalDiv.id = 'exampleModal';
+    modalDiv.setAttribute('tabindex', '-1');
+    modalDiv.setAttribute('aria-labelledby', 'exampleModalLabel');
+    modalDiv.setAttribute('aria-hidden', 'true');
+
+    modalDialog.classList.add('modal-dialog');
+    modalContent.classList.add('modal-content');
+    modalHeader.classList.add('modal-header');
+    modalTitle.classList.add('modal-title', 'fs-5');
+    modalTitle.id = 'exampleModalLabel';
+    modalTitle.textContent = 'Assetauswahl';
+
+    closeButton.type = 'button';
+    closeButton.classList.add('btn-close');
+    closeButton.setAttribute('data-bs-dismiss', 'modal');
+    closeButton.setAttribute('aria-label', 'Close');
+
+    modalBody.classList.add('modal-body');
+    modalBodyText.textContent = 'Bitte wählen Sie ein Bild welches sie anzeigen wollen.';
+    selectAsset.classList.add('form-select', 'w-100');
+    selectAsset.id = 'selectAsset';
+
+    modalFooter.classList.add('modal-footer');
+    closeModalButton.type = 'button';
+    closeModalButton.classList.add('btn', 'btn-secondary');
+    closeModalButton.setAttribute('data-bs-dismiss', 'modal');
+    closeModalButton.textContent = 'Schließen';
+
+    saveImageButton.type = 'button';
+    saveImageButton.classList.add('btn', 'btn-primary');
+    saveImageButton.setAttribute('onclick', 'saveImage()');
+    saveImageButton.textContent = 'Speichern';
+
+    // Assemble elements
+    modalHeader.appendChild(modalTitle);
+    modalHeader.appendChild(closeButton);
+    modalBody.appendChild(modalBodyText);
+    modalBody.appendChild(selectAsset);
+    modalFooter.appendChild(closeModalButton);
+    modalFooter.appendChild(saveImageButton);
+
+    modalContent.appendChild(modalHeader);
+    modalContent.appendChild(modalBody);
+    modalContent.appendChild(modalFooter);
+
+    modalDialog.appendChild(modalContent);
+    modalDiv.appendChild(modalDialog);
+
+    // Append the modal to the body or another element
+    document.body.appendChild(modalDiv);
+}
+
 async function getAllAssets() {
     try {
         const response = await axios.get('/GetAssetList?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=');
@@ -350,6 +419,7 @@ async function getAllAssets() {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
+    createModal()
     getAllAssets()
     addFunctions()
 });
