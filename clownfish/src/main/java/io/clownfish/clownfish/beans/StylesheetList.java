@@ -440,4 +440,22 @@ public class StylesheetList implements ISourceContentInterface {
             access = false;
         }
     }
+
+    @Override
+    public void onCopy(ActionEvent actionEvent) {
+        if (null != selectedStylesheet) {
+            CfStylesheet newstylesheet = new CfStylesheet();
+            String newname = stylesheetUtility.getUniqueName(selectedStylesheet.getName());
+            newstylesheet.setName(newname);
+            newstylesheet.setContent(selectedStylesheet.getContent());
+            cfstylesheetService.create(newstylesheet);
+            stylesheetListe = cfstylesheetService.findAll();
+            stylesheetName = newname;
+            selectedStylesheet = newstylesheet;
+            onCommit(null);
+            refresh();
+            onSelect(null);
+            onCheckOut(null);
+        }
+    }
 }

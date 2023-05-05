@@ -598,6 +598,10 @@
                             <p:commandButton id="changetemplate" icon="pi pi-pencil" process="form" value="Change" actionListener="#{templateList.onChange}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate :form:tabview:classtemplate" disabled="#{templateList.newButtonDisabled}" />
                         </div>
                         <div class="flex align-items-center pr-2">
+                            <p:commandButton id="copytemplateButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{templateList.onCopy}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate :form:tabview:edittemplate :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:classtemplate">
+                            </p:commandButton>
+                        </div>
+                        <div class="flex align-items-center pr-2">
                             <p:commandButton id="deletetemplateButton" icon="pi pi-trash" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:tabsiteview:selecttemplate :form:tabview:classtemplate">
                                 <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                             </p:commandButton>
@@ -659,7 +663,10 @@
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="changestylesheet" icon="pi pi-pencil" process="form" value="Change" actionListener="#{stylesheetList.onChange}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
                         </div>
-                        
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="copystylesheetButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{stylesheetList.onCopy}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:editstylesheet :form:tabview:tabsiteview:selectstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup">
+                            </p:commandButton>
+                        </div>
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="deletestylesheetButton" icon="pi pi-trash" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:tabsiteview:selectstylesheet">
                                 <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
@@ -722,6 +729,11 @@
 
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="changejavascript" icon="pi pi-pencil" process="form" value="Change" actionListener="#{javascriptList.onChange}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="copyjavascriptButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{javascriptList.onCopy}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:editjavascript :form:tabview:tabsiteview:selectjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup">
+                            </p:commandButton>
                         </div>
                         
                         <div class="flex align-items-center pr-2">
@@ -794,6 +806,11 @@
 
                                 <div class="flex align-items-center pr-2">
                                     <p:commandButton id="changejava" icon="pi pi-pencil" process="form" value="Change" actionListener="#{javaList.onChange}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname" disabled="#{javaList.newButtonDisabled}" />
+                                </div>
+                                
+                                <div class="flex align-items-center pr-2">
+                                    <p:commandButton id="copyjavaButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{javaList.onCopy}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname">
+                                    </p:commandButton>
                                 </div>
                                 
                                 <div class="flex align-items-center pr-2">

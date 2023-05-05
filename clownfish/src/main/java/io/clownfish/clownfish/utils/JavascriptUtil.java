@@ -115,4 +115,19 @@ public class JavascriptUtil implements IVersioningInterface, Serializable {
         CfJavascript cfjavascript = cfjavascriptService.findByName(name);
         return cfjavascriptversionService.findMaxVersion((cfjavascript).getId());
     }
+
+    @Override
+    public String getUniqueName(String name) {
+        int i = 1;
+        boolean found = false;
+        do {
+            try {
+                cfjavascriptService.findByName(name+"("+i+")");
+                i++;
+            } catch(Exception ex) {
+                found = true;
+            }
+        } while (!found);
+        return name+"("+i+")";
+    }
 }

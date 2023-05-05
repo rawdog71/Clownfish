@@ -484,4 +484,23 @@ public class JavaList implements ISourceContentInterface
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
+
+    @Override
+    public void onCopy(ActionEvent actionEvent) {
+        if (null != selectedJava) {
+            CfJava newjava = new CfJava();
+            String newname = javaUtility.getUniqueName(selectedJava.getName());
+            newjava.setName(newname);
+            newjava.setLanguage(selectedJava.getLanguage());
+            newjava.setContent(selectedJava.getContent());
+            cfjavaService.create(newjava);
+            javaListe = cfjavaService.findAll();
+            javaName = newname;
+            selectedJava = newjava;
+            onCommit(null);
+            refresh();
+            onSelect(null);
+            onCheckOut(null);
+        }
+    }
 }

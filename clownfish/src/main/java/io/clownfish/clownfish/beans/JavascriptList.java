@@ -440,4 +440,22 @@ public class JavascriptList implements ISourceContentInterface {
             access = false;
         }
     }
+
+    @Override
+    public void onCopy(ActionEvent actionEvent) {
+        if (null != selectedJavascript) {
+            CfJavascript newjavascript = new CfJavascript();
+            String newname = javascriptUtility.getUniqueName(selectedJavascript.getName());
+            newjavascript.setName(newname);
+            newjavascript.setContent(selectedJavascript.getContent());
+            cfjavascriptService.create(newjavascript);
+            javascriptListe = cfjavascriptService.findAll();
+            javascriptName = newname;
+            selectedJavascript = newjavascript;
+            onCommit(null);
+            refresh();
+            onSelect(null);
+            onCheckOut(null);
+        }
+    }
 }

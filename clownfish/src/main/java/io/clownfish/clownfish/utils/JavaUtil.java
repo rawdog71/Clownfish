@@ -101,4 +101,19 @@ public class JavaUtil implements IVersioningInterface<CfJava>, Serializable {
         CfJava cfjava = cfjavaService.findByName(name);
         return cfjavaversionService.findMaxVersion((cfjava).getId());
     }
+
+    @Override
+    public String getUniqueName(String name) {
+        int i = 1;
+        boolean found = false;
+        do {
+            try {
+                cfjavaService.findByName(name+"("+i+")");
+                i++;
+            } catch(Exception ex) {
+                found = true;
+            }
+        } while (!found);
+        return name+"("+i+")";
+    }
 }

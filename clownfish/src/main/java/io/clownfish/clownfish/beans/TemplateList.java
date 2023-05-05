@@ -277,7 +277,7 @@ public class TemplateList implements ISourceContentInterface {
                 FacesContext.getCurrentInstance().addMessage(null, message);
             } else {
                 access = false;
-                FacesMessage message = new FacesMessage("could not Checked Out " + selectedTemplate.getName());
+                FacesMessage message = new FacesMessage("Could not Checked Out " + selectedTemplate.getName());
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }
         }
@@ -292,7 +292,7 @@ public class TemplateList implements ISourceContentInterface {
             difference = templateUtility.hasDifference(selectedTemplate);
             checkedout = false;
             
-            FacesMessage message = new FacesMessage("Checked Out " + selectedTemplate.getName());
+            FacesMessage message = new FacesMessage("Checked In " + selectedTemplate.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
@@ -463,6 +463,26 @@ public class TemplateList implements ISourceContentInterface {
             templateName = "";
             checkedout = false;
             access = false;
+        }
+    }
+
+    @Override
+    public void onCopy(ActionEvent actionEvent) {
+        if (null != selectedTemplate) {
+            CfTemplate newtemplate = new CfTemplate();
+            String newname = templateUtility.getUniqueName(selectedTemplate.getName());
+            newtemplate.setName(newname);
+            newtemplate.setScriptlanguage(selectedTemplate.getScriptlanguage());
+            newtemplate.setType(selectedTemplate.getType());
+            newtemplate.setContent(selectedTemplate.getContent());
+            cftemplateService.create(newtemplate);
+            templateListe = cftemplateService.findAll();
+            templateName = newname;
+            selectedTemplate = newtemplate;
+            onCommit(null);
+            refresh();
+            onSelect(null);
+            onCheckOut(null);
         }
     }
 }

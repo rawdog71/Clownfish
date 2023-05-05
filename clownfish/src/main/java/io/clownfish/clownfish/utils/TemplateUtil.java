@@ -458,4 +458,19 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
         }
         return html;
     }
+    
+    @Override
+    public String getUniqueName(String name) {
+        int i = 1;
+        boolean found = false;
+        do {
+            try {
+                cftemplateService.findByName(name+"("+i+")");
+                i++;
+            } catch(Exception ex) {
+                found = true;
+            }
+        } while (!found);
+        return name+"("+i+")";
+    }
 }
