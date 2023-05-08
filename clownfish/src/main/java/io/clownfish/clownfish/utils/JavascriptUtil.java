@@ -122,12 +122,12 @@ public class JavascriptUtil implements IVersioningInterface, Serializable {
         boolean found = false;
         do {
             try {
-                cfjavascriptService.findByName(name+"("+i+")");
+                cfjavascriptService.findByName(name+"_"+i);
                 i++;
             } catch(Exception ex) {
                 found = true;
             }
         } while (!found);
-        return name+"("+i+")";
+        return name+"_"+i;
     }
 }

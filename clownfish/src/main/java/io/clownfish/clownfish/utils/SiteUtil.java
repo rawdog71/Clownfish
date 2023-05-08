@@ -379,4 +379,18 @@ public class SiteUtil {
             LOGGER.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + classcontent.getId());
         }
     }
+    
+    public String getUniqueName(String name) {
+        int i = 1;
+        boolean found = false;
+        do {
+            try {
+                cfsiteService.findByName(name+"_"+i);
+                i++;
+            } catch(Exception ex) {
+                found = true;
+            }
+        } while (!found);
+        return name+"_"+i;
+    }
 }

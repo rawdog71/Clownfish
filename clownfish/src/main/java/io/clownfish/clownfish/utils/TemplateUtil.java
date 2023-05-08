@@ -465,12 +465,12 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
         boolean found = false;
         do {
             try {
-                cftemplateService.findByName(name+"("+i+")");
+                cftemplateService.findByName(name+"_"+i);
                 i++;
             } catch(Exception ex) {
                 found = true;
             }
         } while (!found);
-        return name+"("+i+")";
+        return name+"_"+i;
     }
 }

@@ -122,12 +122,12 @@ public class StylesheetUtil implements IVersioningInterface, Serializable {
         boolean found = false;
         do {
             try {
-                cfstylesheetService.findByName(name+"("+i+")");
+                cfstylesheetService.findByName(name+"_"+i);
                 i++;
             } catch(Exception ex) {
                 found = true;
             }
         } while (!found);
-        return name+"("+i+")";
+        return name+"_"+i;
     }
 }

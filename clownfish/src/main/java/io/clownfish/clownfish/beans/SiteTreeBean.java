@@ -748,6 +748,101 @@ public class SiteTreeBean implements Serializable {
         }
     }
     
+    public void onCopy(ActionEvent actionEvent) {
+        if (null != selectedSite) {
+            CfSite newsite = new CfSite();
+            String newname = siteUtil.getUniqueName(selectedSite.getName());
+            newsite.setName(newname);
+            
+            newsite.setAliaspath(newname);
+            newsite.setCharacterencoding(selectedSite.getCharacterencoding());
+            newsite.setContenttype(selectedSite.getContenttype());
+            newsite.setDescription(selectedSite.getDescription());
+            newsite.setGzip(selectedSite.getGzip());
+            newsite.setHitcounter(BigInteger.ZERO);
+            newsite.setHtmlcompression(selectedSite.getHtmlcompression());
+            newsite.setJavascriptref(selectedSite.getJavascriptref());
+            newsite.setJob(selectedSite.isJob());
+            newsite.setLocale(selectedSite.getLocale());
+            newsite.setLoginsite(selectedSite.getLoginsite());
+            newsite.setParentref(selectedSite.getParentref());
+            newsite.setSearchrelevant(selectedSite.isSearchrelevant());
+            newsite.setSearchresult(selectedSite.isSearchresult());
+            newsite.setShorturl(siteUtil.generateShorturl());
+            newsite.setSitemap(selectedSite.isSitemap());
+            newsite.setStaticsite(selectedSite.isStaticsite());
+            newsite.setStylesheetref(selectedSite.getStylesheetref());
+            newsite.setTemplateref(selectedSite.getTemplateref());
+            newsite.setTestparams(selectedSite.getTestparams());
+            newsite.setTitle(selectedSite.getTitle());
+            newsite = cfsiteService.create(newsite);
+            
+            // Add selected siteresources
+            if (!selectedDatasources.isEmpty()) {
+                for (CfDatasource datasource : selectedDatasources) {
+                    CfSitedatasource sitedatasource = new CfSitedatasource();
+                    CfSitedatasourcePK cfsitedatasourcePK = new CfSitedatasourcePK();
+                    cfsitedatasourcePK.setSiteref(newsite.getId());
+                    cfsitedatasourcePK.setDatasourceref(datasource.getId());
+                    sitedatasource.setCfSitedatasourcePK(cfsitedatasourcePK);
+                    cfsitedatasourceService.create(sitedatasource);
+                }
+            }
+            
+            // Add selected sitelists
+            if (!selectedContentlist.isEmpty()) {
+                for (CfList contentList : selectedContentlist) {
+                    CfSitelist sitelist = new CfSitelist();
+                    CfSitelistPK cfsitelistPK = new CfSitelistPK();
+                    cfsitelistPK.setSiteref(newsite.getId());
+                    cfsitelistPK.setListref(contentList.getId());
+                    sitelist.setCfSitelistPK(cfsitelistPK);
+                    cfsitelistService.create(sitelist);
+                }
+            }
+            
+            // Add selected sitecontent
+            if (!selectedClasscontentlist.isEmpty()) {
+                for (CfClasscontent content : selectedClasscontentlist) {
+                    CfSitecontent sitecontent = new CfSitecontent();
+                    CfSitecontentPK cfsitecontentPK = new CfSitecontentPK();
+                    cfsitecontentPK.setSiteref(newsite.getId());
+                    cfsitecontentPK.setClasscontentref(content.getId());
+                    sitecontent.setCfSitecontentPK(cfsitecontentPK);
+                    cfsitecontentService.create(sitecontent);
+                }
+            }
+            
+            // Add selected sitecontent
+            if (!selectedAssetlist.isEmpty()) {
+                for (CfAssetlist content : selectedAssetlist) {
+                    CfSiteassetlist siteassetlist = new CfSiteassetlist();
+                    CfSiteassetlistPK cfsitecontentPK = new CfSiteassetlistPK();
+                    cfsitecontentPK.setSiteref(newsite.getId());
+                    cfsitecontentPK.setAssetlistref(content.getId());
+                    siteassetlist.setCfSiteassetlistPK(cfsitecontentPK);
+                    cfsiteassetlistService.create(siteassetlist);
+                }
+            }
+            
+            // Add selected sitecontent
+            if (!selectedKeywordlist.isEmpty()) {
+                for (CfKeywordlist content : selectedKeywordlist) {
+                    CfSitekeywordlist sitekeywordlist = new CfSitekeywordlist();
+                    CfSitekeywordlistPK cfsitecontentPK = new CfSitekeywordlistPK();
+                    cfsitecontentPK.setSiteref(newsite.getId());
+                    cfsitecontentPK.setKeywordlistref(content.getId());
+                    sitekeywordlist.setCfSitekeywordlistPK(cfsitecontentPK);
+                    cfsitekeywordlistService.create(sitekeywordlist);
+                }
+            }
+            loadTree();
+            
+            FacesMessage message = new FacesMessage("Copied " + selectedSite.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
     public void onChangeContent() {
         if (null != selectedClasscontentlist) {
             

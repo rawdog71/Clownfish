@@ -108,12 +108,12 @@ public class JavaUtil implements IVersioningInterface<CfJava>, Serializable {
         boolean found = false;
         do {
             try {
-                cfjavaService.findByName(name+"("+i+")");
+                cfjavaService.findByName(name+"_"+i);
                 i++;
             } catch(Exception ex) {
                 found = true;
             }
         } while (!found);
-        return name+"("+i+")";
+        return name+"_"+i;
     }
 }
