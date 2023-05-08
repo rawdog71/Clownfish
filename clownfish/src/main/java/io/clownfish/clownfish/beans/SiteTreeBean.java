@@ -777,6 +777,19 @@ public class SiteTreeBean implements Serializable {
             newsite.setTitle(selectedSite.getTitle());
             newsite = cfsiteService.create(newsite);
             
+            // Add selected saprfcs
+            if (!saprfclist.isEmpty()) {
+                for (CfSitesaprfc saprfc : saprfclist) {
+                    CfSitesaprfc sitesaprfc = new CfSitesaprfc();
+                    CfSitesaprfcPK cfsitesaprfcPK = new CfSitesaprfcPK();
+                    cfsitesaprfcPK.setSiteref(newsite.getId());
+                    cfsitesaprfcPK.setRfcfunction(saprfc.getCfSitesaprfcPK().getRfcfunction());
+                    cfsitesaprfcPK.setRfcgroup(saprfc.getCfSitesaprfcPK().getRfcgroup());
+                    sitesaprfc.setCfSitesaprfcPK(cfsitesaprfcPK);
+                    cfsitesaprfcService.create(sitesaprfc);
+                }
+            }
+            
             // Add selected siteresources
             if (!selectedDatasources.isEmpty()) {
                 for (CfDatasource datasource : selectedDatasources) {
