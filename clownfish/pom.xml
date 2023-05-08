@@ -513,7 +513,6 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec-http</artifactId>
-            <version>4.1.90.Final</version>
             <type>jar</type>
         </dependency>
         <dependency>
