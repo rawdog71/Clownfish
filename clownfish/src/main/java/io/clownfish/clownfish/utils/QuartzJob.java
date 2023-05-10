@@ -90,6 +90,7 @@ public class QuartzJob implements Job {
     private ClownfishConst.ViewModus modus = STAGING;
     final transient Logger LOGGER = LoggerFactory.getLogger(QuartzJob.class);
     @Value("${sapconnection.file}") String SAPCONNECTION;
+    @Value("${websocket.port:9001}") int websocketPort;
     
     @PostConstruct
     public void init() {
@@ -232,6 +233,7 @@ public class QuartzJob implements Job {
             importBean.initjob(sitedatasourcelist, cfdatasourceService);
             WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();
             WebSocketTemplateBean webSocketBean = new WebSocketTemplateBean();
+            webSocketBean.setWebsocketPort(websocketPort);
             PDFTemplateBean pdfBean = new PDFTemplateBean();
             pdfBean.initjob(pdfUtil);
 

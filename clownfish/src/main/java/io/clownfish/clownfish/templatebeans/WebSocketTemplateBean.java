@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  *
  * @author raine
  */
-@Scope("request")
+@Scope("singleton")
 @Component
 public class WebSocketTemplateBean implements Serializable {
     final transient Logger LOGGER = LoggerFactory.getLogger(WebSocketTemplateBean.class);
@@ -49,6 +49,7 @@ public class WebSocketTemplateBean implements Serializable {
         wsm.setBroadcast(broadcast);
         wsm.setInput(inputmap);
         final String url = "ws://localhost:" + websocketPort + "/websocket";
+        LOGGER.info(url);
         final WebSocketClient client = new WebSocketClient(url);
         client.open();
         client.send(new Gson().toJson(wsm).toString());
