@@ -160,6 +160,7 @@ public class Clownfish {
     SAPTemplateBean sapbean;
     NetworkTemplateBean networkbean;
     WebServiceTemplateBean webservicebean;
+    WebSocketTemplateBean websocketbean;
     ImportTemplateBean importbean;
     PDFTemplateBean pdfbean;
     ExternalClassProvider externalclassproviderbean;
@@ -1234,6 +1235,7 @@ public class Clownfish {
                                 // instantiate Template Beans
                                 networkbean = new NetworkTemplateBean();
                                 webservicebean = new WebServiceTemplateBean();
+                                websocketbean = new WebSocketTemplateBean();
 
                                 emailbean = new EmailTemplateBean();
                                 emailbean.init(propertyUtil.getPropertymap(), mailUtil, propertyUtil);
@@ -1282,6 +1284,7 @@ public class Clownfish {
                                                 fmRoot.put("importBean", importbean);
                                                 fmRoot.put("networkBean", networkbean);
                                                 fmRoot.put("webserviceBean", webservicebean);
+                                                fmRoot.put("websocketBean", websocketbean);
                                                 fmRoot.put("pdfBean", pdfbean);
                                                 fmRoot.put("classBean", externalclassproviderbean);
 
@@ -1379,6 +1382,7 @@ public class Clownfish {
                                                 velContext.put("importBean", importbean);
                                                 velContext.put("networkBean", networkbean);
                                                 velContext.put("webserviceBean", webservicebean);
+                                                velContext.put("websocketBean", websocketbean);
                                                 velContext.put("pdfBean", pdfbean);
                                                 velContext.put("classBean", externalclassproviderbean);
 

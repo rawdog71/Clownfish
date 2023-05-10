@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -344,5 +345,13 @@ public class ClownfishUtil {
             value = defaultvalue;
         }
         return value;
+    }
+    
+    public static HashMap<String, String> getHashmap(Map map) {
+        HashMap<String, String> hm = new HashMap<>();
+        map.keySet().stream().forEach((key) -> {
+            hm.put((String)key, (String)map.get(key));
+        });
+        return hm;
     }
 }

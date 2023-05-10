@@ -595,6 +595,7 @@ public class ContentUtil implements IVersioningInterface {
         }
     }
     
+    @Override
     public String getUniqueName(String name) {
         int i = 1;
         boolean found = false;
