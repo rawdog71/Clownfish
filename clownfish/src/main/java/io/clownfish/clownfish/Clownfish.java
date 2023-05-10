@@ -1236,6 +1236,7 @@ public class Clownfish {
                                 networkbean = new NetworkTemplateBean();
                                 webservicebean = new WebServiceTemplateBean();
                                 websocketbean = new WebSocketTemplateBean();
+                                websocketbean.setWebsocketPort(websocketPort);
 
                                 emailbean = new EmailTemplateBean();
                                 emailbean.init(propertyUtil.getPropertymap(), mailUtil, propertyUtil);
