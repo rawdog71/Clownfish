@@ -21,6 +21,7 @@ import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoTable;
 import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.JsonFormParameter;
+import io.clownfish.clownfish.datamodels.WebserviceCache;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RFC_READ_TABLE;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -57,11 +59,15 @@ public class SAPTemplateBean implements Serializable {
     private transient RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
     private HashMap<String, JCoFunction> jcofunctiontable = null;
     private HashMap<String, List<RpyTableRead>> rpyMap = null;
+    private static @Getter @Setter Map contentCache;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SAPTemplateBean.class);
 
     public SAPTemplateBean() {
         contentmap = new HashMap<>();
+        if (null == contentCache) {
+            contentCache = new HashMap<>();
+        }
     }
     
     public void init(Object sapc, List<CfSitesaprfc> sitesaprfclist, RPY_TABLE_READ rpytableread, List<JsonFormParameter> postmap) {
@@ -202,6 +208,32 @@ public class SAPTemplateBean implements Serializable {
             return contentmap;
         }
     }
+    
+    public Map executeAsync(String rfcFunction, Map parametermap, int seconds) {
+        String hash = parametermap.toString();
+        if (contentCache.containsKey(rfcFunction + "_" + hash)) {
+            if (DateTime.now().isBefore(((WebserviceCache)contentCache.get(rfcFunction + "_" + hash)).getValiduntil())) {
+                return ((WebserviceCache)contentCache.get(rfcFunction + "_" + hash)).getContentmap();
+            } else {
+                Map cm = new HashMap<>();
+                cm.putAll(executeAsync(rfcFunction, parametermap));
+                ((WebserviceCache)contentCache.get(rfcFunction + "_" + hash)).setContentmap(cm);
+                ((WebserviceCache)contentCache.get(rfcFunction + "_" + hash)).setValiduntil(DateTime.now().plusSeconds(seconds));
+                
+                return cm;
+            }
+        } else {
+            Map cm = new HashMap<>();
+            cm.putAll(executeAsync(rfcFunction, parametermap));
+
+            WebserviceCache webservicecache = new WebserviceCache();
+            webservicecache.setContentmap(cm);
+            webservicecache.setValiduntil(DateTime.now().plusSeconds(seconds));
+            contentCache.put(rfcFunction + "_" + hash, webservicecache);
+
+            return cm;
+        }
+    }
 
     public Map execute(String rfcFunction) {
         JCoTable functions_table;
@@ -319,6 +351,29 @@ public class SAPTemplateBean implements Serializable {
         }
         contentmap.put("sap", sapexport);
         return contentmap;
+    }
+    
+    public Map execute(String rfcFunction, int seconds) {
+        if (contentCache.containsKey(rfcFunction)) {
+            if (DateTime.now().isBefore(((WebserviceCache)contentCache.get(rfcFunction)).getValiduntil())) {
+                return ((WebserviceCache)contentCache.get(rfcFunction)).getContentmap();
+            } else {
+                contentmap.putAll(execute(rfcFunction));
+                ((WebserviceCache)contentCache.get(rfcFunction)).setContentmap(contentmap);
+                ((WebserviceCache)contentCache.get(rfcFunction)).setValiduntil(DateTime.now().plusSeconds(seconds));
+                
+                return contentmap;
+            }
+        } else {
+            contentmap.putAll(execute(rfcFunction));
+
+            WebserviceCache webservicecache = new WebserviceCache();
+            webservicecache.setContentmap(contentmap);
+            webservicecache.setValiduntil(DateTime.now().plusSeconds(seconds));
+            contentCache.put(rfcFunction, webservicecache);
+
+            return contentmap;
+        }
     }
     
     private void setTableValues(JCoTable functions_table, List<RpyTableRead> rpytablereadlist, ArrayList<HashMap> tablevalues) {
