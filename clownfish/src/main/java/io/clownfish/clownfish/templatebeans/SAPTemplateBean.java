@@ -80,6 +80,10 @@ public class SAPTemplateBean implements Serializable {
         contentmap.clear();
     }
     
+    public Map executeAsync(String rfcFunction) {
+        return executeAsync(rfcFunction, null);
+    }
+    
     public Map executeAsync(String rfcFunction, Map parametermap) {
         try {
             //LOGGER.info("START SAP execute");
@@ -209,8 +213,15 @@ public class SAPTemplateBean implements Serializable {
         }
     }
     
+    public Map executeAsync(String rfcFunction, int seconds) {
+        return executeAsync(rfcFunction, null, seconds);
+    }
+    
     public Map executeAsync(String rfcFunction, Map parametermap, int seconds) {
-        String hash = parametermap.toString();
+        String hash = "";
+        if (null != parametermap) {
+            hash = parametermap.toString();
+        }
         if (contentCache.containsKey(rfcFunction + "_" + hash)) {
             if (DateTime.now().isBefore(((WebserviceCache)contentCache.get(rfcFunction + "_" + hash)).getValiduntil())) {
                 return ((WebserviceCache)contentCache.get(rfcFunction + "_" + hash)).getContentmap();
