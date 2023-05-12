@@ -57,6 +57,7 @@ public class BackendLoginServlet extends HttpServlet {
     final transient Logger LOGGER = LoggerFactory.getLogger(BackendLoginServlet.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("BA: " + tries);
         if (tries > 3) {
             AuthToken at = null;
             writeResponse(response, at);
