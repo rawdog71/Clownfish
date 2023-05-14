@@ -60,7 +60,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>18.3</version>
+            <version>20.1</version>
         </dependency>
 
         <!-- DEPENDENCIES FROM EMBEDDED TOMCAT -->
@@ -120,14 +120,14 @@
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>primefaces-extensions</artifactId>
-            <version>12.0.5</version>
+            <version>12.0.7</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>resources-monacoeditor</artifactId>
-            <version>12.0.5</version>
+            <version>12.0.7</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -139,7 +139,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>font-awesome</artifactId>
-            <version>6.3.0</version>
+            <version>6.4.0</version>
         </dependency>
         <!--
         <dependency>
@@ -466,7 +466,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>uikit</artifactId>
-            <version>3.9.2</version>
+            <version>3.15.21</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
@@ -476,7 +476,7 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
-            <version>1.8.10</version>
+            <version>1.8.20</version>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>

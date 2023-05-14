@@ -20,17 +20,17 @@ import io.clownfish.clownfish.datamodels.AuthToken;
 import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.dbentities.CfUser;
 import io.clownfish.clownfish.serviceinterface.CfUserService;
+import io.clownfish.clownfish.utils.LoginJob;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.Timer;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import lombok.Getter;
-import lombok.Setter;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,13 +52,20 @@ public class BackendLoginServlet extends HttpServlet {
     
     String email;
     String password;
-    private @Getter @Setter int tries = 0;
+    private final int MINUTES = 10;
+    private LoginJob job = new LoginJob();
     
     final transient Logger LOGGER = LoggerFactory.getLogger(BackendLoginServlet.class);
-
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("BA: " + tries);
-        if (tries > 3) {
+        System.out.println("BA2: " + job.getTries());
+        if (job.getTries() > 3) {
+            if (!job.isRunning()) {
+                job.setRunning(true);
+                DateTime datetime = new DateTime();
+                Timer timer = new Timer();
+                timer.schedule(job, datetime.plusMinutes(MINUTES).toDate());
+            }
             AuthToken at = null;
             writeResponse(response, at);
         } else {
@@ -85,11 +92,11 @@ public class BackendLoginServlet extends HttpServlet {
                         authtokenlist.getAuthtokens().put(token, at);
                     } else {
                         at = null;      // Invalid token
-                        tries++;
+                        job.setTries(job.getTries()+1);
                     }
                 } catch (Exception ex) {
                     at = null;      // Invalid token
-                    tries++;
+                    job.setTries(job.getTries()+1);
                 }
             }
             writeResponse(response, at);
