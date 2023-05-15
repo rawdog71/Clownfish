@@ -30,7 +30,11 @@ import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
@@ -76,7 +80,12 @@ public class QuartzJob implements Job {
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired PropertyList propertylist;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
+    @Autowired CfAttributcontentService cfattributcontentService;
+    @Autowired CfClasscontentService cfclasscontentService;
+    @Autowired CfListService cflistService;
+    @Autowired CfListcontentService cflistcontentService;
     @Autowired PropertyUtil propertyUtil;
+    @Autowired ContentUtil contentUtil;
     @Autowired MailUtil mailUtil;
     @Autowired PDFUtil pdfUtil;
     private @Getter @Setter BeanUtil beanUtil;
@@ -229,6 +238,8 @@ public class QuartzJob implements Job {
             NetworkTemplateBean networkbean = new NetworkTemplateBean();
             DatabaseTemplateBean databasebean = new DatabaseTemplateBean(propertyUtil);
             databasebean.initjob(sitedatasourcelist, cfdatasourceService);
+            ContentTemplateBean contentbean = new ContentTemplateBean(contentUtil);
+            contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService);
             ImportTemplateBean importBean = new ImportTemplateBean();
             importBean.initjob(sitedatasourcelist, cfdatasourceService);
             WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();
@@ -255,6 +266,7 @@ public class QuartzJob implements Job {
                     fmRoot.put("networkBean", networkbean);
                     fmRoot.put("importBean", importBean);
                     fmRoot.put("pdfBean", pdfBean);
+                    fmRoot.put("contentBean", contentbean);
                     fmRoot.put("webserviceBean", webServiceBean);
                     fmRoot.put("websocketBean", webSocketBean);
                     fmRoot.put("property", propertymap);
@@ -297,6 +309,7 @@ public class QuartzJob implements Job {
                     velContext.put("webserviceBean", webServiceBean);
                     velContext.put("websocketBean", webSocketBean);
                     velContext.put("pdfBean", pdfBean);
+                    velContext.put("contentBean", contentbean);
                     velContext.put("parameter", paramMap);
                     
                     for (Class tpbc : beanUtil.getLoadabletemplatebeans()) {

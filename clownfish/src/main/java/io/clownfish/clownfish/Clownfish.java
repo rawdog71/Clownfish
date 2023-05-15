@@ -154,8 +154,10 @@ public class Clownfish {
     @Autowired SearchUtil searchUtil;
     @Autowired CfSearchdatabaseService cfsearchdatabaseService;
     @Autowired AccessManagerUtil accessmanager;
+    @Autowired ContentUtil contentUtil;
     
     DatabaseTemplateBean databasebean;
+    ContentTemplateBean contentbean;
     EmailTemplateBean emailbean;
     SAPTemplateBean sapbean;
     NetworkTemplateBean networkbean;
@@ -1264,8 +1266,9 @@ public class Clownfish {
                                     databasebean.init(sitedatasourcelist, cfdatasourceService);
                                     importbean.init(sitedatasourcelist, cfdatasourceService);
                                 }
-
                                 externalclassproviderbean = new ExternalClassProvider(cfclassCompiler);
+                                contentbean = new ContentTemplateBean(contentUtil);
+                                contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService);
 
                                 if (isScripted) {                                                                           // NORMAL Template
                                     switch (cftemplate.getScriptlanguage()) {
@@ -1288,6 +1291,7 @@ public class Clownfish {
                                                 fmRoot.put("websocketBean", websocketbean);
                                                 fmRoot.put("pdfBean", pdfbean);
                                                 fmRoot.put("classBean", externalclassproviderbean);
+                                                fmRoot.put("contentBean", contentbean);
 
                                                 fmRoot.put("parameter", parametermap);
                                                 if (!searchmetadata.isEmpty()) {
@@ -1386,6 +1390,7 @@ public class Clownfish {
                                                 velContext.put("websocketBean", websocketbean);
                                                 velContext.put("pdfBean", pdfbean);
                                                 velContext.put("classBean", externalclassproviderbean);
+                                                velContext.put("contentBean", contentbean);
 
                                                 velContext.put("parameter", parametermap);
                                                 velContext.put("property", propertyUtil.getPropertymap());
@@ -1729,6 +1734,7 @@ public class Clownfish {
                         fmRoot.put("networkBean", networkbean);
                         fmRoot.put("webserviceBean", webservicebean);
                         fmRoot.put("pdfBean", pdfbean);
+                        fmRoot.put("contentBean", contentbean);
                         fmRoot.put("classBean", externalclassproviderbean);
                         
                         fmRoot.put("parameter", parametermap);
@@ -1821,6 +1827,7 @@ public class Clownfish {
                         velContext.put("importBean", importbean);
                         velContext.put("networkBean", networkbean);
                         velContext.put("webserviceBean", webservicebean);
+                        velContext.put("contentBean", contentbean);
                         velContext.put("pdfBean", pdfbean);
                         velContext.put("classBean", externalclassproviderbean);
                         
