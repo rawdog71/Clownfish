@@ -19,14 +19,17 @@ import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.datamodels.ContentOutput;
 import io.clownfish.clownfish.datamodels.DatalistOutput;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
+import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,6 +42,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 /**
  *
@@ -50,28 +55,28 @@ public class ContentTemplateBean implements Serializable {
     private CfClasscontentService cfclasscontentService;
     private CfAttributcontentService cfattributcontentService;
     private CfListService cflistService;
+    private CfClassService cfclassService;
     private CfListcontentService cflistcontentService;
     private PropertyUtil propertyUtil;
     private ContentUtil contentUtil;
     private transient @Getter @Setter Map contentmap;
+    private int useHibernate;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ContentTemplateBean.class);
     
-    public ContentTemplateBean(ContentUtil contentutil) {
+    public ContentTemplateBean(PropertyUtil propertyUtil, ContentUtil contentutil) {
         this.contentUtil = contentutil;
-        contentmap = new HashMap<>();
-    }
-    
-    public ContentTemplateBean(PropertyUtil propertyUtil) {
         this.propertyUtil = propertyUtil;
         contentmap = new HashMap<>();
     }
     
-    public void init(CfClasscontentService classcontentService, CfAttributcontentService attributcontentService, CfListService listService, CfListcontentService listcontentService) {
+    public void init(CfClasscontentService classcontentService, CfAttributcontentService attributcontentService, CfListService listService, CfListcontentService listcontentService, CfClassService classService, int useHibernate) {
         this.cfclasscontentService = classcontentService;
         this.cfattributcontentService = attributcontentService;
         this.cflistService = listService;
         this.cflistcontentService = listcontentService;
+        this.cfclassService = classService;
+        this.useHibernate = useHibernate;
         contentmap.clear();
     }
     
@@ -107,7 +112,8 @@ public class ContentTemplateBean implements Serializable {
         if (!identifier.isBlank()) {
             try {
                 CfList list = cflistService.findByName(identifier);
-                contentmap.put("DL", getDatalistoutput(list));
+                CfClass clazz = cfclassService.findById(list.getClassref().getId());
+                contentmap.put("DL", getDatalistoutput(list, clazz));
             } catch (Exception ex) {
                 contentmap.put("DL", null);
             }
@@ -121,7 +127,8 @@ public class ContentTemplateBean implements Serializable {
         if (0 != id) {
             try {
                 CfList list = cflistService.findById(id);
-                contentmap.put("DL", getDatalistoutput(list));
+                CfClass clazz = cfclassService.findById(list.getClassref().getId());
+                contentmap.put("DL", getDatalistoutput(list, clazz));
             } catch (Exception ex) {
                 contentmap.put("DL", null);
             }
@@ -144,7 +151,7 @@ public class ContentTemplateBean implements Serializable {
         return contentdataoutput;
     }
     
-    private DatalistOutput getDatalistoutput(CfList list) {
+    private DatalistOutput getDatalistoutput(CfList list, CfClass cfclass) {
         DatalistOutput datalistoutput = new DatalistOutput();
         ArrayList<ContentOutput> outputlist = new ArrayList<>();
         
@@ -163,18 +170,33 @@ public class ContentTemplateBean implements Serializable {
             }
         }
 
-        for (CfClasscontent classcontent : classcontentList) {    
-            List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
-            ContentOutput co = new ContentOutput();
-            co.setIdentifier(classcontent.getName());
-            co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
-            co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
-            outputlist.add(co);
+        if (1 == useHibernate) {
+            Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+            for (CfClasscontent classcontent : classcontentList) {
+
+                Query query = session_tables.createQuery("FROM " + cfclass.getName() + " c WHERE cf_contentref = " + classcontent.getId());
+                Map content = (Map) query.getSingleResult();
+                ContentOutput co = new ContentOutput();
+                co.setIdentifier(classcontent.getName());
+                co.setKeyvals(contentUtil.getContentMap(content));
+                co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
+                outputlist.add(co);
+            }
+            session_tables.close();
+        } else {
+            for (CfClasscontent classcontent : classcontentList) {    
+                List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
+                ContentOutput co = new ContentOutput();
+                co.setIdentifier(classcontent.getName());
+                co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
+                outputlist.add(co);
+            }
         }
 
         datalistoutput.setCflist(list);
         datalistoutput.setOutputlist(outputlist);
         
         return datalistoutput;
-    }
+    }   
 }

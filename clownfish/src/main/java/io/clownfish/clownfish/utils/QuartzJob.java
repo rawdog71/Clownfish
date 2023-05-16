@@ -31,6 +31,7 @@ import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
+import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
@@ -82,6 +83,7 @@ public class QuartzJob implements Job {
     @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired CfAttributcontentService cfattributcontentService;
     @Autowired CfClasscontentService cfclasscontentService;
+    @Autowired CfClassService cfclassService;
     @Autowired CfListService cflistService;
     @Autowired CfListcontentService cflistcontentService;
     @Autowired PropertyUtil propertyUtil;
@@ -100,6 +102,7 @@ public class QuartzJob implements Job {
     final transient Logger LOGGER = LoggerFactory.getLogger(QuartzJob.class);
     @Value("${sapconnection.file}") String SAPCONNECTION;
     @Value("${websocket.port:9001}") int websocketPort;
+    @Value("${hibernate.use:0}") int useHibernate;
     
     @PostConstruct
     public void init() {
@@ -238,8 +241,8 @@ public class QuartzJob implements Job {
             NetworkTemplateBean networkbean = new NetworkTemplateBean();
             DatabaseTemplateBean databasebean = new DatabaseTemplateBean(propertyUtil);
             databasebean.initjob(sitedatasourcelist, cfdatasourceService);
-            ContentTemplateBean contentbean = new ContentTemplateBean(contentUtil);
-            contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService);
+            ContentTemplateBean contentbean = new ContentTemplateBean(propertyUtil, contentUtil);
+            contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService, cfclassService, useHibernate);
             ImportTemplateBean importBean = new ImportTemplateBean();
             importBean.initjob(sitedatasourcelist, cfdatasourceService);
             WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();

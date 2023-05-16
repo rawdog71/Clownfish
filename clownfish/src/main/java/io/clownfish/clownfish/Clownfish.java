@@ -217,6 +217,7 @@ public class Clownfish {
     @Value("${app.datasource.driverClassName}") String dbclass;
     @Value("${check.consistency:0}") int checkConsistency;
     @Value("${hibernate.init:0}") int hibernateInit;
+    @Value("${hibernate.use:0}") int useHibernate;
     @Value("${sapconnection.file}") String SAPCONNECTION;
     @Value("${websocket.use:0}") int websocketUse;
     @Value("${websocket.port:9001}") int websocketPort;
@@ -1267,8 +1268,8 @@ public class Clownfish {
                                     importbean.init(sitedatasourcelist, cfdatasourceService);
                                 }
                                 externalclassproviderbean = new ExternalClassProvider(cfclassCompiler);
-                                contentbean = new ContentTemplateBean(contentUtil);
-                                contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService);
+                                contentbean = new ContentTemplateBean(propertyUtil, contentUtil);
+                                contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService, cfclassService, useHibernate);
 
                                 if (isScripted) {                                                                           // NORMAL Template
                                     switch (cftemplate.getScriptlanguage()) {

@@ -202,7 +202,7 @@ public class ContentList implements Serializable {
                     case "text":
                     case "htmltext":
                     case "markdown":
-                        return Long.MAX_VALUE;
+                        return Integer.MAX_VALUE;
                     default:
                         return 255;
                 }
