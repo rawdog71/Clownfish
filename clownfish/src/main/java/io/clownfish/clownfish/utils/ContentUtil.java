@@ -77,6 +77,7 @@ public class ContentUtil implements IVersioningInterface {
     @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired transient CfClasscontentKeywordService cfcontentkeywordService;
     @Autowired FolderUtil folderUtil;
+    @Autowired MarkdownUtil markdownUtil;
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired transient CfContentversionService cfcontentversionService;
@@ -127,7 +128,7 @@ public class ContentUtil implements IVersioningInterface {
                 }
             case "markdown":
                 if (null != attributcontent.getContentText()) {
-                    return new AttributDef(attributcontent.getContentText(), "markdown");
+                    return new AttributDef(markdownUtil.parseMarkdown(attributcontent.getContentText(), markdownUtil.getMarkdownOptions()), "markdown");
                 } else {
                     return new AttributDef(null, "markdown");
                 }

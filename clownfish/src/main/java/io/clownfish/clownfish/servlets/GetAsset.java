@@ -43,6 +43,7 @@ import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.imgscalr.AsyncScalr;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -206,6 +207,9 @@ public class GetAsset extends HttpServlet {
                                                 }
                                             } else {
                                                 try (OutputStream out = acontext.getResponse().getOutputStream()) {
+                                                    File copied = new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey);
+                                                    FileUtils.copyFile(f, copied);
+                                                    
                                                     in = new FileInputStream(f);
                                                     IOUtils.copy(in, out);
                                                 } catch (IOException ex) {

@@ -1012,15 +1012,18 @@ public class Clownfish {
                             }
                         }
 
-                        cfresponse = getStaticSite(name);
+                        cfresponse = getStaticSite(name, getUrlParamName(name, urlParams), postmap, urlParams);
                         if (0 == cfresponse.getErrorcode()) {
                             return new AsyncResult<>(cfresponse);
                         } else {
                             Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, urlParams, true);
                             try {
-                                String aliasname = cfsite.getAliaspath();
-                                StaticSiteUtil.generateStaticSite(name, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
-                                return makeResponse(name, postmap, urlParams, false);
+                                if (0 == urlParams.size()) {
+                                    String aliasname = cfsite.getAliaspath();
+                                    StaticSiteUtil.generateStaticSite(name, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                                }
+                                //return makeResponse(name, postmap, urlParams, false);
+                                return cfStaticResponse;
                             } catch (InterruptedException | ExecutionException ex) {
                                 LOGGER.error(ex.getMessage());
                                 return makeResponse(name, postmap, urlParams, false);
@@ -1600,11 +1603,11 @@ public class Clownfish {
      * getStaticSite
      * 
      */
-    private ClownfishResponse getStaticSite(String sitename) {
+    private ClownfishResponse getStaticSite(String sitename, String siteurlname, List<JsonFormParameter> postmap, List urlParams) {
         ClownfishResponse cfResponse = new ClownfishResponse();
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getStatic_folder() + File.separator + sitename), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getStatic_folder() + File.separator + siteurlname), "UTF-8"));
             StringBuilder sb = new StringBuilder(1024);
             String line;
             while ((line = br.readLine()) != null) {
@@ -1620,8 +1623,12 @@ public class Clownfish {
             String aliasname = cfsite.getAliaspath();
             Future<ClownfishResponse> cfStaticResponse;
             try {
-                cfStaticResponse = makeResponse(sitename, null, null, true);
-                StaticSiteUtil.generateStaticSite(sitename, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                cfStaticResponse = makeResponse(sitename, postmap, urlParams, true);
+                if (urlParams.size() > 0) {
+                    StaticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                } else {
+                    StaticSiteUtil.generateStaticSite(siteurlname, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                }
             } catch (PageNotFoundException | InterruptedException | ExecutionException ex1) {
                 LOGGER.error(ex.getMessage());
             }
@@ -2001,5 +2008,15 @@ public class Clownfish {
             doc.head().append("<script src=\"resources/js/preview_script.js\"></script>");
         }
         return doc.html();
+    }
+    
+    private String getUrlParamName(String name, List urlParams) {
+        String urlparamname = name;
+        if (urlParams.size()>0) {
+            for (Object urlparam : urlParams) {
+                urlparamname += "_" + (String) (urlparam);
+            }
+        }
+        return urlparamname;
     }
 }
