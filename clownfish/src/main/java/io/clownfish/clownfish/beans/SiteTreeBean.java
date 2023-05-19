@@ -1037,7 +1037,11 @@ public class SiteTreeBean implements Serializable {
     
     public void onStaticsiteSelect(SelectEvent event) {
         selectedstaticsite = (CfStaticsite) event.getObject();
-        iframeurl = selectedstaticsite.getSite() + "/" + selectedstaticsite.getUrlparams();
+        if (!selectedstaticsite.getUrlparams().isBlank()) {
+            iframeurl = selectedstaticsite.getSite() + "/" + selectedstaticsite.getUrlparams();
+        } else {
+            iframeurl = selectedstaticsite.getSite();
+        }
     }
     
     public void onNewStaticsite(ActionEvent actionEvent) {
@@ -1067,7 +1071,11 @@ public class SiteTreeBean implements Serializable {
             selectedstaticsite.setTstamp(new Date());
             cfstaticsiteService.edit(selectedstaticsite);
             staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
-            iframeurl = selectedstaticsite.getSite() + "/" + selectedstaticsite.getUrlparams();
+            if (!selectedstaticsite.getUrlparams().isBlank()) {
+                iframeurl = selectedstaticsite.getSite() + "/" + selectedstaticsite.getUrlparams();
+            } else {
+                iframeurl = selectedstaticsite.getSite();
+            }
         }
     }
     
