@@ -46,6 +46,7 @@ import io.clownfish.clownfish.dbentities.CfSitelist;
 import io.clownfish.clownfish.dbentities.CfSitelistPK;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.dbentities.CfSitesaprfcPK;
+import io.clownfish.clownfish.dbentities.CfStaticsite;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.lucene.SourceIndexer;
@@ -75,12 +76,12 @@ import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfSitekeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
 import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
+import io.clownfish.clownfish.serviceinterface.CfStaticsiteService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.utils.ClassUtil;
-import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.DatabaseUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
@@ -106,13 +107,10 @@ import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.primefaces.component.tabview.TabView;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
@@ -154,7 +152,10 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfList> contentlist;
     private @Getter @Setter List<CfList> selectedContentlist;
     private transient @Getter @Setter List<CfSitesaprfc> saprfclist = null;
+    private transient @Getter @Setter List<CfStaticsite> staticsitelist = null;
     private @Getter @Setter CfSitesaprfc selectedrfc = null;
+    private @Getter @Setter CfStaticsite selectedstaticsite = null;
+    private @Getter @Setter String urlparams = "";
     private @Getter @Setter List<RfcGroup> rfcgrouplist;
     private @Getter @Setter String rfcgroup;
     private @Getter @Setter RfcGroup selectedrfcgroup = null;
@@ -245,6 +246,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfKeywordlistService cfkeywordlistService;
     @Autowired CfLayoutcontentService cflayoutcontentService;
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
+    @Autowired transient CfStaticsiteService cfstaticsiteService;
     @Autowired transient PropertyList propertylist;
     @Autowired private @Getter @Setter ContentList divcontentlist;
     @Autowired private @Getter @Setter DataList divdatalist;
@@ -601,6 +603,7 @@ public class SiteTreeBean implements Serializable {
         contentType = selectedSite.getContenttype();
         locale = selectedSite.getLocale();
         saprfclist = cfsitesaprfcService.findBySiteref(selectedSite.getId());
+        staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
         newButtonDisabled = true;
         
         FacesMessage message = new FacesMessage("Selected " + selectedSite.getName());
@@ -1029,6 +1032,60 @@ public class SiteTreeBean implements Serializable {
                 }
             }
             return null;
+        }
+    }
+    
+    public void onStaticsiteSelect(SelectEvent event) {
+        selectedstaticsite = (CfStaticsite) event.getObject();
+        iframeurl = selectedstaticsite.getSite() + "/" + selectedstaticsite.getUrlparams();
+    }
+    
+    public void onNewStaticsite(ActionEvent actionEvent) {
+        if (null != selectedSite) {
+            CfStaticsite staticsite = new CfStaticsite();
+            staticsite.setSite(selectedSite.getName());
+            staticsite.setUrlparams(urlparams);
+            staticsite.setTstamp(new Date());
+            cfstaticsiteService.create(staticsite);
+            staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
+        }
+    }
+    
+    public void onRecreateStaticSite(ActionEvent actionEvent) {
+        if (null != selectedstaticsite) {
+            if (null != folderUtil.getStatic_folder()) {
+                String filename = selectedstaticsite.getSite() + "_" + selectedstaticsite.getUrlparams().replaceAll("/", "_");
+                File file = new File(folderUtil.getStatic_folder() + File.separator + filename);
+                try {
+                    Files.deleteIfExists(file.toPath());
+                    FacesMessage message = new FacesMessage("Deleted static site for " + filename);
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                } catch (IOException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+            }
+            selectedstaticsite.setTstamp(new Date());
+            cfstaticsiteService.edit(selectedstaticsite);
+            staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
+            iframeurl = selectedstaticsite.getSite() + "/" + selectedstaticsite.getUrlparams();
+        }
+    }
+    
+    public void onDestroyStaticSite(ActionEvent actionEvent) {
+        if (null != selectedstaticsite) {
+            if (null != folderUtil.getStatic_folder()) {
+                String filename = selectedstaticsite.getSite() + "_" + selectedstaticsite.getUrlparams().replaceAll("/", "_");
+                File file = new File(folderUtil.getStatic_folder() + File.separator + filename);
+                try {
+                    Files.deleteIfExists(file.toPath());
+                    FacesMessage message = new FacesMessage("Deleted static site for " + filename);
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                } catch (IOException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+            }
+            cfstaticsiteService.delete(selectedstaticsite);
+            staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
         }
     }
     

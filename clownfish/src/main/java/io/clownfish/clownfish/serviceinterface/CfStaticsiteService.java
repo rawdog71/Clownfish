@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.daointerface;
+package io.clownfish.clownfish.serviceinterface;
 
 import io.clownfish.clownfish.dbentities.CfStaticsite;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
  *
  * @author sulzbachr
  */
-public interface CfStaticsiteDAO {
+public interface CfStaticsiteService {
     List<CfStaticsite> findAll();
     CfStaticsite findById(Long id);
     List<CfStaticsite> findBySite(String name);

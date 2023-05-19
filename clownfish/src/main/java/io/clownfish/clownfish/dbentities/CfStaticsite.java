@@ -43,7 +43,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfStaticsite.findById", query = "SELECT c FROM CfStaticsite c WHERE c.id = :id"),
     @NamedQuery(name = "CfStaticsite.findBySite", query = "SELECT c FROM CfStaticsite c WHERE c.site = :site"),
     @NamedQuery(name = "CfStaticsite.findByUrlparams", query = "SELECT c FROM CfStaticsite c WHERE c.urlparams = :urlparams"),
-    @NamedQuery(name = "CfStaticsite.findByGenerated", query = "SELECT c FROM CfStaticsite c WHERE c.generated = :generated")})
+    @NamedQuery(name = "CfStaticsite.findByTstamp", query = "SELECT c FROM CfStaticsite c WHERE c.tstamp = :tstamp")})
 public class CfStaticsite implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -58,9 +58,9 @@ public class CfStaticsite implements Serializable {
     @Size(max = 1024)
     @Column(name = "urlparams")
     private String urlparams;
-    @Column(name = "generated")
+    @Column(name = "tstamp")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date generated;
+    private Date tstamp;
 
     public CfStaticsite() {
     }
@@ -93,12 +93,12 @@ public class CfStaticsite implements Serializable {
         this.urlparams = urlparams;
     }
 
-    public Date getGenerated() {
-        return generated;
+    public Date getTstamp() {
+        return tstamp;
     }
 
-    public void setGenerated(Date generated) {
-        this.generated = generated;
+    public void setTstamp(Date tstamp) {
+        this.tstamp = tstamp;
     }
 
     @Override

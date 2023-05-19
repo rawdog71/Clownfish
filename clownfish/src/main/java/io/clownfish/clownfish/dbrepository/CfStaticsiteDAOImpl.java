@@ -47,12 +47,12 @@ public class CfStaticsiteDAOImpl implements CfStaticsiteDAO {
     }
 
     @Override
-    public CfStaticsite findBySite(String site) {
+    public List<CfStaticsite> findBySite(String site) {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfStaticsite.findBySite");  
         query.setParameter("site", site);
-        CfStaticsite cfsite = (CfStaticsite) query.getSingleResult();
-        return cfsite;
+        List<CfStaticsite> cfstaticsitelist = query.getResultList();
+        return cfstaticsitelist;
     }
 
     @Override
