@@ -788,13 +788,9 @@ public class Clownfish {
             }
             
             userSession = request.getSession();
-            //LOGGER.info("CONTENTTYPE: " + request.getContentType());
             if (request.getContentType().startsWith("multipart/form-data")) {
                 Map<String, String[]> parameterMap = request.getParameterMap();
                 List<FileItem> fis = request.getFileItems("file");
-                LOGGER.info(String.valueOf(parameterMap.size()));
-                LOGGER.info("MULTIPART");
-                
                 List<JsonFormParameter> map = new ArrayList<>();
                 for (String key : parameterMap.keySet()) {
                     map.add(new JsonFormParameter(key, parameterMap.get(key)[0]));
@@ -808,25 +804,27 @@ public class Clownfish {
                     
                     if ((null != uploadbean) && (null != uploadbean.getUploadpath()) && (!uploadbean.getUploadpath().isEmpty())) {
                         for (FileItem fi : fis) {
-                            File result = new File(uploadbean.getUploadpath() + File.separator + fi.getName());
-                            boolean fileexists = result.exists();
-                            InputStream inputStream = fi.getInputStream();
-                            if (!fileexists) {
-                                try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
-                                    byte[] buffer = new byte[64535];
-                                    int bulk;
-                                    while (true) {
-                                        bulk = inputStream.read(buffer);
-                                        if (bulk < 0) {
-                                            break;
+                            if ((uploadbean.getFileitemmap().get(fi.getName())) || (uploadbean.getFileitemmap().isEmpty())) {
+                                File result = new File(uploadbean.getUploadpath() + File.separator + fi.getName());
+                                boolean fileexists = result.exists();
+                                InputStream inputStream = fi.getInputStream();
+                                if (!fileexists) {
+                                    try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
+                                        byte[] buffer = new byte[64535];
+                                        int bulk;
+                                        while (true) {
+                                            bulk = inputStream.read(buffer);
+                                            if (bulk < 0) {
+                                                break;
+                                            }
+                                            fileOutputStream.write(buffer, 0, bulk);
+                                            fileOutputStream.flush();
                                         }
-                                        fileOutputStream.write(buffer, 0, bulk);
-                                        fileOutputStream.flush();
+                                        fileOutputStream.close();
                                     }
-                                    fileOutputStream.close();
                                 }
+                                inputStream.close();
                             }
-                            inputStream.close();
                         }
                     }
                     

@@ -22,7 +22,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.fileupload.FileItem;
 
 /**
@@ -34,9 +36,19 @@ import org.apache.commons.fileupload.FileItem;
 public class UploadTemplateBean implements Serializable {
     private @Getter @Setter String uploadpath;
     private @Getter @Setter List<FileItem> fileitemlist;
+    private @Getter @Setter Map<String, Boolean> fileitemmap;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(UploadTemplateBean.class);
     
     public UploadTemplateBean() {
+        fileitemmap = new HashMap<>();
+    }
+    
+    public void clearFileitemMap() {
+        fileitemmap.clear();
+    }
+    
+    public void addFileitemMapEntry(String name, boolean upload) {
+        fileitemmap.put(name, upload);
     }
 }
