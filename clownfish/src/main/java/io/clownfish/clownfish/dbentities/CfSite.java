@@ -356,8 +356,9 @@ public class CfSite implements Serializable {
 
     public void setLoginsite(String loginsite) {
         this.loginsite = loginsite;
+    }
 
-      public boolean getInvisible() {
+    public boolean getInvisible() {
         return invisible;
     }
     public void setInvisible(boolean invis) {

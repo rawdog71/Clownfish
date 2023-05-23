@@ -69,6 +69,7 @@ import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.serviceinterface.CfPropertyService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;

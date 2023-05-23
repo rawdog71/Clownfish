@@ -428,7 +428,8 @@
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                     </p:commandButton>
                                                     <p:commandButton id="copySiteButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{sitetree.onCopy}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref :form:tabview:preview">
-
+                                                        <f:actionListener binding="#{quartzlist.refresh()}" />
+                                                    </p:commandButton>
                                                     <p:commandButton id="deleteSiteButton" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree :form:tabview:invissitetree :form:tabview:jobsiteref">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                         <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />

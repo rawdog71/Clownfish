@@ -34,7 +34,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -55,29 +54,6 @@ public class WebServiceTemplateBean implements Serializable {
         contentlist = new ArrayList();
         if (null == contentCache) {
             contentCache = new HashMap<>();
-        }
-    }
-    
-    public String callService(String url, int seconds) {
-        if (contentCache.containsKey(url)) {
-            if (DateTime.now().isBefore(((WebserviceCache)contentCache.get(url)).getValiduntil())) {
-                return ((WebserviceCache)contentCache.get(url)).getContentmap().get("body").toString();
-            } else {
-                contentmap.put("body", getContentString(url));
-                ((WebserviceCache)contentCache.get(url)).setContentmap(contentmap);
-                ((WebserviceCache)contentCache.get(url)).setValiduntil(DateTime.now().plusSeconds(seconds));
-                
-                return contentmap.get("body").toString();
-            }
-        } else {
-            contentmap.put("body", getContentString(url));
-
-            WebserviceCache webservicecache = new WebserviceCache();
-            webservicecache.setContentmap(contentmap);
-            webservicecache.setValiduntil(DateTime.now().plusSeconds(seconds));
-            contentCache.put(url, webservicecache);
-
-            return contentmap.get("body").toString();
         }
     }
     
@@ -225,22 +201,6 @@ public class WebServiceTemplateBean implements Serializable {
     private List getContentList(String url, String user, String password) {
         try {
             url = url.replace("+", "%2B");
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.getInterceptors().add(
-                new BasicAuthorizationInterceptor(user, password));
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(response.getBody());
-            List<Map<String, Object>> result = mapper.convertValue(root, new TypeReference<List<Map<String, Object>>>(){});
-            return result;
-        } catch (JsonProcessingException ex) {
-            LOGGER.error(ex.getMessage());
-            return null;
-        }
-    }
-    
-    private List getContentList(String url, String user, String password) {
-        try {
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getInterceptors().add(
                 new BasicAuthorizationInterceptor(user, password));
