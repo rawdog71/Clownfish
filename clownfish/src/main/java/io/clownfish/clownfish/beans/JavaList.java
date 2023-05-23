@@ -51,6 +51,7 @@ public class JavaList implements ISourceContentInterface
     @Autowired CfJavaversionService cfjavaversionService;
 
     private @Getter @Setter List<CfJava> javaListe;
+    private @Getter @Setter List<CfJava> invisJavaList;
     private @Getter @Setter CfJava selectedJava = null;
     private @Getter @Setter String javaName = "";
     private @Getter @Setter boolean newButtonDisabled = true;
@@ -74,6 +75,7 @@ public class JavaList implements ISourceContentInterface
     @Autowired @Getter @Setter IndexService indexService;
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
     @Autowired @Getter @Setter CfClassCompiler classcompiler;
+    private @Getter @Setter boolean invisible;
 
     final transient Logger LOGGER = LoggerFactory.getLogger(JavaList.class);
 
@@ -121,6 +123,8 @@ public class JavaList implements ISourceContentInterface
         }
         javaName = "";
         javaListe = cfjavaService.findAll();
+        invisJavaList = cfjavaService.findAll().stream()
+                .filter((cfJava -> !cfJava.getInvisible())).collect(Collectors.toList());
         javaUtility.setJavaContent("");
         checkedout = false;
         access = false;
@@ -138,6 +142,8 @@ public class JavaList implements ISourceContentInterface
     public void refresh()
     {
         javaListe = cfjavaService.findAll();
+        invisJavaList = cfjavaService.findAll().stream()
+                .filter((cfJava -> !cfJava.getInvisible())).collect(Collectors.toList());
     }
     
     public HashMap<Integer, String> getJvmLanguages() {
@@ -154,6 +160,12 @@ public class JavaList implements ISourceContentInterface
         String queryLowerCase = query.toLowerCase();
 
         return javaListe.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
+    }
+
+    public List<CfJava> completeInvisText(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return invisJavaList.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
     }
 
     @Override
@@ -195,6 +207,7 @@ public class JavaList implements ISourceContentInterface
             access = checkoutUtil.isAccess();
             javaversionMax = versionlist.size();
             selectedjavaversion = javaversionMax;
+            setInvisible(selectedJava.getInvisible());
         }
         else
         {
@@ -211,6 +224,7 @@ public class JavaList implements ISourceContentInterface
         {
             selectedJava.setLanguage(javaLanguage);
             selectedJava.setContent(getContent());
+            selectedJava.setInvisible(invisible);
             cfjavaService.edit(selectedJava);
             difference = javaUtility.hasDifference(selectedJava);
 
@@ -382,8 +396,15 @@ public class JavaList implements ISourceContentInterface
                         break;
                 }
                 newjava.setLanguage(javaLanguage);
+                if (loginbean.getCfuser().getSuperadmin()) {
+                    newjava.setInvisible(invisible);
+                } else {
+                    newjava.setInvisible(false);
+                }
                 cfjavaService.create(newjava);
                 javaListe = cfjavaService.findAll();
+                invisJavaList = cfjavaService.findAll().stream()
+                        .filter((cfJava -> !cfJava.getInvisible())).collect(Collectors.toList());
                 javaName = "";
             }
             else
@@ -405,6 +426,8 @@ public class JavaList implements ISourceContentInterface
         {
             cfjavaService.delete(selectedJava);
             javaListe = cfjavaService.findAll();
+            invisJavaList = cfjavaService.findAll().stream()
+                    .filter((cfJava -> !cfJava.getInvisible())).collect(Collectors.toList());
 
             FacesMessage message = new FacesMessage("Deleted " + selectedJava.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -471,6 +494,7 @@ public class JavaList implements ISourceContentInterface
         {
             selectedJava.setLanguage(javaLanguage);
             selectedJava.setName(javaName);
+            selectedJava.setInvisible(invisible);
             cfjavaService.edit(selectedJava);
             difference = javaUtility.hasDifference(selectedJava);
             refresh();

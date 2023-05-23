@@ -97,6 +97,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.inject.Named;
@@ -140,6 +141,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter String params;
     private transient @Getter @Setter TabView tabview;
     private transient @Getter @Setter TreeNode root;
+    private transient @Getter @Setter TreeNode invisibleRoot;
     private transient @Getter @Setter TreeNode selectedNode = null;
     private @Getter @Setter String siteName;
     private @Getter @Setter CfSite selectedSite = null;
@@ -174,6 +176,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter boolean sitesearchrelevant;
     private @Getter @Setter boolean sitemap;
     private @Getter @Setter boolean searchresult;
+    private @Getter @Setter boolean invisible;
     private @Getter @Setter String siteTitle;
     private @Getter @Setter String siteDescription;
     private @Getter @Setter String aliaspath;
@@ -247,6 +250,8 @@ public class SiteTreeBean implements Serializable {
     @Autowired CfLayoutcontentService cflayoutcontentService;
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
     @Autowired transient CfStaticsiteService cfstaticsiteService;
+    @Autowired transient CfPropertyService cfpropertyService;
+    @Autowired transient LoginBean loginBean;
     @Autowired transient PropertyList propertylist;
     @Autowired private @Getter @Setter ContentList divcontentlist;
     @Autowired private @Getter @Setter DataList divdatalist;
@@ -320,6 +325,7 @@ public class SiteTreeBean implements Serializable {
         showDatalist = false;
         showAssetLibrary = false;
         showKeywordLibrary = false;
+        invisible = false;
         templatelist.setSitetree(this);
         javascriptlist.setSitetree(this);
         stylesheetlist.setSitetree(this);
@@ -389,6 +395,15 @@ public class SiteTreeBean implements Serializable {
             for (CfSite site : sitelist) {
                 TreeNode tn = new DefaultTreeNode(site);
                 root.getChildren().add(tn);
+                fillChildren(site, tn);
+            }
+
+            invisibleRoot = new DefaultTreeNode("Root", null);
+            List<CfSite> invisSiteList = cfsiteService.findAll().stream()
+                    .filter(cfSite -> {return !cfSite.getInvisible();}).collect(Collectors.toList());
+            for (CfSite site : invisSiteList) {
+                TreeNode tn = new DefaultTreeNode(site);
+                invisibleRoot.getChildren().add(tn);
                 fillChildren(site, tn);
             }
         } catch (Exception ex) {
@@ -470,6 +485,7 @@ public class SiteTreeBean implements Serializable {
         sitestatic = false;
         newButtonDisabled = false;
         contenteditable = false;
+        invisible = false;
         selected_contentclass = null;
         selected_datalisttclass = null;
         selected_asset = null;
@@ -596,6 +612,11 @@ public class SiteTreeBean implements Serializable {
         sitemap = selectedSite.isSitemap();
         sitestatic = selectedSite.isStaticsite();
         searchresult = selectedSite.isSearchresult();
+        if (loginBean.getCfuser().getSuperadmin()) {
+            invisible = selectedSite.getInvisible();
+        } else {
+            invisible = false;
+        }
         aliaspath = selectedSite.getAliaspath();
         loginsite = selectedSite.getLoginsite();
         sitehtmlcompression = selectedSite.getHtmlcompression();
@@ -740,6 +761,7 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setJob(sitejob);
             selectedSite.setSearchrelevant(sitesearchrelevant);
             selectedSite.setSearchresult(searchresult);
+            selectedSite.setInvisible(invisible);
             selectedSite.setSitemap(sitemap);
             selectedSite.setStaticsite(sitestatic);
             selectedSite.setTestparams(params);
@@ -929,6 +951,11 @@ public class SiteTreeBean implements Serializable {
             newsite.setJob(sitejob);
             newsite.setSearchrelevant(sitesearchrelevant);
             newsite.setSearchresult(searchresult);
+            if (loginBean.getCfuser().getSuperadmin()) {
+                newsite.setInvisible(invisible);
+            } else {
+                newsite.setInvisible(false);
+            }
             newsite.setSitemap(sitemap);
             newsite.setStaticsite(sitestatic);
             newsite.setShorturl(siteUtil.generateShorturl());

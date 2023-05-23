@@ -52,6 +52,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoginBean implements Serializable {
     @Autowired transient CfUserService cfuserService;
+    @Autowired transient TemplateList templateList;
+    @Autowired transient SiteTreeBean sitetree;
     @Autowired transient CfUserBackendService cfuserbackendService;
     @Autowired transient CfBackendService cfbackendService;
     @Autowired transient AuthTokenList authtokenlist;
@@ -144,6 +146,14 @@ public class LoginBean implements Serializable {
     
     public void onLogout() {
         userrights.clear();
+        templateList.setSelectedTemplate(null);
+        templateList.setTemplateName("");
+        sitetree.setSelectedSite(null);
+        sitetree.setSiteName("");
+        sitetree.setSelectedTemplate(null);
+        sitetree.setSelectedStylesheet(null);
+        sitetree.setSelectedJavascript(null);
+        sitetree.getSelectedDatasources().clear();
         login = false;
     }
 }

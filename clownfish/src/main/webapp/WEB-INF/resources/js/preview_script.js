@@ -32,6 +32,7 @@ function createSaveToClownfishElement() {
     document.body.appendChild(anchor);
 }
 
+
 document.addEventListener("DOMContentLoaded", function () {
     createSaveToClownfishElement();
 });

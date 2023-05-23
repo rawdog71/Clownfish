@@ -79,6 +79,7 @@ public class StylesheetList implements ISourceContentInterface {
     @Autowired transient CfSiteService cfsiteService;
     
     private @Getter @Setter List<CfStylesheet> stylesheetListe;
+    private @Getter @Setter List<CfStylesheet> invisStylesheetList;
     private @Getter @Setter CfStylesheet selectedStylesheet = null;
     private @Getter @Setter String stylesheetName = "";
     private @Getter @Setter boolean newButtonDisabled = true;
@@ -101,6 +102,7 @@ public class StylesheetList implements ISourceContentInterface {
     @Autowired @Getter @Setter SourceIndexer sourceindexer;
     @Autowired private FolderUtil folderUtil;
     private @Getter @Setter SiteTreeBean sitetree;
+    private @Getter @Setter boolean invisible;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(StylesheetList.class);
 
@@ -141,6 +143,8 @@ public class StylesheetList implements ISourceContentInterface {
         showDiff = false;
         stylesheetName = "";
         stylesheetListe = cfstylesheetService.findAll();
+        invisStylesheetList = cfstylesheetService.findAll().stream()
+                .filter((cfStylesheet -> !cfStylesheet.getInvisible())).collect(Collectors.toList());
         stylesheetUtility.setStyelsheetContent("");
         checkedout = false;
         access = false;
@@ -157,6 +161,8 @@ public class StylesheetList implements ISourceContentInterface {
     @Override
     public void refresh() {
         stylesheetListe = cfstylesheetService.findAll();
+        invisStylesheetList = cfstylesheetService.findAll().stream()
+                .filter((cfStylesheet -> !cfStylesheet.getInvisible())).collect(Collectors.toList());
         if (null != sitetree) {
             sitetree.onRefreshSelection();
         }
@@ -167,19 +173,27 @@ public class StylesheetList implements ISourceContentInterface {
 
         return stylesheetListe.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
     }
+
+    public List<CfStylesheet> completeInvisText(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return invisStylesheetList.stream().filter(t -> t.getName().toLowerCase().startsWith(queryLowerCase)).collect(Collectors.toList());
+    }
     
     @Override
     public void onSelect(AjaxBehaviorEvent event) {
         selectStylesheet(selectedStylesheet);
+        setInvisible(selectedStylesheet.getInvisible());
     }
     
     @Override
     public void onSave(ActionEvent actionEvent) {
         if (null != selectedStylesheet) {
             selectedStylesheet.setContent(getContent());
+            selectedStylesheet.setInvisible(invisible);
             cfstylesheetService.edit(selectedStylesheet);
             difference = stylesheetUtility.hasDifference(selectedStylesheet);
-            
+
             FacesMessage message = new FacesMessage("Saved " + selectedStylesheet.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
@@ -299,6 +313,11 @@ public class StylesheetList implements ISourceContentInterface {
                 CfStylesheet newstylesheet = new CfStylesheet();
                 newstylesheet.setName(stylesheetName);
                 newstylesheet.setContent("//"+stylesheetName);
+                if (loginbean.getCfuser().getSuperadmin()) {
+                    newstylesheet.setInvisible(invisible);
+                } else {
+                    newstylesheet.setInvisible(false);
+                }
                 cfstylesheetService.create(newstylesheet);
                 stylesheetListe = cfstylesheetService.findAll();
                 stylesheetName = "";
@@ -325,6 +344,8 @@ public class StylesheetList implements ISourceContentInterface {
             sitetree.loadTree();
             cfstylesheetService.delete(selectedStylesheet);
             stylesheetListe = cfstylesheetService.findAll();
+            invisStylesheetList = cfstylesheetService.findAll().stream()
+                    .filter((cfStylesheet -> !cfStylesheet.getInvisible())).collect(Collectors.toList());;
             FacesMessage message = new FacesMessage("Deleted " + selectedStylesheet.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
@@ -381,6 +402,7 @@ public class StylesheetList implements ISourceContentInterface {
     public void onChange(ActionEvent actionEvent) {
         if (null != selectedStylesheet) {
             selectedStylesheet.setName(stylesheetName);
+            selectedStylesheet.setInvisible(invisible);
             cfstylesheetService.edit(selectedStylesheet);
             difference = stylesheetUtility.hasDifference(selectedStylesheet);
             refresh();
@@ -434,6 +456,7 @@ public class StylesheetList implements ISourceContentInterface {
             stylesheetversionMin = 1;
             stylesheetversionMax = versionlist.size();
             selectedstylesheetversion = stylesheetversionMax;
+            setInvisible(selectedStylesheet.getInvisible());
         } else {
             stylesheetName = "";
             checkedout = false;

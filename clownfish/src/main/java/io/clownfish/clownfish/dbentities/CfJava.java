@@ -16,7 +16,9 @@ import java.math.BigInteger;
         @NamedQuery(name = "CfJava.findAll", query = "SELECT c FROM CfJava c"),
         @NamedQuery(name = "CfJava.findById", query = "SELECT c FROM CfJava c WHERE c.id = :id"),
         @NamedQuery(name = "CfJava.findByName", query = "SELECT c FROM CfJava c WHERE c.name = :name"),
-        @NamedQuery(name = "CfJava.findByCheckedoutby", query = "SELECT c FROM CfJava c WHERE c.checkedoutby = :checkedoutby")})
+        @NamedQuery(name = "CfJava.findByCheckedoutby", query = "SELECT c FROM CfJava c WHERE c.checkedoutby = :checkedoutby"),
+        @NamedQuery(name = "CfJava.findByInvisible", query = "SELECT c FROM CfJava c WHERE c.invisible = :invisible")
+})
 public class CfJava implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,6 +44,8 @@ public class CfJava implements Serializable {
     private int language;
     // @Column(name = "compilestatus")
     // private boolean compileStatus;
+    @Column(name = "invisible")
+    private boolean invisible;
 
     public CfJava() {}
 
@@ -93,6 +97,13 @@ public class CfJava implements Serializable {
 
     public void setLanguage(int language) {
         this.language = language;
+    }
+
+    public boolean getInvisible() {
+        return invisible;
+    }
+    public void setInvisible(boolean invis) {
+        invisible = invis;
     }
     
     public String getNameExt() {

@@ -120,6 +120,18 @@ public class UserList implements Serializable {
             String secure = PasswordUtil.generateSecurePassword(passwort, salt);
             newuser.setSalt(salt);
             newuser.setPasswort(secure);
+
+            if (!selectedbackendListcontent.isEmpty()) {
+                for (CfBackend selected : selectedbackendListcontent) {
+                    CfUserbackend listcontent = new CfUserbackend();
+                    CfUserbackendPK cflistcontentPK = new CfUserbackendPK();
+                    cflistcontentPK.setUserref(selectedUser.getId());
+                    cflistcontentPK.setBackendref(selected.getId());
+                    listcontent.setCfUserbackendPK(cflistcontentPK);
+                    cfuserbackendService.create(listcontent);
+                }
+            }
+
             cfuserService.create(newuser);
 
             userlist = cfuserService.findAll();
@@ -140,6 +152,24 @@ public class UserList implements Serializable {
                     selectedUser.setPasswort(secure);
                 }
                 selectedUser.setAssetref(avatar);
+
+                // Delete listcontent first
+                List<CfUserbackend> contentList = cfuserbackendService.findByUserRef(selectedUser.getId());
+                for (CfUserbackend content : contentList) {
+                    cfuserbackendService.delete(content);
+                }
+                // Add selected listcontent
+                if (!selectedbackendListcontent.isEmpty()) {
+                    for (CfBackend selected : selectedbackendListcontent) {
+                        CfUserbackend listcontent = new CfUserbackend();
+                        CfUserbackendPK cflistcontentPK = new CfUserbackendPK();
+                        cflistcontentPK.setUserref(selectedUser.getId());
+                        cflistcontentPK.setBackendref(selected.getId());
+                        listcontent.setCfUserbackendPK(cflistcontentPK);
+                        cfuserbackendService.create(listcontent);
+                    }
+                }
+
                 cfuserService.edit(selectedUser);
                 userlist = cfuserService.findAll();
             }
