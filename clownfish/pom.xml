@@ -370,12 +370,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast-all</artifactId>
-            <version>4.2.5</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
             <version>6.20.0</version>

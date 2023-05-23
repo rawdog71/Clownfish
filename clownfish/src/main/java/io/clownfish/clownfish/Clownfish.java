@@ -342,16 +342,6 @@ public class Clownfish {
               }
         }
         
-        /* Hazelcast test */
-        /*
-        if (null == hazelConfig) {
-            hazelConfig = new Config();
-        }
-        if (null == hcInstance) {
-            hcInstance = Hazelcast.newHazelcastInstance(hazelConfig);
-        }
-        */
-        
         Package p = FacesContext.class.getPackage();
         if (null == clownfishutil) {
             clownfishutil = new ClownfishUtil();
