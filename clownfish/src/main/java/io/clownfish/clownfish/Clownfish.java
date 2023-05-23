@@ -806,7 +806,7 @@ public class Clownfish {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
                     
-                    if (!uploadbean.getUploadpath().isEmpty()) {
+                    if ((null != uploadbean) && (!uploadbean.getUploadpath().isEmpty())) {
                         for (FileItem fi : fis) {
                             File result = new File(uploadbean.getUploadpath() + File.separator + fi.getName());
                             boolean fileexists = result.exists();
