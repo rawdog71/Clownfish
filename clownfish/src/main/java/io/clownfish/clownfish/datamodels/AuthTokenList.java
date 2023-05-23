@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthTokenList {
     private @Getter @Setter HashMap<String, AuthToken> authtokens;
-    @Autowired transient PropertyUtil propertyUtil;
+    @Autowired transient @Getter @Setter PropertyUtil propertyUtil;
 
     public AuthTokenList() {
         authtokens = new HashMap<>();
@@ -42,7 +42,7 @@ public class AuthTokenList {
         ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
         exec.scheduleAtFixedRate(gcRunnable , 0, 1, TimeUnit.MINUTES);
     }
-    
+        
     public boolean checkValidToken(String token) {
         if (propertyUtil.getPropertyBoolean("check_authtoken", true)) {
             if (authtokens.containsKey(token)) {

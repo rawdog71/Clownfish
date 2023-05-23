@@ -177,6 +177,7 @@ public class WebServiceTemplateBean implements Serializable {
     
     private Map getContentMap(String url) {
         try {
+            url = url.replace("+", "%2B");
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             ObjectMapper mapper = new ObjectMapper();
@@ -189,19 +190,9 @@ public class WebServiceTemplateBean implements Serializable {
         }
     }
     
-    private String getContentString(String url) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            return response.getBody();
-        } catch (RestClientException ex) {
-            LOGGER.error(ex.getMessage());
-            return null;
-        }
-    }
-    
     private Map getContentMap(String url, String user, String password) {
         try {
+            url = url.replace("+", "%2B");
             RestTemplate restTemplate = new RestTemplate();
             restTemplate.getInterceptors().add(
                 new BasicAuthorizationInterceptor(user, password));
@@ -218,7 +209,25 @@ public class WebServiceTemplateBean implements Serializable {
     
     private List getContentList(String url) {
         try {
+            url = url.replace("+", "%2B");
             RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.getBody());
+            List<Map<String, Object>> result = mapper.convertValue(root, new TypeReference<List<Map<String, Object>>>(){});
+            return result;
+        } catch (JsonProcessingException ex) {
+            LOGGER.error(ex.getMessage());
+            return null;
+        }
+    }
+    
+    private List getContentList(String url, String user, String password) {
+        try {
+            url = url.replace("+", "%2B");
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getInterceptors().add(
+                new BasicAuthorizationInterceptor(user, password));
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response.getBody());

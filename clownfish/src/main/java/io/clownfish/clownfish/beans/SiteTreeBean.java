@@ -46,6 +46,7 @@ import io.clownfish.clownfish.dbentities.CfSitelist;
 import io.clownfish.clownfish.dbentities.CfSitelistPK;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.dbentities.CfSitesaprfcPK;
+import io.clownfish.clownfish.dbentities.CfStaticsite;
 import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.lucene.SourceIndexer;
@@ -53,9 +54,34 @@ import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
 import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
 import io.clownfish.clownfish.sap.models.RfcFunction;
 import io.clownfish.clownfish.sap.models.RfcGroup;
-import io.clownfish.clownfish.serviceinterface.*;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
+import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
+import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
+import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
+import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
+import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
+import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfSitekeywordlistService;
+import io.clownfish.clownfish.serviceinterface.CfSitelistService;
+import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
+import io.clownfish.clownfish.serviceinterface.CfStaticsiteService;
+import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
+import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
+import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.utils.ClassUtil;
-import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.DatabaseUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
@@ -80,12 +106,12 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.primefaces.component.tabview.TabView;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
@@ -128,7 +154,10 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfList> contentlist;
     private @Getter @Setter List<CfList> selectedContentlist;
     private transient @Getter @Setter List<CfSitesaprfc> saprfclist = null;
+    private transient @Getter @Setter List<CfStaticsite> staticsitelist = null;
     private @Getter @Setter CfSitesaprfc selectedrfc = null;
+    private @Getter @Setter CfStaticsite selectedstaticsite = null;
+    private @Getter @Setter String urlparams = "";
     private @Getter @Setter List<RfcGroup> rfcgrouplist;
     private @Getter @Setter String rfcgroup;
     private @Getter @Setter RfcGroup selectedrfcgroup = null;
@@ -152,6 +181,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter String siteDescription;
     private @Getter @Setter String aliaspath;
     private @Getter @Setter String characterEncoding;
+    private @Getter @Setter String loginsite;
     private @Getter @Setter String contentType;
     private @Getter @Setter String locale;
     private transient @Getter @Setter Map<String, String> propertymap = null;
@@ -219,6 +249,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfKeywordlistService cfkeywordlistService;
     @Autowired CfLayoutcontentService cflayoutcontentService;
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
+    @Autowired transient CfStaticsiteService cfstaticsiteService;
     @Autowired transient CfPropertyService cfpropertyService;
     @Autowired transient LoginBean loginBean;
     @Autowired transient PropertyList propertylist;
@@ -244,6 +275,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfAsset> previewAssetlistOutput = new ArrayList<>();
     private @Getter @Setter String previewDatalistOutput = "";
     private @Getter @Setter List<CfKeyword> previewKeywordlistOutput = new ArrayList<>();
+    @Inject LoginBean loginbean;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
@@ -436,6 +468,7 @@ public class SiteTreeBean implements Serializable {
         siteTitle = "";
         siteDescription = "";
         aliaspath = "";
+        loginsite = "";
         sitehtmlcompression = 0;
         characterEncoding = "";
         contentType = "";
@@ -476,15 +509,27 @@ public class SiteTreeBean implements Serializable {
             int idx = templatelist.getTemplateListe().indexOf(template);
             selectedTemplate = templatelist.getTemplateListe().get(idx);
             
+            String auth_token = "";
+            if (null != loginbean) {
+                auth_token = loginbean.getToken();
+            }
+            
             iframeurl = selectedSite.getName() + "?preview=true";
-            if (!params.isBlank()) {
+            if ((null != params) && (!params.isBlank())) {
                 if (!params.startsWith("&")) {
                     iframeurl += "&" + params;
                 } else {
                     iframeurl += params;
                 }
             }
-            
+            if ((null != auth_token) && (!auth_token.isBlank())) {
+                if (!auth_token.startsWith("&")) {
+                    iframeurl += "&cf_login_token=" + URLEncoder.encode(auth_token, StandardCharsets.UTF_8);
+                } else {
+                    iframeurl += "cf_login_token=" + URLEncoder.encode(auth_token, StandardCharsets.UTF_8);
+                }
+            }
+                        
             selectedDiv = null;
             showContent = false;
             showDatalist = false;
@@ -496,35 +541,8 @@ public class SiteTreeBean implements Serializable {
                 FacesMessage message = new FacesMessage("LAYOUT TEMPLATE");
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 //List<CfLayoutcontent> layoutcontent = cflayoutcontentService.findBySiteref(selectedSite.getId());
-                layout = new CfLayout(template.getName());
-                Document doc = Jsoup.parse(template.getContent());
-                Elements divs = doc.getElementsByAttribute("template");
-                for (Element div : divs) {
-                    String contents = div.attr("contents");
-                    String datalists = div.attr("datalists");
-                    String assets = div.attr("assets");
-                    String assetlists = div.attr("assetlists");
-                    String keywordlists = div.attr("keywordlists");
-                    CfDiv cfdiv = new CfDiv();
-                    cfdiv.setId(div.attr("id"));
-                    cfdiv.setName(div.attr("template"));
-                    if (!contents.isEmpty()) {
-                        cfdiv.getContentArray().addAll(ClownfishUtil.toList(contents.split(",")));
-                    }
-                    if (!datalists.isEmpty()) {
-                        cfdiv.getContentlistArray().addAll(ClownfishUtil.toList(datalists.split(",")));
-                    }
-                    if (!assets.isEmpty()) {
-                        cfdiv.getAssetArray().addAll(ClownfishUtil.toList(assets.split(",")));
-                    }
-                    if (!assetlists.isEmpty()) {
-                        cfdiv.getAssetlistArray().addAll(ClownfishUtil.toList(assetlists.split(",")));
-                    }
-                    if (!keywordlists.isEmpty()) {
-                        cfdiv.getKeywordlistArray().addAll(ClownfishUtil.toList(keywordlists.split(",")));
-                    }
-                    layout.getDivArray().put(div.attr("id"), cfdiv);
-                }
+                templateUtility.fetchLayout(template);
+                layout = templateUtility.getLayout();
             } else {
                 contenteditable = false;
                 selected_contentclass = null;
@@ -600,11 +618,13 @@ public class SiteTreeBean implements Serializable {
             invisible = false;
         }
         aliaspath = selectedSite.getAliaspath();
+        loginsite = selectedSite.getLoginsite();
         sitehtmlcompression = selectedSite.getHtmlcompression();
         characterEncoding = selectedSite.getCharacterencoding();
         contentType = selectedSite.getContenttype();
         locale = selectedSite.getLocale();
         saprfclist = cfsitesaprfcService.findBySiteref(selectedSite.getId());
+        staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
         newButtonDisabled = true;
         
         FacesMessage message = new FacesMessage("Selected " + selectedSite.getName());
@@ -613,6 +633,11 @@ public class SiteTreeBean implements Serializable {
     
     public void onDelete(ActionEvent actionEvent) {
         if (null != selectedSite) {
+            List<CfSite> sites = cfsiteService.findByParentref(selectedSite);
+            for (CfSite site : sites) {
+                site.setParentref(null);
+                cfsiteService.edit(site);
+            }
             cfsiteService.delete(selectedSite);
             loadTree();
             
@@ -730,6 +755,7 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setContenttype(contentType);
             selectedSite.setLocale(locale);
             selectedSite.setAliaspath(aliaspath);
+            selectedSite.setLoginsite(loginsite);
             selectedSite.setTitle(siteTitle);
             selectedSite.setDescription(siteDescription);
             selectedSite.setJob(sitejob);
@@ -743,6 +769,114 @@ public class SiteTreeBean implements Serializable {
             loadTree();
             
             FacesMessage message = new FacesMessage("Changed " + selectedSite.getName());
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public void onCopy(ActionEvent actionEvent) {
+        if (null != selectedSite) {
+            CfSite newsite = new CfSite();
+            String newname = siteUtil.getUniqueName(selectedSite.getName());
+            newsite.setName(newname);
+            
+            newsite.setAliaspath(newname);
+            newsite.setCharacterencoding(selectedSite.getCharacterencoding());
+            newsite.setContenttype(selectedSite.getContenttype());
+            newsite.setDescription(selectedSite.getDescription());
+            newsite.setGzip(selectedSite.getGzip());
+            newsite.setHitcounter(BigInteger.ZERO);
+            newsite.setHtmlcompression(selectedSite.getHtmlcompression());
+            newsite.setJavascriptref(selectedSite.getJavascriptref());
+            newsite.setJob(selectedSite.isJob());
+            newsite.setLocale(selectedSite.getLocale());
+            newsite.setLoginsite(selectedSite.getLoginsite());
+            newsite.setParentref(selectedSite.getParentref());
+            newsite.setSearchrelevant(selectedSite.isSearchrelevant());
+            newsite.setSearchresult(selectedSite.isSearchresult());
+            newsite.setShorturl(siteUtil.generateShorturl());
+            newsite.setSitemap(selectedSite.isSitemap());
+            newsite.setStaticsite(selectedSite.isStaticsite());
+            newsite.setStylesheetref(selectedSite.getStylesheetref());
+            newsite.setTemplateref(selectedSite.getTemplateref());
+            newsite.setTestparams(selectedSite.getTestparams());
+            newsite.setTitle(selectedSite.getTitle());
+            newsite = cfsiteService.create(newsite);
+            
+            // Add selected saprfcs
+            if (!saprfclist.isEmpty()) {
+                for (CfSitesaprfc saprfc : saprfclist) {
+                    CfSitesaprfc sitesaprfc = new CfSitesaprfc();
+                    CfSitesaprfcPK cfsitesaprfcPK = new CfSitesaprfcPK();
+                    cfsitesaprfcPK.setSiteref(newsite.getId());
+                    cfsitesaprfcPK.setRfcfunction(saprfc.getCfSitesaprfcPK().getRfcfunction());
+                    cfsitesaprfcPK.setRfcgroup(saprfc.getCfSitesaprfcPK().getRfcgroup());
+                    sitesaprfc.setCfSitesaprfcPK(cfsitesaprfcPK);
+                    cfsitesaprfcService.create(sitesaprfc);
+                }
+            }
+            
+            // Add selected siteresources
+            if (!selectedDatasources.isEmpty()) {
+                for (CfDatasource datasource : selectedDatasources) {
+                    CfSitedatasource sitedatasource = new CfSitedatasource();
+                    CfSitedatasourcePK cfsitedatasourcePK = new CfSitedatasourcePK();
+                    cfsitedatasourcePK.setSiteref(newsite.getId());
+                    cfsitedatasourcePK.setDatasourceref(datasource.getId());
+                    sitedatasource.setCfSitedatasourcePK(cfsitedatasourcePK);
+                    cfsitedatasourceService.create(sitedatasource);
+                }
+            }
+            
+            // Add selected sitelists
+            if (!selectedContentlist.isEmpty()) {
+                for (CfList contentList : selectedContentlist) {
+                    CfSitelist sitelist = new CfSitelist();
+                    CfSitelistPK cfsitelistPK = new CfSitelistPK();
+                    cfsitelistPK.setSiteref(newsite.getId());
+                    cfsitelistPK.setListref(contentList.getId());
+                    sitelist.setCfSitelistPK(cfsitelistPK);
+                    cfsitelistService.create(sitelist);
+                }
+            }
+            
+            // Add selected sitecontent
+            if (!selectedClasscontentlist.isEmpty()) {
+                for (CfClasscontent content : selectedClasscontentlist) {
+                    CfSitecontent sitecontent = new CfSitecontent();
+                    CfSitecontentPK cfsitecontentPK = new CfSitecontentPK();
+                    cfsitecontentPK.setSiteref(newsite.getId());
+                    cfsitecontentPK.setClasscontentref(content.getId());
+                    sitecontent.setCfSitecontentPK(cfsitecontentPK);
+                    cfsitecontentService.create(sitecontent);
+                }
+            }
+            
+            // Add selected sitecontent
+            if (!selectedAssetlist.isEmpty()) {
+                for (CfAssetlist content : selectedAssetlist) {
+                    CfSiteassetlist siteassetlist = new CfSiteassetlist();
+                    CfSiteassetlistPK cfsitecontentPK = new CfSiteassetlistPK();
+                    cfsitecontentPK.setSiteref(newsite.getId());
+                    cfsitecontentPK.setAssetlistref(content.getId());
+                    siteassetlist.setCfSiteassetlistPK(cfsitecontentPK);
+                    cfsiteassetlistService.create(siteassetlist);
+                }
+            }
+            
+            // Add selected sitecontent
+            if (!selectedKeywordlist.isEmpty()) {
+                for (CfKeywordlist content : selectedKeywordlist) {
+                    CfSitekeywordlist sitekeywordlist = new CfSitekeywordlist();
+                    CfSitekeywordlistPK cfsitecontentPK = new CfSitekeywordlistPK();
+                    cfsitecontentPK.setSiteref(newsite.getId());
+                    cfsitecontentPK.setKeywordlistref(content.getId());
+                    sitekeywordlist.setCfSitekeywordlistPK(cfsitecontentPK);
+                    cfsitekeywordlistService.create(sitekeywordlist);
+                }
+            }
+            loadTree();
+            
+            FacesMessage message = new FacesMessage("Copied " + selectedSite.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
@@ -811,6 +945,7 @@ public class SiteTreeBean implements Serializable {
             newsite.setCharacterencoding(characterEncoding);
             newsite.setLocale(locale);
             newsite.setAliaspath(siteName);
+            newsite.setLoginsite(loginsite);
             newsite.setTitle(siteTitle);
             newsite.setDescription(siteDescription);
             newsite.setJob(sitejob);
@@ -924,6 +1059,68 @@ public class SiteTreeBean implements Serializable {
                 }
             }
             return null;
+        }
+    }
+    
+    public void onStaticsiteSelect(SelectEvent event) {
+        selectedstaticsite = (CfStaticsite) event.getObject();
+        if (!selectedstaticsite.getUrlparams().isBlank()) {
+            iframeurl = selectedstaticsite.getSite() + "/" + selectedstaticsite.getUrlparams();
+        } else {
+            iframeurl = selectedstaticsite.getSite();
+        }
+    }
+    
+    public void onNewStaticsite(ActionEvent actionEvent) {
+        if (null != selectedSite) {
+            CfStaticsite staticsite = new CfStaticsite();
+            staticsite.setSite(selectedSite.getName());
+            staticsite.setUrlparams(urlparams);
+            staticsite.setTstamp(new Date());
+            cfstaticsiteService.create(staticsite);
+            staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
+        }
+    }
+    
+    public void onRecreateStaticSite(ActionEvent actionEvent) {
+        if (null != selectedstaticsite) {
+            if (null != folderUtil.getStatic_folder()) {
+                String filename = selectedstaticsite.getSite() + "_" + selectedstaticsite.getUrlparams().replaceAll("/", "_");
+                File file = new File(folderUtil.getStatic_folder() + File.separator + filename);
+                try {
+                    Files.deleteIfExists(file.toPath());
+                    FacesMessage message = new FacesMessage("Deleted static site for " + filename);
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                } catch (IOException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+            }
+            selectedstaticsite.setTstamp(new Date());
+            cfstaticsiteService.edit(selectedstaticsite);
+            staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
+            if (!selectedstaticsite.getUrlparams().isBlank()) {
+                iframeurl = selectedstaticsite.getSite() + "/" + selectedstaticsite.getUrlparams();
+            } else {
+                iframeurl = selectedstaticsite.getSite();
+            }
+        }
+    }
+    
+    public void onDestroyStaticSite(ActionEvent actionEvent) {
+        if (null != selectedstaticsite) {
+            if (null != folderUtil.getStatic_folder()) {
+                String filename = selectedstaticsite.getSite() + "_" + selectedstaticsite.getUrlparams().replaceAll("/", "_");
+                File file = new File(folderUtil.getStatic_folder() + File.separator + filename);
+                try {
+                    Files.deleteIfExists(file.toPath());
+                    FacesMessage message = new FacesMessage("Deleted static site for " + filename);
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                } catch (IOException ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+            }
+            cfstaticsiteService.delete(selectedstaticsite);
+            staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
         }
     }
     

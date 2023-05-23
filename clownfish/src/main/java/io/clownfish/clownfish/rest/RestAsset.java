@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 
 /**
  *
@@ -56,7 +57,7 @@ public class RestAsset {
     }
     */
 
-    @PostMapping("/updateasset")
+    @PostMapping(value = "/updateasset", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestAssetParameter restUpdateAsset(@RequestBody RestAssetParameter ikp) {
         return updateAsset(ikp);
     }
@@ -72,6 +73,39 @@ public class RestAsset {
                         asset.setDescription(ikp.getDescription());
                         // TODO: change asset name [asset.setName(ikp.getName());]
                         asset.setPublicuse(ikp.isPublicuse());
+                        CfAsset newasset2 = cfassetService.edit(asset);
+                        ikp.setReturncode("OK");
+                    } catch (javax.persistence.NoResultException ex) {
+                        LOGGER.warn("No Asset");
+                        ikp.setReturncode("No Asset");
+                    }
+                } else {
+                    ikp.setReturncode("Wrong API KEY");
+                }
+            } else {
+                ikp.setReturncode("Invalid token");
+            }
+        } catch (javax.persistence.NoResultException ex) {
+            LOGGER.error("NoResultException");
+            ikp.setReturncode("NoResultException");
+        }
+        return ikp;
+    }
+    
+    @PostMapping(value = "/deleteasset", produces = MediaType.APPLICATION_JSON_VALUE)
+    public RestAssetParameter restDeleteAsset(@RequestBody RestAssetParameter ikp) {
+        return deleteAsset(ikp);
+    }
+    
+    private RestAssetParameter deleteAsset(RestAssetParameter ikp) {
+        try {
+            String token = ikp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = ikp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
+                    try {
+                        CfAsset asset = cfassetService.findById(ikp.getId());
+                        asset.setScrapped(true);
                         CfAsset newasset2 = cfassetService.edit(asset);
                         ikp.setReturncode("OK");
                     } catch (javax.persistence.NoResultException ex) {

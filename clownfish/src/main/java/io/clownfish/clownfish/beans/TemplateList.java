@@ -15,11 +15,13 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.dbentities.CfTemplateversion;
 import io.clownfish.clownfish.dbentities.CfTemplateversionPK;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.lucene.SourceIndexer;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
@@ -49,7 +51,7 @@ import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
 import org.primefaces.extensions.model.monacoeditor.ETheme;
 import org.primefaces.extensions.model.monacoeditor.EditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
-import org.primefaces.extensions.model.monacoeditor.MonacoDiffEditorModel;
+import org.primefaces.extensions.model.monaco.MonacoDiffEditorModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +70,7 @@ public class TemplateList implements ISourceContentInterface {
     LoginBean loginbean;
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfTemplateversionService cftemplateversionService;
+    @Autowired transient CfSiteService cfsiteService;
     
     private @Getter @Setter List<CfTemplate> templateListe;
     private @Getter @Setter List<CfTemplate> invisibleTemplateList;
@@ -304,7 +307,7 @@ public class TemplateList implements ISourceContentInterface {
                 FacesContext.getCurrentInstance().addMessage(null, message);
             } else {
                 access = false;
-                FacesMessage message = new FacesMessage("could not Checked Out " + selectedTemplate.getName());
+                FacesMessage message = new FacesMessage("Could not Checked Out " + selectedTemplate.getName());
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }
         }
@@ -319,7 +322,7 @@ public class TemplateList implements ISourceContentInterface {
             difference = templateUtility.hasDifference(selectedTemplate);
             checkedout = false;
             
-            FacesMessage message = new FacesMessage("Checked Out " + selectedTemplate.getName());
+            FacesMessage message = new FacesMessage("Checked In " + selectedTemplate.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
@@ -373,6 +376,12 @@ public class TemplateList implements ISourceContentInterface {
     @Override
     public void onDelete(ActionEvent actionEvent) {
         if (null != selectedTemplate) {
+            List<CfSite> sites = cfsiteService.findByTemplateref(selectedTemplate);
+            for (CfSite site : sites) {
+                site.setTemplateref(null);
+                cfsiteService.edit(site);
+            }
+            sitetree.loadTree();
             cftemplateService.delete(selectedTemplate);
             templateListe = cftemplateService.findAll();
             invisibleTemplateList = cftemplateService.findAll().stream()
@@ -493,6 +502,26 @@ public class TemplateList implements ISourceContentInterface {
             templateName = "";
             checkedout = false;
             access = false;
+        }
+    }
+
+    @Override
+    public void onCopy(ActionEvent actionEvent) {
+        if (null != selectedTemplate) {
+            CfTemplate newtemplate = new CfTemplate();
+            String newname = templateUtility.getUniqueName(selectedTemplate.getName());
+            newtemplate.setName(newname);
+            newtemplate.setScriptlanguage(selectedTemplate.getScriptlanguage());
+            newtemplate.setType(selectedTemplate.getType());
+            newtemplate.setContent(selectedTemplate.getContent());
+            cftemplateService.create(newtemplate);
+            templateListe = cftemplateService.findAll();
+            templateName = newname;
+            selectedTemplate = newtemplate;
+            onCommit(null);
+            refresh();
+            onSelect(null);
+            onCheckOut(null);
         }
     }
 }

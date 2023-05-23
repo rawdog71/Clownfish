@@ -202,7 +202,7 @@ public class ContentList implements Serializable {
                     case "text":
                     case "htmltext":
                     case "markdown":
-                        return Long.MAX_VALUE;
+                        return Integer.MAX_VALUE;
                     default:
                         return 255;
                 }
@@ -453,7 +453,7 @@ public class ContentList implements Serializable {
         if (selectedContent != null) {
             try {
                 CfClasscontent newclasscontent = new CfClasscontent();
-                String newname = getUniqueName(selectedContent.getName());
+                String newname = contentUtil.getUniqueName(selectedContent.getName());
                 if (newname.startsWith(selectedClass.getName().toUpperCase() + "_")) {
                     newname = newname.replaceAll("\\s+", "_");
                 } else {
@@ -904,20 +904,6 @@ public class ContentList implements Serializable {
         return contentUtil.toString(attributcontent);
     }
 
-    private String getUniqueName(String name) {
-        int i = 1;
-        boolean found = false;
-        do {
-            try {
-                cfclasscontentService.findByName(name+"("+i+")");
-                i++;
-            } catch(Exception ex) {
-                found = true;
-            }
-        } while (!found);
-        return name+"("+i+")";
-    }
-    
     public void selectDivContent(String contentname) {
         selectContent(cfclasscontentService.findByName(contentname));
     }

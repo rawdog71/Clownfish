@@ -27,10 +27,8 @@ import io.clownfish.clownfish.dbentities.CfContentversion;
 import io.clownfish.clownfish.dbentities.CfContentversionPK;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
-import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
-import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
@@ -43,6 +41,7 @@ import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
+import jakarta.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Date;
@@ -50,6 +49,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,8 +64,6 @@ public class RestContent {
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
-    @Autowired transient CfAttributetypeService cfattributetypeService;
-    @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
@@ -78,7 +76,7 @@ public class RestContent {
     @Autowired private CfContentversionService cfcontentversionService;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestContent.class);
 
-    @PostMapping("/insertcontent")
+    @PostMapping(value = "/insertcontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameter restInsertContent(@RequestBody RestContentParameter icp) {
         return insertContent(icp);
     }
@@ -153,7 +151,7 @@ public class RestContent {
         return icp;
     }
     
-    @PostMapping("/deletecontent")
+    @PostMapping(value = "/deletecontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameter restDeleteContent(@RequestBody RestContentParameter ucp) {
         return deleteContent(ucp);
     }
@@ -201,7 +199,7 @@ public class RestContent {
         return ucp;
     }
     
-    @PostMapping("/updatecontent")
+    @PostMapping(value = "/updatecontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameter restUpdateContent(@RequestBody RestContentParameter ucp) {
         return updateContent(ucp);
     }
@@ -216,6 +214,16 @@ public class RestContent {
 
                     try {
                         CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
+                        try {
+                            if ((null != ucp.getUpdatecontentname()) && (!ucp.getUpdatecontentname().isEmpty())) {
+                                CfClasscontent updateclasscontent = cfclasscontentService.findByName(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                            }
+                        } catch (javax.persistence.NoResultException ex) {
+                            classcontent.setName(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                            ucp.setContentname(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                            cfclasscontentService.edit(classcontent);
+                        }
+                        
                         List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
                         for (CfAttributcontent attributcontent : attributcontentlist) {
                             CfAttribut attribut = attributcontent.getAttributref();
@@ -245,7 +253,7 @@ public class RestContent {
         return ucp;
     }
     
-    @PostMapping("/destroycontent")
+    @PostMapping(value = "/destroycontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameter restDestroyContent(@RequestBody RestContentParameter ucp) {
         return destroyContent(ucp);
     }
@@ -305,8 +313,91 @@ public class RestContent {
         }
         return ucp;
     }
+    
+    @PostMapping(value = "/copycontent", produces = MediaType.APPLICATION_JSON_VALUE)
+    public RestContentParameter restCopyContent(@RequestBody RestContentParameter ucp) {
+        return copyContent(ucp);
+    }
+    
+    private RestContentParameter copyContent(RestContentParameter ucp) {
+        try {
+            String token = ucp.getToken();
+            if (authtokenlist.checkValidToken(token)) {
+                String apikey = ucp.getApikey();
+                if (apikeyutil.checkApiKey(apikey, "RestService")) {
+                    CfClass selectedClass = cfclassService.findByName(ucp.getClassname());
+                    CfClasscontent newclasscontent = new CfClasscontent();
+                    try {
+                        CfClasscontent selectedContent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
+                        String newname = contentUtil.getUniqueName(selectedContent.getName());
+                        ucp.setUpdatecontentname(newname);
+                        if (newname.startsWith(selectedClass.getName().toUpperCase() + "_")) {
+                            newname = newname.replaceAll("\\s+", "_");
+                        } else {
+                            newname = selectedClass.getName().toUpperCase() + "_" + newname.replaceAll("\\s+", "_");
+                        }
+                        newclasscontent.setName(newname);
 
-    @PostMapping("/checkoutcontent")
+                        newclasscontent.setClassref(selectedContent.getClassref());
+                        cfclasscontentService.create(newclasscontent);
+
+                        List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
+                        attributlist.stream().forEach((attribut) -> {
+                            if (attribut.getAutoincrementor() == true) {
+                                List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
+                                long max = 0;
+                                int last = classcontentlist2.size();
+                                if (1 == last) {
+                                    max = 0;
+                                } else {
+                                    CfClasscontent classcontent = classcontentlist2.get(last - 2);
+                                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
+                                    if (attributcontent.getContentInteger().longValue() > max) {
+                                        max = attributcontent.getContentInteger().longValue();
+                                    }
+                                }
+                                CfAttributcontent newcontent = new CfAttributcontent();
+                                newcontent.setAttributref(attribut);
+                                newcontent.setClasscontentref(newclasscontent);
+                                newcontent.setContentInteger(BigInteger.valueOf(max+1));
+                                cfattributcontentService.create(newcontent);
+                            } else {
+                                CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, selectedContent); 
+
+                                CfAttributcontent newcontent = new CfAttributcontent();
+                                newcontent.setAttributref(attribut);
+                                newcontent.setClasscontentref(newclasscontent);
+                                newcontent.setAssetcontentlistref(attributcontent.getAssetcontentlistref());
+                                newcontent.setClasscontentlistref(attributcontent.getClasscontentlistref());
+                                newcontent.setContentBoolean(attributcontent.getContentBoolean());
+                                newcontent.setContentDate(attributcontent.getContentDate());
+                                newcontent.setContentInteger(attributcontent.getContentInteger());
+                                newcontent.setContentReal(attributcontent.getContentReal());
+                                newcontent.setContentString(attributcontent.getContentString());
+                                newcontent.setContentText(attributcontent.getContentText());
+                                newcontent.setIndexed(attributcontent.isIndexed());
+                                newcontent.setSalt(attributcontent.getSalt());
+                                cfattributcontentService.create(newcontent);
+                            }
+                        });
+                        hibernateUtil.insertContent(newclasscontent);
+                        ucp.setReturncode("OK");
+                    } catch (ConstraintViolationException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                } else {
+                    ucp.setReturncode("Wrong API KEY");
+                }
+            } else {
+                ucp.setReturncode("Invalid token");
+            }
+        } catch (javax.persistence.NoResultException ex) {
+            ucp.setReturncode("NoResultException");
+        }
+        return ucp;
+    }
+
+    @PostMapping(value = "/checkoutcontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameterExt restCheckoutContent(@RequestBody RestContentParameterExt ucp) {
         return checkoutContent(ucp);
     }
@@ -342,7 +433,7 @@ public class RestContent {
         return ucp;
     }
 
-    @PostMapping("/checkincontent")
+    @PostMapping(value = "/checkincontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameterExt restCheckinContent(@RequestBody RestContentParameterExt ucp) {
         return checkinContent(ucp);
     }
@@ -413,7 +504,7 @@ public class RestContent {
         cfcontentversionService.create(cfcontentversion);
     }
     
-    @PostMapping("/commitcontent")
+    @PostMapping(value = "/commitcontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestContentParameterExt restCommitContent(@RequestBody RestContentParameterExt icp) {
         return commitContent(icp);
     }
@@ -466,4 +557,6 @@ public class RestContent {
         }
         return icp;
     }
+    
+    
 }

@@ -24,4 +24,22 @@ public class ClownfishConst {
         DEVELOPMENT,
         STAGING
     }
+    
+    public enum AccessTypes {
+        TYPE_CLASS(0),
+        TYPE_CONTENTLIST(1),
+        TYPE_CONTENT(2),
+        TYPE_ASSETLIST(3),
+        TYPE_ASSET(4),
+        TYPE_SITE(5);
+        
+        private final Integer value;
+
+        AccessTypes(final Integer value) {
+           this.value = value;
+        }
+        public Integer getValue(){
+           return value;
+        }
+    }
 }

@@ -16,7 +16,11 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_ASSET;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_ASSETLIST;
 import io.clownfish.clownfish.datamodels.AssetDataOutput;
+import io.clownfish.clownfish.datamodels.AuthTokenClasscontent;
+import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetkeyword;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
@@ -27,10 +31,11 @@ import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
+import io.clownfish.clownfish.utils.AccessManagerUtil;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
-import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.servlet.annotation.WebServlet;
@@ -55,15 +60,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class GetFilteredAssets extends HttpServlet {
     @Autowired transient CfAssetService cfassetService;
-    @Autowired transient PropertyUtil propertyUtil;
     @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
     @Autowired transient CfAssetKeywordService cfassetkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired transient AuthTokenListClasscontent authtokenlist;
+    @Autowired AccessManagerUtil accessmanager;
     
     private static transient @Getter @Setter String assetlibrary;
     private static transient @Getter @Setter String apikey;
+    private static transient @Getter @Setter String token;
+    private static transient @Getter @Setter String keywords;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(GetFilteredAssets.class);
     
@@ -81,38 +89,51 @@ public class GetFilteredAssets extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         String inst_assetlibrary = null;
         String inst_apikey = "";
+        String inst_token = "";
+        String inst_keywords = "";
         ArrayList<String> searchkeywords;
         List<CfAssetlistcontent> assetlistcontent = null;
         HashMap<String, String> outputmap;
         List<AssetDataOutput> outputlist = SetUniqueList.decorate(new ArrayList<AssetDataOutput>());
         outputmap = new HashMap<>();
         Map<String, String[]> parameters = request.getParameterMap();
+        apikey = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             apikey = values[0];
         });
         inst_apikey = apikey;
+        token = "";
+        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("token") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+            token = values[0];
+        });
+        inst_token = token;
         if (apikeyutil.checkApiKey(inst_apikey, "RestService")) {
+            assetlibrary = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("assetlibrary") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 assetlibrary = values[0];
             });
             inst_assetlibrary = assetlibrary;
             assetlistcontent = null;
-            if (null != inst_assetlibrary) {
+            if ((null != inst_assetlibrary) && (!inst_assetlibrary.isEmpty())) {
                 CfAssetlist assetList = cfassetlistService.findByName(inst_assetlibrary);
-                assetlistcontent = cfassetlistcontentService.findByAssetlistref(assetList.getId());
+                // !ToDo: #95 check AccessManager
+                if (accessmanager.checkAccess(token, TYPE_ASSETLIST.getValue(), BigInteger.valueOf(assetList.getId()))) {
+                    assetlistcontent = cfassetlistcontentService.findByAssetlistref(assetList.getId());
+                }
             }
 
             searchkeywords = new ArrayList<>();
-            parameters.keySet().stream().filter((paramname) -> (paramname.startsWith("keywords"))).forEach((paramname) -> {
-                String[] keys = paramname.split("\\$");
-                int counter = 0;
-                for (String key : keys) {
-                    if (counter > 0) {
-                        searchkeywords.add(key);
-                    }
-                    counter++;
-                }
+            keywords = "";
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("keywords") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                keywords = values[0];
             });
+            inst_keywords = keywords;
+            if ((null != inst_keywords) && (!inst_keywords.isEmpty())) {
+                String[] keys = inst_keywords.split("\\$");
+                for (String key : keys) {
+                    searchkeywords.add(key);
+                }
+            };
 
             boolean found = true;
             if (null != assetlistcontent) {
@@ -120,18 +141,23 @@ public class GetFilteredAssets extends HttpServlet {
                     CfAsset asset = cfassetService.findById(assetcontent.getCfAssetlistcontentPK().getAssetref());
                     // Only assets that are for public use and not scrapped
                     if ((!asset.isScrapped()) && (asset.isPublicuse())) {
-                        // Check the keyword filter (at least one keyword must be found (OR))
-                        if (!searchkeywords.isEmpty()) {
-                            ArrayList contentkeywords = getContentOutputKeywords(asset, true);
-                            boolean dummyfound = false;
-                            for (String keyword : searchkeywords) {
-                                if (contentkeywords.contains(keyword.toLowerCase())) {
-                                    dummyfound = true;
+                        // !ToDo: #95 check AccessManager
+                        if (accessmanager.checkAccess(token, TYPE_ASSET.getValue(), BigInteger.valueOf(asset.getId()))) {
+                            // Check the keyword filter (at least one keyword must be found (OR))
+                            if (!searchkeywords.isEmpty()) {
+                                ArrayList contentkeywords = getContentOutputKeywords(asset, true);
+                                boolean dummyfound = false;
+                                for (String keyword : searchkeywords) {
+                                    if (contentkeywords.contains(keyword.toLowerCase())) {
+                                        dummyfound = true;
+                                    }
                                 }
+                                found = dummyfound;
+                            } else {
+                                found = true;
                             }
-                            found = dummyfound;
                         } else {
-                            found = true;
+                            found = false;
                         }
                     }
 
@@ -144,7 +170,7 @@ public class GetFilteredAssets extends HttpServlet {
                 }
             } else {
                 // If Assetlist is empty but keywords are set
-                if (!searchkeywords.isEmpty()) {
+                if ((!searchkeywords.isEmpty()) && (inst_assetlibrary.isEmpty())) {
                     for (String searchkeyword : searchkeywords) {
                         CfKeyword keyword = cfkeywordService.findByName(searchkeyword);
                         if (null != keyword) {
@@ -153,21 +179,34 @@ public class GetFilteredAssets extends HttpServlet {
                                 CfAsset asset = cfassetService.findById(assetkeyword.getCfAssetkeywordPK().getAssetref());
                                 // Only assets that are for public use and not scrapped
                                 if ((!asset.isScrapped()) && (asset.isPublicuse())) {
-                                    AssetDataOutput ao = new AssetDataOutput();
-                                    ao.setAsset(asset);
-                                    ao.setKeywords(getContentOutputKeywords(asset, false));
-                                    if (!outputlist.contains(ao)) {
-                                        outputlist.add(ao);
+                                    // !ToDo: #95 check AccessManager
+                                    if (accessmanager.checkAccess(token, TYPE_ASSET.getValue(), BigInteger.valueOf(asset.getId()))) {
+                                        AssetDataOutput ao = new AssetDataOutput();
+                                        ao.setAsset(asset);
+                                        ao.setKeywords(getContentOutputKeywords(asset, false));
+                                        if (!outputlist.contains(ao)) {
+                                            outputlist.add(ao);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 } else {
-                    List<CfAsset> assetlist = cfassetService.findByScrapped(false);
-                    for (CfAsset asset : assetlist) {
-                        // Only assets that are for public
-                        if (asset.isPublicuse()) {
+                    if (inst_assetlibrary.isEmpty()) {
+                        List<CfAsset> assetlist;
+                        // !ToDo: #95 check AccessManager
+                        if ((null != token) && (!token.isEmpty())) {
+                            AuthTokenClasscontent classcontent = authtokenlist.getAuthtokens().get(token);
+                            if (null != classcontent) {
+                                assetlist = cfassetService.findByPublicuseAndScrappedNotInList(true, false, BigInteger.valueOf(classcontent.getUser().getId()));
+                            } else {
+                                assetlist = cfassetService.findByPublicuseAndScrappedNotInList(true, false, BigInteger.valueOf(0L));
+                            }
+                        } else {
+                            assetlist = cfassetService.findByPublicuseAndScrappedNotInList(true, false, BigInteger.valueOf(0L));
+                        }
+                        for (CfAsset asset : assetlist) {
                             AssetDataOutput ao = new AssetDataOutput();
                             ao.setAsset(asset);
                             ao.setKeywords(getContentOutputKeywords(asset, false));
@@ -175,8 +214,10 @@ public class GetFilteredAssets extends HttpServlet {
                                 outputlist.add(ao);
                             }
                         }
+                        found = true;
+                    } else {
+                        found = false;
                     }
-                    found = true;
                 }
             }
 

@@ -18,6 +18,7 @@ package io.clownfish.clownfish.serviceimpl;
 import io.clownfish.clownfish.daointerface.CfAssetDAO;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import java.math.BigInteger;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,5 +96,10 @@ public class CfAssetServiceImpl implements CfAssetService {
     @Override
     public List<CfAsset> findByPublicuseAndScrapped(boolean publicuse, boolean scrapped) {
         return this.cfassetDAO.findByPublicuseAndScrapped(publicuse, scrapped);
+    }
+
+    @Override
+    public List<CfAsset> findByPublicuseAndScrappedNotInList(boolean publicuse, boolean scrapped, BigInteger ref) {
+        return this.cfassetDAO.findByPublicuseAndScrappedNotInList(publicuse, scrapped, ref);
     }
 }

@@ -44,7 +44,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfList.findByName", query = "SELECT c FROM CfList c WHERE c.name = :name"),
     @NamedQuery(name = "CfList.findByClassref", query = "SELECT c FROM CfList c WHERE c.classref = :classref"),
     @NamedQuery(name = "CfList.findByClassrefAndName", query = "SELECT c FROM CfList c WHERE c.classref = :classref AND c.name = :name"),
-    @NamedQuery(name = "CfList.findByMaintenance", query = "SELECT l FROM CfList l INNER JOIN CfClass c ON l.classref = c.id WHERE c.maintenance = :maintenance")
+    @NamedQuery(name = "CfList.findByMaintenance", query = "SELECT l FROM CfList l INNER JOIN CfClass c ON l.classref = c.id WHERE c.maintenance = :maintenance"),
+    @NamedQuery(name = "CfList.findNotInList", query = "SELECT l FROM CfList l WHERE l.classref.id NOT IN (SELECT am.ref FROM CfAccessmanager am WHERE am.type = 1 AND am.refclasscontent <> :refclasscontent)"),
+    @NamedQuery(name = "CfList.findByNameNotInList", query = "SELECT l FROM CfList l WHERE l.name = :name AND l.classref.id NOT IN (SELECT am.ref FROM CfAccessmanager am WHERE am.type = 1 AND am.refclasscontent <> :refclasscontent)"),
 })
 public class CfList implements Serializable {
 

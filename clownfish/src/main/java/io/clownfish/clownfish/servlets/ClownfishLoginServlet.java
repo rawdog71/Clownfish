@@ -77,19 +77,23 @@ public class ClownfishLoginServlet extends HttpServlet {
         ar.setValiduntil(null);
         try {
             Map<String, String[]> parameters = request.getParameterMap();
-
+            klasse = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("class") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 klasse = values[0];
             });
+            clearPw = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("clearPw") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 clearPw = values[0];
             });
+            id_field = ""; 
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("idField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 id_field = values[0];
             });
+            id = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("id") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 id = values[0];
             });
+            pw_field = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("pwField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 pw_field = values[0];
             });
@@ -107,7 +111,7 @@ public class ClownfishLoginServlet extends HttpServlet {
 
             for (CfClasscontent classcontent : classcontentList) {
                 CfAttributcontent attributContent = cfattributcontentService.findByAttributrefAndClasscontentref(attributField, classcontent);
-                if (attributContent.getContentString().equals(inst_identifier)) {
+                if ((null != attributContent) && (attributContent.getContentString().equals(inst_identifier))) {
                     long cref = attributContent.getClasscontentref().getId();
                     for (CfClasscontent classcontent1 : classcontentList) {
                         CfAttributcontent attributContent1 = cfattributcontentService.findByAttributrefAndClasscontentref(attributPassword, classcontent1);
@@ -135,6 +139,7 @@ public class ClownfishLoginServlet extends HttpServlet {
             LOGGER.error(ex.getMessage());
         }
 
+        response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
             out.print(gson.toJson(ar));

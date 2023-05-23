@@ -35,14 +35,13 @@ import io.clownfish.clownfish.graphql.GraphQLDataFetchers;
 import io.clownfish.clownfish.graphql.GraphQLUtil;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.NoResultException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -61,38 +60,43 @@ public class RestGraphQL {
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfAttributService cfattributservice;
     @Autowired transient AuthTokenList authtokenlist;
+    @Value("${graphql.use:0}") int graphql_use;
 
     @RequestMapping(value = "/graphql", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public String myGraphql(@RequestHeader("token") String token, @RequestBody String request) throws Exception {
-        if (authtokenlist.checkValidToken(token)) {
-        
-            JSONObject jsonRequest = new JSONObject(request);
-            JSONObject jsonVariables = null;
-            try {
-                jsonVariables = jsonRequest.getJSONObject("variables");
-            } catch (JSONException jex) {
-                
-            }
-            Map<String, Object> variables = new LinkedHashMap<>();
-            if (null != jsonVariables) {
-                for (String key : jsonVariables.keySet()) {
-                    variables.put(key, jsonVariables.opt(key));
+        if (1 == graphql_use) {
+            if (authtokenlist.checkValidToken(token)) {
+
+                JSONObject jsonRequest = new JSONObject(request);
+                JSONObject jsonVariables = null;
+                try {
+                    jsonVariables = jsonRequest.getJSONObject("variables");
+                } catch (JSONException jex) {
+
                 }
-            }
-            ExecutionInput executionInput = ExecutionInput.newExecutionInput().query(jsonRequest.getString("query")).variables(variables).build();
+                Map<String, Object> variables = new LinkedHashMap<>();
+                if (null != jsonVariables) {
+                    for (String key : jsonVariables.keySet()) {
+                        variables.put(key, jsonVariables.opt(key));
+                    }
+                }
+                ExecutionInput executionInput = ExecutionInput.newExecutionInput().query(jsonRequest.getString("query")).variables(variables).build();
 
-            try {
-                CfClass clazz = cfclassservice.findByName(graphQLUtil.getClassnameFromQuery(jsonRequest.getString("query")));
-                String sdl = graphQLUtil.generateSchema(clazz.getName());
+                try {
+                    CfClass clazz = cfclassservice.findByName(graphQLUtil.getClassnameFromQuery(jsonRequest.getString("query")));
+                    String sdl = graphQLUtil.generateSchema(clazz.getName());
 
-                GraphQLSchema graphQLSchema = buildSchema(clazz, sdl);
-                GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
-                ExecutionResult executionResult = build.execute(executionInput);
+                    GraphQLSchema graphQLSchema = buildSchema(clazz, sdl);
+                    GraphQL build = GraphQL.newGraphQL(graphQLSchema).build();
+                    ExecutionResult executionResult = build.execute(executionInput);
 
-                Map<String, Object> toSpecificationResult = executionResult.toSpecification();
-                Gson gson = new Gson();
-                return gson.toJson(toSpecificationResult);
-            } catch (NoResultException ex) {
+                    Map<String, Object> toSpecificationResult = executionResult.toSpecification();
+                    Gson gson = new Gson();
+                    return gson.toJson(toSpecificationResult);
+                } catch (NoResultException ex) {
+                    return null;
+                }
+            } else {
                 return null;
             }
         } else {

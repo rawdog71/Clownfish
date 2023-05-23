@@ -50,6 +50,12 @@ public class StaticSiteUtil {
         FileOutputStream fileStream = null;
         try {
             Document doc = Jsoup.parse(content);
+            Elements elem_icon = doc.head().select("link");
+            for (Element icon : elem_icon) {
+                String href = icon.attr("href");
+                href = makeStaticImage(href, cfassetService);
+                icon.attr("href", href);
+            }
             Elements elem_images = doc.body().select("img");
             for (Element image : elem_images) {
                 String src = image.attr("src");
@@ -85,13 +91,13 @@ public class StaticSiteUtil {
             }
             Elements links = doc.head().getElementsByAttribute("href");
             for (Element link : links) {
-                if (0 == link.attr("href").compareToIgnoreCase("resources/css/cf_preview.css")) {
+                if (0 == link.attr("href").compareToIgnoreCase("/resources/css/cf_preview.css")) {
                     link.remove();
                 }
             }
             Elements scripts = doc.head().getElementsByAttribute("src");
             for (Element script : scripts) {
-                if (0 == script.attr("src").compareToIgnoreCase("resources/js/cf_preview.js")) {
+                if (0 == script.attr("src").compareToIgnoreCase("/resources/js/cf_preview.js")) {
                     script.remove();
                 }
             }
@@ -155,9 +161,9 @@ public class StaticSiteUtil {
             }
             if (null != asset) {
                 if (asset.getMimetype().contains("svg")) {
-                    src = "cache/cache" + asset.getName();
+                    src = "/cache/cache" + asset.getName();
                 } else {
-                    src = "cache/cache" + asset.getName() + width + height;
+                    src = "/cache/cache" + asset.getName() + width + height;
                 }
             }
         }
@@ -193,7 +199,7 @@ public class StaticSiteUtil {
                     }
                 }
                 if (null != asset) {
-                    src_out = src_out.append("cache/cache").append(asset.getName());
+                    src_out = src_out.append("/cache/cache").append(asset.getName());
                     if (!asset.getMimetype().contains("svg")) {
                         src_out.append(width).
                         append(height);

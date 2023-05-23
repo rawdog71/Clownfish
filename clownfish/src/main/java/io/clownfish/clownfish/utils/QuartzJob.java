@@ -30,7 +30,12 @@ import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
+import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
@@ -76,7 +81,13 @@ public class QuartzJob implements Job {
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired PropertyList propertylist;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
+    @Autowired CfAttributcontentService cfattributcontentService;
+    @Autowired CfClasscontentService cfclasscontentService;
+    @Autowired CfClassService cfclassService;
+    @Autowired CfListService cflistService;
+    @Autowired CfListcontentService cflistcontentService;
     @Autowired PropertyUtil propertyUtil;
+    @Autowired ContentUtil contentUtil;
     @Autowired MailUtil mailUtil;
     @Autowired PDFUtil pdfUtil;
     private @Getter @Setter BeanUtil beanUtil;
@@ -90,6 +101,8 @@ public class QuartzJob implements Job {
     private ClownfishConst.ViewModus modus = STAGING;
     final transient Logger LOGGER = LoggerFactory.getLogger(QuartzJob.class);
     @Value("${sapconnection.file}") String SAPCONNECTION;
+    @Value("${websocket.port:9001}") int websocketPort;
+    @Value("${hibernate.use:0}") int useHibernate;
     
     @PostConstruct
     public void init() {
@@ -132,14 +145,6 @@ public class QuartzJob implements Job {
         propertymap = propertylist.fillPropertyMap();
         Map<String, String> paramMap = makeParamMap(quartz.getParameter());
         //clownfishutil = new ClownfishUtil();
-        String sapSupportProp = propertymap.get("sap_support");
-        if (sapSupportProp.compareToIgnoreCase("true") == 0) {
-            sapSupport = true;
-        }
-        if (sapSupport) {
-            sapc = new SAPConnection(SAPCONNECTION, "Clownfish5");
-            rpytableread = new RPY_TABLE_READ(sapc);
-        }
         
         // Freemarker Template
         freemarker.template.Template fmTemplate = null;
@@ -154,6 +159,16 @@ public class QuartzJob implements Job {
         cfsite = cfsiteService.findById(siteref);
 
         CfTemplate cftemplate = cftemplateService.findById(cfsite.getTemplateref().getId());
+        
+        String sapSupportProp = propertymap.get("sap_support");
+        if (sapSupportProp.compareToIgnoreCase("true") == 0) {
+            sapSupport = true;
+        }
+        if (sapSupport) {
+            sapc = new SAPConnection(SAPCONNECTION, "Clownfish5_" + quartz.getName());
+            rpytableread = new RPY_TABLE_READ(sapc);
+        }
+        
         // fetch the dependend template 
         switch (cftemplate.getScriptlanguage()) {
             case 0:
@@ -226,9 +241,14 @@ public class QuartzJob implements Job {
             NetworkTemplateBean networkbean = new NetworkTemplateBean();
             DatabaseTemplateBean databasebean = new DatabaseTemplateBean(propertyUtil);
             databasebean.initjob(sitedatasourcelist, cfdatasourceService);
+            ContentTemplateBean contentbean = new ContentTemplateBean(propertyUtil, contentUtil);
+            contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService, cfclassService, useHibernate);
             ImportTemplateBean importBean = new ImportTemplateBean();
             importBean.initjob(sitedatasourcelist, cfdatasourceService);
             WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();
+            WebSocketTemplateBean webSocketBean = new WebSocketTemplateBean();
+            webSocketBean.setWebsocketPort(websocketPort);
+            UploadTemplateBean uploadBean = new UploadTemplateBean();
             PDFTemplateBean pdfBean = new PDFTemplateBean();
             pdfBean.initjob(pdfUtil);
 
@@ -250,7 +270,10 @@ public class QuartzJob implements Job {
                     fmRoot.put("networkBean", networkbean);
                     fmRoot.put("importBean", importBean);
                     fmRoot.put("pdfBean", pdfBean);
+                    fmRoot.put("contentBean", contentbean);
                     fmRoot.put("webserviceBean", webServiceBean);
+                    fmRoot.put("websocketBean", webSocketBean);
+                    fmRoot.put("uploadBean", uploadBean);
                     fmRoot.put("property", propertymap);
                     fmRoot.put("parameter", paramMap);
                     
@@ -289,7 +312,10 @@ public class QuartzJob implements Job {
                     velContext.put("networkBean", networkbean);
                     velContext.put("importBean", importBean);
                     velContext.put("webserviceBean", webServiceBean);
+                    velContext.put("websocketBean", webSocketBean);
+                    velContext.put("uploadBean", uploadBean);
                     velContext.put("pdfBean", pdfBean);
+                    velContext.put("contentBean", contentbean);
                     velContext.put("parameter", paramMap);
                     
                     for (Class tpbc : beanUtil.getLoadabletemplatebeans()) {

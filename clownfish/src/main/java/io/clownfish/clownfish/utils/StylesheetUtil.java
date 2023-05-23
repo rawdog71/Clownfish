@@ -115,4 +115,19 @@ public class StylesheetUtil implements IVersioningInterface, Serializable {
         CfStylesheet cfstylesheet = cfstylesheetService.findByName(name);
         return cfstylesheetversionService.findMaxVersion((cfstylesheet).getId());
     }
+
+    @Override
+    public String getUniqueName(String name) {
+        int i = 1;
+        boolean found = false;
+        do {
+            try {
+                cfstylesheetService.findByName(name+"_"+i);
+                i++;
+            } catch(Exception ex) {
+                found = true;
+            }
+        } while (!found);
+        return name+"_"+i;
+    }
 }

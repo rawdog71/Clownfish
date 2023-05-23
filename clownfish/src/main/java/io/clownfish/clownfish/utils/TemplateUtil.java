@@ -20,6 +20,7 @@ import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import io.clownfish.clownfish.datamodels.CfDiv;
+import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
@@ -86,6 +87,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     private transient @Getter @Setter Patch<String> patch = null;
     private transient @Getter @Setter List<String> source = null;
     private transient @Getter @Setter List<String> target = null;
+    private @Getter @Setter CfLayout layout;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(TemplateUtil.class);
 
@@ -141,6 +143,38 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
         return diff;
     }
     
+    public void fetchLayout(CfTemplate template) {
+        layout = new CfLayout(template.getName());
+        Document doc = Jsoup.parse(template.getContent());
+        Elements divs = doc.getElementsByAttribute("template");
+        for (Element div : divs) {
+            String contents = div.attr("contents");
+            String datalists = div.attr("datalists");
+            String assets = div.attr("assets");
+            String assetlists = div.attr("assetlists");
+            String keywordlists = div.attr("keywordlists");
+            CfDiv cfdiv = new CfDiv();
+            cfdiv.setId(div.attr("id"));
+            cfdiv.setName(div.attr("template"));
+            if (!contents.isEmpty()) {
+                cfdiv.getContentArray().addAll(ClownfishUtil.toList(contents.split(",")));
+            }
+            if (!datalists.isEmpty()) {
+                cfdiv.getContentlistArray().addAll(ClownfishUtil.toList(datalists.split(",")));
+            }
+            if (!assets.isEmpty()) {
+                cfdiv.getAssetArray().addAll(ClownfishUtil.toList(assets.split(",")));
+            }
+            if (!assetlists.isEmpty()) {
+                cfdiv.getAssetlistArray().addAll(ClownfishUtil.toList(assetlists.split(",")));
+            }
+            if (!keywordlists.isEmpty()) {
+                cfdiv.getKeywordlistArray().addAll(ClownfishUtil.toList(keywordlists.split(",")));
+            }
+            layout.getDivArray().put(div.attr("id"), cfdiv);
+        }
+    }
+    
     public String fetchIncludes(String content, ClownfishConst.ViewModus modus) {
         Pattern pattern = Pattern.compile("(\\[\\[\\*).+(\\*\\]\\])");
         Matcher matcher = pattern.matcher(content);
@@ -177,7 +211,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     
     public String replacePlaceholders(String content, CfDiv cfdiv, List<CfLayoutcontent> layoutcontent, boolean preview) {
         // prepare site for inplace edit
-        if (preview) {
+        if (preview) {          // ToDo check accessmanager
             content = surroundInplaceDivs(content, cfdiv, layoutcontent);
         }
         // replace Content
@@ -185,7 +219,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             List<CfLayoutcontent> contentlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("C") == 0).collect(Collectors.toList());
             for (CfLayoutcontent lc : contentlist) {
                 CfClasscontent cfcontent = null;
-                if (preview) {
+                if (preview) {          // ToDo check accessmanager
                     if (lc.getPreview_contentref().longValue() > 0) {
                         cfcontent = cfclasscontentService.findById(lc.getPreview_contentref().longValue());
                     }
@@ -212,7 +246,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             List<CfLayoutcontent> datalist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("DL") == 0).collect(Collectors.toList());
             for (CfLayoutcontent lc : datalist) {
                 CfList cflist = null;
-                if (preview) {
+                if (preview) {          // ToDo check accessmanager
                     if (lc.getPreview_contentref().longValue() > 0) {
                         cflist = cflistService.findById(lc.getPreview_contentref().longValue());
                     }
@@ -240,7 +274,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             List<CfLayoutcontent> assets = layoutcontent.stream().filter(lc -> (lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("A") == 0) && (lc.getCfLayoutcontentPK().getLfdnr() == lfdnr)).collect(Collectors.toList());
             for (CfLayoutcontent lc : assets) {
                 CfAsset cfasset = null;
-                if (preview) {
+                if (preview) {          // ToDo check accessmanager
                     if (lc.getPreview_contentref().longValue() > 0) {
                         cfasset = cfassetService.findById(lc.getPreview_contentref().longValue());
                     }
@@ -264,7 +298,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             List<CfLayoutcontent> assetlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("AL") == 0).collect(Collectors.toList());
             for (CfLayoutcontent lc : assetlist) {
                 CfAssetlist cfassetlist = null;
-                if (preview) {
+                if (preview) {          // ToDo check accessmanager
                     if (lc.getPreview_contentref().longValue() > 0) {
                         cfassetlist = cfassetlistService.findById(lc.getPreview_contentref().longValue());
                     }
@@ -291,7 +325,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             List<CfLayoutcontent> keywordlist = layoutcontent.stream().filter(lc -> lc.getCfLayoutcontentPK().getContenttype().compareToIgnoreCase("KL") == 0).collect(Collectors.toList());
             for (CfLayoutcontent lc : keywordlist) {
                 CfKeywordlist cfkeywordlist = null;
-                if (preview) {
+                if (preview) {          // ToDo check accessmanager
                     if (lc.getPreview_contentref().longValue() > 0) {
                         cfkeywordlist = cfkeywordlistService.findById(lc.getPreview_contentref().longValue());
                     }
@@ -370,6 +404,23 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                         surrounddiv.attr("id", "cf_id_" + cfdiv.getName()+"_"+counter);
                         el.wrap(surrounddiv.toString());
                     }
+                    matcher = Pattern.compile("#A:[a-zA-Z0-9_]*:[0-9]*#").matcher(outerhtml);
+                    if (matcher.find()) {
+                        String region = outerhtml.substring((matcher.start()+3), (matcher.end()-1));
+                        String[] parts = region.split(":");
+                        String name = parts[0];
+                        String number = parts[1].replaceAll("!", "");
+                        
+                        String attr = "asset:" + name + ":mediaid:" + number;
+                        Attributes attributes = new Attributes();
+                        attributes.put("cf_inplace",attr);
+
+                        Element surrounddiv = new Element(Tag.valueOf("div"), "", attributes);
+                        surrounddiv.addClass("cf_inplace");
+                        counter++;
+                        surrounddiv.attr("id", "cf_id_" + cfdiv.getName()+"_"+counter);
+                        el.wrap(surrounddiv.toString());
+                    }
                 }
             }
         }
@@ -406,5 +457,20 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             html = "<div id=\"cf_id_" + cfdiv.getName() + "\" class=\"cf_inplace\" cf_inplace=\"" + attr + "\">" + html + "</div>";
         }
         return html;
+    }
+    
+    @Override
+    public String getUniqueName(String name) {
+        int i = 1;
+        boolean found = false;
+        do {
+            try {
+                cftemplateService.findByName(name+"_"+i);
+                i++;
+            } catch(Exception ex) {
+                found = true;
+            }
+        } while (!found);
+        return name+"_"+i;
     }
 }

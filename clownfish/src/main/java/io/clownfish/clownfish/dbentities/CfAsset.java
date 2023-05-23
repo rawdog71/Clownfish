@@ -51,6 +51,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfAsset.findByScrapped", query = "SELECT c FROM CfAsset c WHERE c.scrapped = :scrapped"),
     @NamedQuery(name = "CfAsset.findByPublicuse", query = "SELECT c FROM CfAsset c WHERE c.publicuse = :publicuse"),
     @NamedQuery(name = "CfAsset.findByPublicuseAndScrapped", query = "SELECT c FROM CfAsset c WHERE c.publicuse = :publicuse AND c.scrapped = :scrapped"),
+    @NamedQuery(name = "CfAsset.findByPublicuseAndScrappedNotInList", query = "SELECT c FROM CfAsset c WHERE c.publicuse = :publicuse AND c.scrapped = :scrapped AND c.id NOT IN (SELECT am.ref FROM CfAccessmanager am WHERE am.type = 4 AND am.refclasscontent <> :refclasscontent)"),
     @NamedQuery(name = "CfAsset.findByFilesize", query = "SELECT c FROM CfAsset c WHERE c.filesize = :filesize"),
     @NamedQuery(name = "CfAsset.findByAvatars", query = "SELECT c FROM CfAsset c WHERE c.publicuse = 0 AND c.fileextension IN ('jpg', 'gif', 'png')"),
     @NamedQuery(name = "CfAsset.findByDownloads", query = "SELECT c FROM CfAsset c WHERE c.downloads = :downloads")

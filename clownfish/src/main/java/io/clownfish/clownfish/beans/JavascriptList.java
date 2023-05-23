@@ -18,10 +18,12 @@ package io.clownfish.clownfish.beans;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfJavascriptversion;
 import io.clownfish.clownfish.dbentities.CfJavascriptversionPK;
+import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.lucene.SourceIndexer;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
+import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.FolderUtil;
@@ -55,7 +57,7 @@ import org.primefaces.extensions.model.monacoeditor.EScrollbarVertical;
 import org.primefaces.extensions.model.monacoeditor.ETheme;
 import org.primefaces.extensions.model.monacoeditor.EditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EditorScrollbarOptions;
-import org.primefaces.extensions.model.monacoeditor.MonacoDiffEditorModel;
+import org.primefaces.extensions.model.monaco.MonacoDiffEditorModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
@@ -74,6 +76,7 @@ public class JavascriptList implements ISourceContentInterface {
     LoginBean loginbean;
     @Autowired CfJavascriptService cfjavascriptService;
     @Autowired CfJavascriptversionService cfjavascriptversionService;
+    @Autowired transient CfSiteService cfsiteService;
     
     private @Getter @Setter List<CfJavascript> javascriptListe;
     private @Getter @Setter List<CfJavascript> invisJavascriptList;
@@ -334,6 +337,12 @@ public class JavascriptList implements ISourceContentInterface {
     @Override
     public void onDelete(ActionEvent actionEvent) {
         if (null != selectedJavascript) {
+            List<CfSite> sites = cfsiteService.findByJavascriptref(selectedJavascript);
+            for (CfSite site : sites) {
+                site.setJavascriptref(null);
+                cfsiteService.edit(site);
+            }
+            sitetree.loadTree();
             cfjavascriptService.delete(selectedJavascript);
             javascriptListe = cfjavascriptService.findAll();
             invisJavascriptList = cfjavascriptService.findAll().stream()
@@ -453,6 +462,24 @@ public class JavascriptList implements ISourceContentInterface {
             javascriptName = "";
             checkedout = false;
             access = false;
+        }
+    }
+
+    @Override
+    public void onCopy(ActionEvent actionEvent) {
+        if (null != selectedJavascript) {
+            CfJavascript newjavascript = new CfJavascript();
+            String newname = javascriptUtility.getUniqueName(selectedJavascript.getName());
+            newjavascript.setName(newname);
+            newjavascript.setContent(selectedJavascript.getContent());
+            cfjavascriptService.create(newjavascript);
+            javascriptListe = cfjavascriptService.findAll();
+            javascriptName = newname;
+            selectedJavascript = newjavascript;
+            onCommit(null);
+            refresh();
+            onSelect(null);
+            onCheckOut(null);
         }
     }
 }

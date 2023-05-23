@@ -15,7 +15,10 @@
  */
 package io.clownfish.clownfish.rest;
 
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_CLASS;
+import io.clownfish.clownfish.datamodels.AuthTokenClasscontent;
 import io.clownfish.clownfish.datamodels.AuthTokenList;
+import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.datamodels.RestDatalistParameter;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfList;
@@ -23,12 +26,14 @@ import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.utils.AccessManagerUtil;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
-import io.clownfish.clownfish.utils.FolderUtil;
+import java.math.BigInteger;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,12 +47,13 @@ public class RestDatalist {
     @Autowired transient CfClassService cfclassService;
     @Autowired transient CfListService cflistService;
     @Autowired transient CfListcontentService cflistcontentService;
-    @Autowired FolderUtil folderUtil;
     @Autowired ApiKeyUtil apikeyutil;
     @Autowired transient AuthTokenList authtokenlist;
+    @Autowired transient AuthTokenListClasscontent contentauthtokenlist;
+    @Autowired AccessManagerUtil accessmanager;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestDatalist.class);
     
-    @PostMapping("/getdatalists")
+    @PostMapping(value = "/getdatalists", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestDatalistParameter restGetDatalists(@RequestBody RestDatalistParameter idp) {
         return getDatalists(idp);
     }
@@ -59,11 +65,21 @@ public class RestDatalist {
                 String apikey = idp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     if ((null == idp.getClassname()) || (idp.getClassname().isBlank())) {
-                        idp.setList(cflistService.findAll());
+                        // !ToDo: #95 check AccessManager
+                        AuthTokenClasscontent classcontent = contentauthtokenlist.getAuthtokens().get(token);
+                        if (null != classcontent) {
+                            idp.setList(cflistService.findNotInList(BigInteger.valueOf(classcontent.getUser().getId())));
+                        } else {
+                            idp.setList(cflistService.findNotInList(BigInteger.valueOf(0L)));
+                        }
                         idp.setReturncode("OK");
                     } else {
-                        idp.setList(cflistService.findByClassref(cfclassService.findByName(idp.getClassname())));
-                        idp.setReturncode("OK");
+                        // !ToDo: #95 check AccessManager
+                        CfClass clazz = cfclassService.findByName(idp.getClassname());
+                        if (accessmanager.checkAccess(token, TYPE_CLASS.getValue(), BigInteger.valueOf(clazz.getId()))) {
+                            idp.setList(cflistService.findByClassref(clazz));
+                            idp.setReturncode("OK");
+                        }
                     }
                 } else {
                     idp.setReturncode("Wrong API KEY");
@@ -77,7 +93,7 @@ public class RestDatalist {
         return idp;
     }
 
-    @PostMapping("/insertdatalist")
+    @PostMapping(value = "/insertdatalist", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestDatalistParameter restInsertDatalist(@RequestBody RestDatalistParameter idp) {
         return insertDatalist(idp);
     }
@@ -114,7 +130,7 @@ public class RestDatalist {
         return idp;
     }
     
-    @PostMapping("/deletedatalist")
+    @PostMapping(value = "/deletedatalist", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestDatalistParameter restDeleteDatalist(@RequestBody RestDatalistParameter idp) {
         return deleteDatalist(idp);
     }

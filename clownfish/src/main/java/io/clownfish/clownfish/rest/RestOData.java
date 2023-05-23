@@ -27,6 +27,7 @@ import org.apache.olingo.server.api.processor.EntityCollectionProcessor;
 import org.apache.olingo.server.api.processor.EntityProcessor;
 import org.apache.olingo.server.api.processor.PrimitiveProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,20 +51,24 @@ public class RestOData {
     
     @Autowired
     PrimitiveProcessor primitiveprocessor;
+    
+    @Value("${odata.use:0}") int odata_use;
 
     @RequestMapping({"*", "*/*"})
     public void process(HttpServletRequest request, HttpServletResponse response) {
-        OData odata = OData.newInstance();
-        ServiceMetadata edm = odata.createServiceMetadata(edmProvider, new ArrayList<>());
-        ODataHttpHandler handler = odata.createHandler(edm);
-        handler.register(processor);
-        handler.register(singletonprocessor);
-        handler.register(primitiveprocessor);
-        handler.process(new HttpServletRequestWrapper(request) {
-            @Override
-            public String getServletPath() {
-                return RestOData.URI;
-            }
-        }, response);
+        if (1 == odata_use) {
+            OData odata = OData.newInstance();
+            ServiceMetadata edm = odata.createServiceMetadata(edmProvider, new ArrayList<>());
+            ODataHttpHandler handler = odata.createHandler(edm);
+            handler.register(processor);
+            handler.register(singletonprocessor);
+            handler.register(primitiveprocessor);
+            handler.process(new HttpServletRequestWrapper(request) {
+                @Override
+                public String getServletPath() {
+                    return RestOData.URI;
+                }
+            }, response);
+        }
     }
 }

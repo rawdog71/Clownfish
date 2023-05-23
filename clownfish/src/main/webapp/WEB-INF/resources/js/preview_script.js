@@ -4,8 +4,6 @@ var oldTag;
 var counter = -1;
 var oldPicture;
 
-
-
 function createSaveToClownfishElement() {
     const anchor = document.createElement('a');
     anchor.classList.add('float');
@@ -34,7 +32,10 @@ function createSaveToClownfishElement() {
     document.body.appendChild(anchor);
 }
 
-createSaveToClownfishElement();
+
+document.addEventListener("DOMContentLoaded", function () {
+    createSaveToClownfishElement();
+});
 
 // Switch from text to input
 // Add styling to the element so nothing get really changed on the frontend
@@ -89,19 +90,19 @@ function changeElement(element) {
     parentDiv.insertBefore(para, parentDiv.children[position]);
 }
 
-/*
+
 function changeImage(element) {
-    console.log(element)
+    //console.log(element)
     $("#exampleModal").modal('show');
-    for (let i = 0; i < element.parentNode.children[i].length; i++) {
+    for (let i = 0; i < element.parentNode.children.length; i++) {
         if (element.parentNode.children[i].tagName == 'IMG') {
-            oldPicture = element.children[i];
+            oldPicture = element.parentNode.children[i];
         }
     }
 }
 
 function saveImage() {
-    console.log(oldPicture)
+    //console.log(oldPicture)
     var parentDiv = oldPicture.parentNode;
     // Get information from the parentdiv (classname, contentname, attributename)
     var cfInplace = parentDiv.getAttribute('cf_inplace').split(':');
@@ -119,12 +120,11 @@ function saveImage() {
     if (index == -1) {
         changesArray.push(newContent)
     } else {
-        changesArray[index] = newContent
+        Object.assign(changesArray[index].attributemap, newContent.attributemap)
     }
 
-    oldPicture.src = `http://localhost:9000/GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid=${document.getElementById('selectAsset').value}`
+    oldPicture.src = `/GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid=${document.getElementById('selectAsset').value}`
 }
-*/
 
 // Revert from input to text
 function convertToOldElement(element) {
@@ -166,16 +166,29 @@ function convertToOldElement(element) {
 }
 
 // Safe to clownish via updatecontent
-function saveToClownfish() {
-    console.log(changesArray)
+async function saveToClownfish() {
+    //console.log(changesArray)
         for (let i = 0; i < changesArray.length; i++) {
-            axios.post('/updatecontent', {
+            await axios.post('/updatecontent', {
+                    apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
+                    token: new URL(window.location.href).searchParams.get("cf_login_token"),
                     classname: changesArray[i].classname,
                     contentname: changesArray[i].contentname,
-                    attributemap: changesArray[i].attributemap
+                    attributmap: changesArray[i].attributemap
                 })
-                .then(function(response) {
-                    console.log(response);
+                .then(async function(response) {
+                    await axios.post('/commitcontent', {
+                        apikey: "+4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=",
+                        token: new URL(window.location.href).searchParams.get("cf_login_token"),
+                        contentname: changesArray[i].contentname
+                    })
+                    .then(function(response) {
+                        //console.log(response);
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+                    //console.log(response);
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -202,15 +215,18 @@ function saveToArray(element) {
         'attributemap': {},
     }
     newContent.attributemap[`${cfInplace[2]}`] = element.innerText
-
+    //console.log(newContent);
     // Check if the changes are already in an array if not push
     // if they are replace
     var index = changesArray.findIndex(e => e.classname === cfInplace[0] && e.contentname === cfInplace[1])
     if (index == -1) {
         changesArray.push(newContent)
     } else {
-        changesArray[index] = newContent
+        Object.assign(changesArray[index].attributemap, newContent.attributemap)
+        //changesArray[index] = newContent
     }
+
+    //console.log(changesArray)
 }
 
 // If the user clicks outter the input he intended to edit
@@ -229,7 +245,7 @@ function getPosition(div, oldelement) {
     for (let i = 0; i < div.childElementCount; i++) {
         if (div.children[i] == oldelement) {
             position = i
-            console.log(div.children[i])
+            //console.log(div.children[i])
         }
     }
 
@@ -250,15 +266,18 @@ function detectKeyPressed(element) {
 function addFunctions() {
     var divList = document.getElementsByClassName('cf_inplace')
     for (let i = 0; i < divList.length; i++) {
-        console.log(divList[i].children.length)
+        //console.log(divList[i].children.length)
         for (let j = 0; j < divList[i].children.length; j++) {
-            divList[i].children[j].setAttribute("onmouseleave", "toggleEditButton(this)")
-            divList[i].children[j].setAttribute("onmouseenter", "toggleEditButton(this)")
+            if(divList[i].children[j].tagName == "IMG") {
+                divList[i].children[j].setAttribute('ondblclick', 'changeImage(this)')
+            } else {
+                divList[i].children[j].setAttribute('ondblclick', 'triggerChangeElement(this)')
+            }
         }
     }
 
     for (let i = 0; i < divList.length; i++) {
-        console.log("add")
+        //console.log("add")
         divList[i].appendChild(createEditButton(divList[i]))
     }
 }
@@ -310,10 +329,79 @@ function triggerChangeElement(element) {
     }
 }
 
-/*
+function createModal() {
+    // Create elements
+    const modalDiv = document.createElement('div');
+    const modalDialog = document.createElement('div');
+    const modalContent = document.createElement('div');
+    const modalHeader = document.createElement('div');
+    const modalTitle = document.createElement('h1');
+    const closeButton = document.createElement('button');
+    const modalBody = document.createElement('div');
+    const modalBodyText = document.createElement('p');
+    const selectAsset = document.createElement('select');
+    const modalFooter = document.createElement('div');
+    const closeModalButton = document.createElement('button');
+    const saveImageButton = document.createElement('button');
+
+    // Set attributes and content
+    modalDiv.classList.add('modal', 'fade');
+    modalDiv.id = 'exampleModal';
+    modalDiv.setAttribute('tabindex', '-1');
+    modalDiv.setAttribute('aria-labelledby', 'exampleModalLabel');
+    modalDiv.setAttribute('aria-hidden', 'true');
+
+    modalDialog.classList.add('modal-dialog');
+    modalContent.classList.add('modal-content');
+    modalHeader.classList.add('modal-header');
+    modalTitle.classList.add('modal-title', 'fs-5');
+    modalTitle.id = 'exampleModalLabel';
+    modalTitle.textContent = 'Assetauswahl';
+
+    closeButton.type = 'button';
+    closeButton.classList.add('btn-close');
+    closeButton.setAttribute('data-bs-dismiss', 'modal');
+    closeButton.setAttribute('aria-label', 'Close');
+
+    modalBody.classList.add('modal-body');
+    modalBodyText.textContent = 'Bitte wählen Sie ein Bild welches sie anzeigen wollen.';
+    selectAsset.classList.add('form-select', 'w-100');
+    selectAsset.id = 'selectAsset';
+
+    modalFooter.classList.add('modal-footer');
+    closeModalButton.type = 'button';
+    closeModalButton.classList.add('btn', 'btn-secondary');
+    closeModalButton.setAttribute('data-bs-dismiss', 'modal');
+    closeModalButton.textContent = 'Schließen';
+
+    saveImageButton.type = 'button';
+    saveImageButton.classList.add('btn', 'btn-primary');
+    saveImageButton.setAttribute('onclick', 'saveImage()');
+    saveImageButton.textContent = 'Speichern';
+
+    // Assemble elements
+    modalHeader.appendChild(modalTitle);
+    modalHeader.appendChild(closeButton);
+    modalBody.appendChild(modalBodyText);
+    modalBody.appendChild(selectAsset);
+    modalFooter.appendChild(closeModalButton);
+    modalFooter.appendChild(saveImageButton);
+
+    modalContent.appendChild(modalHeader);
+    modalContent.appendChild(modalBody);
+    modalContent.appendChild(modalFooter);
+
+    modalDialog.appendChild(modalContent);
+    modalDiv.appendChild(modalDialog);
+
+    // Append the modal to the body or another element
+    document.body.appendChild(modalDiv);
+}
+
 async function getAllAssets() {
     try {
-        const response = await axios.get('http://localhost:9000/asset_length');
+        const response = await axios.get('/GetAssetList?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=');
+
         let selectTag = document.getElementById('selectAsset')
         let optionElements = []
         let imageAssets = response.data.filter(asset => /\.(jpeg|jpg|png|svg)$/.test(asset.name))
@@ -323,17 +411,16 @@ async function getAllAssets() {
             opt.innerHTML = imageAssets[i].name;
             optionElements.push(opt)
         }
+        //console.log(selectTag);
         selectTag.append(...optionElements);
-        console.log(response.data);
+        //console.log(response.data);
     } catch (error) {
         console.error(error);
     }
 }
 
-getAllAssets()
-
-*/
-
 document.addEventListener("DOMContentLoaded", function(event) {
+    createModal()
+    getAllAssets()
     addFunctions()
 });

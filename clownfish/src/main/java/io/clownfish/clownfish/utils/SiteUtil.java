@@ -109,13 +109,17 @@ public class SiteUtil {
                 List<CfListcontent> contentlist = cflistcontentService.findByListref(cflist.getId());
                 for (CfListcontent listcontent : contentlist) {
                     CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                    cfclassService.findById(classcontent.getClassref().getId());
-                    List<CfAttributcontent> attributcontentlist = new ArrayList<>();
-                    attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
-                    if (0 == useHibernate) {
-                        listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
+                    if (null != classcontent) {
+                        cfclassService.findById(classcontent.getClassref().getId());
+                        List<CfAttributcontent> attributcontentlist = new ArrayList<>();
+                        attributcontentlist.addAll(cfattributcontentService.findByClasscontentref(classcontent));
+                        if (0 == useHibernate) {
+                            listcontentmap.put(classcontent.getName(), classutil.getattributmap(classcontent));
+                        } else {
+                            listcontentmap.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId(), null, null));
+                        }
                     } else {
-                        listcontentmap.put(classcontent.getName(), hibernateutil.getContent(classcontent.getClassref().getName(), classcontent.getId(), null, null));
+                        LOGGER.warn("LISTENTRY MISSING: " + listcontent.getCfListcontentPK().getClasscontentref());
                     }
                 }
                 sitecontentmap.put(cflist.getName(), listcontentmap);
@@ -374,5 +378,19 @@ public class SiteUtil {
         } else {
             LOGGER.warn("CLASSCONTENT NOT FOUND (deleted or on scrapyard): " + classcontent.getId());
         }
+    }
+    
+    public String getUniqueName(String name) {
+        int i = 1;
+        boolean found = false;
+        do {
+            try {
+                cfsiteService.findByName(name+"_"+i);
+                i++;
+            } catch(Exception ex) {
+                found = true;
+            }
+        } while (!found);
+        return name+"_"+i;
     }
 }

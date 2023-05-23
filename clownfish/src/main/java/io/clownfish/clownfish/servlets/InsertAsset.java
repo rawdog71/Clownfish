@@ -55,6 +55,7 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,6 +183,12 @@ public class InsertAsset extends HttpServlet {
                             if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
                                 Thread assetindexer_thread = new Thread(assetIndexer);
                                 assetindexer_thread.start();
+                            }
+                            // If Asset exists and is overwrite, delete all assetkeywords
+                            if (fileexists && overwrite) {
+                                for (CfAssetkeyword assetkeyword : cfassetkeywordService.findByAssetRef(newasset.getId())) {
+                                    cfassetkeywordService.delete(assetkeyword);
+                                }
                             }
                             if (null != keywordlist) {
                                 for (String keyword : keywordlist) {

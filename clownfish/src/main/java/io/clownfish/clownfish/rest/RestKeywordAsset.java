@@ -24,6 +24,7 @@ import io.clownfish.clownfish.utils.ApiKeyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +40,7 @@ public class RestKeywordAsset {
     @Autowired transient AuthTokenList authtokenlist;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestKeywordAsset.class);
 
-    @PostMapping("/insertkeywordasset")
+    @PostMapping(value = "/insertkeywordasset", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestKeywordAssetParameter restInsertKeywordAsset(@RequestBody RestKeywordAssetParameter iklp) {
         return insertKeywordAsset(iklp);
     }
@@ -73,7 +74,7 @@ public class RestKeywordAsset {
         return iklp;
     }
     
-    @PostMapping("/deletekeywordasset")
+    @PostMapping(value = "/deletekeywordasset", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestKeywordAssetParameter restDeleteKeywordContent(@RequestBody RestKeywordAssetParameter iklp) {
         return deleteKeywordAsset(iklp);
     }

@@ -27,6 +27,7 @@ public class ClownfishResponse {
     private @Getter @Setter String output;
     private @Getter @Setter int errorcode;
     private @Getter @Setter ByteArrayOutputStream outputstream;
+    private @Getter @Setter String relocation;
 
     public ClownfishResponse() {
     }

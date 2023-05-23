@@ -127,6 +127,9 @@ public class CfSite implements Serializable {
     @Size(max = 255)
     @Column(name = "testparams")
     private String testparams;
+    @Size(max = 255)
+    @Column(name = "loginsite")
+    private String loginsite;
     @Column(name = "invisible")
     private boolean invisible;
     
@@ -347,7 +350,14 @@ public class CfSite implements Serializable {
         this.testparams = testparams;
     }
 
-    public boolean getInvisible() {
+    public String getLoginsite() {
+        return loginsite;
+    }
+
+    public void setLoginsite(String loginsite) {
+        this.loginsite = loginsite;
+
+      public boolean getInvisible() {
         return invisible;
     }
     public void setInvisible(boolean invis) {

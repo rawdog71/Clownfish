@@ -17,6 +17,7 @@ package io.clownfish.clownfish.serviceinterface;
 
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfList;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -29,6 +30,8 @@ public interface CfListService {
     CfList findByName(String name);
     CfList findByClassrefAndName(CfClass ref, String name);
     List<CfList> findByClassref(CfClass ref);
+    List<CfList> findNotInList(BigInteger ref);
+    CfList findByNameNotInList(String name, BigInteger ref);
     CfList create(CfList entity);
     boolean delete(CfList entity);
     CfList edit(CfList entity);

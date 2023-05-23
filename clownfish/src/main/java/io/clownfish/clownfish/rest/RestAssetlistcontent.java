@@ -31,6 +31,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,13 +45,11 @@ public class RestAssetlistcontent {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
-    @Autowired FolderUtil folderUtil;
     @Autowired ApiKeyUtil apikeyutil;
-    @Autowired HibernateUtil hibernateutil;
     @Autowired transient AuthTokenList authtokenlist;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestAssetlistcontent.class);
 
-    @PostMapping("/insertassetlistcontent")
+    @PostMapping(value = "/insertassetlistcontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestAssetlistcontentParameter restInsertAssetlistcontent(@RequestBody RestAssetlistcontentParameter ilcp) {
         return insertAssetlistcontent(ilcp);
     }
@@ -87,7 +86,7 @@ public class RestAssetlistcontent {
         return ilcp;
     }
     
-    @PostMapping("/deleteassetlistcontent")
+    @PostMapping(value = "/deleteassetlistcontent", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestAssetlistcontentParameter restDeleteAssetlistcontent(@RequestBody RestAssetlistcontentParameter ilcp) {
         return deleteAssetlistcontent(ilcp);
     }

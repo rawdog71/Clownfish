@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.primefaces.extensions.model.monaco.MonacoDiffEditorModel;
 
 @Named("javaList")
 @Scope("singleton")
@@ -505,6 +506,25 @@ public class JavaList implements ISourceContentInterface
         {
             FacesMessage message = new FacesMessage("No Java selected. Nothing changed.");
             FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+
+    @Override
+    public void onCopy(ActionEvent actionEvent) {
+        if (null != selectedJava) {
+            CfJava newjava = new CfJava();
+            String newname = javaUtility.getUniqueName(selectedJava.getName());
+            newjava.setName(newname);
+            newjava.setLanguage(selectedJava.getLanguage());
+            newjava.setContent(selectedJava.getContent());
+            cfjavaService.create(newjava);
+            javaListe = cfjavaService.findAll();
+            javaName = newname;
+            selectedJava = newjava;
+            onCommit(null);
+            refresh();
+            onSelect(null);
+            onCheckOut(null);
         }
     }
 }

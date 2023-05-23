@@ -16,7 +16,10 @@
 package io.clownfish.clownfish.serviceimpl;
 
 import io.clownfish.clownfish.daointerface.CfSiteDAO;
+import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfSite;
+import io.clownfish.clownfish.dbentities.CfStylesheet;
+import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +60,7 @@ public class CfSiteServiceImpl implements CfSiteService {
 
     //@Cacheable(value = "site", key = "#ref")
     @Override
-    public CfSite findByTemplateref(Long ref) {
+    public List<CfSite> findByTemplateref(CfTemplate ref) {
         return this.cfsiteDAO.findByTemplateref(ref);
     }
 
@@ -99,6 +102,16 @@ public class CfSiteServiceImpl implements CfSiteService {
     @Override
     public CfSite findByShorturl(String shorturl) {
         return this.cfsiteDAO.findByShorturl(shorturl);
+    }
+
+    @Override
+    public List<CfSite> findByStylesheetref(CfStylesheet ref) {
+        return this.cfsiteDAO.findByStylesheetref(ref);
+    }
+
+    @Override
+    public List<CfSite> findByJavascriptref(CfJavascript ref) {
+        return this.cfsiteDAO.findByJavascriptref(ref);
     }
 
 }

@@ -16,15 +16,18 @@
 package io.clownfish.clownfish.servlets;
 
 import com.google.gson.Gson;
+import static io.clownfish.clownfish.constants.ClownfishConst.AccessTypes.TYPE_ASSET;
 import io.clownfish.clownfish.datamodels.AssetDataOutput;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetkeyword;
 import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.utils.AccessManagerUtil;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
@@ -47,6 +50,7 @@ public class GetAssetData extends HttpServlet {
     @Autowired transient CfAssetKeywordService cfassetkeywordService;
     @Autowired transient CfKeywordService cfkeywordService;
     @Autowired ApiKeyUtil apikeyutil;
+    @Autowired AccessManagerUtil accessmanager;
         
     final transient Logger LOGGER = LoggerFactory.getLogger(GetAsset.class);
 
@@ -61,6 +65,7 @@ public class GetAssetData extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             String apikey = request.getParameter("apikey");
+            String token = request.getParameter("token");
             if (apikeyutil.checkApiKey(apikey, "RestService")) {
                 CfAsset asset = null;
                 String imagefilename = request.getParameter("file");
@@ -80,19 +85,22 @@ public class GetAssetData extends HttpServlet {
 
                 if (null != asset) {
                     if (!asset.isScrapped()) {
-                        ArrayList<String> keywords = getAssetKeywords(asset, true);
-                        AssetDataOutput assetdataoutput = new AssetDataOutput();
+                        // !ToDo: #95 check AccessManager
+                        if (accessmanager.checkAccess(token, TYPE_ASSET.getValue(), BigInteger.valueOf(asset.getId()))) {
+                            ArrayList<String> keywords = getAssetKeywords(asset, true);
+                            AssetDataOutput assetdataoutput = new AssetDataOutput();
 
-                        assetdataoutput.setAsset(asset);
-                        assetdataoutput.setKeywords(keywords);
+                            assetdataoutput.setAsset(asset);
+                            assetdataoutput.setKeywords(keywords);
 
-                        Gson gson = new Gson(); 
-                        String json = gson.toJson(assetdataoutput);
-                        response.setContentType("application/json;charset=UTF-8");
-                        try (PrintWriter out = response.getWriter()) {
-                            out.print(json);
-                        } catch (IOException ex) {
-                            LOGGER.error(ex.getMessage());
+                            Gson gson = new Gson(); 
+                            String json = gson.toJson(assetdataoutput);
+                            response.setContentType("application/json;charset=UTF-8");
+                            try (PrintWriter out = response.getWriter()) {
+                                out.print(json);
+                            } catch (IOException ex) {
+                                LOGGER.error(ex.getMessage());
+                            }
                         }
                     }
                 } else {

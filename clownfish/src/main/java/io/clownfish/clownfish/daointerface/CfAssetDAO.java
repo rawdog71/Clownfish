@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.daointerface;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -30,6 +31,7 @@ public interface CfAssetDAO {
     List<CfAsset> findByScrapped(boolean scrapped);
     List<CfAsset> findByPublicuse(boolean publicuse);
     List<CfAsset> findByPublicuseAndScrapped(boolean publicuse, boolean scrapped);
+    List<CfAsset> findByPublicuseAndScrappedNotInList(boolean publicuse, boolean scrapped, BigInteger ref);
     List<CfAsset> findByFilesize(long filesize);
     List<CfAsset> findByAvatars();
     CfAsset create(CfAsset entity);

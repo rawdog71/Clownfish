@@ -24,13 +24,9 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
-import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
-import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
-import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
@@ -69,13 +65,8 @@ public class GetDatalistHibernate extends HttpServlet {
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired transient CfClasscontentService cfclasscontentService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
-    @Autowired transient CfAttributService cfattributService;
-    @Autowired transient CfAttributetypeService cfattributetypeService;
-    @Autowired transient CfKeywordService cfkeywordService;
-    @Autowired transient CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired ContentUtil contentUtil;
     @Autowired ApiKeyUtil apikeyutil;
-    @Autowired HibernateUtil hibernateUtil;
     
     private static transient @Getter @Setter String name;
     private static transient @Getter @Setter String apikey;
@@ -146,6 +137,7 @@ public class GetDatalistHibernate extends HttpServlet {
         String inst_name = "";
         
         Map<String, String[]> parameters = request.getParameterMap();
+        apikey = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("apikey") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             apikey = values[0];
         });
@@ -164,6 +156,7 @@ public class GetDatalistHibernate extends HttpServlet {
             for (CfListcontent listcontent : listcontentList) {
                 CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
                 if (null != classcontent) {
+                    // ToDo: #95 check AccessManager
                     classcontentList.add(classcontent);
                 } else {
                     LOGGER.warn("Classcontent does not exist: " + inst_name + " - "  + listcontent.getCfListcontentPK().getClasscontentref());
@@ -252,6 +245,7 @@ public class GetDatalistHibernate extends HttpServlet {
             for (CfListcontent listcontent : listcontentList) {
                 CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
                 if (null != classcontent) {
+                    // ToDo: #95 check AccessManager
                     classcontentList.add(classcontent);
                 } else {
                     LOGGER.warn("Classcontent does not exist: " + inst_name + " - "  + listcontent.getCfListcontentPK().getClasscontentref());

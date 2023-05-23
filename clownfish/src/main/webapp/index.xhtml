@@ -9,12 +9,13 @@
     <h:head>
         <title>Clownfish CMS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <h:outputStylesheet library="webjars" name="primeflex/3.2.1/primeflex.min.css" />
-        <h:outputStylesheet library="webjars" name="font-awesome/6.2.0/css/all.min-jsf.css" />
-        <h:outputStylesheet library="webjars" name="font-awesome/6.2.0/css/v4-shims.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="primeflex/3.3.0/primeflex.min.css" />
+        <h:outputStylesheet library="webjars" name="font-awesome/6.4.0/css/all.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="font-awesome/6.4.0/css/v4-shims.min-jsf.css" />
         <script src="resources/js/main.js"></script>
         <f:facet name="last">
             <link rel="stylesheet" type="text/css" href="resources/css/main.css" />
+            <link rel="icon" href="images/clownfish-48.png" />
         </f:facet>
     </h:head>
     <h:body>
@@ -100,8 +101,8 @@
                                     </p:tree>
                                     <p:tree id="invissitetree" value="#{sitetree.invisibleRoot}" var="node" dynamic="true" selectionMode="single" draggable="true" droppable="true" rendered="#{!loginBean.cfuser.superadmin}">
                                         <p:ajax event="dragdrop" listener="#{sitetree.onDragDrop}" update=":form:msgs" />
-                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup :form:tabview:siteparameterlist" />
-                                        <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup" />
+                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup :form:tabview:siteparameterlist :form:tabview:tabsiteview:staticsitelist :form:tabview:tabsiteview" />
+                                        <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup :form:tabview:tabsiteview:staticsitelist" />
                                         <p:treeNode icon="pi #{node.icon}">
                                             <h:outputText value="#{node.name}" />
                                         </p:treeNode>
@@ -290,6 +291,14 @@
                                             <p:row>
                                                 <p:column>
                                                     <div class="content-justify">
+                                                        <p:outputLabel for="loginsite" value="Login URL" />
+                                                        <p:inputText id="loginsite" value="#{sitetree.loginsite}" maxlength="255" />
+                                                    </div>
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>
+                                                    <div class="content-justify">
                                                         <p:outputLabel for="shorturl" value="Shorturl:" />
                                                         <p:inputText id="shorturl" value="#{sitetree.selectedSite.shorturl}" maxlength="5" readonly="true" />
                                                     </div>
@@ -347,6 +356,31 @@
                                             </p:row>
                                         </p:panelGrid>
                                     </p:tab>
+                                    
+                                    <p:tab title="Static Sites" id="site_static" rendered="#{sitetree.selectedSite.staticsite}">
+                                        <p:panelGrid id="sitepanel_static" columns="1">
+                                            <p:column colspan="12" style="vertical-align: top;">
+                                                <p:dataTable id="staticsitelist" size="small" var="staticsitelist" value="#{sitetree.staticsitelist}" selectionMode="single" selection="#{sitetree.selectedstaticsite}" rowKey="#{staticsitelist.id}">
+                                                    <p:ajax event="rowSelect" listener="#{sitetree.onStaticsiteSelect}" update=":form:tabview:preview" />
+                                                    <p:column headerText="URLPARAMS" filterBy="#{staticsitelist.urlparams}" filterMatchMode="contains">
+                                                        <h:outputText value="#{staticsitelist.urlparams}" />
+                                                    </p:column>
+                                                    <p:column headerText="DATE" filterBy="#{staticsitelist.tstamp}" filterMatchMode="contains">
+                                                        <h:outputText value="#{staticsitelist.tstamp}" />
+                                                    </p:column>
+                                                </p:dataTable>
+                                                <p:inputText id="staticsiteurlparams" value="#{sitetree.urlparams}" />
+                                                <p:commandButton id="newStaticsite" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{sitetree.onNewStaticsite(actionEvent)}" update=":form:tabview:tabsiteview:staticsitelist" />
+                                                <p:commandButton id="recreateStaticsite" process="form" icon="pi pi-refresh" value="Recreate" actionListener="#{sitetree.onRecreateStaticSite(actionEvent)}" update=":form:tabview:tabsiteview:staticsitelist :form:tabview:preview">
+                                                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                                </p:commandButton>
+                                                <p:commandButton id="destroyStaticsite" process="form" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDestroyStaticSite(actionEvent)}" update=":form:tabview:tabsiteview:staticsitelist :form:tabview:preview">
+                                                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                                </p:commandButton>
+                                            </p:column>
+                                        </p:panelGrid>
+                                    </p:tab>
+                                    
                                     <p:tab title="SAP" id="site_sap" rendered="#{sitetree.sapSupport}">
                                         <p:panelGrid id="sitepanel_sap" columns="1">
                                             <p:column colspan="12" style="vertical-align: top;">
@@ -389,9 +423,12 @@
                                                     <p:commandButton id="newsite" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{sitetree.onCreate}" update=":form:msgs :form:tabview:sitetree :form:tabview:invissitetree :form:tabview:jobsiteref" disabled="#{sitetree.newButtonDisabled}">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                     </p:commandButton>
-                                                    <p:commandButton id="changeSiteButton" icon="pi pi-pencil" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs :form:tabview:sitetree :form:tabview:invissitetree :form:tabview:jobsiteref :form:tabview:preview">
+
+                                                    <p:commandButton id="changeSiteButton" icon="pi pi-pencil" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs :form:tabview:sitetree :form:tabview:invissitetree :form:tabview:jobsiteref :form:tabview:preview :form:tabview:tabsiteview">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                     </p:commandButton>
+                                                    <p:commandButton id="copySiteButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{sitetree.onCopy}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref :form:tabview:preview">
+
                                                     <p:commandButton id="deleteSiteButton" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree :form:tabview:invissitetree :form:tabview:jobsiteref">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                         <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
@@ -551,7 +588,7 @@
                     <p:panelGrid id="preview" columns="1">
                         <p:row>
                             <p:column colspan="12" style="vertical-align: top;">
-                                <iframe id="previewframe" src="#{sitetree.iframeurl}" height="800" width="1600"></iframe>
+                                <iframe id="previewframe" src="#{sitetree.iframeurl}" height="800" width="1800"></iframe>
                             </p:column>
                         </p:row>
                     </p:panelGrid>
@@ -610,6 +647,10 @@
                         </div>
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="changetemplate" icon="pi pi-pencil" process="form" value="Change" actionListener="#{templateList.onChange}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate :form:tabview:classtemplate" disabled="#{templateList.newButtonDisabled}" />
+                        </div>
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="copytemplateButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{templateList.onCopy}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate :form:tabview:edittemplate :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:classtemplate">
+                            </p:commandButton>
                         </div>
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="deletetemplateButton" icon="pi pi-trash" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:tabsiteview:selecttemplate :form:tabview:classtemplate">
@@ -684,7 +725,10 @@
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="changestylesheet" icon="pi pi-pencil" process="form" value="Change" actionListener="#{stylesheetList.onChange}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
                         </div>
-                        
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="copystylesheetButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{stylesheetList.onCopy}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:editstylesheet :form:tabview:tabsiteview:selectstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup">
+                            </p:commandButton>
+                        </div>
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="deletestylesheetButton" icon="pi pi-trash" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:tabsiteview:selectstylesheet">
                                 <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
@@ -758,6 +802,11 @@
 
                         <div class="flex align-items-center pr-2">
                             <p:commandButton id="changejavascript" icon="pi pi-pencil" process="form" value="Change" actionListener="#{javascriptList.onChange}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="copyjavascriptButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{javascriptList.onCopy}" update=":form:msgs :form:tabview:javascriptlist :form:tabview:javascriptname :form:tabview:editjavascript :form:tabview:tabsiteview:selectjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup">
+                            </p:commandButton>
                         </div>
                         
                         <div class="flex align-items-center pr-2">
@@ -841,6 +890,11 @@
 
                                 <div class="flex align-items-center pr-2">
                                     <p:commandButton id="changejava" icon="pi pi-pencil" process="form" value="Change" actionListener="#{javaList.onChange}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname" disabled="#{javaList.newButtonDisabled}" />
+                                </div>
+                                
+                                <div class="flex align-items-center pr-2">
+                                    <p:commandButton id="copyjavaButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{javaList.onCopy}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname">
+                                    </p:commandButton>
                                 </div>
                                 
                                 <div class="flex align-items-center pr-2">
@@ -1531,7 +1585,7 @@
                             <p:ajax listener="#{assetList.onChangeOverwrite}"/>
                         </p:selectBooleanCheckbox>
                         <p:fileUpload listener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true" 
-                                      update="messages :form:tabview:assetlist" maxChunkSize="1000000000" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|mov|mp4|pdf|doc|docx|dotx|svg|ppt|potx|pptx|xls|xlsx|zip|jar|xml)$/i" >
+                                      update="messages :form:tabview:assetlist" maxChunkSize="1000000000" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|webp|mov|mp4|pdf|doc|docx|dotx|svg|ppt|potx|pptx|xls|xlsx|zip|jar|xml)$/i" >
                         </p:fileUpload>
                         <p:growl id="messages" showDetail="true" />
                     </h:form>
