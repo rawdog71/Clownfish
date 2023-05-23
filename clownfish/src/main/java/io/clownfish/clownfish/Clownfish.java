@@ -90,8 +90,7 @@ import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.serviceimpl.CfStringTemplateLoaderImpl;
 import io.clownfish.clownfish.websocket.WebSocketServer;
 import java.util.logging.Level;
-import javax.servlet.ServletException;
-import javax.servlet.http.Part;
+import org.apache.commons.fileupload.FileItem;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -99,6 +98,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.primefaces.webapp.MultipartRequest;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 
 
@@ -163,6 +163,7 @@ public class Clownfish {
     NetworkTemplateBean networkbean;
     WebServiceTemplateBean webservicebean;
     WebSocketTemplateBean websocketbean;
+    UploadTemplateBean uploadbean;
     ImportTemplateBean importbean;
     PDFTemplateBean pdfbean;
     ExternalClassProvider externalclassproviderbean;
@@ -712,7 +713,7 @@ public class Clownfish {
                 });
 
                 addHeader(response, clownfishutil.getVersion());
-                Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams, urlParams, false);
+                Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams, urlParams, false, null);
                 if (cfResponse.get().getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
@@ -764,7 +765,7 @@ public class Clownfish {
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException
      */
     @PostMapping("/{name}/**")
-    public void universalPost(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) throws PageNotFoundException {
+    public void universalPost(@PathVariable("name") String name, @Context MultipartRequest request, @Context HttpServletResponse response) throws PageNotFoundException {
         boolean alias = false;
         try {
             ArrayList urlParams = new ArrayList();
@@ -790,9 +791,7 @@ public class Clownfish {
             //LOGGER.info("CONTENTTYPE: " + request.getContentType());
             if (request.getContentType().startsWith("multipart/form-data")) {
                 Map<String, String[]> parameterMap = request.getParameterMap();
-                int partsize = request.getParts().size();
-                Part filepart = request.getPart("file");
-                //Collection filesparts = request.getParts().size();
+                List<FileItem> fis = request.getFileItems("file");
                 LOGGER.info(String.valueOf(parameterMap.size()));
                 LOGGER.info("MULTIPART");
                 
@@ -802,10 +801,35 @@ public class Clownfish {
                 }
                 
                 addHeader(response, clownfishutil.getVersion());
-                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false);
+                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, fis);
                 if (cfResponse.get().getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
+                    
+                    if (!uploadbean.getUploadpath().isEmpty()) {
+                        for (FileItem fi : fis) {
+                            File result = new File(uploadbean.getUploadpath() + File.separator + fi.getName());
+                            boolean fileexists = result.exists();
+                            InputStream inputStream = fi.getInputStream();
+                            if (!fileexists) {
+                                try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
+                                    byte[] buffer = new byte[64535];
+                                    int bulk;
+                                    while (true) {
+                                        bulk = inputStream.read(buffer);
+                                        if (bulk < 0) {
+                                            break;
+                                        }
+                                        fileOutputStream.write(buffer, 0, bulk);
+                                        fileOutputStream.flush();
+                                    }
+                                    fileOutputStream.close();
+                                }
+                            }
+                            inputStream.close();
+                        }
+                    }
+                    
                     ServletOutputStream out = response.getOutputStream();
                     out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
                 } else {
@@ -881,7 +905,7 @@ public class Clownfish {
                 }
                 
                 addHeader(response, clownfishutil.getVersion());
-                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false);
+                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, null);
                 if (cfResponse.get().getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
@@ -896,8 +920,6 @@ public class Clownfish {
             }
         } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException | IllegalStateException | ParseException ex) {
             LOGGER.error(ex.getMessage());
-        } catch (ServletException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -912,7 +934,7 @@ public class Clownfish {
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException 
      */
     @Async
-    public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, List urlParams, boolean makestatic) throws PageNotFoundException {
+    public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, List urlParams, boolean makestatic, List<FileItem> fileitems) throws PageNotFoundException {
         authtokenlist.setPropertyUtil(propertyUtil);
         ClownfishResponse cfresponse = new ClownfishResponse();
         if (null != sitecontentmap) {
@@ -1006,7 +1028,7 @@ public class Clownfish {
                         if (0 == cfresponse.getErrorcode()) {
                             return new AsyncResult<>(cfresponse);
                         } else {
-                            Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, urlParams, true);
+                            Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, urlParams, true, fileitems);
                             try {
                                 if (0 == urlParams.size()) {
                                     String aliasname = cfsite.getAliaspath();
@@ -1016,7 +1038,7 @@ public class Clownfish {
                                 return cfStaticResponse;
                             } catch (InterruptedException | ExecutionException ex) {
                                 LOGGER.error(ex.getMessage());
-                                return makeResponse(name, postmap, urlParams, false);
+                                return makeResponse(name, postmap, urlParams, false, fileitems);
                             }
                         }
                     } else {
@@ -1233,6 +1255,10 @@ public class Clownfish {
                                 webservicebean = new WebServiceTemplateBean();
                                 websocketbean = new WebSocketTemplateBean();
                                 websocketbean.setWebsocketPort(websocketPort);
+                                uploadbean = new UploadTemplateBean();
+                                if (null != fileitems) {
+                                    uploadbean.setFileitemlist(fileitems);
+                                }
 
                                 emailbean = new EmailTemplateBean();
                                 emailbean.init(propertyUtil.getPropertymap(), mailUtil, propertyUtil);
@@ -1283,6 +1309,7 @@ public class Clownfish {
                                                 fmRoot.put("networkBean", networkbean);
                                                 fmRoot.put("webserviceBean", webservicebean);
                                                 fmRoot.put("websocketBean", websocketbean);
+                                                fmRoot.put("uploadBean", uploadbean);
                                                 fmRoot.put("pdfBean", pdfbean);
                                                 fmRoot.put("classBean", externalclassproviderbean);
                                                 fmRoot.put("contentBean", contentbean);
@@ -1382,6 +1409,7 @@ public class Clownfish {
                                                 velContext.put("networkBean", networkbean);
                                                 velContext.put("webserviceBean", webservicebean);
                                                 velContext.put("websocketBean", websocketbean);
+                                                velContext.put("uploadBean", uploadbean);
                                                 velContext.put("pdfBean", pdfbean);
                                                 velContext.put("classBean", externalclassproviderbean);
                                                 velContext.put("contentBean", contentbean);
@@ -1613,7 +1641,7 @@ public class Clownfish {
             String aliasname = cfsite.getAliaspath();
             Future<ClownfishResponse> cfStaticResponse;
             try {
-                cfStaticResponse = makeResponse(sitename, postmap, urlParams, true);
+                cfStaticResponse = makeResponse(sitename, postmap, urlParams, true, null);
                 if (urlParams.size() > 0) {
                     StaticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
                 } else {

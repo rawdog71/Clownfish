@@ -248,6 +248,7 @@ public class QuartzJob implements Job {
             WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();
             WebSocketTemplateBean webSocketBean = new WebSocketTemplateBean();
             webSocketBean.setWebsocketPort(websocketPort);
+            UploadTemplateBean uploadBean = new UploadTemplateBean();
             PDFTemplateBean pdfBean = new PDFTemplateBean();
             pdfBean.initjob(pdfUtil);
 
@@ -272,6 +273,7 @@ public class QuartzJob implements Job {
                     fmRoot.put("contentBean", contentbean);
                     fmRoot.put("webserviceBean", webServiceBean);
                     fmRoot.put("websocketBean", webSocketBean);
+                    fmRoot.put("uploadBean", uploadBean);
                     fmRoot.put("property", propertymap);
                     fmRoot.put("parameter", paramMap);
                     
@@ -311,6 +313,7 @@ public class QuartzJob implements Job {
                     velContext.put("importBean", importBean);
                     velContext.put("webserviceBean", webServiceBean);
                     velContext.put("websocketBean", webSocketBean);
+                    velContext.put("uploadBean", uploadBean);
                     velContext.put("pdfBean", pdfBean);
                     velContext.put("contentBean", contentbean);
                     velContext.put("parameter", paramMap);
