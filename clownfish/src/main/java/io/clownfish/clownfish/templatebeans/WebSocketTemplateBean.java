@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  *
  * @author raine
  */
-@Scope("singleton")
+@Scope("request")
 @Component
 public class WebSocketTemplateBean implements Serializable {
     final transient Logger LOGGER = LoggerFactory.getLogger(WebSocketTemplateBean.class);
