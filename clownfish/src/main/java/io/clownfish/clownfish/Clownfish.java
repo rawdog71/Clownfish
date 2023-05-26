@@ -765,7 +765,7 @@ public class Clownfish {
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException
      */
     @PostMapping("/{name}/**")
-    public void universalPost(@PathVariable("name") String name, @Context MultipartRequest request, @Context HttpServletResponse response) throws PageNotFoundException {
+    public void universalPostMultipart(@PathVariable("name") String name, @Context MultipartRequest request, @Context HttpServletResponse response) throws PageNotFoundException {
         boolean alias = false;
         try {
             ArrayList urlParams = new ArrayList();
@@ -915,6 +915,121 @@ public class Clownfish {
                     ServletOutputStream out = response.getOutputStream();
                     out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
                 }
+            }
+        } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException | IllegalStateException | ParseException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+    }
+    
+    /**
+     * POST
+     * 
+     * @param name
+     * @param request
+     * @param response
+     * @throws io.clownfish.clownfish.exceptions.PageNotFoundException
+     */
+    @PostMapping("/{name}")
+    public void universalPostHttp(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) throws PageNotFoundException {
+        boolean alias = false;
+        try {
+            ArrayList urlParams = new ArrayList();
+            String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+            if (path.contains("/")) {
+                String[] params = path.split("/");
+                for (int i = 1; i < params.length; i++) {
+                    if (1 == i) {
+                        path = params[i];
+                    } else {
+                        urlParams.add(params[i]);
+                    }
+                }
+            }
+            if (name.compareToIgnoreCase(path) != 0) {
+                name = path.substring(1);
+                if (name.lastIndexOf("/")+1 == name.length()) {
+                    name = name.substring(0, name.length()-1);
+                }
+            }
+            
+            userSession = request.getSession();
+            String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+
+            Gson gson = new Gson();
+            List<JsonFormParameter> map;
+            map = (List<JsonFormParameter>) gson.fromJson(content, new TypeToken<List<JsonFormParameter>>() {}.getType());
+
+            // fetch site by name or aliasname
+            CfSite cfsite = null;
+            try {
+                cfsite = cfsiteService.findByName(name);
+            } catch (Exception ex) {
+                try {
+                    cfsite = cfsiteService.findByAliaspath(name);
+                    name = cfsite.getName();
+                    alias = true;
+                } catch (Exception e1) {
+                    try {
+                        cfsite = cfsiteService.findByShorturl(name);
+                        name = cfsite.getName();
+                        alias = true;
+                    } catch (Exception ey) {
+                        throw new PageNotFoundException("PageNotFound Exception: " + name);
+                    }
+                }
+            }
+
+            if (cfsite.isSearchresult()) {
+                if (searchcontentmap.isEmpty()) {
+                    String query = "";
+                    for (JsonFormParameter jsp : map) {
+                        if (0 == jsp.getName().compareToIgnoreCase("search")) {
+                            query += jsp.getValue();
+                        }
+                    }
+                    String[] searchexpressions = query.split(" ");
+                    searchUtil.updateSearchhistory(searchexpressions);
+
+                    searcher.setIndexPath(folderUtil.getIndex_folder());
+                    long startTime = System.currentTimeMillis();
+                    SearchResult searchresult = searcher.search(query, searchlimit);
+                    long endTime = System.currentTimeMillis();
+
+                    LOGGER.info("Search Time :" + (endTime - startTime));
+                    searchmetadata.clear();
+                    searchmetadata.put("cfSearchQuery", query);
+                    searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
+                    searchcontentmap.clear();
+                    searchresult.getFoundSites().stream().forEach((site) -> {
+                        searchcontentmap.put(site.getName(), site);
+                    });
+                    searchassetmap.clear();
+                    searchresult.getFoundAssets().stream().forEach((asset) -> {
+                        searchassetmap.put(asset.getName(), asset);
+                    });
+                    searchassetmetadatamap.clear();
+                    searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
+                        searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
+                    });
+                    searchclasscontentmap.clear();
+                    searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
+                        searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
+                    });
+                }
+            }
+
+            addHeader(response, clownfishutil.getVersion());
+            Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, null);
+            if (cfResponse.get().getErrorcode() == 0) {
+                response.setContentType(this.contenttype);
+                response.setCharacterEncoding(this.characterencoding);
+                ServletOutputStream out = response.getOutputStream();
+                out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
+            } else {
+                response.setContentType("text/html");
+                response.setCharacterEncoding("UTF-8");
+                ServletOutputStream out = response.getOutputStream();
+                out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
             }
         } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException | IllegalStateException | ParseException ex) {
             LOGGER.error(ex.getMessage());
