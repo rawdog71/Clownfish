@@ -86,6 +86,10 @@ public class ContentUtil implements IVersioningInterface {
     private @Getter @Setter long currentVersion;
     private @Getter @Setter String content = "";
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentUtil.class);
+
+    public void init(MarkdownUtil markdownUtil) {
+        this.markdownUtil = markdownUtil;
+    }
     
     public AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent) {
         CfAttributetype knattributtype = cfattributetypeService.findById(attributtypeid);

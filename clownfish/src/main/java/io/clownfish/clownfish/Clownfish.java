@@ -1384,6 +1384,7 @@ public class Clownfish {
                                     importbean.init(sitedatasourcelist, cfdatasourceService);
                                 }
                                 externalclassproviderbean = new ExternalClassProvider(cfclassCompiler);
+                                contentUtil.init(markdownUtil);
                                 contentbean = new ContentTemplateBean(propertyUtil, contentUtil);
                                 contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService, cfclassService, useHibernate);
 
