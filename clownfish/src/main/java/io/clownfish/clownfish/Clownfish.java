@@ -770,22 +770,6 @@ public class Clownfish {
         try {
             ArrayList urlParams = new ArrayList();
             String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-            if (path.contains("/")) {
-                String[] params = path.split("/");
-                for (int i = 1; i < params.length; i++) {
-                    if (1 == i) {
-                        path = params[i];
-                    } else {
-                        urlParams.add(params[i]);
-                    }
-                }
-            }
-            if (name.compareToIgnoreCase(path) != 0) {
-                name = path.substring(1);
-                if (name.lastIndexOf("/")+1 == name.length()) {
-                    name = name.substring(0, name.length()-1);
-                }
-            }
             
             userSession = request.getSession();
             if (request.getContentType().startsWith("multipart/form-data")) {
