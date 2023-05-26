@@ -764,7 +764,7 @@ public class Clownfish {
      * @param response
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException
      */
-    @PostMapping("/{name}/**")
+    @PostMapping("/upload/{name}")
     public void universalPostMultipart(@PathVariable("name") String name, @Context MultipartRequest request, @Context HttpServletResponse response) throws PageNotFoundException {
         boolean alias = false;
         try {
@@ -929,7 +929,7 @@ public class Clownfish {
      * @param response
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException
      */
-    @PostMapping("/{name}")
+    @PostMapping("/{name}/**")
     public void universalPostHttp(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) throws PageNotFoundException {
         boolean alias = false;
         try {
