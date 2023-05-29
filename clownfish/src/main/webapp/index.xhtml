@@ -360,12 +360,12 @@
                                     <p:tab title="Static Sites" id="site_static" rendered="#{sitetree.selectedSite.staticsite}">
                                         <p:panelGrid id="sitepanel_static" columns="1">
                                             <p:column colspan="12" style="vertical-align: top;">
-                                                <p:dataTable id="staticsitelist" size="small" var="staticsitelist" value="#{sitetree.staticsitelist}" selectionMode="single" selection="#{sitetree.selectedstaticsite}" rowKey="#{staticsitelist.id}">
+                                                <p:dataTable id="staticsitelist" size="small" var="staticsitelist" value="#{sitetree.staticsitelist}" selectionMode="single" selection="#{sitetree.selectedstaticsite}" rowKey="#{staticsitelist.id}" sortMode="single">
                                                     <p:ajax event="rowSelect" listener="#{sitetree.onStaticsiteSelect}" update=":form:tabview:preview" />
-                                                    <p:column headerText="URLPARAMS" filterBy="#{staticsitelist.urlparams}" filterMatchMode="contains">
+                                                    <p:column headerText="URLPARAMS" filterBy="#{staticsitelist.urlparams}" filterMatchMode="contains" sortBy="#{staticsitelist.urlparams}">
                                                         <h:outputText value="#{staticsitelist.urlparams}" />
                                                     </p:column>
-                                                    <p:column headerText="DATE" filterBy="#{staticsitelist.tstamp}" filterMatchMode="contains">
+                                                    <p:column headerText="DATE" filterBy="#{staticsitelist.tstamp}" filterMatchMode="contains" sortBy="#{staticsitelist.tstamp}">
                                                         <h:outputText value="#{staticsitelist.tstamp}" />
                                                     </p:column>
                                                 </p:dataTable>
@@ -1048,9 +1048,9 @@
                     </f:facet>
                     
                     <div class="flex flex-row pb-2">
-                        <p:dataTable id="classlist" size="small" scrollable="true" scrollHeight="250" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}">
+                        <p:dataTable id="classlist" size="small" scrollable="true" scrollHeight="250" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}" sortMode="single">
                             <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate :form:tabview:classencrypted" />
-                            <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains">
+                            <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains" sortBy="#{clazz.name}">
                                 <h:outputText value="#{clazz.name}" />
                             </p:column>
                         </p:dataTable>
@@ -1263,9 +1263,9 @@
                                          paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                                          rowsPerPageTemplate="10,50,100"
                                          selectionMode="single" selection="#{classcontentList.selectedContent}" rowKey="#{classcontent.id}"
-                                         emptyMessage="No content available" filteredValue="#{classcontentList.filteredContent}" widgetVar="classcontentlist">
+                                         emptyMessage="No content available" filteredValue="#{classcontentList.filteredContent}" widgetVar="classcontentlist" sortMode="single">
                                 <p:ajax event="rowSelect" listener="#{classcontentList.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:contentbtnpanel :form:tabview:contentkeywordpicklist :form:tabview:contentpreview" />
-                                <p:column headerText="Name" filterBy="#{classcontent.name}" filterMatchMode="contains">
+                                <p:column headerText="Name" filterBy="#{classcontent.name}" filterMatchMode="contains" sortBy="#{classcontent.name}">
                                     <h:outputText value="#{classcontent.name}" />
                                 </p:column>
                                 <p:column headerText="Klasse" filterBy="#{classcontent.classref}" filterMatchMode="exact">
@@ -1441,9 +1441,9 @@
                         <p:dataTable id="datalistcontent" size="small" scrollable="true" scrollHeight="250" var="datalist" value="#{datacontentList.datacontentlist}" 
                                      paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
                                      rowsPerPageTemplate="10,50,100"
-                                     selectionMode="single" selection="#{datacontentList.selectedList}" rowKey="#{datalist.id}" widgetVar="datalistcontent">
+                                     selectionMode="single" selection="#{datacontentList.selectedList}" rowKey="#{datalist.id}" widgetVar="datalistcontent" sortMode="single">
                             <p:ajax event="rowSelect" listener="#{datacontentList.onSelect}" update=":form:msgs :form:tabview:datacontentname :form:tabview:datacontentclass :form:tabview:newcontentlist :form:tabview:datacontentlistbox" />
-                            <p:column headerText="Name" filterBy="#{datalist.name}" filterMatchMode="contains">
+                            <p:column headerText="Name" filterBy="#{datalist.name}" filterMatchMode="contains" sortBy="#{datalist.name}">
                                 <h:outputText value="#{datalist.name}" />
                             </p:column>
                             <p:column headerText="Klasse" filterBy="#{datalist.classref}" filterMatchMode="exact">
@@ -1662,9 +1662,7 @@
 
                             </p:commandButton>
                         </p:outputPanel>
-
                     </h:panelGrid>
-
                 </p:tab>
 
                 <p:tab title="AssetLibraries" id="assetlistpanel" rendered="#{loginBean.login and loginBean.hasRights(10)}">
@@ -1675,9 +1673,9 @@
                     
                     <p:dataTable id="assetlistcontent" size="small" scrollable="true" scrollHeight="250" var="assetlistcontent" value="#{assetLibrary.assetlist}" 
                                  selectionMode="single" selection="#{assetLibrary.selectedAssetlist}" rowKey="#{assetlistcontent.id}"
-                                 emptyMessage="No content available" filteredValue="#{assetLibrary.filteredAssetlist}" widgetVar="assetcontentlist">
+                                 emptyMessage="No content available" filteredValue="#{assetLibrary.filteredAssetlist}" widgetVar="assetcontentlist" sortMode="single">
                         <p:ajax event="rowSelect" listener="#{assetLibrary.onSelect}" update=":form:msgs :form:tabview:assetcontentlist :form:tabview:assetcontentlistbox" />
-                        <p:column headerText="Name" filterBy="#{assetlistcontent.name}" filterMatchMode="contains">
+                        <p:column headerText="Name" filterBy="#{assetlistcontent.name}" filterMatchMode="contains" sortBy="#{assetlistcontent.name}">
                             <h:outputText value="#{assetlistcontent.name}" />
                         </p:column>
                     </p:dataTable>
@@ -1706,8 +1704,8 @@
                     
                     <p:dataTable id="keywordlist" size="small" scrollable="true" scrollHeight="250" var="keywordcontent" value="#{keywordList.keywordlist}" 
                                  selectionMode="single" selection="#{keywordList.selectedKeyword}" rowKey="#{keywordcontent.id}"
-                                 emptyMessage="No content available" filteredValue="#{keywordList.filteredKeyword}" widgetVar="keywordlist">
-                        <p:column headerText="Name" filterBy="#{keywordcontent.name}" filterMatchMode="contains">
+                                 emptyMessage="No content available" filteredValue="#{keywordList.filteredKeyword}" widgetVar="keywordlist" sortMode="single">
+                        <p:column headerText="Name" filterBy="#{keywordcontent.name}" filterMatchMode="contains" sortBy="#{keywordcontent.name}">
                             <h:outputText value="#{keywordcontent.name}" />
                         </p:column>
                     </p:dataTable>
@@ -1730,9 +1728,9 @@
                     
                     <p:dataTable id="keywordlistcontent" size="small" scrollable="true" scrollHeight="250" var="keywordlistcontent" value="#{keywordContentList.keywordlist}" 
                                  selectionMode="single" selection="#{keywordContentList.selectedKeywordlist}" rowKey="#{keywordlistcontent.id}"
-                                 emptyMessage="No content available" filteredValue="#{keywordContentList.filteredKeywordlist}" widgetVar="keywordcontentlist">
+                                 emptyMessage="No content available" filteredValue="#{keywordContentList.filteredKeywordlist}" widgetVar="keywordcontentlist" sortMode="single">
                         <p:ajax event="rowSelect" listener="#{keywordContentList.onSelect}" update=":form:msgs :form:tabview:keywordcontentlist :form:tabview:keywordcontentlistbox" />
-                        <p:column headerText="Name" filterBy="#{keywordlistcontent.name}" filterMatchMode="contains">
+                        <p:column headerText="Name" filterBy="#{keywordlistcontent.name}" filterMatchMode="contains" sortBy="#{keywordlistcontent.name}">
                             <h:outputText value="#{keywordlistcontent.name}" />
                         </p:column>
                     </p:dataTable>
@@ -1762,9 +1760,9 @@
                     
                     <p:dataTable id="propertylist" size="small" scrollable="true" scrollHeight="250" var="propertycontent" value="#{propertylist.propertylist}" 
                                  selectionMode="single" selection="#{propertylist.selectedProperty}" rowKey="#{propertycontent.hashkey}"
-                                 emptyMessage="No content available" filteredValue="#{propertylist.filteredProperty}" widgetVar="propertylist">
+                                 emptyMessage="No content available" filteredValue="#{propertylist.filteredProperty}" widgetVar="propertylist" sortMode="single">
                         <p:ajax event="rowSelect" listener="#{propertylist.onSelect}" update=":form:tabview:propertypanel :form:tabview:propertybtnpanel" />
-                        <p:column headerText="Key" filterBy="#{propertycontent.hashkey}" filterMatchMode="contains">
+                        <p:column headerText="Key" filterBy="#{propertycontent.hashkey}" filterMatchMode="contains" sortBy="#{propertycontent.hashkey}">
                             <h:outputText value="#{propertycontent.hashkey}" />
                         </p:column>
                         <p:column headerText="Value" filterBy="#{propertycontent.value}" filterMatchMode="contains">
@@ -1800,9 +1798,9 @@
                     
                     <p:dataTable id="joblist" size="small" scrollable="true" scrollHeight="250" var="jobcontent" value="#{quartzlist.quartzlist}" 
                                  selectionMode="single" selection="#{quartzlist.selectedQuartz}" rowKey="#{jobcontent.id}"
-                                 emptyMessage="No content available" filteredValue="#{quartzlist.filteredQuartz}" widgetVar="quartzlist">
+                                 emptyMessage="No content available" filteredValue="#{quartzlist.filteredQuartz}" widgetVar="quartzlist" sortMode="single">
                         <p:ajax event="rowSelect" listener="#{quartzlist.onSelect}" update=":form:tabview:jobpanel :form:tabview:jobbtnpanel" />
-                        <p:column headerText="Name" filterBy="#{jobcontent.name}" filterMatchMode="contains">
+                        <p:column headerText="Name" filterBy="#{jobcontent.name}" filterMatchMode="contains" sortBy="#{jobcontent.name}">
                             <h:outputText value="#{jobcontent.name}" />
                         </p:column>
                         <p:column headerText="Value" filterBy="#{jobcontent.schedule}" filterMatchMode="contains">
