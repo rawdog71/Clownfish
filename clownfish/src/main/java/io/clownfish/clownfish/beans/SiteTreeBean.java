@@ -178,6 +178,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter boolean sitemap;
     private @Getter @Setter boolean searchresult;
     private @Getter @Setter boolean invisible;
+    private @Getter @Setter boolean offline;
     private @Getter @Setter String siteTitle;
     private @Getter @Setter String siteDescription;
     private @Getter @Setter String aliaspath;
@@ -327,6 +328,7 @@ public class SiteTreeBean implements Serializable {
         showAssetLibrary = false;
         showKeywordLibrary = false;
         invisible = false;
+        offline = false;
         templatelist.setSitetree(this);
         javascriptlist.setSitetree(this);
         stylesheetlist.setSitetree(this);
@@ -487,6 +489,7 @@ public class SiteTreeBean implements Serializable {
         newButtonDisabled = false;
         contenteditable = false;
         invisible = false;
+        offline = false;
         selected_contentclass = null;
         selected_datalisttclass = null;
         selected_asset = null;
@@ -618,6 +621,7 @@ public class SiteTreeBean implements Serializable {
         } else {
             invisible = false;
         }
+        offline = selectedSite.isOffline();
         aliaspath = selectedSite.getAliaspath();
         loginsite = selectedSite.getLoginsite();
         sitehtmlcompression = selectedSite.getHtmlcompression();
@@ -763,6 +767,7 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setSearchrelevant(sitesearchrelevant);
             selectedSite.setSearchresult(searchresult);
             selectedSite.setInvisible(invisible);
+            selectedSite.setOffline(offline);
             selectedSite.setSitemap(sitemap);
             selectedSite.setStaticsite(sitestatic);
             selectedSite.setTestparams(params);
@@ -801,6 +806,8 @@ public class SiteTreeBean implements Serializable {
             newsite.setTemplateref(selectedSite.getTemplateref());
             newsite.setTestparams(selectedSite.getTestparams());
             newsite.setTitle(selectedSite.getTitle());
+            newsite.setInvisible(selectedSite.getInvisible());
+            newsite.setOffline(selectedSite.isOffline());
             newsite = cfsiteService.create(newsite);
             
             // Add selected saprfcs
@@ -957,6 +964,7 @@ public class SiteTreeBean implements Serializable {
             } else {
                 newsite.setInvisible(false);
             }
+            newsite.setOffline(offline);
             newsite.setSitemap(sitemap);
             newsite.setStaticsite(sitestatic);
             newsite.setShorturl(siteUtil.generateShorturl());

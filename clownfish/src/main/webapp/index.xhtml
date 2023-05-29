@@ -162,6 +162,15 @@
                                                     </p:commandButton>
                                                 </p:column>
                                             </p:row>
+                                            <p:row>
+                                                <p:column>
+                                                    <div class="content-justify">
+                                                        <p:outputLabel for="selectoffline" value="Offline:" />
+                                                        <p:selectBooleanCheckbox id="selectoffline" value="#{sitetree.offline}"/>
+                                                    </div>
+                                                </p:column>
+                                            </p:row>
+                                            
                                         </p:panelGrid>
                                     </p:tab>
                                     <p:tab title="Content" id="site_content" class="tester">
@@ -1060,6 +1069,7 @@
                         <div class="flex align-items-center pr-2">
                             <p:outputLabel for="classname" style="margin-right: 0.5rem">Name: </p:outputLabel>
                             <p:inputText id="classname" value="#{classList.className}" >
+                                <f:validateRegex pattern="^[a-zA-Z][0-9a-zA-Z_]+$"/>
                                 <p:ajax event="keyup" listener="#{classList.onChangeName(changeEvent)}" update=":form:tabview:newclass" />
                             </p:inputText>
                         </div>
@@ -1169,6 +1179,7 @@
                             <div class="flex align-items-center pr-2">
                                 <p:outputLabel for="attributname" style="margin-right: 0.5rem">Name</p:outputLabel>
                                 <p:inputText id="attributname" value="#{classList.attributName}" >
+                                    <f:validateRegex pattern="^[a-zA-Z][0-9a-zA-Z_]+$"/>
                                     <p:ajax event="keyup" listener="#{classList.onChangeAttributName(changeEvent)}" update=":form:tabview:newattribut" />
                                 </p:inputText>
                             </div>
@@ -1291,6 +1302,7 @@
                             <div class="flex align-items-center pr-2">
                                 <p:outputLabel for="contentname" style="margin-right: 0.5rem">Name</p:outputLabel>
                                 <p:inputText id="contentname" value="#{classcontentList.contentName}" >
+                                    <f:validateRegex pattern="^[a-zA-ZäöüÄÖÜ][0-9a-zA-ZäöüÄÖÜ_()]+$"/>
                                     <p:ajax event="keyup" listener="#{classcontentList.onChangeName(changeEvent)}" update="newcontent" />
                                 </p:inputText>
                             </div>
@@ -1460,6 +1472,7 @@
                     
                     <p:outputLabel for="datacontentname" style="margin-right: 0.5rem">Name</p:outputLabel>
                     <p:inputText id="datacontentname" value="#{datacontentList.contentName}" >
+                        <f:validateRegex pattern="^[a-zA-Z][0-9a-zA-Z_]+$"/>
                         <p:ajax event="keyup" listener="#{datacontentList.onChangeName(changeEvent)}" update="newcontentlist" />
                     </p:inputText>
 
@@ -1712,7 +1725,7 @@
                     
                     <h:panelGrid columns="2">
                         <p:outputLabel for="keywords" value="Keywords: " />
-                        <p:chips id="keywords" value="#{keywordList.items}" />
+                        <p:chips id="keywords" unique="true" value="#{keywordList.items}" />
                         
                         <p:commandButton id="newkeyword" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{keywordList.onCreate}" update=":form:tabview:keywordlist :form:tabview:assetkeywordpicklist :form:tabview:contentkeywordpicklist" />
                         <p:commandButton id="refreshkeyword" icon="pi pi-refresh" value="Refresh" actionListener="#{keywordList.onRefreshAll}" update=":form:tabview:keywordlist :form:tabview:assetkeywordpicklist :form:tabview:contentkeywordpicklist" />

@@ -132,6 +132,8 @@ public class CfSite implements Serializable {
     private String loginsite;
     @Column(name = "invisible")
     private boolean invisible;
+    @Column(name = "offline")
+    private boolean offline;
     
     public CfSite() {
     }
@@ -363,6 +365,14 @@ public class CfSite implements Serializable {
     }
     public void setInvisible(boolean invis) {
         invisible = invis;
+    }
+
+    public boolean isOffline() {
+        return offline;
+    }
+
+    public void setOffline(boolean offline) {
+        this.offline = offline;
     }
     
     public String getIcon() {
