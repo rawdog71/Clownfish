@@ -346,6 +346,7 @@
             <groupId>com.vladsch.flexmark</groupId>
             <artifactId>flexmark-all</artifactId>
             <version>0.64.8</version>
+            <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
