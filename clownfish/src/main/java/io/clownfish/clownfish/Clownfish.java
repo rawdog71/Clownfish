@@ -1121,7 +1121,7 @@ public class Clownfish {
                                 }
                             }
 
-                            if (isOnline(name, urlParams)) {
+                            if ((authtokenlist.checkValidToken(login_token)) || (isOnline(name, urlParams))) {
                                 cfresponse = getStaticSite(name, getUrlParamName(name, urlParams), postmap, urlParams);
                                 if (0 == cfresponse.getErrorcode()) {
                                     return new AsyncResult<>(cfresponse);
@@ -2155,7 +2155,12 @@ public class Clownfish {
                 urlparamname += "/" + (String) (urlparam);
             }
         }
-        CfStaticsite staticsite = cfstaticsiteservice.findBySiteAndUrlparams(name, urlparamname.substring(1));
+        CfStaticsite staticsite = null;
+        if (urlparamname.isEmpty()) {
+            staticsite = cfstaticsiteservice.findBySiteAndUrlparams(name, urlparamname);
+        } else {
+            staticsite = cfstaticsiteservice.findBySiteAndUrlparams(name, urlparamname.substring(1));
+        }
         return !staticsite.isOffline();
     }
 }

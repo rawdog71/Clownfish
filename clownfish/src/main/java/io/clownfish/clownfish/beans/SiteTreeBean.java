@@ -1077,11 +1077,27 @@ public class SiteTreeBean implements Serializable {
     
     public void onStaticsiteSelect(SelectEvent event) {
         selectedstaticsite = (CfStaticsite) event.getObject();
+        
+        String auth_token = "";
+        if (null != loginbean) {
+            auth_token = loginbean.getToken();
+        }
+        
         if (!selectedstaticsite.getUrlparams().isBlank()) {
             iframeurl = selectedstaticsite.getSite() + "/" + selectedstaticsite.getUrlparams();
         } else {
             iframeurl = selectedstaticsite.getSite();
         }
+        
+        /*
+        if ((null != auth_token) && (!auth_token.isBlank())) {
+            if (!auth_token.startsWith("&")) {
+                iframeurl += "&cf_login_token=" + URLEncoder.encode(auth_token, StandardCharsets.UTF_8);
+            } else {
+                iframeurl += "cf_login_token=" + URLEncoder.encode(auth_token, StandardCharsets.UTF_8);
+            }
+        }
+        */
     }
     
     public void onNewStaticsite(ActionEvent actionEvent) {
