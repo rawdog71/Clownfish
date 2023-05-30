@@ -129,6 +129,7 @@ public class Clownfish {
     @Autowired CfJavaService cfjavaService;
     @Autowired CfSitesaprfcService cfsitesaprfcService;
     @Autowired CfLayoutcontentService cflayoutcontentService;
+    @Autowired CfStaticsiteService cfstaticsiteservice;
     @Autowired TemplateUtil templateUtil;
     @Autowired PropertyList propertylist;
     @Autowired QuartzList quartzlist;
@@ -1120,22 +1121,28 @@ public class Clownfish {
                                 }
                             }
 
-                            cfresponse = getStaticSite(name, getUrlParamName(name, urlParams), postmap, urlParams);
-                            if (0 == cfresponse.getErrorcode()) {
-                                return new AsyncResult<>(cfresponse);
-                            } else {
-                                Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, urlParams, true, fileitems);
-                                try {
-                                    if (0 == urlParams.size()) {
-                                        String aliasname = cfsite.getAliaspath();
-                                        StaticSiteUtil.generateStaticSite(name, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                            if (isOnline(name, urlParams)) {
+                                cfresponse = getStaticSite(name, getUrlParamName(name, urlParams), postmap, urlParams);
+                                if (0 == cfresponse.getErrorcode()) {
+                                    return new AsyncResult<>(cfresponse);
+                                } else {
+                                    Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, urlParams, true, fileitems);
+                                    try {
+                                        if (0 == urlParams.size()) {
+                                            String aliasname = cfsite.getAliaspath();
+                                            StaticSiteUtil.generateStaticSite(name, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                                        }
+                                        //return makeResponse(name, postmap, urlParams, false);
+                                        return cfStaticResponse;
+                                    } catch (InterruptedException | ExecutionException ex) {
+                                        LOGGER.error(ex.getMessage());
+                                        return makeResponse(name, postmap, urlParams, false, fileitems);
                                     }
-                                    //return makeResponse(name, postmap, urlParams, false);
-                                    return cfStaticResponse;
-                                } catch (InterruptedException | ExecutionException ex) {
-                                    LOGGER.error(ex.getMessage());
-                                    return makeResponse(name, postmap, urlParams, false, fileitems);
                                 }
+                            } else {
+                                cfresponse.setErrorcode(4);
+                                cfresponse.setOutput("Offline");
+                                return new AsyncResult<>(cfresponse);
                             }
                         } else {
                             if ((cfsite.getContenttype() != null)) {
@@ -2139,5 +2146,16 @@ public class Clownfish {
             }
         }
         return urlparamname;
+    }
+    
+    private boolean isOnline(String name, List urlParams) {
+        String urlparamname = "";
+        if (urlParams.size()>0) {
+            for (Object urlparam : urlParams) {
+                urlparamname += "/" + (String) (urlparam);
+            }
+        }
+        CfStaticsite staticsite = cfstaticsiteservice.findBySiteAndUrlparams(name, urlparamname.substring(1));
+        return !staticsite.isOffline();
     }
 }

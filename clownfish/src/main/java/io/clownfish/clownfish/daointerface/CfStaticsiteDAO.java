@@ -26,7 +26,8 @@ public interface CfStaticsiteDAO {
     List<CfStaticsite> findAll();
     CfStaticsite findById(Long id);
     List<CfStaticsite> findBySite(String name);
-    CfStaticsite findByUrlparams(String alias);
+    CfStaticsite findByUrlparams(String urlparams);
+    CfStaticsite findBySiteAndUrlparams(String name, String urlparams);
     CfStaticsite create(CfStaticsite entity);
     boolean delete(CfStaticsite entity);
     CfStaticsite edit(CfStaticsite entity);

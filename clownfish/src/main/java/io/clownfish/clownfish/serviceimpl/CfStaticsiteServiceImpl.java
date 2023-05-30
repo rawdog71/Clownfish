@@ -71,4 +71,9 @@ public class CfStaticsiteServiceImpl implements CfStaticsiteService {
     public CfStaticsite edit(CfStaticsite entity) {
         return this.cfstaticsiteDAO.edit(entity);
     }
+
+    @Override
+    public CfStaticsite findBySiteAndUrlparams(String name, String urlparams) {
+        return this.cfstaticsiteDAO.findBySiteAndUrlparams(name, urlparams);
+    }
 }
