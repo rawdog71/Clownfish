@@ -81,7 +81,11 @@ public class RfcFunctionConverter implements Converter, Serializable {
             return null;
         } else {
             if (sapSupport) {
-                rfcfunctionlist = new RFC_FUNCTION_SEARCH(sapc).getRfcFunctionsList(sitetree.getSelectedrfcgroup().getName());
+                if (!sitetree.getRfcgroup().isEmpty()) {
+                    rfcfunctionlist = new RFC_FUNCTION_SEARCH(sapc).getRfcFunctionsList(sitetree.getRfcgroup());
+                } else {
+                    rfcfunctionlist = new RFC_FUNCTION_SEARCH(sapc).getRfcFunctionsList(sitetree.getSelectedrfcgroup().getName());
+                }
                 for (RfcFunction rfcfunction : rfcfunctionlist) {
                     if (rfcfunction.getName().compareToIgnoreCase(value) == 0 ) {
                         return (Object) rfcfunction;

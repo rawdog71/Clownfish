@@ -1023,11 +1023,15 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onNewRfc(ActionEvent actionEvent) {
-        if ((null != selectedrfcgroup) && (null != selectedrfcfunction)) {
+        if (((null != selectedrfcgroup) && (null != selectedrfcfunction)) || ((!rfcgroup.isEmpty()) && (null != selectedrfcfunction))) {
             CfSitesaprfc sitesaprfc = new CfSitesaprfc();
             CfSitesaprfcPK cfsitesaprfcPK = new CfSitesaprfcPK();
             cfsitesaprfcPK.setSiteref(selectedSite.getId());
-            cfsitesaprfcPK.setRfcgroup(selectedrfcgroup.getName());
+            if (null != selectedrfcgroup) {
+                cfsitesaprfcPK.setRfcgroup(selectedrfcgroup.getName());
+            } else {
+                cfsitesaprfcPK.setRfcgroup(rfcgroup);
+            }
             cfsitesaprfcPK.setRfcfunction(selectedrfcfunction.getName());
             sitesaprfc.setCfSitesaprfcPK(cfsitesaprfcPK);
             cfsitesaprfcService.create(sitesaprfc);
