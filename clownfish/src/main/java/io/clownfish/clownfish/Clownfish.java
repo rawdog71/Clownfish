@@ -539,7 +539,7 @@ public class Clownfish {
                 });
             }
             AnsiConsole.systemUninstall();
-        } catch (Exception ex) {
+        } catch (IOException | SchedulerException ex) {
             LOGGER.error(ex.getMessage());
         }
         folderUtil.init();
@@ -1026,6 +1026,7 @@ public class Clownfish {
      * @param postmap
      * @param urlParams
      * @param makestatic
+     * @param fileitems
      * @return 
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException 
      */
@@ -1128,7 +1129,7 @@ public class Clownfish {
                                 } else {
                                     Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, urlParams, true, fileitems);
                                     try {
-                                        if (0 == urlParams.size()) {
+                                        if (urlParams.isEmpty()) {
                                             String aliasname = cfsite.getAliaspath();
                                             StaticSiteUtil.generateStaticSite(name, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
                                         }
@@ -1752,7 +1753,7 @@ public class Clownfish {
             Future<ClownfishResponse> cfStaticResponse;
             try {
                 cfStaticResponse = makeResponse(sitename, postmap, urlParams, true, null);
-                if (urlParams.size() > 0) {
+                if (!urlParams.isEmpty()) {
                     StaticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
                 } else {
                     StaticSiteUtil.generateStaticSite(siteurlname, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
@@ -2140,7 +2141,7 @@ public class Clownfish {
     
     private String getUrlParamName(String name, List urlParams) {
         String urlparamname = name;
-        if (urlParams.size()>0) {
+        if (!urlParams.isEmpty()) {
             for (Object urlparam : urlParams) {
                 urlparamname += "_" + (String) (urlparam);
             }
@@ -2150,16 +2151,34 @@ public class Clownfish {
     
     private boolean isOnline(String name, List urlParams) {
         String urlparamname = "";
-        if (urlParams.size()>0) {
+        if (!urlParams.isEmpty()) {
             for (Object urlparam : urlParams) {
                 urlparamname += "/" + (String) (urlparam);
             }
         }
         CfStaticsite staticsite = null;
         if (urlparamname.isEmpty()) {
-            staticsite = cfstaticsiteservice.findBySiteAndUrlparams(name, urlparamname);
+            try {
+                staticsite = cfstaticsiteservice.findBySiteAndUrlparams(name, urlparamname);
+            } catch (NoResultException ex) {
+                staticsite = new CfStaticsite();
+                staticsite.setOffline(false);
+                staticsite.setSite(name);
+                staticsite.setUrlparams(urlparamname);
+                staticsite.setTstamp(new Date());
+                cfstaticsiteservice.create(staticsite);
+            }
         } else {
-            staticsite = cfstaticsiteservice.findBySiteAndUrlparams(name, urlparamname.substring(1));
+            try {
+                staticsite = cfstaticsiteservice.findBySiteAndUrlparams(name, urlparamname.substring(1));
+            } catch (NoResultException ex) {
+                staticsite = new CfStaticsite();
+                staticsite.setOffline(false);
+                staticsite.setSite(name);
+                staticsite.setUrlparams(urlparamname);
+                staticsite.setTstamp(new Date());
+                cfstaticsiteservice.create(staticsite);
+            }
         }
         return !staticsite.isOffline();
     }
