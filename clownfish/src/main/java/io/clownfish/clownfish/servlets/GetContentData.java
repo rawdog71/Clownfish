@@ -110,13 +110,16 @@ public class GetContentData extends HttpServlet {
                         if (lversion < maxversion) {
                             String contentversion = contentUtil.getVersion(content.getId(), lversion);
                             List<CfAttributcontent> attributcontentList = classutil.jsonImport(contentversion);
-                            ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
+                            ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyvalList(attributcontentList);
+                            HashMap keyval = contentUtil.getContentOutputKeyval(attributcontentList);
                             contentdataoutput.setKeyvals(keyvals);
+                            contentdataoutput.setKeyval(keyval);
                         } else {
                             List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(content);
-                            ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
+                            ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyvalList(attributcontentList);
+                            HashMap keyval = contentUtil.getContentOutputKeyval(attributcontentList);
                             contentdataoutput.setKeyvals(keyvals);
-
+                            contentdataoutput.setKeyval(keyval);
                         }
                         contentdataoutput.setKeywords(keywords);
                         contentdataoutput.setDifference(contentUtil.hasDifference(content));

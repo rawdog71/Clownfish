@@ -172,7 +172,8 @@ public class GetDatalistHibernate extends HttpServlet {
                 //List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
                 ContentOutput co = new ContentOutput();
                 co.setIdentifier(classcontent.getName());
-                co.setKeyvals(getContentMap(content));
+                co.setKeyvals(getContentMapList(content));
+                co.setKeyval(getContentMap(content));
                 co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
                 outputlist.add(co);
             }
@@ -256,7 +257,8 @@ public class GetDatalistHibernate extends HttpServlet {
                 List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
                 ContentOutput co = new ContentOutput();
                 co.setIdentifier(classcontent.getName());
-                co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                co.setKeyvals(contentUtil.getContentOutputKeyvalList(attributcontentList));
+                co.setKeyval(contentUtil.getContentOutputKeyval(attributcontentList));
                 co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
                 outputlist.add(co);
             }
@@ -275,10 +277,15 @@ public class GetDatalistHibernate extends HttpServlet {
         }    
     }
     
-    private ArrayList getContentMap(Map content) {
+    private ArrayList getContentMapList(Map content) {
         HashMap<String, String> contentMap = new HashMap<>(content);
-        ArrayList contenList = new ArrayList<>();
-        contenList.add(contentMap);
-        return contenList;
+        ArrayList contentList = new ArrayList<>();
+        contentList.add(contentMap);
+        return contentList;
+    }
+    
+    private HashMap getContentMap(Map content) {
+        HashMap<String, String> contentMap = new HashMap<>(content);
+        return contentMap;
     }
 }

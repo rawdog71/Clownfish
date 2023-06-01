@@ -177,7 +177,8 @@ public class GetDatalist extends HttpServlet {
                     List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
                     ContentOutput co = new ContentOutput();
                     co.setIdentifier(classcontent.getName());
-                    co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                    co.setKeyvals(contentUtil.getContentOutputKeyvalList(attributcontentList));
+                    co.setKeyval(contentUtil.getContentOutputKeyval(attributcontentList));
                     co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
                     outputlist.add(co);
                 }
@@ -265,7 +266,8 @@ public class GetDatalist extends HttpServlet {
                     List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
                     ContentOutput co = new ContentOutput();
                     co.setIdentifier(classcontent.getName());
-                    co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                    co.setKeyvals(contentUtil.getContentOutputKeyvalList(attributcontentList));
+                    co.setKeyval(contentUtil.getContentOutputKeyval(attributcontentList));
                     co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
                     outputlist.add(co);
                 }
