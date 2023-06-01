@@ -140,13 +140,15 @@ public class ContentTemplateBean implements Serializable {
     
     private ContentDataOutput getContentdataoutput(CfClasscontent classcontent) {
         List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
-        ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
+        ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyvalList(attributcontentList);
+        HashMap keyval = contentUtil.getContentOutputKeyval(attributcontentList);
         ArrayList<String> keywords = contentUtil.getContentOutputKeywords(classcontent, true);
 
         ContentDataOutput contentdataoutput = new ContentDataOutput();
         contentdataoutput.setContent(classcontent);
         contentdataoutput.setKeywords(keywords);
         contentdataoutput.setKeyvals(keyvals);
+        contentdataoutput.setKeyval(keyval);
         
         return contentdataoutput;
     }
@@ -178,7 +180,8 @@ public class ContentTemplateBean implements Serializable {
                 Map content = (Map) query.getSingleResult();
                 ContentOutput co = new ContentOutput();
                 co.setIdentifier(classcontent.getName());
-                co.setKeyvals(contentUtil.getContentMap(content));
+                co.setKeyvals(contentUtil.getContentMapList(content));
+                co.setKeyval(contentUtil.getContentMap(content));
                 co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
                 outputlist.add(co);
             }
@@ -188,7 +191,8 @@ public class ContentTemplateBean implements Serializable {
                 List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
                 ContentOutput co = new ContentOutput();
                 co.setIdentifier(classcontent.getName());
-                co.setKeyvals(contentUtil.getContentOutputKeyval(attributcontentList));
+                co.setKeyvals(contentUtil.getContentOutputKeyvalList(attributcontentList));
+                co.setKeyval(contentUtil.getContentOutputKeyval(attributcontentList));
                 co.setKeywords(contentUtil.getContentOutputKeywords(classcontent, false));
                 outputlist.add(co);
             }

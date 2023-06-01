@@ -165,7 +165,7 @@ public class GraphQLDataFetchers {
                     HashMap<String, String> attributmap = new HashMap<>();
                     List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
                     if (checkCompare(aclist, cc, attributname, attributvalue)) {
-                        List keyvals = contentUtil.getContentOutputKeyval(aclist);
+                        List keyvals = contentUtil.getContentOutputKeyvalList(aclist);
 
                         result.putAll((Map)keyvals.get(0));
                     }
@@ -192,9 +192,11 @@ public class GraphQLDataFetchers {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
                             contentdataoutput.setContent(cfclasscontent);
                             if (cfclasscontent.getClassref().isEncrypted()) {
-                                contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
                             } else {
-                                contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
+                                contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
+                                contentdataoutput.setKeyval(contentUtil.getContentMap(content));
                             }
                             setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, null);
                             setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
@@ -226,12 +228,12 @@ public class GraphQLDataFetchers {
                     if (!attributname.isEmpty()) {
                         List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
                         if (checkCompare(aclist, cc, attributname, attributvalue)) {
-                            List keyvals = contentUtil.getContentOutputKeyval(aclist);
+                            List keyvals = contentUtil.getContentOutputKeyvalList(aclist);
                             result.add((Map)keyvals.get(0));
                         }
                     } else {
                         List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
-                        List keyvals = contentUtil.getContentOutputKeyval(aclist);
+                        List keyvals = contentUtil.getContentOutputKeyvalList(aclist);
                         result.add((Map)keyvals.get(0));
                     }
                 }
@@ -259,9 +261,11 @@ public class GraphQLDataFetchers {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
                             contentdataoutput.setContent(cfclasscontent);
                             if (cfclasscontent.getClassref().isEncrypted()) {
-                                contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
                             } else {
-                                contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
+                                contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
+                                contentdataoutput.setKeyval(contentUtil.getContentMap(content));
                             }
                             setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, null);
                             setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
@@ -301,12 +305,12 @@ public class GraphQLDataFetchers {
                         if (!field.isEmpty()) {
                             List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
                             if (checkCompare(aclist, cc, field, value1)) {
-                                List keyvals = contentUtil.getContentOutputKeyval(aclist);
+                                List keyvals = contentUtil.getContentOutputKeyvalList(aclist);
                                 result.add((Map)keyvals.get(0));
                             }
                         } else {
                             List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
-                            List keyvals = contentUtil.getContentOutputKeyval(aclist);
+                            List keyvals = contentUtil.getContentOutputKeyvalList(aclist);
                             result.add((Map)keyvals.get(0));
                         }
 
@@ -347,9 +351,11 @@ public class GraphQLDataFetchers {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
                             contentdataoutput.setContent(cfclasscontent);
                             if (cfclasscontent.getClassref().isEncrypted()) {
-                                contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
                             } else {
-                                contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
+                                contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
+                                contentdataoutput.setKeyval(contentUtil.getContentMap(content));
                             }
                             found = setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
                             setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
@@ -391,9 +397,11 @@ public class GraphQLDataFetchers {
                                         ContentDataOutput contentdataoutput = new ContentDataOutput();
                                         contentdataoutput.setContent(cfclasscontent);
                                         if (cfclasscontent.getClassref().isEncrypted()) {
-                                            contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(output, cfclasscontent.getClassref()));
+                                            contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(output, cfclasscontent.getClassref()));
+                                            contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(output, cfclasscontent.getClassref()));
                                         } else {
-                                            contentdataoutput.setKeyvals(contentUtil.getContentMap(output));
+                                            contentdataoutput.setKeyvals(contentUtil.getContentMapList(output));
+                                            contentdataoutput.setKeyval(contentUtil.getContentMap(output));
                                         }
                                         setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
                                         setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);

@@ -229,9 +229,11 @@ public class GetContentHibernate extends HttpServlet {
                                                 contentdataoutput.setContent(cfclasscontent);
                                                 contentdataoutput.setKeywords(contentUtil.getContentKeywords(cfclasscontent, true));
                                                 if (cfclasscontent.getClassref().isEncrypted()) {
-                                                    contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                                    contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                                                    contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
                                                 } else {
-                                                    contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
+                                                    contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
+                                                    contentdataoutput.setKeyval(contentUtil.getContentMap(content));
                                                 }
                                                 try {
                                                     contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
@@ -246,9 +248,11 @@ public class GetContentHibernate extends HttpServlet {
                                             contentdataoutput.setContent(cfclasscontent);
                                             contentdataoutput.setKeywords(contentUtil.getContentKeywords(cfclasscontent, true));
                                             if (cfclasscontent.getClassref().isEncrypted()) {
-                                                contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                                contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                                                contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
                                             } else {
-                                                contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
+                                                contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
+                                                contentdataoutput.setKeyval(contentUtil.getContentMap(content));
                                             }
                                             try {
                                                 contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
@@ -415,9 +419,11 @@ public class GetContentHibernate extends HttpServlet {
                                 contentdataoutput.setContent(cfclasscontent);
                                 contentdataoutput.setKeywords(contentUtil.getContentKeywords(cfclasscontent, true));
                                 if (cfclasscontent.getClassref().isEncrypted()) {
-                                    contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                    contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                                    contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
                                 } else {
-                                    contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
+                                    contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
+                                    contentdataoutput.setKeyval(contentUtil.getContentMap(content));
                                 }
                                 outputlist.add(contentdataoutput);
                             }
@@ -426,9 +432,11 @@ public class GetContentHibernate extends HttpServlet {
                             contentdataoutput.setContent(cfclasscontent);
                             contentdataoutput.setKeywords(contentUtil.getContentKeywords(cfclasscontent, true));
                             if (cfclasscontent.getClassref().isEncrypted()) {
-                                contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
                             } else {
-                                contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
+                                contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
+                                contentdataoutput.setKeyval(contentUtil.getContentMap(content));
                             }
                             outputlist.add(contentdataoutput);
                         }

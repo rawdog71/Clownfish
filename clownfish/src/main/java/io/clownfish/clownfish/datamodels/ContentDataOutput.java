@@ -29,6 +29,7 @@ import lombok.Setter;
 public class ContentDataOutput {
     private @Getter @Setter CfClasscontent content;
     private @Getter @Setter ArrayList<HashMap> keyvals;
+    private @Getter @Setter HashMap keyval;
     private @Getter @Setter ArrayList<String> keywords;
     private @Getter @Setter boolean difference;
     private @Getter @Setter long maxversion;
