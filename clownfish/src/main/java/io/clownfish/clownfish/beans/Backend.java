@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 @Scope("session")
 @Component
 public class Backend implements Serializable  {
+    @Autowired SiteTreeBean sitetree;
     @Autowired ContentList contentlist;
     @Autowired AssetList assetlist;
     @Autowired AssetLibrary assetlibrary;
@@ -46,6 +47,7 @@ public class Backend implements Serializable  {
     }
     
     public void onRefreshAll() {
+        sitetree.onRefreshAll();
         contentlist.onRefreshAll();
         assetlist.onRefreshAll();
         assetlibrary.onRefreshAll();
