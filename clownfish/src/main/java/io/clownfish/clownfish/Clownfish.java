@@ -20,6 +20,7 @@ import com.google.gson.reflect.TypeToken;
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import de.destrukt.sapconnection.SAPConnection;
 import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.TemplateException;
 import io.clownfish.clownfish.beans.*;
 import io.clownfish.clownfish.compiler.CfClassCompiler;
 import io.clownfish.clownfish.compiler.CfClassLoader;
@@ -87,6 +88,7 @@ import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
+import io.clownfish.clownfish.exceptions.ClownfishTemplateException;
 import io.clownfish.clownfish.serviceimpl.CfStringTemplateLoaderImpl;
 import io.clownfish.clownfish.websocket.WebSocketServer;
 import java.util.logging.Level;
@@ -722,10 +724,12 @@ public class Clownfish {
                     switch (cfResponse.get().getErrorcode()) {
                         case 1:
                         case 2:
+                        case 4:
                             response.setContentType("text/html");
                             response.setCharacterEncoding("UTF-8");
                             break;
                         case 3:
+                        case 5:
                             response.sendRedirect(cfResponse.get().getRelocation());
                             break;
                     }
@@ -1485,9 +1489,17 @@ public class Clownfish {
                                                     try {
                                                         if (null != fmTemplate) {
                                                             if (1 == cftemplate.getType()) {
-                                                                String output = manageLayout(cfsite, cftemplate.getName(), cftemplate.getContent(), cfstylesheet, cfjavascript, parametermap);
-                                                                output = interpretscript(output, cftemplate, cfstylesheet, cfjavascript, parametermap);
-                                                                out.write(output);
+                                                                try {
+                                                                    String output = manageLayout(cfsite, cftemplate.getName(), cftemplate.getContent(), cfstylesheet, cfjavascript, parametermap);
+                                                                    output = interpretscript(output, cftemplate, cfstylesheet, cfjavascript, parametermap);
+                                                                    out.write(output);
+                                                                } catch (ClownfishTemplateException ex) {
+                                                                    //LOGGER.error(ex.getMessage());
+                                                                    cfresponse.setErrorcode(5);
+                                                                    cfresponse.setOutput("ClownfishTemplateException");
+                                                                    cfresponse.setRelocation(cfsite.getLoginsite());
+                                                                    return new AsyncResult<>(cfresponse);
+                                                                }
                                                             } else {
                                                                 freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
                                                                 env.process();
@@ -1585,9 +1597,17 @@ public class Clownfish {
 
                                                     if (null != velTemplate) {
                                                         if (1 == cftemplate.getType()) {
-                                                            String output = manageLayout(cfsite, cftemplate.getName(), cftemplate.getContent(), cfstylesheet, cfjavascript, parametermap);
-                                                            output = interpretscript(output, cftemplate, cfstylesheet, cfjavascript, parametermap);
-                                                            out.write(output);
+                                                            try {
+                                                                String output = manageLayout(cfsite, cftemplate.getName(), cftemplate.getContent(), cfstylesheet, cfjavascript, parametermap);
+                                                                output = interpretscript(output, cftemplate, cfstylesheet, cfjavascript, parametermap);
+                                                                out.write(output);
+                                                            } catch (TemplateException | ClownfishTemplateException ex) {
+                                                                //LOGGER.error(ex.getMessage());
+                                                                cfresponse.setErrorcode(5);
+                                                                cfresponse.setOutput("ClownfishTemplateException");
+                                                                cfresponse.setRelocation(cfsite.getLoginsite());
+                                                                return new AsyncResult<>(cfresponse);
+                                                            }
                                                         } else {
                                                             velTemplate.merge(velContext, out);
                                                         }
@@ -1599,7 +1619,16 @@ public class Clownfish {
                                         }
                                     } else {                                                                                // LAYOUT Template
                                         if (1 == cftemplate.getType()) {
-                                            String output = manageLayout(cfsite, cftemplate.getName(), cftemplate.getContent(), cfstylesheet, cfjavascript, parametermap);
+                                            String output = "";
+                                            try {
+                                                output = manageLayout(cfsite, cftemplate.getName(), cftemplate.getContent(), cfstylesheet, cfjavascript, parametermap);
+                                            } catch (ClownfishTemplateException ex) {
+                                                //LOGGER.error(ex.getMessage());
+                                                cfresponse.setErrorcode(5);
+                                                cfresponse.setOutput("ClownfishTemplateException");
+                                                cfresponse.setRelocation(cfsite.getLoginsite());
+                                                return new AsyncResult<>(cfresponse);
+                                            }
                                             out.write(output);
                                             out.flush();
                                             out.close();
@@ -1753,10 +1782,14 @@ public class Clownfish {
             Future<ClownfishResponse> cfStaticResponse;
             try {
                 cfStaticResponse = makeResponse(sitename, postmap, urlParams, true, null);
-                if (!urlParams.isEmpty()) {
-                    StaticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                if (0 == cfStaticResponse.get().getErrorcode()) {
+                    if (!urlParams.isEmpty()) {
+                        StaticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                    } else {
+                        StaticSiteUtil.generateStaticSite(siteurlname, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                    }
                 } else {
-                    StaticSiteUtil.generateStaticSite(siteurlname, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                    deleteStaticSite(sitename, urlParams);
                 }
             } catch (PageNotFoundException | InterruptedException | ExecutionException ex1) {
                 LOGGER.error(ex.getMessage());
@@ -1798,7 +1831,7 @@ public class Clownfish {
         }
     }
     
-    private String interpretscript(String templatecontent, CfTemplate cftemplate, String cfstylesheet, String cfjavascript, Map parametermap) {
+    private String interpretscript(String templatecontent, CfTemplate cftemplate, String cfstylesheet, String cfjavascript, Map parametermap) throws TemplateException {
         StringWriter out = new StringWriter();
         try {
             freemarker.template.Template fmTemplate = null;
@@ -1937,13 +1970,15 @@ public class Clownfish {
                             }
                         });
                         
+                        freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
                         try {
                             if (null != fmTemplate) {
-                                freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
+                                //freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
                                 env.process();
                             }
                         } catch (freemarker.template.TemplateException ex) {
-                            LOGGER.error(ex.getMessage());
+                            //LOGGER.error(ex.getMessage());
+                            throw new TemplateException(ex.getMessage(), env);
                         } catch (IOException ex) {
                             LOGGER.error(ex.getMessage());
                         }
@@ -2053,7 +2088,7 @@ public class Clownfish {
         }
     }
     
-    private String manageLayout(CfSite cfsite, String templatename, String templatecontent, String cfstylesheet, String cfjavascript, Map parametermap) {
+    private String manageLayout(CfSite cfsite, String templatename, String templatecontent, String cfstylesheet, String cfjavascript, Map parametermap) throws ClownfishTemplateException {
         String login_token = "";
         if (parametermap.containsKey("cf_login_token")) {    // check token for access manager
             login_token = parametermap.get("cf_login_token").toString();
@@ -2102,7 +2137,12 @@ public class Clownfish {
                 String content = templateUtil.getVersion((cfdivtemplate).getId(), currentTemplateVersion);
                 content = templateUtil.fetchIncludes(content, modus);
                 content = templateUtil.replacePlaceholders(content, cfdiv, layoutcontent, preview);
-                content = interpretscript(content, cfdivtemplate, cfstylesheet, cfjavascript, parametermap);
+                try {
+                    content = interpretscript(content, cfdivtemplate, cfstylesheet, cfjavascript, parametermap);
+                } catch (TemplateException ex) {
+                    //LOGGER.error(ex.getMessage());
+                    throw new ClownfishTemplateException(ex.getMessage());
+                }
                 //System.out.println(out);
                 div.removeAttr("template");
                 div.removeAttr("contents");
@@ -2175,11 +2215,34 @@ public class Clownfish {
                 staticsite = new CfStaticsite();
                 staticsite.setOffline(false);
                 staticsite.setSite(name);
-                staticsite.setUrlparams(urlparamname);
+                staticsite.setUrlparams(urlparamname.substring(1));
                 staticsite.setTstamp(new Date());
                 cfstaticsiteservice.create(staticsite);
             }
         }
         return !staticsite.isOffline();
+    }
+    
+    private void deleteStaticSite(String name, List urlParams) {
+        String urlparamname = "";
+        if (!urlParams.isEmpty()) {
+            for (Object urlparam : urlParams) {
+                urlparamname += "/" + (String) (urlparam);
+            }
+        }
+        CfStaticsite staticsite = null;
+        if (urlparamname.isEmpty()) {
+            try {
+                staticsite = cfstaticsiteservice.findBySiteAndUrlparams(name, urlparamname);
+                cfstaticsiteservice.delete(staticsite);
+            } catch (NoResultException ex) {
+            }
+        } else {
+            try {
+                staticsite = cfstaticsiteservice.findBySiteAndUrlparams(name, urlparamname.substring(1));
+                cfstaticsiteservice.delete(staticsite);
+            } catch (NoResultException ex) {
+            }
+        }
     }
 }
