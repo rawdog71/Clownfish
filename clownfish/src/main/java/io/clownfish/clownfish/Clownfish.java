@@ -730,7 +730,7 @@ public class Clownfish {
                             break;
                         case 3:
                         case 5:
-                            response.sendRedirect(cfResponse.get().getRelocation());
+                            response.sendRedirect("/" + cfResponse.get().getRelocation());
                             break;
                     }
                 }
@@ -1497,7 +1497,7 @@ public class Clownfish {
                                                                     //LOGGER.error(ex.getMessage());
                                                                     cfresponse.setErrorcode(5);
                                                                     cfresponse.setOutput("ClownfishTemplateException");
-                                                                    cfresponse.setRelocation(cfsite.getLoginsite());
+                                                                    cfresponse.setRelocation(propertyUtil.getPropertyValue("site_error"));
                                                                     return new AsyncResult<>(cfresponse);
                                                                 }
                                                             } else {
@@ -1605,7 +1605,7 @@ public class Clownfish {
                                                                 //LOGGER.error(ex.getMessage());
                                                                 cfresponse.setErrorcode(5);
                                                                 cfresponse.setOutput("ClownfishTemplateException");
-                                                                cfresponse.setRelocation(cfsite.getLoginsite());
+                                                                cfresponse.setRelocation(propertyUtil.getPropertyValue("site_error"));
                                                                 return new AsyncResult<>(cfresponse);
                                                             }
                                                         } else {
@@ -1626,7 +1626,7 @@ public class Clownfish {
                                                 //LOGGER.error(ex.getMessage());
                                                 cfresponse.setErrorcode(5);
                                                 cfresponse.setOutput("ClownfishTemplateException");
-                                                cfresponse.setRelocation(cfsite.getLoginsite());
+                                                cfresponse.setRelocation(propertyUtil.getPropertyValue("site_error"));
                                                 return new AsyncResult<>(cfresponse);
                                             }
                                             out.write(output);
