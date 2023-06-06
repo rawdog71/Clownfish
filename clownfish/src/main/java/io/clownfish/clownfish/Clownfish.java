@@ -579,6 +579,7 @@ public class Clownfish {
             String token = request.getHeader("cf_token");
             String login_token = request.getHeader("cf_login_token");
             boolean alias = false;
+            String aliasname = "";
             try {
                 ArrayList urlParams = new ArrayList();
                 // fetch site by name or aliasname
@@ -587,11 +588,13 @@ public class Clownfish {
                     cfsite = cfsiteService.findByName(name);
                 } catch (Exception ex) {
                     try {
+                        aliasname = name;
                         cfsite = cfsiteService.findByAliaspath(name);
                         name = cfsite.getName();
                         alias = true;
                     } catch (Exception e1) {
                         try {
+                            aliasname = name;
                             cfsite = cfsiteService.findByShorturl(name);
                             name = cfsite.getName();
                             alias = true;
@@ -602,9 +605,9 @@ public class Clownfish {
                 }
                 
                 if (!cfsite.isSearchresult()) {
-                    String path;
+                    String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
                     if (alias) {
-                        path = name;
+                        path = path.replaceFirst(aliasname, name);
                     } else {
                         path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
                     }
@@ -621,7 +624,11 @@ public class Clownfish {
                     }
 
                     if (name.compareToIgnoreCase(path) != 0) {
-                        name = path.substring(1);
+                        if (path.startsWith("/")) {
+                            name = path.substring(1);
+                        } else {
+                            name = path;
+                        }
                         if (name.lastIndexOf("/")+1 == name.length()) {
                             name = name.substring(0, name.length()-1);
                         }

@@ -292,7 +292,7 @@
                                             <p:row>
                                                 <p:column>
                                                     <div class="content-justify">
-                                                        <p:outputLabel for="aliaspath" value="Path:" />
+                                                        <p:outputLabel for="aliaspath" value="Alias:" />
                                                         <p:inputText id="aliaspath" value="#{sitetree.aliaspath}" maxlength="255" />
                                                     </div>
                                                 </p:column>
@@ -1302,7 +1302,7 @@
                             <div class="flex align-items-center pr-2">
                                 <p:outputLabel for="contentname" style="margin-right: 0.5rem">Name</p:outputLabel>
                                 <p:inputText id="contentname" value="#{classcontentList.contentName}" >
-                                    <f:validateRegex pattern="^[a-zA-ZäöüÄÖÜ][0-9a-zA-ZäöüÄÖÜ_()]+$"/>
+                                    <f:validateRegex pattern="^[a-zA-ZäöüÄÖÜ][0-9a-zA-ZäöüÄÖÜ_ ()]+$"/>
                                     <p:ajax event="keyup" listener="#{classcontentList.onChangeName(changeEvent)}" update="newcontent" />
                                 </p:inputText>
                             </div>
