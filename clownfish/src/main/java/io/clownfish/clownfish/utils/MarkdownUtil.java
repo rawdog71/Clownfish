@@ -39,10 +39,13 @@ import com.vladsch.flexmark.ext.gfm.strikethrough.*;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.data.DataKey;
+import com.vladsch.flexmark.util.data.DataKeyBase;
 import com.vladsch.flexmark.util.misc.Extension;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.dbentities.CfProperty;
+import io.clownfish.clownfish.markdownext.PaginationExtension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +70,9 @@ public class MarkdownUtil {
     private @Getter @Setter Map<String, String> propertymap;
     @Autowired private final PropertyList proplist;
     private List<Extension> extensionList;
+    private @Getter @Setter List urlParams;
+    private @Getter @Setter String site;
+    private @Getter @Setter boolean init = true;
 
     final transient Logger LOGGER = LoggerFactory.getLogger(MarkdownUtil.class);
     
@@ -158,6 +164,9 @@ public class MarkdownUtil {
                 case "markdown_YouTubeLinkExtension":
                     extensionList.add(YouTubeLinkExtension.create());
                     break;
+                case "markdown_PaginationExtension":
+                    extensionList.add(PaginationExtension.create());
+                    break;
             }
         } catch (SecurityException  ex) {
             LOGGER.error(ex.getMessage());
@@ -165,6 +174,52 @@ public class MarkdownUtil {
     }
     
     public String parseMarkdown(String content, MutableDataSet markdownOptions) {
+        if (init) {
+            init = false;
+            if (!urlParams.isEmpty()) {
+                for (DataKeyBase dkb : markdownOptions.getKeys()) {
+                    if (dkb.getName().startsWith("urlparam/")) {
+                        markdownOptions.set((DataKey) dkb, "");
+                    }
+                }
+                int counter = 1;
+                String key = "";
+                String val = "";
+                for (Object param : urlParams) {
+                    if (counter % 2 == 0) {
+                        val = (String) param;
+                        DataKey dk = new DataKey("urlparam/" + key, val);
+                        boolean found = false;
+                        for (DataKeyBase dkb : markdownOptions.getKeys()) {
+                            if (0 == dkb.getName().compareToIgnoreCase(dk.getName())) {
+                                markdownOptions.set((DataKey) dkb, val);
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            markdownOptions.set(dk, val);
+                        }
+                    } else {
+                        key = (String) param;
+                    }
+                    counter++;
+                }
+                // set site markdownoption
+                boolean found = false;
+                for (DataKeyBase dkb : markdownOptions.getKeys()) {
+                    if (0 == dkb.getName().compareToIgnoreCase("urlparam/site")) {
+                        markdownOptions.set((DataKey) dkb, site);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    DataKey dk = new DataKey("urlparam/site", site);
+                    markdownOptions.set(dk, site);
+                }
+            }
+        }
         // uncomment to convert soft-breaks to hard breaks
         //options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
 

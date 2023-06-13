@@ -87,8 +87,11 @@ public class ContentUtil implements IVersioningInterface {
     private @Getter @Setter String content = "";
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentUtil.class);
 
-    public void init(MarkdownUtil markdownUtil) {
+    public void init(MarkdownUtil markdownUtil, String site, List urlParams) {
         this.markdownUtil = markdownUtil;
+        this.markdownUtil.setSite(site);
+        this.markdownUtil.setUrlParams(urlParams);
+        this.markdownUtil.setInit(true);
     }
     
     public AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent) {
