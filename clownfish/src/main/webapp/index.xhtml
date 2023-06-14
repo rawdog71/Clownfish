@@ -1068,8 +1068,8 @@
                     <div class="flex flex-row pb-2">
                         <div class="flex align-items-center pr-2">
                             <p:outputLabel for="classname" style="margin-right: 0.5rem">Name: </p:outputLabel>
-                            <p:inputText id="classname" value="#{classList.className}" >
-                                <f:validateRegex pattern="^[a-zA-Z][0-9a-zA-Z_]+$"/>
+                            <p:inputText id="classname" value="#{classList.className}" required="false">
+                                <f:validateRegex pattern="^([a-zA-Z][0-9a-zA-Z_]+)?$"/>
                                 <p:ajax event="keyup" listener="#{classList.onChangeName(changeEvent)}" update=":form:tabview:newclass" />
                             </p:inputText>
                         </div>
@@ -1178,8 +1178,8 @@
                         <div class="flex flex-row pb-2">
                             <div class="flex align-items-center pr-2">
                                 <p:outputLabel for="attributname" style="margin-right: 0.5rem">Name</p:outputLabel>
-                                <p:inputText id="attributname" value="#{classList.attributName}" >
-                                    <f:validateRegex pattern="^[a-zA-Z][0-9a-zA-Z_]+$"/>
+                                <p:inputText id="attributname" value="#{classList.attributName}" required="false">
+                                    <f:validateRegex pattern="^([a-zA-Z][0-9a-zA-Z_]+)?$"/>
                                     <p:ajax event="keyup" listener="#{classList.onChangeAttributName(changeEvent)}" update=":form:tabview:newattribut" />
                                 </p:inputText>
                             </div>
@@ -1301,8 +1301,8 @@
 
                             <div class="flex align-items-center pr-2">
                                 <p:outputLabel for="contentname" style="margin-right: 0.5rem">Name</p:outputLabel>
-                                <p:inputText id="contentname" value="#{classcontentList.contentName}" >
-                                    <f:validateRegex pattern="^[a-zA-ZäöüÄÖÜ][0-9a-zA-ZäöüÄÖÜ_ ()]+$"/>
+                                <p:inputText id="contentname" value="#{classcontentList.contentName}" required="false">
+                                    <f:validateRegex pattern="^([a-zA-ZäöüÄÖÜ][0-9a-zA-ZäöüÄÖÜ_ ()]+)?$"/>
                                     <p:ajax event="keyup" listener="#{classcontentList.onChangeName(changeEvent)}" update="newcontent" />
                                 </p:inputText>
                             </div>
@@ -1471,8 +1471,8 @@
                     </p:panel>
                     
                     <p:outputLabel for="datacontentname" style="margin-right: 0.5rem">Name</p:outputLabel>
-                    <p:inputText id="datacontentname" value="#{datacontentList.contentName}" >
-                        <f:validateRegex pattern="^[a-zA-Z][0-9a-zA-Z_]+$"/>
+                    <p:inputText id="datacontentname" value="#{datacontentList.contentName}" required="false">
+                        <f:validateRegex pattern="^([a-zA-Z][0-9a-zA-Z_]+)?$"/>
                         <p:ajax event="keyup" listener="#{datacontentList.onChangeName(changeEvent)}" update="newcontentlist" />
                     </p:inputText>
 
