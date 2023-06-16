@@ -62,6 +62,10 @@ public class CfApiPK implements Serializable {
     public void setKeyname(String keyname) {
         this.keyname = keyname;
     }
+    
+    public int getHash() {
+        return hashCode();
+    }
 
     @Override
     public int hashCode() {

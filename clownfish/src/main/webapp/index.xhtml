@@ -366,6 +366,31 @@
                                         </p:panelGrid>
                                     </p:tab>
                                     
+                                    <p:tab title="API" id="site_api">
+                                        <p:panelGrid id="sitepanel_api" columns="1">
+                                            <p:column colspan="12" style="vertical-align: top;">
+                                                <p:dataTable id="apilist" size="small" var="apilist" value="#{sitetree.apilist}" selectionMode="single" selection="#{sitetree.selectedapi}" rowKey="#{apilist.cfApiPK.hash}">
+                                                    <p:ajax event="rowSelect" listener="#{sitetree.onApiSelect}" update=":form:tabview:preview" />
+                                                    <p:column headerText="KEYNAME" filterBy="#{apilist.cfApiPK.keyname}" filterMatchMode="contains" sortBy="#{apilist.cfApiPK.keyname}">
+                                                        <h:outputText value="#{apilist.cfApiPK.keyname}" />
+                                                    </p:column>
+                                                    <p:column headerText="DESCRIPTION" filterBy="#{apilist.description}" filterMatchMode="contains" sortBy="#{apilist.description}">
+                                                        <h:outputText value="#{apilist.description}" />
+                                                    </p:column>
+                                                </p:dataTable>
+                                                
+                                                <p:outputLabel for="apikeyname" value="Keyname:" />
+                                                <p:inputText id="apikeyname" value="#{sitetree.apikeyname}" />
+                                                <p:outputLabel for="apidescription" value="Description" />
+                                                <p:inputText id="apidescription" value="#{sitetree.apidescription}" />
+                                                <p:commandButton id="newApi" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{sitetree.onNewApi(actionEvent)}" update=":form:tabview:tabsiteview:apilist" />
+                                                <p:commandButton id="deleteApi" process="form" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDeleteApi(actionEvent)}" update=":form:tabview:tabsiteview:apilist">
+                                                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                                </p:commandButton>
+                                            </p:column>
+                                        </p:panelGrid>
+                                    </p:tab>
+                                    
                                     <p:tab title="Static Sites" id="site_static" rendered="#{sitetree.selectedSite.staticsite}">
                                         <p:panelGrid id="sitepanel_static" columns="1">
                                             <p:column colspan="12" style="vertical-align: top;">
@@ -393,7 +418,7 @@
                                     <p:tab title="SAP" id="site_sap" rendered="#{sitetree.sapSupport}">
                                         <p:panelGrid id="sitepanel_sap" columns="1">
                                             <p:column colspan="12" style="vertical-align: top;">
-                                                <p:dataTable id="saprfclist" size="small" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.cfSitesaprfcPK}">
+                                                <p:dataTable id="saprfclist" size="small" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.cfSitesaprfcPK.hashCode}">
                                                     <p:ajax event="rowSelect" listener="#{sitetree.onRfcSelect}" update=":form:tabview:tabsiteview:siterfcgroup :form:tabview:tabsiteview:siterfcfunction" />
                                                     <p:column headerText="RFC GRUPPE">
                                                         <h:outputText value="#{rfclist.cfSitesaprfcPK.rfcgroup}" />

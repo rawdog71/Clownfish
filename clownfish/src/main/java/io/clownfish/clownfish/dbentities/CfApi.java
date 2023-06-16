@@ -36,7 +36,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfApi.findAll", query = "SELECT c FROM CfApi c"),
     @NamedQuery(name = "CfApi.findBySiteref", query = "SELECT c FROM CfApi c WHERE c.cfApiPK.siteref = :siteref"),
     @NamedQuery(name = "CfApi.findByKeyname", query = "SELECT c FROM CfApi c WHERE c.cfApiPK.keyname = :keyname"),
-    @NamedQuery(name = "CfApi.findByDescription", query = "SELECT c FROM CfApi c WHERE c.description = :description")})
+    @NamedQuery(name = "CfApi.findByDescription", query = "SELECT c FROM CfApi c WHERE c.description = :description"),
+    @NamedQuery(name = "CfApi.findBySiteRefAndKeyname", query = "SELECT c FROM CfApi c WHERE c.cfApiPK.siteref = :siteref AND c.cfApiPK.keyname = :keyname")
+})
 public class CfApi implements Serializable {
 
     private static final long serialVersionUID = 1L;

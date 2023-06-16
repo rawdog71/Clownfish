@@ -19,6 +19,8 @@ import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
+import io.clownfish.clownfish.dbentities.CfApi;
+import io.clownfish.clownfish.dbentities.CfApiPK;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
@@ -54,6 +56,7 @@ import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
 import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
 import io.clownfish.clownfish.sap.models.RfcFunction;
 import io.clownfish.clownfish.sap.models.RfcGroup;
+import io.clownfish.clownfish.serviceinterface.CfApiService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
@@ -156,8 +159,12 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfList> selectedContentlist;
     private transient @Getter @Setter List<CfSitesaprfc> saprfclist = null;
     private transient @Getter @Setter List<CfStaticsite> staticsitelist = null;
+    private transient @Getter @Setter List<CfApi> apilist = null;
     private @Getter @Setter CfSitesaprfc selectedrfc = null;
     private @Getter @Setter CfStaticsite selectedstaticsite = null;
+    private @Getter @Setter CfApi selectedapi = null;
+    private @Getter @Setter String apikeyname = "";
+    private @Getter @Setter String apidescription = "";
     private @Getter @Setter String urlparams = "";
     private @Getter @Setter List<RfcGroup> rfcgrouplist;
     private @Getter @Setter String rfcgroup;
@@ -252,6 +259,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired CfLayoutcontentService cflayoutcontentService;
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
     @Autowired transient CfStaticsiteService cfstaticsiteService;
+    @Autowired transient CfApiService cfapiService;
     @Autowired transient CfPropertyService cfpropertyService;
     @Autowired transient LoginBean loginBean;
     @Autowired transient PropertyList propertylist;
@@ -501,6 +509,7 @@ public class SiteTreeBean implements Serializable {
         showAssetLibrary = false;
         showKeywordLibrary = false;
         selectedDiv = null;
+        apilist = null;
     }
     
     public void onSelect(NodeSelectEvent event) {
@@ -630,6 +639,7 @@ public class SiteTreeBean implements Serializable {
         locale = selectedSite.getLocale();
         saprfclist = cfsitesaprfcService.findBySiteref(selectedSite.getId());
         staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
+        apilist = cfapiService.findBySiteRef(selectedSite.getId());
         newButtonDisabled = true;
         
         FacesMessage message = new FacesMessage("Selected " + selectedSite.getName());
@@ -1072,6 +1082,30 @@ public class SiteTreeBean implements Serializable {
                 }
             }
             return null;
+        }
+    }
+    
+    public void onApiSelect(SelectEvent event) {
+        selectedapi = (CfApi) event.getObject();
+    }
+    
+    public void onNewApi(ActionEvent actionEvent) {
+        if (null != selectedSite) {
+            CfApi api = new CfApi();
+            api.setDescription(apidescription);
+            CfApiPK apipk = new CfApiPK();
+            apipk.setSiteref(selectedSite.getId());
+            apipk.setKeyname(apikeyname);
+            api.setCfApiPK(apipk);
+            cfapiService.create(api);
+            apilist = cfapiService.findBySiteRef(selectedSite.getId());
+        }
+    }
+    
+    public void onDeleteApi(ActionEvent actionEvent) {
+        if (null != selectedapi) {
+            cfapiService.delete(selectedapi);
+            apilist = cfapiService.findBySiteRef(selectedSite.getId());
         }
     }
     
