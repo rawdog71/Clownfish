@@ -418,7 +418,7 @@
                                     <p:tab title="SAP" id="site_sap" rendered="#{sitetree.sapSupport}">
                                         <p:panelGrid id="sitepanel_sap" columns="1">
                                             <p:column colspan="12" style="vertical-align: top;">
-                                                <p:dataTable id="saprfclist" size="small" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.cfSitesaprfcPK.hashCode}">
+                                                <p:dataTable id="saprfclist" size="small" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.cfSitesaprfcPK.hash}">
                                                     <p:ajax event="rowSelect" listener="#{sitetree.onRfcSelect}" update=":form:tabview:tabsiteview:siterfcgroup :form:tabview:tabsiteview:siterfcfunction" />
                                                     <p:column headerText="RFC GRUPPE">
                                                         <h:outputText value="#{rfclist.cfSitesaprfcPK.rfcgroup}" />

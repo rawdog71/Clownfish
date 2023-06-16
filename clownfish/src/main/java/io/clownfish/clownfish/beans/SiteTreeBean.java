@@ -167,7 +167,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter String apidescription = "";
     private @Getter @Setter String urlparams = "";
     private @Getter @Setter List<RfcGroup> rfcgrouplist;
-    private @Getter @Setter String rfcgroup;
+    private @Getter @Setter String rfcgroup = "";
     private @Getter @Setter RfcGroup selectedrfcgroup = null;
     private @Getter @Setter List<RfcFunction> rfcfunctionlist;
     private @Getter @Setter RfcFunction selectedrfcfunction = null;
