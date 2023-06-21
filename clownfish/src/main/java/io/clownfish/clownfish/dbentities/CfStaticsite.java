@@ -43,6 +43,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfStaticsite.findById", query = "SELECT c FROM CfStaticsite c WHERE c.id = :id"),
     @NamedQuery(name = "CfStaticsite.findBySite", query = "SELECT c FROM CfStaticsite c WHERE c.site = :site"),
     @NamedQuery(name = "CfStaticsite.findByUrlparams", query = "SELECT c FROM CfStaticsite c WHERE c.urlparams = :urlparams"),
+    @NamedQuery(name = "CfStaticsite.findBySiteAndUrlparams", query = "SELECT c FROM CfStaticsite c WHERE c.site = :site AND c.urlparams = :urlparams"),
     @NamedQuery(name = "CfStaticsite.findByTstamp", query = "SELECT c FROM CfStaticsite c WHERE c.tstamp = :tstamp")})
 public class CfStaticsite implements Serializable {
 
@@ -61,6 +62,8 @@ public class CfStaticsite implements Serializable {
     @Column(name = "tstamp")
     @Temporal(TemporalType.TIMESTAMP)
     private Date tstamp;
+    @Column(name = "offline")
+    private boolean offline;
 
     public CfStaticsite() {
     }
@@ -99,6 +102,14 @@ public class CfStaticsite implements Serializable {
 
     public void setTstamp(Date tstamp) {
         this.tstamp = tstamp;
+    }
+
+    public boolean isOffline() {
+        return offline;
+    }
+
+    public void setOffline(boolean offline) {
+        this.offline = offline;
     }
 
     @Override

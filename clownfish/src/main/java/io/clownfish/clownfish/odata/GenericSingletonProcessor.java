@@ -127,7 +127,7 @@ public class GenericSingletonProcessor implements EntityProcessor {
                 if (!cc.isScrapped()) {
                     HashMap<String, String> attributmap = new HashMap<>();
                     List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
-                    List keyvals = contentUtil.getContentOutputKeyval(aclist);
+                    List keyvals = contentUtil.getContentOutputKeyvalList(aclist);
                     Entity entity = new Entity();
                     // ToDo: fill out entity
                 }
@@ -147,9 +147,11 @@ public class GenericSingletonProcessor implements EntityProcessor {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
                             contentdataoutput.setContent(cfclasscontent);
                             if (cfclasscontent.getClassref().isEncrypted()) {
-                                contentdataoutput.setKeyvals(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
                             } else {
-                                contentdataoutput.setKeyvals(contentUtil.getContentMap(content));
+                                contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
+                                contentdataoutput.setKeyval(contentUtil.getContentMap(content));
                             }
                             contentUtil.setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, null);
                             // setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);

@@ -19,6 +19,8 @@ import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
+import io.clownfish.clownfish.dbentities.CfApi;
+import io.clownfish.clownfish.dbentities.CfApiPK;
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
@@ -54,6 +56,7 @@ import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
 import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
 import io.clownfish.clownfish.sap.models.RfcFunction;
 import io.clownfish.clownfish.sap.models.RfcGroup;
+import io.clownfish.clownfish.serviceinterface.CfApiService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
@@ -156,11 +159,15 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfList> selectedContentlist;
     private transient @Getter @Setter List<CfSitesaprfc> saprfclist = null;
     private transient @Getter @Setter List<CfStaticsite> staticsitelist = null;
+    private transient @Getter @Setter List<CfApi> apilist = null;
     private @Getter @Setter CfSitesaprfc selectedrfc = null;
     private @Getter @Setter CfStaticsite selectedstaticsite = null;
+    private @Getter @Setter CfApi selectedapi = null;
+    private @Getter @Setter String apikeyname = "";
+    private @Getter @Setter String apidescription = "";
     private @Getter @Setter String urlparams = "";
     private @Getter @Setter List<RfcGroup> rfcgrouplist;
-    private @Getter @Setter String rfcgroup;
+    private @Getter @Setter String rfcgroup = "";
     private @Getter @Setter RfcGroup selectedrfcgroup = null;
     private @Getter @Setter List<RfcFunction> rfcfunctionlist;
     private @Getter @Setter RfcFunction selectedrfcfunction = null;
@@ -178,6 +185,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter boolean sitemap;
     private @Getter @Setter boolean searchresult;
     private @Getter @Setter boolean invisible;
+    private @Getter @Setter boolean offline;
     private @Getter @Setter String siteTitle;
     private @Getter @Setter String siteDescription;
     private @Getter @Setter String aliaspath;
@@ -251,6 +259,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired CfLayoutcontentService cflayoutcontentService;
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
     @Autowired transient CfStaticsiteService cfstaticsiteService;
+    @Autowired transient CfApiService cfapiService;
     @Autowired transient CfPropertyService cfpropertyService;
     @Autowired transient LoginBean loginBean;
     @Autowired transient PropertyList propertylist;
@@ -327,6 +336,7 @@ public class SiteTreeBean implements Serializable {
         showAssetLibrary = false;
         showKeywordLibrary = false;
         invisible = false;
+        offline = false;
         templatelist.setSitetree(this);
         javascriptlist.setSitetree(this);
         stylesheetlist.setSitetree(this);
@@ -487,6 +497,7 @@ public class SiteTreeBean implements Serializable {
         newButtonDisabled = false;
         contenteditable = false;
         invisible = false;
+        offline = false;
         selected_contentclass = null;
         selected_datalisttclass = null;
         selected_asset = null;
@@ -498,6 +509,7 @@ public class SiteTreeBean implements Serializable {
         showAssetLibrary = false;
         showKeywordLibrary = false;
         selectedDiv = null;
+        apilist = null;
     }
     
     public void onSelect(NodeSelectEvent event) {
@@ -618,6 +630,7 @@ public class SiteTreeBean implements Serializable {
         } else {
             invisible = false;
         }
+        offline = selectedSite.isOffline();
         aliaspath = selectedSite.getAliaspath();
         loginsite = selectedSite.getLoginsite();
         sitehtmlcompression = selectedSite.getHtmlcompression();
@@ -626,6 +639,7 @@ public class SiteTreeBean implements Serializable {
         locale = selectedSite.getLocale();
         saprfclist = cfsitesaprfcService.findBySiteref(selectedSite.getId());
         staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
+        apilist = cfapiService.findBySiteRef(selectedSite.getId());
         newButtonDisabled = true;
         
         FacesMessage message = new FacesMessage("Selected " + selectedSite.getName());
@@ -763,6 +777,7 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setSearchrelevant(sitesearchrelevant);
             selectedSite.setSearchresult(searchresult);
             selectedSite.setInvisible(invisible);
+            selectedSite.setOffline(offline);
             selectedSite.setSitemap(sitemap);
             selectedSite.setStaticsite(sitestatic);
             selectedSite.setTestparams(params);
@@ -801,6 +816,8 @@ public class SiteTreeBean implements Serializable {
             newsite.setTemplateref(selectedSite.getTemplateref());
             newsite.setTestparams(selectedSite.getTestparams());
             newsite.setTitle(selectedSite.getTitle());
+            newsite.setInvisible(selectedSite.getInvisible());
+            newsite.setOffline(selectedSite.isOffline());
             newsite = cfsiteService.create(newsite);
             
             // Add selected saprfcs
@@ -957,6 +974,7 @@ public class SiteTreeBean implements Serializable {
             } else {
                 newsite.setInvisible(false);
             }
+            newsite.setOffline(offline);
             newsite.setSitemap(sitemap);
             newsite.setStaticsite(sitestatic);
             newsite.setShorturl(siteUtil.generateShorturl());
@@ -1015,11 +1033,15 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onNewRfc(ActionEvent actionEvent) {
-        if ((null != selectedrfcgroup) && (null != selectedrfcfunction)) {
+        if (((null != selectedrfcgroup) && (null != selectedrfcfunction)) || ((!rfcgroup.isEmpty()) && (null != selectedrfcfunction))) {
             CfSitesaprfc sitesaprfc = new CfSitesaprfc();
             CfSitesaprfcPK cfsitesaprfcPK = new CfSitesaprfcPK();
             cfsitesaprfcPK.setSiteref(selectedSite.getId());
-            cfsitesaprfcPK.setRfcgroup(selectedrfcgroup.getName());
+            if (null != selectedrfcgroup) {
+                cfsitesaprfcPK.setRfcgroup(selectedrfcgroup.getName());
+            } else {
+                cfsitesaprfcPK.setRfcgroup(rfcgroup);
+            }
             cfsitesaprfcPK.setRfcfunction(selectedrfcfunction.getName());
             sitesaprfc.setCfSitesaprfcPK(cfsitesaprfcPK);
             cfsitesaprfcService.create(sitesaprfc);
@@ -1063,13 +1085,53 @@ public class SiteTreeBean implements Serializable {
         }
     }
     
+    public void onApiSelect(SelectEvent event) {
+        selectedapi = (CfApi) event.getObject();
+    }
+    
+    public void onNewApi(ActionEvent actionEvent) {
+        if (null != selectedSite) {
+            CfApi api = new CfApi();
+            api.setDescription(apidescription);
+            CfApiPK apipk = new CfApiPK();
+            apipk.setSiteref(selectedSite.getId());
+            apipk.setKeyname(apikeyname);
+            api.setCfApiPK(apipk);
+            cfapiService.create(api);
+            apilist = cfapiService.findBySiteRef(selectedSite.getId());
+        }
+    }
+    
+    public void onDeleteApi(ActionEvent actionEvent) {
+        if (null != selectedapi) {
+            cfapiService.delete(selectedapi);
+            apilist = cfapiService.findBySiteRef(selectedSite.getId());
+        }
+    }
+    
     public void onStaticsiteSelect(SelectEvent event) {
         selectedstaticsite = (CfStaticsite) event.getObject();
+        
+        String auth_token = "";
+        if (null != loginbean) {
+            auth_token = loginbean.getToken();
+        }
+        
         if (!selectedstaticsite.getUrlparams().isBlank()) {
             iframeurl = selectedstaticsite.getSite() + "/" + selectedstaticsite.getUrlparams();
         } else {
             iframeurl = selectedstaticsite.getSite();
         }
+        
+        /*
+        if ((null != auth_token) && (!auth_token.isBlank())) {
+            if (!auth_token.startsWith("&")) {
+                iframeurl += "&cf_login_token=" + URLEncoder.encode(auth_token, StandardCharsets.UTF_8);
+            } else {
+                iframeurl += "cf_login_token=" + URLEncoder.encode(auth_token, StandardCharsets.UTF_8);
+            }
+        }
+        */
     }
     
     public void onNewStaticsite(ActionEvent actionEvent) {

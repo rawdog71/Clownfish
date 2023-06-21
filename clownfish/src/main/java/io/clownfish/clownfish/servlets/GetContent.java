@@ -248,7 +248,8 @@ public class GetContent extends HttpServlet {
                 if (inList) {
                     boolean putToList = true;
                     List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
-                    ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
+                    ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyvalList(attributcontentList);
+                    HashMap keyval = contentUtil.getContentOutputKeyval(attributcontentList);
                     ArrayList<String> keywords = contentUtil.getContentOutputKeywords(classcontent, true);
                     if (!searchmap.isEmpty()) {
                         for (String searchcontent : searchmap.keySet()) {
@@ -280,6 +281,7 @@ public class GetContent extends HttpServlet {
                                 contentdataoutput.setContent(classcontent);
                                 contentdataoutput.setKeywords(keywords);
                                 contentdataoutput.setKeyvals(keyvals);
+                                contentdataoutput.setKeyval(keyval);
                                 contentdataoutput.setDifference(contentUtil.hasDifference(classcontent));
                                 try {
                                     contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(classcontent.getId()));
@@ -294,6 +296,7 @@ public class GetContent extends HttpServlet {
                             contentdataoutput.setContent(classcontent);
                             contentdataoutput.setKeywords(keywords);
                             contentdataoutput.setKeyvals(keyvals);
+                            contentdataoutput.setKeyval(keyval);
                             contentdataoutput.setDifference(contentUtil.hasDifference(classcontent));
                             try {
                                 contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(classcontent.getId()));
@@ -458,7 +461,8 @@ public class GetContent extends HttpServlet {
                 if (inList) {
                     boolean putToList = true;
                     List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(classcontent);
-                    ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyval(attributcontentList);
+                    ArrayList<HashMap> keyvals = contentUtil.getContentOutputKeyvalList(attributcontentList);
+                    HashMap keyval = contentUtil.getContentOutputKeyval(attributcontentList);
                     ArrayList<String> keywords = contentUtil.getContentOutputKeywords(classcontent, true);
                     if (!searchmap.isEmpty()) {
                         for (String searchcontent : searchmap.keySet()) {
@@ -490,6 +494,7 @@ public class GetContent extends HttpServlet {
                                 contentdataoutput.setContent(classcontent);
                                 contentdataoutput.setKeywords(keywords);
                                 contentdataoutput.setKeyvals(keyvals);
+                                contentdataoutput.setKeyval(keyval);
                                 outputlist.add(contentdataoutput);
                                 //System.out.println(inst_klasse + " - " + listcounter);
                             }
@@ -498,6 +503,7 @@ public class GetContent extends HttpServlet {
                             contentdataoutput.setContent(classcontent);
                             contentdataoutput.setKeywords(keywords);
                             contentdataoutput.setKeyvals(keyvals);
+                            contentdataoutput.setKeyval(keyval);
                             outputlist.add(contentdataoutput);
                             //System.out.println(inst_klasse + " - " + listcounter);
                         }

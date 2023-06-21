@@ -516,6 +516,11 @@ public class ContentList implements Serializable {
     
     public void onChangeContent(ActionEvent actionEvent) {
         if (selectedContent != null) {
+            if (contentName.startsWith(selectedClass.getName().toUpperCase() + "_")) {
+                contentName = contentName.replaceAll("\\s+", "_");
+            } else {
+                contentName = selectedClass.getName().toUpperCase() + "_" + contentName.replaceAll("\\s+", "_");
+            }
             try {
                 CfClasscontent findcontent = cfclasscontentService.findByName(contentName);
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "WARNING", "Contentname already exists!");

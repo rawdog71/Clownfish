@@ -59,7 +59,7 @@ public class MavenList implements Serializable {
     @Autowired transient CfMavenService cfmavenService;
     @Autowired transient PropertyUtil propertyUtil;
     
-    private static @Getter @Setter ClassPathUtil classpathUtil;
+    private @Getter @Setter ClassPathUtil classpathUtil;
     private transient @Getter @Setter List<CfMaven> mavenlist = null;
     private @Getter @Setter CfMaven selectedMaven = null;
     private @Getter @Setter String group;

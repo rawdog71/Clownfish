@@ -77,6 +77,10 @@ public class CfSitesaprfcPK implements Serializable {
         this.rfcfunction = rfcfunction;
     }
 
+    public int getHash() {
+        return hashCode();
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

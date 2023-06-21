@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.datamodels;
-
-import io.clownfish.clownfish.dbentities.CfClasscontent;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import lombok.Getter;
-import lombok.Setter;
+package io.clownfish.clownfish.exceptions;
 
 /**
  *
  * @author SulzbachR
  */
-public class ContentDataOutput {
-    private @Getter @Setter CfClasscontent content;
-    private @Getter @Setter ArrayList<HashMap> keyvals;
-    private @Getter @Setter HashMap keyval;
-    private @Getter @Setter ArrayList<String> keywords;
-    private @Getter @Setter boolean difference;
-    private @Getter @Setter long maxversion;
+public class ClownfishTemplateException extends Exception {
+
+    public ClownfishTemplateException() {
+    }
+
+    public ClownfishTemplateException(String message) {
+        super(message);
+    }
+    
 }

@@ -93,4 +93,14 @@ public class CfStaticsiteDAOImpl implements CfStaticsiteDAO {
         session.merge(entity);
         return entity;
     }
+
+    @Override
+    public CfStaticsite findBySiteAndUrlparams(String name, String urlparams) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfStaticsite.findBySiteAndUrlparams");
+        query.setParameter("site", name);
+        query.setParameter("urlparams", urlparams);
+        CfStaticsite cfsite = (CfStaticsite) query.getSingleResult();
+        return cfsite;
+    }
 }

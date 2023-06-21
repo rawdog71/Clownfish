@@ -80,7 +80,14 @@ public class ContentUtil implements IVersioningInterface {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentUtil.class);
 
     @Value("${hibernate.use:0}") int useHibernate;
-    
+
+    public void init(MarkdownUtil markdownUtil, String site, List urlParams) {
+        this.markdownUtil = markdownUtil;
+        this.markdownUtil.setSite(site);
+        this.markdownUtil.setUrlParams(urlParams);
+        this.markdownUtil.setInit(true);
+    }
+
     public AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent) {
         CfAttributetype knattributtype = cfattributetypeService.findById(attributtypeid);
         switch (knattributtype.getName()) {
@@ -341,7 +348,7 @@ public class ContentUtil implements IVersioningInterface {
         }
     }
     
-    public ArrayList getContentOutputKeyval(List<CfAttributcontent> attributcontentList) {
+    public ArrayList getContentOutputKeyvalList(List<CfAttributcontent> attributcontentList) {
         ArrayList<HashMap> output = new ArrayList<>();
         HashMap<String, String> dummyoutputmap = new HashMap<>();
         attributcontentList.stream().forEach((attributcontent) -> {
@@ -358,6 +365,25 @@ public class ContentUtil implements IVersioningInterface {
         });
         output.add(dummyoutputmap);
         return output;
+    }
+    
+    public HashMap getContentOutputKeyval(List<CfAttributcontent> attributcontentList) {
+        //ArrayList<HashMap> output = new ArrayList<>();
+        HashMap<String, String> dummyoutputmap = new HashMap<>();
+        attributcontentList.stream().forEach((attributcontent) -> {
+            CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
+            long attributtypeid = knattribut.getAttributetype().getId();
+            AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
+            if (attributdef.getType().compareToIgnoreCase("hashstring") != 0) {
+                if (((knattribut.getClassref().isEncrypted()) && (!knattribut.getIdentity())) && (isEncryptable(knattribut))) {
+                    dummyoutputmap.put(knattribut.getName(), EncryptUtil.decrypt(attributdef.getValue(), propertyUtil.getPropertyValue("aes_key")));
+                } else {
+                    dummyoutputmap.put(knattribut.getName(), attributdef.getValue());
+                }
+            }
+        });
+        //output.add(dummyoutputmap);
+        return dummyoutputmap;
     }
     
     public ArrayList getContentOutputKeywords(CfClasscontent classcontent, boolean toLower) {
@@ -450,14 +476,19 @@ public class ContentUtil implements IVersioningInterface {
         return keywords;
     }
     
-    public ArrayList getContentMap(Map content) {
+    public ArrayList getContentMapList(Map content) {
         HashMap<String, String> contentMap = new HashMap<>(content);
         ArrayList contenList = new ArrayList<>();
         contenList.add(contentMap);
         return contenList;
     }
     
-    public ArrayList getContentMapDecrypted(Map content, CfClass classref) {
+    public HashMap getContentMap(Map content) {
+        HashMap<String, String> contentMap = new HashMap<>(content);
+        return contentMap;
+    }
+    
+    public ArrayList getContentMapListDecrypted(Map content, CfClass classref) {
         List<CfAttribut> attributlist = cfattributService.findByClassref(classref);
         HashMap<String, String> contentMap = new HashMap<>(content);
         for (CfAttribut attribut : attributlist) {
@@ -468,6 +499,17 @@ public class ContentUtil implements IVersioningInterface {
         ArrayList contenList = new ArrayList<>();
         contenList.add(contentMap);
         return contenList;
+    }
+    
+    public HashMap getContentMapDecrypted(Map content, CfClass classref) {
+        List<CfAttribut> attributlist = cfattributService.findByClassref(classref);
+        HashMap<String, String> contentMap = new HashMap<>(content);
+        for (CfAttribut attribut : attributlist) {
+            if ((isEncryptable(attribut)) && (!attribut.getIdentity())) {
+                contentMap.put(attribut.getName(), EncryptUtil.decrypt(contentMap.get(attribut.getName()), propertyUtil.getPropertyValue("aes_key")));
+            }
+        }
+        return contentMap;
     }
     
     public String toString(CfAttributcontent attributcontent) {

@@ -18,6 +18,7 @@ package io.clownfish.clownfish.templatebeans;
 import com.sap.conn.jco.ConversionException;
 import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.JCoFunction;
+import com.sap.conn.jco.JCoStructure;
 import com.sap.conn.jco.JCoTable;
 import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.JsonFormParameter;
@@ -154,7 +155,14 @@ public class SAPTemplateBean implements Serializable {
                                     saptables.put(paramname, tablevalues);
                                 }
                             } else {
-                                sapvalues.put(rfcfunctionparam.getParameter(), function.getExportParameterList().getString(rfcfunctionparam.getParameter()));
+                                if (exid.compareToIgnoreCase("u") == 0) {
+                                    JCoStructure functions_structure = function.getExportParameterList().getStructure(paramname);
+                                    rpytablereadlist = getRpytablereadlist(tablename);
+                                    setStructureValues(functions_structure, rpytablereadlist, tablevalues);
+                                    saptables.put(paramname, tablevalues);
+                                } else {
+                                    sapvalues.put(rfcfunctionparam.getParameter(), function.getExportParameterList().getString(rfcfunctionparam.getParameter()));
+                                }
                             }
                             break;
                         case "t":
@@ -200,7 +208,7 @@ public class SAPTemplateBean implements Serializable {
                     }
                 }
                 sapvalues.put("table", saptables);
-                sapexport.put(rfcFunction, sapvalues);
+                sapexport.put(rfcFunction.replaceFirst("/", "").replaceAll("/", "_"), sapvalues);
             } catch(JCoException ex) {
                 LOGGER.error(ex.getMessage());
             }
@@ -401,9 +409,10 @@ public class SAPTemplateBean implements Serializable {
                         (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CUKY) == 0) ||
                         (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.RAW) == 0) ||
                         (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.LANG) == 0) ||
+                        (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.ACCP) == 0) ||    
                         (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.UNIT) == 0)) {
                         String value = functions_table.getString(rpytablereadentry.getFieldname());
-                        sapexportvalues.put(rpytablereadentry.getFieldname(), value);
+                        sapexportvalues.put(rpytablereadentry.getFieldname().replaceFirst("/", "").replaceAll("/", "_"), value);
                         continue;
                     }
                     if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) || 
@@ -419,13 +428,13 @@ public class SAPTemplateBean implements Serializable {
                                 datum = sdf.format(value);
                             }
                         }
-                        sapexportvalues.put(rpytablereadentry.getFieldname(), datum);
+                        sapexportvalues.put(rpytablereadentry.getFieldname().replaceFirst("/", "").replaceAll("/", "_"), datum);
                         continue;
                     }
                     if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.QUAN) == 0) ||
                         (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.FLTP) == 0)) {
                         double value = functions_table.getDouble(rpytablereadentry.getFieldname());
-                        sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
+                        sapexportvalues.put(rpytablereadentry.getFieldname().replaceFirst("/", "").replaceAll("/", "_"), String.valueOf(value));
                         continue;
                     }
                     if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT1) == 0) || 
@@ -433,7 +442,7 @@ public class SAPTemplateBean implements Serializable {
                         (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT4) == 0) || 
                         (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT8) == 0)) {
                         int value = functions_table.getInt(rpytablereadentry.getFieldname());
-                        sapexportvalues.put(rpytablereadentry.getFieldname(), String.valueOf(value));
+                        sapexportvalues.put(rpytablereadentry.getFieldname().replaceFirst("/", "").replaceAll("/", "_"), String.valueOf(value));
                         continue;
                     }
                     if (!rpytablereadentry.getDatatype().isBlank()) 
@@ -446,6 +455,65 @@ public class SAPTemplateBean implements Serializable {
         }
     }
     
+
+    private void setStructureValues(JCoStructure functions_table, List<RpyTableRead> rpytablereadlist, ArrayList<HashMap> tablevalues) {
+        try {
+            tablevalues.clear();
+            HashMap<String, String> sapexportvalues = new HashMap<>();
+            for (RpyTableRead rpytablereadentry : rpytablereadlist) {
+                if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CHAR) == 0) || 
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CLNT) == 0) ||
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.NUMC) == 0) ||
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DEC) == 0) ||    
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CURR) == 0) ||
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.CUKY) == 0) ||
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.RAW) == 0) ||
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.LANG) == 0) ||
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.ACCP) == 0) ||    
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.UNIT) == 0)) {
+                    String value = functions_table.getString(rpytablereadentry.getFieldname());
+                    sapexportvalues.put(rpytablereadentry.getFieldname().replaceFirst("/", "").replaceAll("/", "_"), value);
+                    continue;
+                }
+                if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) || 
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.TIMS) == 0)) {
+                    Date value = functions_table.getDate(rpytablereadentry.getFieldname());
+                    String datum = "";
+                    if (null != value) {
+                        if (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.DATS) == 0) {
+                            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+                            datum = sdf.format(value);
+                        } else {
+                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                            datum = sdf.format(value);
+                        }
+                    }
+                    sapexportvalues.put(rpytablereadentry.getFieldname().replaceFirst("/", "").replaceAll("/", "_"), datum);
+                    continue;
+                }
+                if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.QUAN) == 0) ||
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.FLTP) == 0)) {
+                    double value = functions_table.getDouble(rpytablereadentry.getFieldname());
+                    sapexportvalues.put(rpytablereadentry.getFieldname().replaceFirst("/", "").replaceAll("/", "_"), String.valueOf(value));
+                    continue;
+                }
+                if ((rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT1) == 0) || 
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT2) == 0) || 
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT4) == 0) || 
+                    (rpytablereadentry.getDatatype().compareToIgnoreCase(SAPDATATYPE.INT8) == 0)) {
+                    int value = functions_table.getInt(rpytablereadentry.getFieldname());
+                    sapexportvalues.put(rpytablereadentry.getFieldname().replaceFirst("/", "").replaceAll("/", "_"), String.valueOf(value));
+                    continue;
+                }
+                if (!rpytablereadentry.getDatatype().isBlank()) 
+                    System.out.println("SAP_FIELD = " + rpytablereadentry.getFieldname() + " - SAP_DATA_TYPE = " + rpytablereadentry.getDatatype());
+                }
+                tablevalues.add(sapexportvalues);
+        } catch(Exception ex) {
+            LOGGER.error(ex.getMessage());
+        }
+    }
+        
     private List<RpyTableRead> getRpytablereadlist(String tablename) {
         List<RpyTableRead> rpytablereadlist;
         if (rpyMap.containsKey(tablename)) {

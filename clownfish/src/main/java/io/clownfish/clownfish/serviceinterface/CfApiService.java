@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.clownfish.clownfish.daointerface;
+package io.clownfish.clownfish.serviceinterface;
 
-import io.clownfish.clownfish.dbentities.CfStaticsite;
+import io.clownfish.clownfish.dbentities.CfApi;
 import java.util.List;
 
 /**
  *
  * @author sulzbachr
  */
-public interface CfStaticsiteDAO {
-    List<CfStaticsite> findAll();
-    CfStaticsite findById(Long id);
-    List<CfStaticsite> findBySite(String name);
-    CfStaticsite findByUrlparams(String urlparams);
-    CfStaticsite findBySiteAndUrlparams(String name, String urlparams);
-    CfStaticsite create(CfStaticsite entity);
-    boolean delete(CfStaticsite entity);
-    CfStaticsite edit(CfStaticsite entity);
+public interface CfApiService {
+    List<CfApi> findAll();
+    List<CfApi> findBySiteRef(Long id);
+    List<CfApi> findByKeyname(String key);
+    CfApi findBySiteRefAndKeyname(Long id, String keyname);
+    CfApi create(CfApi entity);
+    boolean delete(CfApi entity);
+    CfApi edit(CfApi entity);
 }

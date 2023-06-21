@@ -31,6 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  *
  * @author raine
+ * 
+ * Endpoint for dynamically rendering the sitemap.xml
+ * Domain information is fetched out of the property #domain#
+ * Renderes all sites with the sitemap flag set to true
  */
 @RestController
 public class EndpointSitemap {

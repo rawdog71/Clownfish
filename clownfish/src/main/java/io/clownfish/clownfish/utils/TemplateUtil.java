@@ -391,8 +391,12 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                         String contentname = "";
                         String attributtype = "";
                         if (null != cfcontent) {
-                            contentname = cfcontent.getName();
-                            attributtype = cfattributService.findByNameAndClassref(attributname, cfcontent.getClassref()).getAttributetypeString();
+                            try {
+                                contentname = cfcontent.getName();
+                                attributtype = cfattributService.findByNameAndClassref(attributname, cfcontent.getClassref()).getAttributetypeString();
+                            } catch (NoResultException nre) {
+                                LOGGER.error("Wrong attribut " + attributname + " at content " + contentname);
+                            }
                         }
                         String attr = classname+":"+contentname+":"+attributname+":"+attributtype;
                         Attributes attributes = new Attributes();
