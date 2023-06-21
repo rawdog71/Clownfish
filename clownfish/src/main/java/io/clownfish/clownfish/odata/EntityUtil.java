@@ -17,28 +17,33 @@ package io.clownfish.clownfish.odata;
 
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttribut;
+import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfList;
+import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfContentversionService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
 import org.apache.olingo.commons.api.data.ComplexValue;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.data.ValueType;
-import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import javax.persistence.NoResultException;
 
 /**
  *
@@ -47,11 +52,42 @@ import java.util.stream.Collectors;
 @Component
 public class EntityUtil {
     @Autowired private CfAttributService cfattributservice;
+    @Autowired private CfAttributcontentService cfattributcontentService;
     @Autowired private CfClasscontentService cfClasscontentService;
     @Autowired private CfContentversionService cfcontentversionService;
+    @Autowired private CfListService cflistService;
+    @Autowired private CfListcontentService cflistcontentService;
     @Autowired private ContentUtil contentUtil;
 
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(EntityUtil.class);
+    
+    private static void setPropValue(Property prop, Object value) {
+        if (value == null) {
+            prop.setValue(ValueType.PRIMITIVE, null);
+            return;
+        }
+        switch (prop.getType()) {
+            case "Edm.String":
+                prop.setValue(ValueType.PRIMITIVE, (String)value);
+                break;
+            case "Edm.Int32":
+                if (value instanceof String) {
+                    prop.setValue(ValueType.PRIMITIVE, Integer.valueOf((String)value));
+                } else if (value instanceof Long) {
+                    prop.setValue(ValueType.PRIMITIVE, ((Long) value).intValue());
+                }
+                break;
+            case "Edm.Double":
+                prop.setValue(ValueType.PRIMITIVE, Double.valueOf((String)value));
+                break;
+            case "Edm.Boolean":
+                prop.setValue(ValueType.PRIMITIVE, Boolean.valueOf((String)value));
+                break;
+            default:
+                prop.setValue(ValueType.PRIMITIVE, null);
+        }
+    }
+    
     public Entity makeEntity(ContentDataOutput contentdataoutput) {
         Entity entity = new Entity();
         String id = "";
@@ -66,59 +102,41 @@ public class EntityUtil {
                         }
                         Property prop = new Property();
                         prop.setName(attribut.getName());
-                        prop.setValue(ValueType.PRIMITIVE, hm.get(attributname));
+                        prop.setType(GenericEdmProvider.getODataType(attribut).getFullQualifiedNameAsString());
+                        setPropValue(prop, hm.get(attributname));
                         entity.addProperty(prop);
                     } else {
                         if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == attribut.getRelationtype())) { // 1:n
                             Property prop = new Property();
                             prop.setName(attribut.getName());
-                            Long content_id = (Long)((HashMap)hm.get(attributname)).get("cf_contentref");
+                            Long content_id = (Long)hm.get(attributname);
                             CfClasscontent cfclasscontent = cfClasscontentService.findById(content_id);
-                            HashMap attributes = (HashMap) hm.get(attributname);
-
-//                            if (Objects.equals(attribute.toString(), "cf_contentref")) {
-//                                continue;
-//                            }
-                            if (cfclasscontent != null && !cfclasscontent.isScrapped()) {
-                                ContentDataOutput cdo = new ContentDataOutput();
-                                cdo.setContent(cfclasscontent);
-                                if (cfclasscontent.getClassref().isEncrypted()) {
-                                    cdo.setKeyvals(contentUtil.getContentMapListDecrypted(attributes, cfclasscontent.getClassref()));
-                                    cdo.setKeyval(contentUtil.getContentMapDecrypted(attributes, cfclasscontent.getClassref()));
-                                } else {
-                                    cdo.setKeyvals(contentUtil.getContentMapList(attributes));
-                                    cdo.setKeyval(contentUtil.getContentMap(attributes));
-                                }
-                                contentUtil.setClassrefVals(cdo.getKeyvals().get(0), cfclasscontent.getClassref(), null);
-                                contentUtil.setAssetrefVals(cdo.getKeyvals().get(0), cfclasscontent.getClassref());
-                                try {
-                                    cdo.setDifference(contentUtil.hasDifference(cfclasscontent));
-                                    cdo.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
-                                } catch (Exception ex) {
-                                    LOGGER.error(ex.getMessage());
-                                }
-                            ComplexValue val = new ComplexValue();
-                            val.setTypeName("OData.Complex." + cfclasscontent.getClassref().getName());
-                            for (Object att : attributes.entrySet()) {
-                                String key = (String)((Map.Entry)att).getKey();
-                                var value = ((Map.Entry<?, ?>) att).getValue();
-                                if (Objects.equals(key, "cf_contentref")
-                                        || Objects.equals(key, "$type$")
-                                        || Objects.equals(key, "cf_id")) {
-                                    continue;
-                                }
-                                CfAttribut cfAtt = cfattributservice.findByNameAndClassref(key, cfclasscontent.getClassref());
-                                Property class_prop = new Property();
-                                class_prop.setName(key);
-                                class_prop.setType(GenericEdmProvider.getODataType(cfAtt).getFullQualifiedNameAsString());
-                                class_prop.setValue(ValueType.PRIMITIVE, value);
-                                val.getValue().add(class_prop);
-                            }
-                            prop.setValue(ValueType.COMPLEX, val);
+                            prop.setValue(ValueType.COMPLEX, createComplexVal(cfclasscontent));
                             prop.setType("OData.Complex." + cfclasscontent.getClassref().getName());
                             entity.addProperty(prop);
+                        } else {                                                // n:m Relation
+                            Property coll_prop = new Property();
+                            List<ComplexValue> values = new ArrayList<>();
+                            String datalistname = (String) hm.get(attributname);
+                            if (attribut.getIdentity()) {
+                                id = (String) hm.get(attributname).toString();
                             }
-
+                            try {
+                                CfList datalist = cflistService.findByName(datalistname);
+                                List<CfListcontent> contentlist = cflistcontentService.findByListref(datalist.getId());
+                                for (CfListcontent listcontent : contentlist) {
+                                    CfClasscontent cfclasscontent = cfClasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                                    values.add(createComplexVal(cfclasscontent));
+                                }
+                                coll_prop.setValue(ValueType.COLLECTION_COMPLEX, values);
+                                coll_prop.setName((String)attributname);
+                                coll_prop.setType("Collection(OData.Complex." + datalist.getClassref().getName() + ")");
+                                entity.addProperty(coll_prop);
+                            } catch (NoResultException nre) {
+                                LOGGER.warn("Datalist not set for attribute " + (String)attributname + " of class " + contentdataoutput.getContent().getClassref().getName());
+                                coll_prop.setValue(ValueType.COLLECTION_COMPLEX, null);
+                                entity.addProperty(coll_prop);
+                            }
                         }
                     }
                 } catch (Exception ex) {
@@ -127,15 +145,57 @@ public class EntityUtil {
             }
         }
         entity.setId(createId(contentdataoutput.getContent().getClassref().getName(), id));
-        // entity.setType("OData.Entity." + contentdataoutput.getContent().getClassref().getName());
         return entity;
     }
     
     private URI createId(String entitySetName, Object id) {
         try {
-            return new URI(entitySetName + "(" + id + ")");
+            return new URI(entitySetName + "(" + id.toString().replaceAll(" ", "_") + ")");
         } catch (URISyntaxException e) {
             throw new ODataRuntimeException("Unable to create id for entity: " + entitySetName, e);
         }
+    }
+    
+    private ComplexValue createComplexVal(CfClasscontent cfclasscontent) {
+        List<CfAttributcontent> attributcontentList = cfattributcontentService.findByClasscontentref(cfclasscontent);
+        HashMap attributes = contentUtil.getContentOutputKeyval(attributcontentList);
+        if (cfclasscontent != null && !cfclasscontent.isScrapped()) {
+            ContentDataOutput cdo = new ContentDataOutput();
+            cdo.setContent(cfclasscontent);
+            if (cfclasscontent.getClassref().isEncrypted()) {
+                cdo.setKeyvals(contentUtil.getContentMapListDecrypted(attributes, cfclasscontent.getClassref()));
+                cdo.setKeyval(contentUtil.getContentMapDecrypted(attributes, cfclasscontent.getClassref()));
+            } else {
+                cdo.setKeyvals(contentUtil.getContentMapList(attributes));
+                cdo.setKeyval(contentUtil.getContentMap(attributes));
+            }
+            contentUtil.setClassrefVals(cdo.getKeyvals().get(0), cfclasscontent.getClassref(), null);
+            contentUtil.setAssetrefVals(cdo.getKeyvals().get(0), cfclasscontent.getClassref());
+            try {
+                cdo.setDifference(contentUtil.hasDifference(cfclasscontent));
+                cdo.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+            } catch (Exception ex) {
+                LOGGER.error(ex.getMessage());
+            }
+            ComplexValue val = new ComplexValue();
+            val.setTypeName("OData.Complex." + cfclasscontent.getClassref().getName());
+            for (Object att : attributes.entrySet()) {
+                String key = (String)((Map.Entry)att).getKey();
+                var value = ((Map.Entry<?, ?>) att).getValue();
+                if (Objects.equals(key, "cf_contentref")
+                        || Objects.equals(key, "$type$")
+                        || Objects.equals(key, "cf_id")) {
+                    continue;
+                }
+                CfAttribut cfAtt = cfattributservice.findByNameAndClassref(key, cfclasscontent.getClassref());
+                Property class_prop = new Property();
+                class_prop.setName(key);
+                class_prop.setType(GenericEdmProvider.getODataType(cfAtt).getFullQualifiedNameAsString());
+                setPropValue(class_prop, value);
+                val.getValue().add(class_prop);
+            }
+            return val;
+        }
+        return null;
     }
 }

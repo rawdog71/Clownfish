@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
-import org.apache.olingo.commons.api.edm.annotation.EdmCollection;
-import org.apache.olingo.commons.api.edm.annotation.EdmExpression;
 import org.apache.olingo.commons.api.edm.provider.*;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.slf4j.Logger;
@@ -132,7 +130,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         if (complexTypeName.getFullQualifiedNameAsString().startsWith("Edm")) {
             return null;
         }
-        System.out.println(complexTypeName.getFullQualifiedNameAsString());
+        //System.out.println(complexTypeName.getFullQualifiedNameAsString());
         CfClass classref = cfclassservice.findByName(complexTypeName.getName());
         List propsList = new ArrayList();
         List keysList = new ArrayList();
@@ -148,7 +146,6 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         CsdlComplexType complexType = new CsdlComplexType();
         complexType.setName(complexTypeName.getName());
         complexType.setProperties(propsList);
-        // entityType.setKey(keysList);
 
         if (!keysList.isEmpty()) {
             return complexType;
@@ -213,10 +210,8 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                 return EdmPrimitiveTypeKind.Boolean.getFullQualifiedName();
             case "classref":
                 if (0 == attribut.getRelationtype()) {                          // n:m
-                    //return EdmPrimitiveTypeKind.String.getFullQualifiedName();
                     return new FullQualifiedName(NAMESPACE_COMPLEX, attribut.getRelationref().getName());
                 } else {                                                        // 1:n
-                    //return EdmPrimitiveTypeKind.String.getFullQualifiedName();
                     return new FullQualifiedName(NAMESPACE_COMPLEX, attribut.getRelationref().getName());
                 }
             default:

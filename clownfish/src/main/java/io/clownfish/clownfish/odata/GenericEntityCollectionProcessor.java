@@ -138,12 +138,10 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
                     List<CfAttributcontent> aclist = cfattributcontentservice.findByClasscontentref(cc);
                     List keyvals = contentUtil.getContentOutputKeyvalList(aclist);
                     Entity entity = new Entity();
-                    // ToDo: fill out entity
                 }
             }
         } else {
             Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
-            //HashMap searchmap = new HashMap<>();
             Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
             try {
                 List<Map> contentliste = (List<Map>) query.getResultList();
@@ -162,16 +160,6 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
                                 contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
                                 contentdataoutput.setKeyval(contentUtil.getContentMap(content));
                             }
-                            /*
-                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
-                            setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
-                            try {
-                                contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
-                                contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
-                            } catch (Exception ex) {
-
-                            }
-                            */
                             Entity entity = entityUtil.makeEntity(contentdataoutput);
                             genericList.add(entity);
                         }
