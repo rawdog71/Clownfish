@@ -72,16 +72,24 @@ public class EntityUtil {
                 break;
             case "Edm.Int32":
                 if (value instanceof String) {
-                    prop.setValue(ValueType.PRIMITIVE, Integer.valueOf((String)value));
+                    prop.setValue(ValueType.PRIMITIVE, Integer.parseInt((String)value));
                 } else if (value instanceof Long) {
                     prop.setValue(ValueType.PRIMITIVE, ((Long) value).intValue());
+                } else if (value instanceof Integer) {
+                    prop.setValue(ValueType.PRIMITIVE, (Integer) value);
                 }
                 break;
             case "Edm.Double":
-                prop.setValue(ValueType.PRIMITIVE, Double.valueOf((String)value));
+                if (value instanceof String) {
+                    prop.setValue(ValueType.PRIMITIVE, Double.parseDouble((String)value));
+                } else if (value instanceof Long) {
+                    prop.setValue(ValueType.PRIMITIVE, ((Double)value));
+                } else if (value instanceof Double) {
+                    prop.setValue(ValueType.PRIMITIVE, ((Double)value));
+                }
                 break;
             case "Edm.Boolean":
-                prop.setValue(ValueType.PRIMITIVE, Boolean.valueOf((String)value));
+                prop.setValue(ValueType.PRIMITIVE, ((Boolean)value));
                 break;
             default:
                 prop.setValue(ValueType.PRIMITIVE, null);
