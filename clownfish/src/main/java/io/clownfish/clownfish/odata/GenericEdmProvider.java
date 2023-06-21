@@ -23,15 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
-import org.apache.olingo.commons.api.edm.provider.CsdlAbstractEdmProvider;
-import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainer;
-import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainerInfo;
-import org.apache.olingo.commons.api.edm.provider.CsdlEntitySet;
-import org.apache.olingo.commons.api.edm.provider.CsdlEntityType;
-import org.apache.olingo.commons.api.edm.provider.CsdlProperty;
-import org.apache.olingo.commons.api.edm.provider.CsdlPropertyRef;
-import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
-import org.apache.olingo.commons.api.edm.provider.CsdlSingleton;
+import org.apache.olingo.commons.api.edm.annotation.EdmCollection;
+import org.apache.olingo.commons.api.edm.annotation.EdmExpression;
+import org.apache.olingo.commons.api.edm.provider.*;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +38,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class GenericEdmProvider extends CsdlAbstractEdmProvider {
-    public static final String NAMESPACE = "OData.Generic";
+    public static final String NAMESPACE_ENTITY = "OData.Entity";
+    public static final String NAMESPACE_COMPLEX = "OData.Complex";
     public static final String CONTAINER_NAME = "Container";
-    public static final FullQualifiedName CONTAINER = new FullQualifiedName(NAMESPACE, CONTAINER_NAME);
+    public static final FullQualifiedName CONTAINER = new FullQualifiedName(NAMESPACE_ENTITY, CONTAINER_NAME);
 
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfAttributService cfattributservice;
@@ -55,21 +50,27 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
 
     @Override
     public List<CsdlSchema> getSchemas() throws ODataException {
-        CsdlSchema schema = new CsdlSchema();
-        schema.setNamespace(NAMESPACE);
+        CsdlSchema entity_schema = new CsdlSchema();
+        entity_schema.setNamespace(NAMESPACE_ENTITY);
         // add EntityTypes
         List<CsdlEntityType> entityTypes = new ArrayList<>();
+        List<CsdlComplexType> complexTypes = new ArrayList<>();
         for (CfClass clazz : cfclassservice.findAll()) {
-            CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE, clazz.getName()));
+            CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()));
+            CsdlComplexType ct = getComplexType(new FullQualifiedName(NAMESPACE_COMPLEX, clazz.getName()));
             if (null != et) {
                 entityTypes.add(et);
             }
+            if (ct != null) {
+                complexTypes.add(ct);
+            }
         }
-        schema.setEntityTypes(entityTypes);
+        entity_schema.setEntityTypes(entityTypes);
+        entity_schema.setComplexTypes(complexTypes);
         // add EntityContainer
-        schema.setEntityContainer(getEntityContainer());
+        entity_schema.setEntityContainer(getEntityContainer());
         List<CsdlSchema> schemas = new ArrayList<>();
-        schemas.add(schema);
+        schemas.add(entity_schema);
 
         return schemas;
     }
@@ -100,7 +101,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
 
     @Override
     public CsdlEntityType getEntityType(FullQualifiedName entityTypeName) throws ODataException {
-        //System.out.println(entityTypeName.getFullQualifiedNameAsString());
+        System.out.println(entityTypeName.getFullQualifiedNameAsString());
         CfClass classref = cfclassservice.findByName(entityTypeName.getName());
         List propsList = new ArrayList();
         List keysList = new ArrayList();
@@ -127,11 +128,42 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
     }
 
     @Override
+    public CsdlComplexType getComplexType(FullQualifiedName complexTypeName) {
+        if (complexTypeName.getFullQualifiedNameAsString().startsWith("Edm")) {
+            return null;
+        }
+        System.out.println(complexTypeName.getFullQualifiedNameAsString());
+        CfClass classref = cfclassservice.findByName(complexTypeName.getName());
+        List propsList = new ArrayList();
+        List keysList = new ArrayList();
+        for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
+            CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
+            propsList.add(prop);
+            if (attribut.getIdentity()) {
+                CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+                propertyRef.setName(attribut.getName());
+                keysList.add(propertyRef);
+            }
+        }
+        CsdlComplexType complexType = new CsdlComplexType();
+        complexType.setName(complexTypeName.getName());
+        complexType.setProperties(propsList);
+        // entityType.setKey(keysList);
+
+        if (!keysList.isEmpty()) {
+            return complexType;
+        } else {
+            LOGGER.warn("OData - Missing identifier for " + complexTypeName.getName());
+            return null;
+        }
+    }
+
+    @Override
     public CsdlSingleton getSingleton(FullQualifiedName entityContainer, String singletonName) throws ODataException {
         if (entityContainer.equals(CONTAINER)) {
             CsdlSingleton singleton = new CsdlSingleton();
             singleton.setName(singletonName);
-            singleton.setType(new FullQualifiedName(NAMESPACE, singletonName));
+            singleton.setType(new FullQualifiedName(NAMESPACE_ENTITY, singletonName));
             //singleton.setNavigationPropertyBindings(navigationPropertyBindings);
             
             return singleton;
@@ -144,7 +176,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         if (entityContainer.equals(CONTAINER)) {
             CsdlEntitySet entitySet = new CsdlEntitySet();
             entitySet.setName(entitySetName);
-            entitySet.setType(new FullQualifiedName(NAMESPACE, entitySetName.substring(0, entitySetName.length()-3)));
+            entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName.substring(0, entitySetName.length()-3)));
 
             return entitySet;
         }
@@ -162,7 +194,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         return null;
     }
     
-    private FullQualifiedName getODataType(CfAttribut attribut) {
+    public static FullQualifiedName getODataType(CfAttribut attribut) {
         switch (attribut.getAttributetype().getName()) {
             case "string":
             case "hashstring":
@@ -182,10 +214,10 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             case "classref":
                 if (0 == attribut.getRelationtype()) {                          // n:m
                     //return EdmPrimitiveTypeKind.String.getFullQualifiedName();
-                    return new FullQualifiedName(NAMESPACE, attribut.getRelationref().getName());
+                    return new FullQualifiedName(NAMESPACE_COMPLEX, attribut.getRelationref().getName());
                 } else {                                                        // 1:n
                     //return EdmPrimitiveTypeKind.String.getFullQualifiedName();
-                    return new FullQualifiedName(NAMESPACE, attribut.getRelationref().getName());
+                    return new FullQualifiedName(NAMESPACE_COMPLEX, attribut.getRelationref().getName());
                 }
             default:
                 return null;

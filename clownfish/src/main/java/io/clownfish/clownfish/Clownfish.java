@@ -1113,6 +1113,7 @@ public class Clownfish {
 
                                 String gzip = propertyUtil.getPropertySwitch("html_gzip", cfsite.getGzip());
                                 if (gzip.compareToIgnoreCase("on") == 0) {
+                                    gzipswitch = new GzipSwitch();
                                     gzipswitch.setGzipon(true);
                                 }
                                 String htmlcompression = propertyUtil.getPropertySwitch("html_compression", cfsite.getHtmlcompression());
