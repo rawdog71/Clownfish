@@ -23,6 +23,7 @@ import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.InputStream;
@@ -51,6 +52,7 @@ import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.core.uri.UriParameterImpl;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -66,6 +68,7 @@ public class GenericSingletonProcessor implements EntityProcessor {
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfClasscontentService cfclasscontentService;
     @Autowired private CfAttributcontentService cfattributcontentservice;
+    @Autowired private CfContentversionService cfcontentversionservice;
     @Autowired ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     @Autowired EntityUtil entityUtil;
@@ -83,7 +86,7 @@ public class GenericSingletonProcessor implements EntityProcessor {
         //System.out.println(uriResourceSingleton.getEntityType().getName());
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
         System.out.println(uriResourceEntitySet.getKeyPredicates());
-        
+
         EntityCollection entitySet = getData(edmEntitySet, uriResourceEntitySet.getKeyPredicates());
         
         ODataSerializer serializer = odata.createSerializer(responseFormat);
@@ -105,7 +108,8 @@ public class GenericSingletonProcessor implements EntityProcessor {
         HashMap searchmap = new HashMap<>();
         for (Object entry : keypredicates) {
             String attributname = ((UriParameterImpl) entry).getName();
-            String attributvalue = ((UriParameterImpl) entry).getText();
+            String attributvalue = ((UriParameterImpl) entry).getText().replaceAll("^'", "")
+                    .replaceAll("'$", "");
             searchmap.put(attributname+"_1", ":eq:" + attributvalue);
         }
         String classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
@@ -149,16 +153,14 @@ public class GenericSingletonProcessor implements EntityProcessor {
                                 contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
                                 contentdataoutput.setKeyval(contentUtil.getContentMap(content));
                             }
-                            /*
-                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz);
-                            setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                            contentUtil.setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, null);
+                            // setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
                             try {
                                 contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
-                                contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                                contentdataoutput.setMaxversion(cfcontentversionservice.findMaxVersion(cfclasscontent.getId()));
                             } catch (Exception ex) {
 
                             }
-                            */
                             Entity entity = entityUtil.makeEntity(contentdataoutput);
                             genericList.add(entity);
                         }
