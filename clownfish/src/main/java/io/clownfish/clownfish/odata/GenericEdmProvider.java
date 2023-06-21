@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
@@ -44,84 +45,104 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfAttributService cfattributservice;
     
+    private static final HashMap<String, CsdlSingleton> singletonlist = new HashMap<>();
+    private static final HashMap<String, CsdlEntitySet> entitysetlist = new HashMap<>();
+    private static final HashMap<FullQualifiedName, CsdlEntityType> entitytypelist = new HashMap<>();
+    private static final HashMap<FullQualifiedName, CsdlComplexType> complextypelist = new HashMap<>();
+    private static CsdlEntityContainer entityContainer = null;
+    private static List<CsdlSchema> schemas = null;
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericEdmProvider.class);
 
     @Override
     public List<CsdlSchema> getSchemas() throws ODataException {
-        CsdlSchema entity_schema = new CsdlSchema();
-        entity_schema.setNamespace(NAMESPACE_ENTITY);
-        // add EntityTypes
-        List<CsdlEntityType> entityTypes = new ArrayList<>();
-        List<CsdlComplexType> complexTypes = new ArrayList<>();
-        for (CfClass clazz : cfclassservice.findAll()) {
-            CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()));
-            CsdlComplexType ct = getComplexType(new FullQualifiedName(NAMESPACE_COMPLEX, clazz.getName()));
-            if (null != et) {
-                entityTypes.add(et);
+        if (null == schemas) {
+            CsdlSchema entity_schema = new CsdlSchema();
+            entity_schema.setNamespace(NAMESPACE_ENTITY);
+            // add EntityTypes
+            List<CsdlEntityType> entityTypes = new ArrayList<>();
+            List<CsdlComplexType> complexTypes = new ArrayList<>();
+            for (CfClass clazz : cfclassservice.findAll()) {
+                CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()));
+                CsdlComplexType ct = getComplexType(new FullQualifiedName(NAMESPACE_COMPLEX, clazz.getName()));
+                if (null != et) {
+                    entityTypes.add(et);
+                }
+                if (ct != null) {
+                    complexTypes.add(ct);
+                }
             }
-            if (ct != null) {
-                complexTypes.add(ct);
-            }
-        }
-        entity_schema.setEntityTypes(entityTypes);
-        entity_schema.setComplexTypes(complexTypes);
-        // add EntityContainer
-        entity_schema.setEntityContainer(getEntityContainer());
-        List<CsdlSchema> schemas = new ArrayList<>();
-        schemas.add(entity_schema);
+            entity_schema.setEntityTypes(entityTypes);
+            entity_schema.setComplexTypes(complexTypes);
+            // add EntityContainer
+            entity_schema.setEntityContainer(getEntityContainer());
+            schemas = new ArrayList<>();
+            schemas.add(entity_schema);
 
-        return schemas;
+            return schemas;
+        } else {
+            return schemas;
+        }
     }
 
     @Override
     public CsdlEntityContainer getEntityContainer() throws ODataException {
-        // create EntitySets
-        List<CsdlEntitySet> entitySets = new ArrayList<>();
-        List<CsdlSingleton> singletons = new ArrayList<>();
-        for (CfClass clazz : cfclassservice.findAll()) {
-            if (!getKeys(clazz).isEmpty()) {
-                CsdlSingleton si = getSingleton(CONTAINER, clazz.getName());
-                CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName()+"Set");
-                if (null != es) {
-                    singletons.add(si);
-                    entitySets.add(es);
+        if (null == entityContainer) {
+            // create EntitySets
+            List<CsdlEntitySet> entitySets = new ArrayList<>();
+            List<CsdlSingleton> singletons = new ArrayList<>();
+            for (CfClass clazz : cfclassservice.findAll()) {
+                if (!getKeys(clazz).isEmpty()) {
+                    CsdlSingleton si = getSingleton(CONTAINER, clazz.getName());
+                    CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName()+"Set");
+                    if (null != es) {
+                        singletons.add(si);
+                        entitySets.add(es);
+                    }
                 }
             }
+            // create EntityContainer
+            entityContainer = new CsdlEntityContainer();
+            entityContainer.setName(CONTAINER_NAME);
+            entityContainer.setSingletons(singletons);
+            entityContainer.setEntitySets(entitySets);
+
+            return entityContainer;
+        } else {
+            return entityContainer;
         }
-        // create EntityContainer
-        CsdlEntityContainer entityContainer = new CsdlEntityContainer();
-        entityContainer.setName(CONTAINER_NAME);
-        entityContainer.setSingletons(singletons);
-        entityContainer.setEntitySets(entitySets);
-        
-        return entityContainer;
     }
 
     @Override
     public CsdlEntityType getEntityType(FullQualifiedName entityTypeName) throws ODataException {
-        System.out.println(entityTypeName.getFullQualifiedNameAsString());
-        CfClass classref = cfclassservice.findByName(entityTypeName.getName());
-        List propsList = new ArrayList();
-        List keysList = new ArrayList();
-        for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
-            CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
-            propsList.add(prop);
-            if (attribut.getIdentity()) {
-                CsdlPropertyRef propertyRef = new CsdlPropertyRef();
-                propertyRef.setName(attribut.getName());
-                keysList.add(propertyRef);
-            }
-        }
-        CsdlEntityType entityType = new CsdlEntityType();
-        entityType.setName(entityTypeName.getName());
-        entityType.setProperties(propsList);
-        entityType.setKey(keysList);
-
-        if (!keysList.isEmpty()) {
-            return entityType;
+        if (entitytypelist.containsKey(entityTypeName)) {
+            return entitytypelist.get(entityTypeName);
         } else {
-            LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
-            return null;
+            System.out.println(entityTypeName.getFullQualifiedNameAsString());
+            CfClass classref = cfclassservice.findByName(entityTypeName.getName());
+            List propsList = new ArrayList();
+            List keysList = new ArrayList();
+            for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
+                CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
+                propsList.add(prop);
+                if (attribut.getIdentity()) {
+                    CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+                    propertyRef.setName(attribut.getName());
+                    keysList.add(propertyRef);
+                }
+            }
+            CsdlEntityType entityType = new CsdlEntityType();
+            entityType.setName(entityTypeName.getName());
+            entityType.setProperties(propsList);
+            entityType.setKey(keysList);
+
+            if (!keysList.isEmpty()) {
+                entitytypelist.put(entityTypeName, entityType);
+                return entityType;
+            } else {
+                LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
+                return null;
+            }
         }
     }
 
@@ -131,39 +152,48 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             return null;
         }
         //System.out.println(complexTypeName.getFullQualifiedNameAsString());
-        CfClass classref = cfclassservice.findByName(complexTypeName.getName());
-        List propsList = new ArrayList();
-        List keysList = new ArrayList();
-        for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
-            CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
-            propsList.add(prop);
-            if (attribut.getIdentity()) {
-                CsdlPropertyRef propertyRef = new CsdlPropertyRef();
-                propertyRef.setName(attribut.getName());
-                keysList.add(propertyRef);
-            }
-        }
-        CsdlComplexType complexType = new CsdlComplexType();
-        complexType.setName(complexTypeName.getName());
-        complexType.setProperties(propsList);
-
-        if (!keysList.isEmpty()) {
-            return complexType;
+        if (complextypelist.containsKey(complexTypeName)) {
+            return complextypelist.get(complexTypeName);
         } else {
-            LOGGER.warn("OData - Missing identifier for " + complexTypeName.getName());
-            return null;
+            CfClass classref = cfclassservice.findByName(complexTypeName.getName());
+            List propsList = new ArrayList();
+            List keysList = new ArrayList();
+            for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
+                CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
+                propsList.add(prop);
+                if (attribut.getIdentity()) {
+                    CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+                    propertyRef.setName(attribut.getName());
+                    keysList.add(propertyRef);
+                }
+            }
+            CsdlComplexType complexType = new CsdlComplexType();
+            complexType.setName(complexTypeName.getName());
+            complexType.setProperties(propsList);
+
+            if (!keysList.isEmpty()) {
+                complextypelist.put(complexTypeName, complexType);
+                return complexType;
+            } else {
+                LOGGER.warn("OData - Missing identifier for " + complexTypeName.getName());
+                return null;
+            }
         }
     }
 
     @Override
     public CsdlSingleton getSingleton(FullQualifiedName entityContainer, String singletonName) throws ODataException {
         if (entityContainer.equals(CONTAINER)) {
-            CsdlSingleton singleton = new CsdlSingleton();
-            singleton.setName(singletonName);
-            singleton.setType(new FullQualifiedName(NAMESPACE_ENTITY, singletonName));
-            //singleton.setNavigationPropertyBindings(navigationPropertyBindings);
-            
-            return singleton;
+            if (singletonlist.containsKey(singletonName)) {
+                return singletonlist.get(singletonName);
+            } else {
+                CsdlSingleton singleton = new CsdlSingleton();
+                singleton.setName(singletonName);
+                singleton.setType(new FullQualifiedName(NAMESPACE_ENTITY, singletonName));
+                //singleton.setNavigationPropertyBindings(navigationPropertyBindings);
+                singletonlist.put(singletonName, singleton);
+                return singleton;
+            }
         }
         return null;
     }
@@ -171,11 +201,15 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
     @Override
     public CsdlEntitySet getEntitySet(FullQualifiedName entityContainer, String entitySetName) throws ODataException {
         if (entityContainer.equals(CONTAINER)) {
-            CsdlEntitySet entitySet = new CsdlEntitySet();
-            entitySet.setName(entitySetName);
-            entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName.substring(0, entitySetName.length()-3)));
-
-            return entitySet;
+            if (entitysetlist.containsKey(entitySetName)) {
+                return entitysetlist.get(entitySetName);
+            } else {
+                CsdlEntitySet entitySet = new CsdlEntitySet();
+                entitySet.setName(entitySetName);
+                entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName.substring(0, entitySetName.length()-3)));
+                entitysetlist.put(entitySetName, entitySet);
+                return entitySet;
+            }
         }
 
         return null;
