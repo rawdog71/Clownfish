@@ -16,29 +16,12 @@
 package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.datamodels.AttributDef;
-import io.clownfish.clownfish.dbentities.CfAsset;
-import io.clownfish.clownfish.dbentities.CfAssetlist;
-import io.clownfish.clownfish.dbentities.CfAttribut;
-import io.clownfish.clownfish.dbentities.CfAttributcontent;
-import io.clownfish.clownfish.dbentities.CfAttributetype;
-import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.dbentities.CfClasscontent;
-import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
-import io.clownfish.clownfish.dbentities.CfContentversion;
-import io.clownfish.clownfish.dbentities.CfContentversionPK;
-import io.clownfish.clownfish.dbentities.CfList;
+import io.clownfish.clownfish.datamodels.ContentDataOutput;
+import io.clownfish.clownfish.dbentities.*;
 import io.clownfish.clownfish.lucene.ContentIndexer;
 import io.clownfish.clownfish.lucene.IndexService;
-import io.clownfish.clownfish.serviceinterface.CfAssetService;
-import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
-import io.clownfish.clownfish.serviceinterface.CfAttributService;
-import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
-import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
-import io.clownfish.clownfish.serviceinterface.CfContentversionService;
-import io.clownfish.clownfish.serviceinterface.CfKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.serviceinterface.*;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -51,6 +34,8 @@ import java.util.Map;
 import java.util.zip.DataFormatException;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -58,7 +43,10 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import javax.persistence.NoResultException;
 
 /**
  *
@@ -76,8 +64,12 @@ public class ContentUtil implements IVersioningInterface {
     @Autowired transient CfListService cflistService;
     @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired transient CfClasscontentKeywordService cfcontentkeywordService;
+    @Autowired transient CfAttributService cfattributservice;
+    @Autowired transient CfListcontentService cflistcontentService;
+    @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
     @Autowired FolderUtil folderUtil;
     @Autowired MarkdownUtil markdownUtil;
+    @Autowired HibernateUtil hibernateUtil;
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired transient CfContentversionService cfcontentversionService;
@@ -86,6 +78,8 @@ public class ContentUtil implements IVersioningInterface {
     private @Getter @Setter long currentVersion;
     private @Getter @Setter String content = "";
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentUtil.class);
+
+    @Value("${hibernate.use:0}") int useHibernate;
     
     public AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent) {
         CfAttributetype knattributtype = cfattributetypeService.findById(attributtypeid);
@@ -595,7 +589,7 @@ public class ContentUtil implements IVersioningInterface {
                 return false;
         }
     }
-    
+
     @Override
     public String getUniqueName(String name) {
         int i = 1;
@@ -609,5 +603,332 @@ public class ContentUtil implements IVersioningInterface {
             }
         } while (!found);
         return name+"("+i+")";
+    }
+
+    public boolean setClassrefVals(HashMap hm, CfClass clazz, List<HashMap<String, String>> filter_list) {
+        boolean found = true;
+        for (Object key : hm.keySet()) {
+            try {
+                CfAttribut attr = cfattributservice.findByNameAndClassref((String) key, clazz);
+                if (0 == attr.getAttributetype().getName().compareToIgnoreCase("classref")) {
+                    if (0 == attr.getRelationtype()) {          // n:m
+                        CfList contentlist = cflistService.findByClassrefAndName(attr.getRelationref(), (String) hm.get(key));
+                        List<CfListcontent> listcontent = cflistcontentService.findByListref(contentlist.getId());
+                        List<Map<String, String>> result = new ArrayList<>();
+                        for (CfListcontent contentitem : listcontent) {
+                            Map output = hibernateUtil.getContent(attr.getRelationref().getName(), contentitem.getCfListcontentPK().getClasscontentref(), attr.getName(), filter_list);
+                            if (!output.isEmpty()) {
+                                CfClasscontent cfclasscontent = cfclasscontentService.findById((long)output.get("cf_contentref"));
+                                if (null != cfclasscontent) {
+                                    if (!cfclasscontent.isScrapped()) {
+                                        ContentDataOutput contentdataoutput = new ContentDataOutput();
+                                        contentdataoutput.setContent(cfclasscontent);
+                                        if (cfclasscontent.getClassref().isEncrypted()) {
+                                            contentdataoutput.setKeyvals(getContentMapDecrypted(output, cfclasscontent.getClassref()));
+                                        } else {
+                                            contentdataoutput.setKeyvals(getContentMap(output));
+                                        }
+                                        setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
+                                        setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                                        try {
+                                            contentdataoutput.setDifference(hasDifference(cfclasscontent));
+                                            contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                                        } catch (Exception ex) {
+
+                                        }
+                                        result.add(contentdataoutput.getKeyvals().get(0));
+                                    }
+                                }
+                            }
+                        }
+                        hm.put(attr.getName(), result);
+                        if (result.isEmpty()) found = false;
+                    } else {                                    // 1:n
+                        Map output = hibernateUtil.getContent(attr.getRelationref().getName(), (long) hm.get(key), attr.getName(), filter_list);
+                        hm.put(attr.getName(), output);
+                        if (output.isEmpty()) found = false;
+                    }
+                }
+            } catch (Exception ex) {
+                //System.out.println(ex.getMessage());
+            }
+        }
+        return found;
+    }
+
+    public void setAssetrefVals(HashMap hm, CfClass clazz) {
+        for (Object key : hm.keySet()) {
+            try {
+                CfAttribut attr = cfattributservice.findByNameAndClassref((String) key, clazz);
+                if (0 == attr.getAttributetype().getName().compareToIgnoreCase("assetref")) {
+                    CfAssetlist assetlist = cfassetlistService.findByName((String)hm.get(key));
+                    List<CfAssetlistcontent> assetcontentlist = cfassetlistcontentService.findByAssetlistref(assetlist.getId());
+
+                    List<Long> result = new ArrayList<>();
+                    for (CfAssetlistcontent assetitem : assetcontentlist) {
+                        result.add(assetitem.getCfAssetlistcontentPK().getAssetref());
+                    }
+                    hm.put(attr.getName(), result);
+                }
+            } catch (Exception ex) {
+
+            }
+        }
+    }
+
+    public Map<String, String> getSingle(CfClass clazz, String attributname, Object attributvalue) {
+        if (0 == useHibernate) {
+            Map<String, String> result = new HashMap<>();
+            List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(clazz);
+            for (CfClasscontent cc : classcontentList) {
+                if (!cc.isScrapped()) {
+                    HashMap<String, String> attributmap = new HashMap<>();
+                    List<CfAttributcontent> aclist = cfattributcontentService.findByClasscontentref(cc);
+                    if (checkCompare(aclist, cc, attributname, attributvalue)) {
+                        List keyvals = getContentOutputKeyval(aclist);
+
+                        result.putAll((Map)keyvals.get(0));
+                    }
+                }
+            }
+            return result;
+        } else {
+            Map<String, String> result = new HashMap<>();
+            Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+            HashMap searchmap = new HashMap<>();
+            searchmap.put(attributname+"_1", ":eq:" + (String) attributvalue.toString());
+            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
+            if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+                LOGGER.info("Query: " + query.getQueryString());
+            }
+            try {
+                List<Map> contentliste = (List<Map>) query.getResultList();
+
+                session_tables.close();
+                for (Map content : contentliste) {
+                    CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
+                    if (null != cfclasscontent) {
+                        if (!cfclasscontent.isScrapped()) {
+                            ContentDataOutput contentdataoutput = new ContentDataOutput();
+                            contentdataoutput.setContent(cfclasscontent);
+                            if (cfclasscontent.getClassref().isEncrypted()) {
+                                contentdataoutput.setKeyvals(getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                            } else {
+                                contentdataoutput.setKeyvals(getContentMap(content));
+                            }
+                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, null);
+                            setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                            try {
+                                contentdataoutput.setDifference(hasDifference(cfclasscontent));
+                                contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                            } catch (Exception ex) {
+
+                            }
+                            result.putAll(contentdataoutput.getKeyvals().get(0));
+                        }
+                    }
+                }
+            } catch (NoResultException ex) {
+                session_tables.close();
+            }
+
+            return result;
+        }
+    }
+
+    public List<Map<String, String>> getList(CfClass clazz, String attributname, Object attributvalue) {
+        if (0 == useHibernate) {
+            List<Map<String, String>> result = new ArrayList<>();
+            List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(clazz);
+            for (CfClasscontent cc : classcontentList) {
+                if (!cc.isScrapped()) {
+                    HashMap<String, String> attributmap = new HashMap<>();
+                    if (!attributname.isEmpty()) {
+                        List<CfAttributcontent> aclist = cfattributcontentService.findByClasscontentref(cc);
+                        if (checkCompare(aclist, cc, attributname, attributvalue)) {
+                            List keyvals = getContentOutputKeyval(aclist);
+                            result.add((Map)keyvals.get(0));
+                        }
+                    } else {
+                        List<CfAttributcontent> aclist = cfattributcontentService.findByClasscontentref(cc);
+                        List keyvals = getContentOutputKeyval(aclist);
+                        result.add((Map)keyvals.get(0));
+                    }
+                }
+            }
+            return result;
+        } else {
+            List<Map<String, String>> result = new ArrayList<>();
+            Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+            HashMap searchmap = new HashMap<>();
+            if (null != attributvalue) {
+                searchmap.put(attributname+"_1", (String) attributvalue.toString());
+            }
+            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
+            if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+                LOGGER.info("Query: " + query.getQueryString());
+            }
+            try {
+                List<Map> contentliste = (List<Map>) query.getResultList();
+
+                session_tables.close();
+                for (Map content : contentliste) {
+                    CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
+                    if (null != cfclasscontent) {
+                        if (!cfclasscontent.isScrapped()) {
+                            ContentDataOutput contentdataoutput = new ContentDataOutput();
+                            contentdataoutput.setContent(cfclasscontent);
+                            if (cfclasscontent.getClassref().isEncrypted()) {
+                                contentdataoutput.setKeyvals(getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                            } else {
+                                contentdataoutput.setKeyvals(getContentMap(content));
+                            }
+                            setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, null);
+                            setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                            try {
+                                contentdataoutput.setDifference(hasDifference(cfclasscontent));
+                                contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                            } catch (Exception ex) {
+
+                            }
+                            result.add(contentdataoutput.getKeyvals().get(0));
+                        }
+                    }
+                }
+            } catch (NoResultException ex) {
+                session_tables.close();
+            }
+
+            return result;
+        }
+    }
+
+    public List<Map<String, String>> getList(CfClass clazz, List<HashMap<String, String>> filter_list) {
+        if (0 == useHibernate) {
+            List<Map<String, String>> result = new ArrayList<>();
+            List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(clazz);
+            for (CfClasscontent cc : classcontentList) {
+                if (!cc.isScrapped()) {
+                    HashMap<String, String> attributmap = new HashMap<>();
+
+                    for (HashMap<String, String> filter : filter_list) {
+                        String field = filter.get("field");
+                        String op = filter.get("op");
+                        String value1 = filter.get("value1");
+                        String value2 = filter.get("value2");
+
+                        CfAttribut attribut = cfattributservice.findByNameAndClassref(field, clazz);
+                        if (!field.isEmpty()) {
+                            List<CfAttributcontent> aclist = cfattributcontentService.findByClasscontentref(cc);
+                            if (checkCompare(aclist, cc, field, value1)) {
+                                List keyvals = getContentOutputKeyval(aclist);
+                                result.add((Map)keyvals.get(0));
+                            }
+                        } else {
+                            List<CfAttributcontent> aclist = cfattributcontentService.findByClasscontentref(cc);
+                            List keyvals = getContentOutputKeyval(aclist);
+                            result.add((Map)keyvals.get(0));
+                        }
+
+                    }
+                }
+            }
+            return result;
+        } else {
+            List<Map<String, String>> result = new ArrayList<>();
+            Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+            HashMap searchmap = new HashMap<>();
+            for (HashMap<String, String> filter : filter_list) {
+                String field = filter.get("field");
+                String op = filter.get("op");
+                String value1 = filter.get("value1");
+                String value2 = filter.get("value2");
+                if ((null != field) && (!field.contains("."))) {
+                    if ((!value2.isEmpty()) && (0 == op.compareToIgnoreCase("bt"))) {
+                        searchmap.put(field+"_1", ":" + op + ":" + value1 + ":" + value2);
+                    } else {
+                        searchmap.put(field+"_1", ":" + op + ":" + value1);
+                    }
+                }
+            }
+            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
+            if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+                LOGGER.info("Query: " + query.getQueryString());
+            }
+            try {
+                List<Map> contentliste = (List<Map>) query.getResultList();
+
+                session_tables.close();
+                for (Map content : contentliste) {
+                    CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
+                    if (null != cfclasscontent) {
+                        if (!cfclasscontent.isScrapped()) {
+                            boolean found = false;
+                            ContentDataOutput contentdataoutput = new ContentDataOutput();
+                            contentdataoutput.setContent(cfclasscontent);
+                            if (cfclasscontent.getClassref().isEncrypted()) {
+                                contentdataoutput.setKeyvals(getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                            } else {
+                                contentdataoutput.setKeyvals(getContentMap(content));
+                            }
+                            found = setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
+                            setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
+                            try {
+                                contentdataoutput.setDifference(hasDifference(cfclasscontent));
+                                contentdataoutput.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
+                            } catch (Exception ex) {
+
+                            }
+                            if (found)
+                                result.add(contentdataoutput.getKeyvals().get(0));
+                        }
+                    }
+                }
+            } catch (NoResultException ex) {
+                session_tables.close();
+            }
+
+            return result;
+        }
+    }
+
+    private boolean checkCompare(List<CfAttributcontent> aclist, CfClasscontent cc, String attributname, Object attributvalue) {
+        boolean found = false;
+        for (CfAttributcontent ac : aclist) {
+            if ((!found) && (0 == ac.getAttributref().getName().compareToIgnoreCase(attributname))) {
+                switch (ac.getAttributref().getAttributetype().getName()) {
+                    case "string":
+                    case "text":
+                    case "htmltext":
+                    case "markdown":
+                        if ((ac.getClasscontentref().getClassref().isEncrypted()) && (!ac.getAttributref().getIdentity())) {
+                            if (0 == EncryptUtil.decrypt(ac.getContentString(), propertyUtil.getPropertyValue("aes_key")).compareTo((String) attributvalue)) {
+                                found = true;
+                            }
+                        } else {
+                            if ((null != ac.getContentString()) && (0 == ac.getContentString().compareTo((String) attributvalue))) {
+                                found = true;
+                            }
+                        }
+                        break;
+                    case "boolean":
+                        if ((null != ac.getContentBoolean()) && (ac.getContentBoolean() == (boolean) attributvalue)) {
+                            found = true;
+                        }
+                        break;
+                    case "integer":
+                        if ((null != ac.getContentInteger()) && (ac.getContentInteger().longValue() == (long) attributvalue)) {
+                            found = true;
+                        }
+                        break;
+                    case "real":
+                        if ((null != ac.getContentReal()) && (ac.getContentReal().floatValue()  == (float) attributvalue)) {
+                            found = true;
+                        }
+                        break;
+                }
+            }
+        }
+        return found;
     }
 }
