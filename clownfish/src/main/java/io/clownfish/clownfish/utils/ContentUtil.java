@@ -666,9 +666,11 @@ public class ContentUtil implements IVersioningInterface {
                                         ContentDataOutput contentdataoutput = new ContentDataOutput();
                                         contentdataoutput.setContent(cfclasscontent);
                                         if (cfclasscontent.getClassref().isEncrypted()) {
-                                            contentdataoutput.setKeyvals(getContentMapDecrypted(output, cfclasscontent.getClassref()));
+                                            contentdataoutput.setKeyvals(getContentMapListDecrypted(output, cfclasscontent.getClassref()));
+                                            contentdataoutput.setKeyval(getContentMapDecrypted(output, cfclasscontent.getClassref()));
                                         } else {
-                                            contentdataoutput.setKeyvals(getContentMap(output));
+                                            contentdataoutput.setKeyvals(getContentMapList(output));
+                                            contentdataoutput.setKeyval(getContentMap(output));
                                         }
                                         setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
                                         setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
@@ -727,7 +729,7 @@ public class ContentUtil implements IVersioningInterface {
                     HashMap<String, String> attributmap = new HashMap<>();
                     List<CfAttributcontent> aclist = cfattributcontentService.findByClasscontentref(cc);
                     if (checkCompare(aclist, cc, attributname, attributvalue)) {
-                        List keyvals = getContentOutputKeyval(aclist);
+                        List keyvals = getContentOutputKeyvalList(aclist);
 
                         result.putAll((Map)keyvals.get(0));
                     }
@@ -754,9 +756,11 @@ public class ContentUtil implements IVersioningInterface {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
                             contentdataoutput.setContent(cfclasscontent);
                             if (cfclasscontent.getClassref().isEncrypted()) {
-                                contentdataoutput.setKeyvals(getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyvals(getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyval(getContentMapDecrypted(content, cfclasscontent.getClassref()));
                             } else {
-                                contentdataoutput.setKeyvals(getContentMap(content));
+                                contentdataoutput.setKeyvals(getContentMapList(content));
+                                contentdataoutput.setKeyval(getContentMap(content));
                             }
                             setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, null);
                             setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
@@ -788,12 +792,12 @@ public class ContentUtil implements IVersioningInterface {
                     if (!attributname.isEmpty()) {
                         List<CfAttributcontent> aclist = cfattributcontentService.findByClasscontentref(cc);
                         if (checkCompare(aclist, cc, attributname, attributvalue)) {
-                            List keyvals = getContentOutputKeyval(aclist);
+                            List keyvals = getContentOutputKeyvalList(aclist);
                             result.add((Map)keyvals.get(0));
                         }
                     } else {
                         List<CfAttributcontent> aclist = cfattributcontentService.findByClasscontentref(cc);
-                        List keyvals = getContentOutputKeyval(aclist);
+                        List keyvals = getContentOutputKeyvalList(aclist);
                         result.add((Map)keyvals.get(0));
                     }
                 }
@@ -821,9 +825,11 @@ public class ContentUtil implements IVersioningInterface {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
                             contentdataoutput.setContent(cfclasscontent);
                             if (cfclasscontent.getClassref().isEncrypted()) {
-                                contentdataoutput.setKeyvals(getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyvals(getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyval(getContentMapDecrypted(content, cfclasscontent.getClassref()));
                             } else {
-                                contentdataoutput.setKeyvals(getContentMap(content));
+                                contentdataoutput.setKeyvals(getContentMapList(content));
+                                contentdataoutput.setKeyval(getContentMap(content));
                             }
                             setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, null);
                             setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
@@ -863,12 +869,12 @@ public class ContentUtil implements IVersioningInterface {
                         if (!field.isEmpty()) {
                             List<CfAttributcontent> aclist = cfattributcontentService.findByClasscontentref(cc);
                             if (checkCompare(aclist, cc, field, value1)) {
-                                List keyvals = getContentOutputKeyval(aclist);
+                                List keyvals = getContentOutputKeyvalList(aclist);
                                 result.add((Map)keyvals.get(0));
                             }
                         } else {
                             List<CfAttributcontent> aclist = cfattributcontentService.findByClasscontentref(cc);
-                            List keyvals = getContentOutputKeyval(aclist);
+                            List keyvals = getContentOutputKeyvalList(aclist);
                             result.add((Map)keyvals.get(0));
                         }
 
@@ -909,9 +915,11 @@ public class ContentUtil implements IVersioningInterface {
                             ContentDataOutput contentdataoutput = new ContentDataOutput();
                             contentdataoutput.setContent(cfclasscontent);
                             if (cfclasscontent.getClassref().isEncrypted()) {
-                                contentdataoutput.setKeyvals(getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyvals(getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                                contentdataoutput.setKeyval(getContentMapDecrypted(content, cfclasscontent.getClassref()));
                             } else {
-                                contentdataoutput.setKeyvals(getContentMap(content));
+                                contentdataoutput.setKeyvals(getContentMapList(content));
+                                contentdataoutput.setKeyval(getContentMap(content));
                             }
                             found = setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, filter_list);
                             setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);

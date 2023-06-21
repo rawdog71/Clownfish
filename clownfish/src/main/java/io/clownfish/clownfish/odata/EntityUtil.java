@@ -83,9 +83,11 @@ public class EntityUtil {
                                 ContentDataOutput cdo = new ContentDataOutput();
                                 cdo.setContent(cfclasscontent);
                                 if (cfclasscontent.getClassref().isEncrypted()) {
-                                    cdo.setKeyvals(contentUtil.getContentMapDecrypted(attributes, cfclasscontent.getClassref()));
+                                    cdo.setKeyvals(contentUtil.getContentMapListDecrypted(attributes, cfclasscontent.getClassref()));
+                                    cdo.setKeyval(contentUtil.getContentMapDecrypted(attributes, cfclasscontent.getClassref()));
                                 } else {
-                                    cdo.setKeyvals(contentUtil.getContentMap(attributes));
+                                    cdo.setKeyvals(contentUtil.getContentMapList(attributes));
+                                    cdo.setKeyval(contentUtil.getContentMap(attributes));
                                 }
                                 contentUtil.setClassrefVals(cdo.getKeyvals().get(0), cfclasscontent.getClassref(), null);
                                 contentUtil.setAssetrefVals(cdo.getKeyvals().get(0), cfclasscontent.getClassref());
