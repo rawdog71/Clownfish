@@ -53,6 +53,15 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
     private static List<CsdlSchema> schemas = null;
     
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericEdmProvider.class);
+    
+    public void init() {
+        singletonlist.clear();
+        entitysetlist.clear();
+        entitytypelist.clear();
+        complextypelist.clear();
+        entityContainer = null;
+        schemas = null;
+    }
 
     @Override
     public List<CsdlSchema> getSchemas() throws ODataException {
@@ -231,9 +240,10 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             case "hashstring":
             case "htmltext":
             case "markdown":
-            case "datetime":
             case "text":
                 return EdmPrimitiveTypeKind.String.getFullQualifiedName();
+            case "datetime":
+                return EdmPrimitiveTypeKind.Date.getFullQualifiedName();
             case "integer":
             case "media":
             case "assetref":

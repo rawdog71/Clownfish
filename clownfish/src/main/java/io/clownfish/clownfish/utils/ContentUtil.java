@@ -688,13 +688,19 @@ public class ContentUtil implements IVersioningInterface {
                         hm.put(attr.getName(), result);
                         if (result.isEmpty()) found = false;
                     } else {                                    // 1:n
-                        Map output = hibernateUtil.getContent(attr.getRelationref().getName(), (long) hm.get(key), attr.getName(), filter_list);
-                        hm.put(attr.getName(), output);
-                        if (output.isEmpty()) found = false;
+                        if (hm.get(key) instanceof String) {
+                            Map output = hibernateUtil.getContent(attr.getRelationref().getName(), Long.parseLong((String)hm.get(key)), attr.getName(), filter_list);
+                            hm.put(attr.getName(), output);
+                            if (output.isEmpty()) found = false;
+                        } else {
+                            Map output = hibernateUtil.getContent(attr.getRelationref().getName(), (long) hm.get(key), attr.getName(), filter_list);
+                            hm.put(attr.getName(), output);
+                            if (output.isEmpty()) found = false;
+                        }
                     }
                 }
             } catch (Exception ex) {
-                //System.out.println(ex.getMessage());
+                System.out.println(ex.getMessage());
             }
         }
         return found;

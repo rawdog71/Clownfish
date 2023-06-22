@@ -22,6 +22,7 @@ import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfTemplate;
+import io.clownfish.clownfish.odata.GenericEdmProvider;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
@@ -65,6 +66,7 @@ public class ClassList implements Serializable {
     @Autowired DataList datalist;
     @Autowired ContentList contentlist;
     @Autowired ClassUtil classutil;
+    @Autowired GenericEdmProvider edmprovider;
     
     private @Getter @Setter List<CfClass> classListe;
     private @Getter @Setter CfClass selectedClass = null;
@@ -300,6 +302,7 @@ public class ClassList implements Serializable {
     public void onRecreateDatamodel(ActionEvent actionEvent) {
         if (null != selectedClass) {
             HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
+            edmprovider.init();
             FacesMessage message = new FacesMessage("Datamodel recreated with data init");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }

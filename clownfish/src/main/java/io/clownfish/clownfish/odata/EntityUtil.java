@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +91,9 @@ public class EntityUtil {
                 break;
             case "Edm.Boolean":
                 prop.setValue(ValueType.PRIMITIVE, ((Boolean)value));
+                break;
+            case "Edm.Date":
+                prop.setValue(ValueType.PRIMITIVE, ((Date)value));
                 break;
             default:
                 prop.setValue(ValueType.PRIMITIVE, null);
@@ -178,6 +182,7 @@ public class EntityUtil {
                 cdo.setKeyval(contentUtil.getContentMap(attributes));
             }
             contentUtil.setClassrefVals(cdo.getKeyvals().get(0), cfclasscontent.getClassref(), null);
+            cdo.setKeyval(cdo.getKeyvals().get(0));
             contentUtil.setAssetrefVals(cdo.getKeyvals().get(0), cfclasscontent.getClassref());
             try {
                 cdo.setDifference(contentUtil.hasDifference(cfclasscontent));
@@ -199,7 +204,14 @@ public class EntityUtil {
                 Property class_prop = new Property();
                 class_prop.setName(key);
                 class_prop.setType(GenericEdmProvider.getODataType(cfAtt).getFullQualifiedNameAsString());
-                setPropValue(class_prop, value);
+                if ((0 == cfAtt.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == cfAtt.getRelationtype())) { // 1:n
+                    Long content_id = Long.valueOf((String)value);
+                    CfClasscontent cfclasscontentref = cfClasscontentService.findById(content_id);
+                    class_prop.setValue(ValueType.COMPLEX, createComplexVal(cfclasscontentref));
+                    class_prop.setType("OData.Complex." + cfclasscontentref.getClassref().getName());
+                } else {
+                    setPropValue(class_prop, value);
+                }
                 val.getValue().add(class_prop);
             }
             return val;
