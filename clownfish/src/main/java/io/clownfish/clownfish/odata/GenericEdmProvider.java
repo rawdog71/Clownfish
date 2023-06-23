@@ -215,7 +215,11 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             } else {
                 CsdlEntitySet entitySet = new CsdlEntitySet();
                 entitySet.setName(entitySetName);
-                entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName.substring(0, entitySetName.length()-3)));
+                if (entitySetName.endsWith("Set")) {
+                    entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName.substring(0, entitySetName.length()-3)));
+                } else {
+                    entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName));
+                }
                 entitysetlist.put(entitySetName, entitySet);
                 return entitySet;
             }

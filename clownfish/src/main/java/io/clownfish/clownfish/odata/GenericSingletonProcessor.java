@@ -111,7 +111,12 @@ public class GenericSingletonProcessor implements EntityProcessor {
                     .replaceAll("'$", "");
             searchmap.put(attributname+"_1", ":eq:" + attributvalue);
         }
-        String classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        String classname = "";
+        if (edmEntitySet.getName().endsWith("Set")) {
+            classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        } else {
+            classname = edmEntitySet.getName();
+        }
         EntityCollection genericCollection = new EntityCollection();
         getList(cfclassservice.findByName(classname), searchmap, genericCollection);
        
@@ -150,14 +155,6 @@ public class GenericSingletonProcessor implements EntityProcessor {
                             } else {
                                 contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
                                 contentdataoutput.setKeyval(contentUtil.getContentMap(content));
-                            }
-                            contentUtil.setClassrefVals(contentdataoutput.getKeyvals().get(0), clazz, null);
-                            // setAssetrefVals(contentdataoutput.getKeyvals().get(0), clazz);
-                            try {
-                                contentdataoutput.setDifference(contentUtil.hasDifference(cfclasscontent));
-                                contentdataoutput.setMaxversion(cfcontentversionservice.findMaxVersion(cfclasscontent.getId()));
-                            } catch (Exception ex) {
-
                             }
                             Entity entity = entityUtil.makeEntity(contentdataoutput);
                             genericList.add(entity);

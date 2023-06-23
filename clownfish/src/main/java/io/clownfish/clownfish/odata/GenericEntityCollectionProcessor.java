@@ -120,7 +120,12 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
     }
 
     private EntityCollection getData(EdmEntitySet edmEntitySet, Expression filterExpression) {
-        String classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        String classname = "";
+        if (edmEntitySet.getName().endsWith("Set")) {
+            classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        } else {
+            classname = edmEntitySet.getName();
+        }
         HashMap searchMap = getSearchMap(filterExpression);
         EntityCollection genericCollection = new EntityCollection();
         getList(cfclassservice.findByName(classname), genericCollection, searchMap);
