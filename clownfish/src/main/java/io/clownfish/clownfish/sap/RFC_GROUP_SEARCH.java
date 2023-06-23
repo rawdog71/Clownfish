@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.sap;
 
+import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoTable;
 import de.destrukt.sapconnection.SAPConnection;
@@ -32,33 +33,42 @@ public class RFC_GROUP_SEARCH {
     static SAPConnection sapc = null;
     JCoTable groups_table = null;
     
+    private static final List<RfcGroup> groupslist = new ArrayList<>();
+    
     final transient Logger LOGGER = LoggerFactory.getLogger(RFC_GROUP_SEARCH.class);
     
     public RFC_GROUP_SEARCH(SAPConnection sapc) {
         RFC_GROUP_SEARCH.sapc = sapc;
     }
     
+    public void init() {
+        groupslist.clear();
+    }
+    
     public List<RfcGroup> getRfcGroupList() {
-        try {
-            JCoFunction function = sapc.getDestination().getRepository().getFunction("RFC_GROUP_SEARCH");
-            function.getImportParameterList().setValue("GROUPNAME", "z*");
-            function.getImportParameterList().setValue("LANGUAGE", "DE");
-            function.execute(sapc.getDestination());
-            groups_table = function.getTableParameterList().getTable("GROUPS");
-            List<RfcGroup> groupsList = new ArrayList<>();
-            for (int i = 0; i < groups_table.getNumRows(); i++) {
-                groups_table.setRow(i);
+        if (groupslist.isEmpty()) {
+            try {
+                JCoFunction function = sapc.getDestination().getRepository().getFunction("RFC_GROUP_SEARCH");
+                function.getImportParameterList().setValue("GROUPNAME", "z*");
+                function.getImportParameterList().setValue("LANGUAGE", "DE");
+                function.execute(sapc.getDestination());
+                groups_table = function.getTableParameterList().getTable("GROUPS");
+                for (int i = 0; i < groups_table.getNumRows(); i++) {
+                    groups_table.setRow(i);
 
-                RfcGroup rfcgroup = new RfcGroup(
-                    groups_table.getString("GROUPNAME"),
-                    groups_table.getString("STEXT")
-                );
-                groupsList.add(rfcgroup);
+                    RfcGroup rfcgroup = new RfcGroup(
+                        groups_table.getString("GROUPNAME"),
+                        groups_table.getString("STEXT")
+                    );
+                    groupslist.add(rfcgroup);
+                }
+                return groupslist;
+            } catch (JCoException ex) {
+                LOGGER.error(ex.getMessage());
+                return null;
             }
-            return groupsList;
-        } catch(Exception ex) {
-            LOGGER.error(ex.getMessage());
-            return null;
+        } else {
+            return groupslist;
         }
     }
 }

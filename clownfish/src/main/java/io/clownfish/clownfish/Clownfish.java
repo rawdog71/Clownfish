@@ -89,6 +89,9 @@ import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.exceptions.ClownfishTemplateException;
+import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
+import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
+import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
 import io.clownfish.clownfish.serviceimpl.CfStringTemplateLoaderImpl;
 import io.clownfish.clownfish.websocket.WebSocketServer;
 import java.util.logging.Level;
@@ -181,7 +184,10 @@ public class Clownfish {
 
     private GzipSwitch gzipswitch;
     private freemarker.template.Configuration freemarkerCfg;
-    private RPY_TABLE_READ rpytableread = null;
+    private @Getter @Setter RPY_TABLE_READ rpytableread = null;
+    private @Getter @Setter RFC_GET_FUNCTION_INTERFACE rfcfunctioninterface = null;
+    private @Getter @Setter RFC_GROUP_SEARCH rfcgroupsearch = null;
+    private @Getter @Setter RFC_FUNCTION_SEARCH rfcfunctionsearch = null;
     private static SAPConnection sapc = null;
     private boolean sapSupport = false;
     private boolean jobSupport = false;
@@ -210,7 +216,7 @@ public class Clownfish {
     private @Getter @Setter int searchlimit;
     private @Getter @Setter Map<String, String> metainfomap;
     private static HibernateInit hibernateInitializer = null;
-    
+        
     private WebSocketServer wss;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(Clownfish.class);
@@ -440,6 +446,9 @@ public class Clownfish {
                 if (null == sapc) {
                     sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
                     rpytableread = new RPY_TABLE_READ(sapc);
+                    rfcfunctioninterface = new RFC_GET_FUNCTION_INTERFACE(sapc);
+                    rfcgroupsearch = new RFC_GROUP_SEARCH(sapc);
+                    rfcfunctionsearch = new RFC_FUNCTION_SEARCH(sapc);
                 }
             }
             // Override default values with system properties
@@ -487,13 +496,11 @@ public class Clownfish {
                 databasetableIndexer_thread.start();
                 LOGGER.info("DATABASETABLEINDEXER RUN");
                 
-                
                 indexService.getWriter().commit();
             }
            
             // Init Site Metadata Map
             if (null == metainfomap) {
-                //hzMetainfomap = hcInstance.getMap("metainfos");
                 metainfomap = new HashMap();
             }
             metainfomap.put("version", clownfishutil.getVersion());
@@ -1862,21 +1869,6 @@ public class Clownfish {
                     freemarkerCfg.setTagSyntax(freemarker.template.Configuration.AUTO_DETECT_TAG_SYNTAX);
                     
                     fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
-                    
-                    /*
-                    StringTemplateLoader stringLoader = new StringTemplateLoader();
-                    stringLoader.putTemplate(cftemplate.getName(), templatecontent);
-                    fmRoot = new LinkedHashMap();
-                    freemarkerTemplateloader.setModus(modus);
-                    
-                    freemarkerCfg = new freemarker.template.Configuration();
-                    freemarkerCfg.setDefaultEncoding("UTF-8");
-                    freemarkerCfg.setTemplateLoader(stringLoader);
-                    freemarkerCfg.setLocalizedLookup(false);
-                    freemarkerCfg.setLocale(Locale.GERMANY);
-                    
-                    fmTemplate = freemarkerCfg.getTemplate(cftemplate.getName());
-                    */
                     break;
                 case 1:
                     velContext = new org.apache.velocity.VelocityContext();
@@ -1980,7 +1972,6 @@ public class Clownfish {
                         freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
                         try {
                             if (null != fmTemplate) {
-                                //freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
                                 env.process();
                             }
                         } catch (freemarker.template.TemplateException ex) {

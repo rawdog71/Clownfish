@@ -53,7 +53,9 @@ import io.clownfish.clownfish.dbentities.CfStylesheet;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.lucene.SourceIndexer;
 import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
+import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
+import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.sap.models.RfcFunction;
 import io.clownfish.clownfish.sap.models.RfcGroup;
 import io.clownfish.clownfish.serviceinterface.CfApiService;
@@ -310,7 +312,7 @@ public class SiteTreeBean implements Serializable {
             }
             if (sapSupport) {
                 sapc = new SAPConnection(SAPCONNECTION, "Clownfish4");
-                rfcgrouplist = new RFC_GROUP_SEARCH(sapc).getRfcGroupList();
+                rfcgrouplist = clownfish.getRfcgroupsearch().getRfcGroupList();
             }
         }
         //root = new DefaultTreeNode("Root", null);
@@ -370,6 +372,13 @@ public class SiteTreeBean implements Serializable {
         contentlist = cflistService.findByMaintenance(true);
         classcontentlist = cfclasscontentService.findByMaintenance(true);
         assetlist = cfassetlistService.findAll();
+    }
+    
+    public void onRefreshSAP(ActionEvent actionEvent) {
+        clownfish.getRpytableread().init();
+        clownfish.getRfcfunctioninterface().init();
+        clownfish.getRfcgroupsearch().init();
+        clownfish.getRfcfunctionsearch().init();
     }
     
     public void onRefreshSelection() {
@@ -553,7 +562,6 @@ public class SiteTreeBean implements Serializable {
                 contenteditable = true;
                 FacesMessage message = new FacesMessage("LAYOUT TEMPLATE");
                 FacesContext.getCurrentInstance().addMessage(null, message);
-                //List<CfLayoutcontent> layoutcontent = cflayoutcontentService.findBySiteref(selectedSite.getId());
                 templateUtility.fetchLayout(template);
                 layout = templateUtility.getLayout();
             } else {
@@ -949,7 +957,6 @@ public class SiteTreeBean implements Serializable {
                 newsite.setParentref(null);
             }
             if (null != selectedTemplate) {
-                //newsite.setTemplateref(BigInteger.valueOf(selectedTemplate.getId()));
                 newsite.setTemplateref(selectedTemplate);
             }
             if (null != selectedStylesheet) {
@@ -1008,14 +1015,14 @@ public class SiteTreeBean implements Serializable {
     public void onChangeRfCGroupInput() {
         if (!rfcgroup.isEmpty()) {
             selectedrfcgroup = null;
-            rfcfunctionlist = new RFC_FUNCTION_SEARCH(sapc).getRfcFunctionsList(rfcgroup);
+            rfcfunctionlist = clownfish.getRfcfunctionsearch().getRfcFunctionsList(rfcgroup);
         }
     }
     
     public void onChangeRfcGroup() {
         if (null != selectedrfcgroup) {
             rfcgroup = selectedrfcgroup.getName();
-            rfcfunctionlist = new RFC_FUNCTION_SEARCH(sapc).getRfcFunctionsList(selectedrfcgroup.getName());
+            rfcfunctionlist = clownfish.getRfcfunctionsearch().getRfcFunctionsList(selectedrfcgroup.getName());
         }
     }
     
@@ -1060,7 +1067,7 @@ public class SiteTreeBean implements Serializable {
             return null;
         } else {
             if (sapSupport) {
-                rfcgrouplist = new RFC_GROUP_SEARCH(sapc).getRfcGroupList();
+                rfcgrouplist = clownfish.getRfcgroupsearch().getRfcGroupList();
                 for (RfcGroup rfcGroup : rfcgrouplist) {
                     if (rfcGroup.getName().compareToIgnoreCase(value) == 0 ) {
                         return rfcGroup;
@@ -1075,7 +1082,7 @@ public class SiteTreeBean implements Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            rfcfunctionlist = new RFC_FUNCTION_SEARCH(sapc).getRfcFunctionsList(selectedrfc.getCfSitesaprfcPK().getRfcgroup());
+            rfcfunctionlist = clownfish.getRfcfunctionsearch().getRfcFunctionsList(selectedrfc.getCfSitesaprfcPK().getRfcgroup());
             for (RfcFunction rfcfunction : rfcfunctionlist) {
                 if (rfcfunction.getName().compareToIgnoreCase(value) == 0 ) {
                     return rfcfunction;
@@ -1327,7 +1334,6 @@ public class SiteTreeBean implements Serializable {
             
             if (null != cc) {
                 attributcontentlist = cfattributcontentService.findByClasscontentref(cc);
-                //String output = cc.getClassref().getTemplateref().getContent();
                 for (CfAttributcontent attributcontent : attributcontentlist) {
                     template = template.replaceAll("#" + attributcontent.getAttributref().getName() + "#", attributcontent.toString());
                 }
@@ -1362,7 +1368,6 @@ public class SiteTreeBean implements Serializable {
             showAssetLibrary = false;
             showKeywordLibrary = false;
             String[] assetinfos = selected_asset.split(":");
-            //String name = assetinfos[0];
             int lfdnr = Integer.parseInt(assetinfos[1]);
             List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiterefAndTemplaterefAndContenttype(selectedSite.getId(), selectedDivTemplate.getId(), "A");
             long assetref = 0;
@@ -1421,7 +1426,6 @@ public class SiteTreeBean implements Serializable {
             showAssetLibrary = true;
             showKeywordLibrary = false;
             String[] assetlibraryinfos = selected_assetlist.split(":");
-            //String assetlist = assetlibraryinfos[0];
             int lfdnr = Integer.parseInt(assetlibraryinfos[1]);
             List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiterefAndTemplaterefAndContenttype(selectedSite.getId(), selectedDivTemplate.getId(), "AL");
             long listref = 0;
@@ -1482,7 +1486,6 @@ public class SiteTreeBean implements Serializable {
             showAssetLibrary = false;
             showKeywordLibrary = true;
             String[] keywordlibraryinfos = selected_keywordlist.split(":");
-            //String keywordlist = keywordlibraryinfos[0];
             int lfdnr = Integer.parseInt(keywordlibraryinfos[1]);
             List<CfLayoutcontent> layoutcontentlist = cflayoutcontentService.findBySiterefAndTemplaterefAndContenttype(selectedSite.getId(), selectedDivTemplate.getId(), "KL");
             long listref = 0;

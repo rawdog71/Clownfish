@@ -49,6 +49,7 @@ public class SAPUtility {
         Übergibt die POST Parameter und ruft SAP RFC auf
         Setzt die Ergebnisse in eine Hashmap zur Ausgabe in Freemarker
     */
+    @Deprecated
     public static HashMap<String, HashMap> getSapExport(List<CfSitesaprfc> sitesaprfclist, HashMap<String, List> saprfcfunctionparamMap, List<JsonFormParameter> postmap, RPY_TABLE_READ rpytableread) {
         JCoTable functions_table = null;
         HashMap<String, HashMap> sapexport = new HashMap<>();

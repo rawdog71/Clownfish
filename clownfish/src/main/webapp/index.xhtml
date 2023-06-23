@@ -416,6 +416,9 @@
                                     </p:tab>
                                     
                                     <p:tab title="SAP" id="site_sap" rendered="#{sitetree.sapSupport}">
+                                        <p:commandButton id="saprefresh" process="form" value="Refresh SAP Repository" actionListener="#{sitetree.onRefreshSAP(actionEvent)}" update=":form:msgs">
+                                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                        </p:commandButton>
                                         <p:panelGrid id="sitepanel_sap" columns="1">
                                             <p:column colspan="12" style="vertical-align: top;">
                                                 <p:dataTable id="saprfclist" size="small" var="rfclist" value="#{sitetree.saprfclist}" selectionMode="single" selection="#{sitetree.selectedrfc}" rowKey="#{rfclist.cfSitesaprfcPK.hash}">
