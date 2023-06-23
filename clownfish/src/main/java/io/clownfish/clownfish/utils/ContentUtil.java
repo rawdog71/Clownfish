@@ -747,7 +747,7 @@ public class ContentUtil implements IVersioningInterface {
             Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
             HashMap searchmap = new HashMap<>();
             searchmap.put(attributname+"_1", ":eq:" + (String) attributvalue.toString());
-            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
+            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName(), null);
             if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
                 LOGGER.info("Query: " + query.getQueryString());
             }
@@ -816,7 +816,7 @@ public class ContentUtil implements IVersioningInterface {
             if (null != attributvalue) {
                 searchmap.put(attributname+"_1", (String) attributvalue.toString());
             }
-            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
+            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName(), null);
             if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
                 LOGGER.info("Query: " + query.getQueryString());
             }
@@ -905,7 +905,7 @@ public class ContentUtil implements IVersioningInterface {
                     }
                 }
             }
-            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
+            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName(), null);
             if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
                 LOGGER.info("Query: " + query.getQueryString());
             }

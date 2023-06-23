@@ -802,7 +802,7 @@ public class HibernateUtil implements Runnable {
         
     }
     
-    public Query getQuery(Session session_tables, HashMap<String, String> searchmap, String inst_klasse) {
+    public Query getQuery(Session session_tables, HashMap<String, String> searchmap, String inst_klasse, HashMap<String, String> orderbymap) {
         Query query = null;
         if (!searchmap.isEmpty()) {
             CfClass clazz = cfclassservice.findByName(inst_klasse);
@@ -854,9 +854,9 @@ public class HibernateUtil implements Runnable {
 
             }
             whereclause = whereclause.substring(0, whereclause.length()-5);
-            query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause);
+            query = session_tables.createQuery("FROM " + inst_klasse + " c " + whereclause + getOrderbyClause(orderbymap));
         } else {
-            query = session_tables.createQuery("FROM " + inst_klasse + " c ");
+            query = session_tables.createQuery("FROM " + inst_klasse + " c " + getOrderbyClause(orderbymap));
         }
         return query;
     }
@@ -937,5 +937,17 @@ public class HibernateUtil implements Runnable {
         generateTablesDatamodel(hibernateInit);
         // generate Relation Tables
         generateRelationsDatamodel(hibernateInit);
+    }
+    
+    private String getOrderbyClause(HashMap orderbymap) {
+        String orderby = "";
+        if (null != orderbymap) {
+            orderby += " ORDER BY ";
+            for (Object key : orderbymap.keySet()) {
+                orderby += (String)key + " " + orderbymap.get(key) + ", ";
+            }
+            orderby = orderby.substring(0, orderby.length()-2);
+        }
+        return orderby;
     }
 }

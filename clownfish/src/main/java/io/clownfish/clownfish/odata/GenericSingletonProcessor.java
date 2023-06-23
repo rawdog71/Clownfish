@@ -52,6 +52,11 @@ import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.queryoption.OrderByItem;
+import org.apache.olingo.server.api.uri.queryoption.OrderByOption;
+import org.apache.olingo.server.api.uri.queryoption.SelectOption;
+import org.apache.olingo.server.api.uri.queryoption.SkipOption;
+import org.apache.olingo.server.api.uri.queryoption.TopOption;
 import org.apache.olingo.server.core.uri.UriParameterImpl;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -81,12 +86,16 @@ public class GenericSingletonProcessor implements EntityProcessor {
     public void readEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
         List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
         UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+        TopOption topoption = uriInfo.getTopOption();
+        SkipOption skipoption = uriInfo.getSkipOption();
+        SelectOption selectoption = uriInfo.getSelectOption();
+        OrderByOption orderbyoption = uriInfo.getOrderByOption();
         //UriResourceSingleton uriResourceSingleton = (UriResourceSingleton) resourcePaths.get(0);
         //System.out.println(uriResourceSingleton.getEntityType().getName());
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
         System.out.println(uriResourceEntitySet.getKeyPredicates());
 
-        EntityCollection entitySet = getData(edmEntitySet, uriResourceEntitySet.getKeyPredicates());
+        EntityCollection entitySet = getData(edmEntitySet, uriResourceEntitySet.getKeyPredicates(), orderbyoption);
         
         ODataSerializer serializer = odata.createSerializer(responseFormat);
 
@@ -103,7 +112,7 @@ public class GenericSingletonProcessor implements EntityProcessor {
         response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
     }
     
-    private EntityCollection getData(EdmEntitySet edmEntitySet, List keypredicates) {
+    private EntityCollection getData(EdmEntitySet edmEntitySet, List keypredicates, OrderByOption orderbyoption) {
         HashMap searchmap = new HashMap<>();
         for (Object entry : keypredicates) {
             String attributname = ((UriParameterImpl) entry).getName();
@@ -118,12 +127,12 @@ public class GenericSingletonProcessor implements EntityProcessor {
             classname = edmEntitySet.getName();
         }
         EntityCollection genericCollection = new EntityCollection();
-        getList(cfclassservice.findByName(classname), searchmap, genericCollection);
+        getList(cfclassservice.findByName(classname), searchmap, genericCollection, orderbyoption);
        
        return genericCollection;
     }
     
-    private void getList(CfClass clazz, HashMap searchmap, EntityCollection genericCollection) {
+    private void getList(CfClass clazz, HashMap searchmap, EntityCollection genericCollection, OrderByOption orderbyoption) {
         List<Entity> genericList = genericCollection.getEntities();
         if (0 == useHibernate) {
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(clazz);
@@ -138,7 +147,7 @@ public class GenericSingletonProcessor implements EntityProcessor {
             }
         } else {
             Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
-            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName());
+            Query query = hibernateUtil.getQuery(session_tables, searchmap, clazz.getName(), getOrderbyMap(orderbyoption));
             try {
                 List<Map> contentliste = (List<Map>) query.getResultList();
 
@@ -188,4 +197,23 @@ public class GenericSingletonProcessor implements EntityProcessor {
         this.serviceMetadata = sm;
     }
     
+    private HashMap<String, String> getOrderbyMap(OrderByOption orderbyoption) {
+        if (null != orderbyoption) {
+            HashMap<String, String> orderbymap = new HashMap<>();
+            for (OrderByItem obi : orderbyoption.getOrders()) {
+                orderbymap.put(obi.getExpression().toString().replace("[", "").replace("]", ""), getBoolean(obi.isDescending()));
+            }
+            return orderbymap;
+        } else {
+            return null;
+        }
+    }
+    
+    private String getBoolean(boolean descending) {
+        if (descending) {
+            return "DESC";
+        } else {
+            return "ASC";
+        }
+    }
 }

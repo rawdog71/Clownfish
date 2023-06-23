@@ -209,7 +209,7 @@ public class GetContentHibernate extends HttpServlet {
                         });
 
                         Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
-                        Query query = hibernateUtil.getQuery(session_tables, searchmap, inst_klasse);
+                        Query query = hibernateUtil.getQuery(session_tables, searchmap, inst_klasse, null);
 
                         try {
                             List<Map> contentliste = (List<Map>) query.getResultList();
@@ -403,7 +403,7 @@ public class GetContentHibernate extends HttpServlet {
             }
 
             Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
-            Query query = hibernateUtil.getQuery(session_tables, searchmap, inst_klasse);
+            Query query = hibernateUtil.getQuery(session_tables, searchmap, inst_klasse, null);
 
             List<Map> contentliste = (List<Map>) query.getResultList();
             session_tables.close();
