@@ -28,6 +28,7 @@ import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.dbentities.CfTemplate;
+import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
@@ -98,6 +99,7 @@ public class QuartzJob implements Job {
     private SAPTemplateBean sapbean;
     private static SAPConnection sapc = null;
     private RPY_TABLE_READ rpytableread = null;
+    private RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
     private ClownfishConst.ViewModus modus = STAGING;
     final transient Logger LOGGER = LoggerFactory.getLogger(QuartzJob.class);
     @Value("${sapconnection.file}") String SAPCONNECTION;
@@ -167,6 +169,7 @@ public class QuartzJob implements Job {
         if (sapSupport) {
             sapc = new SAPConnection(SAPCONNECTION, "Clownfish5_" + quartz.getName());
             rpytableread = new RPY_TABLE_READ(sapc);
+            rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapc);
         }
         
         // fetch the dependend template 
@@ -236,7 +239,7 @@ public class QuartzJob implements Job {
                 List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                 sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
                 sapbean = new SAPTemplateBean();
-                sapbean.init(sapc, sitesaprfclist, rpytableread, null);
+                sapbean.init(sapc, sitesaprfclist, rpytableread, rfc_get_function_interface, null);
             }
             NetworkTemplateBean networkbean = new NetworkTemplateBean();
             DatabaseTemplateBean databasebean = new DatabaseTemplateBean(propertyUtil);
@@ -262,7 +265,7 @@ public class QuartzJob implements Job {
                         List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                         sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
                         sapbean = new SAPTemplateBean();
-                        sapbean.init(sapc, sitesaprfclist, rpytableread, null);
+                        sapbean.init(sapc, sitesaprfclist, rpytableread, rfc_get_function_interface, null);
                         fmRoot.put("sapBean", sapbean);
                     }
 
