@@ -58,8 +58,8 @@ public class SAPTemplateBean implements Serializable {
     private transient @Getter @Setter Map contentmap;
     static SAPConnection sapc = null;
     private transient RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
-    private static final HashMap<String, JCoFunction> jcofunctiontable = new HashMap();
-    private static final HashMap<String, List<RpyTableRead>> rpyMap = new HashMap();
+    private HashMap<String, JCoFunction> jcofunctiontable = new HashMap();
+    private HashMap<String, List<RpyTableRead>> rpyMap = new HashMap();
     private static @Getter @Setter Map contentCache;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SAPTemplateBean.class);
@@ -71,11 +71,13 @@ public class SAPTemplateBean implements Serializable {
         }
     }
     
-    public void init(Object sapc, List<CfSitesaprfc> sitesaprfclist, RPY_TABLE_READ rpytableread, RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface, List<JsonFormParameter> postmap) {
+    public void init(Object sapc, List<CfSitesaprfc> sitesaprfclist, RPY_TABLE_READ rpytableread, List<JsonFormParameter> postmap) {
         this.sapc = (SAPConnection) sapc;
         this.rpytableread = rpytableread;
-        this.rfc_get_function_interface = rfc_get_function_interface;
         this.postmap = postmap;
+        rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapc);
+        jcofunctiontable = new HashMap();
+        rpyMap = new HashMap();
         contentmap.clear();
     }
     

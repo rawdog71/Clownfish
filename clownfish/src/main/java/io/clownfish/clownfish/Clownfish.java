@@ -1397,7 +1397,7 @@ public class Clownfish {
                                         List<CfSitesaprfc> sitesaprfclist = new ArrayList<>();
                                         sitesaprfclist.addAll(cfsitesaprfcService.findBySiteref(cfsite.getId()));
                                         sapbean = new SAPTemplateBean();
-                                        sapbean.init(sapc, sitesaprfclist, rpytableread, rfcfunctioninterface, postmap);
+                                        sapbean.init(sapc, sitesaprfclist, rpytableread, postmap);
                                     }
 
                                     databasebean = new DatabaseTemplateBean(propertyUtil);
