@@ -26,7 +26,9 @@ import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javax.persistence.NoResultException;
 import org.apache.olingo.commons.api.data.ContextURL;
@@ -57,6 +59,7 @@ import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 import org.apache.olingo.server.api.uri.queryoption.SkipOption;
 import org.apache.olingo.server.api.uri.queryoption.TopOption;
 import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
+import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,19 +102,54 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
     @Override
     public void readEntityCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
         List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+        UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+        EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+
         TopOption topoption = uriInfo.getTopOption();
         SkipOption skipoption = uriInfo.getSkipOption();
         SelectOption selectoption = uriInfo.getSelectOption();
         OrderByOption orderbyoption = uriInfo.getOrderByOption();
-        UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
-        EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
-        Expression filterExpression = null;
         FilterOption filterOption = uriInfo.getFilterOption();
+
+        EntityCollection entitySet = getData(edmEntitySet, null, orderbyoption);
+
         if (filterOption != null) {
-            filterExpression = filterOption.getExpression();
+            // Apply $filter system query option
+            try {
+                List<Entity> entityList = entitySet.getEntities();
+                Iterator<Entity> entityIterator = entityList.iterator();
+
+                // Evaluate the expression for each entity
+                // If the expression is evaluated to "true", keep the entity, otherwise remove it from the entityList
+                while (entityIterator.hasNext()) {
+                    // To evaluate the expression, create an instance of the Filter Expression Visitor and pass
+                    // the current entity to the constructor
+                    Entity currentEntity = entityIterator.next();
+                    Expression filterExpression = filterOption.getExpression();
+                    GenericFilterExpressionVisitor expressionVisitor = new GenericFilterExpressionVisitor(currentEntity);
+
+                    // Start evaluating the expression
+                    Object visitorResult = filterExpression.accept(expressionVisitor);
+
+                    // The result of the filter expression must be of type Edm.Boolean
+                    if (visitorResult instanceof Boolean) {
+                        if (!Boolean.TRUE.equals(visitorResult)) {
+                            // The expression evaluated to false (or null), so we have to remove the currentEntity from entityList
+                            entityIterator.remove();
+                        }
+                    } else {
+                        throw new ODataApplicationException("A filter expression must evaulate to type Edm.Boolean",
+                                HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ENGLISH);
+                    }
+                }
+
+            } catch (ExpressionVisitException e) {
+                throw new ODataApplicationException("Exception in filter evaluation",
+                        HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
+            }
         }
-        EntityCollection entitySet = getData(edmEntitySet, filterExpression, orderbyoption);
+        // entitySet = getData(edmEntitySet, filterExpression, orderbyoption);
 
         ODataSerializer serializer = odata.createSerializer(responseFormat);
 
@@ -187,6 +225,8 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
     
     private HashMap getSearchMap(Expression filterExpression) {
         HashMap searchmap = new HashMap<>();
+        // https://olingo.apache.org/doc/odata2/tutorials/Olingo_Tutorial_AdvancedRead_FilterVisitor.html
+
 
         return searchmap;
     }
