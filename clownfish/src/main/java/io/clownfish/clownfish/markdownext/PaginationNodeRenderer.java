@@ -24,6 +24,7 @@ import com.vladsch.flexmark.html.renderer.NodeRendererFactory;
 import com.vladsch.flexmark.html.renderer.NodeRenderingHandler;
 import com.vladsch.flexmark.html.renderer.PhasedNodeRenderer;
 import com.vladsch.flexmark.html.renderer.RenderingPhase;
+import static com.vladsch.flexmark.html.renderer.RenderingPhase.BODY_BOTTOM;
 import static com.vladsch.flexmark.html.renderer.RenderingPhase.BODY_TOP;
 import com.vladsch.flexmark.util.ast.Block;
 import com.vladsch.flexmark.util.ast.Document;
@@ -45,10 +46,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PaginationNodeRenderer implements PhasedNodeRenderer {
 
+    private int pages;
+    private String site;
+    private String url;
+
     @Override
     public Set<RenderingPhase> getRenderingPhases() {
         LinkedHashSet<RenderingPhase> phaseSet = new LinkedHashSet<>();
         phaseSet.add(BODY_TOP);
+        phaseSet.add(BODY_BOTTOM);
         return phaseSet;
     }
 
@@ -56,7 +62,7 @@ public class PaginationNodeRenderer implements PhasedNodeRenderer {
     public void renderDocument(NodeRendererContext context, HtmlWriter html, Document dcmnt, RenderingPhase phase) {
         if (phase == BODY_TOP) {
             HashMap<Integer, List<Node>> blocklist = new HashMap<>();
-            int pages = 0;
+            pages = 0;
             Node lastblock = null;
             ArrayList<Node> nodelist = null;
             for (Node childblock : dcmnt.getChildren()) {
@@ -75,30 +81,22 @@ public class PaginationNodeRenderer implements PhasedNodeRenderer {
             if (pages > 0) {
                 blocklist.put(pages, nodelist);
                 int currentpage = getPage(context);
-                String site = getSite(context);
-                String url = getUrl(context);
+                site = getSite(context);
+                url = getUrl(context);
                 if (currentpage > pages) currentpage = 1;
                 dcmnt.removeChildren();
                 List currentnodelist = blocklist.get(currentpage);
                 for (Object node : currentnodelist) {
                     dcmnt.appendChild((Node) node);
                 }
-                
-                // create a paragraph for the text
-                /*
-                Text text = new Text("TEST");
-                Paragraph paragraph = new Paragraph(text.getChars());
-                paragraph.setCharsFromContent();
-                
-                dcmnt.appendChild(paragraph);
-                dcmnt.setCharsFromSegments();
-                */
-                for (int i = 1; i<= pages; i++) {
-                    html.attr("href", "/" + site + url + "/page/" + i);
-                    html.withAttr().tag("a").line();
-                    html.raw(""+i);
-                    html.closeTag("a").line();
-                }
+            }
+        }
+        if (phase == BODY_BOTTOM && pages > 0 && site != null && url != null) {
+            for (int i = 1; i<= pages; i++) {
+                html.attr("href", "/" + site + url + "/page/" + i);
+                html.withAttr().tag("a").line();
+                html.raw(""+i);
+                html.closeTag("a").line();
             }
         }
     }
@@ -109,64 +107,9 @@ public class PaginationNodeRenderer implements PhasedNodeRenderer {
         set.add(new NodeRenderingHandler<>(PaginationBlock.class, this::render));
         return set;
     }
-    
+
     private void render(PaginationBlock node, NodeRendererContext context, HtmlWriter html) {
-        /*
-        System.out.println(html.toString());
-        HashMap<Integer, String> blocklist = new HashMap<>();
-        int pages = 0;
-        String block = "";
-        for (Node childblock : node.getParent().getChildren()) {
-            if (0 == childblock.getChars().compareTo(node.getOpeningMarker())) {
-                if (pages > 0) {
-                    blocklist.put(pages, block);
-                }
-                pages++;
-                block = "";
-            } else {
-                //System.out.println(childblock.getChars());
-                block += childblock.getChars();
-            }
-        }
-        blocklist.put(pages, block);
-
-        int currentpage = getPage(context);
-        if (currentpage > pages) currentpage = 1;
-        html.text("TEST");
-        */
         
-        /*
-        if (title.isEmpty()) {
-            html.srcPos(node.getChars()).withAttr()
-                    .attr(Attribute.CLASS_ATTR, "adm-block")
-                    .attr(Attribute.CLASS_ATTR, "adm-" + type)
-                    .tag("div", false).line();
-
-            html.attr(Attribute.CLASS_ATTR, "adm-body").withAttr(ADMONITION_BODY_PART).tag("div").indent().line();
-
-            context.renderChildren(node);
-
-            html.unIndent().closeTag("div").line();
-            html.closeTag("div").line();
-        } else {
-            html.srcPos(node.getChars())
-                    .attr(Attribute.CLASS_ATTR, "adm-block").attr(Attribute.CLASS_ATTR, "adm-" + type);
-
-            if (openClose != null) {
-                html.attr(Attribute.CLASS_ATTR, openClose).attr(Attribute.CLASS_ATTR, "adm-" + type);
-            }
-
-            html.withAttr().tag("div", false).line();
-            html.attr(Attribute.CLASS_ATTR, "adm-heading").withAttr(ADMONITION_HEADING_PART).tag("div").line();
-            html.attr(Attribute.CLASS_ATTR, "adm-icon").withAttr(ADMONITION_ICON_PART).tag("svg").raw("<use xlink:href=\"#adm-").raw(type).raw("\" />").closeTag("svg");
-            html.withAttr(ADMONITION_TITLE_PART).tag("span").text(title).closeTag("span").line();
-            html.closeTag("div").line();
-
-            html.attr(Attribute.CLASS_ATTR, "adm-body").withAttr(ADMONITION_BODY_PART).withCondIndent().tagLine("div", () -> context.renderChildren(node));
-
-            html.closeTag("div").line();
-        }
-        */
     }
 
     public static class Factory implements NodeRendererFactory {
