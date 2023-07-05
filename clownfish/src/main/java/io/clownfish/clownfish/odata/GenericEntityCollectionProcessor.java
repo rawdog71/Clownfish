@@ -149,8 +149,7 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
                         HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
             }
         }
-        // entitySet = getData(edmEntitySet, filterExpression, orderbyoption);
-
+        
         ODataSerializer serializer = odata.createSerializer(responseFormat);
 
         EdmEntityType edmEntityType = edmEntitySet.getEntityType();
