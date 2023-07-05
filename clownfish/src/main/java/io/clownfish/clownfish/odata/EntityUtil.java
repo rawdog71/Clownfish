@@ -59,6 +59,8 @@ public class EntityUtil {
     @Autowired private CfListService cflistService;
     @Autowired private CfListcontentService cflistcontentService;
     @Autowired private ContentUtil contentUtil;
+    
+    private static final HashMap<String, CfAttribut> attributmap = new HashMap<>();
 
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(EntityUtil.class);
     
@@ -105,8 +107,18 @@ public class EntityUtil {
         String id = "";
         for (HashMap hm : contentdataoutput.getKeyvals()) {
             for (Object attributname : hm.keySet()) {
-                try {
-                    CfAttribut attribut = cfattributservice.findByNameAndClassref((String) attributname, contentdataoutput.getContent().getClassref());
+                CfAttribut attribut = null;
+                if (attributmap.containsKey(contentdataoutput.getContent().getClassref().getName() + "_" +attributname)) {
+                    attribut = attributmap.get(contentdataoutput.getContent().getClassref().getName() + "_" +attributname);
+                } else {
+                    try {
+                        attribut = cfattributservice.findByNameAndClassref((String) attributname, contentdataoutput.getContent().getClassref());
+                        attributmap.put(contentdataoutput.getContent().getClassref().getName() + "_" +attributname, attribut);
+                    } catch (Exception ex) {
+                        attributmap.put(contentdataoutput.getContent().getClassref().getName() + "_" +attributname, null);
+                    }
+                }
+                if (null != attribut) {
                     if ((0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 != attribut.getAttributetype().getName().compareToIgnoreCase("assetref"))) {
                         //System.out.println(attribut.getAttributetype().getName());
                         if (attribut.getIdentity()) {
@@ -151,8 +163,6 @@ public class EntityUtil {
                             }
                         }
                     }
-                } catch (Exception ex) {
-                    LOGGER.error(ex.getMessage());
                 }
             }
         }
@@ -200,7 +210,14 @@ public class EntityUtil {
                         || Objects.equals(key, "cf_id")) {
                     continue;
                 }
-                CfAttribut cfAtt = cfattributservice.findByNameAndClassref(key, cfclasscontent.getClassref());
+                CfAttribut cfAtt = null;
+                if (attributmap.containsKey(cfclasscontent.getClassref().getName() + "_" + key)) {
+                    cfAtt = attributmap.get(cfclasscontent.getClassref().getName() + "_" + key);
+                } else {
+                    cfAtt = cfattributservice.findByNameAndClassref(key, cfclasscontent.getClassref());
+                    attributmap.put(cfclasscontent.getClassref().getName() + "_" + key, cfAtt);
+                }
+                
                 Property class_prop = new Property();
                 class_prop.setName(key);
                 class_prop.setType(GenericEdmProvider.getODataType(cfAtt).getFullQualifiedNameAsString());
