@@ -32,6 +32,8 @@ jobs:
       run: mvn install:install-file -Dfile=${{github.workspace}}/lib/SAPJCo-3.8.jar -DgroupId=SAPJCo -DartifactId=SAPJCo -Dversion=3.8 -Dpackaging=jar -DgeneratePom=true
     - name: Add ojdbc8 dependency to Maven
       run: mvn install:install-file -Dfile=${{github.workspace}}/lib/ojdbc8-19.3.jar -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=19.3 -Dpackaging=jar -DgeneratePom=true
+    - name: Set build target to WAR
+      run: sed -i 's/<packaging>jar/<packaging>war/g' ${{github.workspace}}/clownfish/pom.xml
     - name: Build with Maven
       run: mvn package --file ${{github.workspace}}/clownfish/pom.xml
     - name: Get package version
