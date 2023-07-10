@@ -88,12 +88,15 @@ import io.clownfish.clownfish.datamodels.AuthTokenList;
 import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
+import io.clownfish.clownfish.datamodels.ClientInformation;
 import io.clownfish.clownfish.exceptions.ClownfishTemplateException;
 import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
 import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
 import io.clownfish.clownfish.serviceimpl.CfStringTemplateLoaderImpl;
 import io.clownfish.clownfish.websocket.WebSocketServer;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import org.apache.commons.fileupload.FileItem;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
@@ -583,6 +586,7 @@ public class Clownfish {
     @GetMapping(path = "/{name}/**")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         if (servicestatus.isOnline()) {
+            ClientInformation clientinfo = getClientinformation(request.getRemoteAddr());
             String token = request.getHeader("cf_token");
             String login_token = request.getHeader("cf_login_token");
             boolean alias = false;
@@ -730,7 +734,7 @@ public class Clownfish {
                 });
 
                 addHeader(response, clownfishutil.getVersion());
-                Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams, urlParams, false, null);
+                Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams, urlParams, false, null, clientinfo);
                 if (cfResponse.get().getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
@@ -787,6 +791,7 @@ public class Clownfish {
     public void universalPostMultipart(@PathVariable("name") String name, @Context MultipartRequest request, @Context HttpServletResponse response) throws PageNotFoundException {
         boolean alias = false;
         try {
+            ClientInformation clientinfo = getClientinformation(request.getRemoteAddr());
             ArrayList urlParams = new ArrayList();
             String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
             
@@ -800,7 +805,7 @@ public class Clownfish {
                 }
                 
                 addHeader(response, clownfishutil.getVersion());
-                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, fis);
+                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, fis, clientinfo);
                 if (cfResponse.get().getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
@@ -905,7 +910,7 @@ public class Clownfish {
                 }
 
                 addHeader(response, clownfishutil.getVersion());
-                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, null);
+                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, null, clientinfo);
                 if (cfResponse.get().getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
@@ -935,6 +940,7 @@ public class Clownfish {
     public void universalPostHttp(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) throws PageNotFoundException {
         boolean alias = false;
         try {
+            ClientInformation clientinfo = getClientinformation(request.getRemoteAddr());
             ArrayList urlParams = new ArrayList();
             String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
             if (path.contains("/")) {
@@ -1020,7 +1026,7 @@ public class Clownfish {
             }
 
             addHeader(response, clownfishutil.getVersion());
-            Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, null);
+            Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, null, clientinfo);
             if (cfResponse.get().getErrorcode() == 0) {
                 response.setContentType(this.contenttype);
                 response.setCharacterEncoding(this.characterencoding);
@@ -1049,7 +1055,7 @@ public class Clownfish {
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException 
      */
     @Async
-    public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, List urlParams, boolean makestatic, List<FileItem> fileitems) throws PageNotFoundException {
+    public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, List urlParams, boolean makestatic, List<FileItem> fileitems, ClientInformation clientinfo) throws PageNotFoundException {
         authtokenlist.setPropertyUtil(propertyUtil);
         ClownfishResponse cfresponse = new ClownfishResponse();
         if (null != sitecontentmap) {
@@ -1145,7 +1151,7 @@ public class Clownfish {
                                 if (0 == cfresponse.getErrorcode()) {
                                     return new AsyncResult<>(cfresponse);
                                 } else {
-                                    Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, urlParams, true, fileitems);
+                                    Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, urlParams, true, fileitems, clientinfo);
                                     try {
                                         if (urlParams.isEmpty()) {
                                             String aliasname = cfsite.getAliaspath();
@@ -1155,7 +1161,7 @@ public class Clownfish {
                                         return cfStaticResponse;
                                     } catch (InterruptedException | ExecutionException ex) {
                                         LOGGER.error(ex.getMessage());
-                                        return makeResponse(name, postmap, urlParams, false, fileitems);
+                                        return makeResponse(name, postmap, urlParams, false, fileitems, clientinfo);
                                     }
                                 }
                             } else {
@@ -1371,6 +1377,10 @@ public class Clownfish {
                                     metainfomap.put("locale", cfsite.getLocale());
                                     metainfomap.put("alias", cfsite.getAliaspath());
                                     metainfomap.put("templateversion", String.valueOf(currentTemplateVersion));
+                                    if (null != clientinfo) {
+                                        if (null != clientinfo.getHostname()) metainfomap.put("hostname", clientinfo.getHostname());
+                                        if (null != clientinfo.getIpadress()) metainfomap.put("ipaddress", clientinfo.getIpadress());
+                                    }
 
                                     // instantiate Template Beans
                                     networkbean = new NetworkTemplateBean();
@@ -1795,7 +1805,7 @@ public class Clownfish {
             String aliasname = cfsite.getAliaspath();
             Future<ClownfishResponse> cfStaticResponse;
             try {
-                cfStaticResponse = makeResponse(sitename, postmap, urlParams, true, null);
+                cfStaticResponse = makeResponse(sitename, postmap, urlParams, true, null, null);
                 if (0 == cfStaticResponse.get().getErrorcode()) {
                     if (!urlParams.isEmpty()) {
                         StaticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
@@ -2242,5 +2252,18 @@ public class Clownfish {
             } catch (NoResultException ex) {
             }
         }
+    }
+
+    private ClientInformation getClientinformation(String ip) {
+        ClientInformation ci = new ClientInformation();
+        ci.setIpadress(ip);
+        InetAddress addr = null;
+        try {
+            addr = InetAddress.getByName(ip);
+            ci.setHostname(addr.getHostName());
+        } catch (UnknownHostException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return ci;
     }
 }

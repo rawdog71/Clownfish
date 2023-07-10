@@ -35,6 +35,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Locale;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmBoolean;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmDecimal;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmInt32;
 
 /**
  *
@@ -98,7 +101,19 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
         } else {
             // Try to convert the literal into a Java Integer
             try {
-                return Integer.parseInt(literalAsString);
+                if (literal.getType() instanceof EdmInt32) {
+                    return Integer.parseInt(literalAsString);
+                } else {
+                    if (literal.getType() instanceof EdmBoolean) {
+                        return Boolean.parseBoolean(literalAsString);
+                    } else {
+                        if (literal.getType() instanceof EdmDecimal) {
+                            return Double.parseDouble(literalAsString);
+                        } else {
+                            return null;
+                        }
+                    }
+                }
             } catch(NumberFormatException e) {
                 throw new ODataApplicationException("Only Edm.Int32 and Edm.String literals are implemented",
                         HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
@@ -191,6 +206,8 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
                 result = ((String) left).compareTo((String) right);
             } else if(left instanceof Boolean) {
                 result = ((Boolean) left).compareTo((Boolean) right);
+            }  else if(left instanceof Double) {
+                result = ((Double) left).compareTo((Double) right);
             } else {
                 throw new ODataApplicationException("Class " + left.getClass().getCanonicalName() + " not expected",
                         HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);

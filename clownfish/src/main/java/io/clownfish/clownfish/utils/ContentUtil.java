@@ -88,8 +88,8 @@ public class ContentUtil implements IVersioningInterface {
         this.markdownUtil.setInit(true);
     }
 
-    public AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent) {
-        CfAttributetype knattributtype = cfattributetypeService.findById(attributtypeid);
+    public AttributDef getAttributContent(long attributtypeid, CfAttributcontent attributcontent, CfAttributetype knattributtype) {
+        //CfAttributetype knattributtype = cfattributetypeService.findById(attributtypeid);
         switch (knattributtype.getName()) {
             case "boolean":
                 if (null != attributcontent.getContentBoolean()) {
@@ -354,7 +354,7 @@ public class ContentUtil implements IVersioningInterface {
         attributcontentList.stream().forEach((attributcontent) -> {
             CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
             long attributtypeid = knattribut.getAttributetype().getId();
-            AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
+            AttributDef attributdef = getAttributContent(attributtypeid, attributcontent, knattribut.getAttributetype());
             if (attributdef.getType().compareToIgnoreCase("hashstring") != 0) {
                 if (((knattribut.getClassref().isEncrypted()) && (!knattribut.getIdentity())) && (isEncryptable(knattribut))) {
                     dummyoutputmap.put(knattribut.getName(), EncryptUtil.decrypt(attributdef.getValue(), propertyUtil.getPropertyValue("aes_key")));
@@ -368,12 +368,11 @@ public class ContentUtil implements IVersioningInterface {
     }
     
     public HashMap getContentOutputKeyval(List<CfAttributcontent> attributcontentList) {
-        //ArrayList<HashMap> output = new ArrayList<>();
         HashMap<String, String> dummyoutputmap = new HashMap<>();
         attributcontentList.stream().forEach((attributcontent) -> {
             CfAttribut knattribut = cfattributService.findById(attributcontent.getAttributref().getId());
             long attributtypeid = knattribut.getAttributetype().getId();
-            AttributDef attributdef = getAttributContent(attributtypeid, attributcontent);
+            AttributDef attributdef = getAttributContent(attributtypeid, attributcontent, knattribut.getAttributetype());
             if (attributdef.getType().compareToIgnoreCase("hashstring") != 0) {
                 if (((knattribut.getClassref().isEncrypted()) && (!knattribut.getIdentity())) && (isEncryptable(knattribut))) {
                     dummyoutputmap.put(knattribut.getName(), EncryptUtil.decrypt(attributdef.getValue(), propertyUtil.getPropertyValue("aes_key")));
@@ -382,7 +381,6 @@ public class ContentUtil implements IVersioningInterface {
                 }
             }
         });
-        //output.add(dummyoutputmap);
         return dummyoutputmap;
     }
     

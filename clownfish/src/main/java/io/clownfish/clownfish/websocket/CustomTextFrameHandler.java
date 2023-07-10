@@ -62,7 +62,7 @@ public class CustomTextFrameHandler extends SimpleChannelInboundHandler<TextWebS
             jfp.setValue(value);
             postmap.add(jfp);
         });
-        Future<ClownfishResponse> cfResponse = clownfish.makeResponse(wsbm.getWebservice(), postmap, new ArrayList<>(), false, null);
+        Future<ClownfishResponse> cfResponse = clownfish.makeResponse(wsbm.getWebservice(), postmap, new ArrayList<>(), false, null, null);
         
         if (wsbm.isBroadcast()) {
             for (ChannelHandlerContext session : sessions) {
