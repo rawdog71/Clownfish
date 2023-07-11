@@ -17,12 +17,9 @@ package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import org.apache.commons.io.IOUtils;
+import org.apache.olingo.commons.api.data.Property;
+import org.imgscalr.AsyncScalr;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,12 +27,31 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.concurrent.ExecutionException;
+
 /**
  *
  * @author raine
  */
 public class StaticSiteUtil {
+    private PropertyUtil propertyUtil;
+
     final static transient Logger LOGGER = LoggerFactory.getLogger(StaticSiteUtil.class);
+
+    public StaticSiteUtil(PropertyUtil prop) {
+        this.propertyUtil = prop;
+    }
 
     /**
      * generateStaticSite
@@ -46,7 +62,7 @@ public class StaticSiteUtil {
      * @param cfassetService
      * @param folderUtil
      */
-    public static void generateStaticSite(String sitename, String aliasname, String content, CfAssetService cfassetService, FolderUtil folderUtil) {
+    public void generateStaticSite(String sitename, String aliasname, String content, CfAssetService cfassetService, FolderUtil folderUtil) {
         FileOutputStream fileStream = null;
         try {
             Document doc = Jsoup.parse(content);
@@ -134,7 +150,7 @@ public class StaticSiteUtil {
         }
     }
     
-    public static String makeStaticImage(String src, CfAssetService cfassetService) {
+    public String makeStaticImage(String src, CfAssetService cfassetService) {
         if (src.contains("GetAsset?apikey=")) {
             String[] src_params = src.split("&");
             CfAsset asset = null;
@@ -164,6 +180,25 @@ public class StaticSiteUtil {
                     src = "/cache/cache" + asset.getName();
                 } else {
                     src = "/cache/cache" + asset.getName() + width + height;
+                    if (!new File(propertyUtil.getPropertyValue("folder_cache") + src.substring(6))
+                            .exists()) {
+                        File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + asset.getName());
+                        int width_val = Integer.parseInt(width.substring(1));
+                        int height_val = Integer.parseInt(height.substring(1));
+
+                        if ((width_val > 0) || (height_val > 0)) {
+                            String cacheKey = "cache" + asset.getName() + "W" + width_val + "H" + height_val;
+                            BufferedImage result = null;
+                            try {
+                                result = AsyncScalr.resize(ImageIO.read(f), width_val).get();
+                                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                                ImageIO.write(result, asset.getFileextension(), os);
+                                ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey));
+                            } catch (InterruptedException | ExecutionException | IOException e) {
+                                LOGGER.error("Error in static image generation: " + e.getMessage());
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -215,7 +250,7 @@ public class StaticSiteUtil {
         return src;
     }
 
-    private static String makeStaticImageInStyle(String src, CfAssetService cfassetService) {
+    private String makeStaticImageInStyle(String src, CfAssetService cfassetService) {
         String output = "";
         String[] semikolon_split = src.split(";");
         for (String semikolon_part : semikolon_split) {
