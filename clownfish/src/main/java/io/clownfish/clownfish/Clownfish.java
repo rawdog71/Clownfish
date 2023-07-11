@@ -206,6 +206,7 @@ public class Clownfish {
     private BeanUtil beanUtil;
     private ClassPathUtil classpathUtil;
     private MavenList mavenlist;
+    private StaticSiteUtil staticSiteUtil;
     private @Getter @Setter Map sitecontentmap;
     private @Getter @Setter Map searchcontentmap;
     private @Getter @Setter Map searchassetmap;
@@ -287,6 +288,10 @@ public class Clownfish {
         // read all System Properties of the property table
         if (null == propertyUtil) {
             propertyUtil = new PropertyUtil(propertylist);
+        }
+
+        if (null == staticSiteUtil) {
+            staticSiteUtil = new StaticSiteUtil(propertyUtil);
         }
 
         if (null == cfclassLoader)
@@ -1155,7 +1160,7 @@ public class Clownfish {
                                     try {
                                         if (urlParams.isEmpty()) {
                                             String aliasname = cfsite.getAliaspath();
-                                            StaticSiteUtil.generateStaticSite(name, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                                            staticSiteUtil.generateStaticSite(name, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
                                         }
                                         //return makeResponse(name, postmap, urlParams, false);
                                         return cfStaticResponse;
@@ -1808,9 +1813,9 @@ public class Clownfish {
                 cfStaticResponse = makeResponse(sitename, postmap, urlParams, true, null, null);
                 if (0 == cfStaticResponse.get().getErrorcode()) {
                     if (!urlParams.isEmpty()) {
-                        StaticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                        staticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
                     } else {
-                        StaticSiteUtil.generateStaticSite(siteurlname, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                        staticSiteUtil.generateStaticSite(siteurlname, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
                     }
                 } else {
                     deleteStaticSite(sitename, urlParams);
