@@ -254,44 +254,6 @@ public class ContentList implements Serializable {
     public void onSelect(SelectEvent event) {
         selectedContent = (CfClasscontent) event.getObject();
         selectContent(selectedContent);
-        /*
-        attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
-       
-        contentName = selectedContent.getName();
-        selectedClass = selectedContent.getClassref();
-        newContentButtonDisabled = true;
-        
-        keywords.getTarget().clear();
-        keywords.getSource().clear();
-        keywords.setSource(cfkeywordService.findAll());
-        contentkeywordlist = cfclasscontentkeywordService.findByClassContentRef(selectedContent.getId());
-        for (CfClasscontentkeyword contentkeyword : contentkeywordlist) {
-            CfKeyword kw = cfkeywordService.findById(contentkeyword.getCfClasscontentkeywordPK().getKeywordref());
-            keywords.getTarget().add(kw);
-            keywords.getSource().remove(kw);
-        }
-        
-        versionlist = cfcontentversionService.findByContentref(selectedContent.getId());
-        difference = contentUtility.hasDifference(selectedContent);
-        BigInteger co = selectedContent.getCheckedoutby();
-        CheckoutUtil checkoutUtil = new CheckoutUtil();
-        checkoutUtil.getCheckoutAccess(co, loginbean);
-        checkedout = checkoutUtil.isCheckedout();
-        access = checkoutUtil.isAccess();
-        contentversionMin = 1;
-        contentversionMax = versionlist.size();
-        selectedcontentversion = contentversionMax;
-        
-        try {
-            String output = selectedContent.getClassref().getTemplateref().getContent();
-            for (CfAttributcontent attributcontent : attributcontentlist) {
-                output = output.replaceAll("#" + attributcontent.getAttributref().getName() + "#", contentUtil.toString(attributcontent));
-            }
-            contentpreview = output;
-        } catch (Exception ex) {
-            contentpreview = "";
-        }
-        */
     }
     
     public void onSelectAttribut(SelectEvent event) {
