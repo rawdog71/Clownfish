@@ -161,7 +161,11 @@ public class SAPTemplateBean implements Serializable {
                                     setStructureValues(functions_structure, rpytablereadlist, tablevalues);
                                     saptables.put(paramname, tablevalues);
                                 } else {
-                                    sapvalues.put(rfcfunctionparam.getParameter(), function.getExportParameterList().getString(rfcfunctionparam.getParameter()));
+                                    if (exid.compareToIgnoreCase("c") == 0) {
+                                        sapvalues.put(rfcfunctionparam.getParameter(), function.getExportParameterList().getChar(rfcfunctionparam.getParameter()));
+                                    } else {
+                                        sapvalues.put(rfcfunctionparam.getParameter(), function.getExportParameterList().getString(rfcfunctionparam.getParameter()));
+                                    }
                                 }
                             }
                             break;

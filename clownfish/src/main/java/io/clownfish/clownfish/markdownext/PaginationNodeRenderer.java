@@ -15,8 +15,6 @@
  */
 package io.clownfish.clownfish.markdownext;
 
-import com.vladsch.flexmark.ast.Paragraph;
-import com.vladsch.flexmark.ast.Text;
 import com.vladsch.flexmark.html.HtmlWriter;
 import com.vladsch.flexmark.html.renderer.NodeRenderer;
 import com.vladsch.flexmark.html.renderer.NodeRendererContext;
@@ -26,7 +24,6 @@ import com.vladsch.flexmark.html.renderer.PhasedNodeRenderer;
 import com.vladsch.flexmark.html.renderer.RenderingPhase;
 import static com.vladsch.flexmark.html.renderer.RenderingPhase.BODY_BOTTOM;
 import static com.vladsch.flexmark.html.renderer.RenderingPhase.BODY_TOP;
-import com.vladsch.flexmark.util.ast.Block;
 import com.vladsch.flexmark.util.ast.Document;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.DataHolder;

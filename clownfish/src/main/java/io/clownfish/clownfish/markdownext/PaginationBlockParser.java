@@ -175,17 +175,9 @@ public class PaginationBlockParser extends AbstractBlockParser {
                 if (matcher.find()) {
                     // Pagination block
                     blockcounter++;
-                    
                     BasedSequence openingMarker = line.subSequence(nextNonSpace + matcher.start(1), nextNonSpace + matcher.end(1));
-                    //BasedSequence info = line.subSequence(nextNonSpace + matcher.start(2), nextNonSpace + matcher.end(2));
-                    //BasedSequence titleChars = matcher.group(3) == null ? BasedSequence.NULL : line.subSequence(nextNonSpace + matcher.start(3), nextNonSpace + matcher.end(3));
-
-                    //int contentOffset = options.contentIndent;
-
                     PaginationBlockParser paginationBlockParser = new PaginationBlockParser();
                     paginationBlockParser.block.setOpeningMarker(openingMarker);
-                    //paginationBlockParser.block.setInfo(info);
-                    //paginationBlockParser.block.setTitleChars(titleChars);
 
                     return BlockStart.of(paginationBlockParser)
                             .atIndex(line.length());

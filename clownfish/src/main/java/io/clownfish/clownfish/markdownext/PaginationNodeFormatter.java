@@ -48,12 +48,6 @@ public class PaginationNodeFormatter implements NodeFormatter {
     private void render(PaginationBlock node, NodeFormatterContext context, MarkdownWriter markdown) {
         markdown.blankLine();
         markdown.append(node.getOpeningMarker()).append(' ');
-        /*
-        markdown.appendNonTranslating(node.getInfo());
-        if (node.getTitle().isNotNull()) {
-            markdown.append(' ').append('"').appendTranslating(node.getTitle()).append('"');
-        }
-        */
         markdown.line();
         markdown.pushPrefix().addPrefix(RepeatedSequence.repeatOf(" ", 0).toString());
         context.renderChildren(node);
