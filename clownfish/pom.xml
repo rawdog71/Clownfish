@@ -122,20 +122,20 @@
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>primefaces-extensions</artifactId>
-            <version>12.0.7</version>
+            <version>12.0.9</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>resources-monacoeditor</artifactId>
-            <version>12.0.7</version>
+            <version>12.0.9</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>primeflex</artifactId>
-            <version>3.3.0</version>
+            <version>3.3.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
