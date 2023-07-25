@@ -52,6 +52,7 @@ import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.queryoption.CountOption;
 import org.apache.olingo.server.api.uri.queryoption.FilterOption;
 import org.apache.olingo.server.api.uri.queryoption.OrderByItem;
 import org.apache.olingo.server.api.uri.queryoption.OrderByOption;
@@ -105,21 +106,58 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
 
-        TopOption topoption = uriInfo.getTopOption();
-        SkipOption skipoption = uriInfo.getSkipOption();
+        CountOption countOption = uriInfo.getCountOption();
+        TopOption topOption = uriInfo.getTopOption();
+        SkipOption skipOption = uriInfo.getSkipOption();
         SelectOption selectoption = uriInfo.getSelectOption();
         OrderByOption orderbyoption = uriInfo.getOrderByOption();
 
         FilterOption filterOption = uriInfo.getFilterOption();
 
         EntityCollection entitySet = getData(edmEntitySet, null, orderbyoption);
+        EntityCollection returnCollection = new EntityCollection();
 
+        List<Entity> entityList = entitySet.getEntities();
+        Iterator<Entity> entityIterator = entityList.iterator();
+
+        // handle $count
+        if (countOption != null) {
+            if (countOption.getValue()) {
+                returnCollection.setCount(entityList.size());
+            }
+        }
+
+        // handle $skip
+        if (skipOption != null) {
+            int skipNumber = skipOption.getValue();
+            if (skipNumber >= 0) {
+                if (skipNumber <= entityList.size()) {
+                    entityList = entityList.subList(skipNumber, entityList.size());
+                } else {
+                    // The client skipped all entities
+                    entityList.clear();
+                }
+            } else {
+                throw new ODataApplicationException("Invalid value for $skip", HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
+            }
+        }
+
+        // handle $top
+        if (topOption != null) {
+            int topNumber = topOption.getValue();
+            if (topNumber >= 0) {
+                if (topNumber <= entityList.size()) {
+                    entityList = entityList.subList(0, topNumber);
+                }  // else the client has requested more entities than available, just return what we have
+            } else {
+                throw new ODataApplicationException("Invalid value for $top", HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
+            }
+        }
+
+        // handle $filter
         if (filterOption != null) {
             // Apply $filter system query option
             try {
-                List<Entity> entityList = entitySet.getEntities();
-                Iterator<Entity> entityIterator = entityList.iterator();
-
                 // Evaluate the expression for each entity
                 // If the expression is evaluated to "true", keep the entity, otherwise remove it from the entityList
                 while (entityIterator.hasNext()) {
@@ -149,6 +187,10 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
                         HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
             }
         }
+
+        for (Entity entity : entityList) {
+            returnCollection.getEntities().add(entity);
+        }
         
         ODataSerializer serializer = odata.createSerializer(responseFormat);
 
@@ -156,8 +198,13 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).build();
 
         final String id = request.getRawBaseUri() + "/" + edmEntitySet.getName();
-        EntityCollectionSerializerOptions opts = EntityCollectionSerializerOptions.with().id(id).contextURL(contextUrl).select(selectoption).build();
-        SerializerResult serializerResult = serializer.entityCollection(serviceMetadata, edmEntityType, entitySet, opts);
+        EntityCollectionSerializerOptions opts = EntityCollectionSerializerOptions.with().id(id)
+                .contextURL(contextUrl)
+                .select(selectoption)
+                .count(countOption)
+                .build();
+        SerializerResult serializerResult = serializer
+                .entityCollection(serviceMetadata, edmEntityType, returnCollection, opts);
         InputStream serializedContent = serializerResult.getContent();
 
         response.setContent(serializedContent);
