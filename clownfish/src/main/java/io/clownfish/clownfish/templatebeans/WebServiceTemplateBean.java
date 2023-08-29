@@ -103,8 +103,6 @@ public class WebServiceTemplateBean implements Serializable {
         }
     }
     
-  
-    
     public List callServiceList(String url, int seconds) {
         if (contentCache.containsKey(url)) {
             if (DateTime.now().isBefore(((WebserviceCache)contentCache.get(url)).getValiduntil())) {

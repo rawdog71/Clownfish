@@ -391,6 +391,7 @@ public class DatabaseTemplateBean implements Serializable {
                         tableFieldsList.add(new TableField(columnName, "INT", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case 7:       // real
+                    case 3:
                         tableFieldsList.add(new TableField(columnName, "REAL", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;            
                     case 8:       // float
@@ -404,6 +405,10 @@ public class DatabaseTemplateBean implements Serializable {
                         break;
                     case 93:      // Date
                         tableFieldsList.add(new TableField(columnName, "DATE", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        break;
+                    default:
+                        tableFieldsList.add(new TableField(columnName, "STRING", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                        LOGGER.error("FEHLENDE DATENTYPUMWANDLUNG: " + columnType);
                         break;
                 }
             }
