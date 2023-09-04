@@ -22,9 +22,16 @@ import io.clownfish.clownfish.dbentities.CfUser;
 import io.clownfish.clownfish.serviceinterface.CfUserService;
 import io.clownfish.clownfish.utils.LoginJob;
 import io.clownfish.clownfish.utils.PasswordUtil;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Timer;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -35,9 +42,11 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DefaultPropertiesPersister;
 
 /**
  *
@@ -52,7 +61,8 @@ public class BackendLoginServlet extends HttpServlet {
     
     String email;
     String password;
-    private final int MINUTES = 10;
+    @Value("${logintimeout:10}") int MINUTES;
+    //private final int MINUTES = 10;
     private LoginJob job = new LoginJob();
     
     final transient Logger LOGGER = LoggerFactory.getLogger(BackendLoginServlet.class);
@@ -65,6 +75,40 @@ public class BackendLoginServlet extends HttpServlet {
                 DateTime datetime = new DateTime();
                 Timer timer = new Timer();
                 timer.schedule(job, datetime.plusMinutes(MINUTES).toDate());
+            } else {
+                InputStream fis = null;
+                try {
+                    Properties props = new Properties();
+                    String propsfile = "application.properties";
+                    fis = new FileInputStream(propsfile);
+                    if (null != fis) {
+                        props.load(fis);
+                    }
+                    int refreshlogin = Integer.parseInt(props.getProperty("loginrefresh"));
+                    if (1 == refreshlogin) {
+                        job.setRunning(false);
+                        job.setTries(0);
+                        
+                        File f = new File("application.properties");
+                        OutputStream out = new FileOutputStream(f);
+                        props.setProperty("loginrefresh", String.valueOf("0"));
+                        DefaultPropertiesPersister p = new DefaultPropertiesPersister();
+                        p.store(props, out, "Bootstrap properties");
+                        out.close();
+                    }
+                } catch (FileNotFoundException ex) {
+                    LOGGER.error(ex.getMessage());
+                } catch (IOException ex) {
+                    LOGGER.error(ex.getMessage());
+                } finally {
+                    try {
+                        if (null != fis) {
+                            fis.close();
+                        }
+                    } catch (IOException ex) {
+                        LOGGER.error(ex.getMessage());
+                    }
+                }
             }
             AuthToken at = null;
             writeResponse(response, at);

@@ -16,39 +16,18 @@
 package io.clownfish.clownfish.graphql;
 
 import graphql.schema.DataFetcher;
-import io.clownfish.clownfish.datamodels.ContentDataOutput;
-import io.clownfish.clownfish.dbentities.CfAssetlist;
-import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.dbentities.CfAttribut;
-import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.dbentities.CfClasscontent;
-import io.clownfish.clownfish.dbentities.CfList;
-import io.clownfish.clownfish.dbentities.CfListcontent;
-import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
-import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
-import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
-import io.clownfish.clownfish.serviceinterface.CfContentversionService;
-import io.clownfish.clownfish.serviceinterface.CfListService;
-import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
-import io.clownfish.clownfish.utils.EncryptUtil;
-import io.clownfish.clownfish.utils.HibernateUtil;
-import io.clownfish.clownfish.utils.PropertyUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.NoResultException;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
