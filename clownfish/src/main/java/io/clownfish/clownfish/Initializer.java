@@ -30,7 +30,7 @@ import org.springframework.web.multipart.support.MultipartFilter;
  */
 @Configuration
 public class Initializer implements ServletContextInitializer {
-
+    
     /**
      * Ititialization of custom settings
      * Sets Primefaces configuartion

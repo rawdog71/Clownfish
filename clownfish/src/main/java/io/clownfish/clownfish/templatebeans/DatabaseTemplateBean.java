@@ -379,31 +379,40 @@ public class DatabaseTemplateBean implements Serializable {
                 String is_autoIncrment = "";
 
                 switch (columnType) {
-                    case -1:      // TEXT, varchar -> String
+                    case -1:      // TEXT, varchar, char -> String
                     case 1:
                     case 12:
+                    case -15:
+                    case -16:
+                    case -9:
                     case 2005:
                         tableFieldsList.add(new TableField(columnName, "STRING", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
-                    case 2:       // int, smallint
+                    case 2:       // int, smallint, tinyint
                     case 4:
                     case 5:
+                    case -6:
                         tableFieldsList.add(new TableField(columnName, "INT", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
-                    case 7:       // real
+                    case 7:       // real, decimal
                     case 3:
                         tableFieldsList.add(new TableField(columnName, "REAL", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;            
+                        break;
                     case 8:       // float
+                    case 6:
                         tableFieldsList.add(new TableField(columnName, "FLOAT", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case -5:      // long
                         tableFieldsList.add(new TableField(columnName, "LONG", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
-                    case -7:      // bit
+                    case -7:      // bit, boolean
+                    case 16:
                         tableFieldsList.add(new TableField(columnName, "BOOLEAN", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     case 93:      // Date
+                    case 92:
+                    case 91:
+                    case 2014:
                         tableFieldsList.add(new TableField(columnName, "DATE", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                         break;
                     default:

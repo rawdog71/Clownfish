@@ -93,6 +93,8 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     int webdavuse;
     @Value("${cachetime:2}")
     int cachetime;
+    @Value("${backend:1}")
+    int backend;
     
     @Autowired
     AutowireCapableBeanFactory beanFactory;
@@ -122,15 +124,24 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     }
 
     @Bean
-    public ServletRegistrationBean facesServletRegistratiton() {
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new FacesServlet(), new String[]{"*.xhtml"});
-        servletRegistrationBean.setName("XHTML Faces Servlet");
-        servletRegistrationBean.setLoadOnStartup(1);
-        return servletRegistrationBean;
+    public ServletRegistrationBean facesServletRegistratition() {
+        if (backend == 1) {
+            ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new FacesServlet(), new String[]{"*.xhtml"});
+            servletRegistrationBean.setName("XHTML Faces Servlet");
+            servletRegistrationBean.setLoadOnStartup(1);
+            servletRegistrationBean.setOrder(0);
+            return servletRegistrationBean;
+        } else {
+            ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new EmptyWebdavServlet(),  new String[]{"*.xhtml"});
+            servletRegistrationBean.setName("XHTML Faces Servlet");
+            servletRegistrationBean.setLoadOnStartup(0);
+            servletRegistrationBean.setOrder(0);
+            return servletRegistrationBean;
+        }
     }
     
     @Bean
-    public ServletRegistrationBean webdavRegistratiton() {
+    public ServletRegistrationBean webdavRegistratition() {
         if (1 == webdavuse) {
             System.out.println(ansi().fg(GREEN));
             System.out.println("WEBDAV activated");
