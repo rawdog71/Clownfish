@@ -4,7 +4,7 @@
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
     <version>0.7.28-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
@@ -69,7 +69,7 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <scope>compile</scope>
-            <version>9.0.74</version>
+            <version>9.0.79</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>9.0.74</version>
+            <version>9.0.79</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
