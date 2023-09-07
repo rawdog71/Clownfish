@@ -16,12 +16,18 @@
 package io.clownfish.clownfish.odata;
 
 import org.apache.olingo.commons.api.data.Entity;
+import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmBoolean;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmDecimal;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmInt32;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmSByte;
 import org.apache.olingo.commons.core.edm.primitivetype.EdmString;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriResource;
+import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
 import org.apache.olingo.server.api.uri.queryoption.expression.BinaryOperatorKind;
 import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
@@ -31,12 +37,12 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Literal;
 import org.apache.olingo.server.api.uri.queryoption.expression.Member;
 import org.apache.olingo.server.api.uri.queryoption.expression.MethodKind;
 import org.apache.olingo.server.api.uri.queryoption.expression.UnaryOperatorKind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Locale;
-import org.apache.olingo.commons.core.edm.primitivetype.EdmBoolean;
-import org.apache.olingo.commons.core.edm.primitivetype.EdmDecimal;
-import org.apache.olingo.commons.core.edm.primitivetype.EdmInt32;
+import java.util.Objects;
 
 /**
  *
@@ -45,6 +51,8 @@ import org.apache.olingo.commons.core.edm.primitivetype.EdmInt32;
 public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object> {
 
     private Entity currentEntity;
+
+    final transient Logger LOGGER = LoggerFactory.getLogger(GenericFilterExpressionVisitor.class);
 
     public GenericFilterExpressionVisitor(Entity currentEntity) {
         this.currentEntity = currentEntity;
@@ -76,8 +84,27 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
             //  -> Complex Property       Address
             //  -> Primitive Property     City
             // For such cases, the resource path returns a list of UriResourceParts
-            throw new ODataApplicationException("Only primitive properties are implemented in filter expressions",
-                    HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
+            int i = 0;
+            UriResourceComplexProperty last_cmplx_prop;
+            Property cur_property = null;
+            // loop through every complex property until we hit a primitive
+            while (uriResourceParts.get(i) instanceof UriResourceComplexProperty) {
+                LOGGER.info(String.format("i = %d prop = %s", i, uriResourceParts.get(i)));
+                last_cmplx_prop = (UriResourceComplexProperty) uriResourceParts.get(i++);
+                cur_property = currentEntity.getProperty(last_cmplx_prop.getProperty().getName());
+                LOGGER.info(String.format("i = %d last_cmplx_prop = %s cur_prop = %s", i, last_cmplx_prop, cur_property.getName()));
+            }
+            if (cur_property != null && cur_property.asComplex() != null) {
+                var cmplx = cur_property.asComplex();
+                var primitive_prop_name = uriResourceParts.get(uriResourceParts.size() - 1).toString();
+                for (Property prop : cmplx.getValue()) {
+                    if ((prop.getName().equals(primitive_prop_name))) {
+                        return prop.getValue();
+                    }
+                }
+            }
+            throw new ODataApplicationException("Error during complex property filtering.",
+                    HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ENGLISH);
         }
     }
 
@@ -100,7 +127,7 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
         } else {
             // Try to convert the literal into a Java Integer
             try {
-                if (literal.getType() instanceof EdmInt32) {
+                if (literal.getType() instanceof EdmInt32 || literal.getType() instanceof EdmSByte) {
                     return Integer.parseInt(literalAsString);
                 } else {
                     if (literal.getType() instanceof EdmBoolean) {
