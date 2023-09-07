@@ -176,7 +176,7 @@ public class MarkdownUtil {
     public String parseMarkdown(String content, MutableDataSet markdownOptions) {
         if (init) {
             init = false;
-            if (!urlParams.isEmpty()) {
+            if ((null != urlParams) && (!urlParams.isEmpty())) {
                 for (DataKeyBase dkb : markdownOptions.getKeys()) {
                     if (dkb.getName().startsWith("urlparam/")) {
                         markdownOptions.set((DataKey) dkb, "");
