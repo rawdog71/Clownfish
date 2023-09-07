@@ -90,7 +90,7 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
             var props = first.asComplex().getValue();
             int j = 1;
             var name = uriResourceParts.get(j).toString();
-            Property primitive = null;
+            Property primitive = first;
             while (uriResourceParts.get(j) instanceof UriResourceComplexProperty) {
                 if (j > 1) {
                     if (primitive != null && primitive.asComplex() != null) {
