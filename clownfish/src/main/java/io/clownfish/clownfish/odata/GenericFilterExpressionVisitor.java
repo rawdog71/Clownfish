@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.odata;
 
+import java.util.ArrayList;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.edm.EdmEnumType;
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import org.apache.olingo.server.api.uri.UriResourceProperty;
 
 /**
  *
@@ -84,22 +86,37 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
             //  -> Complex Property       Address
             //  -> Primitive Property     City
             // For such cases, the resource path returns a list of UriResourceParts
-            int i = 0;
-            UriResourceComplexProperty last_cmplx_prop;
-            Property cur_property = null;
-            // loop through every complex property until we hit a primitive
-            while (uriResourceParts.get(i) instanceof UriResourceComplexProperty) {
-                LOGGER.info(String.format("i = %d prop = %s", i, uriResourceParts.get(i)));
-                last_cmplx_prop = (UriResourceComplexProperty) uriResourceParts.get(i++);
-                cur_property = currentEntity.getProperty(last_cmplx_prop.getProperty().getName());
-                LOGGER.info(String.format("i = %d last_cmplx_prop = %s cur_prop = %s", i, last_cmplx_prop, cur_property.getName()));
+            Property first = currentEntity.getProperty(((UriResourceComplexProperty)uriResourceParts.get(0)).getProperty().getName());
+            var props = first.asComplex().getValue();
+            int j = 1;
+            var name = uriResourceParts.get(j).toString();
+            Property primitive = null;
+            while (uriResourceParts.get(j) instanceof UriResourceComplexProperty) {
+                if (j > 1) {
+                    if (primitive != null && primitive.asComplex() != null) {
+                        var name_0 = uriResourceParts.get(j).toString();
+                        var properties = primitive.asComplex().getValue();
+                        for (Property property : properties) {
+                            if ((property.getName().equals(name_0))) {
+                                primitive = property;
+                            }
+                        }
+                    }
+                } else {
+                    for (Property property : props) {
+                        if ((property.getName().equals(name))) {
+                            primitive = property;
+                        }
+                    }
+                }
+                j++;
             }
-            if (cur_property != null && cur_property.asComplex() != null) {
-                var cmplx = cur_property.asComplex();
+            if (primitive != null && primitive.asComplex() != null) {
+                var cmplx = primitive.asComplex();
                 var primitive_prop_name = uriResourceParts.get(uriResourceParts.size() - 1).toString();
-                for (Property prop : cmplx.getValue()) {
-                    if ((prop.getName().equals(primitive_prop_name))) {
-                        return prop.getValue();
+                for (Property p : cmplx.getValue()) {
+                    if ((p.getName().equals(primitive_prop_name))) {
+                        return p.getValue();
                     }
                 }
             }
