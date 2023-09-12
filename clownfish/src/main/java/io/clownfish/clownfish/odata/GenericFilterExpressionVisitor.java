@@ -15,7 +15,6 @@
  */
 package io.clownfish.clownfish.odata;
 
-import java.util.ArrayList;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.edm.EdmEnumType;
@@ -43,8 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
-import org.apache.olingo.server.api.uri.UriResourceProperty;
 
 /**
  *
@@ -65,6 +62,7 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
+    @Override
     public Object visitMember(final Member member) throws ExpressionVisitException, ODataApplicationException {
         // To keep things simple, we only allow primitive properties.
         // We have faith that the Java type of Edm.Int32 is Integer
@@ -164,6 +162,7 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
         }
     }
 
+    @Override
     public Object visitUnaryOperator(UnaryOperatorKind operator, Object operand)
             throws ExpressionVisitException, ODataApplicationException {
         // OData allows two different unary operators. We have to take care that the type of the operand fits to
@@ -359,6 +358,7 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
                 HttpStatusCode.NOT_IMPLEMENTED.getStatusCode(), Locale.ENGLISH);
     }
 
+    @Override
     public Object visitLambdaReference(String variableName)
             throws ExpressionVisitException, ODataApplicationException {
         throw new ODataApplicationException("Lamdba references are not implemented",

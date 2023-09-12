@@ -137,7 +137,9 @@ public class DatabaseTemplateBean implements Serializable {
                 LOGGER.error(catalog + " - " + tablename + " - " + sqlstatement);
             }
         });
-        //LOGGER.info("END dbread");
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("END dbread");
+        }
         return contentmap;
     }
 
@@ -198,7 +200,9 @@ public class DatabaseTemplateBean implements Serializable {
         } else {
             LOGGER.warn("Connection to database not established");
         }
-        //LOGGER.info("END dbread");
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("END dbread");
+        }
         return contentmap;
     }
     
@@ -259,7 +263,9 @@ public class DatabaseTemplateBean implements Serializable {
                 LOGGER.warn("Connection to database not established");
             }
         }
-        //LOGGER.info("END dbexecute");
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("END execute");
+        }
         return ok;
     }
 
@@ -354,76 +360,78 @@ public class DatabaseTemplateBean implements Serializable {
             else
                 LOGGER.warn("Connection to database could not be established!");
         }
-        //LOGGER.info("END dbexecute");
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("END execute");
+        }
         return map;
     }
     
     private TableFieldStructure getTableFieldsList(ResultSetMetaData dmd) {
         try {
-            TableFieldStructure tfs = new TableFieldStructure();
-            ArrayList<TableField> tableFieldsList = new ArrayList<>();
-            int columncount = dmd.getColumnCount();
-            for (int i = 1; i <= columncount; i++) {
-                String columnName = dmd.getColumnLabel(i);
-                int columnType = dmd.getColumnType(i);
-                String columnTypeName = dmd.getColumnTypeName(i);
-                int columnsize = dmd.getColumnDisplaySize(i);
-                int decimaldigits = dmd.getPrecision(i);
-                /*
-                if (decimaldigits == null) {
-                    decimaldigits = "0";
-                }
-                 */
-                int isNullable = dmd.isNullable(i);
-                //String is_autoIncrment = columns.getString("IS_AUTOINCREMENT");
-                String is_autoIncrment = "";
+                TableFieldStructure tfs = new TableFieldStructure();
+                ArrayList<TableField> tableFieldsList = new ArrayList<>();
+                int columncount = dmd.getColumnCount();
+                for (int i = 1; i <= columncount; i++) {
+                    String columnName = dmd.getColumnLabel(i);
+                    int columnType = dmd.getColumnType(i);
+                    String columnTypeName = dmd.getColumnTypeName(i);
+                    int columnsize = dmd.getColumnDisplaySize(i);
+                    int decimaldigits = dmd.getPrecision(i);
+                    /*
+                    if (decimaldigits == null) {
+                        decimaldigits = "0";
+                    }
+                     */
+                    int isNullable = dmd.isNullable(i);
+                    //String is_autoIncrment = columns.getString("IS_AUTOINCREMENT");
+                    String is_autoIncrment = "";
 
-                switch (columnType) {
-                    case -1:      // TEXT, varchar, char -> String
-                    case 1:
-                    case 12:
-                    case -15:
-                    case -16:
-                    case -9:
-                    case 2005:
-                        tableFieldsList.add(new TableField(columnName, "STRING", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 2:       // int, smallint, tinyint
-                    case 4:
-                    case 5:
-                    case -6:
-                        tableFieldsList.add(new TableField(columnName, "INT", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 7:       // real, decimal
-                    case 3:
-                        tableFieldsList.add(new TableField(columnName, "REAL", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 8:       // float
-                    case 6:
-                        tableFieldsList.add(new TableField(columnName, "FLOAT", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case -5:      // long
-                        tableFieldsList.add(new TableField(columnName, "LONG", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case -7:      // bit, boolean
-                    case 16:
-                        tableFieldsList.add(new TableField(columnName, "BOOLEAN", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 93:      // Date
-                    case 92:
-                    case 91:
-                    case 2014:
-                        tableFieldsList.add(new TableField(columnName, "DATE", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    default:
-                        tableFieldsList.add(new TableField(columnName, "STRING", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        LOGGER.error("FEHLENDE DATENTYPUMWANDLUNG: " + columnType);
-                        break;
+                    switch (columnType) {
+                        case -1:      // TEXT, varchar, char -> String
+                        case 1:
+                        case 12:
+                        case -15:
+                        case -16:
+                        case -9:
+                        case 2005:
+                            tableFieldsList.add(new TableField(columnName, "STRING", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                            break;
+                        case 2:       // int, smallint, tinyint
+                        case 4:
+                        case 5:
+                        case -6:
+                            tableFieldsList.add(new TableField(columnName, "INT", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                            break;
+                        case 7:       // real, decimal
+                        case 3:
+                            tableFieldsList.add(new TableField(columnName, "REAL", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                            break;
+                        case 8:       // float
+                        case 6:
+                            tableFieldsList.add(new TableField(columnName, "FLOAT", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                            break;
+                        case -5:      // long
+                            tableFieldsList.add(new TableField(columnName, "LONG", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                            break;
+                        case -7:      // bit, boolean
+                        case 16:
+                            tableFieldsList.add(new TableField(columnName, "BOOLEAN", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                            break;
+                        case 93:      // Date
+                        case 92:
+                        case 91:
+                        case 2014:
+                            tableFieldsList.add(new TableField(columnName, "DATE", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                            break;
+                        default:
+                            tableFieldsList.add(new TableField(columnName, "STRING", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
+                            LOGGER.error("FEHLENDE DATENTYPUMWANDLUNG: " + columnType);
+                            break;
+                    }
                 }
-            }
-            tfs.setDefault_order("");
-            tfs.setTableFieldsList(tableFieldsList);
-            return tfs;
+                tfs.setDefault_order("");
+                tfs.setTableFieldsList(tableFieldsList);
+                return tfs;
         } catch (SQLException ex) {
             LOGGER.error(ex.getMessage());
             return null;
