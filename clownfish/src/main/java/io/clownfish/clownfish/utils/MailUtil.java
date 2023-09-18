@@ -40,6 +40,8 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 public class MailUtil implements Serializable {
     private @Getter @Setter PropertyUtil propertyUtil;
+    private @Getter @Setter String mailsslenabled;
+    private @Getter @Setter String mailsmtpport;
     private @Getter @Setter String mailsmtphost;
     private @Getter @Setter String mailtransportprotocol;
     private @Getter @Setter String mailuser;
@@ -57,22 +59,39 @@ public class MailUtil implements Serializable {
     public MailUtil(PropertyUtil propertyUtil) {
         this.propertyUtil = propertyUtil;
         
+        this.mailsslenabled = propertyUtil.getPropertyValue("mail_ssl_enabled");
         this.mailsmtphost = propertyUtil.getPropertyValue("mail_smtp_host");
+        this.mailsmtpport = propertyUtil.getPropertyValue("mail_smtp_port");
         this.mailtransportprotocol = propertyUtil.getPropertyValue("mail_transport_protocol");
         this.mailuser = propertyUtil.getPropertyValue("mail_user");
         this.mailpassword = propertyUtil.getPropertyValue("mail_password");
         this.sendfrom = propertyUtil.getPropertyValue("mail_sendfrom");
         
         props = System.getProperties();
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); //SSL Factory Class
         props.put("mail.smtp.host", propertyUtil.getPropertyValue("mail_smtp_host"));
         props.put("mail.transport.protocol", propertyUtil.getPropertyValue("mail_transport_protocol"));
         props.put("mail.user", propertyUtil.getPropertyValue("mail_user"));
         props.put("mail.password", propertyUtil.getPropertyValue("mail_password"));
+        props.put("mail.smtp.socketFactory.port", propertyUtil.getPropertyValue("mail_smtp_port")); //SSL Port
+        props.put("mail.smtp.auth", propertyUtil.getPropertyValue("mail_ssl_enabled")); //Enabling SMTP Authentication
+        props.put("mail.smtp.port", propertyUtil.getPropertyValue("mail_smtp_port")); //SMTP Port
     }
 
     public boolean sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
-        Session session = Session.getInstance(props, null);
-
+        Session session;
+        if (0 == propertyUtil.getPropertyValue("mail_ssl_enabled").compareToIgnoreCase("true")) {
+            Authenticator auth = new Authenticator() {
+                //override the getPasswordAuthentication method
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(propertyUtil.getPropertyValue("mail_sendfrom"), propertyUtil.getPropertyValue("mail_password"));
+                }
+            };
+            session = Session.getDefaultInstance(props, auth);
+        } else {
+            session = Session.getInstance(props, null);
+        }
+        
         // Define message
         MimeMessage message = new MimeMessage(session);
         message.setHeader("Content-Type", encodingOptions);
