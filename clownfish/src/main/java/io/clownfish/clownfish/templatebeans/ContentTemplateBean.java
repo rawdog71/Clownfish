@@ -15,14 +15,23 @@
  */
 package io.clownfish.clownfish.templatebeans;
 
+import io.clownfish.clownfish.datamodels.AssetListOutput;
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.datamodels.ContentOutput;
 import io.clownfish.clownfish.datamodels.DatalistOutput;
+import io.clownfish.clownfish.datamodels.RestContentParameter;
+import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfAssetlist;
+import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
+import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
@@ -55,6 +64,9 @@ public class ContentTemplateBean implements Serializable {
     private CfClasscontentService cfclasscontentService;
     private CfAttributcontentService cfattributcontentService;
     private CfListService cflistService;
+    private CfAssetlistService cfassetlistService;
+    private CfAssetlistcontentService cfassetlistcontentService;
+    private CfAssetService cfassetService;
     private CfClassService cfclassService;
     private CfListcontentService cflistcontentService;
     private PropertyUtil propertyUtil;
@@ -70,12 +82,16 @@ public class ContentTemplateBean implements Serializable {
         contentmap = new HashMap<>();
     }
     
-    public void init(CfClasscontentService classcontentService, CfAttributcontentService attributcontentService, CfListService listService, CfListcontentService listcontentService, CfClassService classService, int useHibernate) {
+    public void init(CfClasscontentService classcontentService, CfAttributcontentService attributcontentService, CfListService listService, CfListcontentService listcontentService, CfClassService classService, CfAssetlistService cfassetlistService, CfAssetlistcontentService cfassetlistcontentService, CfAssetService cfassetService, int useHibernate) {
         this.cfclasscontentService = classcontentService;
         this.cfattributcontentService = attributcontentService;
         this.cflistService = listService;
         this.cflistcontentService = listcontentService;
         this.cfclassService = classService;
+        this.cfassetlistService = cfassetlistService;
+        this.cfassetlistcontentService = cfassetlistcontentService;
+        this.cfassetService = cfassetService;
+        
         this.useHibernate = useHibernate;
         contentmap.clear();
     }
@@ -134,6 +150,20 @@ public class ContentTemplateBean implements Serializable {
             }
         } else {
             contentmap.put("DL", null);
+        }
+        return contentmap;
+    }
+    
+    public Map getAssetlist(String identifier) {
+        if (!identifier.isBlank()) {
+            try {
+                CfAssetlist list = cfassetlistService.findByName(identifier);
+                contentmap.put("AL", getDatalistoutput(list));
+            } catch (Exception ex) {
+                contentmap.put("AL", null);
+            }
+        } else {
+            contentmap.put("AL", null);
         }
         return contentmap;
     }
@@ -202,5 +232,53 @@ public class ContentTemplateBean implements Serializable {
         datalistoutput.setOutputlist(outputlist);
         
         return datalistoutput;
-    }   
+    }
+    
+    private AssetListOutput getDatalistoutput(CfAssetlist list) {
+        AssetListOutput assetlistoutput = new AssetListOutput();
+        List<CfAsset> assetcontentList = new ArrayList<>();
+        List<CfAssetlistcontent> assetcontentlist = cfassetlistcontentService.findByAssetlistref(list.getId());
+        for (CfAssetlistcontent alc : assetcontentlist) {
+            CfAsset asset = cfassetService.findById(alc.getCfAssetlistcontentPK().getAssetref());
+            assetcontentList.add(asset);
+        }
+        assetlistoutput.setAssetlist(list);
+        assetlistoutput.setAssets(assetcontentList);
+        
+        return assetlistoutput;
+    }
+    
+    /*
+    public Map updateContent(RestContentParameter ucp) {
+        try {
+            CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
+            try {
+                if ((null != ucp.getUpdatecontentname()) && (!ucp.getUpdatecontentname().isEmpty())) {
+                    CfClasscontent updateclasscontent = cfclasscontentService.findByName(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                }
+            } catch (javax.persistence.NoResultException ex) {
+                classcontent.setName(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                ucp.setContentname(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                cfclasscontentService.edit(classcontent);
+            }
+
+            List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
+            for (CfAttributcontent attributcontent : attributcontentlist) {
+                CfAttribut attribut = attributcontent.getAttributref();
+                // Check, if attribut exists in attributmap
+                if (ucp.getAttributmap().containsKey(attribut.getName())) {
+                    contentUtil.setAttributValue(attributcontent, ucp.getAttributmap().get(attribut.getName()));
+                    cfattributcontentService.edit(attributcontent);
+                    if (ucp.isIndexing()) {
+                        contentUtil.indexContent();
+                    }
+                    ucp.setReturncode("OK");
+                }
+            }
+            contentUtil.getHibernateUtil().updateContent(classcontent);
+        } catch (javax.persistence.NoResultException ex) {
+            ucp.setReturncode("Classcontent not found");
+        }
+    }
+    */
 }

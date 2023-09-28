@@ -31,6 +31,9 @@ import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.serviceimpl.CfTemplateLoaderImpl;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
@@ -86,6 +89,9 @@ public class QuartzJob implements Job {
     @Autowired CfClasscontentService cfclasscontentService;
     @Autowired CfClassService cfclassService;
     @Autowired CfListService cflistService;
+    @Autowired CfAssetlistService cfassetlistService;
+    @Autowired CfAssetlistcontentService cfassetlistcontentService;
+    @Autowired CfAssetService cfassetService;
     @Autowired CfListcontentService cflistcontentService;
     @Autowired PropertyUtil propertyUtil;
     @Autowired ContentUtil contentUtil;
@@ -200,7 +206,6 @@ public class QuartzJob implements Job {
                 try {
                     // Velocity Template
                     velContext = new org.apache.velocity.VelocityContext();
-
                     velTemplate = new org.apache.velocity.Template();
                     org.apache.velocity.runtime.RuntimeServices runtimeServices = org.apache.velocity.runtime.RuntimeSingleton.getRuntimeServices();
                     String templateContent;
@@ -245,7 +250,7 @@ public class QuartzJob implements Job {
             DatabaseTemplateBean databasebean = new DatabaseTemplateBean(propertyUtil);
             databasebean.initjob(sitedatasourcelist, cfdatasourceService);
             ContentTemplateBean contentbean = new ContentTemplateBean(propertyUtil, contentUtil);
-            contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService, cfclassService, useHibernate);
+            contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService, cfclassService, cfassetlistService, cfassetlistcontentService, cfassetService, useHibernate);
             ImportTemplateBean importBean = new ImportTemplateBean();
             importBean.initjob(sitedatasourcelist, cfdatasourceService);
             WebServiceTemplateBean webServiceBean = new WebServiceTemplateBean();

@@ -154,6 +154,7 @@ public class Clownfish {
     @Autowired CfKeywordService cfkeywordService;
     @Autowired CfAssetlistService cfassetlistService;
     @Autowired CfKeywordlistService cfkeywordlistService;
+    @Autowired CfAssetlistcontentService cfassetlistcontentService;
     @Autowired private Scheduler scheduler;
     @Autowired private FolderUtil folderUtil;
     @Autowired Searcher searcher;
@@ -1426,7 +1427,7 @@ public class Clownfish {
                                     externalclassproviderbean = new ExternalClassProvider(cfclassCompiler);
                                     contentUtil.init(markdownUtil, name, urlParams);
                                     contentbean = new ContentTemplateBean(propertyUtil, contentUtil);
-                                    contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService, cfclassService, useHibernate);
+                                    contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService, cfclassService, cfassetlistService, cfassetlistcontentService, cfassetService, useHibernate);
 
                                     if (isScripted) {                                                                           // NORMAL Template
                                         switch (cftemplate.getScriptlanguage()) {
