@@ -15,12 +15,18 @@
  */
 package io.clownfish.clownfish.servlets;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
@@ -127,19 +133,34 @@ public class BarcodeServlet extends HttpServlet {
                         if (type.compareToIgnoreCase("datamatrix") == 0) {
                             bean = new DataMatrixBean();
                         }
-                        ((AbstractBarcodeBean) bean).setBarHeight(barcodeHeight);
-                        if (message.compareToIgnoreCase("no") == 0) {
-                            ((AbstractBarcodeBean) bean).setMsgPosition(HumanReadablePlacement.HRP_NONE);
+                        if (type.compareToIgnoreCase("qr") == 0) {
+                            QRCodeWriter qrbean = new QRCodeWriter();
+                            try {
+                                BitMatrix bm = qrbean.encode(barcode, BarcodeFormat.QR_CODE, barcodeHeight, barcodeHeight);
+                                BufferedImage barcodeImage = MatrixToImageWriter.toBufferedImage(bm);
+                                acontext.getResponse().setContentType("image/x-png");
+                                OutputStream outputStream = acontext.getResponse().getOutputStream();
+                                ImageIO.write(barcodeImage, "png", outputStream);
+                                outputStream.close();
+                            } catch (WriterException ex) {
+                                LOGGER.error(ex.getMessage());
+                                acontext.complete();
+                            }
+                        } else {
+                            ((AbstractBarcodeBean) bean).setBarHeight(barcodeHeight);
+                            if (message.compareToIgnoreCase("no") == 0) {
+                                ((AbstractBarcodeBean) bean).setMsgPosition(HumanReadablePlacement.HRP_NONE);
+                            }
+                            out = new java.io.FileOutputStream(new File("output.png"));
+                            BitmapCanvasProvider provider = new BitmapCanvasProvider(out, "image/x-png", barcodeDpi, BufferedImage.TYPE_BYTE_GRAY, true, 0);
+                            ((AbstractBarcodeBean) bean).generateBarcode(provider, barcode);
+                            provider.finish();
+                            BufferedImage barcodeImage = provider.getBufferedImage();
+                            acontext.getResponse().setContentType("image/x-png");
+                            OutputStream outputStream = acontext.getResponse().getOutputStream();
+                            ImageIO.write(barcodeImage, "png", outputStream);
+                            outputStream.close();
                         }
-                        out = new java.io.FileOutputStream(new File("output.png"));
-                        BitmapCanvasProvider provider = new BitmapCanvasProvider(out, "image/x-png", barcodeDpi, BufferedImage.TYPE_BYTE_GRAY, true, 0);
-                        ((AbstractBarcodeBean) bean).generateBarcode(provider, barcode);
-                        provider.finish();
-                        BufferedImage barcodeImage = provider.getBufferedImage();
-                        acontext.getResponse().setContentType("image/x-png");
-                        OutputStream outputStream = acontext.getResponse().getOutputStream();
-                        ImageIO.write(barcodeImage, "png", outputStream);
-                        outputStream.close();
                     } else {
                         OutputStream outputStream = acontext.getResponse().getOutputStream();
                         outputStream.close();
