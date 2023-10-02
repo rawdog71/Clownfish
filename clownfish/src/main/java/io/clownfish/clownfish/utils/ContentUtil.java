@@ -23,7 +23,9 @@ import io.clownfish.clownfish.lucene.IndexService;
 import io.clownfish.clownfish.serviceinterface.*;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.zip.DataFormatException;
 import lombok.Getter;
 import lombok.Setter;
@@ -69,7 +72,7 @@ public class ContentUtil implements IVersioningInterface {
     @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
     @Autowired FolderUtil folderUtil;
     @Autowired MarkdownUtil markdownUtil;
-    @Autowired HibernateUtil hibernateUtil;
+    @Autowired @Getter @Setter HibernateUtil hibernateUtil;
     @Autowired IndexService indexService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired transient CfContentversionService cfcontentversionService;
@@ -215,9 +218,16 @@ public class ContentUtil implements IVersioningInterface {
                     break;
                 case "hashstring":
                     String salt = PasswordUtil.getSalt(30);
-                    selectedAttribut.setContentString(PasswordUtil.generateSecurePassword(editContent, salt));
+                    {
+                        try {
+                            selectedAttribut.setContentString(URLEncoder.encode(PasswordUtil.generateSecurePassword(editContent, salt), StandardCharsets.UTF_8.toString()));
+                        } catch (UnsupportedEncodingException ex) {
+                             LOGGER.error(ex.getMessage());
+                        }
+                    }
                     selectedAttribut.setSalt(salt);
                     break;    
+    
                 case "integer":
                     if (!editContent.isBlank()) {
                         selectedAttribut.setContentInteger(BigInteger.valueOf(Long.parseLong(editContent)));

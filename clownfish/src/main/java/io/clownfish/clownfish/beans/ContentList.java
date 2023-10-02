@@ -65,6 +65,10 @@ import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
@@ -592,7 +596,13 @@ public class ContentList implements Serializable {
                 break;
             case "hashstring":
                 String salt = PasswordUtil.getSalt(30);
-                selectedAttribut.setContentString(PasswordUtil.generateSecurePassword(editContent, salt));
+                {
+                    try {
+                        selectedAttribut.setContentString(URLEncoder.encode(PasswordUtil.generateSecurePassword(editContent, salt), StandardCharsets.UTF_8.toString()));
+                    } catch (UnsupportedEncodingException ex) {
+                         LOGGER.error(ex.getMessage());
+                    }
+                }
                 selectedAttribut.setSalt(salt);
                 break;    
             case "integer":
