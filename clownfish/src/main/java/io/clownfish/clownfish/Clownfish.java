@@ -1536,6 +1536,13 @@ public class Clownfish {
                                                             }
                                                         }
                                                     } catch (freemarker.template.TemplateException ex) {
+                                                        System.out.println(name);
+                                                        postmap.stream().forEach((jfp) -> {
+                                                            System.out.println(jfp.getName() + " -> " + jfp.getValue());
+                                                        });
+                                                        urlParams.stream().forEach((jfp) -> {
+                                                            System.out.println(jfp.toString());
+                                                        });
                                                         LOGGER.error(ex.getMessage());
                                                     }
                                                 }
@@ -1992,8 +1999,18 @@ public class Clownfish {
                             }
                         } catch (freemarker.template.TemplateException ex) {
                             //LOGGER.error(ex.getMessage());
+                            System.out.println(templatecontent);
+                            System.out.println(cftemplate.getName());
+                            System.out.println(cfstylesheet);
+                            System.out.println(cfjavascript);
+                            System.out.println(parametermap.toString());
                             throw new TemplateException(ex.getMessage(), env);
                         } catch (IOException ex) {
+                            System.out.println(templatecontent);
+                            System.out.println(cftemplate.getName());
+                            System.out.println(cfstylesheet);
+                            System.out.println(cfjavascript);
+                            System.out.println(parametermap.toString());
                             LOGGER.error(ex.getMessage());
                         }
                     }
