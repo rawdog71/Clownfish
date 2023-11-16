@@ -92,7 +92,11 @@ public class EntityUtil {
                 }
                 break;
             case "Edm.Boolean":
-                prop.setValue(ValueType.PRIMITIVE, Boolean.parseBoolean((String)value));
+                if (value instanceof String) {
+                    prop.setValue(ValueType.PRIMITIVE, Boolean.parseBoolean((String)value));
+                } else {
+                    prop.setValue(ValueType.PRIMITIVE, ((Boolean)value));
+                }    
                 break;
             case "Edm.Date":
                 prop.setValue(ValueType.PRIMITIVE, ((Date)value));
