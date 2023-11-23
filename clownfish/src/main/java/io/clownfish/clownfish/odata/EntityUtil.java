@@ -18,16 +18,20 @@ package io.clownfish.clownfish.odata;
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
+import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
+import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.HibernateUtil;
+import java.math.BigInteger;
 import org.apache.olingo.commons.api.data.ComplexValue;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
@@ -45,6 +49,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.persistence.NoResultException;
+import org.apache.olingo.commons.api.edm.EdmEntitySet;
+import org.apache.olingo.commons.api.edm.EdmEntityType;
+import org.apache.olingo.commons.api.http.HttpMethod;
+import org.apache.olingo.server.api.uri.UriParameter;
 
 /**
  *
@@ -52,13 +60,15 @@ import javax.persistence.NoResultException;
  */
 @Component
 public class EntityUtil {
-    @Autowired private CfAttributService cfattributservice;
+    @Autowired private CfClassService cfclassService;
+    @Autowired private CfAttributService cfattributService;
     @Autowired private CfAttributcontentService cfattributcontentService;
     @Autowired private CfClasscontentService cfClasscontentService;
     @Autowired private CfContentversionService cfcontentversionService;
     @Autowired private CfListService cflistService;
     @Autowired private CfListcontentService cflistcontentService;
     @Autowired private ContentUtil contentUtil;
+    @Autowired HibernateUtil hibernateUtil;
     
     private static final HashMap<String, CfAttribut> attributmap = new HashMap<>();
 
@@ -116,7 +126,7 @@ public class EntityUtil {
                     attribut = attributmap.get(contentdataoutput.getContent().getClassref().getName() + "_" +attributname);
                 } else {
                     try {
-                        attribut = cfattributservice.findByNameAndClassref((String) attributname, contentdataoutput.getContent().getClassref());
+                        attribut = cfattributService.findByNameAndClassref((String) attributname, contentdataoutput.getContent().getClassref());
                         attributmap.put(contentdataoutput.getContent().getClassref().getName() + "_" +attributname, attribut);
                     } catch (Exception ex) {
                         attributmap.put(contentdataoutput.getContent().getClassref().getName() + "_" +attributname, null);
@@ -174,6 +184,179 @@ public class EntityUtil {
         return entity;
     }
     
+    public Entity createEntity(EdmEntitySet edmEntitySet, Entity requestEntity) {
+        Entity entity = requestEntity;
+        
+        CfClass clazz = cfclassService.findByName(edmEntitySet.getName());
+        long newmax = getMaxID(clazz) + 1;
+        
+        CfClasscontent newclasscontent = new CfClasscontent();
+        newclasscontent.setName(clazz.getName().toUpperCase() + "_" + newmax);
+        newclasscontent.setCheckedoutby(BigInteger.valueOf(0));
+        newclasscontent.setClassref(clazz);
+        CfClasscontent newclasscontent2 = cfClasscontentService.create(newclasscontent);
+        hibernateUtil.insertContent(newclasscontent);
+        List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent2.getClassref());
+        attributlist.stream().forEach((attribut) -> {
+            if (attribut.getAutoincrementor() == true) {
+                List<CfClasscontent> classcontentlist2 = cfClasscontentService.findByClassref(newclasscontent2.getClassref());
+                long max = 0;
+                int last = classcontentlist2.size();
+                if (1 == last) {
+                    max = 0;
+                } else {
+                    CfClasscontent classcontent = classcontentlist2.get(last - 2);
+                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
+                    if (attributcontent.getContentInteger().longValue() > max) {
+                        max = attributcontent.getContentInteger().longValue();
+                    }
+                }
+                CfAttributcontent newcontent = new CfAttributcontent();
+                newcontent.setAttributref(attribut);
+                newcontent.setClasscontentref(newclasscontent);
+                newcontent.setContentInteger(BigInteger.valueOf(max+1));
+                CfAttributcontent newcontent2 = cfattributcontentService.create(newcontent);
+                Property prop = entity.getProperty(attribut.getName());
+                prop.setType(GenericEdmProvider.getODataType(attribut).getFullQualifiedNameAsString());
+                setPropValue(prop, max+1);
+            } else {
+                if ((0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 != attribut.getAttributetype().getName().compareToIgnoreCase("assetref"))) {
+                    CfAttributcontent newcontent = new CfAttributcontent();
+                    newcontent.setAttributref(attribut);
+                    newcontent.setClasscontentref(newclasscontent);
+                    newcontent = contentUtil.setAttributValue(newcontent, entity.getProperty(attribut.getName()).getValue().toString());
+
+                    cfattributcontentService.create(newcontent);
+                    contentUtil.indexContent();
+                } else {
+                    if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == attribut.getRelationtype())) { // 1:n
+                        CfClass relationref = attribut.getRelationref();
+                        ComplexValue complex = (ComplexValue) entity.getProperty(attribut.getName()).getValue();
+                        for (Property prop : complex.getValue()) {
+                            System.out.println(prop.getName());
+                            if (0 == prop.getName().compareToIgnoreCase("id")) {
+                                CfClasscontent cfclasscontent = cfClasscontentService.findById(hibernateUtil.getContentRef(relationref.getName(), "id", ((Integer) prop.getValue()).longValue()));
+
+                                CfAttributcontent newcontent = new CfAttributcontent();
+                                newcontent.setAttributref(attribut);
+                                newcontent.setClasscontentref(newclasscontent);
+                                newcontent = contentUtil.setAttributValue(newcontent, cfclasscontent.getId().toString());
+
+                                cfattributcontentService.create(newcontent);
+                            }
+                        }
+                    } else {                                                // n:m Relation
+                        /*
+                        Property coll_prop = new Property();
+                        List<ComplexValue> values = new ArrayList<>();
+                        String datalistname = (String) hm.get(attributname);
+                        if (attribut.getIdentity()) {
+                            id = (String) hm.get(attributname).toString();
+                        }
+                        try {
+                            CfList datalist = cflistService.findByName(datalistname);
+                            List<CfListcontent> contentlist = cflistcontentService.findByListref(datalist.getId());
+                            for (CfListcontent listcontent : contentlist) {
+                                CfClasscontent cfclasscontent = cfClasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                                values.add(createComplexVal(cfclasscontent));
+                            }
+                            coll_prop.setValue(ValueType.COLLECTION_COMPLEX, values);
+                            coll_prop.setName((String)attributname);
+                            coll_prop.setType("Collection(OData.Complex." + datalist.getClassref().getName() + ")");
+                            entity.addProperty(coll_prop);
+                        } catch (NoResultException nre) {
+                            LOGGER.warn("Datalist not set for attribute " + (String)attributname + " of class " + contentdataoutput.getContent().getClassref().getName());
+                            coll_prop.setValue(ValueType.COLLECTION_COMPLEX, null);
+                            entity.addProperty(coll_prop);
+                        }
+                        */
+                    }
+                }
+            }
+        });
+        hibernateUtil.updateContent(newclasscontent);
+        
+        try {
+            entity.setId(new URI(String.valueOf(newmax)));
+        } catch (URISyntaxException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+        return entity;
+    }
+    
+    public void updateEntity(EdmEntitySet edmEntitySet, List<UriParameter> keyParams, Entity entity, HttpMethod httpMethod) {
+        CfClass clazz = cfclassService.findByName(edmEntitySet.getName());
+        CfClasscontent cfclasscontent = null;
+        for (UriParameter param : keyParams) {
+            if (0 == param.getName().compareToIgnoreCase("id")) {
+                cfclasscontent = cfClasscontentService.findById(hibernateUtil.getContentRef(clazz.getName(), "id", Long.parseLong(param.getText())));
+            }
+        }
+        if (null != cfclasscontent) {
+            List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(cfclasscontent);
+            for (CfAttributcontent attributcontent : attributcontentlist) {
+                if (!attributcontent.getAttributref().getIdentity()) {
+                    CfAttribut attribut = attributcontent.getAttributref();
+                    
+                    if ((0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 != attribut.getAttributetype().getName().compareToIgnoreCase("assetref"))) {
+                        Property p = entity.getProperty(attributcontent.getAttributref().getName());
+                        if (null != p) {
+                            contentUtil.setAttributValue(attributcontent, p.getValue().toString());
+                            cfattributcontentService.edit(attributcontent);
+                            contentUtil.indexContent();
+                        } else {
+                            if (httpMethod.equals(HttpMethod.PUT)) {
+                                contentUtil.setAttributValue(attributcontent, null);
+                                cfattributcontentService.edit(attributcontent);
+                                contentUtil.indexContent();
+                            }
+                        }
+                    } else {
+                        if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == attribut.getRelationtype())) { // 1:n
+                            CfClass relationref = attribut.getRelationref();
+                            ComplexValue complex = (ComplexValue) entity.getProperty(attribut.getName()).getValue();
+                            for (Property prop : complex.getValue()) {
+                                System.out.println(prop.getName());
+                                if (0 == prop.getName().compareToIgnoreCase("id")) {
+                                    CfClasscontent cfclasscontentref = cfClasscontentService.findById(hibernateUtil.getContentRef(relationref.getName(), "id", ((Integer) prop.getValue()).longValue()));
+
+                                    contentUtil.setAttributValue(attributcontent, cfclasscontentref.getId().toString());
+                                    cfattributcontentService.edit(attributcontent);
+                                }
+                            }
+                        } else {                                                // n:m Relation
+                            /*
+                            Property coll_prop = new Property();
+                            List<ComplexValue> values = new ArrayList<>();
+                            String datalistname = (String) hm.get(attributname);
+                            if (attribut.getIdentity()) {
+                                id = (String) hm.get(attributname).toString();
+                            }
+                            try {
+                                CfList datalist = cflistService.findByName(datalistname);
+                                List<CfListcontent> contentlist = cflistcontentService.findByListref(datalist.getId());
+                                for (CfListcontent listcontent : contentlist) {
+                                    CfClasscontent cfclasscontent = cfClasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                                    values.add(createComplexVal(cfclasscontent));
+                                }
+                                coll_prop.setValue(ValueType.COLLECTION_COMPLEX, values);
+                                coll_prop.setName((String)attributname);
+                                coll_prop.setType("Collection(OData.Complex." + datalist.getClassref().getName() + ")");
+                                entity.addProperty(coll_prop);
+                            } catch (NoResultException nre) {
+                                LOGGER.warn("Datalist not set for attribute " + (String)attributname + " of class " + contentdataoutput.getContent().getClassref().getName());
+                                coll_prop.setValue(ValueType.COLLECTION_COMPLEX, null);
+                                entity.addProperty(coll_prop);
+                            }
+                            */
+                        }
+                    }
+                }
+            }
+            hibernateUtil.updateContent(cfclasscontent);
+        }
+    }
+    
     private URI createId(String entitySetName, Object id) {
         try {
             return new URI(entitySetName + "(" + id.toString().replaceAll(" ", "_") + ")");
@@ -218,7 +401,7 @@ public class EntityUtil {
                 if (attributmap.containsKey(cfclasscontent.getClassref().getName() + "_" + key)) {
                     cfAtt = attributmap.get(cfclasscontent.getClassref().getName() + "_" + key);
                 } else {
-                    cfAtt = cfattributservice.findByNameAndClassref(key, cfclasscontent.getClassref());
+                    cfAtt = cfattributService.findByNameAndClassref(key, cfclasscontent.getClassref());
                     attributmap.put(cfclasscontent.getClassref().getName() + "_" + key, cfAtt);
                 }
                 
@@ -238,5 +421,26 @@ public class EntityUtil {
             return val;
         }
         return null;
+    }
+    
+    private long getMaxID(CfClass clazz) {
+        long max = 0;
+        List<CfAttribut> attributlist = cfattributService.findByClassref(clazz);
+        for (CfAttribut attribut : attributlist) {
+            if (attribut.getAutoincrementor()) {
+                List<CfClasscontent> classcontentlist2 = cfClasscontentService.findByClassref(clazz);
+                int last = classcontentlist2.size();
+                if (1 == last) {
+                    max = 0;
+                } else {
+                    CfClasscontent classcontent = classcontentlist2.get(last - 2);
+                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
+                    if (attributcontent.getContentInteger().longValue() > max) {
+                        max = attributcontent.getContentInteger().longValue();
+                    }
+                }
+            }
+        }
+        return max;
     }
 }

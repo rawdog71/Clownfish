@@ -186,7 +186,11 @@ public class ContentUtil implements IVersioningInterface {
         try {
             switch (selectedAttribut.getAttributref().getAttributetype().getName()) {
                 case "boolean":
-                    selectedAttribut.setContentBoolean(Boolean.valueOf(editContent));
+                    if (!editContent.isBlank()) {
+                        selectedAttribut.setContentBoolean(Boolean.valueOf(editContent));
+                    } else {
+                        selectedAttribut.setContentInteger(null);
+                    }
                     break;
                 case "string":
                     if (editContent.length() > 255) {
@@ -227,15 +231,18 @@ public class ContentUtil implements IVersioningInterface {
                     }
                     selectedAttribut.setSalt(salt);
                     break;    
-    
                 case "integer":
                     if (!editContent.isBlank()) {
                         selectedAttribut.setContentInteger(BigInteger.valueOf(Long.parseLong(editContent)));
+                    } else {
+                        selectedAttribut.setContentInteger(null);
                     }
                     break;
                 case "real":
                     if (!editContent.isBlank()) {
                         selectedAttribut.setContentReal(Double.parseDouble(editContent));
+                    } else {
+                        selectedAttribut.setContentInteger(null);
                     }
                     break;
                 case "htmltext":

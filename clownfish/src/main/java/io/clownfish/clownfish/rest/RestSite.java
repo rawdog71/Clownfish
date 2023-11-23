@@ -16,10 +16,8 @@
 package io.clownfish.clownfish.rest;
 
 import io.clownfish.clownfish.datamodels.AuthTokenList;
-import io.clownfish.clownfish.datamodels.RestLayoutcontentParameter;
 import io.clownfish.clownfish.datamodels.RestSiteParameter;
 import io.clownfish.clownfish.dbentities.CfLayoutcontent;
-import io.clownfish.clownfish.dbentities.CfLayoutcontentPK;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
@@ -27,11 +25,8 @@ import io.clownfish.clownfish.utils.ApiKeyUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.util.List;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

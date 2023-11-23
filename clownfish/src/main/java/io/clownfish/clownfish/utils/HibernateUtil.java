@@ -950,4 +950,27 @@ public class HibernateUtil implements Runnable {
         }
         return orderby;
     }
+    
+    public long getContentRef(String tablename, String fieldid, long contentid) {
+        long contentref = -1;
+        Map contentmap = null;
+        Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
+        Query query = null;
+        query = session_tables.createQuery("FROM " + tablename + " c WHERE " + fieldid + "_ = " + contentid);
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("Query: " + query.getQueryString());
+        }
+        try {
+            contentmap = (Map) query.getSingleResult();
+            for (Object key : contentmap.keySet()) {
+                if (0 == key.toString().compareToIgnoreCase("cf_contentref")) {
+                    contentref = (Long) contentmap.get(key);
+                }
+            }
+            session_tables.close();
+        } catch (NoResultException ex) {
+            LOGGER.error("HIBERNATEUTIL: " + tablename + " is empty. Please use hibernate.init=1 in application.properties");
+        }
+        return contentref;
+    }
 }

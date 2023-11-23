@@ -38,6 +38,7 @@ import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
+import org.apache.olingo.commons.api.http.HttpMethod;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataApplicationException;
@@ -45,11 +46,15 @@ import org.apache.olingo.server.api.ODataLibraryException;
 import org.apache.olingo.server.api.ODataRequest;
 import org.apache.olingo.server.api.ODataResponse;
 import org.apache.olingo.server.api.ServiceMetadata;
+import org.apache.olingo.server.api.deserializer.DeserializerResult;
+import org.apache.olingo.server.api.deserializer.ODataDeserializer;
 import org.apache.olingo.server.api.processor.EntityProcessor;
 import org.apache.olingo.server.api.serializer.EntityCollectionSerializerOptions;
+import org.apache.olingo.server.api.serializer.EntitySerializerOptions;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
+import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.queryoption.OrderByItem;
@@ -177,13 +182,52 @@ public class GenericSingletonProcessor implements EntityProcessor {
     }
 
     @Override
-    public void createEntity(ODataRequest odr, ODataResponse odr1, UriInfo ui, ContentType ct, ContentType ct1) throws ODataApplicationException, ODataLibraryException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void createEntity(ODataRequest odr, ODataResponse odr1, UriInfo uriInfo, ContentType ct, ContentType ct1) throws ODataApplicationException, ODataLibraryException {
+        List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+        UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+        EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+        EdmEntityType edmEntityType = edmEntitySet.getEntityType();
+        
+        InputStream requestInputStream = odr.getBody();
+        ODataDeserializer deserializer = this.odata.createDeserializer(ct);
+        DeserializerResult result = deserializer.entity(requestInputStream, edmEntityType);
+        Entity requestEntity = result.getEntity();
+        Entity createdEntity = entityUtil.createEntity(edmEntitySet, requestEntity);
+
+        ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).build();
+        EntitySerializerOptions options = EntitySerializerOptions.with().contextURL(contextUrl).build();
+
+        ODataSerializer serializer = this.odata.createSerializer(ct1);
+        SerializerResult serializedResponse = serializer.entity(serviceMetadata, edmEntityType, createdEntity, options);
+
+        odr1.setContent(serializedResponse.getContent());
+        odr1.setStatusCode(HttpStatusCode.CREATED.getStatusCode());
+        odr1.setHeader(HttpHeader.CONTENT_TYPE, ct1.toContentTypeString());
     }
 
     @Override
-    public void updateEntity(ODataRequest odr, ODataResponse odr1, UriInfo ui, ContentType ct, ContentType ct1) throws ODataApplicationException, ODataLibraryException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void updateEntity(ODataRequest odr, ODataResponse odr1, UriInfo uriInfo, ContentType ct, ContentType ct1) throws ODataApplicationException, ODataLibraryException {
+        // 1. Retrieve the entity set which belongs to the requested entity
+        List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+        // Note: only in our example we can assume that the first segment is the EntitySet
+        UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+        EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+        EdmEntityType edmEntityType = edmEntitySet.getEntityType();
+
+        // 2. update the data in backend
+        // 2.1. retrieve the payload from the PUT request for the entity to be updated
+        InputStream requestInputStream = odr.getBody();
+        ODataDeserializer deserializer = this.odata.createDeserializer(ct);
+        DeserializerResult result = deserializer.entity(requestInputStream, edmEntityType);
+        Entity requestEntity = result.getEntity();
+        // 2.2 do the modification in backend
+        List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
+        // Note that this updateEntity()-method is invoked for both PUT or PATCH operations
+        HttpMethod httpMethod = odr.getMethod();
+        entityUtil.updateEntity(edmEntitySet, keyPredicates, requestEntity, httpMethod);
+
+        //3. configure the response object
+        odr1.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
     }
 
     @Override

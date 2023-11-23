@@ -40,6 +40,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,7 +56,7 @@ public class RestDatabase {
     @Autowired private CfDatasourceService cfdatasourceService;
     private static final Logger LOGGER = LoggerFactory.getLogger(RestDatabase.class);
 
-    @PostMapping("/readdb")
+    @PostMapping(value = "/readdb", produces = MediaType.APPLICATION_JSON_VALUE)
     public String restReadContent(@RequestBody RestDatabaseParameter icp) {
         Gson gson = new Gson();
         return gson.toJson(readContent(icp));
@@ -129,7 +130,7 @@ public class RestDatabase {
         return icp;
     }
 
-    @PostMapping("/insertdb")
+    @PostMapping(value = "/insertdb", produces = MediaType.APPLICATION_JSON_VALUE)
     public String restInsertContent(@RequestBody RestDatabaseParameter icp) {
         Gson gson = new Gson();
         return gson.toJson(insertContent(icp));
@@ -189,7 +190,7 @@ public class RestDatabase {
         return icp;
     }
 
-    @PostMapping("/deletedb")
+    @PostMapping(value = "/deletedb", produces = MediaType.APPLICATION_JSON_VALUE)
     public String restDeleteContent(@RequestBody RestDatabaseParameter ucp) {
         Gson gson = new Gson();
         return gson.toJson(deleteContent(ucp));
@@ -247,7 +248,7 @@ public class RestDatabase {
         return ucp;
     }
 
-    @PostMapping("/updatedb")
+    @PostMapping(value = "/updatedb", produces = MediaType.APPLICATION_JSON_VALUE)
     public String restUpdateContent(@RequestBody RestDatabaseParameter ucp) {
         Gson gson = new Gson();
         return gson.toJson(updateContent(ucp));
