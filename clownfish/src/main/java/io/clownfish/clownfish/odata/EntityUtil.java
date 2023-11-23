@@ -314,15 +314,19 @@ public class EntityUtil {
                     } else {
                         if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == attribut.getRelationtype())) { // 1:n
                             CfClass relationref = attribut.getRelationref();
-                            ComplexValue complex = (ComplexValue) entity.getProperty(attribut.getName()).getValue();
-                            for (Property prop : complex.getValue()) {
-                                System.out.println(prop.getName());
-                                if (0 == prop.getName().compareToIgnoreCase("id")) {
-                                    CfClasscontent cfclasscontentref = cfClasscontentService.findById(hibernateUtil.getContentRef(relationref.getName(), "id", ((Integer) prop.getValue()).longValue()));
+                            try {
+                                ComplexValue complex = (ComplexValue) entity.getProperty(attribut.getName()).getValue();
+                                for (Property prop : complex.getValue()) {
+                                    System.out.println(prop.getName());
+                                    if (0 == prop.getName().compareToIgnoreCase("id")) {
+                                        CfClasscontent cfclasscontentref = cfClasscontentService.findById(hibernateUtil.getContentRef(relationref.getName(), "id", ((Integer) prop.getValue()).longValue()));
 
-                                    contentUtil.setAttributValue(attributcontent, cfclasscontentref.getId().toString());
-                                    cfattributcontentService.edit(attributcontent);
+                                        contentUtil.setAttributValue(attributcontent, cfclasscontentref.getId().toString());
+                                        cfattributcontentService.edit(attributcontent);
+                                    }
                                 }
+                            } catch (Exception ex) {
+                                LOGGER.debug(ex.getMessage());
                             }
                         } else {                                                // n:m Relation
                             /*
