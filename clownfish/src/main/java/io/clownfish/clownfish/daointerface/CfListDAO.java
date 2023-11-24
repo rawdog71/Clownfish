@@ -28,6 +28,7 @@ public interface CfListDAO {
     List<CfList> findAll();
     CfList findById(Long id);
     CfList findByName(String name);
+    List<CfList> findByNameLike(String name);
     List<CfList> findByClassref(CfClass id);
     List<CfList> findNotInList(BigInteger ref);
     CfList create(CfList entity);

@@ -28,6 +28,7 @@ public interface CfListService {
     List<CfList> findAll();
     CfList findById(Long id);
     CfList findByName(String name);
+    List<CfList> findByNameLike(String name);
     CfList findByClassrefAndName(CfClass ref, String name);
     List<CfList> findByClassref(CfClass ref);
     List<CfList> findNotInList(BigInteger ref);

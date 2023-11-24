@@ -132,4 +132,13 @@ public class CfListDAOImpl implements CfListDAO {
         CfList cflist = (CfList) query.getSingleResult();
         return cflist;
     }
+
+    @Override
+    public List<CfList> findByNameLike(String name) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfList.findByNameLike");  
+        query.setParameter("name", name);
+        List<CfList> cfcontentlist = query.getResultList();
+        return cfcontentlist;
+    }
 }

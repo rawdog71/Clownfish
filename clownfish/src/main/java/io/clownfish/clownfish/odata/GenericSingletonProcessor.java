@@ -207,26 +207,19 @@ public class GenericSingletonProcessor implements EntityProcessor {
 
     @Override
     public void updateEntity(ODataRequest odr, ODataResponse odr1, UriInfo uriInfo, ContentType ct, ContentType ct1) throws ODataApplicationException, ODataLibraryException {
-        // 1. Retrieve the entity set which belongs to the requested entity
         List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
-        // Note: only in our example we can assume that the first segment is the EntitySet
         UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
         EdmEntityType edmEntityType = edmEntitySet.getEntityType();
 
-        // 2. update the data in backend
-        // 2.1. retrieve the payload from the PUT request for the entity to be updated
         InputStream requestInputStream = odr.getBody();
         ODataDeserializer deserializer = this.odata.createDeserializer(ct);
         DeserializerResult result = deserializer.entity(requestInputStream, edmEntityType);
         Entity requestEntity = result.getEntity();
-        // 2.2 do the modification in backend
         List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
-        // Note that this updateEntity()-method is invoked for both PUT or PATCH operations
         HttpMethod httpMethod = odr.getMethod();
         entityUtil.updateEntity(edmEntitySet, keyPredicates, requestEntity, httpMethod);
 
-        //3. configure the response object
         odr1.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
     }
 

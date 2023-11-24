@@ -93,4 +93,9 @@ public class CfListServiceImpl implements CfListService {
     public CfList findByNameNotInList(String name, BigInteger ref) {
         return this.cflistDAO.findByNameNotInList(name, ref);
     }
+
+    @Override
+    public List<CfList> findByNameLike(String name) {
+        return this.cflistDAO.findByNameLike(name);
+    }
 }
