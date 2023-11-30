@@ -89,6 +89,8 @@ public class CfAttribut implements Serializable {
     private Boolean mandatory;
     @Column(name = "description")
     private String description;
+    @Column(name = "nodelete")
+    private Boolean nodelete;
 
     public CfAttribut() {
     }
@@ -233,6 +235,14 @@ public class CfAttribut implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Boolean getNodelete() {
+        return nodelete;
+    }
+
+    public void setNodelete(Boolean nodelete) {
+        this.nodelete = nodelete;
     }
 
     @Override

@@ -23,6 +23,7 @@ import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfListcontentPK;
+import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
@@ -30,6 +31,7 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.math.BigInteger;
@@ -67,6 +69,7 @@ public class EntityUtil {
     @Autowired private CfContentversionService cfcontentversionService;
     @Autowired private CfListService cflistService;
     @Autowired private CfListcontentService cflistcontentService;
+    @Autowired private CfSitecontentService cfsitecontentService;
     @Autowired private ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     
@@ -373,6 +376,40 @@ public class EntityUtil {
                 }
             }
             hibernateUtil.updateContent(cfclasscontent);
+        }
+    }
+    
+    void deleteEntity(EdmEntitySet edmEntitySet, List<UriParameter> keyParams) {
+        CfClass clazz = cfclassService.findByName(edmEntitySet.getName());
+
+        try {
+            CfClasscontent cfclasscontent = null;
+            for (UriParameter param : keyParams) {
+                if (0 == param.getName().compareToIgnoreCase("id")) {
+                    cfclasscontent = cfClasscontentService.findById(hibernateUtil.getContentRef(clazz.getName(), "id", Long.parseLong(param.getText())));
+                }
+            }
+            if (null != cfclasscontent) {
+                cfclasscontent.setScrapped(true);
+
+                // Delete from Listcontent - consistency
+                List<CfListcontent> listcontent = cflistcontentService.findByClasscontentref(cfclasscontent.getId());
+                for (CfListcontent lc : listcontent) {
+                    cflistcontentService.delete(lc);
+                    hibernateUtil.deleteRelation(cflistService.findById(lc.getCfListcontentPK().getListref()), cfClasscontentService.findById(lc.getCfListcontentPK().getClasscontentref()));
+                }
+
+                // Delete from Sitecontent - consistency
+                List<CfSitecontent> sitecontent = cfsitecontentService.findByClasscontentref(cfclasscontent.getId());
+                for (CfSitecontent sc : sitecontent) {
+                    cfsitecontentService.delete(sc);
+                }
+
+                cfClasscontentService.edit(cfclasscontent);
+                hibernateUtil.updateContent(cfclasscontent);
+            }
+        } catch (javax.persistence.NoResultException ex) {
+            
         }
     }
     

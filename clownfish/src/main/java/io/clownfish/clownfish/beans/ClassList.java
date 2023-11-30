@@ -86,6 +86,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter long minval;
     private @Getter @Setter long maxval;
     private @Getter @Setter boolean mandatory;
+    private @Getter @Setter boolean nodelete;
     private @Getter @Setter String description;
     private @Getter @Setter List<CfClass> classListeRef;
     private @Getter @Setter CfClass selectedClassRef = null;
@@ -93,6 +94,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter CfTemplate selectedTemplateRef = null;
     private @Getter @Setter boolean newButtonDisabled;
     private @Getter @Setter boolean newAttributButtonDisabled;
+    private @Getter @Setter boolean editAttributButtonDisabled;
     private @Getter @Setter boolean renderClass;
     private @Getter @Setter int javaLanguage = 0;
     
@@ -156,7 +158,9 @@ public class ClassList implements Serializable {
         maxval = selectedAttribut.getMax_val();
         mandatory = selectedAttribut.getMandatory();
         description = selectedAttribut.getDescription();
+        nodelete = selectedAttribut.getNodelete();
         newAttributButtonDisabled = true;
+        editAttributButtonDisabled = nodelete;
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
@@ -188,7 +192,38 @@ public class ClassList implements Serializable {
             newclass.setMaintenance(classMaintenance);
             newclass.setEncrypted(classEncrypted);
             newclass.setTemplateref(selectedTemplateRef);
-            cfclassService.create(newclass);
+            CfClass createdclass = cfclassService.create(newclass);
+            
+            CfAttribut newattribut = new CfAttribut();
+            newattribut.setClassref(createdclass);
+            newattribut.setName("id");
+            newattribut.setIdentity(true);
+            newattribut.setAutoincrementor(true);
+            newattribut.setIsindex(false);
+            newattribut.setAttributetype(cfattributetypeService.findByName("integer"));
+            //newattribut.setRelationref(selectedClassRef);
+            newattribut.setRelationtype(-1);
+            newattribut.setDefault_val("");
+            //newattribut.setMin_val(0);
+            //newattribut.setMax_val(0);
+            newattribut.setMandatory(false);
+            newattribut.setDescription("Identifikation");
+            newattribut.setNodelete(true);
+            
+            cfattributService.create(newattribut);
+            selectedAttributList = attributlist.init(selectedClass);
+            attributName = "";
+            
+            // Fill attributcontent with new attribut value
+            List<CfClasscontent> modifyList = cfclascontentService.findByClassref(newattribut.getClassref());
+            for (CfClasscontent classcontent : modifyList) {
+                CfAttributcontent newattributcontent = new CfAttributcontent();
+                newattributcontent.setAttributref(newattribut);
+                newattributcontent.setClasscontentref(classcontent);
+                cfattributcontentService.create(newattributcontent);
+            }
+            
+            
             classListe = cfclassService.findAll();
             classListeRef = cfclassService.findAll();
             className = "";
@@ -240,6 +275,7 @@ public class ClassList implements Serializable {
             newattribut.setMax_val(maxval);
             newattribut.setMandatory(mandatory);
             newattribut.setDescription(description);
+            newattribut.setNodelete(false);
             
             cfattributService.create(newattribut);
             selectedAttributList = attributlist.init(selectedClass);

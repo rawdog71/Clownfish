@@ -225,7 +225,14 @@ public class GenericSingletonProcessor implements EntityProcessor {
 
     @Override
     public void deleteEntity(ODataRequest odr, ODataResponse odr1, UriInfo ui) throws ODataApplicationException, ODataLibraryException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        List<UriResource> resourcePaths = ui.getUriResourceParts();
+        UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+        EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+
+        List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
+        entityUtil.deleteEntity(edmEntitySet, keyPredicates);
+
+        odr1.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
     }
 
     @Override
