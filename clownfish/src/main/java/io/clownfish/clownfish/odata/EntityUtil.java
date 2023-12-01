@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfListcontentPK;
@@ -27,6 +28,7 @@ import io.clownfish.clownfish.dbentities.CfSitecontent;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
@@ -70,6 +72,7 @@ public class EntityUtil {
     @Autowired private CfListService cflistService;
     @Autowired private CfListcontentService cflistcontentService;
     @Autowired private CfSitecontentService cfsitecontentService;
+    @Autowired private CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired private ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     
@@ -407,6 +410,24 @@ public class EntityUtil {
 
                 cfClasscontentService.edit(cfclasscontent);
                 hibernateUtil.updateContent(cfclasscontent);
+                
+                // Delete corresponding attributcontent entries
+                List<CfAttributcontent> attributcontentlistdummy = cfattributcontentService.findByClasscontentref(cfclasscontent);
+                for (CfAttributcontent attributcontent : attributcontentlistdummy) {
+                    cfattributcontentService.delete(attributcontent);
+                }
+                // Delete corresponding keywordcontent entries
+                List<CfClasscontentkeyword> keywordcontentdummy = cfclasscontentkeywordService.findByClassContentRef(cfclasscontent.getId());
+                for (CfClasscontentkeyword keywordcontent : keywordcontentdummy) {
+                    cfclasscontentkeywordService.delete(keywordcontent);
+                }
+
+                cfClasscontentService.delete(cfclasscontent);
+                try {
+                    hibernateUtil.deleteContent(cfclasscontent);
+                } catch (javax.persistence.NoResultException ex) {
+                    LOGGER.warn(ex.getMessage());
+                }
             }
         } catch (javax.persistence.NoResultException ex) {
             
