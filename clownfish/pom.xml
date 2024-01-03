@@ -69,7 +69,7 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <scope>compile</scope>
-            <version>9.0.80</version>
+            <version>9.0.83</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>9.0.80</version>
+            <version>9.0.83</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
