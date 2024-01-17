@@ -57,6 +57,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import org.slf4j.Logger;
@@ -96,6 +97,13 @@ public class SiteUtil {
     @Value("${hibernate.use:0}") int useHibernate;
     
     public SiteUtil() {
+    }
+    
+    @PostConstruct
+    public void init() {
+        if (null != classutil) {
+            classutil.setSiteutil(this);
+        }
     }
     
     public Map getSitelist_list(CfSite cfsite, Map sitecontentmap) {

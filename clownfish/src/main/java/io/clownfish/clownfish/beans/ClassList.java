@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.beans;
 
 import io.clownfish.clownfish.compiler.JVMLanguages;
+import io.clownfish.clownfish.datamodels.ODataWizard;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfAttributetype;
@@ -38,6 +39,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.util.ArrayList;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import lombok.Getter;
@@ -71,6 +73,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter List<CfClass> classListe;
     private @Getter @Setter CfClass selectedClass = null;
     private transient @Getter @Setter List<CfAttribut> selectedAttributList = null;
+    private transient @Getter @Setter List<ODataWizard> odataWizardList = null;
     private @Getter @Setter CfAttribut selectedAttribut = null;
     private @Getter @Setter CfAttributetype selectedAttributeType = null;
     private transient @Getter @Setter List<CfAttributetype> attributetypelist = null;
@@ -107,6 +110,7 @@ public class ClassList implements Serializable {
         classListe = cfclassService.findAll();
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
+        odataWizardList = new ArrayList<>();
         renderClass = false;
         LOGGER.info("INIT CLASSLIST END");
     }
@@ -127,6 +131,33 @@ public class ClassList implements Serializable {
     public void onSelect(SelectEvent event) {
         selectedClass = (CfClass) event.getObject();
         selectedAttributList = attributlist.init(selectedClass);
+        odataWizardList.clear();
+        for (CfAttribut attr : selectedAttributList) {
+            ODataWizard odw = new ODataWizard();
+            switch (attr.getAttributetype().getName()) {
+                case "string":
+                case "integer":
+                case "real":
+                case "datetime":
+                    odw.setHeaderenabled(true);
+                    odw.setRelationenabled(false);
+                    odw.setTableheader(true);
+                    break;
+                case "classref":
+                    odw.setRelationenabled(true);
+                    odw.setHeaderenabled(true);
+                    odw.setTableheader(true);
+                    break;
+                default:
+                    odw.setTableheader(false);
+                    odw.setHeaderenabled(false);
+                    odw.setRelationenabled(false);
+                    break;
+            }
+            odw.setRelationattribut(null);
+            odw.setAttribut(attr);
+            odataWizardList.add(odw);
+        }
         className = selectedClass.getName();
         classSearchrelevant = selectedClass.isSearchrelevant();
         classMaintenance = selectedClass.isMaintenance();
@@ -358,5 +389,17 @@ public class ClassList implements Serializable {
             FacesMessage message = new FacesMessage("HTML Form template generated");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
+    }
+    
+    public void onGenerateODataForm(ActionEvent actionEvent) {
+        if (selectedClass != null) {
+            classutil.generateODataForm(selectedClass, odataWizardList);
+            FacesMessage message = new FacesMessage("HTML Form template generated");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public List getAttributenames(CfClass clazz) {
+        return cfattributService.findByClassref(clazz);
     }
 }

@@ -1086,7 +1086,7 @@
                     
                     <div class="flex flex-row pb-2">
                         <p:dataTable id="classlist" size="small" scrollable="true" scrollHeight="250" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}" sortMode="single">
-                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate :form:tabview:classencrypted" />
+                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate :form:tabview:classencrypted form:wizardattributlist" />
                             <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains" sortBy="#{clazz.name}">
                                 <h:outputText value="#{clazz.name}" />
                             </p:column>
@@ -1154,12 +1154,26 @@
                         </div>
                     </div>
 
-                    <div class="flex align-items-center pr-2">
-                        <p:commandButton id="generatehtmlform" process="form" value="Generate HTML Webform" actionListener="#{classList.onGenerateHTMLForm(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
-                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
-                            <f:actionListener binding="#{templateList.refresh()}" />
-                            <f:actionListener binding="#{sitetree.onRefreshAll()}" />
-                        </p:commandButton>
+                    <div class="flex flex-row pb-2">
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton id="generatehtmlform" process="form" value="Generate HTML Webform" actionListener="#{classList.onGenerateHTMLForm(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+                                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                <f:actionListener binding="#{templateList.refresh()}" />
+                                <f:actionListener binding="#{sitetree.onRefreshAll()}" />
+                            </p:commandButton>
+                        </div>
+
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton value="Generate OData Form Wizard" type="button" onclick="PF('ODataWizardDlg').show()" />
+                            <!--
+                            <p:commandButton id="odataformwizard" process="form" value="Generate OData Form Wizard" actionListener="#{classList.onGenerateODataForm(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+                                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                                <f:actionListener binding="#{templateList.refresh()}" />
+                                <f:actionListener binding="#{javascriptList.refresh()}" />
+                                <f:actionListener binding="#{sitetree.onRefreshAll()}" />
+                            </p:commandButton>
+                            -->
+                        </div>
                     </div>
 
                     <p:dataTable id="attributlist" size="small" var="attribut" value="#{classList.selectedAttributList}" selectionMode="single" selection="#{classList.selectedAttribut}" rowKey="#{attribut.id}">
@@ -2623,6 +2637,38 @@
                     </f:facet>
                     <div class="flex">#{keyword.name}</div>
                 </p:dataScroller>
+            </p:dialog>
+            
+            <p:dialog id="ODataWizardDlg" header="OData Formular Wizard" widgetVar="ODataWizardDlg" minHeight="100" width="1200" showEffect="fade" modal="true">
+                <p:dataTable id="wizardattributlist" size="small" var="attribut" value="#{classList.odataWizardList}" selectionMode="single" rowKey="#{attribut.attribut.id}">
+                    <p:column headerText="Header">
+                        <p:selectBooleanCheckbox value="#{attribut.tableheader}" disabled="#{!attribut.headerenabled}" />
+                    </p:column>
+                    <p:column headerText="Name">
+                        <h:outputText value="#{attribut.attribut.name}" />
+                    </p:column>
+                    <p:column headerText="Type">
+                        <h:outputText value="#{attribut.attribut.attributetype}" />
+                    </p:column>
+                    <p:column headerText="Class">
+                        <h:outputText value="#{attribut.attribut.relationref}" />
+                    </p:column>
+                    <p:column headerText="Relation">
+                        <h:outputText value="#{attribut.attribut.relationtypeFull}" />
+                    </p:column>
+                    <p:column headerText="RelationAttribut">
+                        <p:selectOneMenu id="option" value="#{attribut.relationattribut}" rendered="#{attribut.relationenabled}">
+                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                            <f:selectItems value="#{classList.getAttributenames(attribut.attribut.relationref)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:dataTable>
+                <p:commandButton id="odataformwizard" process="form" value="Generate OData Form Wizard" actionListener="#{classList.onGenerateODataForm(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                    <f:actionListener binding="#{templateList.refresh()}" />
+                    <f:actionListener binding="#{javascriptList.refresh()}" />
+                    <f:actionListener binding="#{sitetree.onRefreshAll()}" />
+                </p:commandButton>
             </p:dialog>
             
             <p:confirmPopup global="true">

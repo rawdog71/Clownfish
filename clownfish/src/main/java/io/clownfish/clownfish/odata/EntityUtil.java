@@ -47,8 +47,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -232,6 +234,11 @@ public class EntityUtil {
                     newcontent.setClasscontentref(newclasscontent);
                     newcontent = contentUtil.setAttributValue(newcontent, entity.getProperty(attribut.getName()).getValue().toString());
 
+                    if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("datetime")) {
+                        newcontent = contentUtil.setAttributValue(newcontent, entity.getProperty(attribut.getName()).getValue().toString());
+                    } else {
+                        newcontent = contentUtil.setAttributValue(newcontent, ((GregorianCalendar)entity.getProperty(attribut.getName()).getValue()).toZonedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+                    }
                     cfattributcontentService.create(newcontent);
                     contentUtil.indexContent();
                 } else {
@@ -322,7 +329,11 @@ public class EntityUtil {
                     if ((0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 != attribut.getAttributetype().getName().compareToIgnoreCase("assetref"))) {
                         Property p = entity.getProperty(attributcontent.getAttributref().getName());
                         if (null != p) {
-                            contentUtil.setAttributValue(attributcontent, p.getValue().toString());
+                            if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("datetime")) {
+                                contentUtil.setAttributValue(attributcontent, p.getValue().toString());
+                            } else {
+                                contentUtil.setAttributValue(attributcontent, ((GregorianCalendar) p.getValue()).toZonedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+                            }
                             cfattributcontentService.edit(attributcontent);
                             contentUtil.indexContent();
                         } else {
