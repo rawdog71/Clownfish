@@ -961,7 +961,15 @@ public class ClassUtil implements Serializable {
                         break;
                     case "classref":
                         if (1 == attr.getRelationtype()) {
-                            html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append(" == '").append(attr.getName()).append(".").append(odw.getRelationattribut().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append(" == '-").append(attr.getName()).append(".").append(odw.getRelationattribut().toLowerCase()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('").append(attr.getName()).append(".").append(odw.getRelationattribut().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('-").append(attr.getName()).append(".").append(odw.getRelationattribut().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                            if (!odw.getRelationattribut1().isBlank()) {
+                                html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append(" == '").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append(" == '-").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('-").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                            }
+                            if (!odw.getRelationattribut2().isBlank()) {
+                                html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append(" == '").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append(" == '-").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('-").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                            }
+                            if (!odw.getRelationattribut3().isBlank()) {
+                                html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append(" == '").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append(" == '-").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('-").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                            }
                         }
                         break;
                 }
@@ -1017,7 +1025,15 @@ public class ClassUtil implements Serializable {
                         break;
                     case "classref":
                         if (1 == attr.getRelationtype()) {
-                            html.append("| filter: {").append(attr.getName()).append(": {").append(odw.getRelationattribut().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}} ");
+                            if (!odw.getRelationattribut1().isBlank()) {
+                                html.append("| filter: {").append(attr.getName()).append(": {").append(odw.getRelationattribut1().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}} ");
+                            }
+                            if (!odw.getRelationattribut2().isBlank()) {
+                                html.append("| filter: {").append(attr.getName()).append(": {").append(odw.getRelationattribut2().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}} ");
+                            }
+                            if (!odw.getRelationattribut3().isBlank()) {
+                                html.append("| filter: {").append(attr.getName()).append(": {").append(odw.getRelationattribut3().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}} ");
+                            }
                         }
                         break;
                 }
@@ -1041,7 +1057,15 @@ public class ClassUtil implements Serializable {
                         break;
                     case "classref":
                         if (1 == attr.getRelationtype()) {
-                            html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut().toLowerCase()).append("}}</td>").append("\n");
+                            if (!odw.getRelationattribut1().isBlank()) {
+                                html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("}}</td>").append("\n");
+                            }
+                            if (!odw.getRelationattribut2().isBlank()) {
+                                html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("}}</td>").append("\n");
+                            }
+                            if (!odw.getRelationattribut3().isBlank()) {
+                                html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("}}</td>").append("\n");
+                            }
                         }
                         break;
                 }
@@ -1146,10 +1170,62 @@ public class ClassUtil implements Serializable {
                     if (1 == attr.getRelationtype()) {
                         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                         html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                        html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(attr.getName()).append("\" >").append("\n");
+                        html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(attr.getName()).append("\" >").append("\n");
                         html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
                         html.append("\t\t\t\t\t\t</select>").append("\n");
                         html.append("\t\t\t\t\t</div>").append("\n");
+                    } else {
+                        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"").append(attr.getName()).append("-list-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                        html.append("\t\t\t\t\t\t<div class=\"uk-overflow-auto\" style=\"height: 370px\">").append("\n");
+                        html.append("\t\t\t\t\t\t\t<table id=\"").append(attr.getName()).append("-list-add\" class=\"uk-table uk-table-hover uk-table-small uk-table-divider\">").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t<thead class=\"table-head\">").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\"></th>").append("\n");
+                        if (!odw.getRelationattribut1().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut1()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut1()).append("'}\">").append(odw.getRelationattribut1()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut1()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut1()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                        }
+                        if (!odw.getRelationattribut2().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut2()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut2()).append("'}\">").append(odw.getRelationattribut2()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut2()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut2()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                        }
+                        if (!odw.getRelationattribut3().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut3()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut3()).append("'}\">").append(odw.getRelationattribut3()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut3()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut3()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                        }
+                        html.append("\t\t\t\t\t\t\t\t\t</tr>").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
+                        if (!odw.getRelationattribut1().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut1()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut1()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append("\"></th>").append("\n");
+                        }
+                        if (!odw.getRelationattribut2().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut2()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut2()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2()).append("\"></th>").append("\n");
+                        }
+                        if (!odw.getRelationattribut3().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut3()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut3()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3()).append("\"></th>").append("\n");
+                        }
+                        html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t</thead>").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t<tbody>").append("\n");
+                        
+                        // FILTER !!!
+                        if (null != odw.getRelationattribut1()) {
+                            html.append("\t\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST | filter: {").append(odw.getRelationattribut1()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append("} | orderBy: order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("\">").append("\n");
+                        }
+                        html.append("\t\t\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"select").append(clazz.getName()).append("").append(attr.getName()).append("(").append(attr.getName()).append(".id)\"></td>").append("\n");
+                        if (!odw.getRelationattribut1().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append("}}</td>").append("\n");
+                        }
+                        if (!odw.getRelationattribut2().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut2()).append("}}</td>").append("\n");
+                        }
+                        if (!odw.getRelationattribut3().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut3()).append("}}</td>").append("\n");
+                        }
+                        html.append("\t\t\t\t\t\t\t\t\t\t</tr>").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t\t</tbody>").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t</table>").append("\n");
+                        html.append("\t\t\t\t\t\t\t</div>").append("\n");
+                        html.append("\t\t\t\t\t\t</div>").append("\n");
                     }
                     break;
             }
@@ -1157,12 +1233,11 @@ public class ClassUtil implements Serializable {
         
         html.append("\t\t\t\t\t<div class=\"uk-align-right\">").append("\n");
         html.append("\t\t\t\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"save").append(clazz.getName()).append("()\" ng-disabled=\"inprogress\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
-        html.append("\t\t\t\t\t<button class=\"uk-button uk-button-secondary\" type=\"button\" ng-click=\"closeModal('#modal-").append(clazz.getName().toLowerCase()).append("-add')\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
+        html.append("\t\t\t\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
         html.append("\t\t\t\t</div>").append("\n");
         html.append("\t\t\t</div>").append("\n");
         html.append("\t\t</div>").append("\n");
 	html.append("\t</div>").append("\n");
-        
         
         html.append("\t\t<div id=\"modal-").append(clazz.getName().toLowerCase()).append("-update\" class=\"uk-modal-container uk-flex-top\" uk-modal>").append("\n");
 	html.append("\t\t\t<div class=\"uk-modal-dialog uk-modal-header\">").append("\n");
@@ -1252,18 +1327,68 @@ public class ClassUtil implements Serializable {
                     if (1 == attr.getRelationtype()) {
                         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                         html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                        html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut().toLowerCase()).append(" for ").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" >").append("\n");
+                        html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" >").append("\n");
                         html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
                         html.append("\t\t\t\t\t\t</select>").append("\n");
                         html.append("\t\t\t\t\t</div>").append("\n");
+                    } else {
+                        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"").append(attr.getName()).append("-list-update\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                        html.append("\t\t\t\t\t\t<div class=\"uk-overflow-auto\" style=\"height: 370px\">").append("\n");
+                        html.append("\t\t\t\t\t\t\t<table id=\"").append(attr.getName()).append("-list-update\" class=\"uk-table uk-table-hover uk-table-small uk-table-divider\">").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t<thead class=\"table-head\">").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\"></th>").append("\n");
+                        if (!odw.getRelationattribut1().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut1().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut1().toLowerCase()).append("'}\">").append(odw.getRelationattribut1().toLowerCase()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut1().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut1().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                         }
+                        if (!odw.getRelationattribut2().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut2().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut2().toLowerCase()).append("'}\">").append(odw.getRelationattribut2().toLowerCase()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut2().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut2().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                        }
+                        if (!odw.getRelationattribut3().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut3().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut3().toLowerCase()).append("'}\">").append(odw.getRelationattribut3().toLowerCase()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut3().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut3().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                        }
+                        html.append("\t\t\t\t\t\t\t\t\t</tr>").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
+                        if (!odw.getRelationattribut1().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut1().toLowerCase()).append("_upd\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut1().toLowerCase()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("\"></th>").append("\n");
+                        }
+                        if (!odw.getRelationattribut2().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut2().toLowerCase()).append("_upd\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut2().toLowerCase()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("\"></th>").append("\n");
+                        }
+                        if (!odw.getRelationattribut3().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut3().toLowerCase()).append("_upd\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut3().toLowerCase()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("\"></th>").append("\n");
+                        }
+                        html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t</thead>").append("\n");
+                        html.append("\t\t\t\t\t\t\t<tbody>").append("\n");
+                        
+                        // FILTER !!!
+                        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST | filter: {").append(odw.getRelationattribut1().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("} | orderBy: order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("\">").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-value=\"").append(attr.getName()).append(".id\" ng-checked=\"in").append(StringUtils.capitalise(attr.getName())).append("Selected(").append(attr.getName()).append(".id)\" ng-click=\"select").append(clazz.getName()).append("").append(attr.getName()).append("(").append(attr.getName()).append(".id)\"></td>").append("\n");
+                        if (!odw.getRelationattribut1().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("}}</td>").append("\n");
+                        }
+                        if (!odw.getRelationattribut2().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("}}</td>").append("\n");
+                        }
+                        if (!odw.getRelationattribut3().isBlank()) {
+                            html.append("\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("}}</td>").append("\n");
+                        }
+                        html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+                        html.append("\t\t\t\t\t\t\t</tbody>").append("\n");
+                        html.append("\t\t\t\t\t\t</table>").append("\n");
+                        html.append("\t\t\t\t\t</div>").append("\n");
+                        html.append("\t\t\t\t</div>").append("\n");
+                    }
                     break;
             }
         }
 
 	html.append("\t\t<div class=\"uk-align-right\">").append("\n");
 	html.append("\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"update").append(clazz.getName()).append("(").append(clazz.getName()).append(".id)\" ng-disabled=\"inprogress\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
-	html.append("\t\t<button class=\"uk-button uk-button-secondary\" type=\"button\" ng-click=\"closeModal('#modal-").append(clazz.getName().toLowerCase()).append("-update')\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
+	html.append("\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
 	html.append("\t\t</div>").append("\n");
 	html.append("\t\t</div>").append("\n");
 	html.append("\t\t</div>").append("\n");
@@ -1277,7 +1402,7 @@ public class ClassUtil implements Serializable {
 	html.append("\t\t\t\t\t<p>{{").append(clazz.getName()).append(".id}}</p>").append("\n");
 	html.append("\t\t\t\t\t<div class=\"uk-align-right\">").append("\n");
 	html.append("\t\t\t\t\t\t<button class=\"uk-button uk-button-danger\" type=\"button\" ng-click=\"delete").append(clazz.getName()).append("(").append(clazz.getName()).append(".id)\" ng-disabled=\"inprogress\">Löschen <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
-	html.append("\t\t\t\t\t\t<button class=\"uk-button uk-button-secondary\" type=\"button\" ng-click=\"closeModal('#modal-").append(clazz.getName().toLowerCase()).append("-delete')\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
+	html.append("\t\t\t\t\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
 	html.append("\t\t\t\t\t</div>").append("\n");
 	html.append("\t\t\t\t</div>").append("\n");
 	html.append("\t\t\t</div>").append("\n");
@@ -1334,6 +1459,12 @@ public class ClassUtil implements Serializable {
                     javascript.append("\t$scope.media_").append(attr.getName()).append(" = {};").append("\n");
                     javascript.append("\t$scope.media_").append(attr.getName()).append(".").append(attr.getName()).append(" = null;").append("\n");
                     break;
+                case "classref":
+                    if (0 == attr.getRelationtype()) {
+                        javascript.append("\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" = {};").append("\n");
+                        javascript.append("\t$scope.order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" = 'id';").append("\n");
+                    }
+                    break;
             }
         }
         
@@ -1351,12 +1482,22 @@ public class ClassUtil implements Serializable {
             }
             switch (attr.getAttributetype().getName()) {
                 case "classref":
-                    if (1 == attr.getRelationtype()) {
-                        javascript.append("\t$scope.").append(attr.getName().toUpperCase()).append("LIST = [];").append("\n");
-                        javascript.append("\t$scope.get").append(StringUtils.capitalise(attr.getName())).append("list = function() {").append("\n");
-                        javascript.append("\t\t$http.get('/OData/").append(attr.getRelationref().getName()).append("Set').then(function (res) {").append("\n");
-                        javascript.append("\t\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST = res.data.value;").append("\n");
-                        javascript.append("\t\t});").append("\n");
+                    javascript.append("\t$scope.").append(attr.getName().toUpperCase()).append("LIST = [];").append("\n");
+                    javascript.append("\t$scope.get").append(StringUtils.capitalise(attr.getName())).append("list = function() {").append("\n");
+                    javascript.append("\t\t$http.get('/OData/").append(attr.getRelationref().getName()).append("Set').then(function (res) {").append("\n");
+                    javascript.append("\t\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST = res.data.value;").append("\n");
+                    javascript.append("\t\t});").append("\n");
+                    javascript.append("\t};").append("\n");
+                    if (0 == attr.getRelationtype()) {
+                        javascript.append("\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED = [];").append("\n");
+                        
+                        javascript.append("\t$scope.in").append(StringUtils.capitalise(attr.getName())).append("Selected = function(id) {").append("\n");
+                        javascript.append("\t\tfor (const element of $scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED) {").append("\n");
+                        javascript.append("\t\t\tif (element.id == id) {").append("\n");
+                        javascript.append("\t\t\t\treturn true;").append("\n");
+                        javascript.append("\t\t\t}").append("\n");
+                        javascript.append("\t\t}").append("\n");
+                        javascript.append("\t\treturn false;").append("\n");
                         javascript.append("\t};").append("\n");
                     }
                     break;
@@ -1366,7 +1507,8 @@ public class ClassUtil implements Serializable {
         javascript.append("\t$scope.init = function() {").append("\n");
         javascript.append("\t\t$scope.get").append(clazz.getName()).append("list();").append("\n");
         
-        for (CfAttribut attr : attributList) {
+        for (ODataWizard odw : wizardlist) {
+            CfAttribut attr = odw.getAttribut();
             if (attr.getAutoincrementor()) {
                 continue;
             }
@@ -1388,9 +1530,18 @@ public class ClassUtil implements Serializable {
                     javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(" = null;").append("\n");
                     break;
                 case "classref":
-                    if (1 == attr.getRelationtype()) {
-                        javascript.append("\t\t$scope.get").append(StringUtils.capitalise(attr.getName())).append("list();").append("\n");
-                        javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(" = \"\";").append("\n");
+                    javascript.append("\t\t$scope.get").append(StringUtils.capitalise(attr.getName())).append("list();").append("\n");
+                    javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(" = \"\";").append("\n");
+                    if (0 == attr.getRelationtype()) {
+                        if (!odw.getRelationattribut1().isBlank()) {
+                            javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append(" = \"\";").append("\n");
+                        }
+                        if (!odw.getRelationattribut2().isBlank()) {
+                            javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2()).append(" = \"\";").append("\n");
+                        }
+                        if (!odw.getRelationattribut3().isBlank()) {
+                            javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3()).append(" = \"\";").append("\n");
+                        }
                     }
                     break;
             }
@@ -1442,12 +1593,64 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t$scope.order_").append(clazz.getName().toLowerCase()).append(" = field;").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            CfAttribut attr = odw.getAttribut();
+            if (attr.getAutoincrementor()) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "classref":
+                    if (0 == attr.getRelationtype()) {
+                        javascript.append("\t$scope.sort").append(clazz.getName()).append("").append(attr.getName()).append(" = function(field) {").append("\n");
+                        javascript.append("\t\t$scope.order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" = field;").append("\n");
+                        javascript.append("\t};").append("\n");
+                    }
+                    break;
+            }
+        }
+        
         javascript.append("\t$scope.get").append(clazz.getName()).append("list = function() {").append("\n");
         javascript.append("\t\t$http.get('/OData/").append(clazz.getName()).append("Set').then(function (res) {").append("\n");
         javascript.append("\t\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST = res.data.value;").append("\n");
         javascript.append("\t\t});").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            CfAttribut attr = odw.getAttribut();
+            if (attr.getAutoincrementor()) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "classref":
+                    if (0 == attr.getRelationtype()) {
+                        javascript.append("\t$scope.select").append(clazz.getName()).append("").append(attr.getName()).append(" = function(id) {").append("\n");
+                        javascript.append("\t\tselect = true;").append("\n");
+                        javascript.append("\t\tfor (const element of $scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED) {").append("\n");
+                        javascript.append("\t\t\tif (element.id == id) {").append("\n");
+                        javascript.append("\t\t\t\tselect = false;").append("\n");
+                        javascript.append("\t\t\t\tconst index = getIndex($scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED, id);").append("\n");
+                        javascript.append("\t\t\t\tif (index > -1) {").append("\n");
+                        javascript.append("\t\t\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED.splice(index, 1);").append("\n");
+                        javascript.append("\t\t\t\t}").append("\n");
+                        javascript.append("\t\t\t\tbreak;").append("\n");
+                        javascript.append("\t\t\t}").append("\n");
+                        javascript.append("\t\t}").append("\n");
+                        javascript.append("\t\tif (select) {").append("\n");
+                        javascript.append("\t\t\tfor (const element of $scope.").append(attr.getName().toUpperCase()).append("LIST) {").append("\n");
+                        javascript.append("\t\t\t\tif (element.id == id) {").append("\n");
+                        javascript.append("\t\t\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED.push(element);").append("\n");
+                        javascript.append("\t\t\t\t\tbreak;").append("\n");
+                        javascript.append("\t\t\t\t}").append("\n");
+                        javascript.append("\t\t\t}").append("\n");
+                        javascript.append("\t\t}").append("\n");
+                        javascript.append("\t}").append("\n");
+                    }
+                    break;
+            }
+        }
+        
         javascript.append("\t$scope.add").append(clazz.getName()).append("Modal = function() {").append("\n");
         javascript.append("\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\t$scope.init").append(clazz.getName()).append("();").append("\n");
@@ -1504,6 +1707,16 @@ public class ClassUtil implements Serializable {
                         javascript.append("\t\tif ($scope.").append(attr.getName()).append(" != null) {").append("\n");
                         javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = $scope.").append(attr.getName()).append(";").append("\n");
                         javascript.append("\t\t}").append("\n");
+                    } else {
+                        javascript.append("\t\tif ($scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED != null) {").append("\n");
+                        javascript.append("\t\t\tvar ").append(attr.getName()).append("set_ref = [];").append("\n");
+                        javascript.append("\t\t\tfor (const element of $scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED) {").append("\n");
+                        javascript.append("\t\t\t\tvar entry = new Object();").append("\n");
+                        javascript.append("\t\t\t\tentry.id = element.id;").append("\n");
+                        javascript.append("\t\t\t\t").append(attr.getName()).append("set_ref.push(entry);").append("\n");
+                        javascript.append("\t\t\t}").append("\n");
+                        javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = ").append(attr.getName()).append("set_ref;").append("\n");
+                        javascript.append("\t\t}").append("\n");
                     }
                     break;
             }
@@ -1534,6 +1747,14 @@ public class ClassUtil implements Serializable {
             switch (attr.getAttributetype().getName()) {
                 case "hashstring":
                     javascript.append("\t\t\t$scope.").append(clazz.getName()).append(".").append(attr.getName()).append(" = \"\";").append("\n");
+                    break;
+                case "classref":
+                    if (0 == attr.getRelationtype()) {
+                        javascript.append("\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED = [];").append("\n");
+                        javascript.append("\t\t\tfor (const element of $scope.").append(clazz.getName()).append(".").append(attr.getName()).append(") {").append("\n");
+                        javascript.append("\t\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED.push(element);").append("\n");
+                        javascript.append("\t\t\t}").append("\n");
+                    }
                     break;
             }
         }
@@ -1597,6 +1818,16 @@ public class ClassUtil implements Serializable {
                         javascript.append("\t\tif ($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
                         javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = $scope.").append(clazz.getName()).append(".").append(attr.getName()).append(";").append("\n");
                         javascript.append("\t\t}").append("\n");
+                    } else {
+                        javascript.append("\t\tif ($scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED != null) {").append("\n");
+                        javascript.append("\t\t\tvar ").append(attr.getName()).append("set_ref = [];").append("\n");
+                        javascript.append("\t\t\tfor (const element of $scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED) {").append("\n");
+                        javascript.append("\t\t\t\tvar entry = new Object();").append("\n");
+                        javascript.append("\t\t\t\tentry.id = element.id;").append("\n");
+                        javascript.append("\t\t\t\t").append(attr.getName()).append("set_ref.push(entry);").append("\n");
+                        javascript.append("\t\t\t}").append("\n");
+                        javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = ").append(attr.getName()).append("set_ref;").append("\n");
+                        javascript.append("\t\t}").append("\n");
                     }
                     break;
             }
@@ -1639,6 +1870,17 @@ public class ClassUtil implements Serializable {
         javascript.append("\t$scope.closeModal = function(modalelement) {").append("\n");
         javascript.append("\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\tUIkit.modal(modalelement).hide();").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\tgetIndex = function(array, id) {").append("\n");
+        javascript.append("\t\tidx = 0;").append("\n");
+        javascript.append("\t\tfor (const element of array) {").append("\n");
+        javascript.append("\t\t\tif (element.id == id) {").append("\n");
+        javascript.append("\t\t\t\treturn idx;").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t\tidx++;").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t\treturn -1;").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("});").append("\n");
         

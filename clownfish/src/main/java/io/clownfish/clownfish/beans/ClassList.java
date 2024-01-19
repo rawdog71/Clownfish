@@ -154,7 +154,9 @@ public class ClassList implements Serializable {
                     odw.setRelationenabled(false);
                     break;
             }
-            odw.setRelationattribut(null);
+            odw.setRelationattribut1(null);
+            odw.setRelationattribut2(null);
+            odw.setRelationattribut3(null);
             odw.setAttribut(attr);
             odataWizardList.add(odw);
         }

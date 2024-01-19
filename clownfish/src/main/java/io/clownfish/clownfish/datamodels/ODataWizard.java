@@ -28,5 +28,7 @@ public class ODataWizard {
     private @Getter @Setter boolean tableheader;
     private @Getter @Setter CfAttribut attribut;
     private @Getter @Setter boolean relationenabled;
-    private @Getter @Setter String relationattribut;
+    private @Getter @Setter String relationattribut1;
+    private @Getter @Setter String relationattribut2;
+    private @Getter @Setter String relationattribut3;
 }

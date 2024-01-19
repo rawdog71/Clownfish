@@ -2656,8 +2656,20 @@
                     <p:column headerText="Relation">
                         <h:outputText value="#{attribut.attribut.relationtypeFull}" />
                     </p:column>
-                    <p:column headerText="RelationAttribut">
-                        <p:selectOneMenu id="option" value="#{attribut.relationattribut}" rendered="#{attribut.relationenabled}">
+                    <p:column headerText="RelAttr1">
+                        <p:selectOneMenu id="RelAttrOption1" value="#{attribut.relationattribut1}" rendered="#{attribut.relationenabled}">
+                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                            <f:selectItems value="#{classList.getAttributenames(attribut.attribut.relationref)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                        </p:selectOneMenu>
+                    </p:column>
+                    <p:column headerText="RelAttr2">
+                        <p:selectOneMenu id="RelAttrOption2" value="#{attribut.relationattribut2}" rendered="#{attribut.relationenabled}">
+                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                            <f:selectItems value="#{classList.getAttributenames(attribut.attribut.relationref)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                        </p:selectOneMenu>
+                    </p:column>
+                    <p:column headerText="RelAttr3">
+                        <p:selectOneMenu id="RelAttrOption3" value="#{attribut.relationattribut3}" rendered="#{attribut.relationenabled}">
                             <f:selectItem itemLabel="Select One" itemValue=""/>
                             <f:selectItems value="#{classList.getAttributenames(attribut.attribut.relationref)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
                         </p:selectOneMenu>
