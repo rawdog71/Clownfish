@@ -1207,10 +1207,18 @@ public class ClassUtil implements Serializable {
                         html.append("\t\t\t\t\t\t\t\t</thead>").append("\n");
                         html.append("\t\t\t\t\t\t\t\t<tbody>").append("\n");
                         
-                        // FILTER !!!
-                        if (null != odw.getRelationattribut1()) {
-                            html.append("\t\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST | filter: {").append(odw.getRelationattribut1()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append("} | orderBy: order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("\">").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST ");
+                        if (!odw.getRelationattribut1().isBlank()) {
+                            html.append("| filter: {").append(odw.getRelationattribut1()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append("} ");
                         }
+                        if (!odw.getRelationattribut2().isBlank()) {
+                            html.append("| filter: {").append(odw.getRelationattribut2()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2()).append("} ");
+                        }
+                        if (!odw.getRelationattribut3().isBlank()) {
+                            html.append("| filter: {").append(odw.getRelationattribut3()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3()).append("} ");
+                        }
+                        html.append("| orderBy: order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("\">").append("\n");
+                        
                         html.append("\t\t\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"select").append(clazz.getName()).append("").append(attr.getName()).append("(").append(attr.getName()).append(".id)\"></td>").append("\n");
                         if (!odw.getRelationattribut1().isBlank()) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append("}}</td>").append("\n");
@@ -1364,8 +1372,18 @@ public class ClassUtil implements Serializable {
                         html.append("\t\t\t\t\t\t\t\t</thead>").append("\n");
                         html.append("\t\t\t\t\t\t\t<tbody>").append("\n");
                         
-                        // FILTER !!!
-                        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST | filter: {").append(odw.getRelationattribut1().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("} | orderBy: order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("\">").append("\n");
+                        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST ");
+                        if (!odw.getRelationattribut1().isBlank()) {
+                            html.append("| filter: {").append(odw.getRelationattribut1().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("} ");
+                        }
+                        if (!odw.getRelationattribut2().isBlank()) {
+                            html.append("| filter: {").append(odw.getRelationattribut2().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("} ");
+                        }
+                        if (!odw.getRelationattribut3().isBlank()) {
+                            html.append("| filter: {").append(odw.getRelationattribut3().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("} ");
+                        }
+                        html.append(" | orderBy: order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("\">").append("\n");
+                        
                         html.append("\t\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-value=\"").append(attr.getName()).append(".id\" ng-checked=\"in").append(StringUtils.capitalise(attr.getName())).append("Selected(").append(attr.getName()).append(".id)\" ng-click=\"select").append(clazz.getName()).append("").append(attr.getName()).append("(").append(attr.getName()).append(".id)\"></td>").append("\n");
                         if (!odw.getRelationattribut1().isBlank()) {
                             html.append("\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("}}</td>").append("\n");
