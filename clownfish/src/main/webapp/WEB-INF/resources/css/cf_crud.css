@@ -1,0 +1,21 @@
+.table-head {
+    background: white;
+    top: 0 !important;
+    position: sticky !important;
+}
+.table-row {
+    border: 0 !important;
+}
+.table-caption {
+    margin: 0 !important;
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 0.875rem;
+    text-align: left;
+    color: #999;
+}
+.ascending {
+    text-decoration: overline;
+}
+.descending {
+    text-decoration: underline;
+}

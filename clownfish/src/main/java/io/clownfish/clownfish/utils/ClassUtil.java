@@ -927,7 +927,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t<meta charset=\"utf-8\">").append("\n");
         html.append("\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">").append("\n");
         html.append("\t\t<link rel=\"stylesheet\" href=\"/resources/css/uikit.css\">").append("\n");
-        html.append("\t\t<link rel=\"stylesheet\" href=\"css/katalog.css\">").append("\n");
+        html.append("\t\t<link rel=\"stylesheet\" href=\"/resources/css/cf_crud.css\">").append("\n");
         html.append("\t\t<link href=\"/resources/css/pikaday.css\" rel=\"stylesheet\">").append("\n");
         html.append("\t\t<script src=\"/resources/js/angular.js\"></script>").append("\n");
         html.append("\t\t<script src=\"/js/crud_").append(clazz.getName()).append("_debug.js\"></script>").append("\n");
