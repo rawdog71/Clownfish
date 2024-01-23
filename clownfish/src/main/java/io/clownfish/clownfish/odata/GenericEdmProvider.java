@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
+import org.apache.olingo.commons.api.edm.annotation.EdmCollection;
 import org.apache.olingo.commons.api.edm.provider.*;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.slf4j.Logger;
@@ -250,6 +251,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                 return EdmPrimitiveTypeKind.Date.getFullQualifiedName();
             case "integer":
             case "media":
+                return EdmPrimitiveTypeKind.Int32.getFullQualifiedName();
             case "assetref":
                 return EdmPrimitiveTypeKind.Int32.getFullQualifiedName();
             case "real":
@@ -280,6 +282,6 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
     }
 
     private boolean getODataCollection(CfAttribut attribut) {
-        return (0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 == attribut.getRelationtype());
+        return ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 == attribut.getRelationtype()) || (0 == attribut.getAttributetype().getName().compareToIgnoreCase("assetref")));
     }
 }

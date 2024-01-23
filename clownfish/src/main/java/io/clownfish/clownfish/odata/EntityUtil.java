@@ -16,6 +16,8 @@
 package io.clownfish.clownfish.odata;
 
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
+import io.clownfish.clownfish.dbentities.CfAssetlist;
+import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
@@ -25,6 +27,8 @@ import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfListcontentPK;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
@@ -75,6 +79,8 @@ public class EntityUtil {
     @Autowired private CfListcontentService cflistcontentService;
     @Autowired private CfSitecontentService cfsitecontentService;
     @Autowired private CfClasscontentKeywordService cfclasscontentkeywordService;
+    @Autowired private CfAssetlistService cfassetlistService;
+    @Autowired private CfAssetlistcontentService cfassetlistcontentService;
     @Autowired private ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     
@@ -152,36 +158,60 @@ public class EntityUtil {
                         setPropValue(prop, hm.get(attributname));
                         entity.addProperty(prop);
                     } else {
-                        if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == attribut.getRelationtype())) { // 1:n
-                            Property prop = new Property();
-                            prop.setName(attribut.getName());
-                            Long content_id = (Long)hm.get(attributname);
-                            CfClasscontent cfclasscontent = cfClasscontentService.findById(content_id);
-                            prop.setValue(ValueType.COMPLEX, createComplexVal(cfclasscontent));
-                            prop.setType("OData.Complex." + cfclasscontent.getClassref().getName());
-                            entity.addProperty(prop);
-                        } else {                                                // n:m Relation
+                        if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("assetref")) {
                             Property coll_prop = new Property();
-                            List<ComplexValue> values = new ArrayList<>();
-                            String datalistname = (String) hm.get(attributname);
+                            List<Long> values = new ArrayList<>();
+                            String assetlistname = (String) hm.get(attributname);
                             if (attribut.getIdentity()) {
                                 id = (String) hm.get(attributname).toString();
                             }
                             try {
-                                CfList datalist = cflistService.findByName(datalistname);
-                                List<CfListcontent> contentlist = cflistcontentService.findByListref(datalist.getId());
-                                for (CfListcontent listcontent : contentlist) {
-                                    CfClasscontent cfclasscontent = cfClasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                                    values.add(createComplexVal(cfclasscontent));
+                                CfAssetlist assetlist = cfassetlistService.findByName(assetlistname);
+                                List<CfAssetlistcontent> medialist = cfassetlistcontentService.findByAssetlistref(assetlist.getId());
+                                for (CfAssetlistcontent listcontent : medialist) {
+                                    values.add(listcontent.getCfAssetlistcontentPK().getAssetref());
                                 }
-                                coll_prop.setValue(ValueType.COLLECTION_COMPLEX, values);
+                                coll_prop.setValue(ValueType.COLLECTION_PRIMITIVE, values);
                                 coll_prop.setName((String)attributname);
-                                coll_prop.setType("Collection(OData.Complex." + datalist.getClassref().getName() + ")");
+                                coll_prop.setType(ValueType.COLLECTION_PRIMITIVE.toString());
                                 entity.addProperty(coll_prop);
                             } catch (NoResultException nre) {
                                 LOGGER.warn("Datalist not set for attribute " + (String)attributname + " of class " + contentdataoutput.getContent().getClassref().getName());
-                                coll_prop.setValue(ValueType.COLLECTION_COMPLEX, null);
+                                coll_prop.setValue(ValueType.COLLECTION_PRIMITIVE, null);
                                 entity.addProperty(coll_prop);
+                            }
+                        } else {
+                            if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == attribut.getRelationtype())) { // 1:n
+                                Property prop = new Property();
+                                prop.setName(attribut.getName());
+                                Long content_id = (Long)hm.get(attributname);
+                                CfClasscontent cfclasscontent = cfClasscontentService.findById(content_id);
+                                prop.setValue(ValueType.COMPLEX, createComplexVal(cfclasscontent));
+                                prop.setType("OData.Complex." + cfclasscontent.getClassref().getName());
+                                entity.addProperty(prop);
+                            } else {                                                // n:m Relation
+                                Property coll_prop = new Property();
+                                List<ComplexValue> values = new ArrayList<>();
+                                String datalistname = (String) hm.get(attributname);
+                                if (attribut.getIdentity()) {
+                                    id = (String) hm.get(attributname).toString();
+                                }
+                                try {
+                                    CfList datalist = cflistService.findByName(datalistname);
+                                    List<CfListcontent> contentlist = cflistcontentService.findByListref(datalist.getId());
+                                    for (CfListcontent listcontent : contentlist) {
+                                        CfClasscontent cfclasscontent = cfClasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                                        values.add(createComplexVal(cfclasscontent));
+                                    }
+                                    coll_prop.setValue(ValueType.COLLECTION_COMPLEX, values);
+                                    coll_prop.setName((String)attributname);
+                                    coll_prop.setType("Collection(OData.Complex." + datalist.getClassref().getName() + ")");
+                                    entity.addProperty(coll_prop);
+                                } catch (NoResultException nre) {
+                                    LOGGER.warn("Datalist not set for attribute " + (String)attributname + " of class " + contentdataoutput.getContent().getClassref().getName());
+                                    coll_prop.setValue(ValueType.COLLECTION_COMPLEX, null);
+                                    entity.addProperty(coll_prop);
+                                }
                             }
                         }
                     }
