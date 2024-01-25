@@ -169,6 +169,7 @@ public class InsertAsset extends HttpServlet {
                         newasset.setImagewidth(metamap.get("Image Width"));
                         newasset.setImageheight(metamap.get("Image Height"));
                         newasset.setPublicuse(publicuse);
+                        newasset.setDescription("");
                         newasset.setUploadtime(new DateTime().toDate());
                         newasset.setFilesize(result.length());
                         try {

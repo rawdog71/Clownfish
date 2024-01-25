@@ -1151,9 +1151,15 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t<th class=\"uk-table-small\">Name</th>").append("\n");
                     html.append("\t\t\t\t\t<th class=\"uk-width-small\">Beschreibung</th>").append("\n");
                     html.append("\t\t\t\t\t</tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th><input id=\"filter_media_").append(attr.getName()).append("_name_add\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_media_").append(attr.getName()).append("_name_add.length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"name\" ng-model=\"filter_media_").append(attr.getName()).append("_name_add\"></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th><input id=\"filter_media_").append(attr.getName()).append("_description_add\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_media_").append(attr.getName()).append("_description_add.length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"beschreibung\" ng-model=\"filter_media_").append(attr.getName()).append("_description_add\"></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<tr>").append("\n");
                     html.append("\t\t\t\t\t</thead>").append("\n");
                     html.append("\t\t\t\t\t<tbody>").append("\n");
-                    html.append("\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter:filterByMimetypes\">").append("\n");
+                    html.append("\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter: {name: filter_media_").append(attr.getName()).append("_name_add} | filter: {description: filter_media_").append(attr.getName()).append("_description_add} | filter:filterByMimetypes\">").append("\n");
                     html.append("\t\t\t\t\t<td><input class=\"uk-radio\" type=\"radio\" name=\"radio-").append(attr.getName()).append("\" ng-value=\"media.id\" ng-model=\"media_").append(attr.getName()).append(".").append(attr.getName()).append("\"></td>").append("\n");
                     html.append("\t\t\t\t\t<td><img class=\"uk-preserve-width\" src=\"GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid={{media.id}}\" width=\"40\" height=\"40\" alt=\"\"></td>").append("\n");
                     html.append("\t\t\t\t\t<td class=\"uk-table-link\">").append("\n");
@@ -1248,9 +1254,15 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t\t\t\t\t\t\t<th class=\"uk-table-small\">Name</th>").append("\n");
                     html.append("\t\t\t\t\t\t\t\t\t\t\t<th class=\"uk-width-small\">Beschreibung</th>").append("\n");
                     html.append("\t\t\t\t\t\t\t\t\t\t</tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th><input id=\"filter_media_").append(attr.getName()).append("_name_add\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_media_").append(attr.getName()).append("_name_add.length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"name\" ng-model=\"filter_media_").append(attr.getName()).append("_name_add\"></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th><input id=\"filter_media_").append(attr.getName()).append("_description_add\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_media_").append(attr.getName()).append("_description_add.length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"beschreibung\" ng-model=\"filter_media_").append(attr.getName()).append("_description_add\"></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<tr>").append("\n");
                     html.append("\t\t\t\t\t\t\t\t\t</thead>").append("\n");
                     html.append("\t\t\t\t\t\t\t\t\t<tbody>").append("\n");
-                    html.append("\t\t\t\t\t\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter:filterByMimetypes\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter: {name: filter_media_").append(attr.getName()).append("_name_add} | filter: {description: filter_media_").append(attr.getName()).append("_description_add} | filter:filterByMimetypes\">").append("\n");
                     html.append("\t\t\t\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"select").append(clazz.getName()).append("").append(attr.getName()).append("(media.id)\"></td>").append("\n");
                     html.append("\t\t\t\t\t\t\t\t\t\t\t<td><img class=\"uk-preserve-width\" src=\"GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid={{media.id}}\" width=\"40\" height=\"40\" alt=\"\"></td>").append("\n");
                     html.append("\t\t\t\t\t\t\t\t\t\t\t<td class=\"uk-table-link\">").append("\n");
@@ -1343,9 +1355,15 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t<th class=\"uk-table-small\">Name</th>").append("\n");
                     html.append("\t\t\t\t\t<th class=\"uk-width-small\">Beschreibung</th>").append("\n");
                     html.append("\t\t\t\t\t</tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th><input id=\"filter_media_").append(attr.getName()).append("_name_upd\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_media_").append(attr.getName()).append("_name_upd.length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"name\" ng-model=\"filter_media_").append(attr.getName()).append("_name_upd\"></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th><input id=\"filter_media_").append(attr.getName()).append("_description_upd\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_media_").append(attr.getName()).append("_description_upd.length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"beschreibung\" ng-model=\"filter_media_").append(attr.getName()).append("_description_upd\"></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<tr>").append("\n");
                     html.append("\t\t\t\t\t</thead>").append("\n");
                     html.append("\t\t\t\t\t<tbody>").append("\n");
-                    html.append("\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter:filterByMimetypes\">").append("\n");
+                    html.append("\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter: {name: filter_media_").append(attr.getName()).append("_name_upd} | filter: {description: filter_media_").append(attr.getName()).append("_description_upd} | filter:filterByMimetypes\">").append("\n");
                     html.append("<td><input class=\"uk-radio\" type=\"radio\" name=\"radio-").append(attr.getName()).append("\" ng-value=\"media.id\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" ng-checked=\"media.id == ").append(clazz.getName()).append(".").append(attr.getName()).append("\"></td>").append("\n");
                     html.append("\t\t\t\t\t<td><img class=\"uk-preserve-width\" src=\"GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid={{media.id}}\" width=\"40\" height=\"40\" alt=\"\"></td>").append("\n");
                     html.append("\t\t\t\t\t<td class=\"uk-table-link\">").append("\n");
@@ -1440,9 +1458,15 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t\t\t\t\t<th class=\"uk-table-small\">Name</th>").append("\n");
                     html.append("\t\t\t\t\t\t\t\t\t<th class=\"uk-width-small\">Beschreibung</th>").append("\n");
                     html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th><input id=\"filter_media_").append(attr.getName()).append("_name_upd\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_media_").append(attr.getName()).append("_name_upd.length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"name\" ng-model=\"filter_media_").append(attr.getName()).append("_name_upd\"></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th><input id=\"filter_media_").append(attr.getName()).append("_description_upd\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_media_").append(attr.getName()).append("_description_upd.length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"beschreibung\" ng-model=\"filter_media_").append(attr.getName()).append("_description_upd\"></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<tr>").append("\n");
                     html.append("\t\t\t\t\t\t\t</thead>").append("\n");
                     html.append("\t\t\t\t\t\t\t<tbody>").append("\n");
-                    html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter:filterByMimetypes\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter: {name: filter_media_").append(attr.getName()).append("_name_upd} | filter: {description: filter_media_").append(attr.getName()).append("_description_upd} | filter:filterByMimetypes\">").append("\n");
                     html.append("\t\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-value=\"media.id\" ng-checked=\"in").append(StringUtils.capitalise(attr.getName())).append("Selected(media.id)\" ng-click=\"select").append(clazz.getName()).append("").append(attr.getName()).append("(media.id)\"></td>").append("\n");
                     html.append("\t\t\t\t\t\t\t\t\t<td><img class=\"uk-preserve-width\" src=\"GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid={{media.id}}\" width=\"40\" height=\"40\" alt=\"\"></td>").append("\n");
                     html.append("\t\t\t\t\t\t\t\t\t<td class=\"uk-table-link\">").append("\n");
@@ -1530,12 +1554,22 @@ public class ClassUtil implements Serializable {
                 case "media":
                     javascript.append("\t$scope.media_").append(attr.getName()).append(" = {};").append("\n");
                     javascript.append("\t$scope.media_").append(attr.getName()).append(".").append(attr.getName()).append(" = null;").append("\n");
+                    javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_name_add = \"\";").append("\n");
+                    javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_description_add = \"\";").append("\n");
+                    javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_name_upd = \"\";").append("\n");
+                    javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_description_upd = \"\";").append("\n");
                     break;
                 case "classref":
                     if (0 == attr.getRelationtype()) {
                         javascript.append("\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" = {};").append("\n");
                         javascript.append("\t$scope.order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" = 'id';").append("\n");
                     }
+                    break;
+                case "assetref":
+                        javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_name_add = \"\";").append("\n");
+                	javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_description_add = \"\";").append("\n");
+                        javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_name_upd = \"\";").append("\n");
+                	javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_description_upd = \"\";").append("\n");
                     break;
             }
         }

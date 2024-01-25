@@ -510,6 +510,7 @@ public class ClownfishWebdavServlet extends DefaultServlet {
                     newasset.setImagewidth(metamap.get("Image Width"));
                     newasset.setImageheight(metamap.get("Image Height"));
                 }
+                newasset.setDescription("");
                 newasset.setUploadtime(new DateTime().toDate());
                 newasset = cfassetService.create(newasset);
                 assetlist = cfassetService.findAll();

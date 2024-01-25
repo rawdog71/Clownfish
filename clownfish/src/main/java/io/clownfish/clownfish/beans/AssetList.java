@@ -202,6 +202,7 @@ public class AssetList {
                 newasset.setImagewidth(metamap.get("Image Width"));
                 newasset.setImageheight(metamap.get("Image Height"));
                 newasset.setPublicuse(publicusage);
+                newasset.setDescription("");
                 newasset.setUploadtime(new DateTime().toDate());
                 newasset.setFilesize(result.length());
 
