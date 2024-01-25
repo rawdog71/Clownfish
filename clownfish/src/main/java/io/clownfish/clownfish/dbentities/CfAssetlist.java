@@ -39,7 +39,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "CfAssetlist.findAll", query = "SELECT c FROM CfAssetlist c"),
     @NamedQuery(name = "CfAssetlist.findById", query = "SELECT c FROM CfAssetlist c WHERE c.id = :id"),
-    @NamedQuery(name = "CfAssetlist.findByName", query = "SELECT c FROM CfAssetlist c WHERE c.name = :name")})
+    @NamedQuery(name = "CfAssetlist.findByName", query = "SELECT c FROM CfAssetlist c WHERE c.name = :name"),
+    @NamedQuery(name = "CfAssetlist.findByNameLike", query = "SELECT c FROM CfAssetlist c WHERE c.name LIKE :name"),})
 public class CfAssetlist implements Serializable {
 
     private static final long serialVersionUID = 1L;

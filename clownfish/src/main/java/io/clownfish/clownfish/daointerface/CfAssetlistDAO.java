@@ -26,6 +26,7 @@ public interface CfAssetlistDAO {
     List<CfAssetlist> findAll();
     CfAssetlist findById(Long id);
     CfAssetlist findByName(String name);
+    List<CfAssetlist> findByNameLike(String name);
     CfAssetlist create(CfAssetlist entity);
     boolean delete(CfAssetlist entity);
     CfAssetlist edit(CfAssetlist entity);

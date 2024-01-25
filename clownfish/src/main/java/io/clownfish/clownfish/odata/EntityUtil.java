@@ -620,7 +620,6 @@ public class EntityUtil {
         long max = 0;
         for (CfList listentry : dummylist) {
             String part = listentry.getName().substring(listentry.getName().lastIndexOf("_") + 1, listentry.getName().length());
-            System.out.println(part);
             try {
                 long id = Long.parseLong(part);
                 if (id > max) {
@@ -635,11 +634,10 @@ public class EntityUtil {
     
     private String getNewAssetListName(CfClass clazz, String attributename) {
         String listname = clazz.getName() + "_" + attributename + "_%";
-        List<CfList> dummylist = cflistService.findByNameLike(listname);
+        List<CfAssetlist> dummylist = cfassetlistService.findByNameLike(listname);
         long max = 0;
-        for (CfList listentry : dummylist) {
+        for (CfAssetlist listentry : dummylist) {
             String part = listentry.getName().substring(listentry.getName().lastIndexOf("_") + 1, listentry.getName().length());
-            System.out.println(part);
             try {
                 long id = Long.parseLong(part);
                 if (id > max) {

@@ -67,4 +67,9 @@ public class CfAssetlistServiceImpl implements CfAssetlistService {
         return cfassetlistDAO.edit(entity);
     }
 
+    @Override
+    public List<CfAssetlist> findByNameLike(String name) {
+        return cfassetlistDAO.findByNameLike(name);
+    }
+
 }

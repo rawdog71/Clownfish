@@ -1236,6 +1236,33 @@ public class ClassUtil implements Serializable {
                         html.append("\t\t\t\t\t\t</div>").append("\n");
                     }
                     break;
+                case "assetref":
+                    html.append("\t\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t\t<div class=\"uk-overflow-auto uk-height-max-medium\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<table class=\"uk-table uk-table-small uk-table-hover uk-table-middle uk-table-divider\" id=\"input-").append(attr.getName()).append("-add\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<thead>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t<tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\"></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\">Preview</th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t\t<th class=\"uk-table-small\">Name</th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t\t<th class=\"uk-width-small\">Beschreibung</th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t</tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t</thead>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<tbody>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter:filterByMimetypes\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"select").append(clazz.getName()).append("").append(attr.getName()).append("(media.id)\"></td>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t\t<td><img class=\"uk-preserve-width\" src=\"GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid={{media.id}}\" width=\"40\" height=\"40\" alt=\"\"></td>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t\t<td class=\"uk-table-link\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t\t\t<a class=\"uk-link-reset\" href=\"\">{{media.name}}</a>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t\t</td>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t\t<td class=\"uk-text-truncate\">{{media.description}}</td>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t</tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t</tbody>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t</table>").append("\n");
+                    html.append("\t\t\t\t\t\t\t</div>").append("\n");
+                    html.append("\t\t\t\t\t\t</div>").append("\n");
+                    break;
             }
         }
         
@@ -1401,6 +1428,33 @@ public class ClassUtil implements Serializable {
                         html.append("\t\t\t\t</div>").append("\n");
                     }
                     break;
+                case "assetref":
+                    html.append("\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                    html.append("\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t<div class=\"uk-overflow-auto uk-height-max-medium\">").append("\n");
+                    html.append("\t\t\t\t\t\t<table class=\"uk-table uk-table-small uk-table-hover uk-table-middle uk-table-divider\" id=\"input-").append(attr.getName()).append("-upd\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t<thead>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\"></th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\">Preview</th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th class=\"uk-table-small\">Name</th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<th class=\"uk-width-small\">Beschreibung</th>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t</thead>").append("\n");
+                    html.append("\t\t\t\t\t\t\t<tbody>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter:filterByMimetypes\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-value=\"media.id\" ng-checked=\"in").append(StringUtils.capitalise(attr.getName())).append("Selected(media.id)\" ng-click=\"select").append(clazz.getName()).append("").append(attr.getName()).append("(media.id)\"></td>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<td><img class=\"uk-preserve-width\" src=\"GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid={{media.id}}\" width=\"40\" height=\"40\" alt=\"\"></td>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<td class=\"uk-table-link\">").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t\t<a class=\"uk-link-reset\" href=\"\">{{media.name}}</a>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t</td>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t\t<td class=\"uk-text-truncate\">{{media.description}}</td>").append("\n");
+                    html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+                    html.append("\t\t\t\t\t\t\t</tbody>").append("\n");
+                    html.append("\t\t\t\t\t\t</table>").append("\n");
+                    html.append("\t\t\t\t\t</div>").append("\n");
+                    html.append("\t\t\t\t</div>").append("\n");
+                    break;
             }
         }
 
@@ -1518,6 +1572,17 @@ public class ClassUtil implements Serializable {
                         javascript.append("\t\treturn false;").append("\n");
                         javascript.append("\t};").append("\n");
                     }
+                    break;
+                case "assetref":
+                    javascript.append("\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED = [];").append("\n");
+                    javascript.append("\t$scope.in").append(StringUtils.capitalise(attr.getName())).append("Selected = function(id) {").append("\n");
+                    javascript.append("\t\tfor (const element of $scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED) {").append("\n");
+                    javascript.append("\t\t\tif (element == id) {").append("\n");
+                    javascript.append("\t\t\t\treturn true;").append("\n");
+                    javascript.append("\t\t\t}").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    javascript.append("\t\treturn false;").append("\n");
+                    javascript.append("\t};").append("\n");
                     break;
             }
         }
@@ -1666,12 +1731,52 @@ public class ClassUtil implements Serializable {
                         javascript.append("\t}").append("\n");
                     }
                     break;
+                case "assetref":
+                    javascript.append("\t$scope.select").append(clazz.getName()).append("").append(attr.getName()).append(" = function(id) {").append("\n");
+                    javascript.append("\t\tselect = true;").append("\n");
+                    javascript.append("\t\tfor (const element of $scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED) {").append("\n");
+                    javascript.append("\t\t\tif (element == id) {").append("\n");
+                    javascript.append("\t\t\t\tselect = false;").append("\n");
+                    javascript.append("\t\t\t\tconst index = getAssetIndex($scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED, id);").append("\n");
+                    javascript.append("\t\t\t\tif (index > -1) {").append("\n");
+                    javascript.append("\t\t\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED.splice(index, 1);").append("\n");
+                    javascript.append("\t\t\t\t}").append("\n");
+                    javascript.append("\t\t\t\tbreak;").append("\n");
+                    javascript.append("\t\t\t}").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    javascript.append("\t\tif (select) {").append("\n");
+                    javascript.append("\t\t\tfor (const element of $scope.MEDIALIST) {").append("\n");
+                    javascript.append("\t\t\t\tif (element.id == id) {").append("\n");
+                    javascript.append("\t\t\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED.push(element.id);").append("\n");
+                    javascript.append("\t\t\t\t\tbreak;").append("\n");
+                    javascript.append("\t\t\t\t}").append("\n");
+                    javascript.append("\t\t\t}").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    javascript.append("\t}").append("\n");
+                    break;
             }
         }
         
         javascript.append("\t$scope.add").append(clazz.getName()).append("Modal = function() {").append("\n");
         javascript.append("\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\t$scope.init").append(clazz.getName()).append("();").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            CfAttribut attr = odw.getAttribut();
+            if (attr.getAutoincrementor()) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "classref":
+                    if (0 == attr.getRelationtype()) {
+                        javascript.append("\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED = [];").append("\n");
+                    }
+                    break;
+                case "assetref":
+                    javascript.append("\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED = [];").append("\n");
+                    break;
+            }
+        }
         javascript.append("\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-add').show();").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("\n");
@@ -1737,6 +1842,15 @@ public class ClassUtil implements Serializable {
                         javascript.append("\t\t}").append("\n");
                     }
                     break;
+                case "assetref":
+                    javascript.append("\t\tif ($scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED != null) {").append("\n");
+                    javascript.append("\t\t\tvar ").append(attr.getName()).append("set_ref = [];").append("\n");
+                    javascript.append("\t\t\tfor (const element of $scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED) {").append("\n");
+                    javascript.append("\t\t\t\t").append(attr.getName()).append("set_ref.push(element);").append("\n");
+                    javascript.append("\t\t\t}").append("\n");
+                    javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = ").append(attr.getName()).append("set_ref;").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
             }
         }
         
@@ -1773,6 +1887,12 @@ public class ClassUtil implements Serializable {
                         javascript.append("\t\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED.push(element);").append("\n");
                         javascript.append("\t\t\t}").append("\n");
                     }
+                    break;
+                case "assetref":
+                    javascript.append("\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED = [];").append("\n");
+                    javascript.append("\t\t\tfor (const element of $scope.").append(clazz.getName()).append(".").append(attr.getName()).append(") {").append("\n");
+                    javascript.append("\t\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED.push(element);").append("\n");
+                    javascript.append("\t\t\t}").append("\n");
                     break;
             }
         }
@@ -1848,6 +1968,15 @@ public class ClassUtil implements Serializable {
                         javascript.append("\t\t}").append("\n");
                     }
                     break;
+                case "assetref":
+                    javascript.append("\t\tif ($scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED != null) {").append("\n");
+                    javascript.append("\t\t\tvar ").append(attr.getName()).append("set_ref = [];").append("\n");
+                    javascript.append("\t\t\tfor (const element of $scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED) {").append("\n");
+                    javascript.append("\t\t\t\t").append(attr.getName()).append("set_ref.push(element);").append("\n");
+                    javascript.append("\t\t\t}").append("\n");
+                    javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = ").append(attr.getName()).append("set_ref;").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
             }
         }
         
@@ -1894,6 +2023,17 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\tidx = 0;").append("\n");
         javascript.append("\t\tfor (const element of array) {").append("\n");
         javascript.append("\t\t\tif (element.id == id) {").append("\n");
+        javascript.append("\t\t\t\treturn idx;").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t\tidx++;").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t\treturn -1;").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\tgetAssetIndex = function(array, id) {").append("\n");
+        javascript.append("\t\tidx = 0;").append("\n");
+        javascript.append("\t\tfor (const element of array) {").append("\n");
+        javascript.append("\t\t\tif (element == id) {").append("\n");
         javascript.append("\t\t\t\treturn idx;").append("\n");
         javascript.append("\t\t\t}").append("\n");
         javascript.append("\t\t\tidx++;").append("\n");

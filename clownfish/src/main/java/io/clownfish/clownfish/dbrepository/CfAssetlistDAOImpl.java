@@ -84,4 +84,13 @@ public class CfAssetlistDAOImpl implements CfAssetlistDAO {
         CfAssetlist cfassetlist = (CfAssetlist) query.getSingleResult();
         return cfassetlist;
     }
+
+    @Override
+    public List<CfAssetlist> findByNameLike(String name) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAssetlist.findByNameLike");  
+        query.setParameter("name", name);
+        List<CfAssetlist> cfcontentlist = query.getResultList();
+        return cfcontentlist;
+    }
 }
