@@ -930,7 +930,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t<link rel=\"stylesheet\" href=\"/resources/css/cf_crud.css\">").append("\n");
         html.append("\t\t<link href=\"/resources/css/pikaday.css\" rel=\"stylesheet\">").append("\n");
         html.append("\t\t<script src=\"/resources/js/angular.js\"></script>").append("\n");
-        html.append("\t\t<script src=\"/js/crud_").append(clazz.getName()).append("_debug.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/js/crud_").append(clazz.getName()).append(".js\"></script>").append("\n");
         html.append("\t\t<script src=\"/resources/js/pikaday.js\"></script>").append("\n");
         html.append("\t</head>").append("\n");
         html.append("\t<body id=\"page-top\" ng-controller=\"Crud").append(clazz.getName()).append("Controller\" data-ng-init=\"init()\">").append("\n");
@@ -1096,29 +1096,29 @@ public class ClassUtil implements Serializable {
             switch (attr.getAttributetype().getName()) {
                 case "string":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "hashstring":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("\" class=\"uk-input\" type=\"password\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"password\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "text":
                 case "htmltext":
                 case "markdown":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<textarea id=\"input-").append(attr.getName()).append("\" class=\"uk-textarea\" rows=\"5\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\"></textarea>").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<textarea id=\"input-").append(attr.getName()).append("-add\" class=\"uk-textarea\" rows=\"5\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\"></textarea>").append("\n");
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "integer":
                 case "real":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "datetime":
@@ -1135,15 +1135,15 @@ public class ClassUtil implements Serializable {
                     break;
                 case "boolean":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "media":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
                     html.append("\t\t\t\t\t<div class=\"uk-overflow-auto uk-height-max-medium\">").append("\n");
-                    html.append("\t\t\t\t\t<table class=\"uk-table uk-table-small uk-table-hover uk-table-middle uk-table-divider\" id=\"input-").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t<table class=\"uk-table uk-table-small uk-table-hover uk-table-middle uk-table-divider\" id=\"input-").append(attr.getName()).append("-add\">").append("\n");
                     html.append("\t\t\t\t\t<thead>").append("\n");
                     html.append("\t\t\t\t\t<tr>").append("\n");
                     html.append("\t\t\t\t\t<th class=\"uk-table-shrink\"></th>").append("\n");
@@ -1175,8 +1175,8 @@ public class ClassUtil implements Serializable {
                 case "classref":
                     if (1 == attr.getRelationtype()) {
                         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                        html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(attr.getName()).append("\" >").append("\n");
+                        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                        html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-add\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(attr.getName()).append("\" >").append("\n");
                         html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
                         html.append("\t\t\t\t\t\t</select>").append("\n");
                         html.append("\t\t\t\t\t</div>").append("\n");
@@ -1300,29 +1300,29 @@ public class ClassUtil implements Serializable {
             switch (attr.getAttributetype().getName()) {
                 case "string":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "hashstring":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName().toLowerCase()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("\" class=\"uk-input\" type=\"password\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName().toLowerCase()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"password\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "text":
                 case "htmltext":
                 case "markdown":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<textarea id=\"input-").append(attr.getName()).append("\" class=\"uk-textarea\" rows=\"5\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}</textarea>").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<textarea id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-textarea\" rows=\"5\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}</textarea>").append("\n");
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "integer":
                 case "real":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "datetime":
@@ -1339,15 +1339,15 @@ public class ClassUtil implements Serializable {
                     break;
                 case "boolean":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("\" class=\"uk-checkbox\" type=\"checkbox\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-checkbox\" type=\"checkbox\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "media":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
                     html.append("\t\t\t\t\t<div class=\"uk-overflow-auto uk-height-max-medium\">").append("\n");
-                    html.append("\t\t\t\t\t<table class=\"uk-table uk-table-small uk-table-hover uk-table-middle uk-table-divider\" id=\"input-").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t<table class=\"uk-table uk-table-small uk-table-hover uk-table-middle uk-table-divider\" id=\"input-").append(attr.getName()).append("-upd\">").append("\n");
                     html.append("\t\t\t\t\t<thead>").append("\n");
                     html.append("\t\t\t\t\t<tr>").append("\n");
                     html.append("\t\t\t\t\t<th class=\"uk-table-shrink\"></th>").append("\n");
@@ -1379,8 +1379,8 @@ public class ClassUtil implements Serializable {
                 case "classref":
                     if (1 == attr.getRelationtype()) {
                         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-                        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                        html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" >").append("\n");
+                        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                        html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" >").append("\n");
                         html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
                         html.append("\t\t\t\t\t\t</select>").append("\n");
                         html.append("\t\t\t\t\t</div>").append("\n");
@@ -1509,7 +1509,7 @@ public class ClassUtil implements Serializable {
         html.append("\t<script src=\"/resources/js/uikit-icons.min.js\"></script>").append("\n");
         html.append("</html>").append("\n");
         
-        template.setName("crud_" + clazz.getName() + "_debug");
+        template.setName("crud_" + clazz.getName());
         try {
             CfTemplate dummytemplate = cfTemplateService.findByName(template.getName());
 
@@ -2076,7 +2076,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t};").append("\n");
         javascript.append("});").append("\n");
         
-        js.setName("crud_" + clazz.getName() + "_debug");
+        js.setName("crud_" + clazz.getName());
         try {
             CfJavascript dummyjs = cfJavaScriptService.findByName(js.getName());
             if (null == dummyjs) {
@@ -2093,7 +2093,7 @@ public class ClassUtil implements Serializable {
             cfJavaScriptService.create(js);
         }
 
-        site.setName("crud_" + clazz.getName() + "_debug");
+        site.setName("crud_" + clazz.getName());
         try {
             CfSite dummysite = cfSiteService.findByName(site.getName());
         } catch (Exception ex) {
