@@ -930,7 +930,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t<link rel=\"stylesheet\" href=\"/resources/css/cf_crud.css\">").append("\n");
         html.append("\t\t<link href=\"/resources/css/pikaday.css\" rel=\"stylesheet\">").append("\n");
         html.append("\t\t<script src=\"/resources/js/angular.js\"></script>").append("\n");
-        html.append("\t\t<script src=\"/js/crud_").append(clazz.getName()).append(".js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/js/crud_").append(clazz.getName().toLowerCase()).append(".js\"></script>").append("\n");
         html.append("\t\t<script src=\"/resources/js/pikaday.js\"></script>").append("\n");
         html.append("\t</head>").append("\n");
         html.append("\t<body id=\"page-top\" ng-controller=\"Crud").append(clazz.getName()).append("Controller\" data-ng-init=\"init()\">").append("\n");
@@ -1052,6 +1052,9 @@ public class ClassUtil implements Serializable {
                     case "string":
                     case "integer":
                     case "real":
+                        html.append("\t\t\t\t\t\t<td ng-show=\"!").append(clazz.getName().toLowerCase()).append(".editable\" ng-mouseover=\"").append(clazz.getName().toLowerCase()).append(".editable=true\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
+                        html.append("\t\t\t\t\t\t<td ng-show=\"").append(clazz.getName().toLowerCase()).append(".editable\" ng-mouseleave=\"").append(clazz.getName().toLowerCase()).append(".editable=false\"><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        break;
                     case "datetime":
                         html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
                         break;
@@ -1934,6 +1937,14 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t});").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("\n");
+        javascript.append("\t$scope.update").append(clazz.getName()).append("Instant = function(id, field, value) {").append("\n");
+	javascript.append("\t\t$http.get('/OData/").append(clazz.getName()).append("Set?$filter=id eq ' + id).then(function (res) {").append("\n");
+	javascript.append("\t\t\t$scope.").append(clazz.getName()).append(" = res.data.value[0];").append("\n");
+        javascript.append("\t\t\t$scope.").append(clazz.getName()).append("[field] = value;").append("\n");
+        javascript.append("\t\t\t$scope.update").append(clazz.getName()).append("(id);").append("\n");
+	javascript.append("\t\t});").append("\n");
+	javascript.append("\t};").append("\n");
+        javascript.append("\n");
         javascript.append("\t$scope.update").append(clazz.getName()).append(" = function (id) {").append("\n");
         javascript.append("\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\tvar ").append(clazz.getName()).append(" = new Object();").append("\n");
@@ -2076,7 +2087,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t};").append("\n");
         javascript.append("});").append("\n");
         
-        js.setName("crud_" + clazz.getName());
+        js.setName("crud_" + clazz.getName().toLowerCase());
         try {
             CfJavascript dummyjs = cfJavaScriptService.findByName(js.getName());
             if (null == dummyjs) {
@@ -2093,7 +2104,7 @@ public class ClassUtil implements Serializable {
             cfJavaScriptService.create(js);
         }
 
-        site.setName("crud_" + clazz.getName());
+        site.setName("crud_" + clazz.getName().toLowerCase());
         try {
             CfSite dummysite = cfSiteService.findByName(site.getName());
         } catch (Exception ex) {
@@ -2104,10 +2115,15 @@ public class ClassUtil implements Serializable {
             site.setSearchrelevant(false);
             site.setHtmlcompression(0);
             site.setGzip(0);
-            site.setLocale("");
-            site.setDescription("");
+            site.setLocale("de");
+            site.setDescription("Automatic generation");
             site.setAliaspath(site.getName());
-            site.setParentref(null);
+            CfSite parent = cfSiteService.findByName("crud");
+            if (null != parent) {
+                site.setParentref(parent);
+            } else {
+                site.setParentref(null);
+            }
             site.setTemplateref(template);
             site.setShorturl(siteutil.generateShorturl());
             site.setLoginsite("");
