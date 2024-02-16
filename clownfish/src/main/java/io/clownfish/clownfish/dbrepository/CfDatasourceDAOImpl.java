@@ -83,5 +83,13 @@ public class CfDatasourceDAOImpl implements CfDatasourceDAO {
         CfDatasource cfdatasource = (CfDatasource) query.getSingleResult();
         return cfdatasource;
     }
-    
+
+    @Override
+    public List<CfDatasource> findByRestservice(boolean restservice) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfDatasource.findByRestservice");
+        query.setParameter("restservice", restservice);
+        List<CfDatasource> cfdatasourcetlist = query.getResultList();
+        return cfdatasourcetlist;
+    }
 }

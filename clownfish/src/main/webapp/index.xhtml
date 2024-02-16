@@ -1545,7 +1545,7 @@
                     </f:facet>
 
                     <p:dataTable id="datasourcelist" size="small" scrollable="true" scrollHeight="250" var="datasource" value="#{datasourceList.datasourcelist}" selectionMode="single" selection="#{datasourceList.selectedDatasource}" rowKey="#{datasource.id}">
-                        <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver :form:tabview:tablelist :form:tabview:checksearchdatabase" />
+                        <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver :form:tabview:tablelist :form:tabview:checksearchdatabase :form:tabview:datasourcerestservice" />
                         <p:column headerText="Name" filterBy="#{datasource.name}" filterMatchMode="contains">
                             <h:outputText value="#{datasource.name}" />
                         </p:column>
@@ -1581,6 +1581,9 @@
 
                                 <p:outputLabel for="datasourcedriver">Driver Class</p:outputLabel>
                                 <p:inputText id="datasourcedriver" value="#{datasourceList.datasourceDriverclass}" ></p:inputText>
+                                
+                                <p:outputLabel for="datasourcerestservice">Restservice enabled</p:outputLabel>
+                                <p:selectBooleanCheckbox id="datasourcerestservice" value="#{datasourceList.datasourceRestservice}" ></p:selectBooleanCheckbox>
                             </p:panelGrid>
                         </p:panelGrid>
                         <p:panelGrid columns="1">

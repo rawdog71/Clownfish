@@ -77,6 +77,7 @@ public class DatasourceList implements Serializable {
     private @Getter @Setter String datasourceUser;
     private @Getter @Setter String datasourcePassword;
     private @Getter @Setter String datasourceDriverclass;
+    private @Getter @Setter boolean datasourceRestservice = false;
     private @Getter @Setter boolean newContentButtonDisabled = false;
     private transient @Getter @Setter List<TableData> tablelist = null;
     private @Getter @Setter TableData selectedTable = null;
@@ -115,6 +116,7 @@ public class DatasourceList implements Serializable {
         datasourceServer = selectedDatasource.getServer();
         datasourceURL = selectedDatasource.getUrl();
         datasourceUser = selectedDatasource.getUser();
+        datasourceRestservice = selectedDatasource.isRestservice();
         
         newContentButtonDisabled = true;
         searchdatabseflag = false;
@@ -233,6 +235,7 @@ public class DatasourceList implements Serializable {
             newdatasourcecontent.setServer(datasourceServer);
             newdatasourcecontent.setUrl(datasourceURL);
             newdatasourcecontent.setUser(datasourceUser);
+            newdatasourcecontent.setRestservice(datasourceRestservice);
             
             cfdatasourceService.create(newdatasourcecontent);
             datasourcelist = cfdatasourceService.findAll();
@@ -256,6 +259,7 @@ public class DatasourceList implements Serializable {
                 selectedDatasource.setServer(datasourceServer);
                 selectedDatasource.setUrl(datasourceURL);
                 selectedDatasource.setUser(datasourceUser);
+                selectedDatasource.setRestservice(datasourceRestservice);
                 cfdatasourceService.edit(selectedDatasource);
                 datasourcelist = cfdatasourceService.findAll();
             }

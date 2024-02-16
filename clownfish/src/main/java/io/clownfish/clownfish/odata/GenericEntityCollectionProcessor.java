@@ -19,12 +19,20 @@ import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.jdbc.DatatableProperties;
+import io.clownfish.clownfish.jdbc.JDBCUtil;
+import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +44,7 @@ import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
+import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
@@ -63,6 +72,7 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -73,6 +83,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class GenericEntityCollectionProcessor implements EntityCollectionProcessor {
+    public static final String NAMESPACE_ENTITY = "OData.Entity";
+    
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfClasscontentService cfclasscontentService;
     @Autowired private CfAttributcontentService cfattributcontentservice;
@@ -81,6 +93,8 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
     @Autowired EntityUtil entityUtil;
     
     @Value("${hibernate.use:0}") int useHibernate;
+    
+    final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GenericEntityCollectionProcessor.class);
 
     private OData odata;
     private ServiceMetadata serviceMetadata;
@@ -114,7 +128,13 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
 
         FilterOption filterOption = uriInfo.getFilterOption();
 
-        EntityCollection entitySet = getData(edmEntitySet, null, orderbyoption);
+        String entityname;
+        if (edmEntitySet.getName().endsWith("Set")) {
+            entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        } else {
+            entityname = edmEntitySet.getName();
+        }
+        EntityCollection entitySet = getData(edmEntitySet, null, orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
         EntityCollection returnCollection = new EntityCollection();
 
         List<Entity> entityList = entitySet.getEntities();
@@ -212,7 +232,7 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
     }
 
-    private EntityCollection getData(EdmEntitySet edmEntitySet, Expression filterExpression, OrderByOption orderbyoption) {
+    private EntityCollection getData(EdmEntitySet edmEntitySet, Expression filterExpression, OrderByOption orderbyoption, SourceStructure source) {
         String classname = "";
         if (edmEntitySet.getName().endsWith("Set")) {
             classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
@@ -221,7 +241,11 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         }
         HashMap searchMap = getSearchMap(filterExpression);
         EntityCollection genericCollection = new EntityCollection();
-        getList(cfclassservice.findByName(classname), genericCollection, searchMap, orderbyoption);
+        if (0 == source.getSource()) {
+            getList(cfclassservice.findByName(classname), genericCollection, searchMap, orderbyoption);
+        } else {
+            getListDB(classname, genericCollection, searchMap, orderbyoption, source);
+        }
        
        return genericCollection;
     }
@@ -265,6 +289,49 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
                 }
             } catch (NoResultException ex) {
                 session_tables.close();
+            }
+        }
+    }
+    
+    private void getListDB(String table, EntityCollection genericCollection, HashMap searchmap, OrderByOption orderbyoption, SourceStructure source) {
+        List<Entity> genericList = genericCollection.getEntities();
+        JDBCUtil jdbcutil = new JDBCUtil(source.getClassname(), source.getUrl(), source.getUser(), source.getPassword());
+        Connection con = jdbcutil.getConnection();
+        try {
+            if (null != con) {
+                DatabaseMetaData dmd = con.getMetaData();
+                DatatableProperties datatableproperties = new DatatableProperties();
+                datatableproperties.setTablename(table);
+                datatableproperties.setPagination(100000);
+                datatableproperties.setPage(1);
+
+                ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
+
+                ArrayList<HashMap> resultlist = new ArrayList<>();
+                while(resultSetTables.next())
+                {
+                    String tablename = resultSetTables.getString("TABLE_NAME");
+                    if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
+                        jdbcutil.manageTableRead(con, dmd, tablename, datatableproperties, null, null, resultlist);
+                        TableFieldStructure tfs = jdbcutil.getTableFieldsList(dmd, tablename, null, null);
+                        for (HashMap hm : resultlist) {
+                            System.out.println(hm);
+                            Entity entity = entityUtil.makeEntity(tablename, hm, tfs);
+                            genericList.add(entity);
+                        }
+                    }
+                }
+                con.close();
+            }
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+        finally {
+            try {
+                con.close();
+            }
+            catch (SQLException e) {
+                LOGGER.error(e.getMessage());
             }
         }
     }

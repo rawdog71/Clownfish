@@ -26,6 +26,7 @@ public interface CfDatasourceDAO {
     List<CfDatasource> findAll();
     CfDatasource findById(Long id);
     CfDatasource findByName(String name);
+    List<CfDatasource> findByRestservice(boolean restservice);
     CfDatasource create(CfDatasource entity);
     boolean delete(CfDatasource entity);
     CfDatasource edit(CfDatasource entity);

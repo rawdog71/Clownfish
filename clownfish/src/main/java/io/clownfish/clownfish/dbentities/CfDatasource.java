@@ -48,7 +48,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfDatasource.findByDatabasename", query = "SELECT c FROM CfDatasource c WHERE c.databasename = :databasename"),
     @NamedQuery(name = "CfDatasource.findByUser", query = "SELECT c FROM CfDatasource c WHERE c.user = :user"),
     @NamedQuery(name = "CfDatasource.findByPassword", query = "SELECT c FROM CfDatasource c WHERE c.password = :password"),
-    @NamedQuery(name = "CfDatasource.findByDriverclass", query = "SELECT c FROM CfDatasource c WHERE c.driverclass = :driverclass")})
+    @NamedQuery(name = "CfDatasource.findByDriverclass", query = "SELECT c FROM CfDatasource c WHERE c.driverclass = :driverclass"),
+    @NamedQuery(name = "CfDatasource.findByRestservice", query = "SELECT c FROM CfDatasource c WHERE c.restservice = :restservice")})
 public class CfDatasource implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -96,6 +97,8 @@ public class CfDatasource implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "driverclass")
     private String driverclass;
+    @Column(name = "restservice")
+    private boolean restservice;
 
     public CfDatasource() {
     }
@@ -186,6 +189,14 @@ public class CfDatasource implements Serializable {
 
     public void setDriverclass(String driverclass) {
         this.driverclass = driverclass;
+    }
+
+    public boolean isRestservice() {
+        return restservice;
+    }
+
+    public void setRestservice(boolean restservice) {
+        this.restservice = restservice;
     }
 
     @Override

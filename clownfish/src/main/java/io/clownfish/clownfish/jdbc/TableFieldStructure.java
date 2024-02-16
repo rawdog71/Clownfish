@@ -34,4 +34,13 @@ public class TableFieldStructure {
         this.tableFieldsList = tableFieldsList;
         this.default_order = default_order;
     }
+    
+    public TableField getTableFieldByName(String name) {
+        for (TableField tf : tableFieldsList) {
+            if (0 == tf.getName().compareToIgnoreCase(name)) {
+                return tf;
+            }
+        }
+        return null;
+    }
 }

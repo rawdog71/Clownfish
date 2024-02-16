@@ -66,5 +66,10 @@ public class CfDatasourceServiceImpl implements CfDatasourceService {
     public CfDatasource findByName(String name) {
         return this.cfdatasourceDAO.findByName(name);
     }
+
+    @Override
+    public List<CfDatasource> findByRestservice(boolean restservice) {
+        return this.cfdatasourceDAO.findByRestservice(restservice);
+    }
     
 }

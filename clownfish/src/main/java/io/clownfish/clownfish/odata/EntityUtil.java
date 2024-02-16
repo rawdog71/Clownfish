@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.odata;
 
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
+import io.clownfish.clownfish.datamodels.TableData;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontentPK;
@@ -28,6 +29,8 @@ import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfListcontentPK;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
+import io.clownfish.clownfish.jdbc.TableField;
+import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
@@ -61,9 +64,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.persistence.NoResultException;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
+import org.apache.olingo.commons.api.edm.FullQualifiedName;
+import org.apache.olingo.commons.api.edm.provider.CsdlComplexType;
+import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainer;
+import org.apache.olingo.commons.api.edm.provider.CsdlEntitySet;
+import org.apache.olingo.commons.api.edm.provider.CsdlEntityType;
+import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
+import org.apache.olingo.commons.api.edm.provider.CsdlSingleton;
 import org.apache.olingo.commons.api.http.HttpMethod;
 import org.apache.olingo.server.api.uri.UriParameter;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 /**
  *
@@ -84,6 +98,15 @@ public class EntityUtil {
     @Autowired private CfAssetlistcontentService cfassetlistcontentService;
     @Autowired private ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
+    
+    private @Getter @Setter HashMap<String, CsdlSingleton> singletonlist = new HashMap<>();
+    private @Getter @Setter HashMap<String, CsdlEntitySet> entitysetlist = new HashMap<>();
+    private @Getter @Setter HashMap<FullQualifiedName, CsdlEntityType> entitytypelist = new HashMap<>();
+    private @Getter @Setter HashMap<FullQualifiedName, CsdlComplexType> complextypelist = new HashMap<>();
+    private @Getter @Setter HashMap<FullQualifiedName, SourceStructure> entitysourcelist = new HashMap<>();
+    private @Getter @Setter HashMap<FullQualifiedName, TableData> entitystructurelist = new HashMap<>();
+    private @Getter @Setter CsdlEntityContainer entityContainer = null;
+    private @Getter @Setter List<CsdlSchema> schemas = null;
     
     private static final HashMap<String, CfAttribut> attributmap = new HashMap<>();
 
@@ -124,7 +147,28 @@ public class EntityUtil {
                 }    
                 break;
             case "Edm.Date":
-                prop.setValue(ValueType.PRIMITIVE, ((Date)value));
+                if (value instanceof String) {
+                    String pattern = "dd.MM.yyyy HH:mm:ss";
+                    DateTime dt = null;
+                    try {
+                        dt = DateTime.parse((String)value, DateTimeFormat.forPattern(pattern));
+                    } catch (Exception ex) {
+                        try {
+                            pattern = "yyyy-MM-dd HH:mm:ss";
+                            dt = DateTime.parse((String)value, DateTimeFormat.forPattern(pattern));
+                        } catch (Exception ex1) {
+                            try {
+                                pattern = "yyyy-MM-dd HH:mm:ss.SSS";
+                                dt = DateTime.parse((String)value, DateTimeFormat.forPattern(pattern));
+                            } catch (Exception ex2) {
+
+                            }
+                        }
+                    }
+                    prop.setValue(ValueType.PRIMITIVE, dt.toDate());
+                } else {
+                    prop.setValue(ValueType.PRIMITIVE, ((Date)value));
+                }
                 break;
             default:
                 prop.setValue(ValueType.PRIMITIVE, null);
@@ -220,6 +264,27 @@ public class EntityUtil {
             }
         }
         entity.setId(createId(contentdataoutput.getContent().getClassref().getName(), id));
+        return entity;
+    }
+    
+    public Entity makeEntity(String tablename, HashMap hm, TableFieldStructure tfs) {
+        Entity entity = new Entity();
+        String id = "";
+        
+        for (Object attributname : hm.keySet()) {
+            System.out.println(attributname);
+            TableField tf = tfs.getTableFieldByName((String)attributname);
+            if (tf.isPrimaryKey()) {
+                id += (String) hm.get(attributname).toString();
+            }
+            Property prop = new Property();
+            prop.setName(tf.getName());
+            prop.setType(GenericEdmProvider.getODataDB2Type(tf.getType()).getFullQualifiedNameAsString());
+            setPropValue(prop, hm.get(attributname));
+            entity.addProperty(prop);
+        }
+
+        entity.setId(createId(tablename, id));
         return entity;
     }
     
