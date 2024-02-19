@@ -23,6 +23,7 @@ import io.clownfish.clownfish.dbentities.CfSearchdatabasePK;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.lucene.DatabasetableIndexer;
+import io.clownfish.clownfish.odata.GenericEdmProvider;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
 import io.clownfish.clownfish.serviceinterface.CfSearchdatabaseService;
 import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
@@ -66,6 +67,7 @@ public class DatasourceList implements Serializable {
     @Autowired transient DatabaseUtil databaseUtil;
     @Autowired transient CfSearchdatabaseService cfsearchdatabaseService;
     @Autowired DatabasetableIndexer dbtableIndexer;
+    @Autowired GenericEdmProvider edmprovider;
     
     private transient @Getter @Setter List<CfDatasource> datasourcelist = null;
     private @Getter @Setter CfDatasource selectedDatasource = null;
@@ -239,6 +241,7 @@ public class DatasourceList implements Serializable {
             
             cfdatasourceService.create(newdatasourcecontent);
             datasourcelist = cfdatasourceService.findAll();
+            edmprovider.init();
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -262,6 +265,7 @@ public class DatasourceList implements Serializable {
                 selectedDatasource.setRestservice(datasourceRestservice);
                 cfdatasourceService.edit(selectedDatasource);
                 datasourcelist = cfdatasourceService.findAll();
+                edmprovider.init();
             }
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());

@@ -55,14 +55,6 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
     @Autowired transient CfDatasourceService cfdatasourceService;
     @Autowired EntityUtil entityUtil;
     
-    /*
-    private static final HashMap<String, CsdlSingleton> singletonlist = new HashMap<>();
-    private static final HashMap<String, CsdlEntitySet> entitysetlist = new HashMap<>();
-    private static final HashMap<FullQualifiedName, CsdlEntityType> entitytypelist = new HashMap<>();
-    private static final HashMap<FullQualifiedName, CsdlComplexType> complextypelist = new HashMap<>();
-    private static final HashMap<FullQualifiedName, Integer> entitysourcelist = new HashMap<>();
-    private static final HashMap<FullQualifiedName, TableData> entitystructurelist = new HashMap<>();
-    */
     private static CsdlEntityContainer entityContainer = null;
     private static List<CsdlSchema> schemas = null;
     
@@ -114,6 +106,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                                 ResultSet tables = selectedDdbmd.getTables(value, null, null, null);
                                 while (tables.next()) {
                                     if (0 == tables.getString("TABLE_TYPE").compareToIgnoreCase("TABLE")) {
+                                        boolean hasIdentity = false;
                                         TableData td = new TableData();
                                         td.setName(tables.getString("TABLE_NAME"));
                                         td.setType(tables.getString("TABLE_TYPE"));
@@ -140,23 +133,20 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                                             while (pkrs.next()) {
                                                 if (0 == cd.getName().compareToIgnoreCase(pkrs.getString("COLUMN_NAME"))) {
                                                     cd.setPrimarykey(true);
+                                                    hasIdentity = true;
                                                 }
                                             }
                                             td.getColumns().add(cd);
                                         }
-                                        entityUtil.getEntitystructurelist().put(new FullQualifiedName(NAMESPACE_ENTITY, tables.getString("TABLE_NAME")), td);
-                                        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, tables.getString("TABLE_NAME")), new SourceStructure(1, datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword()));
-                                        
-                                        CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, tables.getString("TABLE_NAME")));
-                                        //CsdlComplexType ct = getComplexType(new FullQualifiedName(NAMESPACE_COMPLEX, tables.getString("TABLE_NAME")));
-                                        if (null != et) {
-                                            entityTypes.add(et);
+                                        if (hasIdentity) {
+                                            entityUtil.getEntitystructurelist().put(new FullQualifiedName(NAMESPACE_ENTITY, tables.getString("TABLE_NAME")), td);
+                                            entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, tables.getString("TABLE_NAME")), new SourceStructure(1, datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword()));
+
+                                            CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, tables.getString("TABLE_NAME")));
+                                            if (null != et) {
+                                                entityTypes.add(et);
+                                            }
                                         }
-                                        /*
-                                        if (ct != null) {
-                                            complexTypes.add(ct);
-                                        }
-                                        */
                                     }
                                 }
                             }
@@ -214,11 +204,13 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                                 ResultSet tables = selectedDdbmd.getTables(value, null, null, null);
                                 while (tables.next()) {
                                     if (0 == tables.getString("TABLE_TYPE").compareToIgnoreCase("TABLE")) {
-                                        CsdlSingleton si = getSingleton(CONTAINER, tables.getString("TABLE_NAME"));
-                                        CsdlEntitySet es = getEntitySet(CONTAINER, tables.getString("TABLE_NAME")+"Set");
-                                        if (null != es) {
-                                            singletons.add(si);
-                                            entitySets.add(es);
+                                        if (entityUtil.getEntitysourcelist().containsKey(new FullQualifiedName(NAMESPACE_ENTITY, tables.getString("TABLE_NAME")))) {
+                                            CsdlSingleton si = getSingleton(CONTAINER, tables.getString("TABLE_NAME"));
+                                            CsdlEntitySet es = getEntitySet(CONTAINER, tables.getString("TABLE_NAME")+"Set");
+                                            if (null != es) {
+                                                singletons.add(si);
+                                                entitySets.add(es);
+                                            }
                                         }
                                     }
                                 }
@@ -249,58 +241,62 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         if (entityUtil.getEntitytypelist().containsKey(entityTypeName)) {
             return entityUtil.getEntitytypelist().get(entityTypeName);
         } else {
-            if (0 == entityUtil.getEntitysourcelist().get(entityTypeName).getSource()) {
-                System.out.println(entityTypeName.getFullQualifiedNameAsString());
-                CfClass classref = cfclassservice.findByName(entityTypeName.getName());
-                List propsList = new ArrayList();
-                List keysList = new ArrayList();
-                for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
-                    CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
-                    propsList.add(prop);
-                    if (attribut.getIdentity()) {
-                        CsdlPropertyRef propertyRef = new CsdlPropertyRef();
-                        propertyRef.setName(attribut.getName());
-                        keysList.add(propertyRef);
+            if (entityUtil.getEntitysourcelist().containsKey(entityTypeName)) {
+                if (0 == entityUtil.getEntitysourcelist().get(entityTypeName).getSource()) {
+                    System.out.println(entityTypeName.getFullQualifiedNameAsString());
+                    CfClass classref = cfclassservice.findByName(entityTypeName.getName());
+                    List propsList = new ArrayList();
+                    List keysList = new ArrayList();
+                    for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
+                        CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
+                        propsList.add(prop);
+                        if (attribut.getIdentity()) {
+                            CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+                            propertyRef.setName(attribut.getName());
+                            keysList.add(propertyRef);
+                        }
                     }
-                }
-                CsdlEntityType entityType = new CsdlEntityType();
-                entityType.setName(entityTypeName.getName());
-                entityType.setProperties(propsList);
-                entityType.setKey(keysList);
+                    CsdlEntityType entityType = new CsdlEntityType();
+                    entityType.setName(entityTypeName.getName());
+                    entityType.setProperties(propsList);
+                    entityType.setKey(keysList);
 
-                if (!keysList.isEmpty()) {
-                    entityUtil.getEntitytypelist().put(entityTypeName, entityType);
-                    return entityType;
+                    if (!keysList.isEmpty()) {
+                        entityUtil.getEntitytypelist().put(entityTypeName, entityType);
+                        return entityType;
+                    } else {
+                        LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
+                        return null;
+                    }
                 } else {
-                    LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
-                    return null;
+                    System.out.println(entityTypeName.getFullQualifiedNameAsString());
+                    TableData td = entityUtil.getEntitystructurelist().get(entityTypeName);
+                    List propsList = new ArrayList();
+                    List keysList = new ArrayList();
+                    for (ColumnData cd : td.getColumns()) {
+                        CsdlProperty prop = new CsdlProperty().setName(cd.getName()).setType(getODataDBType(cd)).setCollection(getODataDBCollection(cd));
+                        propsList.add(prop);
+                        if (cd.isPrimarykey()) {
+                            CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+                            propertyRef.setName(cd.getName());
+                            keysList.add(propertyRef);
+                        }
+                    }
+                    CsdlEntityType entityType = new CsdlEntityType();
+                    entityType.setName(entityTypeName.getName());
+                    entityType.setProperties(propsList);
+                    entityType.setKey(keysList);
+
+                    if (!keysList.isEmpty()) {
+                        entityUtil.getEntitytypelist().put(entityTypeName, entityType);
+                        return entityType;
+                    } else {
+                        LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
+                        return null;
+                    }
                 }
             } else {
-                System.out.println(entityTypeName.getFullQualifiedNameAsString());
-                TableData td = entityUtil.getEntitystructurelist().get(entityTypeName);
-                List propsList = new ArrayList();
-                List keysList = new ArrayList();
-                for (ColumnData cd : td.getColumns()) {
-                    CsdlProperty prop = new CsdlProperty().setName(cd.getName()).setType(getODataDBType(cd)).setCollection(getODataDBCollection(cd));
-                    propsList.add(prop);
-                    if (cd.isPrimarykey()) {
-                        CsdlPropertyRef propertyRef = new CsdlPropertyRef();
-                        propertyRef.setName(cd.getName());
-                        keysList.add(propertyRef);
-                    }
-                }
-                CsdlEntityType entityType = new CsdlEntityType();
-                entityType.setName(entityTypeName.getName());
-                entityType.setProperties(propsList);
-                entityType.setKey(keysList);
-
-                if (!keysList.isEmpty()) {
-                    entityUtil.getEntitytypelist().put(entityTypeName, entityType);
-                    return entityType;
-                } else {
-                    LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
-                    return null;
-                }
+                return null;
             }
         }
     }

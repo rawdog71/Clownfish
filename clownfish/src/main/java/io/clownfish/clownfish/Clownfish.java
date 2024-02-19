@@ -90,6 +90,7 @@ import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.datamodels.ClientInformation;
 import io.clownfish.clownfish.exceptions.ClownfishTemplateException;
+import io.clownfish.clownfish.odata.GenericEdmProvider;
 import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
 import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
@@ -99,6 +100,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.olingo.commons.api.ex.ODataException;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -165,6 +167,7 @@ public class Clownfish {
     @Autowired CfSearchdatabaseService cfsearchdatabaseService;
     @Autowired AccessManagerUtil accessmanager;
     @Autowired ContentUtil contentUtil;
+    @Autowired GenericEdmProvider edmprovider;
     
     DatabaseTemplateBean databasebean;
     ContentTemplateBean contentbean;
@@ -364,6 +367,13 @@ public class Clownfish {
         Package p = FacesContext.class.getPackage();
         if (null == clownfishutil) {
             clownfishutil = new ClownfishUtil();
+        }
+        
+        edmprovider.init();
+        try {
+            edmprovider.getSchemas();
+        } catch (ODataException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         MavenXpp3Reader reader = new MavenXpp3Reader();
