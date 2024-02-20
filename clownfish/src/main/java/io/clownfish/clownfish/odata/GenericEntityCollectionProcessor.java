@@ -244,7 +244,7 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         if (0 == source.getSource()) {
             getList(cfclassservice.findByName(classname), genericCollection, searchMap, orderbyoption);
         } else {
-            getListDB(classname, genericCollection, searchMap, orderbyoption, source);
+            getListDB(classname, genericCollection, source);
         }
        
        return genericCollection;
@@ -293,7 +293,8 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         }
     }
     
-    private void getListDB(String table, EntityCollection genericCollection, HashMap searchmap, OrderByOption orderbyoption, SourceStructure source) {
+    private void getListDB(String table, EntityCollection genericCollection, SourceStructure source) {
+        table = table.substring(table.indexOf("_")+1);
         List<Entity> genericList = genericCollection.getEntities();
         JDBCUtil jdbcutil = new JDBCUtil(source.getClassname(), source.getUrl(), source.getUser(), source.getPassword());
         Connection con = jdbcutil.getConnection();
@@ -315,7 +316,6 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
                         jdbcutil.manageTableRead(con, dmd, tablename, datatableproperties, null, null, resultlist);
                         TableFieldStructure tfs = jdbcutil.getTableFieldsList(dmd, tablename, null, null);
                         for (HashMap hm : resultlist) {
-                            System.out.println(hm);
                             Entity entity = entityUtil.makeEntity(tablename, hm, tfs);
                             genericList.add(entity);
                         }

@@ -130,6 +130,15 @@ public class EntityUtil {
                     prop.setValue(ValueType.PRIMITIVE, (Integer) value);
                 }
                 break;
+            case "Edm.Int64":
+                if (value instanceof String) {
+                    prop.setValue(ValueType.PRIMITIVE, Long.parseLong((String)value));
+                } else if (value instanceof Long) {
+                    prop.setValue(ValueType.PRIMITIVE, ((Long) value).intValue());
+                } else if (value instanceof Integer) {
+                    prop.setValue(ValueType.PRIMITIVE, (Long) value);
+                }
+                break;
             case "Edm.Double":
                 if (value instanceof String) {
                     prop.setValue(ValueType.PRIMITIVE, Double.parseDouble((String)value));
@@ -272,7 +281,6 @@ public class EntityUtil {
         String id = "";
         
         for (Object attributname : hm.keySet()) {
-            System.out.println(attributname);
             TableField tf = tfs.getTableFieldByName((String)attributname);
             if (tf.isPrimaryKey()) {
                 id += (String) hm.get(attributname).toString();

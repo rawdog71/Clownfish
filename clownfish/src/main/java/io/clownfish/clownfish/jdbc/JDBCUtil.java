@@ -94,7 +94,7 @@ public class JDBCUtil {
             long high_limit = 50;
             
             String default_order = "";
-            TableFieldStructure tfs = getTableFieldsList(dmd, tablename, default_order, attributmap);
+            TableFieldStructure tfs = getTableFieldsList(dmd, tablename, default_order, null);
             default_order = tfs.getDefault_order();
             if (0 == dtp.getPagination()) {
                 dtp.setPagination(high_limit);

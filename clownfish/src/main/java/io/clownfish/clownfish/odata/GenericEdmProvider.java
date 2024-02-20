@@ -100,51 +100,53 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                         System.out.println(selectedDdbmd.getDatabaseMajorVersion());
                         ResultSet rs = selectedDdbmd.getCatalogs();
                         while (rs.next()) {
-                            String value = rs.getString("TABLE_CAT");
-                            if (0 == value.compareToIgnoreCase(datasource.getDatabasename())) {
-                                System.out.println(value);
-                                ResultSet tables = selectedDdbmd.getTables(value, null, null, null);
+                            String dbname = rs.getString("TABLE_CAT");
+                            if (0 == dbname.compareToIgnoreCase(datasource.getDatabasename())) {
+                                System.out.println(dbname);
+                                ResultSet tables = selectedDdbmd.getTables(dbname, null, null, null);
                                 while (tables.next()) {
-                                    if (0 == tables.getString("TABLE_TYPE").compareToIgnoreCase("TABLE")) {
-                                        boolean hasIdentity = false;
-                                        TableData td = new TableData();
-                                        td.setName(tables.getString("TABLE_NAME"));
-                                        td.setType(tables.getString("TABLE_TYPE"));
+                                    if (null != tables.getString("TABLE_TYPE")) {
+                                        if (0 == tables.getString("TABLE_TYPE").compareToIgnoreCase("TABLE")) {
+                                            boolean hasIdentity = false;
+                                            TableData td = new TableData();
+                                            td.setName(tables.getString("TABLE_NAME"));
+                                            td.setType(tables.getString("TABLE_TYPE"));
 
-                                        ResultSet crs = selectedDdbmd.getColumns(datasource.getDatabasename(), null, tables.getString("TABLE_NAME"), null);
-                                        while (crs.next()) {
-                                            ColumnData cd = new ColumnData();
-                                            try {
-                                                cd.setName(crs.getString("COLUMN_NAME"));
-                                                cd.setType(crs.getInt("DATA_TYPE"));
-                                                cd.setTypename(crs.getString("TYPE_NAME"));
-                                                cd.setSize(crs.getInt("COLUMN_SIZE"));
-                                                cd.setDigits(crs.getInt("DECIMAL_DIGITS"));
-                                                cd.setRadix(crs.getInt("NUM_PREC_RADIX"));
-                                                cd.setNullable(crs.getInt("NULLABLE"));
-                                                cd.setDefaultvalue(crs.getString("COLUMN_DEF"));
-                                                cd.setAutoinc(crs.getString("IS_AUTOINCREMENT"));
-                                                cd.setPrimarykey(false);
-                                                //cd.setGenerated(crs.getString("IS_GENERATEDCOLUMN"));
-                                            } catch (Exception e) {
-                                                LOGGER.error(e.getMessage());
-                                            }
-                                            ResultSet pkrs = selectedDdbmd.getPrimaryKeys(datasource.getDatabasename(), null, tables.getString("TABLE_NAME"));
-                                            while (pkrs.next()) {
-                                                if (0 == cd.getName().compareToIgnoreCase(pkrs.getString("COLUMN_NAME"))) {
-                                                    cd.setPrimarykey(true);
-                                                    hasIdentity = true;
+                                            ResultSet crs = selectedDdbmd.getColumns(datasource.getDatabasename(), null, tables.getString("TABLE_NAME"), null);
+                                            while (crs.next()) {
+                                                ColumnData cd = new ColumnData();
+                                                try {
+                                                    cd.setName(crs.getString("COLUMN_NAME"));
+                                                    cd.setType(crs.getInt("DATA_TYPE"));
+                                                    cd.setTypename(crs.getString("TYPE_NAME"));
+                                                    cd.setSize(crs.getInt("COLUMN_SIZE"));
+                                                    cd.setDigits(crs.getInt("DECIMAL_DIGITS"));
+                                                    cd.setRadix(crs.getInt("NUM_PREC_RADIX"));
+                                                    cd.setNullable(crs.getInt("NULLABLE"));
+                                                    cd.setDefaultvalue(crs.getString("COLUMN_DEF"));
+                                                    cd.setAutoinc(crs.getString("IS_AUTOINCREMENT"));
+                                                    cd.setPrimarykey(false);
+                                                    //cd.setGenerated(crs.getString("IS_GENERATEDCOLUMN"));
+                                                } catch (Exception e) {
+                                                    LOGGER.error(e.getMessage());
                                                 }
+                                                ResultSet pkrs = selectedDdbmd.getPrimaryKeys(datasource.getDatabasename(), null, tables.getString("TABLE_NAME"));
+                                                while (pkrs.next()) {
+                                                    if (0 == cd.getName().compareToIgnoreCase(pkrs.getString("COLUMN_NAME"))) {
+                                                        cd.setPrimarykey(true);
+                                                        hasIdentity = true;
+                                                    }
+                                                }
+                                                td.getColumns().add(cd);
                                             }
-                                            td.getColumns().add(cd);
-                                        }
-                                        if (hasIdentity) {
-                                            entityUtil.getEntitystructurelist().put(new FullQualifiedName(NAMESPACE_ENTITY, tables.getString("TABLE_NAME")), td);
-                                            entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, tables.getString("TABLE_NAME")), new SourceStructure(1, datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword()));
+                                            if (hasIdentity) {
+                                                entityUtil.getEntitystructurelist().put(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")), td);
+                                                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")), new SourceStructure(1, datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword()));
 
-                                            CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, tables.getString("TABLE_NAME")));
-                                            if (null != et) {
-                                                entityTypes.add(et);
+                                                CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")));
+                                                if (null != et) {
+                                                    entityTypes.add(et);
+                                                }
                                             }
                                         }
                                     }
@@ -198,18 +200,20 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                         System.out.println(selectedDdbmd.getDatabaseMajorVersion());
                         ResultSet rs = selectedDdbmd.getCatalogs();
                         while (rs.next()) {
-                            String value = rs.getString("TABLE_CAT");
-                            if (0 == value.compareToIgnoreCase(datasource.getDatabasename())) {
-                                System.out.println(value);
-                                ResultSet tables = selectedDdbmd.getTables(value, null, null, null);
+                            String dbname = rs.getString("TABLE_CAT");
+                            if (0 == dbname.compareToIgnoreCase(datasource.getDatabasename())) {
+                                System.out.println(dbname);
+                                ResultSet tables = selectedDdbmd.getTables(dbname, null, null, null);
                                 while (tables.next()) {
-                                    if (0 == tables.getString("TABLE_TYPE").compareToIgnoreCase("TABLE")) {
-                                        if (entityUtil.getEntitysourcelist().containsKey(new FullQualifiedName(NAMESPACE_ENTITY, tables.getString("TABLE_NAME")))) {
-                                            CsdlSingleton si = getSingleton(CONTAINER, tables.getString("TABLE_NAME"));
-                                            CsdlEntitySet es = getEntitySet(CONTAINER, tables.getString("TABLE_NAME")+"Set");
-                                            if (null != es) {
-                                                singletons.add(si);
-                                                entitySets.add(es);
+                                    if (null != tables.getString("TABLE_TYPE")) {
+                                        if (0 == tables.getString("TABLE_TYPE").compareToIgnoreCase("TABLE")) {
+                                            if (entityUtil.getEntitysourcelist().containsKey(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")))) {
+                                                CsdlSingleton si = getSingleton(CONTAINER, datasource.getName() + "_" + tables.getString("TABLE_NAME"));
+                                                CsdlEntitySet es = getEntitySet(CONTAINER, datasource.getName() + "_" + tables.getString("TABLE_NAME")+"Set");
+                                                if (null != es) {
+                                                    singletons.add(si);
+                                                    entitySets.add(es);
+                                                }
                                             }
                                         }
                                     }
@@ -424,6 +428,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             case -9:
             case 2005:
             case 2004:  // varbinary ?
+            case -4:    // longblob ?
                 return EdmPrimitiveTypeKind.String.getFullQualifiedName();
             case 93:      // Date
             case 92:

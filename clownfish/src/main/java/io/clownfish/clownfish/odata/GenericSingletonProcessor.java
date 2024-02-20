@@ -20,6 +20,10 @@ import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.jdbc.DatatableProperties;
+import io.clownfish.clownfish.jdbc.JDBCUtil;
+import io.clownfish.clownfish.jdbc.TableFieldStructure;
+import static io.clownfish.clownfish.odata.GenericEntityCollectionProcessor.NAMESPACE_ENTITY;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
@@ -27,6 +31,11 @@ import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +45,7 @@ import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
+import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
 import org.apache.olingo.commons.api.http.HttpMethod;
@@ -65,6 +75,7 @@ import org.apache.olingo.server.api.uri.queryoption.TopOption;
 import org.apache.olingo.server.core.uri.UriParameterImpl;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -83,6 +94,8 @@ public class GenericSingletonProcessor implements EntityProcessor {
     @Autowired EntityUtil entityUtil;
     
     @Value("${hibernate.use:0}") int useHibernate;
+    
+    final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GenericSingletonProcessor.class);
 
     private OData odata;
     private ServiceMetadata serviceMetadata;
@@ -98,9 +111,16 @@ public class GenericSingletonProcessor implements EntityProcessor {
         //UriResourceSingleton uriResourceSingleton = (UriResourceSingleton) resourcePaths.get(0);
         //System.out.println(uriResourceSingleton.getEntityType().getName());
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
-        System.out.println(uriResourceEntitySet.getKeyPredicates());
+        //System.out.println(uriResourceEntitySet.getKeyPredicates());
+        
+        String entityname;
+        if (edmEntitySet.getName().endsWith("Set")) {
+            entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        } else {
+            entityname = edmEntitySet.getName();
+        }
 
-        EntityCollection entitySet = getData(edmEntitySet, uriResourceEntitySet.getKeyPredicates(), orderbyoption);
+        EntityCollection entitySet = getData(edmEntitySet, uriResourceEntitySet.getKeyPredicates(), orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
         
         ODataSerializer serializer = odata.createSerializer(responseFormat);
 
@@ -117,13 +137,16 @@ public class GenericSingletonProcessor implements EntityProcessor {
         response.setHeader(HttpHeader.CONTENT_TYPE, responseFormat.toContentTypeString());
     }
     
-    private EntityCollection getData(EdmEntitySet edmEntitySet, List keypredicates, OrderByOption orderbyoption) {
+    private EntityCollection getData(EdmEntitySet edmEntitySet, List keypredicates, OrderByOption orderbyoption, SourceStructure source) {
         HashMap searchmap = new HashMap<>();
+        HashMap attributmap = new HashMap<String, String[]>();
         for (Object entry : keypredicates) {
             String attributname = ((UriParameterImpl) entry).getName();
             String attributvalue = ((UriParameterImpl) entry).getText().replaceAll("^'", "")
                     .replaceAll("'$", "");
             searchmap.put(attributname+"_1", ":eq:" + attributvalue);
+            String[] values = new String[]{attributvalue};
+            attributmap.put(attributname, values);
         }
         String classname = "";
         if (edmEntitySet.getName().endsWith("Set")) {
@@ -132,9 +155,13 @@ public class GenericSingletonProcessor implements EntityProcessor {
             classname = edmEntitySet.getName();
         }
         EntityCollection genericCollection = new EntityCollection();
-        getList(cfclassservice.findByName(classname), searchmap, genericCollection, orderbyoption);
-       
-       return genericCollection;
+        
+        if (0 == source.getSource()) {
+            getList(cfclassservice.findByName(classname), searchmap, genericCollection, orderbyoption);
+        } else {
+            getListDB(classname, genericCollection, attributmap, source);
+        }
+        return genericCollection;
     }
     
     private void getList(CfClass clazz, HashMap searchmap, EntityCollection genericCollection, OrderByOption orderbyoption) {
@@ -177,6 +204,49 @@ public class GenericSingletonProcessor implements EntityProcessor {
                 }
             } catch (NoResultException ex) {
                 session_tables.close();
+            }
+        }
+    }
+    
+    private void getListDB(String table, EntityCollection genericCollection, HashMap<String, String[]> searchmap, SourceStructure source) {
+        table = table.substring(table.indexOf("_")+1);
+        List<Entity> genericList = genericCollection.getEntities();
+        JDBCUtil jdbcutil = new JDBCUtil(source.getClassname(), source.getUrl(), source.getUser(), source.getPassword());
+        Connection con = jdbcutil.getConnection();
+        try {
+            if (null != con) {
+                DatabaseMetaData dmd = con.getMetaData();
+                DatatableProperties datatableproperties = new DatatableProperties();
+                datatableproperties.setTablename(table);
+                datatableproperties.setPagination(100000);
+                datatableproperties.setPage(1);
+
+                ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
+
+                ArrayList<HashMap> resultlist = new ArrayList<>();
+                while(resultSetTables.next())
+                {
+                    String tablename = resultSetTables.getString("TABLE_NAME");
+                    if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
+                        jdbcutil.manageTableRead(con, dmd, tablename, datatableproperties, searchmap, null, resultlist);
+                        TableFieldStructure tfs = jdbcutil.getTableFieldsList(dmd, tablename, null, null);
+                        for (HashMap hm : resultlist) {
+                            Entity entity = entityUtil.makeEntity(tablename, hm, tfs);
+                            genericList.add(entity);
+                        }
+                    }
+                }
+                con.close();
+            }
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+        finally {
+            try {
+                con.close();
+            }
+            catch (SQLException e) {
+                LOGGER.error(e.getMessage());
             }
         }
     }
