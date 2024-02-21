@@ -229,6 +229,7 @@ public class DatasourceList implements Serializable {
     public void onCreateContent(ActionEvent actionEvent) {
         try {
             CfDatasource newdatasourcecontent = new CfDatasource();
+            datasourceName = datasourceName.replaceAll("[^A-Za-z0-9]", "");
             newdatasourcecontent.setName(datasourceName);
             newdatasourcecontent.setDatabasename(datasourceDatabasename);
             newdatasourcecontent.setDriverclass(datasourceDriverclass);
@@ -254,6 +255,7 @@ public class DatasourceList implements Serializable {
     public void onEditContent(ActionEvent actionEvent) {
         try {
             if (selectedDatasource != null) {
+                datasourceName = datasourceName.replaceAll("[^A-Za-z0-9]", "");
                 selectedDatasource.setName(datasourceName);
                 selectedDatasource.setDatabasename(datasourceDatabasename);
                 selectedDatasource.setDriverclass(datasourceDriverclass);
@@ -284,6 +286,7 @@ public class DatasourceList implements Serializable {
             });
             cfdatasourceService.delete(selectedDatasource);
             datasourcelist = cfdatasourceService.findAll();
+            edmprovider.init();
         }
     }
     

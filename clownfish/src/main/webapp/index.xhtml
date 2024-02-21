@@ -1610,10 +1610,10 @@
                     </div>
 
                     <p:panelGrid columns="7">
-                        <p:commandButton id="newdatasource" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{datasourceList.onCreateContent}" update=":form:msgs :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist" disabled="#{datasourceList.newContentButtonDisabled}">
+                        <p:commandButton id="newdatasource" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{datasourceList.onCreateContent}" update=":form:msgs :form:tabview:datasourcename :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist" disabled="#{datasourceList.newContentButtonDisabled}">
                             <f:actionListener binding="#{sitetree.initDatasources()}" />
                         </p:commandButton>
-                        <p:commandButton id="editdatasource" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{datasourceList.onEditContent}" update=":form:msgs :form:tabview:datalistcontent" />
+                        <p:commandButton id="editdatasource" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{datasourceList.onEditContent}" update=":form:msgs :form:tabview:datasourcename :form:tabview:datalistcontent :form:tabview:datasourcelist" />
                         <p:commandButton id="deletedatasource" icon="pi pi-trash" process="form" value="Delete" actionListener="#{datasourceList.onDeleteContent}" update=":form:msgs :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist">
                             <f:actionListener binding="#{sitetree.initDatasources()}" />
                             <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
