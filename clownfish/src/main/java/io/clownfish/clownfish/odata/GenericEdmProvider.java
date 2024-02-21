@@ -80,7 +80,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             List<CsdlEntityType> entityTypes = new ArrayList<>();
             List<CsdlComplexType> complexTypes = new ArrayList<>();
             for (CfClass clazz : cfclassservice.findAll()) {
-                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()), new SourceStructure(0, null, null, null, null));
+                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()), new SourceStructure(0, null, null, null, null, null));
                 CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()));
                 CsdlComplexType ct = getComplexType(new FullQualifiedName(NAMESPACE_COMPLEX, clazz.getName()));
                 if (null != et) {
@@ -141,7 +141,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                                             }
                                             if (hasIdentity) {
                                                 entityUtil.getEntitystructurelist().put(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")), td);
-                                                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")), new SourceStructure(1, datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword()));
+                                                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")), new SourceStructure(1, datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword(), td.getName()));
 
                                                 CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")));
                                                 if (null != et) {

@@ -356,7 +356,17 @@ public class JDBCUtil {
                                 pattern = "yyyy-MM-dd HH:mm:ss";
                                 dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
                             } catch (Exception ex1) {
-                                
+                                try {
+                                    pattern = "yyyy-MM-dd";
+                                    dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
+                                } catch (Exception ex2) {
+                                    try {
+                                        pattern = "dd.MM.yyyy";
+                                        dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
+                                    } catch (Exception ex3) {
+
+                                    }
+                                }
                             }
                         }
                         if (null != dt) {

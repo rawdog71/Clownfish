@@ -28,13 +28,15 @@ public class SourceStructure {
     private @Getter @Setter String url;
     private @Getter @Setter String user;
     private @Getter @Setter String password;
+    private @Getter @Setter String tablename;
 
-    public SourceStructure(int source, String classname, String url, String user, String password) {
+    public SourceStructure(int source, String classname, String url, String user, String password, String tablename) {
         this.source = source;
         this.classname = classname;
         this.url = url;
         this.user = user;
         this.password = password;
+        this.tablename = tablename;
     }
 
     

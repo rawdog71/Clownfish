@@ -258,11 +258,18 @@ public class GenericSingletonProcessor implements EntityProcessor {
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
         EdmEntityType edmEntityType = edmEntitySet.getEntityType();
         
+        String entityname;
+        if (edmEntitySet.getName().endsWith("Set")) {
+            entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        } else {
+            entityname = edmEntitySet.getName();
+        }
+        
         InputStream requestInputStream = odr.getBody();
         ODataDeserializer deserializer = this.odata.createDeserializer(ct);
         DeserializerResult result = deserializer.entity(requestInputStream, edmEntityType);
         Entity requestEntity = result.getEntity();
-        Entity createdEntity = entityUtil.createEntity(edmEntitySet, requestEntity);
+        Entity createdEntity = entityUtil.createEntity(edmEntitySet, requestEntity, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
 
         ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).build();
         EntitySerializerOptions options = EntitySerializerOptions.with().contextURL(contextUrl).build();
@@ -281,6 +288,13 @@ public class GenericSingletonProcessor implements EntityProcessor {
         UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
         EdmEntityType edmEntityType = edmEntitySet.getEntityType();
+        
+        String entityname;
+        if (edmEntitySet.getName().endsWith("Set")) {
+            entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        } else {
+            entityname = edmEntitySet.getName();
+        }
 
         InputStream requestInputStream = odr.getBody();
         ODataDeserializer deserializer = this.odata.createDeserializer(ct);
@@ -288,7 +302,7 @@ public class GenericSingletonProcessor implements EntityProcessor {
         Entity requestEntity = result.getEntity();
         List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
         HttpMethod httpMethod = odr.getMethod();
-        entityUtil.updateEntity(edmEntitySet, keyPredicates, requestEntity, httpMethod);
+        entityUtil.updateEntity(edmEntitySet, keyPredicates, requestEntity, httpMethod, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
 
         odr1.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
     }
@@ -298,9 +312,16 @@ public class GenericSingletonProcessor implements EntityProcessor {
         List<UriResource> resourcePaths = ui.getUriResourceParts();
         UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+        
+        String entityname;
+        if (edmEntitySet.getName().endsWith("Set")) {
+            entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        } else {
+            entityname = edmEntitySet.getName();
+        }
 
         List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
-        entityUtil.deleteEntity(edmEntitySet, keyPredicates);
+        entityUtil.deleteEntity(edmEntitySet, keyPredicates, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
 
         odr1.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
     }
