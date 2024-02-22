@@ -27,7 +27,6 @@ import static io.clownfish.clownfish.odata.GenericEntityCollectionProcessor.NAME
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
-import io.clownfish.clownfish.serviceinterface.CfContentversionService;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.InputStream;
@@ -69,9 +68,6 @@ import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.queryoption.OrderByItem;
 import org.apache.olingo.server.api.uri.queryoption.OrderByOption;
-import org.apache.olingo.server.api.uri.queryoption.SelectOption;
-import org.apache.olingo.server.api.uri.queryoption.SkipOption;
-import org.apache.olingo.server.api.uri.queryoption.TopOption;
 import org.apache.olingo.server.core.uri.UriParameterImpl;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -88,7 +84,6 @@ public class GenericSingletonProcessor implements EntityProcessor {
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfClasscontentService cfclasscontentService;
     @Autowired private CfAttributcontentService cfattributcontentservice;
-    @Autowired private CfContentversionService cfcontentversionservice;
     @Autowired ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     @Autowired EntityUtil entityUtil;
@@ -104,14 +99,8 @@ public class GenericSingletonProcessor implements EntityProcessor {
     public void readEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException {
         List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
         UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
-        TopOption topoption = uriInfo.getTopOption();
-        SkipOption skipoption = uriInfo.getSkipOption();
-        SelectOption selectoption = uriInfo.getSelectOption();
         OrderByOption orderbyoption = uriInfo.getOrderByOption();
-        //UriResourceSingleton uriResourceSingleton = (UriResourceSingleton) resourcePaths.get(0);
-        //System.out.println(uriResourceSingleton.getEntityType().getName());
         EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
-        //System.out.println(uriResourceEntitySet.getKeyPredicates());
         
         String entityname;
         if (edmEntitySet.getName().endsWith("Set")) {
@@ -119,11 +108,8 @@ public class GenericSingletonProcessor implements EntityProcessor {
         } else {
             entityname = edmEntitySet.getName();
         }
-
         EntityCollection entitySet = getData(edmEntitySet, uriResourceEntitySet.getKeyPredicates(), orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
-        
         ODataSerializer serializer = odata.createSerializer(responseFormat);
-
         EdmEntityType edmEntityType = edmEntitySet.getEntityType();
         ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).build();
 
@@ -148,7 +134,7 @@ public class GenericSingletonProcessor implements EntityProcessor {
             String[] values = new String[]{attributvalue};
             attributmap.put(attributname, values);
         }
-        String classname = "";
+        String classname;
         if (edmEntitySet.getName().endsWith("Set")) {
             classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
         } else {
@@ -222,7 +208,6 @@ public class GenericSingletonProcessor implements EntityProcessor {
                 datatableproperties.setPage(1);
 
                 ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
-
                 ArrayList<HashMap> resultlist = new ArrayList<>();
                 while(resultSetTables.next())
                 {
@@ -243,7 +228,9 @@ public class GenericSingletonProcessor implements EntityProcessor {
         }
         finally {
             try {
-                con.close();
+                if (null != con) {
+                    con.close();
+                }
             }
             catch (SQLException e) {
                 LOGGER.error(e.getMessage());
@@ -264,7 +251,6 @@ public class GenericSingletonProcessor implements EntityProcessor {
         } else {
             entityname = edmEntitySet.getName();
         }
-        
         InputStream requestInputStream = odr.getBody();
         ODataDeserializer deserializer = this.odata.createDeserializer(ct);
         DeserializerResult result = deserializer.entity(requestInputStream, edmEntityType);
@@ -275,11 +261,15 @@ public class GenericSingletonProcessor implements EntityProcessor {
         EntitySerializerOptions options = EntitySerializerOptions.with().contextURL(contextUrl).build();
 
         ODataSerializer serializer = this.odata.createSerializer(ct1);
-        SerializerResult serializedResponse = serializer.entity(serviceMetadata, edmEntityType, createdEntity, options);
+        if (null != createdEntity) {
+            SerializerResult serializedResponse = serializer.entity(serviceMetadata, edmEntityType, createdEntity, options);
 
-        odr1.setContent(serializedResponse.getContent());
-        odr1.setStatusCode(HttpStatusCode.CREATED.getStatusCode());
-        odr1.setHeader(HttpHeader.CONTENT_TYPE, ct1.toContentTypeString());
+            odr1.setContent(serializedResponse.getContent());
+            odr1.setStatusCode(HttpStatusCode.CREATED.getStatusCode());
+            odr1.setHeader(HttpHeader.CONTENT_TYPE, ct1.toContentTypeString());
+        } else {
+            odr1.setStatusCode(HttpStatusCode.NOT_ACCEPTABLE.getStatusCode());
+        }
     }
 
     @Override
@@ -295,16 +285,18 @@ public class GenericSingletonProcessor implements EntityProcessor {
         } else {
             entityname = edmEntitySet.getName();
         }
-
         InputStream requestInputStream = odr.getBody();
         ODataDeserializer deserializer = this.odata.createDeserializer(ct);
         DeserializerResult result = deserializer.entity(requestInputStream, edmEntityType);
         Entity requestEntity = result.getEntity();
         List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
         HttpMethod httpMethod = odr.getMethod();
-        entityUtil.updateEntity(edmEntitySet, keyPredicates, requestEntity, httpMethod, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
-
-        odr1.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
+        boolean modified = entityUtil.updateEntity(edmEntitySet, keyPredicates, requestEntity, httpMethod, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
+        if (modified) {
+            odr1.setStatusCode(HttpStatusCode.OK.getStatusCode());
+        } else {
+            odr1.setStatusCode(HttpStatusCode.NOT_MODIFIED.getStatusCode());
+        }
     }
 
     @Override
@@ -321,9 +313,12 @@ public class GenericSingletonProcessor implements EntityProcessor {
         }
 
         List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
-        entityUtil.deleteEntity(edmEntitySet, keyPredicates, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
-
-        odr1.setStatusCode(HttpStatusCode.NO_CONTENT.getStatusCode());
+        boolean deleted = entityUtil.deleteEntity(edmEntitySet, keyPredicates, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
+        if (deleted) {
+            odr1.setStatusCode(HttpStatusCode.OK.getStatusCode());
+        } else {
+            odr1.setStatusCode(HttpStatusCode.NOT_MODIFIED.getStatusCode());
+        }
     }
 
     @Override

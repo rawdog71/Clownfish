@@ -364,7 +364,7 @@ public class JDBCUtil {
                                         pattern = "dd.MM.yyyy";
                                         dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
                                     } catch (Exception ex3) {
-
+                                        
                                     }
                                 }
                             }
@@ -734,7 +734,17 @@ public class JDBCUtil {
                                 pattern = "yyyy-MM-dd HH:mm:ss";
                                 dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
                             } catch (Exception ex1) {
+                                try {
+                                    pattern = "yyyy-MM-dd";
+                                    dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                                } catch (Exception ex4) {
+                                    try {
+                                        pattern = "dd.MM.yyyy";
+                                        dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                                    } catch (Exception ex5) {
 
+                                    }
+                                }
                             }
                         }
                         if (null != dt) {

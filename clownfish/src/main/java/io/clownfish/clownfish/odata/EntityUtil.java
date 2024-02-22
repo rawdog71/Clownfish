@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.odata;
 
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
+import io.clownfish.clownfish.datamodels.RestDatabaseInsert;
 import io.clownfish.clownfish.datamodels.TableData;
 import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
@@ -156,6 +157,11 @@ public class EntityUtil {
                 break;
             case "Edm.Boolean":
                 if (value instanceof String) {
+                    if (0 == ((String) value).compareToIgnoreCase("1")) {
+                        value = "true";
+                    } else {
+                        value = "false";
+                    }
                     prop.setValue(ValueType.PRIMITIVE, Boolean.parseBoolean((String)value));
                 } else {
                     prop.setValue(ValueType.PRIMITIVE, ((Boolean)value));
@@ -455,17 +461,20 @@ public class EntityUtil {
         } else {
             JDBCUtil jdbcutil = new JDBCUtil(source.getClassname(), source.getUrl(), source.getUser(), source.getPassword());
             Connection con = jdbcutil.getConnection();
+            RestDatabaseInsert rdi = null;
             if (null != con) {
                 try {
                     DatabaseMetaData dmd = con.getMetaData();
                     DatatableProperties datatableproperties = new DatatableProperties();
                     datatableproperties.setTablename(source.getClassname());
                     ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
-                    while(resultSetTables.next())
+                    boolean found = false;
+                    while(resultSetTables.next() && !found)
                     {
                         String tablename = resultSetTables.getString("TABLE_NAME");
                         if (0 == source.getTablename().compareToIgnoreCase(tablename)) {
-                            jdbcutil.manageTableInsert(con, dmd, tablename, entityValues(entity));
+                            rdi = jdbcutil.manageTableInsert(con, dmd, tablename, entityValues(entity));
+                            found = true;
                         }
                     }
                     con.close();
@@ -483,11 +492,15 @@ public class EntityUtil {
             } else {
                 return null;
             }
-            return entity;
+            if ((null == rdi) || (0 == rdi.getCount())) {
+                return null;
+            } else {
+                return entity;
+            }
         }
     }
     
-    public void updateEntity(EdmEntitySet edmEntitySet, List<UriParameter> keyParams, Entity entity, HttpMethod httpMethod, SourceStructure source) {
+    public boolean updateEntity(EdmEntitySet edmEntitySet, List<UriParameter> keyParams, Entity entity, HttpMethod httpMethod, SourceStructure source) {
         if (0 == source.getSource()) {
             CfClass clazz = cfclassService.findByName(edmEntitySet.getName());
             CfClasscontent cfclasscontent = null;
@@ -585,42 +598,54 @@ public class EntityUtil {
                     }
                 }
                 hibernateUtil.updateContent(cfclasscontent);
+                return true;
+            } else {
+                return false;
             }
         } else {
             JDBCUtil jdbcutil = new JDBCUtil(source.getClassname(), source.getUrl(), source.getUser(), source.getPassword());
             Connection con = jdbcutil.getConnection();
+            boolean modified = false;
             if (null != con) {
                 try {
                     DatabaseMetaData dmd = con.getMetaData();
                     DatatableProperties datatableproperties = new DatatableProperties();
                     datatableproperties.setTablename(source.getTablename());
                     ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
-                    while(resultSetTables.next())
+                    boolean found = false;
+                    while(resultSetTables.next() && !found)
                     {
                         String tablename = resultSetTables.getString("TABLE_NAME");
                         if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                            jdbcutil.manageTableUpdate(con, dmd, tablename, entityValues(keyParams), entityValues(entity));
+                            int count = jdbcutil.manageTableUpdate(con, dmd, tablename, entityValues(keyParams), entityValues(entity));
+                            if (count > 0) {
+                                modified = true;
+                            }
+                            found = true;
                         }
                     }
                     con.close();
+                    return modified;
                 } catch (SQLException ex) {
                     LOGGER.error(ex.getMessage());
                 }
                 finally {
                     try {
                         con.close();
+                        return modified;
                     }
                     catch (SQLException e) {
                         LOGGER.error(e.getMessage());
+                        return modified;
                     }
                 }
             } else {
-
+                return modified;
             }
         }
     }
     
-    void deleteEntity(EdmEntitySet edmEntitySet, List<UriParameter> keyParams, SourceStructure source) {
+    public boolean deleteEntity(EdmEntitySet edmEntitySet, List<UriParameter> keyParams, SourceStructure source) {
         if (0 == source.getSource()) {
             CfClass clazz = cfclassService.findByName(edmEntitySet.getName());
             try {
@@ -663,43 +688,57 @@ public class EntityUtil {
                     cfClasscontentService.delete(cfclasscontent);
                     try {
                         hibernateUtil.deleteContent(cfclasscontent);
+                        return true;
                     } catch (javax.persistence.NoResultException ex) {
                         LOGGER.warn(ex.getMessage());
+                        return false;
                     }
+                } else {
+                    return false;
                 }
             } catch (javax.persistence.NoResultException ex) {
-
+                return false;
             }
         } else {
             JDBCUtil jdbcutil = new JDBCUtil(source.getClassname(), source.getUrl(), source.getUser(), source.getPassword());
             Connection con = jdbcutil.getConnection();
+            boolean deleted = false;
             if (null != con) {
                 try {
                     DatabaseMetaData dmd = con.getMetaData();
                     DatatableProperties datatableproperties = new DatatableProperties();
                     datatableproperties.setTablename(source.getTablename());
                     ResultSet resultSetTables = dmd.getTables(null, null, null, new String[]{"TABLE"});
-                    while(resultSetTables.next())
+                    boolean found = false;
+                    while(resultSetTables.next() && !found)
                     {
                         String tablename = resultSetTables.getString("TABLE_NAME");
                         if (0 == datatableproperties.getTablename().compareToIgnoreCase(tablename)) {
-                            jdbcutil.manageTableDelete(con, dmd, tablename, entityValues(keyParams));
+                            int count = jdbcutil.manageTableDelete(con, dmd, tablename, entityValues(keyParams));
+                            if (count > 0) {
+                                deleted = true;
+                            }
+                            found = true;
                         }
                     }
                     con.close();
+                    return deleted;
                 } catch (SQLException ex) {
                     LOGGER.error(ex.getMessage());
+                    return deleted;
                 }
                 finally {
                     try {
                         con.close();
+                        return deleted;
                     }
                     catch (SQLException e) {
                         LOGGER.error(e.getMessage());
+                        return deleted;
                     }
                 }
             } else {
-                
+                return deleted;
             }
         }
     }
