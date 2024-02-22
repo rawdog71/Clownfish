@@ -435,10 +435,9 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             case 91:
             case 2014:
                 return EdmPrimitiveTypeKind.Date.getFullQualifiedName();
-            case 2:       // int, smallint, tinyint
+            case 2:       // int, bigint
             case 4:
-            case 5:
-            case -6:
+            case 5:         // SMALLINT
             case -5:
                 return EdmPrimitiveTypeKind.Int32.getFullQualifiedName();
             case 7:       // real, decimal
@@ -446,6 +445,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             case 8:
             case 6:
                 return EdmPrimitiveTypeKind.Double.getFullQualifiedName();
+            case -6:        // TINYINT
             case -7:      // bit, boolean
             case 16:
                 return EdmPrimitiveTypeKind.Boolean.getFullQualifiedName();
