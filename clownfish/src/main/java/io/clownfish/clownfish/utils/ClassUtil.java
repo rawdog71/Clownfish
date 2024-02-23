@@ -918,6 +918,7 @@ public class ClassUtil implements Serializable {
         StringBuilder html = new StringBuilder();
         StringBuilder javascript = new StringBuilder();
         CfTemplate template = new CfTemplate();
+        CfTemplate dummytemplate = null;
         CfSite site = new CfSite();
         CfJavascript js = new CfJavascript();
         
@@ -1514,8 +1515,7 @@ public class ClassUtil implements Serializable {
         
         template.setName("crud_" + clazz.getName());
         try {
-            CfTemplate dummytemplate = cfTemplateService.findByName(template.getName());
-
+            dummytemplate = cfTemplateService.findByName(template.getName());
             if (null == dummytemplate) {
                 template.setScriptlanguage(2);
                 template.setCheckedoutby(BigInteger.ZERO);
@@ -2124,7 +2124,11 @@ public class ClassUtil implements Serializable {
             } else {
                 site.setParentref(null);
             }
-            site.setTemplateref(template);
+            if (null != template.getContent()) {
+                site.setTemplateref(template);
+            } else {
+                site.setTemplateref(dummytemplate);
+            }
             site.setShorturl(siteutil.generateShorturl());
             site.setLoginsite("");
             site.setTestparams("");

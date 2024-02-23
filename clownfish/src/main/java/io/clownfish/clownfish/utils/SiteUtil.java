@@ -60,6 +60,8 @@ import java.util.Random;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +94,7 @@ public class SiteUtil {
     @Autowired HibernateUtil hibernateutil;
     @Autowired private PropertyUtil propertyUtil;
     @Autowired transient FolderUtil folderUtil;
+    @Autowired DatabaseUtil databaseUtility;
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteUtil.class);
     
     @Value("${hibernate.use:0}") int useHibernate;
@@ -103,6 +106,7 @@ public class SiteUtil {
     public void init() {
         if (null != classutil) {
             classutil.setSiteutil(this);
+            databaseUtility.setSiteutil(this);
         }
     }
     

@@ -29,6 +29,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import javax.persistence.CascadeType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -74,7 +75,7 @@ public class CfSite implements Serializable {
     @Column(name = "name")
     private String name;
     @JoinColumn(name = "templateref", referencedColumnName = "id")
-    @ManyToOne(optional = true)
+    @ManyToOne(optional = true, cascade = CascadeType.MERGE)
     private CfTemplate templateref;
     @JoinColumn(name = "parentref", referencedColumnName = "id")
     @ManyToOne(optional = true)
