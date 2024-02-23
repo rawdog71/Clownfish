@@ -32,6 +32,7 @@ import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.TableField;
 import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import static j2html.TagCreator.h1;
@@ -53,7 +54,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
@@ -73,7 +73,9 @@ public class DatabaseUtil {
     @Autowired CfDatasourceService cfdatasourceService;
     @Autowired CfTemplateService cfTemplateService;
     @Autowired CfSiteService cfSiteService;
+    @Autowired CfJavascriptService cfJavaScriptService;
     private @Getter @Setter SiteTreeBean sitetree;
+    private @Getter @Setter SiteUtil siteutil;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(DatabaseUtil.class);
 
@@ -1024,6 +1026,580 @@ public class DatabaseUtil {
             site.setAliaspath(site.getName());
             site.setParentref(null);
             site.setTemplateref(template);
+            cfSiteService.create(site);
+        }
+        sitetree.loadTree();
+    }
+    
+    public void generateODataForm(CfDatasource datasource, TableData tabledata) {
+        StringBuilder html = new StringBuilder();
+        StringBuilder javascript = new StringBuilder();
+        CfTemplate template = new CfTemplate();
+        CfSite site = new CfSite();
+        CfJavascript js = new CfJavascript();
+        
+        html.append("<!DOCTYPE html>").append("\n");
+        html.append("<html lang=\"de\" ng-app=\"crud").append(tabledata.getName()).append("App\">").append("\n");
+        html.append("\t<head>").append("\n");
+        html.append("\t\t<meta charset=\"utf-8\">").append("\n");
+        html.append("\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">").append("\n");
+        html.append("\t\t<link rel=\"stylesheet\" href=\"/resources/css/uikit.css\">").append("\n");
+        html.append("\t\t<link rel=\"stylesheet\" href=\"/resources/css/cf_crud.css\">").append("\n");
+        html.append("\t\t<link href=\"/resources/css/pikaday.css\" rel=\"stylesheet\">").append("\n");
+        html.append("\t\t<script src=\"/resources/js/angular.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/js/crud_").append(tabledata.getName().toLowerCase()).append(".js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/pikaday.js\"></script>").append("\n");
+        html.append("\t</head>").append("\n");
+        html.append("\t<body id=\"page-top\" ng-controller=\"Crud").append(tabledata.getName()).append("Controller\" data-ng-init=\"init()\">").append("\n");
+        html.append("\t\t<div class=\"uk-container-large uk-align-center\">").append("\n");
+        html.append("\t\t\t<div class=\"uk-margin-top\">").append("\n");
+        html.append("\t\t\t\t<table class=\"uk-table uk-table-small uk-table-striped\">").append("\n");
+        html.append("\t\t\t\t\t<caption>").append(tabledata.getName()).append(" <a href=\"\" class=\"uk-icon-button\" uk-icon=\"plus\" ng-click=\"add").append(tabledata.getName()).append("Modal()\" uk-tooltip=\"").append(tabledata.getName()).append(" hinzufügen\"></a></caption>").append("\n");
+        html.append("\t\t\t\t\t<thead style=\"position: sticky !important;top: 0;background: white;z-index: 1;\">").append("\n");
+        html.append("\t\t\t\t\t\t<tr>").append("\n");
+        html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(tabledata.getName().toLowerCase()).append(" == 'id', 'descending': order_").append(tabledata.getName().toLowerCase()).append(" == '-id'}\">ID</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(tabledata.getName()).append("('id')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(tabledata.getName()).append("('-id')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            //if (odw.isTableheader()) {
+                //CfAttribut attr = odw.getAttribut();
+                if (attr.isPrimarykey()) {
+                    continue;
+                }
+                switch (attr.getTypename()) {
+                    case "VARCHAR":
+                        html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(tabledata.getName().toLowerCase()).append(" == '").append(attr.getName()).append("', 'descending': order_").append(tabledata.getName().toLowerCase()).append(" == '-").append(attr.getName()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(tabledata.getName()).append("('").append(attr.getName()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(tabledata.getName()).append("('-").append(attr.getName()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                        break;
+                    case "INT":
+                    case "DOUBLE":
+                        html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(tabledata.getName().toLowerCase()).append(" == '").append(attr.getName()).append("', 'descending': order_").append(tabledata.getName().toLowerCase()).append(" == '-").append(attr.getName()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(tabledata.getName()).append("('").append(attr.getName()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(tabledata.getName()).append("('-").append(attr.getName()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                        break;
+                    case "DATETIME":
+                        html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(tabledata.getName().toLowerCase()).append(" == '").append(attr.getName()).append("', 'descending': order_").append(tabledata.getName().toLowerCase()).append(" == '-").append(attr.getName()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(tabledata.getName()).append("('").append(attr.getName()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(tabledata.getName()).append("('-").append(attr.getName()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+                        break;
+                }
+            //}
+        }
+        
+        html.append("\t\t\t\t\t\t\t<th class=\"uk-text-right\">Aktion</th>").append("\n");
+        html.append("\t\t\t\t\t</tr>").append("\n");
+        html.append("\t\t\t\t\t<tr>").append("\n");
+        html.append("\t\t\t\t\t\t\t<th></th>").append("\n");
+        for (ColumnData attr : tabledata.getColumns()) {
+            //if (odw.isTableheader()) {
+                //CfAttribut attr = odw.getAttribut();
+                if (attr.isPrimarykey()) {
+                    continue;
+                }
+                switch (attr.getTypename()) {
+                    case "VARCHAR":
+                        html.append("\t\t\t\t\t\t\t<th><input id=\"filter_").append(attr.getName()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("\"></th>").append("\n");
+                        break;
+                    case "INT":
+                    case "DOUBLE":
+                        html.append("\t\t\t\t\t\t\t<th><input id=\"filter_").append(attr.getName()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("\"></th>").append("\n");
+                        break;
+                    case "DATETIME":
+                        html.append("\t\t\t\t\t\t\t<th><input id=\"filter_").append(attr.getName()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("\"></th>").append("\n");
+                        break;
+                }
+            //}
+        }
+        html.append("\t\t\t\t\t\t\t<th></th>").append("\n");
+        html.append("\t\t\t\t\t<tr>").append("\n");
+        html.append("\t\t\t\t</thead>").append("\n");
+        html.append("\t\t\t\t<tbody>").append("\n");
+	html.append("\t\t\t\t\t<tr ng-repeat=\"").append(tabledata.getName().toLowerCase()).append(" in ").append(tabledata.getName().toUpperCase()).append("LIST ");
+        for (ColumnData attr : tabledata.getColumns()) {
+            //if (odw.isTableheader()) {
+                //CfAttribut attr = odw.getAttribut();
+                if (attr.isPrimarykey()) {
+                    continue;
+                }
+                switch (attr.getTypename()) {
+                    case "VARCHAR":
+                    case "INT":
+                    case "DOUBLE":
+                    case "DATETIME":
+                        html.append("| filter: {").append(attr.getName()).append(": filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("} ");
+                        break;
+                }
+            //}
+        }
+        html.append("| orderBy: order_").append(tabledata.getName().toLowerCase()).append("\">").append("\n");
+        
+	html.append("\t\t\t\t\t\t<td>{{").append(tabledata.getName().toLowerCase()).append(".id}}</td>").append("\n");
+        for (ColumnData attr : tabledata.getColumns()) {
+            //if (odw.isTableheader()) {
+                //CfAttribut attr = odw.getAttribut();
+                if (attr.isPrimarykey()) {
+                    continue;
+                }
+                switch (attr.getTypename()) {
+                    case "VARCHAR":
+                    case "INT":
+                    case "DOUBLE":
+                        html.append("\t\t\t\t\t\t<td ng-show=\"!").append(tabledata.getName().toLowerCase()).append(".editable\" ng-mouseover=\"").append(tabledata.getName().toLowerCase()).append(".editable=true\">{{").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
+                        html.append("\t\t\t\t\t\t<td ng-show=\"").append(tabledata.getName().toLowerCase()).append(".editable\" ng-mouseleave=\"").append(tabledata.getName().toLowerCase()).append(".editable=false\"><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-change=\"update").append(tabledata.getName()).append("Instant(").append(tabledata.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        break;
+                    case "DATETIME":
+                        html.append("\t\t\t\t\t\t<td>{{").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
+                        break;
+                }
+            //}
+        }
+	html.append("\t\t\t\t\t\t\t<td class=\"uk-text-right\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<a href=\"\" class=\"uk-icon-button\" ng-click=\"update").append(tabledata.getName()).append("Modal(").append(tabledata.getName().toLowerCase()).append(".id)\" ng-show=\"!inprogress\" uk-icon=\"pencil\" uk-tooltip=\"").append(tabledata.getName()).append(" ändern\"></a>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<a href=\"\" class=\"uk-icon-button\" ng-click=\"delete").append(tabledata.getName()).append("Modal(").append(tabledata.getName().toLowerCase()).append(".id)\" ng-show=\"!inprogress\" uk-icon=\"trash\" uk-tooltip=\"").append(tabledata.getName()).append(" löschen\"></a>").append("\n");
+	html.append("\t\t\t\t\t\t\t</td>").append("\n");
+	html.append("\t\t\t\t\t\t</tr>").append("\n");
+	html.append("\t\t\t\t\t</tbody>").append("\n");
+	html.append("\t\t\t\t</table>").append("\n");
+	html.append("\t\t\t</div>").append("\n");
+	html.append("\t\t</div>").append("\n");
+        html.append("\n");
+        
+        html.append("\t\t<div id=\"modal-").append(tabledata.getName().toLowerCase()).append("-add\" class=\"uk-modal-container uk-flex-top\" uk-modal>").append("\n");
+        html.append("\t\t\t<div class=\"uk-modal-dialog uk-modal-header\">").append("\n");
+        html.append("\t\t\t\t<button class=\"uk-modal-close-default\" type=\"button\" uk-close></button>").append("\n");
+        html.append("\t\t\t\t<h2 class=\"uk-modal-title\">").append(tabledata.getName()).append(" hinzufügen</h2>").append("\n");
+        html.append("\t\t\t\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            //CfAttribut attr = odw.getAttribut();
+            if (attr.isPrimarykey()) {
+                continue;
+            }
+            switch (attr.getTypename()) {
+                case "VARCHAR":
+                    html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t</div>").append("\n");
+                    break;
+                case "INT":
+                case "DOUBLE":
+                    html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t</div>").append("\n");
+                    break;
+                case "DATETIME":
+                    html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t</div>").append("\n");
+                    html.append("\t\t\t\t\t<script>").append("\n");
+                    html.append("\t\t\t\t\t\tvar picker = new Pikaday({ field: document.getElementById('input-").append(attr.getName()).append("-add'), firstDay:1, i18n: { previousMonth: 'Previous Month', nextMonth: 'Next Month', months: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'], weekdays: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'], weekdaysShort : ['So','Mo','Di','Mi','Do','Fr','Sa']}, showWeekNumber: true, toString: function(date) {").append("\n");
+                    html.append("\t\t\t\t\t\t\tvar parts = [date.getFullYear(), ('0'+(date.getMonth()+1)).slice(-2), ('0'+date.getDate()).slice(-2)];").append("\n");
+                    html.append("\t\t\t\t\t\treturn parts.join(\"-\");").append("\n");
+                    html.append("\t\t\t\t\t\t}});").append("\n");
+                    html.append("\t\t\t\t\t</script>").append("\n");
+                    break;
+                case "BIT":
+                    html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t</div>").append("\n");
+                    break;
+            }
+        }
+        
+        html.append("\t\t\t\t\t<div class=\"uk-align-right\">").append("\n");
+        html.append("\t\t\t\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"save").append(tabledata.getName()).append("()\" ng-disabled=\"inprogress\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+        html.append("\t\t\t\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
+        html.append("\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t</div>").append("\n");
+        html.append("\t\t</div>").append("\n");
+	html.append("\t</div>").append("\n");
+        
+        html.append("\t\t<div id=\"modal-").append(tabledata.getName().toLowerCase()).append("-update\" class=\"uk-modal-container uk-flex-top\" uk-modal>").append("\n");
+	html.append("\t\t\t<div class=\"uk-modal-dialog uk-modal-header\">").append("\n");
+	html.append("\t\t\t\t<button class=\"uk-modal-close-default\" type=\"button\" uk-close></button>").append("\n");
+	html.append("\t\t\t\t<h2 class=\"uk-modal-title\">").append(tabledata.getName()).append(" ändern</h2>").append("\n");
+	html.append("\t\t\t\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
+					
+        for (ColumnData attr : tabledata.getColumns()) {
+            //CfAttribut attr = odw.getAttribut();
+            if (attr.isPrimarykey()) {
+                continue;
+            }
+            switch (attr.getTypename()) {
+                case "VARCHAR":
+                    html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(tabledata.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(tabledata.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t</div>").append("\n");
+                    break;
+                case "INT":
+                case "DOUBLE":
+                    html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(tabledata.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(tabledata.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t</div>").append("\n");
+                    break;
+                case "DATETIME":
+                    html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(tabledata.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(tabledata.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t</div>").append("\n");
+                    html.append("\t\t\t\t\t<script>").append("\n");
+                    html.append("\t\t\t\t\t\tvar picker = new Pikaday({ field: document.getElementById('input-").append(attr.getName()).append("-upd'), firstDay:1, i18n: { previousMonth: 'Previous Month', nextMonth: 'Next Month', months: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'], weekdays: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'], weekdaysShort : ['So','Mo','Di','Mi','Do','Fr','Sa']}, showWeekNumber: true, toString: function(date) {").append("\n");
+                    html.append("\t\t\t\t\t\t\tvar parts = [date.getFullYear(), ('0'+(date.getMonth()+1)).slice(-2), ('0'+date.getDate()).slice(-2)];").append("\n");
+                    html.append("\t\t\t\t\t\treturn parts.join(\"-\");").append("\n");
+                    html.append("\t\t\t\t\t\t}});").append("\n");
+                    html.append("\t\t\t\t\t</script>").append("\n");
+                    break;
+                case "BIT":
+                    html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                    html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
+                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-checkbox\" type=\"checkbox\" value=\"{{").append(tabledata.getName()).append(".").append(attr.getName()).append("}}\" ng-model=\"").append(tabledata.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    html.append("\t\t\t\t\t</div>").append("\n");
+                    break;
+            }
+        }
+
+	html.append("\t\t<div class=\"uk-align-right\">").append("\n");
+	html.append("\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"update").append(tabledata.getName()).append("(").append(tabledata.getName()).append(".id)\" ng-disabled=\"inprogress\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+	html.append("\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
+	html.append("\t\t</div>").append("\n");
+	html.append("\t\t</div>").append("\n");
+	html.append("\t\t</div>").append("\n");
+	html.append("\t\t</div>").append("\n");
+        html.append("\n");
+        html.append("\t\t<div id=\"modal-").append(tabledata.getName().toLowerCase()).append("-delete\" class=\"uk-modal-container uk-flex-top\" uk-modal>").append("\n");
+        html.append("\t\t\t<div class=\"uk-modal-dialog uk-modal-header\">").append("\n");
+	html.append("\t\t\t\t<button class=\"uk-modal-close-default\" type=\"button\" uk-close></button>").append("\n");
+	html.append("\t\t\t\t<h2 class=\"uk-modal-title\">").append(tabledata.getName()).append(" löschen</h2>").append("\n");
+	html.append("\t\t\t\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
+	html.append("\t\t\t\t\t<p>{{").append(tabledata.getName()).append(".id}}</p>").append("\n");
+	html.append("\t\t\t\t\t<div class=\"uk-align-right\">").append("\n");
+	html.append("\t\t\t\t\t\t<button class=\"uk-button uk-button-danger\" type=\"button\" ng-click=\"delete").append(tabledata.getName()).append("(").append(tabledata.getName()).append(".id)\" ng-disabled=\"inprogress\">Löschen <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+	html.append("\t\t\t\t\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
+	html.append("\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t</div>").append("\n");
+	html.append("\t\t</div>").append("\n");
+        
+        html.append("\t</body>").append("\n");
+        html.append("\t<script src=\"/resources/js/uikit.min.js\"></script>").append("\n");
+        html.append("\t<script src=\"/resources/js/uikit-icons.min.js\"></script>").append("\n");
+        html.append("</html>").append("\n");
+        
+        template.setName("crud_" + tabledata.getName());
+        try {
+            CfTemplate dummytemplate = cfTemplateService.findByName(template.getName());
+
+            if (null == dummytemplate) {
+                template.setScriptlanguage(2);
+                template.setCheckedoutby(BigInteger.ZERO);
+                template.setContent(html.toString());
+                cfTemplateService.create(template);
+            } else {
+                dummytemplate.setContent(html.toString());
+                cfTemplateService.edit(dummytemplate);
+            }
+        } catch (Exception ex) {
+            template.setScriptlanguage(2);
+            template.setCheckedoutby(BigInteger.ZERO);
+            template.setContent(html.toString());
+            cfTemplateService.create(template);
+        }
+        
+        javascript.append("var crud").append(tabledata.getName()).append(" = angular.module('crud").append(tabledata.getName()).append("App', []);").append("\n");
+        javascript.append("crud").append(tabledata.getName()).append(".controller('Crud").append(tabledata.getName()).append("Controller', function($scope, $http) {").append("\n");
+        javascript.append("\t$scope.loading = false;").append("\n");
+        javascript.append("\t$scope.inprogress = false;").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.").append(tabledata.getName().toUpperCase()).append("LIST = [];").append("\n");
+        
+        javascript.append("\t$scope.filter_").append(tabledata.getName().toLowerCase()).append(" = {};").append("\n");
+        javascript.append("\t$scope.order_").append(tabledata.getName().toLowerCase()).append(" = 'id';").append("\n");
+        javascript.append("\n");
+        
+        javascript.append("\t$scope.init = function() {").append("\n");
+        javascript.append("\t\t$scope.get").append(tabledata.getName()).append("list();").append("\n");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            //CfAttribut attr = odw.getAttribut();
+            if (attr.isPrimarykey()) {
+                continue;
+            }
+            switch (attr.getTypename()) {
+                case "VARCHAR":
+                    javascript.append("\t\t$scope.filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(" = \"\";").append("\n");
+                    break;
+                case "INT":
+                case "DOUBLE":
+                    javascript.append("\t\t$scope.filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(" = \"\";").append("\n");
+                    break;
+                case "DATETIME":
+                    javascript.append("\t\t$scope.filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(" = \"\";").append("\n");
+                    break;
+                case "BIT":
+                    javascript.append("\t\t$scope.filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(" = false;").append("\n");
+                    break;
+            }
+        }
+        
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.init").append(tabledata.getName()).append(" = function() {").append("\n");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            if (attr.isPrimarykey()) {
+                continue;
+            }
+            switch (attr.getTypename()) {
+                case "VARCHAR":
+                    javascript.append("\t\t$scope.").append(attr.getName()).append(" = \"\";").append("\n");
+                    break;
+                case "INT":
+                case "DOUBLE":
+                    javascript.append("\t\t$scope.").append(attr.getName()).append(" = 0;").append("\n");
+                    break;
+                case "DATETIME":
+                    javascript.append("\t\t$scope.").append(attr.getName()).append(" = \"\";").append("\n");
+                    break;
+                case "BIT":
+                    javascript.append("\t\t$scope.").append(attr.getName()).append(" = false;").append("\n");
+                    break;
+            }
+        }
+        
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.init").append(tabledata.getName()).append("();").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.sort").append(tabledata.getName()).append(" = function(field) {").append("\n");
+        javascript.append("\t\t$scope.order_").append(tabledata.getName().toLowerCase()).append(" = field;").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        
+        javascript.append("\t$scope.get").append(tabledata.getName()).append("list = function() {").append("\n");
+        javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("Set').then(function (res) {").append("\n");
+        javascript.append("\t\t\t$scope.").append(tabledata.getName().toUpperCase()).append("LIST = res.data.value;").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        
+        javascript.append("\t$scope.add").append(tabledata.getName()).append("Modal = function() {").append("\n");
+        javascript.append("\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t$scope.init").append(tabledata.getName()).append("();").append("\n");
+        
+        javascript.append("\t\tUIkit.modal('#modal-").append(tabledata.getName().toLowerCase()).append("-add').show();").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.save").append(tabledata.getName()).append(" = function () {").append("\n");
+        javascript.append("\t\t$scope.inprogress = true;").append("\n");
+        javascript.append("\t\tvar ").append(tabledata.getName()).append(" = new Object();").append("\n");
+        javascript.append("\n");
+        javascript.append("\t\t").append(tabledata.getName()).append(".id = null;").append("\n");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            if (attr.isPrimarykey()) {
+                continue;
+            }
+            switch (attr.getTypename()) {
+                case "VARCHAR":
+                    javascript.append("\t\tif ($scope.").append(attr.getName()).append(" != null) {").append("\n");
+                    javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = $scope.").append(attr.getName()).append(";").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
+                case "INT":
+                    javascript.append("\t\tif ($scope.").append(attr.getName()).append(" != null) {").append("\n");
+                    javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = parseInt($scope.").append(attr.getName()).append(");").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
+                case "DOUBLE":
+                    javascript.append("\t\tif ($scope.").append(attr.getName()).append(" != null) {").append("\n");
+                    javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = parseFloat($scope.").append(attr.getName()).append(");").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
+                case "DATETIME":
+                    javascript.append("\t\tif ($scope.").append(attr.getName()).append(" != null) {").append("\n");
+                    javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = $scope.").append(attr.getName()).append(";").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
+                case "BIT":
+                    javascript.append("\t\tif ($scope.").append(attr.getName()).append(" != null) {").append("\n");
+                    javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = $scope.").append(attr.getName()).append(";").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
+            }
+        }
+        
+        javascript.append("\t\tvar jsonString = JSON.stringify(").append(tabledata.getName()).append(");").append("\n");
+        javascript.append("\t\t$http.post('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("', jsonString).then(function (res) {").append("\n");
+        javascript.append("\t\t\tif (res.status === 201) {").append("\n");
+        javascript.append("\t\t\t\t$scope.get").append(tabledata.getName()).append("list();").append("\n");
+        javascript.append("\t\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t\t\tUIkit.modal('#modal-").append(tabledata.getName().toLowerCase()).append("-add').hide();").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t}, function (res) {").append("\n");
+        javascript.append("\t\t\tconsole.log(\"ERROR\");").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.update").append(tabledata.getName()).append("Modal = function(id) {").append("\n");
+        javascript.append("\t\t$scope.inprogress = true;").append("\n");
+        javascript.append("\t\tUIkit.modal('#modal-").append(tabledata.getName().toLowerCase()).append("-update').show();").append("\n");
+        javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("Set?$filter=id eq ' + id).then(function (res) {").append("\n");
+        javascript.append("\t\t\t$scope.").append(tabledata.getName()).append(" = res.data.value[0];").append("\n");
+        
+        javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.update").append(tabledata.getName()).append("Instant = function(id, field, value) {").append("\n");
+	javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("Set?$filter=id eq ' + id).then(function (res) {").append("\n");
+	javascript.append("\t\t\t$scope.").append(tabledata.getName()).append(" = res.data.value[0];").append("\n");
+        javascript.append("\t\t\t$scope.").append(tabledata.getName()).append("[field] = value;").append("\n");
+        javascript.append("\t\t\t$scope.update").append(tabledata.getName()).append("(id);").append("\n");
+	javascript.append("\t\t});").append("\n");
+	javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.update").append(tabledata.getName()).append(" = function (id) {").append("\n");
+        javascript.append("\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\tvar ").append(tabledata.getName()).append(" = new Object();").append("\n");
+        javascript.append("\n");
+        javascript.append("\t\t").append(tabledata.getName()).append(".id = id;").append("\n");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            if (attr.isPrimarykey()) {
+                continue;
+            }
+            switch (attr.getTypename()) {
+                case "VARCHAR":
+                    javascript.append("\t\tif ($scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
+                    javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = $scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(";").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
+                case "INT":
+                    javascript.append("\t\tif ($scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
+                    javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = parseInt($scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(");").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
+                case "DOUBLE":
+                    javascript.append("\t\tif ($scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
+                    javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = parseFloat($scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(");").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
+                case "DATETIME":
+                    javascript.append("\t\tif ($scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
+                    javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = $scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(";").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
+                case "BIT":
+                    javascript.append("\t\tif ($scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
+                    javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = $scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(";").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    break;
+            }
+        }
+        
+        javascript.append("\t\tvar jsonString = JSON.stringify(").append(tabledata.getName()).append(");").append("\n");
+        javascript.append("\t\t$http.patch('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("(' + ").append(tabledata.getName()).append(".id + ')', jsonString).then(function (res) {").append("\n");
+        javascript.append("\t\t\tif (res.status === 200) {").append("\n");
+        javascript.append("\t\t\t\t$scope.get").append(tabledata.getName()).append("list();").append("\n");
+        javascript.append("\t\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t\t\tUIkit.modal('#modal-").append(tabledata.getName().toLowerCase()).append("-update').hide();").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t}, function (res) {").append("\n");
+        javascript.append("\t\t\tconsole.log(\"ERROR\");").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.delete").append(tabledata.getName()).append("Modal = function(id) {").append("\n");
+        javascript.append("\t\t$scope.inprogress = true;").append("\n");
+        javascript.append("\t\tUIkit.modal('#modal-").append(tabledata.getName().toLowerCase()).append("-delete').show();").append("\n");
+        javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("Set?$filter=id eq ' + id).then(function (res) {").append("\n");
+        javascript.append("\t\t\t$scope.").append(tabledata.getName()).append(" = res.data.value[0];").append("\n");
+        javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.delete").append(tabledata.getName()).append(" = function (id) {").append("\n");
+        javascript.append("\t\t$scope.inprogress = true;").append("\n");
+        javascript.append("\t\t$http.delete('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("(' + id + ')').then(function (res) {").append("\n");
+        javascript.append("\t\tif (res.status === 200) {").append("\n");
+        javascript.append("\t\t\t$scope.get").append(tabledata.getName()).append("list();").append("\n");
+        javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t\tUIkit.modal('#modal-").append(tabledata.getName().toLowerCase()).append("-delete').hide();").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t\t}, function (res) {").append("\n");
+        javascript.append("\t\t\tconsole.log(\"ERROR\");").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.closeModal = function(modalelement) {").append("\n");
+        javascript.append("\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\tUIkit.modal(modalelement).hide();").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\tgetIndex = function(array, id) {").append("\n");
+        javascript.append("\t\tidx = 0;").append("\n");
+        javascript.append("\t\tfor (const element of array) {").append("\n");
+        javascript.append("\t\t\tif (element.id == id) {").append("\n");
+        javascript.append("\t\t\t\treturn idx;").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t\tidx++;").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t\treturn -1;").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\tgetAssetIndex = function(array, id) {").append("\n");
+        javascript.append("\t\tidx = 0;").append("\n");
+        javascript.append("\t\tfor (const element of array) {").append("\n");
+        javascript.append("\t\t\tif (element == id) {").append("\n");
+        javascript.append("\t\t\t\treturn idx;").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t\tidx++;").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t\treturn -1;").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("});").append("\n");
+        
+        js.setName("crud_" + tabledata.getName().toLowerCase());
+        try {
+            CfJavascript dummyjs = cfJavaScriptService.findByName(js.getName());
+            if (null == dummyjs) {
+                js.setCheckedoutby(BigInteger.ZERO);
+                js.setContent(javascript.toString());
+                cfJavaScriptService.create(js);
+            } else {
+                dummyjs.setContent(javascript.toString());
+                cfJavaScriptService.edit(dummyjs);
+            }
+        } catch (Exception ex) {
+            js.setCheckedoutby(BigInteger.ZERO);
+            js.setContent(javascript.toString());
+            cfJavaScriptService.create(js);
+        }
+
+        site.setName("crud_" + tabledata.getName().toLowerCase());
+        try {
+            CfSite dummysite = cfSiteService.findByName(site.getName());
+        } catch (Exception ex) {
+            site.setCharacterencoding("UTF-8");
+            site.setHitcounter(BigInteger.ZERO);
+            site.setTitle("");
+            site.setContenttype("text/html");
+            site.setSearchrelevant(false);
+            site.setHtmlcompression(0);
+            site.setGzip(0);
+            site.setLocale("de");
+            site.setDescription("Automatic generation");
+            site.setAliaspath(site.getName());
+            CfSite parent = cfSiteService.findByName("crud");
+            if (null != parent) {
+                site.setParentref(parent);
+            } else {
+                site.setParentref(null);
+            }
+            site.setTemplateref(template);
+            site.setShorturl(siteutil.generateShorturl());
+            site.setLoginsite("");
+            site.setTestparams("");
             cfSiteService.create(site);
         }
         sitetree.loadTree();

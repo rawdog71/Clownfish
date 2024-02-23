@@ -237,13 +237,20 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
 
     private Object evaluateComparisonOperation(BinaryOperatorKind operator, Object left, Object right)
             throws ODataApplicationException {
-
+        // if left type is Long and right type is Integer, cast right to Long
+        if ((0 == left.getClass().toString().compareToIgnoreCase("class java.lang.Long")) && (0 == right.getClass().toString().compareToIgnoreCase("class java.lang.Integer"))) {
+            Integer i = (Integer)right;
+            Long l = i.longValue();
+            right = l;
+        }
         // All types support all logical operations, but we have to make sure that they are equal
         if(left.getClass().equals(right.getClass()) && left instanceof Comparable) {
             // Luckily all used types String, Boolean and also Integer support the interface Comparable
             int result;
             if(left instanceof Integer) {
                 result = ((Integer) left).compareTo((Integer) right);
+            } else if(left instanceof Long) {
+                result = ((Long) left).compareTo((Long) right);
             } else if(left instanceof String) {
                 result = ((String) left).compareTo((String) right);
             } else if(left instanceof Boolean) {

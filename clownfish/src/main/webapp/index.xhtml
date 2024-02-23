@@ -1620,6 +1620,7 @@
                         </p:commandButton>
                         <p:commandButton id="checkdatasource" process="form" value="Check connection" actionListener="#{datasourceList.onConnectionCheck}" update=":form:msgs" />
                         <p:commandButton id="generatehtml" process="form" value="Generate HTML" actionListener="#{datasourceList.onGenerateHTML}" update=":form:msgs" />
+                        <p:commandButton id="generateodata" process="form" value="Generate OData" actionListener="#{datasourceList.onGenerateODATA}" update=":form:msgs" />
                         <p:outputLabel for="checksearchdatabase" value="Use in Lucene searchengine:" />
                         <p:selectBooleanCheckbox id="checksearchdatabase" value="#{datasourceList.searchdatabseflag}">
                             <p:ajax listener="#{datasourceList.onSetSearchdatabse}" />

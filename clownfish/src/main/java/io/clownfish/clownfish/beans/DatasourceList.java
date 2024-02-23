@@ -202,6 +202,12 @@ public class DatasourceList implements Serializable {
         }
     }
     
+    public void onGenerateODATA() {
+        if (null != selectedTable) {
+            databaseUtil.generateODataForm(selectedDatasource, selectedTable);
+        }
+    }
+    
     public void onSetSearchdatabse() {
         if (null != selectedTable) {
             CfSearchdatabase sdb = new CfSearchdatabase();
