@@ -1066,7 +1066,7 @@ public class DatabaseUtil {
                 if (attr.isPrimarykey()) {
                     continue;
                 }
-                switch (attr.getTypename()) {
+                switch (attr.getTypename().toUpperCase()) {
                     case "VARCHAR":
                         html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(tabledata.getName().toLowerCase()).append(" == '").append(attr.getName()).append("', 'descending': order_").append(tabledata.getName().toLowerCase()).append(" == '-").append(attr.getName()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(tabledata.getName()).append("('").append(attr.getName()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(tabledata.getName()).append("('-").append(attr.getName()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                         break;
@@ -1091,7 +1091,7 @@ public class DatabaseUtil {
                 if (attr.isPrimarykey()) {
                     continue;
                 }
-                switch (attr.getTypename()) {
+                switch (attr.getTypename().toUpperCase()) {
                     case "VARCHAR":
                         html.append("\t\t\t\t\t\t\t<th><input id=\"filter_").append(attr.getName()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("\"></th>").append("\n");
                         break;
@@ -1116,7 +1116,7 @@ public class DatabaseUtil {
                 if (attr.isPrimarykey()) {
                     continue;
                 }
-                switch (attr.getTypename()) {
+                switch (attr.getTypename().toUpperCase()) {
                     case "VARCHAR":
                     case "INT":
                     case "DOUBLE":
@@ -1135,7 +1135,7 @@ public class DatabaseUtil {
                 if (attr.isPrimarykey()) {
                     continue;
                 }
-                switch (attr.getTypename()) {
+                switch (attr.getTypename().toUpperCase()) {
                     case "VARCHAR":
                     case "INT":
                     case "DOUBLE":
@@ -1170,7 +1170,7 @@ public class DatabaseUtil {
             if (attr.isPrimarykey()) {
                 continue;
             }
-            switch (attr.getTypename()) {
+            switch (attr.getTypename().toUpperCase()) {
                 case "VARCHAR":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
@@ -1224,7 +1224,7 @@ public class DatabaseUtil {
             if (attr.isPrimarykey()) {
                 continue;
             }
-            switch (attr.getTypename()) {
+            switch (attr.getTypename().toUpperCase()) {
                 case "VARCHAR":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
@@ -1324,7 +1324,7 @@ public class DatabaseUtil {
             if (attr.isPrimarykey()) {
                 continue;
             }
-            switch (attr.getTypename()) {
+            switch (attr.getTypename().toUpperCase()) {
                 case "VARCHAR":
                     javascript.append("\t\t$scope.filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(" = \"\";").append("\n");
                     break;
@@ -1349,7 +1349,7 @@ public class DatabaseUtil {
             if (attr.isPrimarykey()) {
                 continue;
             }
-            switch (attr.getTypename()) {
+            switch (attr.getTypename().toUpperCase()) {
                 case "VARCHAR":
                     javascript.append("\t\t$scope.").append(attr.getName()).append(" = \"\";").append("\n");
                     break;
@@ -1399,7 +1399,7 @@ public class DatabaseUtil {
             if (attr.isPrimarykey()) {
                 continue;
             }
-            switch (attr.getTypename()) {
+            switch (attr.getTypename().toUpperCase()) {
                 case "VARCHAR":
                     javascript.append("\t\tif ($scope.").append(attr.getName()).append(" != null) {").append("\n");
                     javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = $scope.").append(attr.getName()).append(";").append("\n");
@@ -1468,7 +1468,7 @@ public class DatabaseUtil {
             if (attr.isPrimarykey()) {
                 continue;
             }
-            switch (attr.getTypename()) {
+            switch (attr.getTypename().toUpperCase()) {
                 case "VARCHAR":
                     javascript.append("\t\tif ($scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
                     javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = $scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(";").append("\n");
