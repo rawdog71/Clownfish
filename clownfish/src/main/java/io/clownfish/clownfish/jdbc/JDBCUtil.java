@@ -513,6 +513,15 @@ public class JDBCUtil {
         return null;
     }
     
+    private boolean isPrimaryKey(ArrayList<TableField> tableFieldsList, String fieldname) {
+        for (TableField tf : tableFieldsList) {
+            if (0 == tf.getName().compareToIgnoreCase(fieldname)) {
+                return tf.isPrimaryKey();
+            }
+        }
+        return false;
+    }
+    
     public TableFieldStructure getTableFieldsList(DatabaseMetaData dmd, String tablename, String default_order, HashMap<String, String[]> attributmap) {
         try {
             TableFieldStructure tfs = new TableFieldStructure();
@@ -714,60 +723,62 @@ public class JDBCUtil {
             boolean added = false;
             for (Object key : attributmap.keySet().toArray()) {
                 //if (!attributmap.get(key).isBlank()) {
-                added = true;
-                if (0 == sqlmode) {
-                    sql_set.append("`").append((String) key).append("`");
-                } else {
-                    sql_set.append("[").append((String) key).append("]");
-                }
-                String fieldType = getFieldType(tableFieldsList, (String) key);
+                if (!isPrimaryKey(tableFieldsList, (String) key)) {
+                    added = true;
+                    if (0 == sqlmode) {
+                        sql_set.append("`").append((String) key).append("`");
+                    } else {
+                        sql_set.append("[").append((String) key).append("]");
+                    }
+                    String fieldType = getFieldType(tableFieldsList, (String) key);
 
-                sql_set.append(" = ");
-                if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                    if (0 == fieldType.compareToIgnoreCase("date")) {
-                        String pattern = "dd.MM.yyyy HH:mm:ss";
-                        DateTime dt = null;
-                        try {
-                            dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                        } catch (Exception ex) {
+                    sql_set.append(" = ");
+                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                        if (0 == fieldType.compareToIgnoreCase("date")) {
+                            String pattern = "dd.MM.yyyy HH:mm:ss";
+                            DateTime dt = null;
                             try {
-                                pattern = "yyyy-MM-dd HH:mm:ss";
                                 dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                            } catch (Exception ex1) {
+                            } catch (Exception ex) {
                                 try {
-                                    pattern = "yyyy-MM-dd";
+                                    pattern = "yyyy-MM-dd HH:mm:ss";
                                     dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                                } catch (Exception ex4) {
+                                } catch (Exception ex1) {
                                     try {
-                                        pattern = "dd.MM.yyyy";
+                                        pattern = "yyyy-MM-dd";
                                         dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                                    } catch (Exception ex5) {
+                                    } catch (Exception ex4) {
+                                        try {
+                                            pattern = "dd.MM.yyyy";
+                                            dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                                        } catch (Exception ex5) {
 
+                                        }
                                     }
                                 }
                             }
-                        }
-                        if (null != dt) {
-                            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-                            sql_set.append("'").append(dt.toString(dtf)).append("'");
+                            if (null != dt) {
+                                DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+                                sql_set.append("'").append(dt.toString(dtf)).append("'");
+                            } else {
+                                sql_set.append(dt);
+                            }
                         } else {
-                            sql_set.append(dt);
+                            if (null != (String) attributmap.get(key)) {
+                                String value = (String) attributmap.get(key);
+                                value = value.replace("'", "''");
+                                sql_set.append("'").append(value).append("'");
+                            } else {
+                                sql_set.append((String) attributmap.get(key));
+                            }
                         }
+                        sql_set.append(", ");
                     } else {
-                        if (null != (String) attributmap.get(key)) {
-                            String value = (String) attributmap.get(key);
-                            value = value.replace("'", "''");
-                            sql_set.append("'").append(value).append("'");
-                        } else {
-                            sql_set.append((String) attributmap.get(key));
-                        }
+                        sql_set.append((String) attributmap.get(key));
+                        sql_set.append(", ");
                     }
-                    sql_set.append(", ");
-                } else {
-                    sql_set.append((String) attributmap.get(key));
-                    sql_set.append(", ");
+                    //}
                 }
-                //}
             }
             if (added) {
                 sql_set.delete(sql_set.length()-2, sql_set.length());
