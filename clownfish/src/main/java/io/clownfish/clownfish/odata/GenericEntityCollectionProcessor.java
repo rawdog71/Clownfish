@@ -16,15 +16,20 @@
 package io.clownfish.clownfish.odata;
 
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
+import io.clownfish.clownfish.datamodels.ContentOutput;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfList;
+import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
+import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.InputStream;
@@ -86,6 +91,8 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
     public static final String NAMESPACE_ENTITY = "OData.Entity";
     
     @Autowired private CfClassService cfclassservice;
+    @Autowired private CfListService cflistservice;
+    @Autowired private CfListcontentService cflistcontentservice;
     @Autowired private CfClasscontentService cfclasscontentService;
     @Autowired private CfAttributcontentService cfattributcontentservice;
     @Autowired ContentUtil contentUtil;
@@ -132,7 +139,11 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         if (edmEntitySet.getName().endsWith("Set")) {
             entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
         } else {
-            entityname = edmEntitySet.getName();
+            if (edmEntitySet.getName().endsWith("List")) {
+                entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
+            } else {
+                entityname = edmEntitySet.getName();
+            }
         }
         EntityCollection entitySet = getData(edmEntitySet, null, orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
         EntityCollection returnCollection = new EntityCollection();
@@ -237,12 +248,20 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         if (edmEntitySet.getName().endsWith("Set")) {
             classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
         } else {
-            classname = edmEntitySet.getName();
+            if (edmEntitySet.getName().endsWith("List")) {
+                classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
+            } else {
+                classname = edmEntitySet.getName();
+            }
         }
         HashMap searchMap = getSearchMap(filterExpression);
         EntityCollection genericCollection = new EntityCollection();
         if (0 == source.getSource()) {
-            getList(cfclassservice.findByName(classname), genericCollection, searchMap, orderbyoption);
+            if (!source.isList()) {
+                getList(cfclassservice.findByName(classname), genericCollection, searchMap, orderbyoption);
+            } else {
+                getDataList(classname, genericCollection, searchMap, orderbyoption);
+            }
         } else {
             getListDB(classname, genericCollection, source);
         }
@@ -289,6 +308,47 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
                 }
             } catch (NoResultException ex) {
                 session_tables.close();
+            }
+        }
+    }
+    
+    private void getDataList(String listname, EntityCollection genericCollection, HashMap searchmap, OrderByOption orderbyoption) {
+        List<Entity> genericList = genericCollection.getEntities();
+        CfList cflist = cflistservice.findByName(listname);
+        CfClass cfclass = cfclassservice.findById(cflist.getClassref().getId());
+        List<CfListcontent> listcontentList = cflistcontentservice.findByListref(cflist.getId());
+
+        List<CfClasscontent> classcontentList = new ArrayList<>();
+        for (CfListcontent listcontent : listcontentList) {
+            CfClasscontent classcontent = cfclasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+            if (null != classcontent) {
+                // ToDo: #95 check AccessManager
+                classcontentList.add(classcontent);
+            } else {
+                LOGGER.warn("Classcontent does not exist: " + listname + " - "  + listcontent.getCfListcontentPK().getClasscontentref());
+            }
+        }
+
+        Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+        for (CfClasscontent classcontent : classcontentList) {
+            Query query = session_tables.createQuery("FROM " + cfclass.getName() + " c WHERE cf_contentref = " + classcontent.getId());
+            Map content = (Map) query.getSingleResult();
+            
+            CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
+            if (null != cfclasscontent) {
+                if (!cfclasscontent.isScrapped()) {
+                    ContentDataOutput contentdataoutput = new ContentDataOutput();
+                    contentdataoutput.setContent(cfclasscontent);
+                    if (cfclasscontent.getClassref().isEncrypted()) {
+                        contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                        contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                    } else {
+                        contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
+                        contentdataoutput.setKeyval(contentUtil.getContentMap(content));
+                    }
+                    Entity entity = entityUtil.makeEntity(contentdataoutput);
+                    genericList.add(entity);
+                }
             }
         }
     }

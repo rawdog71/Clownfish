@@ -20,10 +20,12 @@ import io.clownfish.clownfish.datamodels.TableData;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfDatasource;
+import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfListService;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -53,6 +55,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
     @Autowired private CfClassService cfclassservice;
     @Autowired private CfAttributService cfattributservice;
     @Autowired transient CfDatasourceService cfdatasourceService;
+    @Autowired private CfListService cflistservice;
     @Autowired EntityUtil entityUtil;
     
     private static CsdlEntityContainer entityContainer = null;
@@ -80,7 +83,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             List<CsdlEntityType> entityTypes = new ArrayList<>();
             List<CsdlComplexType> complexTypes = new ArrayList<>();
             for (CfClass clazz : cfclassservice.findAll()) {
-                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()), new SourceStructure(0, null, null, null, null, null));
+                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()), new SourceStructure(0, false, null, null, null, null, null));
                 CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()));
                 CsdlComplexType ct = getComplexType(new FullQualifiedName(NAMESPACE_COMPLEX, clazz.getName()));
                 if (null != et) {
@@ -88,6 +91,15 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                 }
                 if (ct != null) {
                     complexTypes.add(ct);
+                }
+            }
+            for (CfList list : cflistservice.findByMaintenance(true)) {
+                CfClass clazz = list.getClassref();
+                if (!getKeys(clazz).isEmpty()) {
+                    CsdlEntitySet es = getEntitySet(CONTAINER, list.getName()+"List");
+                    if ((null != es) && (list.getClassref().isMaintenance())) {
+                        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, list.getName()), new SourceStructure(0, true, null, null, null, null, null));
+                    }
                 }
             }
             
@@ -141,7 +153,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                                             }
                                             if (hasIdentity) {
                                                 entityUtil.getEntitystructurelist().put(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")), td);
-                                                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")), new SourceStructure(1, datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword(), td.getName()));
+                                                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")), new SourceStructure(1, false, datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword(), td.getName()));
 
                                                 CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")));
                                                 if (null != et) {
@@ -158,7 +170,6 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                         LOGGER.error(ex.getMessage());
                     }
                 }
-                
             }
             
             entity_schema.setEntityTypes(entityTypes);
@@ -186,6 +197,15 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                     CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName()+"Set");
                     if (null != es) {
                         singletons.add(si);
+                        entitySets.add(es);
+                    }
+                }
+            }
+            for (CfList list : cflistservice.findAll()) {
+                CfClass clazz = list.getClassref();
+                if (!getKeys(clazz).isEmpty()) {
+                    CsdlEntitySet es = getEntitySet(CONTAINER, list.getName()+"List");
+                    if ((null != es) && (list.getClassref().isMaintenance())) {
                         entitySets.add(es);
                     }
                 }
@@ -225,7 +245,6 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                         LOGGER.error(ex.getMessage());
                     }
                 }
-                
             }
             
             // create EntityContainer
@@ -366,9 +385,22 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                 CsdlEntitySet entitySet = new CsdlEntitySet();
                 entitySet.setName(entitySetName);
                 if (entitySetName.endsWith("Set")) {
-                    entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName.substring(0, entitySetName.length()-3)));
+                    if (null != cfclassservice.findByName(entitySetName.substring(0, entitySetName.length()-3))) {
+                        entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName.substring(0, entitySetName.length()-3)));
+                    } else {
+                        return null;
+                    }
                 } else {
-                    entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName));
+                    if (entitySetName.endsWith("List")) {
+                        CfList list = cflistservice.findByName(entitySetName.substring(0, entitySetName.length()-4));
+                        if (null != list) {
+                            entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, list.getClassref().getName()));
+                        } else {
+                            return null;
+                        }
+                    } else {
+                        entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName));
+                    }
                 }
                 entityUtil.getEntitysetlist().put(entitySetName, entitySet);
                 return entitySet;

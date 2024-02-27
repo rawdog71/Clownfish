@@ -44,8 +44,12 @@ public class CfClassDAOImpl implements CfClassDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfClass.findById");  
         query.setParameter("id", id);
-        CfClass cfclass = (CfClass) query.getSingleResult();
-        return cfclass;
+        try {
+            CfClass cfclass = (CfClass) query.getSingleResult();
+            return cfclass;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -82,8 +86,12 @@ public class CfClassDAOImpl implements CfClassDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfClass.findByName");  
         query.setParameter("name", name);
-        CfClass cfclass = (CfClass) query.getSingleResult();
-        return cfclass;
+        try {
+            CfClass cfclass = (CfClass) query.getSingleResult();
+            return cfclass;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
