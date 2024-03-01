@@ -233,6 +233,7 @@ public class ContentList implements Serializable {
         memoryeditDatalist = null;
         classcontentlist = cfclasscontentService.findByMaintenance(true);
         classlist = cfclassService.findAll();
+        classlist.sort((CfClass c1, CfClass c2) -> c1.getName().compareToIgnoreCase(c2.getName()));
         assetlist = cfassetService.findAll();
         selectedAssetList = cfassetlistService.findAll();
         editContent = "";

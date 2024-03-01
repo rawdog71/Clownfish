@@ -37,6 +37,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.util.Comparator;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
@@ -75,16 +76,18 @@ public class DataList implements Serializable {
     @PostConstruct
     public void init() {
         LOGGER.info("INIT DATACONTENTLIST START");
-        datacontentlist = cflistService.findAll();
-        classlist = cfclassService.findAll();
+        datacontentlist = cflistService.findByMaintenance(true);
+        classlist = cfclassService.findByMaintenance(true);
+        classlist.sort((CfClass c1, CfClass c2) -> c1.getName().compareToIgnoreCase(c2.getName()));
         
         selectedListcontent = new ArrayList<>();
         LOGGER.info("INIT DATACONTENTLIST END");
     }
     
     public void onRefreshAll() {
-        datacontentlist = cflistService.findAll();
-        classlist = cfclassService.findAll();
+        datacontentlist = cflistService.findByMaintenance(true);
+        classlist = cfclassService.findByMaintenance(true);
+        classlist.sort((CfClass c1, CfClass c2) -> c1.getName().compareToIgnoreCase(c2.getName()));
     }
     
     public void onSelect(SelectEvent event) {

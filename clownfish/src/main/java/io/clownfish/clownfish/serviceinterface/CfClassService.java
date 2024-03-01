@@ -28,6 +28,7 @@ public interface CfClassService {
     CfClass findById(Long id);
     CfClass findByName(String name);
     List<CfClass> findNotInList(BigInteger ref);
+    List<CfClass> findByMaintenance(boolean maintenance);
     CfClass create(CfClass entity);
     boolean delete(CfClass entity);
     CfClass edit(CfClass entity);

@@ -42,6 +42,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfClass.findAll", query = "SELECT c FROM CfClass c"),
     @NamedQuery(name = "CfClass.findById", query = "SELECT c FROM CfClass c WHERE c.id = :id"),
     @NamedQuery(name = "CfClass.findByName", query = "SELECT c FROM CfClass c WHERE c.name = :name"),
+    @NamedQuery(name = "CfClass.findByMaintenance", query = "SELECT c FROM CfClass c WHERE c.maintenance = :maintenance"),
     @NamedQuery(name = "CfClass.findNotInList", query = "SELECT c FROM CfClass c WHERE c.id NOT IN (SELECT am.ref FROM CfAccessmanager am WHERE am.type = 0 AND am.refclasscontent <> :refclasscontent)"),
 })
 public class CfClass implements Serializable {

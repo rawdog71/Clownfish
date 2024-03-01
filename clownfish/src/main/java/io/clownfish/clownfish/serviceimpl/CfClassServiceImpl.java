@@ -72,4 +72,9 @@ public class CfClassServiceImpl implements CfClassService {
     public List<CfClass> findNotInList(BigInteger ref) {
         return this.cfclassDAO.findNotInList(ref);
     }
+
+    @Override
+    public List<CfClass> findByMaintenance(boolean maintenance) {
+        return this.cfclassDAO.findByMaintenance(maintenance);
+    }
 }
