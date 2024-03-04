@@ -82,8 +82,13 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             // add EntityTypes
             List<CsdlEntityType> entityTypes = new ArrayList<>();
             List<CsdlComplexType> complexTypes = new ArrayList<>();
+            
+            entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFListEntry"), new SourceStructure(0, 3, null, null, null, null, null));
+            CsdlEntityType listentryet = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFListEntry"));
+            entityTypes.add(listentryet);
+            
             for (CfClass clazz : cfclassservice.findAll()) {
-                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()), new SourceStructure(0, false, null, null, null, null, null));
+                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()), new SourceStructure(0, 0, null, null, null, null, null));
                 CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()));
                 CsdlComplexType ct = getComplexType(new FullQualifiedName(NAMESPACE_COMPLEX, clazz.getName()));
                 if (null != et) {
@@ -93,12 +98,22 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                     complexTypes.add(ct);
                 }
             }
+            
+            for (CfClass clazz : cfclassservice.findByMaintenance(true)) {
+                if (!getKeys(clazz).isEmpty()) {
+                    CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName()+"Lists");
+                    if (null != es) {
+                        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()+"Lists"), new SourceStructure(0, 2, null, null, null, null, null));
+                    }
+                }
+            }
+            
             for (CfList list : cflistservice.findByMaintenance(true)) {
                 CfClass clazz = list.getClassref();
                 if (!getKeys(clazz).isEmpty()) {
                     CsdlEntitySet es = getEntitySet(CONTAINER, list.getName()+"List");
                     if ((null != es) && (list.getClassref().isMaintenance())) {
-                        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, list.getName()), new SourceStructure(0, true, null, null, null, null, null));
+                        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, list.getName()), new SourceStructure(0, 1, null, null, null, null, null));
                     }
                 }
             }
@@ -153,7 +168,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                                             }
                                             if (hasIdentity) {
                                                 entityUtil.getEntitystructurelist().put(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")), td);
-                                                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")), new SourceStructure(1, false, datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword(), td.getName()));
+                                                entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")), new SourceStructure(1, 0, datasource.getDriverclass(), datasource.getUrl(), datasource.getUser(), datasource.getPassword(), td.getName()));
 
                                                 CsdlEntityType et = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, datasource.getName() + "_" + tables.getString("TABLE_NAME")));
                                                 if (null != et) {
@@ -197,6 +212,14 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                     CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName()+"Set");
                     if (null != es) {
                         singletons.add(si);
+                        entitySets.add(es);
+                    }
+                }
+            }
+            for (CfClass clazz : cfclassservice.findByMaintenance(true)) {
+                if (!getKeys(clazz).isEmpty()) {
+                    CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName()+"Lists");
+                    if (null != es) {
                         entitySets.add(es);
                     }
                 }
@@ -267,29 +290,44 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             if (entityUtil.getEntitysourcelist().containsKey(entityTypeName)) {
                 if (0 == entityUtil.getEntitysourcelist().get(entityTypeName).getSource()) {
                     System.out.println(entityTypeName.getFullQualifiedNameAsString());
-                    CfClass classref = cfclassservice.findByName(entityTypeName.getName());
-                    List propsList = new ArrayList();
-                    List keysList = new ArrayList();
-                    for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
-                        CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
-                        propsList.add(prop);
-                        if (attribut.getIdentity()) {
-                            CsdlPropertyRef propertyRef = new CsdlPropertyRef();
-                            propertyRef.setName(attribut.getName());
-                            keysList.add(propertyRef);
+                    if (3 != entityUtil.getEntitysourcelist().get(entityTypeName).getList()) {
+                        CfClass classref = cfclassservice.findByName(entityTypeName.getName());
+                        List propsList = new ArrayList();
+                        List keysList = new ArrayList();
+                        for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
+                            CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
+                            propsList.add(prop);
+                            if (attribut.getIdentity()) {
+                                CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+                                propertyRef.setName(attribut.getName());
+                                keysList.add(propertyRef);
+                            }
                         }
-                    }
-                    CsdlEntityType entityType = new CsdlEntityType();
-                    entityType.setName(entityTypeName.getName());
-                    entityType.setProperties(propsList);
-                    entityType.setKey(keysList);
+                        CsdlEntityType entityType = new CsdlEntityType();
+                        entityType.setName(entityTypeName.getName());
+                        entityType.setProperties(propsList);
+                        entityType.setKey(keysList);
 
-                    if (!keysList.isEmpty()) {
-                        entityUtil.getEntitytypelist().put(entityTypeName, entityType);
-                        return entityType;
+                        if (!keysList.isEmpty()) {
+                            entityUtil.getEntitytypelist().put(entityTypeName, entityType);
+                            return entityType;
+                        } else {
+                            LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
+                            return null;
+                        }
                     } else {
-                        LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
-                        return null;
+                        CsdlEntityType entityType = new CsdlEntityType();
+                        entityType.setName(entityTypeName.getName());
+                        List propsList = new ArrayList();
+                        List keysList = new ArrayList();
+                        CsdlProperty prop = new CsdlProperty().setName("name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
+                        propsList.add(prop);
+                        CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+                        propertyRef.setName("name");
+                        keysList.add(propertyRef);
+                        entityType.setProperties(propsList);
+                        entityType.setKey(keysList);
+                        return entityType;
                     }
                 } else {
                     System.out.println(entityTypeName.getFullQualifiedNameAsString());
@@ -384,9 +422,15 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
             } else {
                 CsdlEntitySet entitySet = new CsdlEntitySet();
                 entitySet.setName(entitySetName);
-                if (entitySetName.endsWith("Set")) {
-                    if (null != cfclassservice.findByName(entitySetName.substring(0, entitySetName.length()-3))) {
-                        entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName.substring(0, entitySetName.length()-3)));
+                if ((entitySetName.endsWith("Set")) || (entitySetName.endsWith("Lists"))) {
+                    int postlength = 3;
+                    if (entitySetName.endsWith("Lists")) postlength = 5;
+                    if (null != cfclassservice.findByName(entitySetName.substring(0, entitySetName.length()-postlength))) {
+                        if (3 == postlength) {
+                            entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, entitySetName.substring(0, entitySetName.length()-postlength)));
+                        } else {
+                            entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, "CFListEntry"));
+                        }   
                     } else {
                         return null;
                     }

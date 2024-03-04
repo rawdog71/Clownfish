@@ -24,14 +24,14 @@ import lombok.Setter;
  */
 public class SourceStructure {
     private @Getter @Setter int source;
-    private @Getter @Setter boolean list;
+    private @Getter @Setter int list;
     private @Getter @Setter String classname;
     private @Getter @Setter String url;
     private @Getter @Setter String user;
     private @Getter @Setter String password;
     private @Getter @Setter String tablename;
 
-    public SourceStructure(int source, boolean list, String classname, String url, String user, String password, String tablename) {
+    public SourceStructure(int source, int list, String classname, String url, String user, String password, String tablename) {
         this.source = source;
         this.list = list;
         this.classname = classname;
@@ -40,6 +40,4 @@ public class SourceStructure {
         this.password = password;
         this.tablename = tablename;
     }
-
-    
 }

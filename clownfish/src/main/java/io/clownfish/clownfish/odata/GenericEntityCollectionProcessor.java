@@ -16,7 +16,6 @@
 package io.clownfish.clownfish.odata;
 
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
-import io.clownfish.clownfish.datamodels.ContentOutput;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
@@ -47,8 +46,11 @@ import javax.persistence.NoResultException;
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.EntityCollection;
+import org.apache.olingo.commons.api.data.Property;
+import org.apache.olingo.commons.api.data.ValueType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
+import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
@@ -142,7 +144,11 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
             if (edmEntitySet.getName().endsWith("List")) {
                 entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
             } else {
-                entityname = edmEntitySet.getName();
+                if (edmEntitySet.getName().endsWith("Lists")) {
+                    entityname = edmEntitySet.getName();
+                } else {
+                    entityname = edmEntitySet.getName();
+                }
             }
         }
         EntityCollection entitySet = getData(edmEntitySet, null, orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
@@ -251,16 +257,26 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
             if (edmEntitySet.getName().endsWith("List")) {
                 classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
             } else {
-                classname = edmEntitySet.getName();
+                if (edmEntitySet.getName().endsWith("Lists")) {
+                    classname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-5);
+                } else {
+                    classname = edmEntitySet.getName();
+                }
             }
         }
         HashMap searchMap = getSearchMap(filterExpression);
         EntityCollection genericCollection = new EntityCollection();
         if (0 == source.getSource()) {
-            if (!source.isList()) {
-                getList(cfclassservice.findByName(classname), genericCollection, searchMap, orderbyoption);
-            } else {
-                getDataList(classname, genericCollection, searchMap, orderbyoption);
+            switch (source.getList()) {
+                case 0:
+                    getList(cfclassservice.findByName(classname), genericCollection, searchMap, orderbyoption);
+                    break;
+                case 1:
+                    getDataList(classname, genericCollection, searchMap, orderbyoption);
+                    break;
+                case 2:
+                    getDataLists(classname, genericCollection, searchMap, orderbyoption);
+                    break;
             }
         } else {
             getListDB(classname, genericCollection, source);
@@ -309,6 +325,22 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
             } catch (NoResultException ex) {
                 session_tables.close();
             }
+        }
+    }
+    
+    private void getDataLists(String classname, EntityCollection genericCollection, HashMap searchMap, OrderByOption orderbyoption) {
+        List<Entity> genericList = genericCollection.getEntities();
+        List<CfList> cflist = cflistservice.findByClassref(cfclassservice.findByName(classname));
+        for (CfList list : cflist) {
+            System.out.println(list.getName());
+            Property prop = new Property();
+            
+            prop.setName("name");
+            prop.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName().getFullQualifiedNameAsString());
+            prop.setValue(ValueType.PRIMITIVE, list.getName());
+            Entity entity = new Entity();
+            entity.addProperty(prop);
+            genericList.add(entity);
         }
     }
     
