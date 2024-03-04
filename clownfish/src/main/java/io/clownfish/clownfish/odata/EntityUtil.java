@@ -259,21 +259,27 @@ public class EntityUtil {
                                 Property coll_prop = new Property();
                                 List<ComplexValue> values = new ArrayList<>();
                                 String datalistname = (String) hm.get(attributname);
-                                if (attribut.getIdentity()) {
-                                    id = (String) hm.get(attributname).toString();
-                                }
-                                try {
-                                    CfList datalist = cflistService.findByName(datalistname);
-                                    List<CfListcontent> contentlist = cflistcontentService.findByListref(datalist.getId());
-                                    for (CfListcontent listcontent : contentlist) {
-                                        CfClasscontent cfclasscontent = cfClasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
-                                        values.add(createComplexVal(cfclasscontent));
+                                if (null != datalistname) {
+                                    if (attribut.getIdentity()) {
+                                        id = (String) hm.get(attributname).toString();
                                     }
-                                    coll_prop.setValue(ValueType.COLLECTION_COMPLEX, values);
-                                    coll_prop.setName((String)attributname);
-                                    coll_prop.setType("Collection(OData.Complex." + datalist.getClassref().getName() + ")");
-                                    entity.addProperty(coll_prop);
-                                } catch (NoResultException nre) {
+                                    try {
+                                        CfList datalist = cflistService.findByName(datalistname);
+                                        List<CfListcontent> contentlist = cflistcontentService.findByListref(datalist.getId());
+                                        for (CfListcontent listcontent : contentlist) {
+                                            CfClasscontent cfclasscontent = cfClasscontentService.findById(listcontent.getCfListcontentPK().getClasscontentref());
+                                            values.add(createComplexVal(cfclasscontent));
+                                        }
+                                        coll_prop.setValue(ValueType.COLLECTION_COMPLEX, values);
+                                        coll_prop.setName((String)attributname);
+                                        coll_prop.setType("Collection(OData.Complex." + datalist.getClassref().getName() + ")");
+                                        entity.addProperty(coll_prop);
+                                    } catch (NoResultException nre) {
+                                        LOGGER.warn("Datalist not set for attribute " + (String)attributname + " of class " + contentdataoutput.getContent().getClassref().getName());
+                                        coll_prop.setValue(ValueType.COLLECTION_COMPLEX, null);
+                                        entity.addProperty(coll_prop);
+                                    }
+                                } else {
                                     LOGGER.warn("Datalist not set for attribute " + (String)attributname + " of class " + contentdataoutput.getContent().getClassref().getName());
                                     coll_prop.setValue(ValueType.COLLECTION_COMPLEX, null);
                                     entity.addProperty(coll_prop);
