@@ -53,10 +53,14 @@ public class CfClasscontentDAOImpl implements CfClasscontentDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findById");
         query.setParameter("id", id);
-        CfClasscontent cfclasscontent = (CfClasscontent) query.getSingleResult();
-        if (!cfclasscontent.isScrapped()) {
-            return cfclasscontent;
-        } else {
+        try {
+            CfClasscontent cfclasscontent = (CfClasscontent) query.getSingleResult();
+            if (!cfclasscontent.isScrapped()) {
+                return cfclasscontent;
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
             return null;
         }
     }
@@ -66,10 +70,14 @@ public class CfClasscontentDAOImpl implements CfClasscontentDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontent.findByName");
         query.setParameter("name", name);
-        CfClasscontent cfclasscontent = (CfClasscontent) query.getSingleResult();
-        if (!cfclasscontent.isScrapped()) {
-            return cfclasscontent;
-        } else {
+        try {
+            CfClasscontent cfclasscontent = (CfClasscontent) query.getSingleResult();
+            if (!cfclasscontent.isScrapped()) {
+                return cfclasscontent;
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
             return null;
         }
     }

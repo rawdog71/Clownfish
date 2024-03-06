@@ -87,8 +87,12 @@ public class CfAttributcontentDAOImpl implements CfAttributcontentDAO {
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findByAttributrefAndClasscontentref");
         query.setParameter("attributref", attributref);
         query.setParameter("classcontentref", classcontentref);
-        CfAttributcontent cfattributcontent = (CfAttributcontent) query.getSingleResult();
-        return cfattributcontent;
+        try {
+            CfAttributcontent cfattributcontent = (CfAttributcontent) query.getSingleResult();
+            return cfattributcontent;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

@@ -43,8 +43,12 @@ public class CfPropertyDAOImpl implements CfPropertyDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfProperty.findByHashkey");
         query.setParameter("hashkey", hashkey);
-        CfProperty cfproperty = (CfProperty) query.getSingleResult();
-        return cfproperty;
+        try {
+            CfProperty cfproperty = (CfProperty) query.getSingleResult();
+            return cfproperty;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -52,8 +56,12 @@ public class CfPropertyDAOImpl implements CfPropertyDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfProperty.findByValue");
         query.setParameter("value", value);
-        CfProperty cfproperty = (CfProperty) query.getSingleResult();
-        return cfproperty;
+        try {
+            CfProperty cfproperty = (CfProperty) query.getSingleResult();
+            return cfproperty;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

@@ -44,8 +44,12 @@ public class CfAttributDAOImpl implements CfAttributDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttribut.findById");  
         query.setParameter("id", id);
-        CfAttribut cfattribut = (CfAttribut) query.getSingleResult();
-        return cfattribut;
+        try {
+            CfAttribut cfattribut = (CfAttribut) query.getSingleResult();
+            return cfattribut;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -84,7 +88,11 @@ public class CfAttributDAOImpl implements CfAttributDAO {
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttribut.findByNameAndClassref");  
         query.setParameter("name", name);
         query.setParameter("classref", classref);
-        CfAttribut cfattribut = (CfAttribut) query.getSingleResult();
-        return cfattribut;
+        try {
+            CfAttribut cfattribut = (CfAttribut) query.getSingleResult();
+            return cfattribut;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

@@ -43,8 +43,12 @@ public class CfQuartzDAOImpl implements CfQuartzDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfQuartz.findById");  
         query.setParameter("id", id);
-        CfQuartz cfquartz = (CfQuartz) query.getSingleResult();
-        return cfquartz;
+        try {
+            CfQuartz cfquartz = (CfQuartz) query.getSingleResult();
+            return cfquartz;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -52,8 +56,12 @@ public class CfQuartzDAOImpl implements CfQuartzDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfQuartz.findByName");  
         query.setParameter("name", name);
-        CfQuartz cfquartz = (CfQuartz) query.getSingleResult();
-        return cfquartz;
+        try {
+            CfQuartz cfquartz = (CfQuartz) query.getSingleResult();
+            return cfquartz;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

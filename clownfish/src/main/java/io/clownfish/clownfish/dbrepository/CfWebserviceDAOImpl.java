@@ -43,8 +43,12 @@ public class CfWebserviceDAOImpl implements CfWebserviceDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfWebservice.findById");  
         query.setParameter("id", id);
-        CfWebservice cfwebservice = (CfWebservice) query.getSingleResult();
-        return cfwebservice;
+        try {
+            CfWebservice cfwebservice = (CfWebservice) query.getSingleResult();
+            return cfwebservice;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -52,8 +56,12 @@ public class CfWebserviceDAOImpl implements CfWebserviceDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfWebservice.findByName");  
         query.setParameter("name", name);
-        CfWebservice cfwebservice = (CfWebservice) query.getSingleResult();
-        return cfwebservice;
+        try {
+            CfWebservice cfwebservice = (CfWebservice) query.getSingleResult();
+            return cfwebservice;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

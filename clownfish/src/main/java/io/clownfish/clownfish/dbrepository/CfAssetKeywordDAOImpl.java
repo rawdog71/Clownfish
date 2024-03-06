@@ -92,7 +92,11 @@ public class CfAssetKeywordDAOImpl implements CfAssetkeywordDAO {
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAssetkeyword.findByAssetrefAndKeywordref");
         query.setParameter("assetref", assetref);
         query.setParameter("keywordref", keywordref);
-        CfAssetkeyword cfcontent = (CfAssetkeyword) query.getSingleResult();
-        return cfcontent;
+        try {
+            CfAssetkeyword cfcontent = (CfAssetkeyword) query.getSingleResult();
+            return cfcontent;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

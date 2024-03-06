@@ -43,8 +43,12 @@ public class CfKeywordlistDAOImpl implements CfKeywordlistDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfKeywordlist.findById");  
         query.setParameter("id", id);
-        CfKeywordlist cfkeywordlist = (CfKeywordlist) query.getSingleResult();
-        return cfkeywordlist;
+        try {
+            CfKeywordlist cfkeywordlist = (CfKeywordlist) query.getSingleResult();
+            return cfkeywordlist;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -81,7 +85,11 @@ public class CfKeywordlistDAOImpl implements CfKeywordlistDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfKeywordlist.findByName");  
         query.setParameter("name", name);
-        CfKeywordlist cfkeywordlist = (CfKeywordlist) query.getSingleResult();
-        return cfkeywordlist;
+        try {
+            CfKeywordlist cfkeywordlist = (CfKeywordlist) query.getSingleResult();
+            return cfkeywordlist;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

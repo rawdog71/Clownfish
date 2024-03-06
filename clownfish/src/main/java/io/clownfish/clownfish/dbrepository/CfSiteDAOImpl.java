@@ -54,8 +54,12 @@ public class CfSiteDAOImpl implements CfSiteDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfSite.findByName");  
         query.setParameter("name", name);
-        CfSite cfsite = (CfSite) query.getSingleResult();
-        return cfsite;
+        try {
+            CfSite cfsite = (CfSite) query.getSingleResult();
+            return cfsite;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -72,8 +76,12 @@ public class CfSiteDAOImpl implements CfSiteDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfSite.findById");  
         query.setParameter("id", id);
-        CfSite cfsite = (CfSite) query.getSingleResult();
-        return cfsite;
+        try {
+            CfSite cfsite = (CfSite) query.getSingleResult();
+            return cfsite;
+        } catch (Exception ex) {
+            return null;
+        }
     }
     
     @Override
@@ -116,8 +124,12 @@ public class CfSiteDAOImpl implements CfSiteDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfSite.findByAliaspath");  
         query.setParameter("aliaspath", alias);
-        CfSite cfsite = (CfSite) query.getSingleResult();
-        return cfsite;
+        try {
+            CfSite cfsite = (CfSite) query.getSingleResult();
+            return cfsite;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -134,8 +146,12 @@ public class CfSiteDAOImpl implements CfSiteDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfSite.findByShorturl");  
         query.setParameter("shorturl", shorturl);
-        CfSite cfsite = (CfSite) query.getSingleResult();
-        return cfsite;
+        try {
+            CfSite cfsite = (CfSite) query.getSingleResult();
+            return cfsite;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

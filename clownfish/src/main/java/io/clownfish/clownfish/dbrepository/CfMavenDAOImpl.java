@@ -43,8 +43,12 @@ public class CfMavenDAOImpl implements CfMavenDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findById");  
         query.setParameter("id", id);
-        CfMaven cfmaven = (CfMaven) query.getSingleResult();
-        return cfmaven;
+        try {
+            CfMaven cfmaven = (CfMaven) query.getSingleResult();
+            return cfmaven;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -81,7 +85,11 @@ public class CfMavenDAOImpl implements CfMavenDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfMaven.findByMavenId");  
         query.setParameter("mavenId", name);
-        CfMaven cfmaven = (CfMaven) query.getSingleResult();
-        return cfmaven;
+        try {
+            CfMaven cfmaven = (CfMaven) query.getSingleResult();
+            return cfmaven;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

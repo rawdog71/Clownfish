@@ -44,8 +44,12 @@ public class CfWebserviceauthDAOImpl implements CfWebserviceauthDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfWebserviceauth.findByHash");  
         query.setParameter("hash", hash);
-        CfWebserviceauth cfwebserviceauth = (CfWebserviceauth) query.getSingleResult();
-        return cfwebserviceauth;
+        try {
+            CfWebserviceauth cfwebserviceauth = (CfWebserviceauth) query.getSingleResult();
+            return cfwebserviceauth;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

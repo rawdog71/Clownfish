@@ -50,8 +50,12 @@ public class CfDatasourceDAOImpl implements CfDatasourceDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfDatasource.findById");
         query.setParameter("id", id);
-        CfDatasource cfdatasource = (CfDatasource) query.getSingleResult();
-        return cfdatasource;
+        try {
+            CfDatasource cfdatasource = (CfDatasource) query.getSingleResult();
+            return cfdatasource;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -80,8 +84,12 @@ public class CfDatasourceDAOImpl implements CfDatasourceDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfDatasource.findByName");
         query.setParameter("name", name);
-        CfDatasource cfdatasource = (CfDatasource) query.getSingleResult();
-        return cfdatasource;
+        try {
+            CfDatasource cfdatasource = (CfDatasource) query.getSingleResult();
+            return cfdatasource;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

@@ -91,8 +91,12 @@ public class CfAssetDAOImpl implements CfAssetDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAsset.findByName");  
         query.setParameter("name", name);
-        CfAsset cfasset = (CfAsset) query.getSingleResult();
-        return cfasset;
+        try {
+            CfAsset cfasset = (CfAsset) query.getSingleResult();
+            return cfasset;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

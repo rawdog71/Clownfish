@@ -249,13 +249,17 @@ public class GenericSingletonProcessor implements EntityProcessor {
         if (edmEntitySet.getName().endsWith("Set")) {
             entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
         } else {
-            entityname = edmEntitySet.getName();
+            if (edmEntitySet.getName().endsWith("List")) {
+                entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
+            } else {
+                entityname = edmEntitySet.getName();
+            }
         }
         InputStream requestInputStream = odr.getBody();
         ODataDeserializer deserializer = this.odata.createDeserializer(ct);
         DeserializerResult result = deserializer.entity(requestInputStream, edmEntityType);
         Entity requestEntity = result.getEntity();
-        Entity createdEntity = entityUtil.createEntity(edmEntitySet, requestEntity, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
+        Entity createdEntity = entityUtil.createEntity(edmEntitySet, requestEntity, edmEntityType, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
 
         ContextURL contextUrl = ContextURL.with().entitySet(edmEntitySet).build();
         EntitySerializerOptions options = EntitySerializerOptions.with().contextURL(contextUrl).build();

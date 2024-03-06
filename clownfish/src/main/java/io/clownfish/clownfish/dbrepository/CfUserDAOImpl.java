@@ -43,8 +43,12 @@ public class CfUserDAOImpl implements CfUserDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfUser.findById");  
         query.setParameter("id", id);
-        CfUser cfuser = (CfUser) query.getSingleResult();
-        return cfuser;
+        try {
+            CfUser cfuser = (CfUser) query.getSingleResult();
+            return cfuser;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -52,8 +56,12 @@ public class CfUserDAOImpl implements CfUserDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfUser.findByEmail");  
         query.setParameter("email", email);
-        CfUser cfuser = (CfUser) query.getSingleResult();
-        return cfuser;
+        try {
+            CfUser cfuser = (CfUser) query.getSingleResult();
+            return cfuser;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

@@ -43,8 +43,12 @@ public class CfAttributetypeDAOImpl implements CfAttributetypeDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributetype.findById");  
         query.setParameter("id", id);
-        CfAttributetype cfattributetype = (CfAttributetype) query.getSingleResult();
-        return cfattributetype;
+        try {
+            CfAttributetype cfattributetype = (CfAttributetype) query.getSingleResult();
+            return cfattributetype;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -81,7 +85,11 @@ public class CfAttributetypeDAOImpl implements CfAttributetypeDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributetype.findByName");  
         query.setParameter("name", name);
-        CfAttributetype cfattributetype = (CfAttributetype) query.getSingleResult();
-        return cfattributetype;
+        try {
+            CfAttributetype cfattributetype = (CfAttributetype) query.getSingleResult();
+            return cfattributetype;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

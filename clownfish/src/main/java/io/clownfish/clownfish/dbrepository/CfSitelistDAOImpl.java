@@ -51,8 +51,12 @@ public class CfSitelistDAOImpl implements CfSitelistDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfSitelist.findBySiteref");  
         query.setParameter("siteref", ref);
-        List<CfSitelist> cfsitelistlist = query.getResultList();
-        return cfsitelistlist;
+        try {
+            List<CfSitelist> cfsitelistlist = query.getResultList();
+            return cfsitelistlist;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

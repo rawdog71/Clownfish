@@ -43,8 +43,12 @@ public class CfBackendDAOImpl implements CfBackendDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfBackend.findById");  
         query.setParameter("id", id);
-        CfBackend cfbackend = (CfBackend) query.getSingleResult();
-        return cfbackend;
+        try {
+            CfBackend cfbackend = (CfBackend) query.getSingleResult();
+            return cfbackend;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -81,7 +85,11 @@ public class CfBackendDAOImpl implements CfBackendDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfBackend.findByName");  
         query.setParameter("name", name);
-        CfBackend cfbackend = (CfBackend) query.getSingleResult();
-        return cfbackend;
+        try {
+            CfBackend cfbackend = (CfBackend) query.getSingleResult();
+            return cfbackend;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

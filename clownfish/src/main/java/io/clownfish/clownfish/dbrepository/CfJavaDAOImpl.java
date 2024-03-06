@@ -61,8 +61,12 @@ public class CfJavaDAOImpl implements CfJavaDAO
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfJava.findById");
         query.setParameter("id", id);
-        CfJava CfJava = (CfJava) query.getSingleResult();
-        return CfJava;
+        try {
+            CfJava CfJava = (CfJava) query.getSingleResult();
+            return CfJava;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -71,7 +75,11 @@ public class CfJavaDAOImpl implements CfJavaDAO
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfJava.findByName");
         query.setParameter("name", name);
-        CfJava CfJava = (CfJava) query.getSingleResult();
-        return CfJava;
+        try {
+            CfJava CfJava = (CfJava) query.getSingleResult();
+            return CfJava;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

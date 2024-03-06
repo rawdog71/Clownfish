@@ -43,8 +43,12 @@ public class CfKeywordDAOImpl implements CfKeywordDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfKeyword.findById");  
         query.setParameter("id", id);
-        CfKeyword cfkeyword = (CfKeyword) query.getSingleResult();
-        return cfkeyword;
+        try {
+            CfKeyword cfkeyword = (CfKeyword) query.getSingleResult();
+            return cfkeyword;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -81,8 +85,12 @@ public class CfKeywordDAOImpl implements CfKeywordDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfKeyword.findByName");  
         query.setParameter("name", name);
-        CfKeyword cfkeyword = (CfKeyword) query.getSingleResult();
-        return cfkeyword;
+        try {
+            CfKeyword cfkeyword = (CfKeyword) query.getSingleResult();
+            return cfkeyword;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

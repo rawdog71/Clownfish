@@ -70,6 +70,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         entityUtil.getComplextypelist().clear();
         entityUtil.getEntitysourcelist().clear();
         entityUtil.getEntitystructurelist().clear();
+        entityUtil.init(this);
         entityContainer = null;
         schemas = null;
     }

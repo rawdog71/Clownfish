@@ -72,8 +72,12 @@ public class CfJavascriptDAOImpl implements CfJavascriptDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfJavascript.findById");
         query.setParameter("id", id);
-        CfJavascript cfjavascript = (CfJavascript) query.getSingleResult();
-        return cfjavascript;
+        try {
+            CfJavascript cfjavascript = (CfJavascript) query.getSingleResult();
+            return cfjavascript;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -81,7 +85,11 @@ public class CfJavascriptDAOImpl implements CfJavascriptDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfJavascript.findByName");
         query.setParameter("name", name);
-        CfJavascript cfjavascript = (CfJavascript) query.getSingleResult();
-        return cfjavascript;
+        try {
+            CfJavascript cfjavascript = (CfJavascript) query.getSingleResult();
+            return cfjavascript;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

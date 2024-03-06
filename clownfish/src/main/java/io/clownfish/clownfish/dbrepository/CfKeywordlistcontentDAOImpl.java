@@ -69,8 +69,12 @@ public class CfKeywordlistcontentDAOImpl implements CfKeywordlistcontentDAO {
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfKeywordlistcontent.findByKeywordrefAndKeywordlistref");
         query.setParameter("keywordref", keywordref);
         query.setParameter("keywordlistref", keywordlistref);
-        CfKeywordlistcontent cfcontent = (CfKeywordlistcontent) query.getSingleResult();
-        return cfcontent;
+        try {
+            CfKeywordlistcontent cfcontent = (CfKeywordlistcontent) query.getSingleResult();
+            return cfcontent;
+        } catch (Exception ex) {
+            return null;
+        }
     }
     
     @Override

@@ -72,8 +72,12 @@ public class CfTemplateDAOImpl implements CfTemplateDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findById");
         query.setParameter("id", id);
-        CfTemplate cftemplate = (CfTemplate) query.getSingleResult();
-        return cftemplate;
+        try {
+            CfTemplate cftemplate = (CfTemplate) query.getSingleResult();
+            return cftemplate;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -81,8 +85,12 @@ public class CfTemplateDAOImpl implements CfTemplateDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfTemplate.findByName");
         query.setParameter("name", name);
-        CfTemplate cftemplate = (CfTemplate) query.getSingleResult();
-        return cftemplate;
+        try {
+            CfTemplate cftemplate = (CfTemplate) query.getSingleResult();
+            return cftemplate;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

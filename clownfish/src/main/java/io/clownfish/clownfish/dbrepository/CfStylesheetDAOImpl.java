@@ -72,8 +72,12 @@ public class CfStylesheetDAOImpl implements CfStylesheetDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfStylesheet.findById");
         query.setParameter("id", id);
-        CfStylesheet cfstylesheet = (CfStylesheet) query.getSingleResult();
-        return cfstylesheet;
+        try {
+            CfStylesheet cfstylesheet = (CfStylesheet) query.getSingleResult();
+            return cfstylesheet;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -81,7 +85,11 @@ public class CfStylesheetDAOImpl implements CfStylesheetDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfStylesheet.findByName");
         query.setParameter("name", name);
-        CfStylesheet cfstylesheet = (CfStylesheet) query.getSingleResult();
-        return cfstylesheet;
+        try {
+            CfStylesheet cfstylesheet = (CfStylesheet) query.getSingleResult();
+            return cfstylesheet;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

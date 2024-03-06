@@ -92,7 +92,11 @@ public class CfClasscontentKeywordDAOImpl implements CfClasscontentkeywordDAO {
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfClasscontentkeyword.findByClasscontentrefAndKeywordref");
         query.setParameter("classcontentref", contentref);
         query.setParameter("keywordref", keywordref);
-        CfClasscontentkeyword cfcontent = (CfClasscontentkeyword) query.getSingleResult();
-        return cfcontent;
+        try {
+            CfClasscontentkeyword cfcontent = (CfClasscontentkeyword) query.getSingleResult();
+            return cfcontent;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

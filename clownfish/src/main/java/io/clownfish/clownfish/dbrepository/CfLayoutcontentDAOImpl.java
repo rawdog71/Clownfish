@@ -105,8 +105,12 @@ public class CfLayoutcontentDAOImpl implements CfLayoutcontentDAO {
         query.setParameter("templateref", templateref);
         query.setParameter("contenttype", contenttype);
         query.setParameter("lfdnr", lfdnr);
-        CfLayoutcontent cflayoutcontentlist = (CfLayoutcontent) query.getSingleResult();
-        return cflayoutcontentlist;
+        try {
+            CfLayoutcontent cflayoutcontentlist = (CfLayoutcontent) query.getSingleResult();
+            return cflayoutcontentlist;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
 }

@@ -60,8 +60,12 @@ public class CfStaticsiteDAOImpl implements CfStaticsiteDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfStaticsite.findByUrlparams");  
         query.setParameter("urlparams", urlparam);
-        CfStaticsite cfsite = (CfStaticsite) query.getSingleResult();
-        return cfsite;
+        try {
+            CfStaticsite cfsite = (CfStaticsite) query.getSingleResult();
+            return cfsite;
+        } catch (Exception ex) {
+            return null;
+        }
     }
     
     @Override
@@ -69,8 +73,12 @@ public class CfStaticsiteDAOImpl implements CfStaticsiteDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfStaticsite.findById");  
         query.setParameter("id", id);
-        CfStaticsite cfsite = (CfStaticsite) query.getSingleResult();
-        return cfsite;
+        try {
+            CfStaticsite cfsite = (CfStaticsite) query.getSingleResult();
+            return cfsite;
+        } catch (Exception ex) {
+            return null;
+        }
     }
     
     @Override
@@ -100,7 +108,11 @@ public class CfStaticsiteDAOImpl implements CfStaticsiteDAO {
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfStaticsite.findBySiteAndUrlparams");
         query.setParameter("site", name);
         query.setParameter("urlparams", urlparams);
-        CfStaticsite cfsite = (CfStaticsite) query.getSingleResult();
-        return cfsite;
+        try {
+            CfStaticsite cfsite = (CfStaticsite) query.getSingleResult();
+            return cfsite;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

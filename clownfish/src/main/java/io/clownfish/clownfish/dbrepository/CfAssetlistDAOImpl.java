@@ -43,8 +43,12 @@ public class CfAssetlistDAOImpl implements CfAssetlistDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAssetlist.findById");  
         query.setParameter("id", id);
-        CfAssetlist cfassetlist = (CfAssetlist) query.getSingleResult();
-        return cfassetlist;
+        try {
+            CfAssetlist cfassetlist = (CfAssetlist) query.getSingleResult();
+            return cfassetlist;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -81,8 +85,12 @@ public class CfAssetlistDAOImpl implements CfAssetlistDAO {
         Session session = this.sessionFactory.getCurrentSession();
         TypedQuery query = (TypedQuery) session.getNamedQuery("CfAssetlist.findByName");  
         query.setParameter("name", name);
-        CfAssetlist cfassetlist = (CfAssetlist) query.getSingleResult();
-        return cfassetlist;
+        try {
+            CfAssetlist cfassetlist = (CfAssetlist) query.getSingleResult();
+            return cfassetlist;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
