@@ -125,12 +125,12 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                 if (null != con) {
                     try {
                         DatabaseMetaData selectedDdbmd = selectedJdbcutil.getMetadata();
-                        System.out.println(selectedDdbmd.getDatabaseMajorVersion());
+                        //System.out.println(selectedDdbmd.getDatabaseMajorVersion());
                         ResultSet rs = selectedDdbmd.getCatalogs();
                         while (rs.next()) {
                             String dbname = rs.getString("TABLE_CAT");
                             if (0 == dbname.compareToIgnoreCase(datasource.getDatabasename())) {
-                                System.out.println(dbname);
+                                //System.out.println(dbname);
                                 ResultSet tables = selectedDdbmd.getTables(dbname, null, null, null);
                                 while (tables.next()) {
                                     if (null != tables.getString("TABLE_TYPE")) {
@@ -241,12 +241,12 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                 if (null != con) {
                     try {
                         DatabaseMetaData selectedDdbmd = selectedJdbcutil.getMetadata();
-                        System.out.println(selectedDdbmd.getDatabaseMajorVersion());
+                        //System.out.println(selectedDdbmd.getDatabaseMajorVersion());
                         ResultSet rs = selectedDdbmd.getCatalogs();
                         while (rs.next()) {
                             String dbname = rs.getString("TABLE_CAT");
                             if (0 == dbname.compareToIgnoreCase(datasource.getDatabasename())) {
-                                System.out.println(dbname);
+                                //System.out.println(dbname);
                                 ResultSet tables = selectedDdbmd.getTables(dbname, null, null, null);
                                 while (tables.next()) {
                                     if (null != tables.getString("TABLE_TYPE")) {
@@ -290,7 +290,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
         } else {
             if (entityUtil.getEntitysourcelist().containsKey(entityTypeName)) {
                 if (0 == entityUtil.getEntitysourcelist().get(entityTypeName).getSource()) {
-                    System.out.println(entityTypeName.getFullQualifiedNameAsString());
+                    //System.out.println(entityTypeName.getFullQualifiedNameAsString());
                     if (3 != entityUtil.getEntitysourcelist().get(entityTypeName).getList()) {
                         CfClass classref = cfclassservice.findByName(entityTypeName.getName());
                         List propsList = new ArrayList();
@@ -321,17 +321,22 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                         entityType.setName(entityTypeName.getName());
                         List propsList = new ArrayList();
                         List keysList = new ArrayList();
-                        CsdlProperty prop = new CsdlProperty().setName("name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
-                        propsList.add(prop);
-                        CsdlPropertyRef propertyRef = new CsdlPropertyRef();
-                        propertyRef.setName("name");
-                        keysList.add(propertyRef);
+                        
+                        CsdlProperty prop_id = new CsdlProperty().setName("id").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(false);
+                        propsList.add(prop_id);
+                        CsdlPropertyRef propertyRef_id = new CsdlPropertyRef();
+                        propertyRef_id.setName("id");
+                        keysList.add(propertyRef_id);
+                        
+                        CsdlProperty prop_name = new CsdlProperty().setName("name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
+                        propsList.add(prop_name);
+                        
                         entityType.setProperties(propsList);
                         entityType.setKey(keysList);
                         return entityType;
                     }
                 } else {
-                    System.out.println(entityTypeName.getFullQualifiedNameAsString());
+                    //System.out.println(entityTypeName.getFullQualifiedNameAsString());
                     TableData td = entityUtil.getEntitystructurelist().get(entityTypeName);
                     List propsList = new ArrayList();
                     List keysList = new ArrayList();

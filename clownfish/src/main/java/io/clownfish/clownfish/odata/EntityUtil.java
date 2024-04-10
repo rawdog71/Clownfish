@@ -869,7 +869,7 @@ public class EntityUtil {
                 cdo.setDifference(contentUtil.hasDifference(cfclasscontent));
                 cdo.setMaxversion(cfcontentversionService.findMaxVersion(cfclasscontent.getId()));
             } catch (Exception ex) {
-                LOGGER.error(ex.getMessage());
+                LOGGER.warn("ContentID: " + cfclasscontent.getId() + " Name: " + cfclasscontent.getName() + " has no version info.");
             }
             ComplexValue val = new ComplexValue();
             val.setTypeName("OData.Complex." + cfclasscontent.getClassref().getName());

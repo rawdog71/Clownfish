@@ -332,14 +332,21 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         List<Entity> genericList = genericCollection.getEntities();
         List<CfList> cflist = cflistservice.findByClassref(cfclassservice.findByName(classname));
         for (CfList list : cflist) {
-            System.out.println(list.getName());
-            Property prop = new Property();
+            //System.out.println(list.getName());
+            Property prop_id = new Property();
             
-            prop.setName("name");
-            prop.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName().getFullQualifiedNameAsString());
-            prop.setValue(ValueType.PRIMITIVE, list.getName());
+            prop_id.setName("id");
+            prop_id.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+            prop_id.setValue(ValueType.PRIMITIVE, list.getId());
+            
+            Property prop_name = new Property();
+            
+            prop_name.setName("name");
+            prop_name.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName().getFullQualifiedNameAsString());
+            prop_name.setValue(ValueType.PRIMITIVE, list.getName());
             Entity entity = new Entity();
-            entity.addProperty(prop);
+            entity.addProperty(prop_id);
+            entity.addProperty(prop_name);
             genericList.add(entity);
         }
     }

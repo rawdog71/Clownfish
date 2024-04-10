@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>9.0.83</version>
+            <version>9.0.86</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
@@ -122,14 +122,14 @@
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>primefaces-extensions</artifactId>
-            <version>12.0.9</version>
+            <version>12.0.11</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>resources-monacoeditor</artifactId>
-            <version>12.0.9</version>
+            <version>12.0.11</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -141,7 +141,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>font-awesome</artifactId>
-            <version>6.4.2</version>
+            <version>6.5.1</version>
         </dependency>
         <!--
         <dependency>
