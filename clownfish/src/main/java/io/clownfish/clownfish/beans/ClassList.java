@@ -197,11 +197,11 @@ public class ClassList implements Serializable {
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
-        try {
-            cfclassService.findByName(className);
-            newButtonDisabled = true;
-        } catch (NoResultException ex) {
-            newButtonDisabled = className.isEmpty();
+        CfClass newclass = cfclassService.findByName(className);
+        if (null == newclass) {
+            newButtonDisabled = false;
+        } else {
+            newButtonDisabled = !className.isEmpty();
         }
     }
     

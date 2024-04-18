@@ -186,11 +186,11 @@ public class UserList implements Serializable {
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
-        try {
-            cfuserService.findByEmail(email);
-            newUserButtonDisabled = true;
-        } catch (NoResultException ex) {
-            newUserButtonDisabled = email.isEmpty();
+        CfUser newuser = cfuserService.findByEmail(email);
+        if (null == newuser) {
+            newUserButtonDisabled = false;
+        } else {
+            newUserButtonDisabled = !email.isEmpty();
         }
     }
     

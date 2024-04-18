@@ -72,6 +72,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
@@ -509,6 +511,7 @@ public class EntityUtil {
                         } catch (ODataException ex) {
                             LOGGER.error(ex.getMessage());
                         }
+                        entity.getProperty("id").setValue(ValueType.PRIMITIVE, newlist.getId());
                         return entity;
                     } else {
                         return null;
@@ -560,105 +563,140 @@ public class EntityUtil {
     
     public boolean updateEntity(EdmEntitySet edmEntitySet, List<UriParameter> keyParams, Entity entity, HttpMethod httpMethod, SourceStructure source) {
         if (0 == source.getSource()) {
-            CfClass clazz = cfclassService.findByName(edmEntitySet.getName());
-            CfClasscontent cfclasscontent = null;
-            for (UriParameter param : keyParams) {
-                if (0 == param.getName().compareToIgnoreCase("id")) {
-                    cfclasscontent = cfclasscontentService.findById(hibernateUtil.getContentRef(clazz.getName(), "id", Long.parseLong(param.getText())));
-                }
-            }
-            if (null != cfclasscontent) {
-                List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(cfclasscontent);
-                for (CfAttributcontent attributcontent : attributcontentlist) {
-                    if (!attributcontent.getAttributref().getIdentity()) {
-                        CfAttribut attribut = attributcontent.getAttributref();
+            switch (source.getList()) {
+                case 0:
+                    CfClass clazz = cfclassService.findByName(edmEntitySet.getName());
+                    CfClasscontent cfclasscontent = null;
+                    for (UriParameter param : keyParams) {
+                        if (0 == param.getName().compareToIgnoreCase("id")) {
+                            cfclasscontent = cfclasscontentService.findById(hibernateUtil.getContentRef(clazz.getName(), "id", Long.parseLong(param.getText())));
+                        }
+                    }
+                    if (null != cfclasscontent) {
+                        List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(cfclasscontent);
+                        for (CfAttributcontent attributcontent : attributcontentlist) {
+                            if (!attributcontent.getAttributref().getIdentity()) {
+                                CfAttribut attribut = attributcontent.getAttributref();
 
-                        if ((0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 != attribut.getAttributetype().getName().compareToIgnoreCase("assetref"))) {
-                            Property p = entity.getProperty(attributcontent.getAttributref().getName());
-                            if (null != p) {
-                                if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("datetime")) {
-                                    contentUtil.setAttributValue(attributcontent, p.getValue().toString());
+                                if ((0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 != attribut.getAttributetype().getName().compareToIgnoreCase("assetref"))) {
+                                    Property p = entity.getProperty(attributcontent.getAttributref().getName());
+                                    if (null != p) {
+                                        if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("datetime")) {
+                                            contentUtil.setAttributValue(attributcontent, p.getValue().toString());
+                                        } else {
+                                            contentUtil.setAttributValue(attributcontent, ((GregorianCalendar) p.getValue()).toZonedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+                                        }
+                                        cfattributcontentService.edit(attributcontent);
+                                        contentUtil.indexContent();
+                                    } else {
+                                        if (httpMethod.equals(HttpMethod.PUT)) {
+                                            contentUtil.setAttributValue(attributcontent, null);
+                                            cfattributcontentService.edit(attributcontent);
+                                            contentUtil.indexContent();
+                                        }
+                                    }
                                 } else {
-                                    contentUtil.setAttributValue(attributcontent, ((GregorianCalendar) p.getValue()).toZonedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-                                }
-                                cfattributcontentService.edit(attributcontent);
-                                contentUtil.indexContent();
-                            } else {
-                                if (httpMethod.equals(HttpMethod.PUT)) {
-                                    contentUtil.setAttributValue(attributcontent, null);
-                                    cfattributcontentService.edit(attributcontent);
-                                    contentUtil.indexContent();
-                                }
-                            }
-                        } else {
-                            if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("assetref")) {
-                                // Delete assetlistcontent first
-                                List<CfAssetlistcontent> contentList = cfassetlistcontentService.findByAssetlistref(attributcontent.getAssetcontentlistref().getId());
-                                for (CfAssetlistcontent content : contentList) {
-                                    cfassetlistcontentService.delete(content);
-                                }
-
-                                List<Integer> longList = (List<Integer>) entity.getProperty(attribut.getName()).getValue();
-                                for (Integer val : longList) {
-                                    // Add selected assetlistcontent
-                                    CfAssetlistcontent assetlistcontent = new CfAssetlistcontent();
-                                    CfAssetlistcontentPK cfassetlistcontentPK = new CfAssetlistcontentPK();
-                                    cfassetlistcontentPK.setAssetlistref(attributcontent.getAssetcontentlistref().getId());
-                                    cfassetlistcontentPK.setAssetref(val.longValue());
-                                    assetlistcontent.setCfAssetlistcontentPK(cfassetlistcontentPK);
-                                    cfassetlistcontentService.create(assetlistcontent);
-                                }
-                            } else {
-                                if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == attribut.getRelationtype())) { // 1:n
-                                    CfClass relationref = attribut.getRelationref();
-                                    try {
-                                        ComplexValue complex = (ComplexValue) entity.getProperty(attribut.getName()).getValue();
-                                        for (Property prop : complex.getValue()) {
-                                            //System.out.println(prop.getName());
-                                            if (0 == prop.getName().compareToIgnoreCase("id")) {
-                                                CfClasscontent cfclasscontentref = cfclasscontentService.findById(hibernateUtil.getContentRef(relationref.getName(), "id", ((Integer) prop.getValue()).longValue()));
-
-                                                contentUtil.setAttributValue(attributcontent, cfclasscontentref.getId().toString());
-                                                cfattributcontentService.edit(attributcontent);
-                                            }
+                                    if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("assetref")) {
+                                        // Delete assetlistcontent first
+                                        List<CfAssetlistcontent> contentList = cfassetlistcontentService.findByAssetlistref(attributcontent.getAssetcontentlistref().getId());
+                                        for (CfAssetlistcontent content : contentList) {
+                                            cfassetlistcontentService.delete(content);
                                         }
-                                    } catch (Exception ex) {
-                                        LOGGER.debug(ex.getMessage());
-                                    }
-                                } else {                                                // n:m Relation
-                                    // Delete listcontent first
-                                    List<CfListcontent> contentList = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
-                                    for (CfListcontent content : contentList) {
-                                        cflistcontentService.delete(content);
-                                    }
 
-                                    List<ComplexValue> complexList = (List<ComplexValue>) entity.getProperty(attribut.getName()).getValue();
-                                    for (ComplexValue complexval : complexList) {
-                                        for (Property prop : complexval.getValue()) {
-                                            //System.out.println(prop.getName());
-                                            if (0 == prop.getName().compareToIgnoreCase("id")) {
-                                                // Add selected listcontent
-                                                CfClasscontent cfclasscontententry = cfclasscontentService.findById(hibernateUtil.getContentRef(attribut.getRelationref().getName(), "id", ((Integer) prop.getValue()).longValue()));
-                                                CfListcontent listcontent = new CfListcontent();
-                                                CfListcontentPK cflistcontentPK = new CfListcontentPK();
-                                                cflistcontentPK.setListref(attributcontent.getClasscontentlistref().getId());
+                                        List<Integer> longList = (List<Integer>) entity.getProperty(attribut.getName()).getValue();
+                                        for (Integer val : longList) {
+                                            // Add selected assetlistcontent
+                                            CfAssetlistcontent assetlistcontent = new CfAssetlistcontent();
+                                            CfAssetlistcontentPK cfassetlistcontentPK = new CfAssetlistcontentPK();
+                                            cfassetlistcontentPK.setAssetlistref(attributcontent.getAssetcontentlistref().getId());
+                                            cfassetlistcontentPK.setAssetref(val.longValue());
+                                            assetlistcontent.setCfAssetlistcontentPK(cfassetlistcontentPK);
+                                            cfassetlistcontentService.create(assetlistcontent);
+                                        }
+                                    } else {
+                                        if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == attribut.getRelationtype())) { // 1:n
+                                            CfClass relationref = attribut.getRelationref();
+                                            try {
+                                                ComplexValue complex = (ComplexValue) entity.getProperty(attribut.getName()).getValue();
+                                                for (Property prop : complex.getValue()) {
+                                                    //System.out.println(prop.getName());
+                                                    if (0 == prop.getName().compareToIgnoreCase("id")) {
+                                                        CfClasscontent cfclasscontentref = cfclasscontentService.findById(hibernateUtil.getContentRef(relationref.getName(), "id", ((Integer) prop.getValue()).longValue()));
 
-                                                cflistcontentPK.setClasscontentref(cfclasscontententry.getId());
-                                                listcontent.setCfListcontentPK(cflistcontentPK);
-                                                cflistcontentService.create(listcontent);
+                                                        contentUtil.setAttributValue(attributcontent, cfclasscontentref.getId().toString());
+                                                        cfattributcontentService.edit(attributcontent);
+                                                    }
+                                                }
+                                            } catch (Exception ex) {
+                                                LOGGER.debug(ex.getMessage());
                                             }
+                                        } else {                                                // n:m Relation
+                                            // Delete listcontent first
+                                            List<CfListcontent> contentList = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
+                                            for (CfListcontent content : contentList) {
+                                                cflistcontentService.delete(content);
+                                            }
+
+                                            List<ComplexValue> complexList = (List<ComplexValue>) entity.getProperty(attribut.getName()).getValue();
+                                            for (ComplexValue complexval : complexList) {
+                                                for (Property prop : complexval.getValue()) {
+                                                    //System.out.println(prop.getName());
+                                                    if (0 == prop.getName().compareToIgnoreCase("id")) {
+                                                        // Add selected listcontent
+                                                        CfClasscontent cfclasscontententry = cfclasscontentService.findById(hibernateUtil.getContentRef(attribut.getRelationref().getName(), "id", ((Integer) prop.getValue()).longValue()));
+                                                        CfListcontent listcontent = new CfListcontent();
+                                                        CfListcontentPK cflistcontentPK = new CfListcontentPK();
+                                                        cflistcontentPK.setListref(attributcontent.getClasscontentlistref().getId());
+
+                                                        cflistcontentPK.setClasscontentref(cfclasscontententry.getId());
+                                                        listcontent.setCfListcontentPK(cflistcontentPK);
+                                                        cflistcontentService.create(listcontent);
+                                                    }
+                                                }
+                                            }
+                                            hibernateUtil.updateRelation(attributcontent.getClasscontentlistref());
                                         }
                                     }
-                                    hibernateUtil.updateRelation(attributcontent.getClasscontentlistref());
                                 }
                             }
                         }
+                        hibernateUtil.updateContent(cfclasscontent);
+                        return true;
+                    } else {
+                        return false;
                     }
-                }
-                hibernateUtil.updateContent(cfclasscontent);
-                return true;
-            } else {
-                return false;
+                case 2:
+                    clazz = cfclassService.findByName(edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-5));
+                    String name = "";
+                    Long id = 0L;
+                    for (UriParameter param : keyParams) {
+                        if (0 == param.getName().compareToIgnoreCase("name")) {
+                            name = param.getText().substring(1, param.getText().length()-1);
+                        }
+                        if (0 == param.getName().compareToIgnoreCase("id")) {
+                            id = Long.valueOf(param.getText());
+                        }
+                    }
+                    CfList dummylist = null;
+                    if (0 != id) {
+                        dummylist = cflistService.findById(id);
+                    }
+                    if (null == dummylist) {
+                        return false;
+                    } else {
+                        dummylist.setName(entity.getProperty("name").getValue().toString());
+                        cflistService.edit(dummylist);
+                        
+                        edmprovider.init();
+                        try {
+                            edmprovider.getSchemas();
+                        } catch (ODataException ex) {
+                            LOGGER.error(ex.getMessage());
+                        }
+                        return true;
+                    }
+                default:
+                    return false;
             }
         } else {
             JDBCUtil jdbcutil = new JDBCUtil(source.getClassname(), source.getUrl(), source.getUser(), source.getPassword());
@@ -705,11 +743,14 @@ public class EntityUtil {
     
     public boolean deleteEntity(EdmEntitySet edmEntitySet, List<UriParameter> keyParams, SourceStructure source) {
         if (0 == source.getSource()) {
+            String name = "";
+            CfList dummylist = null;
+            CfClasscontent cfclasscontent = null;
             switch (source.getList()) {
                 case 0:
                     CfClass clazz = cfclassService.findByName(edmEntitySet.getName());
                     try {
-                        CfClasscontent cfclasscontent = null;
+                        cfclasscontent = null;
                         for (UriParameter param : keyParams) {
                             if (0 == param.getName().compareToIgnoreCase("id")) {
                                 cfclasscontent = cfclasscontentService.findById(hibernateUtil.getContentRef(clazz.getName(), "id", Long.parseLong(param.getText())));
@@ -759,15 +800,42 @@ public class EntityUtil {
                     } catch (javax.persistence.NoResultException ex) {
                         return false;
                     }
+                case 1:
+                    name = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
+                    clazz = cfclassService.findByName(edmEntitySet.getEntityType().getName());
+                    dummylist = cflistService.findByClassrefAndName(clazz, name);
+                    
+                    cfclasscontent = null;
+                    for (UriParameter param : keyParams) {
+                        if (0 == param.getName().compareToIgnoreCase("id")) {
+                            cfclasscontent = cfclasscontentService.findById(hibernateUtil.getContentRef(clazz.getName(), "id", Long.parseLong(param.getText())));
+                        }
+                    }
+                    CfListcontentPK lcpk = new CfListcontentPK();
+                    lcpk.setListref(dummylist.getId());
+                    lcpk.setClasscontentref(cfclasscontent.getId());
+                    CfListcontent lcdel = new CfListcontent(lcpk);
+                    cflistcontentService.delete(lcdel);
+                    return true;    
                 case 2:
                     clazz = cfclassService.findByName(edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-5));
-                    String name = "";
+                    name = "";
+                    Long id = 0L;
                     for (UriParameter param : keyParams) {
                         if (0 == param.getName().compareToIgnoreCase("name")) {
                             name = param.getText().substring(1, param.getText().length()-1);
                         }
+                        if (0 == param.getName().compareToIgnoreCase("id")) {
+                            id = Long.valueOf(param.getText());
+                        }
                     }
-                    CfList dummylist = cflistService.findByClassrefAndName(clazz, name);
+                    dummylist = null;
+                    if (!name.isBlank()) {
+                        dummylist = cflistService.findByClassrefAndName(clazz, name);
+                    }
+                    if (0 != id) {
+                        dummylist = cflistService.findById(id);
+                    }
                     if (null == dummylist) {
                         return false;
                     } else {

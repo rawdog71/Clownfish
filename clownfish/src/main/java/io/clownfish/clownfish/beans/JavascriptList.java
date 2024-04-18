@@ -294,11 +294,11 @@ public class JavascriptList implements ISourceContentInterface {
     @Override
     public void onChangeName(ValueChangeEvent changeEvent) {
         if (!javascriptName.isBlank()) {
-            try {
-                cfjavascriptService.findByName(javascriptName);
-                newButtonDisabled = true;
-            } catch (NoResultException ex) {
-                newButtonDisabled = javascriptName.isEmpty();
+            CfJavascript newjavascript = cfjavascriptService.findByName(javascriptName);
+            if (null == newjavascript) {
+                newButtonDisabled = false;
+            } else {
+                newButtonDisabled = !javascriptName.isEmpty();
             }
         } else {
             newButtonDisabled = true;

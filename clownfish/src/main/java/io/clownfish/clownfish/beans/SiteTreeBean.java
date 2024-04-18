@@ -934,11 +934,11 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
-        try {
-            cfsiteService.findByName(siteName);
-            newButtonDisabled = true;
-        } catch (NoResultException ex) {
-            newButtonDisabled = siteName.isEmpty();
+        CfSite newsite = cfsiteService.findByName(siteName);
+        if (null == newsite) {
+            newButtonDisabled = false;
+        } else {
+            newButtonDisabled = !siteName.isEmpty();
         }
     }
     

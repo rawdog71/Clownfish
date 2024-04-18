@@ -151,7 +151,11 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
                 }
             }
         }
-        EntityCollection entitySet = getData(edmEntitySet, null, orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
+        Expression filterexpression = null;
+        if (null != filterOption) {
+            filterexpression = filterOption.getExpression();
+        }
+        EntityCollection entitySet = getData(edmEntitySet, filterexpression, orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
         EntityCollection returnCollection = new EntityCollection();
 
         List<Entity> entityList = entitySet.getEntities();
@@ -221,7 +225,7 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
 
             } catch (ExpressionVisitException e) {
                 throw new ODataApplicationException("Exception in filter evaluation",
-                        HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
+                    HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
             }
         }
 
@@ -329,6 +333,35 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
     }
     
     private void getDataLists(String classname, EntityCollection genericCollection, HashMap searchMap, OrderByOption orderbyoption) {
+        List<ContentDataOutput> genericPropListSet = new ArrayList<>();
+        Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+        Query query = hibernateUtil.getQuery(session_tables, searchMap, classname, getOrderbyMap(orderbyoption));
+
+        try {
+            List<Map> contentliste = (List<Map>) query.getResultList();
+
+            session_tables.close();
+            for (Map content : contentliste) {
+                CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
+                if (null != cfclasscontent) {
+                    if (!cfclasscontent.isScrapped()) {
+                        ContentDataOutput contentdataoutput = new ContentDataOutput();
+                        contentdataoutput.setContent(cfclasscontent);
+                        if (cfclasscontent.getClassref().isEncrypted()) {
+                            contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                            contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                        } else {
+                            contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
+                            contentdataoutput.setKeyval(contentUtil.getContentMap(content));
+                        }
+                        genericPropListSet.add(contentdataoutput);
+                    }
+                }
+            }
+        } catch (NoResultException ex) {
+            session_tables.close();
+        }
+        
         List<Entity> genericList = genericCollection.getEntities();
         List<CfList> cflist = cflistservice.findByClassref(cfclassservice.findByName(classname));
         for (CfList list : cflist) {
@@ -340,13 +373,24 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
             prop_id.setValue(ValueType.PRIMITIVE, list.getId());
             
             Property prop_name = new Property();
-            
             prop_name.setName("name");
             prop_name.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName().getFullQualifiedNameAsString());
             prop_name.setValue(ValueType.PRIMITIVE, list.getName());
+            
+            List<CfListcontent> listcontent = cflistcontentservice.findByListref(list.getId());
+            ArrayList<Long> listset = new ArrayList<>();
+            for (CfListcontent entry : listcontent) {
+                listset.add(getContentId(genericPropListSet, entry.getCfListcontentPK().getClasscontentref()));
+            }
+            Property prop_listset = new Property();
+            prop_listset.setName("listset");
+            prop_listset.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+            prop_listset.setValue(ValueType.COLLECTION_PRIMITIVE, listset);
+            
             Entity entity = new Entity();
             entity.addProperty(prop_id);
             entity.addProperty(prop_name);
+            entity.addProperty(prop_listset);
             genericList.add(entity);
         }
     }
@@ -461,5 +505,14 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         } else {
             return "ASC";
         }
+    }
+
+    private Long getContentId(List<ContentDataOutput> genericPropListSet, long classcontentref) {
+        for (ContentDataOutput cdo : genericPropListSet) {
+            if (classcontentref == (long) cdo.getKeyval().get("cf_contentref")) {
+                return (long) cdo.getKeyval().get("id");
+            }
+        }
+        return -1L;
     }
 }

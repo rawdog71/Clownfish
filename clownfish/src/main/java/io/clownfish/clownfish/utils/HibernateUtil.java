@@ -804,7 +804,7 @@ public class HibernateUtil implements Runnable {
     
     public Query getQuery(Session session_tables, HashMap<String, String> searchmap, String inst_klasse, HashMap<String, String> orderbymap) {
         Query query = null;
-        if (!searchmap.isEmpty()) {
+        if ((null != searchmap) && (!searchmap.isEmpty())) {
             CfClass clazz = cfclassservice.findByName(inst_klasse);
             String whereclause = " WHERE ";
             for (String searchcontent : searchmap.keySet()) {

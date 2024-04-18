@@ -347,22 +347,15 @@ public class JavaList implements ISourceContentInterface
     }
 
     @Override
-    public void onChangeName(ValueChangeEvent changeEvent)
-    {
-        if (!javaName.isBlank())
-        {
-            try
-            {
-                cfjavaService.findByName(javaName);
-                newButtonDisabled = true;
+    public void onChangeName(ValueChangeEvent changeEvent) {
+        if (!javaName.isBlank()) {
+            CfJava newjava = cfjavaService.findByName(javaName);
+            if (null == newjava) {
+                newButtonDisabled = false;
+            } else {
+                newButtonDisabled = !javaName.isEmpty();
             }
-            catch (NoResultException ex)
-            {
-                newButtonDisabled = javaName.isEmpty();
-            }
-        }
-        else
-        {
+        } else {
             newButtonDisabled = true;
         }
     }

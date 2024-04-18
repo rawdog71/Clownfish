@@ -611,21 +611,20 @@ public class Clownfish {
                 ArrayList urlParams = new ArrayList();
                 // fetch site by name or aliasname
                 CfSite cfsite = null;
-                try {
-                    cfsite = cfsiteService.findByName(name);
-                } catch (Exception ex) {
-                    try {
-                        aliasname = name;
-                        cfsite = cfsiteService.findByAliaspath(name);
+                cfsite = cfsiteService.findByName(name);
+                if (null == cfsite) {
+                    aliasname = name;
+                    cfsite = cfsiteService.findByAliaspath(name);
+                    if (null != cfsite) {
                         name = cfsite.getName();
                         alias = true;
-                    } catch (Exception e1) {
-                        try {
-                            aliasname = name;
-                            cfsite = cfsiteService.findByShorturl(name);
+                    } else {
+                        aliasname = name;
+                        cfsite = cfsiteService.findByShorturl(name);
+                        if (null != cfsite) {
                             name = cfsite.getName();
                             alias = true;
-                        } catch (Exception ey) {
+                        } else {
                             throw new PageNotFoundException("PageNotFound Exception: " + name);
                         }
                     }

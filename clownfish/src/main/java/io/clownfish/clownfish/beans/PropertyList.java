@@ -136,11 +136,11 @@ public class PropertyList {
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
-        try {
-            cfpropertyService.findByHashkey(propertykey);
-            newPropertyButtonDisabled = true;
-        } catch (NoResultException ex) {
-            newPropertyButtonDisabled = selectedProperty.getHashkey().isEmpty();
+        CfProperty newproperty = cfpropertyService.findByHashkey(propertykey);
+        if (null == newproperty) {
+            newPropertyButtonDisabled = false;
+        } else {
+            newPropertyButtonDisabled = !selectedProperty.getHashkey().isEmpty();
         }
     }
 }

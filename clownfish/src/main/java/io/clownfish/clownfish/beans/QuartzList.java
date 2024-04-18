@@ -331,11 +331,11 @@ public class QuartzList {
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
-        try {
-            cfquartzService.findByName(jobname);
-            newJobButtonDisabled = true;
-        } catch (NoResultException ex) {
-            newJobButtonDisabled = selectedQuartz.getName().isEmpty();
+        CfQuartz newquartz = cfquartzService.findByName(jobname);
+        if (null == newquartz) {
+            newJobButtonDisabled = false;
+        } else {
+            newJobButtonDisabled = !selectedQuartz.getName().isEmpty();
         }
     }
     

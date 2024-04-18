@@ -295,11 +295,11 @@ public class StylesheetList implements ISourceContentInterface {
     @Override
     public void onChangeName(ValueChangeEvent changeEvent) {
         if (!stylesheetName.isBlank()) {
-            try {
-                cfstylesheetService.findByName(stylesheetName);
-                newButtonDisabled = true;
-            } catch (NoResultException ex) {
-                newButtonDisabled = stylesheetName.isEmpty();
+            CfStylesheet newstylesheet = cfstylesheetService.findByName(stylesheetName);
+            if (null == newstylesheet) {
+                newButtonDisabled = false;
+            } else {
+                newButtonDisabled = !stylesheetName.isEmpty();
             }
         } else {
             newButtonDisabled = true;

@@ -42,6 +42,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Locale;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmInt16;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmInt64;
 
 /**
  *
@@ -142,16 +144,20 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
         } else {
             // Try to convert the literal into a Java Integer
             try {
-                if (literal.getType() instanceof EdmInt32 || literal.getType() instanceof EdmSByte) {
-                    return Integer.parseInt(literalAsString);
+                if (literal.getType() instanceof EdmInt32 || literal.getType() instanceof EdmInt16 || literal.getType() instanceof EdmSByte) {
+                    return Integer.valueOf(literalAsString);
                 } else {
-                    if (literal.getType() instanceof EdmBoolean) {
-                        return Boolean.parseBoolean(literalAsString);
+                    if (literal.getType() instanceof EdmInt64) {
+                        return Long.valueOf(literalAsString);
                     } else {
-                        if (literal.getType() instanceof EdmDecimal) {
-                            return Double.parseDouble(literalAsString);
+                        if (literal.getType() instanceof EdmBoolean) {
+                            return Boolean.valueOf(literalAsString);
                         } else {
-                            return null;
+                            if (literal.getType() instanceof EdmDecimal) {
+                                return Double.valueOf(literalAsString);
+                            } else {
+                                return null;
+                            }
                         }
                     }
                 }

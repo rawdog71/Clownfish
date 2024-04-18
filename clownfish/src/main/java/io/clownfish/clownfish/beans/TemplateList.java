@@ -330,11 +330,11 @@ public class TemplateList implements ISourceContentInterface {
     @Override
     public void onChangeName(ValueChangeEvent changeEvent) {
         if (!templateName.isBlank()) {
-            try {
-                cftemplateService.findByName(templateName);
-                newButtonDisabled = true;
-            } catch (NoResultException ex) {
-                newButtonDisabled = templateName.isEmpty();
+            CfTemplate newtemplate = cftemplateService.findByName(templateName);
+            if (null == newtemplate) {
+                newButtonDisabled = false;
+            } else {
+                newButtonDisabled = !templateName.isEmpty();
             }
         } else {
             newButtonDisabled = true;

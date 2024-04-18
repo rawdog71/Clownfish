@@ -554,11 +554,11 @@ public class ContentList implements Serializable {
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
-        try {
-            cfclasscontentService.findByName(contentName);
-            newContentButtonDisabled = true;
-        } catch (NoResultException ex) {
-            newContentButtonDisabled = contentName.isEmpty();
+        CfClasscontent newclasscontent = cfclasscontentService.findByName(contentName);
+        if (null == newclasscontent) {
+            newContentButtonDisabled = false;
+        } else {
+            newContentButtonDisabled = !contentName.isEmpty();
         }
     }
     

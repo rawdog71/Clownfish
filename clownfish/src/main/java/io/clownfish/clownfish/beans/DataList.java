@@ -96,18 +96,15 @@ public class DataList implements Serializable {
     }
     
     public void onCreateContent(ActionEvent actionEvent) {
-        try {
-            contentName = contentName.trim().replaceAll("\\s+", "_");
-            cflistService.findByName(contentName);
-        } catch (NoResultException ex) {
+        contentName = contentName.trim().replaceAll("\\s+", "_");
+        CfList newlist = cflistService.findByName(contentName);
+        if (null == newlist) {
             CfList newlistcontent = new CfList();
             newlistcontent.setName(contentName);
             newlistcontent.setClassref(selectedClass);
             
             cflistService.create(newlistcontent);
             onRefreshAll();
-        } catch (ConstraintViolationException ex) {
-            LOGGER.error(ex.getMessage());
         }
     }
     

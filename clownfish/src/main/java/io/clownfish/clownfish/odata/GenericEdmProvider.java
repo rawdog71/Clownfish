@@ -331,6 +331,9 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider {
                         CsdlProperty prop_name = new CsdlProperty().setName("name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
                         propsList.add(prop_name);
                         
+                        CsdlProperty prop_listset = new CsdlProperty().setName("listset").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(true);
+                        propsList.add(prop_listset);
+                        
                         entityType.setProperties(propsList);
                         entityType.setKey(keysList);
                         return entityType;
