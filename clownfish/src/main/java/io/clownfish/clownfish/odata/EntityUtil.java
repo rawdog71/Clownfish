@@ -497,13 +497,30 @@ public class EntityUtil {
                     return entity;
                 case 2:
                     clazz = cfclassService.findByName(edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-5));
+                    List<ContentDataOutput> genericPropListSet = hibernateUtil.getDatalist(clazz.getName());
+                    
                     name = entity.getProperty("name").getValue().toString();
                     dummylist = cflistService.findByClassrefAndName(clazz, name);
                     if (null == dummylist) {
                         CfList newlist = new CfList();
                         newlist.setClassref(clazz);
                         newlist.setName(name);
-                        cflistService.create(newlist);
+                        newlist = cflistService.create(newlist);
+                        
+                        List<CfListcontent> listcontent = cflistcontentService.findByListref(newlist.getId());
+                        for (CfListcontent entry : listcontent) {
+                            cflistcontentService.delete(entry);
+                        }
+                        ArrayList listset = (ArrayList) entity.getProperty("listset").getValue();
+                        for (Object entry : listset) {
+                            CfListcontent listcontententry = new CfListcontent();
+                            listcontententry.setCfListcontentPK(new CfListcontentPK(newlist.getId(), getContentId(genericPropListSet, Long.valueOf((Integer)entry))));
+                            cflistcontentService.create(listcontententry);
+                        }
+                        Property prop_listset = new Property();
+                        prop_listset.setName("listset");
+                        prop_listset.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+                        prop_listset.setValue(ValueType.COLLECTION_PRIMITIVE, listset);
                         
                         edmprovider.init();
                         Thread edmprovider_thread = new Thread(edmprovider);
