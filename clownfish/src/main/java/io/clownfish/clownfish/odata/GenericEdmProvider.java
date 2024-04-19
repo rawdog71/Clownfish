@@ -106,6 +106,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
     }
     
     private CsdlSchema generateSchemas() throws ODataException {
+        LOGGER.info("START GENERATE ODATA SCHEMA");
         CsdlSchema entity_schema = new CsdlSchema();
         entity_schema.setNamespace(NAMESPACE_ENTITY);
         // add EntityTypes
@@ -220,6 +221,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
         entity_schema.setComplexTypes(complexTypes);
         // add EntityContainer
         entity_schema.setEntityContainer(getEntityContainer());
+        LOGGER.info("STOP GENERATE ODATA SCHEMA");
         return entity_schema;    
     }
 
