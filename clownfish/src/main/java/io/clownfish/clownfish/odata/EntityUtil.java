@@ -72,13 +72,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.NoResultException;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
+import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.edm.provider.CsdlComplexType;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainer;
@@ -505,12 +504,11 @@ public class EntityUtil {
                         newlist.setClassref(clazz);
                         newlist.setName(name);
                         cflistService.create(newlist);
+                        
                         edmprovider.init();
-                        try {
-                            edmprovider.getSchemas();
-                        } catch (ODataException ex) {
-                            LOGGER.error(ex.getMessage());
-                        }
+                        Thread edmprovider_thread = new Thread(edmprovider);
+                        edmprovider_thread.start();
+                        
                         entity.getProperty("id").setValue(ValueType.PRIMITIVE, newlist.getId());
                         return entity;
                     } else {
@@ -667,6 +665,7 @@ public class EntityUtil {
                     }
                 case 2:
                     clazz = cfclassService.findByName(edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-5));
+                    List<ContentDataOutput> genericPropListSet = hibernateUtil.getDatalist(clazz.getName());
                     String name = "";
                     Long id = 0L;
                     for (UriParameter param : keyParams) {
@@ -687,12 +686,24 @@ public class EntityUtil {
                         dummylist.setName(entity.getProperty("name").getValue().toString());
                         cflistService.edit(dummylist);
                         
-                        edmprovider.init();
-                        try {
-                            edmprovider.getSchemas();
-                        } catch (ODataException ex) {
-                            LOGGER.error(ex.getMessage());
+                        List<CfListcontent> listcontent = cflistcontentService.findByListref(dummylist.getId());
+                        for (CfListcontent entry : listcontent) {
+                            cflistcontentService.delete(entry);
                         }
+                        ArrayList listset = (ArrayList) entity.getProperty("listset").getValue();
+                        for (Object entry : listset) {
+                            CfListcontent lc = new CfListcontent();
+                            lc.setCfListcontentPK(new CfListcontentPK(dummylist.getId(), getContentId(genericPropListSet, Long.valueOf((Integer)entry))));
+                            cflistcontentService.create(lc);
+                        }
+                        Property prop_listset = new Property();
+                        prop_listset.setName("listset");
+                        prop_listset.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+                        prop_listset.setValue(ValueType.COLLECTION_PRIMITIVE, listset);
+                        
+                        edmprovider.init();
+                        Thread edmprovider_thread = new Thread(edmprovider);
+                        edmprovider_thread.start();
                         return true;
                     }
                 default:
@@ -853,13 +864,9 @@ public class EntityUtil {
                         for (CfSitelist sc : sitecontent) {
                             cfsitelistService.delete(sc);
                         }
-                        
                         edmprovider.init();
-                        try {
-                            edmprovider.getSchemas();
-                        } catch (ODataException ex) {
-                            LOGGER.error(ex.getMessage());
-                        }
+                        Thread edmprovider_thread = new Thread(edmprovider);
+                        edmprovider_thread.start();
                         return true;
                     }
                 default:
@@ -1095,5 +1102,14 @@ public class EntityUtil {
             values.put(up.getName(), new String[]{up.getText()});
         }
         return values;
+    }
+    
+    private Long getContentId(List<ContentDataOutput> genericPropListSet, long classcontentref) {
+        for (ContentDataOutput cdo : genericPropListSet) {
+            if (classcontentref == (long) cdo.getKeyval().get("id")) {
+                return (long) cdo.getKeyval().get("cf_contentref");
+            }
+        }
+        return -1L;
     }
 }

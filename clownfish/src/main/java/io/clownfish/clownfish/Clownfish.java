@@ -370,11 +370,8 @@ public class Clownfish {
         }
         
         edmprovider.init();
-        try {
-            edmprovider.getSchemas();
-        } catch (ODataException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Thread edmprovider_thread = new Thread(edmprovider);
+        edmprovider_thread.start();
         
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model = null;

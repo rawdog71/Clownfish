@@ -18,7 +18,6 @@ package io.clownfish.clownfish.odata;
 
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.datamodels.SearchValues;
-import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
@@ -34,7 +33,6 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
-import io.clownfish.clownfish.utils.EncryptUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -44,7 +42,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import javax.persistence.NoResultException;
@@ -81,8 +78,6 @@ import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.queryoption.OrderByItem;
 import org.apache.olingo.server.api.uri.queryoption.OrderByOption;
-import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
-import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
 import org.apache.olingo.server.core.uri.UriParameterImpl;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -220,35 +215,7 @@ public class GenericSingletonProcessor implements EntityProcessor {
     }
     
     private void getDataLists(String classname, EntityCollection genericCollection, HashMap<String, String> searchmap, OrderByOption orderbyoption) {
-        List<ContentDataOutput> genericPropListSet = new ArrayList<>();
-        Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
-        Query query = hibernateUtil.getQuery(session_tables, null, classname, getOrderbyMap(orderbyoption));
-
-        try {
-            List<Map> contentliste = (List<Map>) query.getResultList();
-
-            session_tables.close();
-            for (Map content : contentliste) {
-                CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
-                if (null != cfclasscontent) {
-                    if (!cfclasscontent.isScrapped()) {
-                        ContentDataOutput contentdataoutput = new ContentDataOutput();
-                        contentdataoutput.setContent(cfclasscontent);
-                        if (cfclasscontent.getClassref().isEncrypted()) {
-                            contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
-                            contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
-                        } else {
-                            contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
-                            contentdataoutput.setKeyval(contentUtil.getContentMap(content));
-                        }
-                        genericPropListSet.add(contentdataoutput);
-                    }
-                }
-            }
-        } catch (NoResultException ex) {
-            session_tables.close();
-        }
-        
+        List<ContentDataOutput> genericPropListSet = hibernateUtil.getDatalist(classname);
         String searchcontentval = "";
         String searchvalue = "";
         

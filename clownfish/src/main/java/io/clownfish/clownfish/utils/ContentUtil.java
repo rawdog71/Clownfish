@@ -33,8 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.zip.DataFormatException;
+import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Session;
@@ -84,6 +84,11 @@ public class ContentUtil implements IVersioningInterface {
 
     @Value("${hibernate.use:0}") int useHibernate;
 
+    @PostConstruct
+    public void init() {
+        hibernateUtil.setContentUtil(this);
+    }
+    
     public void init(MarkdownUtil markdownUtil, String site, List urlParams) {
         this.markdownUtil = markdownUtil;
         this.markdownUtil.setSite(site);

@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.beans.ServiceStatus;
+import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.datamodels.HibernateInit;
 import io.clownfish.clownfish.datamodels.SearchValues;
 import io.clownfish.clownfish.dbentities.CfAttribut;
@@ -76,6 +77,7 @@ public class HibernateUtil implements Runnable {
     @Autowired MarkdownUtil markdownUtil;
     private @Getter @Setter int hibernateInit = 0;
     @Autowired private PropertyUtil propertyUtil;
+    public @Getter @Setter ContentUtil contentUtil;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     
@@ -972,5 +974,37 @@ public class HibernateUtil implements Runnable {
             LOGGER.error("HIBERNATEUTIL: " + tablename + " is empty. Please use hibernate.init=1 in application.properties");
         }
         return contentref;
+    }
+    
+    public List<ContentDataOutput> getDatalist(String classname) {
+        List<ContentDataOutput> genericPropListSet = new ArrayList<>();
+        Session session_tables = HibernateUtil.getClasssessions().get("tables").getSessionFactory().openSession();
+        Query query = getQuery(session_tables, null, classname, null);
+
+        try {
+            List<Map> contentliste = (List<Map>) query.getResultList();
+
+            session_tables.close();
+            for (Map content : contentliste) {
+                CfClasscontent cfclasscontent = cfclasscontentService.findById((long)content.get("cf_contentref"));
+                if (null != cfclasscontent) {
+                    if (!cfclasscontent.isScrapped()) {
+                        ContentDataOutput contentdataoutput = new ContentDataOutput();
+                        contentdataoutput.setContent(cfclasscontent);
+                        if (cfclasscontent.getClassref().isEncrypted()) {
+                            contentdataoutput.setKeyvals(contentUtil.getContentMapListDecrypted(content, cfclasscontent.getClassref()));
+                            contentdataoutput.setKeyval(contentUtil.getContentMapDecrypted(content, cfclasscontent.getClassref()));
+                        } else {
+                            contentdataoutput.setKeyvals(contentUtil.getContentMapList(content));
+                            contentdataoutput.setKeyval(contentUtil.getContentMap(content));
+                        }
+                        genericPropListSet.add(contentdataoutput);
+                    }
+                }
+            }
+        } catch (NoResultException ex) {
+            session_tables.close();
+        }
+        return genericPropListSet;
     }
 }
