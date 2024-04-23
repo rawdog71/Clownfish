@@ -206,10 +206,10 @@ public class ClassList implements Serializable {
     }
     
     public void onChangeAttributName(ValueChangeEvent changeEvent) {
-        try {
-            cfattributService.findByNameAndClassref(attributName, selectedClass);
+        CfAttribut dummyattribut = cfattributService.findByNameAndClassref(attributName, selectedClass);
+        if (null != dummyattribut) {
             newAttributButtonDisabled = true;
-        } catch (NoResultException ex) {
+        } else {
             newAttributButtonDisabled = attributName.isEmpty();
         }
     }
