@@ -2634,6 +2634,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t$http.delete('/OData/").append(clazz.getName()).append("(' + id + ')').then(function (res) {").append("\n");
         javascript.append("\t\tif (res.status === 200) {").append("\n");
         javascript.append("\t\t\t$scope.get").append(clazz.getName()).append("list();").append("\n");
+        javascript.append("\t\t\t$scope.get").append(clazz.getName()).append("listArray();").append("\n");
         javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-delete').hide();").append("\n");
         javascript.append("\t\t}").append("\n");
