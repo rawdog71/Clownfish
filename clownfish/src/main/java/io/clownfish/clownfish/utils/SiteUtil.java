@@ -286,13 +286,14 @@ public class SiteUtil {
         String shorturl = "";
         boolean notfound = true;
         while (notfound) {
+            shorturl = "";
             for (int i = 1; i <= 5; i++) {
                 shorturl += getRandomChar();
             }
-            try {
-                cfsiteService.findByShorturl(shorturl);
+            CfSite shortsite = cfsiteService.findByShorturl(shorturl);
+            if (null != shortsite) {
                 notfound = true;
-            } catch (Exception ex) {
+            } else {
                 notfound = false;
             }
         }
@@ -396,10 +397,10 @@ public class SiteUtil {
         int i = 1;
         boolean found = false;
         do {
-            try {
-                cfsiteService.findByName(name+"_"+i);
+            CfSite dummy = cfsiteService.findByName(name+"_"+i);
+            if (null != dummy) {
                 i++;
-            } catch(Exception ex) {
+            } else {
                 found = true;
             }
         } while (!found);

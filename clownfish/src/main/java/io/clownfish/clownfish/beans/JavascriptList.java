@@ -310,7 +310,7 @@ public class JavascriptList implements ISourceContentInterface {
         try {
             if (!javascriptName.isBlank()) {
                 CfJavascript newjavascript = new CfJavascript();
-                newjavascript.setName(javascriptName);
+                newjavascript.setName(javascriptName.replaceAll("[^a-zA-Z0-9]", "_"));
                 newjavascript.setContent("//"+javascriptName);
                 if (loginbean.getCfuser().getSuperadmin()) {
                     newjavascript.setInvisible(invisible);

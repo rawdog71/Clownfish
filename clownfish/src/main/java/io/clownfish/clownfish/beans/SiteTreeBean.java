@@ -946,7 +946,7 @@ public class SiteTreeBean implements Serializable {
         try {
             CfSite newsite = new CfSite();
             newsite.setHitcounter(BigInteger.ZERO);
-            newsite.setName(siteName);
+            newsite.setName(siteName.replaceAll("[^a-zA-Z0-9]", "_"));
             if (null != selectedSite) {
                 newsite.setParentref(selectedSite);
             } else {

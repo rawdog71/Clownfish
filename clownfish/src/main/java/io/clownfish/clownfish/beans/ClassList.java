@@ -216,7 +216,7 @@ public class ClassList implements Serializable {
     
     public void onCreate(ActionEvent actionEvent) {
         try {
-            className = className.trim().replaceAll("\\s+", "_");
+            className = className.trim().replaceAll("[^a-zA-Z0-9]", "_");
             className = className.toLowerCase();
             className = StringUtils.capitalise(className);
             CfClass newclass = new CfClass();

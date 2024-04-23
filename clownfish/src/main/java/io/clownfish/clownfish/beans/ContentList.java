@@ -348,9 +348,9 @@ public class ContentList implements Serializable {
         try {
             CfClasscontent newclasscontent = new CfClasscontent();
             if (contentName.startsWith(selectedClass.getName().toUpperCase() + "_")) {
-                contentName = contentName.replaceAll("\\s+", "_");
+                contentName = contentName.replaceAll("[^a-zA-Z0-9]", "_");
             } else {
-                contentName = selectedClass.getName().toUpperCase() + "_" + contentName.replaceAll("\\s+", "_");
+                contentName = selectedClass.getName().toUpperCase() + "_" + contentName.replaceAll("[^a-zA-Z0-9]", "_");
             }
             newclasscontent.setName(contentName);
             newclasscontent.setClassref(selectedClass);
@@ -421,9 +421,9 @@ public class ContentList implements Serializable {
                 CfClasscontent newclasscontent = new CfClasscontent();
                 String newname = contentUtil.getUniqueName(selectedContent.getName());
                 if (newname.startsWith(selectedClass.getName().toUpperCase() + "_")) {
-                    newname = newname.replaceAll("\\s+", "_");
+                    newname = newname.replaceAll("[^a-zA-Z0-9]", "_");
                 } else {
-                    newname = selectedClass.getName().toUpperCase() + "_" + newname.replaceAll("\\s+", "_");
+                    newname = selectedClass.getName().toUpperCase() + "_" + newname.replaceAll("[^a-zA-Z0-9]", "_");
                 }
                 newclasscontent.setName(newname);
                 

@@ -96,7 +96,7 @@ public class DataList implements Serializable {
     }
     
     public void onCreateContent(ActionEvent actionEvent) {
-        contentName = contentName.trim().replaceAll("\\s+", "_");
+        contentName = contentName.trim().replaceAll("[^a-zA-Z0-9]", "_");
         CfList newlist = cflistService.findByName(contentName);
         if (null == newlist) {
             CfList newlistcontent = new CfList();

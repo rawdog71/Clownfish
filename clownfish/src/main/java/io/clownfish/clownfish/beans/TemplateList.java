@@ -346,7 +346,7 @@ public class TemplateList implements ISourceContentInterface {
         try {
             if (!templateName.isBlank()) {
                 CfTemplate newtemplate = new CfTemplate();
-                newtemplate.setName(templateName);
+                newtemplate.setName(templateName.replaceAll("[^a-zA-Z0-9]", "_"));
                 newtemplate.setContent("//"+templateName);
                 newtemplate.setScriptlanguage(templateScriptLanguage);
                 newtemplate.setType(type);

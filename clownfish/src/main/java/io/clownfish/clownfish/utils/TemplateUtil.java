@@ -468,10 +468,10 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
         int i = 1;
         boolean found = false;
         do {
-            try {
-                cftemplateService.findByName(name+"_"+i);
+            CfTemplate dummy = cftemplateService.findByName(name+"_"+i);
+            if (null != dummy) {
                 i++;
-            } catch(Exception ex) {
+            } else {
                 found = true;
             }
         } while (!found);

@@ -311,7 +311,7 @@ public class StylesheetList implements ISourceContentInterface {
         try {
             if (!stylesheetName.isBlank()) {
                 CfStylesheet newstylesheet = new CfStylesheet();
-                newstylesheet.setName(stylesheetName);
+                newstylesheet.setName(stylesheetName.replaceAll("[^a-zA-Z0-9]", "_"));
                 newstylesheet.setContent("//"+stylesheetName);
                 if (loginbean.getCfuser().getSuperadmin()) {
                     newstylesheet.setInvisible(invisible);

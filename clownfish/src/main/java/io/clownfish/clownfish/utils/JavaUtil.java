@@ -107,10 +107,10 @@ public class JavaUtil implements IVersioningInterface<CfJava>, Serializable {
         int i = 1;
         boolean found = false;
         do {
-            try {
-                cfjavaService.findByName(name+"_"+i);
+            CfJava dummy = cfjavaService.findByName(name+"_"+i);
+            if (null != dummy) {
                 i++;
-            } catch(Exception ex) {
+            } else {
                 found = true;
             }
         } while (!found);

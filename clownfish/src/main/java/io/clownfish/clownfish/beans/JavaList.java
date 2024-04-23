@@ -368,7 +368,7 @@ public class JavaList implements ISourceContentInterface
             if (!javaName.isBlank())
             {
                 CfJava newjava = new CfJava();
-                newjava.setName(javaName);
+                newjava.setName(javaName.replaceAll("[^a-zA-Z0-9]", "_"));
                 
                 switch (javaLanguage) {
                     case 0:

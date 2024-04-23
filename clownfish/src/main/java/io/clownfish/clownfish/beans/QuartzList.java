@@ -287,7 +287,7 @@ public class QuartzList {
     public void onCreateJob(ActionEvent actionEvent) {
         try {
             CfQuartz newquartz = new CfQuartz();
-            newquartz.setName(jobname);
+            newquartz.setName(jobname.replaceAll("[^a-zA-Z0-9]", "_"));
             newquartz.setSchedule(jobvalue);
             newquartz.setActive(active);
             newquartz.setParameter(params);

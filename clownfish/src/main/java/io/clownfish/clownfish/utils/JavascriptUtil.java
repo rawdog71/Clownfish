@@ -121,10 +121,10 @@ public class JavascriptUtil implements IVersioningInterface, Serializable {
         int i = 1;
         boolean found = false;
         do {
-            try {
-                cfjavascriptService.findByName(name+"_"+i);
+            CfJavascript dummy = cfjavascriptService.findByName(name+"_"+i);
+            if (null != dummy) {
                 i++;
-            } catch(Exception ex) {
+            } else {
                 found = true;
             }
         } while (!found);

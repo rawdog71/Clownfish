@@ -499,7 +499,7 @@ public class EntityUtil {
                     clazz = cfclassService.findByName(edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-5));
                     List<ContentDataOutput> genericPropListSet = hibernateUtil.getDatalist(clazz.getName());
                     
-                    name = entity.getProperty("name").getValue().toString();
+                    name = entity.getProperty("name").getValue().toString().replaceAll("[^a-zA-Z0-9]", "_");
                     dummylist = cflistService.findByClassrefAndName(clazz, name);
                     if (null == dummylist) {
                         CfList newlist = new CfList();
@@ -700,7 +700,7 @@ public class EntityUtil {
                     if (null == dummylist) {
                         return false;
                     } else {
-                        dummylist.setName(entity.getProperty("name").getValue().toString());
+                        dummylist.setName(entity.getProperty("name").getValue().toString().replaceAll("[^a-zA-Z0-9]", "_"));
                         cflistService.edit(dummylist);
                         
                         List<CfListcontent> listcontent = cflistcontentService.findByListref(dummylist.getId());

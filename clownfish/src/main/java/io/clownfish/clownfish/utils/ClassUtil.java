@@ -935,6 +935,14 @@ public class ClassUtil implements Serializable {
         html.append("\t\t<script src=\"/resources/js/pikaday.js\"></script>").append("\n");
         html.append("\t</head>").append("\n");
         html.append("\t<body id=\"page-top\" ng-controller=\"Crud").append(clazz.getName()).append("Controller\" data-ng-init=\"init()\">").append("\n");
+        
+        html.append("\t\t<ul class=\"uk-subnav uk-subnav-pill\" uk-switcher>").append("\n");
+	html.append("\t\t\t<li><a href=\"#\">").append(clazz.getName()).append("</a></li>").append("\n");
+	html.append("\t\t\t<li><a href=\"#\">").append(clazz.getName()).append(" Listen</a></li>").append("\n");
+	html.append("\t\t</ul>").append("\n");
+	html.append("\t\t<ul class=\"uk-switcher uk-margin\">").append("\n");
+	html.append("\t\t\t<li>").append("\n");
+        
         html.append("\t\t<div class=\"uk-container-large uk-align-center\">").append("\n");
         html.append("\t\t\t<div class=\"uk-margin-top\">").append("\n");
         html.append("\t\t\t\t<table class=\"uk-table uk-table-small uk-table-striped\">").append("\n");
@@ -1486,27 +1494,569 @@ public class ClassUtil implements Serializable {
             }
         }
 
-	html.append("\t\t<div class=\"uk-align-right\">").append("\n");
-	html.append("\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"update").append(clazz.getName()).append("(").append(clazz.getName()).append(".id)\" ng-disabled=\"inprogress\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
-	html.append("\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
-	html.append("\t\t</div>").append("\n");
-	html.append("\t\t</div>").append("\n");
-	html.append("\t\t</div>").append("\n");
-	html.append("\t\t</div>").append("\n");
-        html.append("\n");
-        html.append("\t\t<div id=\"modal-").append(clazz.getName().toLowerCase()).append("-delete\" class=\"uk-modal-container uk-flex-top\" uk-modal>").append("\n");
-        html.append("\t\t\t<div class=\"uk-modal-dialog uk-modal-header\">").append("\n");
-	html.append("\t\t\t\t<button class=\"uk-modal-close-default\" type=\"button\" uk-close></button>").append("\n");
-	html.append("\t\t\t\t<h2 class=\"uk-modal-title\">").append(clazz.getName()).append(" löschen</h2>").append("\n");
-	html.append("\t\t\t\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
-	html.append("\t\t\t\t\t<p>{{").append(clazz.getName()).append(".id}}</p>").append("\n");
-	html.append("\t\t\t\t\t<div class=\"uk-align-right\">").append("\n");
-	html.append("\t\t\t\t\t\t<button class=\"uk-button uk-button-danger\" type=\"button\" ng-click=\"delete").append(clazz.getName()).append("(").append(clazz.getName()).append(".id)\" ng-disabled=\"inprogress\">Löschen <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
-	html.append("\t\t\t\t\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
-	html.append("\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t<div class=\"uk-align-right\">").append("\n");
+	html.append("\t\t\t\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"update").append(clazz.getName()).append("(").append(clazz.getName()).append(".id)\" ng-disabled=\"inprogress\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+	html.append("\t\t\t\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
 	html.append("\t\t\t\t</div>").append("\n");
 	html.append("\t\t\t</div>").append("\n");
 	html.append("\t\t</div>").append("\n");
+	html.append("\t</div>").append("\n");
+        html.append("\n");
+        html.append("\t<div id=\"modal-").append(clazz.getName().toLowerCase()).append("-delete\" class=\"uk-modal-container uk-flex-top\" uk-modal>").append("\n");
+        html.append("\t\t<div class=\"uk-modal-dialog uk-modal-header\">").append("\n");
+	html.append("\t\t\t<button class=\"uk-modal-close-default\" type=\"button\" uk-close></button>").append("\n");
+	html.append("\t\t\t<h2 class=\"uk-modal-title\">").append(clazz.getName()).append(" löschen</h2>").append("\n");
+	html.append("\t\t\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
+	html.append("\t\t\t\t<p>{{").append(clazz.getName()).append(".id}}</p>").append("\n");
+	html.append("\t\t\t\t<div class=\"uk-align-right\">").append("\n");
+	html.append("\t\t\t\t\t<button class=\"uk-button uk-button-danger\" type=\"button\" ng-click=\"delete").append(clazz.getName()).append("(").append(clazz.getName()).append(".id)\" ng-disabled=\"inprogress\">Löschen <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+	html.append("\t\t\t\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
+	html.append("\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t</div>").append("\n");
+	html.append("\t\t</div>").append("\n");
+	html.append("\t</div>").append("\n");
+
+        html.append("\t</li>").append("\n");
+	html.append("\t<li>").append("\n");
+	html.append("\t<div class=\"uk-container-large uk-align-center\">").append("\n");
+	html.append("\t<div class=\"uk-margin-top\">").append("\n");
+	html.append("\t<table class=\"uk-table uk-table-small uk-table-striped\">").append("\n");
+	html.append("\t<caption>").append(clazz.getName()).append(" Liste <a href=\"\" class=\"uk-icon-button\" uk-icon=\"plus\" ng-click=\"add").append(clazz.getName()).append("ListModal()\" uk-tooltip=\"").append(clazz.getName()).append(" Liste hinzufügen\"></a></caption>").append("\n");
+	html.append("\t<thead style=\"position: sticky !important;top: 0;background: white;z-index: 1;\">").append("\n");
+	html.append("\t<tr>").append("\n");
+	html.append("\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_list == 'id', 'descending': order_").append(clazz.getName().toLowerCase()).append("_list == '-id'}\">ID</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("List('id')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("List('-id')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+	html.append("\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_list == 'name', 'descending': order_").append(clazz.getName().toLowerCase()).append("_list == '-name'}\">Name</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("List('name')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("List('-name')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+	html.append("\t<th></th>").append("\n");
+	html.append("\t<th class=\"uk-text-right\">Aktion</th>").append("\n");
+	html.append("\t</tr>").append("\n");
+	html.append("\t<tr>").append("\n");
+	html.append("\t<th></th>").append("\n");
+	html.append("\t<th><input id=\"filter_list_name\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_list.name.length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"Name\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_list.name\"></th>").append("\n");
+	html.append("\t<th></th>").append("\n");
+	html.append("\t<th></th>").append("\n");
+	html.append("\t</tr>").append("\n");
+	html.append("\t</thead>").append("\n");
+	html.append("\t<tbody>").append("\n");
+	html.append("\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append("Item in ").append(clazz.getName().toUpperCase()).append("LISTARRAY | filter: {name: filter_").append(clazz.getName().toLowerCase()).append("_list.name} | orderBy: order_").append(clazz.getName().toLowerCase()).append("_list\">").append("\n");
+	html.append("\t<td>{{").append(clazz.getName().toLowerCase()).append("Item.id}}</td>").append("\n");
+	html.append("\t<td>{{").append(clazz.getName().toLowerCase()).append("Item.name}}</td>").append("\n");
+	html.append("\t<td>").append("\n");
+	html.append("\t<table class=\"uk-table uk-table-small uk-table-striped\">").append("\n");
+	html.append("\t<thead>").append("\n");
+	html.append("\t<tr>").append("\n");
+	html.append("\t<th>ID</th>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t<th>").append(attr.getName()).append("</th>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t<th>").append(attr.getName()).append("</th>").append("\n");
+                        break;
+                }
+            }
+        }
+        
+	html.append("\t</tr>").append("\n");
+	html.append("\t</thead>").append("\n");
+	html.append("\t<tbody>").append("\n");
+	html.append("\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toLowerCase()).append("Item.").append(clazz.getName().toLowerCase()).append("items\">").append("\n");
+	html.append("\t<td>{{").append(clazz.getName().toLowerCase()).append(".id}}</td>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
+                        break;
+                }
+            }
+        }
+        
+	html.append("\t</tr>").append("\n");
+	html.append("\t</tbody>").append("\n");
+	html.append("\t</table>").append("\n");
+	html.append("\t</td>").append("\n");
+	html.append("\t<td class=\"uk-text-right\">").append("\n");
+	html.append("\t<a href=\"\" class=\"uk-icon-button\" ng-click=\"update").append(clazz.getName()).append("ItemModal(").append(clazz.getName().toLowerCase()).append("Item.id)\" ng-show=\"!inprogress\" uk-icon=\"pencil\" uk-tooltip=\"").append(clazz.getName()).append(" Liste ändern\"></a>").append("\n");
+	html.append("\t<a href=\"\" class=\"uk-icon-button\" ng-click=\"delete").append(clazz.getName()).append("ItemModal(").append(clazz.getName().toLowerCase()).append("Item.id)\" ng-show=\"!inprogress\" uk-icon=\"trash\" uk-tooltip=\"").append(clazz.getName()).append(" Liste löschen\"></a>").append("\n");
+	html.append("\t</td>").append("\n");
+	html.append("\t</tr>").append("\n");
+	html.append("\t</tbody>").append("\n");
+	html.append("\t</table>").append("\n");
+	html.append("\t</div>").append("\n");
+	html.append("\t</div>").append("\n");
+
+	html.append("\t<div id=\"modal-").append(clazz.getName().toLowerCase()).append("-liste-add\" class=\"uk-modal-container uk-flex-top\" uk-modal>").append("\n");
+	html.append("\t<div class=\"uk-modal-dialog uk-modal-header\">").append("\n");
+	html.append("\t<button class=\"uk-modal-close-default\" type=\"button\" uk-close></button>").append("\n");
+	html.append("\t<h2 class=\"uk-modal-title\">").append(clazz.getName()).append(" Liste hinzufügen</h2>").append("\n");
+	html.append("\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
+	html.append("\t<div class=\"uk-margin\">").append("\n");
+	html.append("\t<label class=\"uk-form-label\" for=\"input-name\">Name</label>").append("\n");
+	html.append("\t<input id=\"input-name\" class=\"uk-input\" type=\"text\" placeholder=\"name\" aria-label=\"name\" ng-model=\"").append(clazz.getName().toLowerCase()).append("list_name\">").append("\n");
+
+	html.append("\t<div class=\"uk-child-width-1-2 uk-margin\" uk-grid>").append("\n");
+	html.append("\t<div>").append("\n");
+	html.append("\t<p class=\"table-caption\">Zugeordnete Einträge</p>").append("\n");
+	html.append("\t<div class=\"uk-overflow-auto\" style=\"height: 370px\">").append("\n");
+	html.append("\t<table id=\"connected-artikel-group\" class=\"uk-table uk-table-hover uk-table-small uk-table-divider\">").append("\n");
+	html.append("\t<thead uk-sticky class=\"table-head\">").append("\n");
+	html.append("\t<tr class=\"table-row\">").append("\n");
+	html.append("\t<th class=\"uk-table-shrink\"></th>").append("\n");
+	html.append("\t<th class=\"uk-table-shrink\">ID</th>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t<th class=\"uk-table-expand\">").append(attr.getName()).append("</th>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t<th class=\"uk-table-expand\">").append(attr.getName()).append("</th>").append("\n");
+                        break;
+                }
+            }
+        }
+	html.append("\t</tr>").append("\n");
+	html.append("\t<tr class=\"table-row\">").append("\n");
+	html.append("\t<th></th>").append("\n");
+	html.append("\t<th></th>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("").append(attr.getName().toLowerCase()).append("_connected\" class=\"uk-input\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(attr.getName()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append("\"></th>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("").append(attr.getName().toLowerCase()).append("_connected\" class=\"uk-input\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(attr.getName()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append("\"></th>").append("\n");
+                        break;
+                }
+            }
+        }
+	html.append("\t</tr>").append("\n");
+	html.append("\t</thead>").append("\n");
+        
+	html.append("\t\t\t\t\t\t\t\t<tbody>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED ");
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                    case "datetime":
+                        html.append("| filter: {").append(attr.getName()).append(": filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName()).append("} ");
+                        break;
+                }
+            }
+        }
+        html.append("\">").append("\n");
+        
+	html.append("\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"disconnect").append(clazz.getName()).append("Item(").append(clazz.getName().toLowerCase()).append(".id)\"></td>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".id}}</td>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append("}}</td>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append("}}</td>").append("\n");
+                        break;
+                }
+            }
+        }
+        
+	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</tbody>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</table>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<p class=\"table-caption\">Nicht zugeordnete Einträge</p>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<div class=\"uk-overflow-auto\" style=\"height: 370px\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<table id=\"disconnected-artikel-group\" class=\"uk-table uk-table-hover uk-table-small uk-table-divider\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<thead uk-sticky class=\"table-head\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<tr class=\"table-row\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\"></th>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\">ID</th>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t<th class=\"uk-table-expand\">").append(attr.getName()).append("</th>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t<th class=\"uk-table-expand\">").append(attr.getName()).append("</th>").append("\n");
+                        break;
+                }
+            }
+        }
+	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<tr class=\"table-row\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th></th>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th></th>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("").append(attr.getName().toLowerCase()).append("_disconnected\" class=\"uk-input\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(attr.getName()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append("\"></th>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("").append(attr.getName().toLowerCase()).append("_disconnected\" class=\"uk-input\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(attr.getName()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append("\"></th>").append("\n");
+                        break;
+                }
+            }
+        }
+        
+	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</thead>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<tbody>").append("\n");
+        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED ");
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                    case "datetime":
+                        html.append("| filter: {").append(attr.getName()).append(": filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName()).append("} ");
+                        break;
+                }
+            }
+        }
+        html.append("\">").append("\n");
+        
+	html.append("\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"connect").append(clazz.getName()).append("Item(").append(clazz.getName().toLowerCase()).append(".id)\"></td>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".id}}</td>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append("}}</td>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append("}}</td>").append("\n");
+                        break;
+                }
+            }
+        }
+
+	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</tbody>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</table>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+
+	html.append("\t\t\t\t\t\t\t\t<div class=\"uk-align-right\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"save").append(clazz.getName()).append("Item()\" ng-disabled=\"inprogress || ").append(clazz.getName().toLowerCase()).append("list_name.length == 0\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<button class=\"uk-button uk-button-secondary\" type=\"button\" ng-click=\"closeModal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-add')\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+
+	html.append("\t\t\t\t\t\t\t\t<div id=\"modal-").append(clazz.getName().toLowerCase()).append("-liste-update\" class=\"uk-modal-container uk-flex-top\" uk-modal>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<div class=\"uk-modal-dialog uk-modal-header\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<button class=\"uk-modal-close-default\" type=\"button\" uk-close></button>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<h2 class=\"uk-modal-title\">").append(clazz.getName()).append(" Liste ändern</h2>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-name\">Name</label>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<input id=\"input-name\" class=\"uk-input\" type=\"text\" placeholder=\"name\" aria-label=\"name\" ng-model=\"").append(clazz.getName().toLowerCase()).append("list_name\">").append("\n");
+
+	html.append("\t\t\t\t\t\t\t\t<div class=\"uk-child-width-1-2 uk-margin\" uk-grid>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<p class=\"table-caption\">Zugeordnete Artikel</p>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<div class=\"uk-overflow-auto\" style=\"height: 370px\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<table id=\"connected-artikel-group\" class=\"uk-table uk-table-hover uk-table-small uk-table-divider\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<thead class=\"table-head\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<tr  class=\"table-row\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\"></th>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\">ID</th>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t\t\t\t\t\t\t\t<th class=\"uk-table-expand\">").append(attr.getName()).append("</th>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t\t\t\t\t\t\t\t<th class=\"uk-table-expand\">").append(attr.getName()).append("</th>").append("\n");
+                        break;
+                }
+            }
+        }
+        
+	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<tr class=\"table-row\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th></th>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th></th>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("").append(attr.getName().toLowerCase()).append("_connected\" class=\"uk-input\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(attr.getName()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append("\"></th>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("").append(attr.getName().toLowerCase()).append("_connected\" class=\"uk-input\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(attr.getName()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append("\"></th>").append("\n");
+                        break;
+                }
+            }
+        }
+	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</thead>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<tbody>").append("\n");
+        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED ");
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                    case "datetime":
+                        html.append("| filter: {").append(attr.getName()).append(": filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName()).append("} ");
+                        break;
+                }
+            }
+        }
+        html.append("\">").append("\n");
+        
+	html.append("\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"disconnect").append(clazz.getName()).append("Item(").append(clazz.getName().toLowerCase()).append(".id)\"></td>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".id}}</td>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append("}}</td>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append("}}</td>").append("\n");
+                        break;
+                }
+            }
+        }
+	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</tbody>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</table>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+
+	html.append("\t\t\t\t\t\t\t\t<div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<p class=\"table-caption\">Nicht zugeordnete Artikel</p>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<div class=\"uk-overflow-auto\" style=\"height: 370px\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<table id=\"disconnected-artikel-group\" class=\"uk-table uk-table-hover uk-table-small uk-table-divider\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<thead class=\"table-head\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<tr class=\"table-row\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\"></th>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\">ID</th>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t\t\t\t\t\t\t\t<th class=\"uk-table-expand\">").append(attr.getName()).append("</th>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t\t\t\t\t\t\t\t<th class=\"uk-table-expand\">").append(attr.getName()).append("</th>").append("\n");
+                        break;
+                }
+            }
+        }
+	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<tr class=\"table-row\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th></th>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<th></th>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("").append(attr.getName().toLowerCase()).append("_disconnected\" class=\"uk-input\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(attr.getName()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append("\"></th>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("").append(attr.getName().toLowerCase()).append("_disconnected\" class=\"uk-input\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(attr.getName()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append("\"></th>").append("\n");
+                        break;
+                }
+            }
+        }
+	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</thead>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<tbody>").append("\n");
+        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED ");
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                    case "datetime":
+                        html.append("| filter: {").append(attr.getName()).append(": filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName()).append("} ");
+                        break;
+                }
+            }
+        }
+        html.append("\">").append("\n");
+        
+	html.append("\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"connect").append(clazz.getName()).append("Item(").append(clazz.getName().toLowerCase()).append(".id)\"></td>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".id}}</td>").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append("}}</td>").append("\n");
+                        break;
+                    case "datetime":
+                        html.append("\t\t\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append("}}</td>").append("\n");
+                        break;
+                }
+            }
+        }
+	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</tbody>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</table>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<div class=\"uk-align-right\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"update").append(clazz.getName()).append("Item(IDENTIFIER.id)\" ng-disabled=\"inprogress\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t\t<button class=\"uk-button uk-button-secondary\" type=\"button\" ng-click=\"closeModal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-update')\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t<div id=\"modal-").append(clazz.getName().toLowerCase()).append("-liste-delete\" class=\"uk-modal-container uk-flex-top\" uk-modal>").append("\n");
+	html.append("\t\t\t\t\t\t<div class=\"uk-modal-dialog uk-modal-header\">").append("\n");
+	html.append("\t\t\t\t\t\t\t<button class=\"uk-modal-close-default\" type=\"button\" uk-close></button>").append("\n");
+	html.append("\t\t\t\t\t\t\t<h2 class=\"uk-modal-title\">").append(clazz.getName()).append(" Liste löschen</h2>").append("\n");
+	html.append("\t\t\t\t\t\t\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<p>{{IDENTIFIER.id}} - {{IDENTIFIER.name}}</p>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t<div class=\"uk-align-right\">").append("\n");
+	html.append("\t\t\t\t\t\t\t\t\t<button class=\"uk-button uk-button-danger\" type=\"button\" ng-click=\"delete").append(clazz.getName()).append("Item(IDENTIFIER.id)\" ng-disabled=\"inprogress\">Löschen <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t\t<button class=\"uk-button uk-button-secondary\" type=\"button\" ng-click=\"closeModal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-delete')\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
+	html.append("\t\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t\t\t</div>").append("\n");
+	html.append("\t\t\t</li>").append("\n");
+	html.append("\t\t</ul>").append("\n");
         
         html.append("\t</body>").append("\n");
         html.append("\t<script src=\"/resources/js/uikit.min.js\"></script>").append("\n");
@@ -1577,6 +2127,14 @@ public class ClassUtil implements Serializable {
             }
         }
         
+        javascript.append("\n");
+        javascript.append("\t$scope.").append(clazz.getName().toUpperCase()).append("LISTARRAY = [];").append("\n");
+        javascript.append("\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_list = {};").append("\n");
+        javascript.append("\t$scope.order_").append(clazz.getName().toLowerCase()).append("_list = 'id';").append("\n");
+        javascript.append("\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_connected = {};").append("\n");
+        javascript.append("\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_disconnected = {};").append("\n");
+        javascript.append("\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED = [];").append("\n");
+        javascript.append("\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED = [];").append("\n");
         javascript.append("\n");
         javascript.append("\t$scope.getMediaList = function() {").append("\n");
         javascript.append("\t\t$http.get('/GetAssetList?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=').then(function (res) {").append("\n");
@@ -1668,6 +2226,31 @@ public class ClassUtil implements Serializable {
         }
         
         javascript.append("\t\t$scope.getMediaList();").append("\n");
+        
+        javascript.append("\t\t$scope.get").append(clazz.getName()).append("listArray();").append("\n");
+        javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_list.name = \"\";").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                        javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        break;
+                    case "datetime":
+                        javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        break;
+                }
+            }
+        }
+        
         javascript.append("\t};").append("\n");
         javascript.append("\n");
         javascript.append("\t$scope.init").append(clazz.getName()).append(" = function() {").append("\n");
@@ -2064,6 +2647,153 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\tUIkit.modal(modalelement).hide();").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("\n");
+        javascript.append("\t$scope.get").append(clazz.getName()).append("listArray = function() {").append("\n");
+        javascript.append("\t\t$http.get('/OData/").append(clazz.getName()).append("Lists').then(function (res) {").append("\n");
+        javascript.append("\t\t\t$scope.").append(clazz.getName().toUpperCase()).append("LISTARRAY = res.data.value;").append("\n");
+        javascript.append("\t\t\tfor (const element of $scope.").append(clazz.getName().toUpperCase()).append("LISTARRAY) {").append("\n");
+        javascript.append("\t\t\t\t$http.get('/OData/'+element.name+'List').then(function (res) {").append("\n");
+        javascript.append("\t\t\t\t\tif (res.status === 200) {").append("\n");
+        javascript.append("\t\t\t\t\t\telement.").append(clazz.getName().toLowerCase()).append("items = res.data.value;").append("\n");
+        javascript.append("\t\t\t\t\t}").append("\n");
+        javascript.append("\t\t\t\t})").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.add").append(clazz.getName()).append("ListModal = function() {").append("\n");
+        javascript.append("\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t$scope.init").append(clazz.getName()).append("();").append("\n");
+        javascript.append("\t\t$scope.").append(clazz.getName().toLowerCase()).append("list_name = \"\";").append("\n");
+        javascript.append("\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED = [];").append("\n");
+        javascript.append("\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED = [];").append("\n");
+        javascript.append("\t\tfor (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST) {").append("\n");
+        javascript.append("\t\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED.push(element);").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-add').show();").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.connect").append(clazz.getName()).append("Item = function (id) {").append("\n");
+        javascript.append("\t\tfor (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST) {").append("\n");
+        javascript.append("\t\t\tif (element.id == id) {").append("\n");
+        javascript.append("\t\t\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED.push(element);").append("\n");
+        javascript.append("\t\t\t\tbreak;").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t\tconst index = getIndex($scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED, id);").append("\n");
+        javascript.append("\t\tif (index > -1) {").append("\n");
+        javascript.append("\t\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED.splice(index, 1);").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("$scope.disconnect").append(clazz.getName()).append("Item = function (id) {").append("\n");
+        javascript.append("for (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST) {").append("\n");
+        javascript.append("if (element.id == id) {").append("\n");
+        javascript.append("$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED.push(element);").append("\n");
+        javascript.append("break;").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("const index = getIndex($scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED, id);").append("\n");
+        javascript.append("if (index > -1) {").append("\n");
+        javascript.append("$scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED.splice(index, 1);").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("};").append("\n");
+
+        javascript.append("$scope.save").append(clazz.getName()).append("Item = function() {").append("\n");
+        javascript.append("$scope.inprogress = true;").append("\n");
+        javascript.append("var identifier = new Object();").append("\n");
+        javascript.append("identifier.id = null;").append("\n");
+        javascript.append("identifier.name = $scope.").append(clazz.getName().toLowerCase()).append("list_name;").append("\n");
+        javascript.append("var ").append(clazz.getName().toLowerCase()).append("set_ref = [];").append("\n");
+        javascript.append("for (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED) {").append("\n");
+        javascript.append("").append(clazz.getName().toLowerCase()).append("set_ref.push(element.id);").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("identifier.listset = ").append(clazz.getName().toLowerCase()).append("set_ref;").append("\n");
+        javascript.append("var jsonString = JSON.stringify(identifier);").append("\n");
+        javascript.append("$http.post('/OData/").append(clazz.getName()).append("Lists', jsonString).then(function (res) {").append("\n");
+        javascript.append("if (res.status === 201) {").append("\n");
+        javascript.append("$scope.get").append(clazz.getName()).append("listArray();").append("\n");
+        javascript.append("$scope.inprogress = false;").append("\n");
+        javascript.append("UIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-add').hide();").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("}, function (res) {").append("\n");
+        javascript.append("console.log(\"ERROR\");").append("\n");
+        javascript.append("});").append("\n");
+        javascript.append("};").append("\n");
+
+        javascript.append("$scope.update").append(clazz.getName()).append("ItemModal = function (id) {").append("\n");
+        javascript.append("$scope.inprogress = true;").append("\n");
+        javascript.append("UIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-update').show();").append("\n");
+        javascript.append("$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED = [];").append("\n");
+        javascript.append("$http.get('/OData/").append(clazz.getName()).append("Lists?$filter=id eq ' + id ).then(function (res) {").append("\n");
+        javascript.append("$scope.IDENTIFIER = res.data.value[0];").append("\n");
+        javascript.append("$scope.").append(clazz.getName().toLowerCase()).append("list_id = $scope.IDENTIFIER.id;").append("\n");
+        javascript.append("$scope.").append(clazz.getName().toLowerCase()).append("list_name = $scope.IDENTIFIER.name;").append("\n");
+
+        javascript.append("$http.get('/OData/' + $scope.").append(clazz.getName().toLowerCase()).append("list_name + 'List').then(function (res2) {").append("\n");
+        javascript.append("$scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED = res2.data.value;").append("\n");
+        javascript.append("for (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST) {").append("\n");
+        javascript.append("found = false;").append("\n");
+        javascript.append("for (const element2 of $scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED) {").append("\n");
+        javascript.append("if (element2.id === element.id) {").append("\n");
+        javascript.append("found = true;").append("\n");
+        javascript.append("break;").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("if (!found) {").append("\n");
+        javascript.append("$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED.push(element);").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("});").append("\n");
+        javascript.append("$scope.inprogress = false;").append("\n");
+        javascript.append("});").append("\n");
+        javascript.append("};").append("\n");
+
+        javascript.append("$scope.update").append(clazz.getName()).append("Item = function(id) {").append("\n");
+        javascript.append("$scope.inprogress = true;").append("\n");
+        javascript.append("var identifier = new Object();").append("\n");
+        javascript.append("identifier.id = id;").append("\n");
+        javascript.append("identifier.name = $scope.").append(clazz.getName().toLowerCase()).append("list_name;").append("\n");
+        javascript.append("var ").append(clazz.getName().toLowerCase()).append("set_ref = [];").append("\n");
+        javascript.append("for (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED) {").append("\n");
+        javascript.append("").append(clazz.getName().toLowerCase()).append("set_ref.push(element.id);").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("identifier.listset = ").append(clazz.getName().toLowerCase()).append("set_ref;").append("\n");
+        javascript.append("var jsonString = JSON.stringify(identifier);").append("\n");
+        javascript.append("$http.patch('/OData/").append(clazz.getName()).append("Lists(' + id + ')', jsonString).then(function (res_patch) {").append("\n");
+        javascript.append("if (res_patch.status === 200) {").append("\n");
+        javascript.append("$scope.get").append(clazz.getName()).append("listArray();").append("\n");
+        javascript.append("$scope.inprogress = false;").append("\n");
+        javascript.append("UIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-update').hide();").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("}, function (res) {").append("\n");
+        javascript.append("console.log(\"ERROR\");").append("\n");
+        javascript.append("});").append("\n");
+        javascript.append("};").append("\n");
+
+        javascript.append("$scope.delete").append(clazz.getName()).append("ItemModal = function (id) {").append("\n");
+        javascript.append("$scope.inprogress = true;").append("\n");
+        javascript.append("UIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-delete').show();").append("\n");
+        javascript.append("$http.get('/OData/").append(clazz.getName()).append("Lists?$filter=id eq ' + id).then(function (res) {").append("\n");
+        javascript.append("$scope.IDENTIFIER = res.data.value[0];").append("\n");
+        javascript.append("$scope.inprogress = false;").append("\n");
+        javascript.append("});").append("\n");
+        javascript.append("};").append("\n");
+
+        javascript.append("$scope.delete").append(clazz.getName()).append("Item = function (id) {").append("\n");
+        javascript.append("$scope.inprogress = true;").append("\n");
+        javascript.append("$http.delete('/OData/").append(clazz.getName()).append("Lists(' + id + ')').then(function (res) {").append("\n");
+        javascript.append("if (res.status === 200) {").append("\n");
+        javascript.append("$scope.get").append(clazz.getName()).append("listArray();").append("\n");
+        javascript.append("$scope.inprogress = false;").append("\n");
+        javascript.append("UIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-delete').hide();").append("\n");
+        javascript.append("}").append("\n");
+        javascript.append("}, function (res) {").append("\n");
+        javascript.append("console.log(\"ERROR\");").append("\n");
+        javascript.append("});").append("\n");
+        javascript.append("};").append("\n");
+        
+        
+        javascript.append("\n");
         javascript.append("\tgetIndex = function(array, id) {").append("\n");
         javascript.append("\t\tidx = 0;").append("\n");
         javascript.append("\t\tfor (const element of array) {").append("\n");
@@ -2105,9 +2835,8 @@ public class ClassUtil implements Serializable {
         }
 
         site.setName("crud_" + clazz.getName().toLowerCase());
-        try {
-            CfSite dummysite = cfSiteService.findByName(site.getName());
-        } catch (Exception ex) {
+        CfSite dummysite = cfSiteService.findByName(site.getName());
+        if (null == dummysite) {
             site.setCharacterencoding("UTF-8");
             site.setHitcounter(BigInteger.ZERO);
             site.setTitle("");
