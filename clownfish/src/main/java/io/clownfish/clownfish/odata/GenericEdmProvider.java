@@ -310,6 +310,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
     @Override
     public CsdlEntityType getEntityType(FullQualifiedName entityTypeName) throws ODataException {
         if (entityUtil.getEntitytypelist().containsKey(entityTypeName)) {
+            LOGGER.info(entityUtil.getEntitytypelist().get(entityTypeName).getName());
             return entityUtil.getEntitytypelist().get(entityTypeName);
         } else {
             if (entityUtil.getEntitysourcelist().containsKey(entityTypeName)) {
@@ -335,6 +336,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
 
                         if (!keysList.isEmpty()) {
                             entityUtil.getEntitytypelist().put(entityTypeName, entityType);
+                            LOGGER.info(entityUtil.getEntitytypelist().get(entityTypeName).getName());
                             return entityType;
                         } else {
                             LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
@@ -360,6 +362,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                         
                         entityType.setProperties(propsList);
                         entityType.setKey(keysList);
+                        LOGGER.info(entityType.getName());
                         return entityType;
                     }
                 } else {
@@ -383,6 +386,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
 
                     if (!keysList.isEmpty()) {
                         entityUtil.getEntitytypelist().put(entityTypeName, entityType);
+                        LOGGER.info(entityUtil.getEntitytypelist().get(entityTypeName).getName());
                         return entityType;
                     } else {
                         LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
@@ -390,6 +394,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                     }
                 }
             } else {
+                LOGGER.info(entityTypeName.getName() + " NOT FOUND");
                 return null;
             }
         }

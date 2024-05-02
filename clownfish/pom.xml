@@ -4,7 +4,7 @@
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
     <version>0.7.32-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
@@ -540,6 +540,30 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                  <execution>
+                    <id>buildnumber</id>
+                    <phase>validate</phase>
+                    <goals>
+                      <goal>create</goal>
+                    </goals>
+                  </execution>
+                </executions>
+                <configuration>
+                    <format>{0,number}</format>
+                    <items>
+                        <item>buildNumber</item>
+                        <item>timestamp</item>
+                    </items>
+                  <doCheck>false</doCheck>
+                  <doUpdate>false</doUpdate>
+                  <revisionOnScmFailure>unknownbuild</revisionOnScmFailure>   
+                </configuration>
+              </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
@@ -586,7 +610,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
                 <configuration>
-                   <tagNameFormat>v@{project.version}</tagNameFormat>
+                   <tagNameFormat>v@{project.version}-${buildNumber}</tagNameFormat>
                    <autoVersionSubmodules>true</autoVersionSubmodules>
                    <releaseProfiles>releases</releaseProfiles>
                 </configuration>
@@ -600,5 +624,6 @@
                  </configuration>
              </plugin>
         </plugins>
+        <finalName>${project.artifactId}-${project.version}-${buildNumber}${timestamp}</finalName>
     </build>
 </project>

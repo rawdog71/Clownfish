@@ -249,6 +249,8 @@ public class DatasourceList implements Serializable {
             cfdatasourceService.create(newdatasourcecontent);
             datasourcelist = cfdatasourceService.findAll();
             edmprovider.init();
+            Thread edmprovider_thread = new Thread(edmprovider);
+            edmprovider_thread.start();
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }

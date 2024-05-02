@@ -372,6 +372,8 @@ public class ClassList implements Serializable {
         if (null != selectedClass) {
             HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
             edmprovider.init();
+            Thread edmprovider_thread = new Thread(edmprovider);
+            edmprovider_thread.start();
             FacesMessage message = new FacesMessage("Datamodel recreated with data init");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
