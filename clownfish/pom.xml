@@ -624,6 +624,6 @@
                  </configuration>
              </plugin>
         </plugins>
-        <finalName>${project.artifactId}-${project.version}-${buildNumber}${timestamp}</finalName>
+        <finalName>${project.artifactId}-${project.version}-${buildNumber}_${timestamp}</finalName>
     </build>
 </project>
