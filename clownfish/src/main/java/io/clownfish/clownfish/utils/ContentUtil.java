@@ -455,6 +455,19 @@ public class ContentUtil implements IVersioningInterface {
         cfcontentversion.setCommitedby(BigInteger.valueOf(userid));
         cfcontentversionService.create(cfcontentversion);
     }
+    
+    private void writeVersion(long ref, long version, byte[] content) {
+        CfContentversionPK contentversionpk = new CfContentversionPK();
+        contentversionpk.setContentref(ref);
+        contentversionpk.setVersion(version);
+
+        CfContentversion cfcontentversion = new CfContentversion();
+        cfcontentversion.setCfContentversionPK(contentversionpk);
+        cfcontentversion.setContent(content);
+        cfcontentversion.setTstamp(new Date());
+        cfcontentversion.setCommitedby(BigInteger.ZERO);
+        cfcontentversionService.create(cfcontentversion);
+    }
 
     @Override
     public long getCurrentVersionNumber(String name) {
@@ -479,6 +492,51 @@ public class ContentUtil implements IVersioningInterface {
             diff = true;
         }
         return diff;
+    }
+    
+    public void commit(CfClasscontent selectedContent) {
+        boolean canCommit = false;
+            
+        if (hasDifference(selectedContent)) {
+            canCommit = true;
+        }
+        if (canCommit) {
+            try {
+                try {
+                    long maxversion = cfcontentversionService.findMaxVersion(selectedContent.getId());
+                    List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
+                    byte[] output = CompressionUtils.compress(classUtil.jsonExport(selectedContent, attributcontentlist).getBytes("UTF-8"));
+                    setCurrentVersion(maxversion + 1);
+                    writeVersion(selectedContent.getId(), getCurrentVersion(), output);
+                } catch (NullPointerException npe) {
+                    List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
+                    byte[] output = CompressionUtils.compress(classUtil.jsonExport(selectedContent, attributcontentlist).getBytes("UTF-8"));
+                    writeVersion(selectedContent.getId(), 1, output);
+                    setCurrentVersion(1);
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        } else {
+            //difference = hasDifference(selectedContent);
+            //access = true;
+
+            //FacesMessage message = new FacesMessage("Could not commit " + selectedContent.getName() + " Version: " + 1);
+            //FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+
+        /*
+        try {
+            attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
+            String output = selectedContent.getClassref().getTemplateref().getContent();
+            for (CfAttributcontent attributcontent : attributcontentlist) {
+                output = output.replaceAll("#" + attributcontent.getAttributref().getName() + "#", toString(attributcontent));
+            }
+            contentpreview = output;
+        } catch (Exception ex) {
+            contentpreview = "";
+        }
+        */
     }
     
     public ArrayList getContentKeywords(CfClasscontent content, boolean toLower) {

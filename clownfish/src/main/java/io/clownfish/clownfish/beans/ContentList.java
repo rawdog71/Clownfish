@@ -62,7 +62,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
-import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

@@ -85,7 +85,6 @@ import org.apache.olingo.commons.api.edm.provider.CsdlEntitySet;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityType;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
 import org.apache.olingo.commons.api.edm.provider.CsdlSingleton;
-import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.commons.api.http.HttpMethod;
 import org.apache.olingo.server.api.uri.UriParameter;
 import org.hibernate.Session;
@@ -333,7 +332,7 @@ public class EntityUtil {
             switch (source.getList()) {
                 case 0:
                     CfClass clazz = cfclassService.findByName(edmEntitySet.getName());
-                    long newmax = getMaxID(clazz) + 1;
+                    long newmax = getMaxID(clazz);
 
                     CfClasscontent newclasscontent = new CfClasscontent();
                     newclasscontent.setName(clazz.getName().toUpperCase() + "_" + newmax);
@@ -383,6 +382,7 @@ public class EntityUtil {
 
                                 
                                 cfattributcontentService.create(newcontent);
+                                
                                 contentUtil.indexContent();
                             } else {
                                 if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("assetref")) {
@@ -478,6 +478,7 @@ public class EntityUtil {
                         }
                     });
                     hibernateUtil.updateContent(newclasscontent);
+                    contentUtil.commit(newclasscontent);
 
                     try {
                         entity.setId(new URI(String.valueOf(newmax)));
@@ -682,6 +683,7 @@ public class EntityUtil {
                             }
                         }
                         hibernateUtil.updateContent(cfclasscontent);
+                        contentUtil.commit(cfclasscontent);
                         return true;
                     } else {
                         return false;
@@ -1012,13 +1014,13 @@ public class EntityUtil {
             if (attribut.getAutoincrementor()) {
                 List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(clazz);
                 int last = classcontentlist2.size();
-                if (1 == last) {
-                    max = 0;
+                if (last <= 1)  {
+                    max = last+1;
                 } else {
-                    CfClasscontent classcontent = classcontentlist2.get(last - 2);
+                    CfClasscontent classcontent = classcontentlist2.get(last - 1);
                     CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
                     if (attributcontent.getContentInteger().longValue() > max) {
-                        max = attributcontent.getContentInteger().longValue();
+                        max = attributcontent.getContentInteger().longValue()+1;
                     }
                 }
             }
