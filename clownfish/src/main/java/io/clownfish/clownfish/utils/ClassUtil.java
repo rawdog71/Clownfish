@@ -78,6 +78,8 @@ public class ClassUtil implements Serializable {
     @Autowired MarkdownUtil markdownUtil;
     @Autowired FolderUtil folderUtil;
     @Autowired JavaList javalist;
+    @Autowired TemplateUtil templateutil;
+    @Autowired JavascriptUtil javascriptutil;
     private @Getter @Setter SiteTreeBean sitetree;
     private @Getter @Setter SiteUtil siteutil;
     
@@ -1018,36 +1020,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t<tr>").append("\n");
         html.append("\t\t\t\t</thead>").append("\n");
         html.append("\t\t\t\t<tbody>").append("\n");
-	html.append("\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST ");
-        for (ODataWizard odw : wizardlist) {
-            if (odw.isTableheader()) {
-                CfAttribut attr = odw.getAttribut();
-                if (attr.getAutoincrementor()) {
-                    continue;
-                }
-                switch (attr.getAttributetype().getName()) {
-                    case "string":
-                    case "integer":
-                    case "real":
-                    case "datetime":
-                        html.append("| filter: {").append(attr.getName()).append(": filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("} ");
-                        break;
-                    case "classref":
-                        if (1 == attr.getRelationtype()) {
-                            if (!odw.getRelationattribut1().isBlank()) {
-                                html.append("| filter: {").append(attr.getName()).append(": {").append(odw.getRelationattribut1().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}} ");
-                            }
-                            if (!odw.getRelationattribut2().isBlank()) {
-                                html.append("| filter: {").append(attr.getName()).append(": {").append(odw.getRelationattribut2().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}} ");
-                            }
-                            if (!odw.getRelationattribut3().isBlank()) {
-                                html.append("| filter: {").append(attr.getName()).append(": {").append(odw.getRelationattribut3().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}} ");
-                            }
-                        }
-                        break;
-                }
-            }
-        }
+	html.append("\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST | filter: ").append(clazz.getName().toLowerCase()).append("_filter ");
         html.append("| orderBy: order_").append(clazz.getName().toLowerCase()).append("\">").append("\n");
         
 	html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".id}}</td>").append("\n");
@@ -2071,15 +2044,18 @@ public class ClassUtil implements Serializable {
                 template.setCheckedoutby(BigInteger.ZERO);
                 template.setContent(html.toString());
                 cfTemplateService.create(template);
+                templateutil.commit(template);
             } else {
                 dummytemplate.setContent(html.toString());
                 cfTemplateService.edit(dummytemplate);
+                templateutil.commit(dummytemplate);
             }
         } catch (Exception ex) {
             template.setScriptlanguage(2);
             template.setCheckedoutby(BigInteger.ZERO);
             template.setContent(html.toString());
             cfTemplateService.create(template);
+            templateutil.commit(template);
         }
         
         javascript.append("var crud").append(clazz.getName()).append(" = angular.module('crud").append(clazz.getName()).append("App', []);").append("\n");
@@ -2254,7 +2230,6 @@ public class ClassUtil implements Serializable {
         javascript.append("\t};").append("\n");
         javascript.append("\n");
         javascript.append("\t$scope.init").append(clazz.getName()).append(" = function() {").append("\n");
-        
         for (CfAttribut attr : attributList) {
             if (attr.getAutoincrementor()) {
                 continue;
@@ -2289,6 +2264,50 @@ public class ClassUtil implements Serializable {
         }
         
         javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        javascript.append("\t$scope.").append(clazz.getName().toLowerCase()).append("_filter = function(entry) {").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            CfAttribut attr = odw.getAttribut();
+            if (attr.getAutoincrementor()) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "string":
+                case "integer":
+                case "real":
+                case "datetime":
+                    javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
+                    javascript.append("\t    entry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                    javascript.append("\t        }").append("\n");
+                    break;
+            }
+        }
+        
+        javascript.append("\tif ( ");
+        
+        for (ODataWizard odw : wizardlist) {
+            CfAttribut attr = odw.getAttribut();
+            if (attr.getAutoincrementor()) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "string":
+                case "integer":
+                case "real":
+                case "datetime":
+                    javascript.append("(entry.").append(attr.getName().toLowerCase()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append(".toLowerCase())) && ");
+                    break;
+            }
+        }
+        javascript = javascript.delete(javascript.length()-4, javascript.length());
+        javascript.append(") {").append("\n");
+        javascript.append("\t    return true;").append("\n");
+        javascript.append("\t} else {").append("\n");
+        javascript.append("\treturn false;").append("\n");
+        javascript.append("\t}").append("\n");
+        javascript.append("\t};").append("\n");
+        
         javascript.append("\n");
         javascript.append("\t$scope.init").append(clazz.getName()).append("();").append("\n");
         javascript.append("\n");
@@ -2793,7 +2812,6 @@ public class ClassUtil implements Serializable {
         javascript.append("});").append("\n");
         javascript.append("};").append("\n");
         
-        
         javascript.append("\n");
         javascript.append("\tgetIndex = function(array, id) {").append("\n");
         javascript.append("\t\tidx = 0;").append("\n");
@@ -2825,14 +2843,20 @@ public class ClassUtil implements Serializable {
                 js.setCheckedoutby(BigInteger.ZERO);
                 js.setContent(javascript.toString());
                 cfJavaScriptService.create(js);
+                javascriptutil.commit(js);
+                javascriptutil.writeStaticJS(js.getName(), js.getContent());
             } else {
                 dummyjs.setContent(javascript.toString());
                 cfJavaScriptService.edit(dummyjs);
+                javascriptutil.commit(dummyjs);
+                javascriptutil.writeStaticJS(dummyjs.getName(), dummyjs.getContent());
             }
         } catch (Exception ex) {
             js.setCheckedoutby(BigInteger.ZERO);
             js.setContent(javascript.toString());
             cfJavaScriptService.create(js);
+            javascriptutil.commit(js);
+            javascriptutil.writeStaticJS(js.getName(), js.getContent());
         }
 
         site.setName("crud_" + clazz.getName().toLowerCase());

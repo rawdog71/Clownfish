@@ -517,26 +517,7 @@ public class ContentUtil implements IVersioningInterface {
             } catch (IOException ex) {
                 LOGGER.error(ex.getMessage());
             }
-        } else {
-            //difference = hasDifference(selectedContent);
-            //access = true;
-
-            //FacesMessage message = new FacesMessage("Could not commit " + selectedContent.getName() + " Version: " + 1);
-            //FacesContext.getCurrentInstance().addMessage(null, message);
         }
-
-        /*
-        try {
-            attributcontentlist = cfattributcontentService.findByClasscontentref(selectedContent);
-            String output = selectedContent.getClassref().getTemplateref().getContent();
-            for (CfAttributcontent attributcontent : attributcontentlist) {
-                output = output.replaceAll("#" + attributcontent.getAttributref().getName() + "#", toString(attributcontent));
-            }
-            contentpreview = output;
-        } catch (Exception ex) {
-            contentpreview = "";
-        }
-        */
     }
     
     public ArrayList getContentKeywords(CfClasscontent content, boolean toLower) {

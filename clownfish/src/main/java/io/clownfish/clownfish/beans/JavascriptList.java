@@ -417,27 +417,7 @@ public class JavascriptList implements ISourceContentInterface {
     }
     
     private void writeStaticJS(String filename, String js) {
-        FileOutputStream fileStream = null;
-        try {
-            fileStream = new FileOutputStream(new File(folderUtil.getJs_folder()+ File.separator + filename + ".js"));
-            OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
-            try {
-                writer.write(js);
-                writer.close();
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to create the destination file", e);
-            }
-        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-            LOGGER.error(ex.getMessage());
-        } finally {
-            try {
-                if (null != fileStream) {
-                    fileStream.close();
-                }
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage());
-            }
-        }
+        javascriptUtility.writeStaticJS(filename, js);
     }
     
     public void selectJavascript(CfJavascript javascript) {

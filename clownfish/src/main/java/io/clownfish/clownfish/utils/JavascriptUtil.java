@@ -22,8 +22,13 @@ import io.clownfish.clownfish.dbentities.CfJavascriptversion;
 import io.clownfish.clownfish.dbentities.CfJavascriptversionPK;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -49,6 +54,7 @@ import org.springframework.stereotype.Component;
 public class JavascriptUtil implements IVersioningInterface, Serializable {
     @Autowired transient CfJavascriptService cfjavascriptService;
     @Autowired transient CfJavascriptversionService cfjavascriptversionService;
+    @Autowired private FolderUtil folderUtil;
     
     private @Getter @Setter long currentVersion;
     private @Getter @Setter String javascriptContent = "";
@@ -129,5 +135,53 @@ public class JavascriptUtil implements IVersioningInterface, Serializable {
             }
         } while (!found);
         return name+"_"+i;
+    }
+    
+    public void commit(CfJavascript selectedJavascript) {
+        boolean canCommit = false;
+            
+        if (hasDifference(selectedJavascript)) {
+            canCommit = true;
+        }
+        if (canCommit) {
+            try {
+                try {
+                    long maxversion = cfjavascriptversionService.findMaxVersion(selectedJavascript.getId());
+                    byte[] output = CompressionUtils.compress(selectedJavascript.getContent().getBytes("UTF-8"));
+                    setCurrentVersion(maxversion + 1);
+                    writeVersion(selectedJavascript.getId(), getCurrentVersion(), output, 0);
+                } catch (NullPointerException npe) {
+                    byte[] output = CompressionUtils.compress(selectedJavascript.getContent().getBytes("UTF-8"));
+                    writeVersion(selectedJavascript.getId(), 1, output, 0);
+                    setCurrentVersion(1);
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }
+    }
+    
+    public void writeStaticJS(String filename, String js) {
+        FileOutputStream fileStream = null;
+        try {
+            fileStream = new FileOutputStream(new File(folderUtil.getJs_folder()+ File.separator + filename + ".js"));
+            OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
+            try {
+                writer.write(js);
+                writer.close();
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to create the destination file", e);
+            }
+        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+            LOGGER.error(ex.getMessage());
+        } finally {
+            try {
+                if (null != fileStream) {
+                    fileStream.close();
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }
     }
 }

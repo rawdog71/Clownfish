@@ -477,4 +477,28 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
         } while (!found);
         return name+"_"+i;
     }
+    
+    public void commit(CfTemplate selectedTemplate) {
+        boolean canCommit = false;
+            
+        if (hasDifference(selectedTemplate)) {
+            canCommit = true;
+        }
+        if (canCommit) {
+            try {
+                try {
+                    long maxversion = cftemplateversionService.findMaxVersion(selectedTemplate.getId());
+                    byte[] output = CompressionUtils.compress(selectedTemplate.getContent().getBytes("UTF-8"));
+                    setCurrentVersion(maxversion + 1);
+                    writeVersion(selectedTemplate.getId(), getCurrentVersion(), output, 0);
+                } catch (NullPointerException npe) {
+                    byte[] output = CompressionUtils.compress(selectedTemplate.getContent().getBytes("UTF-8"));
+                    writeVersion(selectedTemplate.getId(), 1, output, 0);
+                    setCurrentVersion(1);
+                }
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }
+    }
 }
