@@ -1641,23 +1641,7 @@ public class ClassUtil implements Serializable {
 	html.append("\t</thead>").append("\n");
         
 	html.append("\t\t\t\t\t\t\t\t<tbody>").append("\n");
-	html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED ");
-        for (ODataWizard odw : wizardlist) {
-            if (odw.isTableheader()) {
-                CfAttribut attr = odw.getAttribut();
-                if (attr.getAutoincrementor()) {
-                    continue;
-                }
-                switch (attr.getAttributetype().getName()) {
-                    case "string":
-                    case "integer":
-                    case "real":
-                    case "datetime":
-                        html.append("| filter: {").append(attr.getName()).append(": filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName()).append("} ");
-                        break;
-                }
-            }
-        }
+	html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED | filter : ").append(clazz.getName().toLowerCase()).append("connected_filter");
         html.append("\">").append("\n");
         
 	html.append("\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"disconnect").append(clazz.getName()).append("Item(").append(clazz.getName().toLowerCase()).append(".id)\"></td>").append("\n");
@@ -1741,23 +1725,7 @@ public class ClassUtil implements Serializable {
 	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
 	html.append("\t\t\t\t\t\t\t\t</thead>").append("\n");
 	html.append("\t\t\t\t\t\t\t\t<tbody>").append("\n");
-        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED ");
-        for (ODataWizard odw : wizardlist) {
-            if (odw.isTableheader()) {
-                CfAttribut attr = odw.getAttribut();
-                if (attr.getAutoincrementor()) {
-                    continue;
-                }
-                switch (attr.getAttributetype().getName()) {
-                    case "string":
-                    case "integer":
-                    case "real":
-                    case "datetime":
-                        html.append("| filter: {").append(attr.getName()).append(": filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName()).append("} ");
-                        break;
-                }
-            }
-        }
+        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED | filter : ").append(clazz.getName().toLowerCase()).append("disconnected_filter");
         html.append("\">").append("\n");
         
 	html.append("\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"connect").append(clazz.getName()).append("Item(").append(clazz.getName().toLowerCase()).append(".id)\"></td>").append("\n");
@@ -1862,23 +1830,7 @@ public class ClassUtil implements Serializable {
 	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
 	html.append("\t\t\t\t\t\t\t\t</thead>").append("\n");
 	html.append("\t\t\t\t\t\t\t\t<tbody>").append("\n");
-        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED ");
-        for (ODataWizard odw : wizardlist) {
-            if (odw.isTableheader()) {
-                CfAttribut attr = odw.getAttribut();
-                if (attr.getAutoincrementor()) {
-                    continue;
-                }
-                switch (attr.getAttributetype().getName()) {
-                    case "string":
-                    case "integer":
-                    case "real":
-                    case "datetime":
-                        html.append("| filter: {").append(attr.getName()).append(": filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName()).append("} ");
-                        break;
-                }
-            }
-        }
+        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED | filter : ").append(clazz.getName().toLowerCase()).append("connected_filter");
         html.append("\">").append("\n");
         
 	html.append("\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"disconnect").append(clazz.getName()).append("Item(").append(clazz.getName().toLowerCase()).append(".id)\"></td>").append("\n");
@@ -1961,23 +1913,7 @@ public class ClassUtil implements Serializable {
 	html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
 	html.append("\t\t\t\t\t\t\t\t</thead>").append("\n");
 	html.append("\t\t\t\t\t\t\t\t<tbody>").append("\n");
-        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED ");
-        for (ODataWizard odw : wizardlist) {
-            if (odw.isTableheader()) {
-                CfAttribut attr = odw.getAttribut();
-                if (attr.getAutoincrementor()) {
-                    continue;
-                }
-                switch (attr.getAttributetype().getName()) {
-                    case "string":
-                    case "integer":
-                    case "real":
-                    case "datetime":
-                        html.append("| filter: {").append(attr.getName()).append(": filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName()).append("} ");
-                        break;
-                }
-            }
-        }
+        html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(clazz.getName().toLowerCase()).append(" in ").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED | filter : ").append(clazz.getName().toLowerCase()).append("disconnected_filter");
         html.append("\">").append("\n");
         
 	html.append("\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"connect").append(clazz.getName()).append("Item(").append(clazz.getName().toLowerCase()).append(".id)\"></td>").append("\n");
@@ -2309,6 +2245,108 @@ public class ClassUtil implements Serializable {
         javascript.append("\t};").append("\n");
         
         javascript.append("\n");
+        javascript.append("\t$scope.").append(clazz.getName().toLowerCase()).append("connected_filter = function(entry) {").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                    case "datetime":
+                        javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
+                        javascript.append("\t    entry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        javascript.append("\t        }").append("\n");
+                        break;
+                }
+            }
+        }
+        
+        javascript.append("\tif ( ");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                    case "datetime":
+                        javascript.append("(entry.").append(attr.getName().toLowerCase()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append(".toLowerCase())) && ");
+                        break;
+                }
+            }
+        }
+        javascript = javascript.delete(javascript.length()-4, javascript.length());
+        javascript.append(") {").append("\n");
+        javascript.append("\t    return true;").append("\n");
+        javascript.append("\t} else {").append("\n");
+        javascript.append("\treturn false;").append("\n");
+        javascript.append("\t}").append("\n");
+        javascript.append("\t};").append("\n");
+        
+        javascript.append("\n");
+        
+        
+        
+        
+        javascript.append("\t$scope.").append(clazz.getName().toLowerCase()).append("disconnected_filter = function(entry) {").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                    case "datetime":
+                        javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
+                        javascript.append("\t    entry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        javascript.append("\t        }").append("\n");
+                        break;
+                }
+            }
+        }
+        
+        javascript.append("\tif ( ");
+        
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "string":
+                    case "integer":
+                    case "real":
+                    case "datetime":
+                        javascript.append("(entry.").append(attr.getName().toLowerCase()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append(".toLowerCase())) && ");
+                        break;
+                }
+            }
+        }
+        javascript = javascript.delete(javascript.length()-4, javascript.length());
+        javascript.append(") {").append("\n");
+        javascript.append("\t    return true;").append("\n");
+        javascript.append("\t} else {").append("\n");
+        javascript.append("\treturn false;").append("\n");
+        javascript.append("\t}").append("\n");
+        javascript.append("\t};").append("\n");
+        
+        
+        javascript.append("\n");
+        
         javascript.append("\t$scope.init").append(clazz.getName()).append("();").append("\n");
         javascript.append("\n");
         javascript.append("\t$scope.sort").append(clazz.getName()).append(" = function(field) {").append("\n");
