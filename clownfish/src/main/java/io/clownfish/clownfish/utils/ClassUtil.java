@@ -2136,12 +2136,9 @@ public class ClassUtil implements Serializable {
                     break;
             }
         }
-        
         javascript.append("\t\t$scope.getMediaList();").append("\n");
-        
         javascript.append("\t\t$scope.get").append(clazz.getName()).append("listArray();").append("\n");
         javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_list.name = \"\";").append("\n");
-        
         for (ODataWizard odw : wizardlist) {
             if (odw.isTableheader()) {
                 CfAttribut attr = odw.getAttribut();
@@ -2210,12 +2207,18 @@ public class ClassUtil implements Serializable {
             }
             switch (attr.getAttributetype().getName()) {
                 case "string":
-                case "integer":
-                case "real":
                 case "datetime":
                     javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
-                    javascript.append("\t    entry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
-                    javascript.append("\t        }").append("\n");
+                    javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                    javascript.append("\t}").append("\n");
+                    break;
+                case "integer":
+                case "real":
+                    javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
+                    javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                    javascript.append("\t} else {").append("\n");
+                    javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = entry.").append(attr.getName().toLowerCase()).append(".toString();").append("\n");
+                    javascript.append("\t}").append("\n");
                     break;
             }
         }
@@ -2255,12 +2258,18 @@ public class ClassUtil implements Serializable {
                 }
                 switch (attr.getAttributetype().getName()) {
                     case "string":
-                    case "integer":
-                    case "real":
                     case "datetime":
                         javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
-                        javascript.append("\t    entry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
-                        javascript.append("\t        }").append("\n");
+                        javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        javascript.append("\t}").append("\n");
+                        break;
+                    case "integer":
+                    case "real":
+                        javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
+                        javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        javascript.append("\t} else {").append("\n");
+                        javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = entry.").append(attr.getName().toLowerCase()).append(".toString();").append("\n");
+                        javascript.append("\t}").append("\n");
                         break;
                 }
             }
@@ -2291,12 +2300,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\treturn false;").append("\n");
         javascript.append("\t}").append("\n");
         javascript.append("\t};").append("\n");
-        
         javascript.append("\n");
-        
-        
-        
-        
         javascript.append("\t$scope.").append(clazz.getName().toLowerCase()).append("disconnected_filter = function(entry) {").append("\n");
         
         for (ODataWizard odw : wizardlist) {
@@ -2307,12 +2311,18 @@ public class ClassUtil implements Serializable {
                 }
                 switch (attr.getAttributetype().getName()) {
                     case "string":
-                    case "integer":
-                    case "real":
                     case "datetime":
                         javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
-                        javascript.append("\t    entry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
-                        javascript.append("\t        }").append("\n");
+                        javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        javascript.append("\t}").append("\n");
+                        break;
+                    case "integer":
+                    case "real":
+                        javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
+                        javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        javascript.append("\t} else {").append("\n");
+                        javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = entry.").append(attr.getName().toLowerCase()).append(".toString();").append("\n");
+                        javascript.append("\t}").append("\n");
                         break;
                 }
             }
