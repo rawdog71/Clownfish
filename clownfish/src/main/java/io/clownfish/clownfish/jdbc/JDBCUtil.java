@@ -350,7 +350,8 @@ public class JDBCUtil {
                         String pattern = "dd.MM.yyyy HH:mm:ss";
                         DateTime dt = null;
                         try {
-                            dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
+                            dt = new DateTime(attributmap.get((String) tf.getName()));
+                            //dt = DateTime.parse(attributmap.get((String) tf.getName()), DateTimeFormat.forPattern(pattern));
                         } catch (Exception ex) {
                             try {
                                 pattern = "yyyy-MM-dd HH:mm:ss";

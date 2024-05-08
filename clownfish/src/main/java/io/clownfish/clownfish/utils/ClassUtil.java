@@ -972,13 +972,13 @@ public class ClassUtil implements Serializable {
                         break;
                     case "classref":
                         if (1 == attr.getRelationtype()) {
-                            if (!odw.getRelationattribut1().isBlank()) {
+                            if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
                                 html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append(" == '").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append(" == '-").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('-").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                             }
-                            if (!odw.getRelationattribut2().isBlank()) {
+                            if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
                                 html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append(" == '").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append(" == '-").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('-").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                             }
-                            if (!odw.getRelationattribut3().isBlank()) {
+                            if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
                                 html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append(" == '").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append(" == '-").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('-").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                             }
                         }
@@ -1042,13 +1042,13 @@ public class ClassUtil implements Serializable {
                         break;
                     case "classref":
                         if (1 == attr.getRelationtype()) {
-                            if (!odw.getRelationattribut1().isBlank()) {
+                            if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
                                 html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("}}</td>").append("\n");
                             }
-                            if (!odw.getRelationattribut2().isBlank()) {
+                            if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
                                 html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("}}</td>").append("\n");
                             }
-                            if (!odw.getRelationattribut3().isBlank()) {
+                            if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
                                 html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("}}</td>").append("\n");
                             }
                         }
@@ -1173,25 +1173,25 @@ public class ClassUtil implements Serializable {
                         html.append("\t\t\t\t\t\t\t\t<thead class=\"table-head\">").append("\n");
                         html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
                         html.append("\t\t\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\"></th>").append("\n");
-                        if (!odw.getRelationattribut1().isBlank()) {
+                        if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut1()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut1()).append("'}\">").append(odw.getRelationattribut1()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut1()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut1()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                         }
-                        if (!odw.getRelationattribut2().isBlank()) {
+                        if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut2()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut2()).append("'}\">").append(odw.getRelationattribut2()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut2()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut2()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                         }
-                        if (!odw.getRelationattribut3().isBlank()) {
+                        if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut3()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut3()).append("'}\">").append(odw.getRelationattribut3()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut3()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut3()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                         }
                         html.append("\t\t\t\t\t\t\t\t\t</tr>").append("\n");
                         html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
                         html.append("\t\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
-                        if (!odw.getRelationattribut1().isBlank()) {
+                        if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut1()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut1()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append("\"></th>").append("\n");
                         }
-                        if (!odw.getRelationattribut2().isBlank()) {
+                        if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut2()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut2()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2()).append("\"></th>").append("\n");
                         }
-                        if (!odw.getRelationattribut3().isBlank()) {
+                        if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut3()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut3()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3()).append("\"></th>").append("\n");
                         }
                         html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
@@ -1199,25 +1199,25 @@ public class ClassUtil implements Serializable {
                         html.append("\t\t\t\t\t\t\t\t<tbody>").append("\n");
                         
                         html.append("\t\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST ");
-                        if (!odw.getRelationattribut1().isBlank()) {
+                        if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
                             html.append("| filter: {").append(odw.getRelationattribut1()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append("} ");
                         }
-                        if (!odw.getRelationattribut2().isBlank()) {
+                        if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
                             html.append("| filter: {").append(odw.getRelationattribut2()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2()).append("} ");
                         }
-                        if (!odw.getRelationattribut3().isBlank()) {
+                        if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
                             html.append("| filter: {").append(odw.getRelationattribut3()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3()).append("} ");
                         }
                         html.append("| orderBy: order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("\">").append("\n");
                         
                         html.append("\t\t\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-click=\"select").append(clazz.getName()).append("").append(attr.getName()).append("(").append(attr.getName()).append(".id)\"></td>").append("\n");
-                        if (!odw.getRelationattribut1().isBlank()) {
+                        if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append("}}</td>").append("\n");
                         }
-                        if (!odw.getRelationattribut2().isBlank()) {
+                        if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut2()).append("}}</td>").append("\n");
                         }
-                        if (!odw.getRelationattribut3().isBlank()) {
+                        if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut3()).append("}}</td>").append("\n");
                         }
                         html.append("\t\t\t\t\t\t\t\t\t\t</tr>").append("\n");
@@ -1377,25 +1377,25 @@ public class ClassUtil implements Serializable {
                         html.append("\t\t\t\t\t\t\t\t<thead class=\"table-head\">").append("\n");
                         html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
                         html.append("\t\t\t\t\t\t\t\t\t\t<th class=\"uk-table-shrink\"></th>").append("\n");
-                        if (!odw.getRelationattribut1().isBlank()) {
+                        if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut1().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut1().toLowerCase()).append("'}\">").append(odw.getRelationattribut1().toLowerCase()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut1().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut1().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                         }
-                        if (!odw.getRelationattribut2().isBlank()) {
+                        if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut2().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut2().toLowerCase()).append("'}\">").append(odw.getRelationattribut2().toLowerCase()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut2().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut2().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                         }
-                        if (!odw.getRelationattribut3().isBlank()) {
+                        if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '").append(odw.getRelationattribut3().toLowerCase()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(" == '-").append(odw.getRelationattribut3().toLowerCase()).append("'}\">").append(odw.getRelationattribut3().toLowerCase()).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('").append(odw.getRelationattribut3().toLowerCase()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("").append(attr.getName()).append("('-").append(odw.getRelationattribut3().toLowerCase()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                         }
                         html.append("\t\t\t\t\t\t\t\t\t</tr>").append("\n");
                         html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
                         html.append("\t\t\t\t\t\t\t\t\t\t<th></th>").append("\n");
-                        if (!odw.getRelationattribut1().isBlank()) {
+                        if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut1().toLowerCase()).append("_upd\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut1().toLowerCase()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("\"></th>").append("\n");
                         }
-                        if (!odw.getRelationattribut2().isBlank()) {
+                        if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut2().toLowerCase()).append("_upd\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut2().toLowerCase()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("\"></th>").append("\n");
                         }
-                        if (!odw.getRelationattribut3().isBlank()) {
+                        if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t\t<th><input id=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("_").append(odw.getRelationattribut3().toLowerCase()).append("_upd\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(odw.getRelationattribut3().toLowerCase()).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("\"></th>").append("\n");
                         }
                         html.append("\t\t\t\t\t\t\t\t\t<tr>").append("\n");
@@ -1403,25 +1403,25 @@ public class ClassUtil implements Serializable {
                         html.append("\t\t\t\t\t\t\t<tbody>").append("\n");
                         
                         html.append("\t\t\t\t\t\t\t\t<tr ng-repeat=\"").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST ");
-                        if (!odw.getRelationattribut1().isBlank()) {
+                        if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
                             html.append("| filter: {").append(odw.getRelationattribut1().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("} ");
                         }
-                        if (!odw.getRelationattribut2().isBlank()) {
+                        if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
                             html.append("| filter: {").append(odw.getRelationattribut2().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("} ");
                         }
-                        if (!odw.getRelationattribut3().isBlank()) {
+                        if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
                             html.append("| filter: {").append(odw.getRelationattribut3().toLowerCase()).append(": filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("} ");
                         }
                         html.append(" | orderBy: order_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append("\">").append("\n");
                         
                         html.append("\t\t\t\t\t\t\t\t\t<td><input class=\"uk-checkbox\" type=\"checkbox\" aria-label=\"Checkbox\" ng-value=\"").append(attr.getName()).append(".id\" ng-checked=\"in").append(StringUtils.capitalise(attr.getName())).append("Selected(").append(attr.getName()).append(".id)\" ng-click=\"select").append(clazz.getName()).append("").append(attr.getName()).append("(").append(attr.getName()).append(".id)\"></td>").append("\n");
-                        if (!odw.getRelationattribut1().isBlank()) {
+                        if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("}}</td>").append("\n");
                         }
-                        if (!odw.getRelationattribut2().isBlank()) {
+                        if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("}}</td>").append("\n");
                         }
-                        if (!odw.getRelationattribut3().isBlank()) {
+                        if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
                             html.append("\t\t\t\t\t\t\t\t\t<td>{{").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("}}</td>").append("\n");
                         }
                         html.append("\t\t\t\t\t\t\t\t</tr>").append("\n");
@@ -2123,13 +2123,13 @@ public class ClassUtil implements Serializable {
                     javascript.append("\t\t$scope.get").append(StringUtils.capitalise(attr.getName())).append("list();").append("\n");
                     javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(" = \"\";").append("\n");
                     if (0 == attr.getRelationtype()) {
-                        if (!odw.getRelationattribut1().isBlank()) {
+                        if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
                             javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append(" = \"\";").append("\n");
                         }
-                        if (!odw.getRelationattribut2().isBlank()) {
+                        if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
                             javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut2()).append(" = \"\";").append("\n");
                         }
-                        if (!odw.getRelationattribut3().isBlank()) {
+                        if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
                             javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".").append(odw.getRelationattribut3()).append(" = \"\";").append("\n");
                         }
                     }

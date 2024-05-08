@@ -276,6 +276,8 @@ public class DatasourceList implements Serializable {
                 cfdatasourceService.edit(selectedDatasource);
                 datasourcelist = cfdatasourceService.findAll();
                 edmprovider.init();
+                Thread edmprovider_thread = new Thread(edmprovider);
+                edmprovider_thread.start();
             }
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
@@ -295,6 +297,8 @@ public class DatasourceList implements Serializable {
             cfdatasourceService.delete(selectedDatasource);
             datasourcelist = cfdatasourceService.findAll();
             edmprovider.init();
+            Thread edmprovider_thread = new Thread(edmprovider);
+            edmprovider_thread.start();
         }
     }
     

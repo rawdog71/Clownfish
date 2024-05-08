@@ -511,7 +511,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
             case "text":
                 return EdmPrimitiveTypeKind.String.getFullQualifiedName();
             case "datetime":
-                return EdmPrimitiveTypeKind.Date.getFullQualifiedName();
+                return EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName();
             case "integer":
             case "media":
                 return EdmPrimitiveTypeKind.Int32.getFullQualifiedName();
@@ -548,7 +548,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
             case 92:
             case 91:
             case 2014:
-                return EdmPrimitiveTypeKind.Date.getFullQualifiedName();
+                return EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName();
             case 2:       // int, bigint
             case 4:
             case 5:         // SMALLINT
@@ -573,7 +573,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
             case "STRING":      // TEXT, varchar, char -> String
                 return EdmPrimitiveTypeKind.String.getFullQualifiedName();
             case "DATE":      // Date
-                return EdmPrimitiveTypeKind.Date.getFullQualifiedName();
+                return EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName();
             case "INT":       // int, smallint, tinyint
                 return EdmPrimitiveTypeKind.Int32.getFullQualifiedName();
             case "LONG":   

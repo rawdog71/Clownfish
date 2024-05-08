@@ -66,6 +66,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -179,7 +180,7 @@ public class EntityUtil {
                     prop.setValue(ValueType.PRIMITIVE, ((Boolean)value));
                 }    
                 break;
-            case "Edm.Date":
+            case "Edm.DateTimeOffset":
                 if (value instanceof String) {
                     String pattern = "dd.MM.yyyy HH:mm:ss";
                     DateTime dt = null;
@@ -263,10 +264,12 @@ public class EntityUtil {
                                 Property prop = new Property();
                                 prop.setName(attribut.getName());
                                 Long content_id = (Long)hm.get(attributname);
-                                CfClasscontent cfclasscontent = cfclasscontentService.findById(content_id);
-                                prop.setValue(ValueType.COMPLEX, createComplexVal(cfclasscontent));
-                                prop.setType("OData.Complex." + cfclasscontent.getClassref().getName());
-                                entity.addProperty(prop);
+                                if (null != content_id) {
+                                    CfClasscontent cfclasscontent = cfclasscontentService.findById(content_id);
+                                    prop.setValue(ValueType.COMPLEX, createComplexVal(cfclasscontent));
+                                    prop.setType("OData.Complex." + cfclasscontent.getClassref().getName());
+                                    entity.addProperty(prop);
+                                }
                             } else {                                                // n:m Relation
                                 Property coll_prop = new Property();
                                 List<ComplexValue> values = new ArrayList<>();
@@ -1075,9 +1078,10 @@ public class EntityUtil {
                         values.put(prop.getName(), prop.getValue());
                     }
                     break;
-                case "Edm.Date":
+                case "Edm.DateTimeOffset":
                     if (null != prop.getValue()) {
-                        values.put(prop.getName(), ((GregorianCalendar)prop.getValue()).toZonedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+                        values.put(prop.getName(), prop.getValue());
+                        //values.put(prop.getName(), ((GregorianCalendar)prop.getValue()).toZonedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm:ss")));
                     } else {
                         values.put(prop.getName(), prop.getValue());
                     }
