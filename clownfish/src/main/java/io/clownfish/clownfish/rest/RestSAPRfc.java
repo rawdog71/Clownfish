@@ -19,6 +19,7 @@ import com.sap.conn.jco.JCoFunction;
 import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.datamodels.RestSAPRfcParameter;
+import io.clownfish.clownfish.datamodels.RestSAPSystemRfcParameter;
 import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
 import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RestSAPRfc {
     static SAPConnection sapc = null;
+    static SAPConnection sapsystemc = null;
     private transient RPY_TABLE_READ rpytableread = null;
     private transient @Getter @Setter Map contentmap;
     private transient RFC_GET_FUNCTION_INTERFACE rfc_get_function_interface = null;
@@ -85,6 +87,24 @@ public class RestSAPRfc {
         return rsrp;
     }
     
+    @PostMapping(value = "/sapsystemrfc", produces = MediaType.APPLICATION_JSON_VALUE)
+    public RestSAPSystemRfcParameter restGetSAPRfc(@RequestBody RestSAPSystemRfcParameter rsrp) {
+        if (null == propertyUtil) {
+            propertyUtil = new PropertyUtil(propertylist);
+        }
+        sapSupport = propertyUtil.getPropertyBoolean("sap_support", sapSupport);
+        if (sapSupport) {
+            sapsystemc = new SAPConnection(rsrp.getRfcSystem(), "Clownfish_RESTSYSTEM");
+            rpytableread = new RPY_TABLE_READ(sapsystemc);
+            rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapsystemc);
+            rfcgroupsearch = new RFC_GROUP_SEARCH(sapsystemc);
+            rfcfunctionsearch = new RFC_FUNCTION_SEARCH(sapsystemc);
+            SAPUtility su = new SAPUtility(sapsystemc);
+            rsrp.setResult(su.executeAsync(rsrp.getRfcFunction(), rsrp.getParametermap(), rfc_get_function_interface, jcofunctiontable));
+        }
+        return rsrp;
+    }
+    
     @PostMapping(value = "/saprfcmeta", produces = MediaType.APPLICATION_JSON_VALUE)
     public RestSAPRfcParameter restGetSAPRfcMeta(@RequestBody RestSAPRfcParameter rsrp) {
         if (null == propertyUtil) {
@@ -100,6 +120,24 @@ public class RestSAPRfc {
                 rfcfunctionsearch = new RFC_FUNCTION_SEARCH(sapc);
             }
             SAPUtility su = new SAPUtility(sapc);
+            rsrp.setResult(su.getMetadata(rsrp.getRfcFunction(), rsrp.getParametermap(), rfc_get_function_interface));
+        }
+        return rsrp;
+    }
+    
+    @PostMapping(value = "/sapsystemrfcmeta", produces = MediaType.APPLICATION_JSON_VALUE)
+    public RestSAPSystemRfcParameter restGetSAPRfcMeta(@RequestBody RestSAPSystemRfcParameter rsrp) {
+        if (null == propertyUtil) {
+            propertyUtil = new PropertyUtil(propertylist);
+        }
+        sapSupport = propertyUtil.getPropertyBoolean("sap_support", sapSupport);
+        if (sapSupport) {
+            sapsystemc = new SAPConnection(rsrp.getRfcSystem(), "Clownfish_RESTSYSTEM");
+            rpytableread = new RPY_TABLE_READ(sapsystemc);
+            rfc_get_function_interface = new RFC_GET_FUNCTION_INTERFACE(sapsystemc);
+            rfcgroupsearch = new RFC_GROUP_SEARCH(sapsystemc);
+            rfcfunctionsearch = new RFC_FUNCTION_SEARCH(sapsystemc);
+            SAPUtility su = new SAPUtility(sapsystemc);
             rsrp.setResult(su.getMetadata(rsrp.getRfcFunction(), rsrp.getParametermap(), rfc_get_function_interface));
         }
         return rsrp;

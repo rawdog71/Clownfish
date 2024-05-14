@@ -2208,16 +2208,16 @@ public class ClassUtil implements Serializable {
             switch (attr.getAttributetype().getName()) {
                 case "string":
                 case "datetime":
-                    javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
-                    javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                    javascript.append("\tif (entry.").append(attr.getName()).append(" === null) {").append("\n");
+                    javascript.append("\t\tentry.").append(attr.getName()).append(" = \"\";").append("\n");
                     javascript.append("\t}").append("\n");
                     break;
                 case "integer":
                 case "real":
-                    javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
-                    javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                    javascript.append("\tif (entry.").append(attr.getName()).append(" === null) {").append("\n");
+                    javascript.append("\t\tentry.").append(attr.getName()).append(" = \"\";").append("\n");
                     javascript.append("\t} else {").append("\n");
-                    javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = entry.").append(attr.getName().toLowerCase()).append(".toString();").append("\n");
+                    javascript.append("\t\tentry.").append(attr.getName()).append(" = entry.").append(attr.getName()).append(".toString();").append("\n");
                     javascript.append("\t}").append("\n");
                     break;
             }
@@ -2235,7 +2235,7 @@ public class ClassUtil implements Serializable {
                 case "integer":
                 case "real":
                 case "datetime":
-                    javascript.append("(entry.").append(attr.getName().toLowerCase()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append(".toLowerCase())) && ");
+                    javascript.append("(entry.").append(attr.getName()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".toLowerCase())) && ");
                     break;
             }
         }

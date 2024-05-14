@@ -90,11 +90,11 @@ public class RestContent {
                     CfClass clazz = cfclassService.findByName(icp.getClassname());
                     //System.out.println(clazz.isSearchrelevant());
 
-                    try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(clazz.getName().toUpperCase() + "_" + icp.getContentname().trim().replaceAll("\\s+", "_"));
+                    CfClasscontent classcontentfind = cfclasscontentService.findByName(clazz.getName().toUpperCase() + "_" + icp.getContentname().trim().replaceAll("\\s+", "_"));
+                    if (null != classcontentfind) {
                         LOGGER.warn("Duplicate Classcontent");
                         icp.setReturncode("Duplicate Classcontent");
-                    } catch (javax.persistence.NoResultException ex) {
+                    } else {
                         CfClasscontent newclasscontent = new CfClasscontent();
                         newclasscontent.setName(clazz.getName().toUpperCase() + "_" + icp.getContentname().trim().replaceAll("\\s+", "_"));
                         newclasscontent.setCheckedoutby(BigInteger.valueOf(icp.getCheckedoutby()));
@@ -164,8 +164,8 @@ public class RestContent {
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfClass clazz = cfclassService.findByName(ucp.getClassname());
 
-                    try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
+                    CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
+                    if (null != classcontent) {
                         classcontent.setScrapped(true);
                         
                         // Delete from Listcontent - consistency
@@ -184,7 +184,7 @@ public class RestContent {
                         cfclasscontentService.edit(classcontent);
                         ucp.setReturncode("OK");
                         hibernateUtil.updateContent(classcontent);
-                    } catch (javax.persistence.NoResultException ex) {
+                    } else {
                         ucp.setReturncode("Classcontent not found");
                     }
                 } else {
@@ -212,18 +212,16 @@ public class RestContent {
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfClass clazz = cfclassService.findByName(ucp.getClassname());
 
-                    try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
-                        try {
-                            if ((null != ucp.getUpdatecontentname()) && (!ucp.getUpdatecontentname().isEmpty())) {
-                                CfClasscontent updateclasscontent = cfclasscontentService.findByName(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                    CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
+                    if (null != classcontent) {
+                        if ((null != ucp.getUpdatecontentname()) && (!ucp.getUpdatecontentname().isEmpty())) {
+                            CfClasscontent updateclasscontent = cfclasscontentService.findByName(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                            if (null != updateclasscontent) {
+                                classcontent.setName(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                                ucp.setContentname(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
+                                cfclasscontentService.edit(classcontent);
                             }
-                        } catch (javax.persistence.NoResultException ex) {
-                            classcontent.setName(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
-                            ucp.setContentname(ucp.getUpdatecontentname().trim().replaceAll("\\s+", "_"));
-                            cfclasscontentService.edit(classcontent);
                         }
-                        
                         List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByClasscontentref(classcontent);
                         for (CfAttributcontent attributcontent : attributcontentlist) {
                             CfAttribut attribut = attributcontent.getAttributref();
@@ -238,7 +236,7 @@ public class RestContent {
                             }
                         }
                         hibernateUtil.updateContent(classcontent);
-                    } catch (javax.persistence.NoResultException ex) {
+                    } else {
                         ucp.setReturncode("Classcontent not found");
                     }
                 } else {
@@ -265,42 +263,46 @@ public class RestContent {
                 String apikey = ucp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     CfClass clazz = cfclassService.findByName(ucp.getClassname());
-                    try {
+                    if (null != clazz) {
                         CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
-                        // Delete corresponding attributcontent entries
-                        List<CfAttributcontent> attributcontentlistdummy = cfattributcontentService.findByClasscontentref(classcontent);
-                        for (CfAttributcontent attributcontent : attributcontentlistdummy) {
-                            cfattributcontentService.delete(attributcontent);
-                        }
+                        if (null != classcontent) {
+                            // Delete corresponding attributcontent entries
+                            List<CfAttributcontent> attributcontentlistdummy = cfattributcontentService.findByClasscontentref(classcontent);
+                            for (CfAttributcontent attributcontent : attributcontentlistdummy) {
+                                cfattributcontentService.delete(attributcontent);
+                            }
 
-                        // Delete corresponding listcontent entries
-                        List<CfListcontent> selectedcontent = cflistcontentService.findByClasscontentref(classcontent.getId());
-                        for (CfListcontent listcontent : selectedcontent) {
-                            cflistcontentService.delete(listcontent);
-                        }
+                            // Delete corresponding listcontent entries
+                            List<CfListcontent> selectedcontent = cflistcontentService.findByClasscontentref(classcontent.getId());
+                            for (CfListcontent listcontent : selectedcontent) {
+                                cflistcontentService.delete(listcontent);
+                            }
 
-                        // Delete corresponding keywordcontent entries
-                        List<CfClasscontentkeyword> keywordcontentdummy = cfclasscontentkeywordService.findByClassContentRef(classcontent.getId());
-                        for (CfClasscontentkeyword keywordcontent : keywordcontentdummy) {
-                            cfclasscontentkeywordService.delete(keywordcontent);
-                        }
+                            // Delete corresponding keywordcontent entries
+                            List<CfClasscontentkeyword> keywordcontentdummy = cfclasscontentkeywordService.findByClassContentRef(classcontent.getId());
+                            for (CfClasscontentkeyword keywordcontent : keywordcontentdummy) {
+                                cfclasscontentkeywordService.delete(keywordcontent);
+                            }
 
-                        // Delete corresponding sitecontent entries
-                        List<CfSitecontent> sitecontentdummy = cfsitecontentService.findByClasscontentref(classcontent.getId());
-                        for (CfSitecontent sitecontent : sitecontentdummy) {
-                            cfsitecontentService.delete(sitecontent);
-                        }
+                            // Delete corresponding sitecontent entries
+                            List<CfSitecontent> sitecontentdummy = cfsitecontentService.findByClasscontentref(classcontent.getId());
+                            for (CfSitecontent sitecontent : sitecontentdummy) {
+                                cfsitecontentService.delete(sitecontent);
+                            }
 
-                        cfclasscontentService.delete(classcontent);
-                        try {
-                            hibernateUtil.deleteContent(classcontent);
-                        } catch (javax.persistence.NoResultException ex) {
-                            LOGGER.warn(ex.getMessage());
-                        }
+                            cfclasscontentService.delete(classcontent);
+                            try {
+                                hibernateUtil.deleteContent(classcontent);
+                            } catch (javax.persistence.NoResultException ex) {
+                                LOGGER.warn(ex.getMessage());
+                            }
 
-                        ucp.setReturncode("OK");
-                    } catch (javax.persistence.NoResultException ex) {
-                        ucp.setReturncode("Classcontent not found");
+                            ucp.setReturncode("OK");
+                        } else {
+                            ucp.setReturncode("Classcontent not found");
+                        }
+                    } else {
+                        ucp.setReturncode("Class not found");
                     }
                 } else {
                     ucp.setReturncode("Wrong API KEY");
@@ -329,59 +331,63 @@ public class RestContent {
                     CfClasscontent newclasscontent = new CfClasscontent();
                     try {
                         CfClasscontent selectedContent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
-                        String newname = contentUtil.getUniqueName(selectedContent.getName());
-                        ucp.setUpdatecontentname(newname);
-                        if (newname.startsWith(selectedClass.getName().toUpperCase() + "_")) {
-                            newname = newname.replaceAll("\\s+", "_");
-                        } else {
-                            newname = selectedClass.getName().toUpperCase() + "_" + newname.replaceAll("\\s+", "_");
-                        }
-                        newclasscontent.setName(newname);
-
-                        newclasscontent.setClassref(selectedContent.getClassref());
-                        cfclasscontentService.create(newclasscontent);
-
-                        List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
-                        attributlist.stream().forEach((attribut) -> {
-                            if (attribut.getAutoincrementor() == true) {
-                                List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
-                                long max = 0;
-                                int last = classcontentlist2.size();
-                                if (1 == last) {
-                                    max = 0;
-                                } else {
-                                    CfClasscontent classcontent = classcontentlist2.get(last - 2);
-                                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
-                                    if (attributcontent.getContentInteger().longValue() > max) {
-                                        max = attributcontent.getContentInteger().longValue();
-                                    }
-                                }
-                                CfAttributcontent newcontent = new CfAttributcontent();
-                                newcontent.setAttributref(attribut);
-                                newcontent.setClasscontentref(newclasscontent);
-                                newcontent.setContentInteger(BigInteger.valueOf(max+1));
-                                cfattributcontentService.create(newcontent);
+                        if (null != selectedContent) {
+                            String newname = contentUtil.getUniqueName(selectedContent.getName());
+                            ucp.setUpdatecontentname(newname);
+                            if (newname.startsWith(selectedClass.getName().toUpperCase() + "_")) {
+                                newname = newname.replaceAll("\\s+", "_");
                             } else {
-                                CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, selectedContent); 
-
-                                CfAttributcontent newcontent = new CfAttributcontent();
-                                newcontent.setAttributref(attribut);
-                                newcontent.setClasscontentref(newclasscontent);
-                                newcontent.setAssetcontentlistref(attributcontent.getAssetcontentlistref());
-                                newcontent.setClasscontentlistref(attributcontent.getClasscontentlistref());
-                                newcontent.setContentBoolean(attributcontent.getContentBoolean());
-                                newcontent.setContentDate(attributcontent.getContentDate());
-                                newcontent.setContentInteger(attributcontent.getContentInteger());
-                                newcontent.setContentReal(attributcontent.getContentReal());
-                                newcontent.setContentString(attributcontent.getContentString());
-                                newcontent.setContentText(attributcontent.getContentText());
-                                newcontent.setIndexed(attributcontent.isIndexed());
-                                newcontent.setSalt(attributcontent.getSalt());
-                                cfattributcontentService.create(newcontent);
+                                newname = selectedClass.getName().toUpperCase() + "_" + newname.replaceAll("\\s+", "_");
                             }
-                        });
-                        hibernateUtil.insertContent(newclasscontent);
-                        ucp.setReturncode("OK");
+                            newclasscontent.setName(newname);
+
+                            newclasscontent.setClassref(selectedContent.getClassref());
+                            cfclasscontentService.create(newclasscontent);
+
+                            List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent.getClassref());
+                            attributlist.stream().forEach((attribut) -> {
+                                if (attribut.getAutoincrementor() == true) {
+                                    List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent.getClassref());
+                                    long max = 0;
+                                    int last = classcontentlist2.size();
+                                    if (1 == last) {
+                                        max = 0;
+                                    } else {
+                                        CfClasscontent classcontent = classcontentlist2.get(last - 2);
+                                        CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, classcontent);        
+                                        if (attributcontent.getContentInteger().longValue() > max) {
+                                            max = attributcontent.getContentInteger().longValue();
+                                        }
+                                    }
+                                    CfAttributcontent newcontent = new CfAttributcontent();
+                                    newcontent.setAttributref(attribut);
+                                    newcontent.setClasscontentref(newclasscontent);
+                                    newcontent.setContentInteger(BigInteger.valueOf(max+1));
+                                    cfattributcontentService.create(newcontent);
+                                } else {
+                                    CfAttributcontent attributcontent = cfattributcontentService.findByAttributrefAndClasscontentref(attribut, selectedContent); 
+
+                                    CfAttributcontent newcontent = new CfAttributcontent();
+                                    newcontent.setAttributref(attribut);
+                                    newcontent.setClasscontentref(newclasscontent);
+                                    newcontent.setAssetcontentlistref(attributcontent.getAssetcontentlistref());
+                                    newcontent.setClasscontentlistref(attributcontent.getClasscontentlistref());
+                                    newcontent.setContentBoolean(attributcontent.getContentBoolean());
+                                    newcontent.setContentDate(attributcontent.getContentDate());
+                                    newcontent.setContentInteger(attributcontent.getContentInteger());
+                                    newcontent.setContentReal(attributcontent.getContentReal());
+                                    newcontent.setContentString(attributcontent.getContentString());
+                                    newcontent.setContentText(attributcontent.getContentText());
+                                    newcontent.setIndexed(attributcontent.isIndexed());
+                                    newcontent.setSalt(attributcontent.getSalt());
+                                    cfattributcontentService.create(newcontent);
+                                }
+                            });
+                            hibernateUtil.insertContent(newclasscontent);
+                            ucp.setReturncode("OK");
+                        } else {
+                            ucp.setReturncode("Clascontent not found");
+                        }
                     } catch (ConstraintViolationException ex) {
                         LOGGER.error(ex.getMessage());
                     }
@@ -408,8 +414,8 @@ public class RestContent {
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ucp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
-                    try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
+                    CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
+                    if (null != classcontent) {
                         if (0 == classcontent.getCheckedoutby().longValue()) {
                             classcontent.setCheckedoutby(BigInteger.valueOf(ucp.getUserid()));
                             ucp.setCheckedoutby(ucp.getUserid());
@@ -418,7 +424,7 @@ public class RestContent {
                         } else {
                             ucp.setReturncode("Classcontent already checkedout");
                         }
-                    } catch (javax.persistence.NoResultException ex) {
+                    } else {
                         ucp.setReturncode("Classcontent not found");
                     }
                 } else {
@@ -444,8 +450,8 @@ public class RestContent {
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ucp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
-                    try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
+                    CfClasscontent classcontent = cfclasscontentService.findByName(ucp.getContentname().trim().replaceAll("\\s+", "_"));
+                    if (null != classcontent) {
                         if (ucp.getUserid() == classcontent.getCheckedoutby().longValue()) {
                             classcontent.setCheckedoutby(BigInteger.ZERO);
                             ucp.setCheckedoutby(0);
@@ -458,7 +464,7 @@ public class RestContent {
                                 ucp.setReturncode("Classcontent checkedout by other user");
                             }
                         }
-                    } catch (javax.persistence.NoResultException ex) {
+                    } else {
                         ucp.setReturncode("Classcontent not found");
                     }
                 } else {
@@ -515,8 +521,8 @@ public class RestContent {
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = icp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
-                    try {
-                        CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname().trim().replaceAll("\\s+", "_"));
+                    CfClasscontent classcontent = cfclasscontentService.findByName(icp.getContentname().trim().replaceAll("\\s+", "_"));
+                    if (null != classcontent) {
                         if (contentUtil.hasDifference(classcontent)) {
                             try {
                                 String content = getContent(classcontent);
@@ -542,7 +548,7 @@ public class RestContent {
                         } else {
                             icp.setReturncode("Cannot commit");
                         }
-                    } catch (javax.persistence.NoResultException ex) {
+                    } else {
                         icp.setReturncode("Classcontent not found");
                     }
                 } else {
