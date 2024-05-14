@@ -100,7 +100,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.olingo.commons.api.ex.ODataException;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.ansi;
