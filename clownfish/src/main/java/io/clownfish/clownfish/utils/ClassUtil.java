@@ -970,6 +970,9 @@ public class ClassUtil implements Serializable {
                     case "datetime":
                         html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append(" == '").append(attr.getName()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append(" == '-").append(attr.getName()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('").append(attr.getName()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('-").append(attr.getName()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                         break;
+                    case "boolean":
+                        html.append("\t\t\t\t\t\t\t<th><span>").append(StringUtils.capitalise(attr.getName())).append("</span></th>").append("\n");
+                        break;
                     case "classref":
                         if (1 == attr.getRelationtype()) {
                             if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
@@ -1008,6 +1011,9 @@ public class ClassUtil implements Serializable {
                     case "datetime":
                         html.append("\t\t\t\t\t\t\t<th><input id=\"filter_").append(attr.getName()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\"></th>").append("\n");
                         break;
+                    case "boolean":
+                        html.append("\t\t\t\t\t\t\t<th></th>").append("\n");
+                        break;
                     case "classref":
                         if (1 == attr.getRelationtype()) {
                             html.append("\t\t\t\t\t\t\t<th><input id=\"filter_").append(attr.getName().toLowerCase()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\"></th>").append("\n");
@@ -1036,6 +1042,9 @@ public class ClassUtil implements Serializable {
                     case "real":
                         html.append("\t\t\t\t\t\t<td ng-show=\"!").append(clazz.getName().toLowerCase()).append(".editable\" ng-mouseover=\"").append(clazz.getName().toLowerCase()).append(".editable=true\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
                         html.append("\t\t\t\t\t\t<td ng-show=\"").append(clazz.getName().toLowerCase()).append(".editable\" ng-mouseleave=\"").append(clazz.getName().toLowerCase()).append(".editable=false\"><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        break;
+                    case "boolean":
+                        html.append("\t\t\t\t\t\t<td><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
                         break;
                     case "datetime":
                         html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");

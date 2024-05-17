@@ -139,6 +139,7 @@ public class ClassList implements Serializable {
                 case "integer":
                 case "real":
                 case "datetime":
+                case "boolean":
                     odw.setHeaderenabled(true);
                     odw.setRelationenabled(false);
                     odw.setTableheader(true);
