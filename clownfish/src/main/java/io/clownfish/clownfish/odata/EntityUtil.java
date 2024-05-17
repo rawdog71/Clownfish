@@ -170,10 +170,12 @@ public class EntityUtil {
                 break;
             case "Edm.Boolean":
                 if (value instanceof String) {
-                    if (0 == ((String) value).compareToIgnoreCase("1")) {
-                        value = "true";
-                    } else {
-                        value = "false";
+                    if (((((String) value).compareToIgnoreCase("true")) != 0) && (((String) value).compareToIgnoreCase("false")) != 0 ) {
+                        if (0 == ((String) value).compareToIgnoreCase("1")) {
+                            value = "true";
+                        } else {
+                            value = "false";
+                        }
                     }
                     prop.setValue(ValueType.PRIMITIVE, Boolean.parseBoolean((String)value));
                 } else {
