@@ -307,10 +307,10 @@ public class DatasourceList implements Serializable {
      * @param changeEvent
      */
     public void onChangeName(ValueChangeEvent changeEvent) {
-        try {
-            cfdatasourceService.findByName(datasourceName);
+        CfDatasource ds = cfdatasourceService.findByName(datasourceName);
+        if (null != ds ) {
             newContentButtonDisabled = true;
-        } catch (NoResultException ex) {
+        } else {
             newContentButtonDisabled = datasourceName.isEmpty();
         }
     }
