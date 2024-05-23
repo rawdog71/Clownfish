@@ -243,6 +243,18 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             System.exit(1);
         }
         
+        if (!propertyUtil.getPropertyValue("folder_icon").isBlank()) {
+            propertyUtil = new PropertyUtil(propertylist);
+            // Register resource handler for font files
+            registry.addResourceHandler("icons/**").addResourceLocations("file:///" + propertyUtil.getPropertyValue("folder_icon")+"/")
+                .setCacheControl(CacheControl.maxAge(cachetime, TimeUnit.HOURS).cachePublic())
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver());
+        } else {
+            LOGGER.error("Please set the folder_icon in the database");
+            System.exit(1);
+        }
+        
         registry.setOrder(-1);
     }
     
