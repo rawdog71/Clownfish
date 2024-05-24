@@ -376,11 +376,6 @@ public class EntityUtil {
                                 Property prop = entity.getProperty(attribut.getName());
                                 if (null != prop) {
                                     newcontent = contentUtil.setAttributValue(newcontent, entity.getProperty(attribut.getName()).getValue().toString());
-                                    if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("datetime")) {
-                                        newcontent = contentUtil.setAttributValue(newcontent, entity.getProperty(attribut.getName()).getValue().toString());
-                                    } else {
-                                        newcontent = contentUtil.setAttributValue(newcontent, ((GregorianCalendar)entity.getProperty(attribut.getName()).getValue()).toZonedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-                                    }
                                 } else {
                                     newcontent = contentUtil.setAttributValue(newcontent, null);
                                 }
