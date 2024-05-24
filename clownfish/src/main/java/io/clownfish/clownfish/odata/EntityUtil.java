@@ -344,7 +344,6 @@ public class EntityUtil {
                     newclasscontent.setCheckedoutby(BigInteger.valueOf(0));
                     newclasscontent.setClassref(clazz);
                     CfClasscontent newclasscontent2 = cfclasscontentService.create(newclasscontent);
-                    hibernateUtil.insertContent(newclasscontent);
                     List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent2.getClassref());
                     attributlist.stream().forEach((attribut) -> {
                         if (attribut.getAutoincrementor() == true) {
@@ -477,7 +476,7 @@ public class EntityUtil {
                             }
                         }
                     });
-                    hibernateUtil.updateContent(newclasscontent);
+                    hibernateUtil.insertContent(newclasscontent);
                     contentUtil.commit(newclasscontent);
 
                     try {
