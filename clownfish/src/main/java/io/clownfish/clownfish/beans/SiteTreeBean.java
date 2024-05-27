@@ -106,7 +106,6 @@ import javax.inject.Named;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
-import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -414,8 +413,8 @@ public class SiteTreeBean implements Serializable {
                 fillChildren(site, tn);
             }
 
-            invisibleRoot = new DefaultTreeNode("Root", null);
-            List<CfSite> invisSiteList = cfsiteService.findAll().stream()
+            invisibleRoot = new DefaultTreeNode("InvRoot", null);
+            List<CfSite> invisSiteList = cfsiteService.findByParentref(null).stream()
                     .filter(cfSite -> {return !cfSite.getInvisible();}).collect(Collectors.toList());
             for (CfSite site : invisSiteList) {
                 TreeNode tn = new DefaultTreeNode(site);
