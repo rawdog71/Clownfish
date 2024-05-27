@@ -70,6 +70,7 @@ public class WebserviceAuthList implements Serializable {
     }
     
     public void setUser(CfUser user) {
+        init();
         currentUser = user;
         webserviceauthlist = cfwebserviceauthService.findByUserRef(currentUser);
         for (CfWebserviceauth webserviceauth : webserviceauthlist) {
