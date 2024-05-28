@@ -696,10 +696,10 @@ public class ContentUtil implements IVersioningInterface {
         int i = 1;
         boolean found = false;
         do {
-            try {
-                cfclasscontentService.findByName(name+"("+i+")");
+            CfClasscontent dummy = cfclasscontentService.findByName(name+"("+i+")");
+            if (null != dummy) {
                 i++;
-            } catch(Exception ex) {
+            } else {
                 found = true;
             }
         } while (!found);
