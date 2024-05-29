@@ -486,12 +486,12 @@ public class ContentList implements Serializable {
             } else {
                 contentName = selectedClass.getName().toUpperCase() + "_" + contentName.replaceAll("\\s+", "_");
             }
-            try {
-                CfClasscontent findcontent = cfclasscontentService.findByName(contentName);
+            CfClasscontent findcontent = cfclasscontentService.findByName(contentName);
+            if (null != findcontent) {
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "WARNING", "Contentname already exists!");
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 contentName = selectedContent.getName();
-            } catch (Exception ex) {
+            } else {
                 selectedContent.setName(contentName);
                 cfclasscontentService.edit(selectedContent);
                 FacesMessage message = new FacesMessage("Contentname changed!");
