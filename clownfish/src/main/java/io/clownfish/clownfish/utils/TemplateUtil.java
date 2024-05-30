@@ -144,7 +144,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     }
     
     public void fetchLayout(CfTemplate template) {
-        layout = new CfLayout(template.getName());
+        CfLayout dummylayout = new CfLayout(template.getName());
         Document doc = Jsoup.parse(template.getContent());
         Elements divs = doc.getElementsByAttribute("template");
         for (Element div : divs) {
@@ -154,6 +154,11 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             String assetlists = div.attr("assetlists");
             String keywordlists = div.attr("keywordlists");
             CfDiv cfdiv = new CfDiv();
+            if (null != layout) {
+                cfdiv.setVisible(layout.getDivArray().get(div.attr("id")).isVisible());
+            } else {
+                cfdiv.setVisible(true);
+            }
             cfdiv.setId(div.attr("id"));
             cfdiv.setName(div.attr("template"));
             if (!contents.isEmpty()) {
@@ -171,8 +176,9 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
             if (!keywordlists.isEmpty()) {
                 cfdiv.getKeywordlistArray().addAll(ClownfishUtil.toList(keywordlists.split(",")));
             }
-            layout.getDivArray().put(div.attr("id"), cfdiv);
+            dummylayout.getDivArray().put(div.attr("id"), cfdiv);
         }
+        layout = dummylayout;
     }
     
     public String fetchIncludes(String content, ClownfishConst.ViewModus modus) {

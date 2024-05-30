@@ -1215,6 +1215,7 @@ public class SiteTreeBean implements Serializable {
     
     public void invertShow(CfDiv div) {
         if (null != div) {
+            templateUtility.getLayout().getDivArray().get(div.getId()).setVisible(!div.isVisible());
             div.setVisible(!div.isVisible());
         }
     }
