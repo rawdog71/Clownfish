@@ -517,6 +517,7 @@ public class SiteTreeBean implements Serializable {
     }
     
     public void onSelect(NodeSelectEvent event) {
+        templateUtility.setLayout(null);
         selectedNode = event.getTreeNode();
         selectedSite = (CfSite) selectedNode.getData();
         params = selectedSite.getTestparams();
