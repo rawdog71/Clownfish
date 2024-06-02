@@ -745,12 +745,12 @@ public class Clownfish {
                 });
 
                 addHeader(response, clownfishutil.getVersion());
-                Future<ClownfishResponse> cfResponse = makeResponse(name, queryParams, urlParams, false, null, clientinfo);
-                if (cfResponse.get().getErrorcode() == 0) {
+                ClownfishResponse cfResponse = makeResponse(name, queryParams, urlParams, false, null, clientinfo);
+                if (cfResponse.getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
                 } else {
-                    switch (cfResponse.get().getErrorcode()) {
+                    switch (cfResponse.getErrorcode()) {
                         case 1:
                         case 2:
                         case 4:
@@ -759,13 +759,13 @@ public class Clownfish {
                             break;
                         case 3:
                         case 5:
-                            response.sendRedirect("/" + cfResponse.get().getRelocation());
+                            response.sendRedirect("/" + cfResponse.getRelocation());
                             break;
                     }
                 }
                 ServletOutputStream out = response.getOutputStream();
-                out.write(cfResponse.get().getOutput().getBytes(this.characterencoding));
-            } catch (IOException | InterruptedException | ExecutionException | ParseException ex) {
+                out.write(cfResponse.getOutput().getBytes(this.characterencoding));
+            } catch (IOException | ParseException ex) {
                 LOGGER.error(ex.getMessage());
             } catch (PageNotFoundException ex) {
                 String error_site = propertyUtil.getPropertyValue("site_error");
@@ -816,8 +816,8 @@ public class Clownfish {
                 }
                 
                 addHeader(response, clownfishutil.getVersion());
-                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, fis, clientinfo);
-                if (cfResponse.get().getErrorcode() == 0) {
+                ClownfishResponse cfResponse = makeResponse(name, map, urlParams, false, fis, clientinfo);
+                if (cfResponse.getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
                     
@@ -848,12 +848,12 @@ public class Clownfish {
                     }
                     
                     ServletOutputStream out = response.getOutputStream();
-                    out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
+                    out.write(cfResponse.getOutput().getBytes(this.characterencoding)); 
                 } else {
                     response.setContentType("text/html");
                     response.setCharacterEncoding("UTF-8");
                     ServletOutputStream out = response.getOutputStream();
-                    out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
+                    out.write(cfResponse.getOutput().getBytes(this.characterencoding)); 
                 }
             } else {
                 String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
@@ -921,20 +921,20 @@ public class Clownfish {
                 }
 
                 addHeader(response, clownfishutil.getVersion());
-                Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, null, clientinfo);
-                if (cfResponse.get().getErrorcode() == 0) {
+                ClownfishResponse cfResponse = makeResponse(name, map, urlParams, false, null, clientinfo);
+                if (cfResponse.getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
                     ServletOutputStream out = response.getOutputStream();
-                    out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
+                    out.write(cfResponse.getOutput().getBytes(this.characterencoding)); 
                 } else {
                     response.setContentType("text/html");
                     response.setCharacterEncoding("UTF-8");
                     ServletOutputStream out = response.getOutputStream();
-                    out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
+                    out.write(cfResponse.getOutput().getBytes(this.characterencoding)); 
                 }
             }
-        } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException | IllegalStateException | ParseException ex) {
+        } catch (IOException | PageNotFoundException | IllegalStateException | ParseException ex) {
             LOGGER.error(ex.getMessage());
         }
     }
@@ -1037,19 +1037,19 @@ public class Clownfish {
             }
 
             addHeader(response, clownfishutil.getVersion());
-            Future<ClownfishResponse> cfResponse = makeResponse(name, map, urlParams, false, null, clientinfo);
-            if (cfResponse.get().getErrorcode() == 0) {
+            ClownfishResponse cfResponse = makeResponse(name, map, urlParams, false, null, clientinfo);
+            if (cfResponse.getErrorcode() == 0) {
                 response.setContentType(this.contenttype);
                 response.setCharacterEncoding(this.characterencoding);
                 ServletOutputStream out = response.getOutputStream();
-                out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
+                out.write(cfResponse.getOutput().getBytes(this.characterencoding)); 
             } else {
                 response.setContentType("text/html");
                 response.setCharacterEncoding("UTF-8");
                 ServletOutputStream out = response.getOutputStream();
-                out.write(cfResponse.get().getOutput().getBytes(this.characterencoding)); 
+                out.write(cfResponse.getOutput().getBytes(this.characterencoding)); 
             }
-        } catch (IOException | InterruptedException | ExecutionException | PageNotFoundException | IllegalStateException | ParseException ex) {
+        } catch (IOException | PageNotFoundException | IllegalStateException | ParseException ex) {
             LOGGER.error(ex.getMessage());
         }
     }
@@ -1065,8 +1065,7 @@ public class Clownfish {
      * @return 
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException 
      */
-    @Async
-    public Future<ClownfishResponse> makeResponse(String name, List<JsonFormParameter> postmap, List urlParams, boolean makestatic, List<FileItem> fileitems, ClientInformation clientinfo) throws PageNotFoundException {
+    public ClownfishResponse makeResponse(String name, List<JsonFormParameter> postmap, List urlParams, boolean makestatic, List<FileItem> fileitems, ClientInformation clientinfo) throws PageNotFoundException {
         authtokenlist.setPropertyUtil(propertyUtil);
         ClownfishResponse cfresponse = new ClownfishResponse();
         if (null != sitecontentmap) {
@@ -1160,25 +1159,20 @@ public class Clownfish {
                             if ((authtokenlist.checkValidToken(login_token)) || (isOnline(name, urlParams))) {
                                 cfresponse = getStaticSite(name, getUrlParamName(name, urlParams), postmap, urlParams);
                                 if (0 == cfresponse.getErrorcode()) {
-                                    return new AsyncResult<>(cfresponse);
+                                    return cfresponse;
                                 } else {
-                                    Future<ClownfishResponse> cfStaticResponse = makeResponse(name, postmap, urlParams, true, fileitems, clientinfo);
-                                    try {
-                                        if (urlParams.isEmpty()) {
-                                            String aliasname = cfsite.getAliaspath();
-                                            staticSiteUtil.generateStaticSite(name, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
-                                        }
-                                        //return makeResponse(name, postmap, urlParams, false);
-                                        return cfStaticResponse;
-                                    } catch (InterruptedException | ExecutionException ex) {
-                                        LOGGER.error(ex.getMessage());
-                                        return makeResponse(name, postmap, urlParams, false, fileitems, clientinfo);
+                                    ClownfishResponse cfStaticResponse = makeResponse(name, postmap, urlParams, true, fileitems, clientinfo);
+                                    if (urlParams.isEmpty()) {
+                                        String aliasname = cfsite.getAliaspath();
+                                        staticSiteUtil.generateStaticSite(name, aliasname, cfStaticResponse.getOutput(), cfassetService, folderUtil);
                                     }
+                                    //return makeResponse(name, postmap, urlParams, false);
+                                    return cfStaticResponse;
                                 }
                             } else {
                                 cfresponse.setErrorcode(4);
                                 cfresponse.setOutput("Offline");
-                                return new AsyncResult<>(cfresponse);
+                                return cfresponse;
                             }
                         } else {
                             if ((cfsite.getContenttype() != null)) {
@@ -1533,7 +1527,7 @@ public class Clownfish {
                                                                     cfresponse.setErrorcode(5);
                                                                     cfresponse.setOutput("ClownfishTemplateException");
                                                                     cfresponse.setRelocation(propertyUtil.getPropertyValue("site_error"));
-                                                                    return new AsyncResult<>(cfresponse);
+                                                                    return cfresponse;
                                                                 }
                                                             } else {
                                                                 freemarker.core.Environment env = fmTemplate.createProcessingEnvironment(fmRoot, out);
@@ -1648,7 +1642,7 @@ public class Clownfish {
                                                                 cfresponse.setErrorcode(5);
                                                                 cfresponse.setOutput("ClownfishTemplateException");
                                                                 cfresponse.setRelocation(propertyUtil.getPropertyValue("site_error"));
-                                                                return new AsyncResult<>(cfresponse);
+                                                                return cfresponse;
                                                             }
                                                         } else {
                                                             velTemplate.merge(velContext, out);
@@ -1669,7 +1663,7 @@ public class Clownfish {
                                                 cfresponse.setErrorcode(5);
                                                 cfresponse.setOutput("ClownfishTemplateException");
                                                 cfresponse.setRelocation(propertyUtil.getPropertyValue("site_error"));
-                                                return new AsyncResult<>(cfresponse);
+                                                return cfresponse;
                                             }
                                             out.write(output);
                                             out.flush();
@@ -1688,48 +1682,48 @@ public class Clownfish {
                                         cfresponse.setErrorcode(0);
                                         cfresponse.setOutput(htmlcompressor.compress(out.toString()));
                                         //LOGGER.info("END makeResponse: " + name);
-                                        return new AsyncResult<>(cfresponse);
+                                        return cfresponse;
                                     } else {
                                         cfresponse.setErrorcode(0);
                                         cfresponse.setOutput(out.toString());
                                         //LOGGER.info("END makeResponse: " + name);
-                                        return new AsyncResult<>(cfresponse);
+                                        return cfresponse;
                                     }
                                 } else {
                                     cfresponse.setErrorcode(4);
                                     cfresponse.setOutput("Template not set");
-                                    return new AsyncResult<>(cfresponse);
+                                    return cfresponse;
                                 }
                             } catch (NoResultException ex) {
                                 LOGGER.info("Exception: " + ex);
                                 cfresponse.setErrorcode(1);
                                 cfresponse.setOutput("No template");
                                 //LOGGER.info("END makeResponse: " + name);
-                                return new AsyncResult<>(cfresponse);
+                                return cfresponse;
                             }
                         }
                     } else {
                         cfresponse.setErrorcode(2);
                         cfresponse.setOutput("Only for Job calling");
-                        return new AsyncResult<>(cfresponse);
+                        return cfresponse;
                     }
                 }   else {
                     cfresponse.setErrorcode(4);
                     cfresponse.setOutput("Offline");
                     cfresponse.setRelocation(cfsite.getLoginsite());
-                    return new AsyncResult<>(cfresponse);
+                    return cfresponse;
                 }
             } else {
                 cfresponse.setErrorcode(3);
                 cfresponse.setOutput("No access");
                 cfresponse.setRelocation(cfsite.getLoginsite());
-                return new AsyncResult<>(cfresponse);
+                return cfresponse;
             } 
         } catch (IOException | org.apache.velocity.runtime.parser.ParseException ex) {
             cfresponse.setErrorcode(1);
             cfresponse.setOutput(ex.getMessage());
             //LOGGER.info("END makeResponse: " + name);
-            return new AsyncResult<>(cfresponse);
+            return cfresponse;
         }
     }
     
@@ -1821,19 +1815,19 @@ public class Clownfish {
         } catch (IOException ex) {
             CfSite cfsite = cfsiteService.findByName(sitename);
             String aliasname = cfsite.getAliaspath();
-            Future<ClownfishResponse> cfStaticResponse;
+            ClownfishResponse cfStaticResponse;
             try {
                 cfStaticResponse = makeResponse(sitename, postmap, urlParams, true, null, null);
-                if (0 == cfStaticResponse.get().getErrorcode()) {
+                if (0 == cfStaticResponse.getErrorcode()) {
                     if (!urlParams.isEmpty()) {
-                        staticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                        staticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.getOutput(), cfassetService, folderUtil);
                     } else {
-                        staticSiteUtil.generateStaticSite(siteurlname, aliasname, cfStaticResponse.get().getOutput(), cfassetService, folderUtil);
+                        staticSiteUtil.generateStaticSite(siteurlname, aliasname, cfStaticResponse.getOutput(), cfassetService, folderUtil);
                     }
                 } else {
                     deleteStaticSite(sitename, urlParams);
                 }
-            } catch (PageNotFoundException | InterruptedException | ExecutionException ex1) {
+            } catch (PageNotFoundException ex1) {
                 LOGGER.error(ex.getMessage());
             }
             LOGGER.error(ex.getMessage());

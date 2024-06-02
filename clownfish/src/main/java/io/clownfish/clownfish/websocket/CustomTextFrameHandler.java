@@ -62,16 +62,16 @@ public class CustomTextFrameHandler extends SimpleChannelInboundHandler<TextWebS
             jfp.setValue(value);
             postmap.add(jfp);
         });
-        Future<ClownfishResponse> cfResponse = clownfish.makeResponse(wsbm.getWebservice(), postmap, new ArrayList<>(), false, null, null);
+        ClownfishResponse cfResponse = clownfish.makeResponse(wsbm.getWebservice(), postmap, new ArrayList<>(), false, null, null);
         
         if (wsbm.isBroadcast()) {
             for (ChannelHandlerContext session : sessions) {
                 if (!session.isRemoved()) {
-                    session.channel().writeAndFlush(new TextWebSocketFrame(cfResponse.get().getOutput()));
+                    session.channel().writeAndFlush(new TextWebSocketFrame(cfResponse.getOutput()));
                 }
             }
         } else {
-            ctx.channel().writeAndFlush(new TextWebSocketFrame(cfResponse.get().getOutput()));
+            ctx.channel().writeAndFlush(new TextWebSocketFrame(cfResponse.getOutput()));
         }
     }
 }
