@@ -74,6 +74,8 @@ public class DatabaseUtil {
     @Autowired CfTemplateService cfTemplateService;
     @Autowired CfSiteService cfSiteService;
     @Autowired CfJavascriptService cfJavaScriptService;
+    @Autowired TemplateUtil templateutil;
+    @Autowired JavascriptUtil javascriptutil;
     private @Getter @Setter SiteTreeBean sitetree;
     private @Getter @Setter SiteUtil siteutil;
     
@@ -1294,15 +1296,18 @@ public class DatabaseUtil {
                 template.setCheckedoutby(BigInteger.ZERO);
                 template.setContent(html.toString());
                 cfTemplateService.create(template);
+                templateutil.commit(template);
             } else {
                 dummytemplate.setContent(html.toString());
                 cfTemplateService.edit(dummytemplate);
+                templateutil.commit(dummytemplate);
             }
         } catch (Exception ex) {
             template.setScriptlanguage(2);
             template.setCheckedoutby(BigInteger.ZERO);
             template.setContent(html.toString());
             cfTemplateService.create(template);
+            templateutil.commit(template);
         }
         
         javascript.append("var crud").append(tabledata.getName()).append(" = angular.module('crud").append(tabledata.getName()).append("App', []);").append("\n");
@@ -1376,7 +1381,7 @@ public class DatabaseUtil {
         javascript.append("\n");
         
         javascript.append("\t$scope.get").append(tabledata.getName()).append("list = function() {").append("\n");
-        javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("Set').then(function (res) {").append("\n");
+        javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("').then(function (res) {").append("\n");
         javascript.append("\t\t\t$scope.").append(tabledata.getName().toUpperCase()).append("LIST = res.data.value;").append("\n");
         javascript.append("\t\t});").append("\n");
         javascript.append("\t};").append("\n");
@@ -1443,7 +1448,7 @@ public class DatabaseUtil {
         javascript.append("\t$scope.update").append(tabledata.getName()).append("Modal = function(id) {").append("\n");
         javascript.append("\t\t$scope.inprogress = true;").append("\n");
         javascript.append("\t\tUIkit.modal('#modal-").append(tabledata.getName().toLowerCase()).append("-update').show();").append("\n");
-        javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("Set?$filter=id eq ' + id).then(function (res) {").append("\n");
+        javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("?$filter=id eq ' + id).then(function (res) {").append("\n");
         javascript.append("\t\t\t$scope.").append(tabledata.getName()).append(" = res.data.value[0];").append("\n");
         
         javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
@@ -1451,7 +1456,7 @@ public class DatabaseUtil {
         javascript.append("\t};").append("\n");
         javascript.append("\n");
         javascript.append("\t$scope.update").append(tabledata.getName()).append("Instant = function(id, field, value) {").append("\n");
-	javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("Set?$filter=id eq ' + id).then(function (res) {").append("\n");
+	javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("?$filter=id eq ' + id).then(function (res) {").append("\n");
 	javascript.append("\t\t\t$scope.").append(tabledata.getName()).append(" = res.data.value[0];").append("\n");
         javascript.append("\t\t\t$scope.").append(tabledata.getName()).append("[field] = value;").append("\n");
         javascript.append("\t\t\t$scope.update").append(tabledata.getName()).append("(id);").append("\n");
@@ -1512,7 +1517,7 @@ public class DatabaseUtil {
         javascript.append("\t$scope.delete").append(tabledata.getName()).append("Modal = function(id) {").append("\n");
         javascript.append("\t\t$scope.inprogress = true;").append("\n");
         javascript.append("\t\tUIkit.modal('#modal-").append(tabledata.getName().toLowerCase()).append("-delete').show();").append("\n");
-        javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("Set?$filter=id eq ' + id).then(function (res) {").append("\n");
+        javascript.append("\t\t$http.get('/OData/").append(datasource.getName()).append("_").append(tabledata.getName()).append("?$filter=id eq ' + id).then(function (res) {").append("\n");
         javascript.append("\t\t\t$scope.").append(tabledata.getName()).append(" = res.data.value[0];").append("\n");
         javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\t});").append("\n");
@@ -1566,20 +1571,25 @@ public class DatabaseUtil {
                 js.setCheckedoutby(BigInteger.ZERO);
                 js.setContent(javascript.toString());
                 cfJavaScriptService.create(js);
+                javascriptutil.commit(js);
+                javascriptutil.writeStaticJS(js.getName(), js.getContent());
             } else {
                 dummyjs.setContent(javascript.toString());
                 cfJavaScriptService.edit(dummyjs);
+                javascriptutil.commit(dummyjs);
+                javascriptutil.writeStaticJS(dummyjs.getName(), dummyjs.getContent());
             }
         } catch (Exception ex) {
             js.setCheckedoutby(BigInteger.ZERO);
             js.setContent(javascript.toString());
             cfJavaScriptService.create(js);
+            javascriptutil.commit(js);
+            javascriptutil.writeStaticJS(js.getName(), js.getContent());
         }
 
         site.setName("crud_" + tabledata.getName().toLowerCase());
-        try {
-            CfSite dummysite = cfSiteService.findByName(site.getName());
-        } catch (Exception ex) {
+        CfSite dummysite = cfSiteService.findByName(site.getName());
+        if (null == dummysite) {
             site.setCharacterencoding("UTF-8");
             site.setHitcounter(BigInteger.ZERO);
             site.setTitle("");

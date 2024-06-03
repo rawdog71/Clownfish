@@ -598,6 +598,7 @@ public class Clownfish {
     @GetMapping(path = "/{name}/**")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         if (servicestatus.isOnline()) {
+            addHeader(response, clownfishutil.getVersion());
             ClientInformation clientinfo = getClientinformation(request.getRemoteAddr());
             String token = request.getHeader("cf_token");
             String login_token = request.getHeader("cf_login_token");
@@ -625,6 +626,9 @@ public class Clownfish {
                         }
                     }
                 }
+                
+                response.setContentType(cfsite.getContenttype());
+                response.setCharacterEncoding(cfsite.getCharacterencoding());
                 
                 if (!cfsite.isSearchresult()) {
                     String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
@@ -671,7 +675,11 @@ public class Clownfish {
                     }
                     if (query.isEmpty()) {
                         Map<String, String[]> parammap = request.getParameterMap();
-                        query = parammap.get("query")[0];
+                        if (parammap.containsKey("query")) {
+                            query = parammap.get("query")[0];
+                        } else {
+                            query = "";
+                        }
                     }
 
                     String[] searchexpressions = query.split(" ");
@@ -744,7 +752,7 @@ public class Clownfish {
                     queryParams.add(jfp);
                 });
 
-                addHeader(response, clownfishutil.getVersion());
+                //addHeader(response, clownfishutil.getVersion());
                 ClownfishResponse cfResponse = makeResponse(name, queryParams, urlParams, false, null, clientinfo);
                 if (cfResponse.getErrorcode() == 0) {
                     response.setContentType(this.contenttype);

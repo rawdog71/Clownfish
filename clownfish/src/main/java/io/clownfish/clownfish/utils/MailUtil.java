@@ -47,7 +47,7 @@ public class MailUtil implements Serializable {
     private @Getter @Setter String mailuser;
     private @Getter @Setter String mailpassword;
     private @Getter @Setter String sendfrom;
-    private final Properties props;
+    private Properties props = null;
     private final String encodingOptions = "text/html; charset=UTF-8";
     
     final transient Logger LOGGER = LoggerFactory.getLogger(MailUtil.class);
@@ -57,25 +57,27 @@ public class MailUtil implements Serializable {
     }
 
     public MailUtil(PropertyUtil propertyUtil) {
-        this.propertyUtil = propertyUtil;
-        
-        this.mailsslenabled = propertyUtil.getPropertyValue("mail_ssl_enabled");
-        this.mailsmtphost = propertyUtil.getPropertyValue("mail_smtp_host");
-        this.mailsmtpport = propertyUtil.getPropertyValue("mail_smtp_port");
-        this.mailtransportprotocol = propertyUtil.getPropertyValue("mail_transport_protocol");
-        this.mailuser = propertyUtil.getPropertyValue("mail_user");
-        this.mailpassword = propertyUtil.getPropertyValue("mail_password");
-        this.sendfrom = propertyUtil.getPropertyValue("mail_sendfrom");
-        
-        props = System.getProperties();
-        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); //SSL Factory Class
-        props.put("mail.smtp.host", propertyUtil.getPropertyValue("mail_smtp_host"));
-        props.put("mail.transport.protocol", propertyUtil.getPropertyValue("mail_transport_protocol"));
-        props.put("mail.user", propertyUtil.getPropertyValue("mail_user"));
-        props.put("mail.password", propertyUtil.getPropertyValue("mail_password"));
-        props.put("mail.smtp.socketFactory.port", propertyUtil.getPropertyValue("mail_smtp_port")); //SSL Port
-        props.put("mail.smtp.auth", propertyUtil.getPropertyValue("mail_ssl_enabled")); //Enabling SMTP Authentication
-        props.put("mail.smtp.port", propertyUtil.getPropertyValue("mail_smtp_port")); //SMTP Port
+        if (null != propertyUtil) {
+            this.propertyUtil = propertyUtil;
+
+            this.mailsslenabled = propertyUtil.getPropertyValue("mail_ssl_enabled");
+            this.mailsmtphost = propertyUtil.getPropertyValue("mail_smtp_host");
+            this.mailsmtpport = propertyUtil.getPropertyValue("mail_smtp_port");
+            this.mailtransportprotocol = propertyUtil.getPropertyValue("mail_transport_protocol");
+            this.mailuser = propertyUtil.getPropertyValue("mail_user");
+            this.mailpassword = propertyUtil.getPropertyValue("mail_password");
+            this.sendfrom = propertyUtil.getPropertyValue("mail_sendfrom");
+
+            props = System.getProperties();
+            props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); //SSL Factory Class
+            props.put("mail.smtp.host", propertyUtil.getPropertyValue("mail_smtp_host"));
+            props.put("mail.transport.protocol", propertyUtil.getPropertyValue("mail_transport_protocol"));
+            props.put("mail.user", propertyUtil.getPropertyValue("mail_user"));
+            props.put("mail.password", propertyUtil.getPropertyValue("mail_password"));
+            props.put("mail.smtp.socketFactory.port", propertyUtil.getPropertyValue("mail_smtp_port")); //SSL Port
+            props.put("mail.smtp.auth", propertyUtil.getPropertyValue("mail_ssl_enabled")); //Enabling SMTP Authentication
+            props.put("mail.smtp.port", propertyUtil.getPropertyValue("mail_smtp_port")); //SMTP Port
+        }
     }
 
     public boolean sendRespondMail(String mailto, String subject, String mailbody) throws Exception {
