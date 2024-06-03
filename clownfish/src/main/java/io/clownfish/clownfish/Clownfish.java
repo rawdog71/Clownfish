@@ -60,8 +60,6 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.web.bind.annotation.*;
@@ -79,8 +77,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.DEVELOPMENT;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
@@ -2194,13 +2190,19 @@ public class Clownfish {
                 }
                 if ((preview) && (authtokenlist.checkValidToken(login_token))) {          // ToDo check accessmanager
                     //templateUtil.fetchLayout(maintemplate);
-                    //if ((null != sitetree) && (null != sitetree.getLayout())) {
+                    if ((null != sitetree) && (null != sitetree.getLayout())) {
                         for (CfDiv comp_div : templateUtil.getLayout().getDivs()) {
-                            if ((0 == cfdiv.getName().compareToIgnoreCase(comp_div.getName())) && (comp_div.isVisible())) {
+                            if ((0 == cfdiv.getName().compareToIgnoreCase(comp_div.getName())) && (sitetree.getVisibleMap().get(comp_div.getId()))) {
                                 div.html(content);
                             }
                         }
-                    //}
+                    } else {
+                        for (CfDiv comp_div : templateUtil.getLayout().getDivs()) {
+                            if (0 == cfdiv.getName().compareToIgnoreCase(comp_div.getName())) {
+                                div.html(content);
+                            }
+                        }
+                    }
                 } else {
                     div.html(content);
                 }

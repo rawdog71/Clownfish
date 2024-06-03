@@ -110,6 +110,7 @@ import jakarta.validation.ConstraintViolationException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
@@ -283,6 +284,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter String previewDatalistOutput = "";
     private @Getter @Setter List<CfKeyword> previewKeywordlistOutput = new ArrayList<>();
     @Inject LoginBean loginbean;
+    private @Getter @Setter HashMap<String, Boolean> visibleMap = new HashMap<String, Boolean>();
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
@@ -339,6 +341,7 @@ public class SiteTreeBean implements Serializable {
         stylesheetlist.setSitetree(this);
         classUtility.setSitetree(this);
         databaseUtility.setSitetree(this);
+        visibleMap.clear();
         LOGGER.info("INIT SITETREE END");
     }
     
@@ -514,6 +517,7 @@ public class SiteTreeBean implements Serializable {
         showKeywordLibrary = false;
         selectedDiv = null;
         apilist = null;
+        visibleMap.clear();
     }
     
     public void onSelect(NodeSelectEvent event) {
@@ -554,12 +558,16 @@ public class SiteTreeBean implements Serializable {
             showAsset = false;
             showAssetLibrary = false;
             showKeywordLibrary = false;
+            visibleMap.clear();
             if (1 == template.getType()) {
                 contenteditable = true;
                 FacesMessage message = new FacesMessage("LAYOUT TEMPLATE");
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 templateUtility.fetchLayout(template);
                 layout = templateUtility.getLayout();
+                for (CfDiv adiv : layout.getDivs()) {
+                    visibleMap.put(adiv.getId(), true);
+                }
             } else {
                 contenteditable = false;
                 selected_contentclass = null;
@@ -1217,6 +1225,7 @@ public class SiteTreeBean implements Serializable {
     public void invertShow(CfDiv div) {
         if (null != div) {
             div.setVisible(!div.isVisible());
+            visibleMap.put(div.getId(), !visibleMap.get(div.getId()));
         }
     }
     
