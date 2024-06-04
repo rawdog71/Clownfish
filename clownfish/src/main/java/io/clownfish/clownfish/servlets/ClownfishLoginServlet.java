@@ -30,6 +30,9 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -118,6 +121,7 @@ public class ClownfishLoginServlet extends HttpServlet {
                         salt = attributContent1.getSalt();
                         if (null != salt) {
                             String test = PasswordUtil.generateSecurePassword(inst_clearTextPw, salt);
+                            test = URLEncoder.encode(test, StandardCharsets.UTF_8.toString());
                             if ((attributContent1.getContentString().compareTo(test) == 0) && (attributContent1.getClasscontentref().getId() == cref)) {
                                 ar.setStatus(PasswordUtil.verifyUserPassword(inst_clearTextPw, PasswordUtil.generateSecurePassword(inst_clearTextPw, salt), salt));
                                 if (ar.isStatus()) {
@@ -132,7 +136,7 @@ public class ClownfishLoginServlet extends HttpServlet {
                     }
                 }
             }
-        } catch (Exception ex) {
+        } catch (UnsupportedEncodingException ex) {
             ar.setStatus(false);
             ar.setToken("");
             ar.setValiduntil(null);

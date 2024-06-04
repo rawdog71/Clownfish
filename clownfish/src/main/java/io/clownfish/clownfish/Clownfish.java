@@ -105,6 +105,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.primefaces.webapp.MultipartRequest;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
+import org.springframework.http.HttpHeaders;
 
 
 /**
@@ -594,6 +595,7 @@ public class Clownfish {
     @GetMapping(path = "/{name}/**")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         if (servicestatus.isOnline()) {
+            String referrer = request.getHeader("cf_referrer");
             addHeader(response, clownfishutil.getVersion());
             ClientInformation clientinfo = getClientinformation(request.getRemoteAddr());
             String token = request.getHeader("cf_token");
@@ -750,10 +752,7 @@ public class Clownfish {
 
                 //addHeader(response, clownfishutil.getVersion());
                 ClownfishResponse cfResponse = makeResponse(name, queryParams, urlParams, false, null, clientinfo);
-                if (cfResponse.getErrorcode() == 0) {
-                    response.setContentType(this.contenttype);
-                    response.setCharacterEncoding(this.characterencoding);
-                } else {
+                if (0 != cfResponse.getErrorcode()) {
                     switch (cfResponse.getErrorcode()) {
                         case 1:
                         case 2:
@@ -763,6 +762,7 @@ public class Clownfish {
                             break;
                         case 3:
                         case 5:
+                            response.addHeader("cf_referrer", name);
                             response.sendRedirect("/" + cfResponse.getRelocation());
                             break;
                     }
@@ -2260,7 +2260,11 @@ public class Clownfish {
                 cfstaticsiteservice.create(staticsite);
             }
         }
-        return !staticsite.isOffline();
+        if (null != staticsite) {
+            return !staticsite.isOffline();
+        } else {
+            return true;
+        }
     }
     
     private void deleteStaticSite(String name, List urlParams) {
