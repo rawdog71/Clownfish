@@ -38,15 +38,11 @@ public class AccessManagerUtil {
     public boolean checkAccess(String token, Integer type, BigInteger ref) {
         AuthTokenClasscontent classcontent = authtokenlist.getAuthtokens().get(token);
         List<CfAccessmanager> acmlist = cfaccessmanagerService.findByTypeAndRef(type, ref);
-        if (acmlist.size() > 0) {
+        if (!acmlist.isEmpty()) {
             if (null != classcontent) {
                 try {
                     CfAccessmanager acm = cfaccessmanagerService.findByTypeAndRefAndRefclasscontent(type, ref, BigInteger.valueOf(classcontent.getUser().getId()));
-                    if (acm.getRefclasscontent().longValue() == classcontent.getUser().getId()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return acm.getRefclasscontent().longValue() == classcontent.getUser().getId();
                 } catch (Exception ex) {
                     return false;
                 }

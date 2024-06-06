@@ -85,6 +85,7 @@ public class MailUtil implements Serializable {
         if (0 == propertyUtil.getPropertyValue("mail_ssl_enabled").compareToIgnoreCase("true")) {
             Authenticator auth = new Authenticator() {
                 //override the getPasswordAuthentication method
+                @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
                     return new PasswordAuthentication(propertyUtil.getPropertyValue("mail_sendfrom"), propertyUtil.getPropertyValue("mail_password"));
                 }

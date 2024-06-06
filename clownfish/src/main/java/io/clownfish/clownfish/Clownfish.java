@@ -95,6 +95,7 @@ import io.clownfish.clownfish.websocket.WebSocketServer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
+import javax.servlet.http.Cookie;
 import org.apache.commons.fileupload.FileItem;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
@@ -595,11 +596,12 @@ public class Clownfish {
     @GetMapping(path = "/{name}/**")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         if (servicestatus.isOnline()) {
-            String referrer = request.getHeader("cf_referrer");
+            Cookie[] cookies = request.getCookies();
+            String referrer = getCookieVal(cookies, "cf_referrer");
             addHeader(response, clownfishutil.getVersion());
             ClientInformation clientinfo = getClientinformation(request.getRemoteAddr());
-            String token = request.getHeader("cf_token");
-            String login_token = request.getHeader("cf_login_token");
+            String token = getCookieVal(cookies, "cf_token");
+            String login_token = getCookieVal(cookies, "cf_login_token");
             boolean alias = false;
             String aliasname = "";
             try {
@@ -751,7 +753,10 @@ public class Clownfish {
                 });
 
                 //addHeader(response, clownfishutil.getVersion());
-                ClownfishResponse cfResponse = makeResponse(name, queryParams, urlParams, false, null, clientinfo);
+                //LOGGER.info("MAKERESPONSE: " + name);
+                ClownfishResponse cfResponse = makeResponse(name, queryParams, urlParams, false, null, clientinfo, referrer);
+                Cookie refcookie = new Cookie("cf_referrer", "");
+                response.addCookie(refcookie);
                 if (0 != cfResponse.getErrorcode()) {
                     switch (cfResponse.getErrorcode()) {
                         case 1:
@@ -762,7 +767,8 @@ public class Clownfish {
                             break;
                         case 3:
                         case 5:
-                            response.addHeader("cf_referrer", name);
+                            refcookie = new Cookie("cf_referrer", name);
+                            response.addCookie(refcookie);
                             response.sendRedirect("/" + cfResponse.getRelocation());
                             break;
                     }
@@ -820,7 +826,7 @@ public class Clownfish {
                 }
                 
                 addHeader(response, clownfishutil.getVersion());
-                ClownfishResponse cfResponse = makeResponse(name, map, urlParams, false, fis, clientinfo);
+                ClownfishResponse cfResponse = makeResponse(name, map, urlParams, false, fis, clientinfo, "");
                 if (cfResponse.getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
@@ -925,7 +931,7 @@ public class Clownfish {
                 }
 
                 addHeader(response, clownfishutil.getVersion());
-                ClownfishResponse cfResponse = makeResponse(name, map, urlParams, false, null, clientinfo);
+                ClownfishResponse cfResponse = makeResponse(name, map, urlParams, false, null, clientinfo, "");
                 if (cfResponse.getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
@@ -1041,7 +1047,7 @@ public class Clownfish {
             }
 
             addHeader(response, clownfishutil.getVersion());
-            ClownfishResponse cfResponse = makeResponse(name, map, urlParams, false, null, clientinfo);
+            ClownfishResponse cfResponse = makeResponse(name, map, urlParams, false, null, clientinfo, "");
             if (cfResponse.getErrorcode() == 0) {
                 response.setContentType(this.contenttype);
                 response.setCharacterEncoding(this.characterencoding);
@@ -1066,10 +1072,12 @@ public class Clownfish {
      * @param urlParams
      * @param makestatic
      * @param fileitems
+     * @param clientinfo
+     * @param referrer
      * @return 
      * @throws io.clownfish.clownfish.exceptions.PageNotFoundException 
      */
-    public ClownfishResponse makeResponse(String name, List<JsonFormParameter> postmap, List urlParams, boolean makestatic, List<FileItem> fileitems, ClientInformation clientinfo) throws PageNotFoundException {
+    public ClownfishResponse makeResponse(String name, List<JsonFormParameter> postmap, List urlParams, boolean makestatic, List<FileItem> fileitems, ClientInformation clientinfo, String referrer) throws PageNotFoundException {
         authtokenlist.setPropertyUtil(propertyUtil);
         ClownfishResponse cfresponse = new ClownfishResponse();
         if (null != sitecontentmap) {
@@ -1131,8 +1139,11 @@ public class Clownfish {
             if (parametermap.containsKey("cf_token")) {    // check token for access manager
                 token = parametermap.get("cf_token").toString();
             }
+            //LOGGER.info("TOKEN:" + token);
             if (accessmanager.checkAccess(token, TYPE_SITE.getValue(), BigInteger.valueOf(cfsite.getId()))) {
+                //LOGGER.info("LOGIN_TOKEN:" + login_token);
                 if (((cfsite.isOffline()) && ((preview) && (authtokenlist.checkValidToken(login_token)))) || (!cfsite.isOffline())) {
+                    //LOGGER.info("SHOW SITE:" + cfsite.getName());
                     // Site has not job flag
                     if ((!cfsite.isJob()) || cf_job) {
                         // increment site hitcounter
@@ -1165,7 +1176,7 @@ public class Clownfish {
                                 if (0 == cfresponse.getErrorcode()) {
                                     return cfresponse;
                                 } else {
-                                    ClownfishResponse cfStaticResponse = makeResponse(name, postmap, urlParams, true, fileitems, clientinfo);
+                                    ClownfishResponse cfStaticResponse = makeResponse(name, postmap, urlParams, true, fileitems, clientinfo, referrer);
                                     if (urlParams.isEmpty()) {
                                         String aliasname = cfsite.getAliaspath();
                                         staticSiteUtil.generateStaticSite(name, aliasname, cfStaticResponse.getOutput(), cfassetService, folderUtil);
@@ -1386,6 +1397,7 @@ public class Clownfish {
                                     metainfomap.put("locale", cfsite.getLocale());
                                     metainfomap.put("alias", cfsite.getAliaspath());
                                     metainfomap.put("templateversion", String.valueOf(currentTemplateVersion));
+                                    metainfomap.put("referrer", referrer);
                                     if (null != clientinfo) {
                                         if (null != clientinfo.getHostname()) metainfomap.put("hostname", clientinfo.getHostname());
                                         if (null != clientinfo.getIpadress()) metainfomap.put("ipaddress", clientinfo.getIpadress());
@@ -1821,7 +1833,7 @@ public class Clownfish {
             String aliasname = cfsite.getAliaspath();
             ClownfishResponse cfStaticResponse;
             try {
-                cfStaticResponse = makeResponse(sitename, postmap, urlParams, true, null, null);
+                cfStaticResponse = makeResponse(sitename, postmap, urlParams, true, null, null, "");
                 if (0 == cfStaticResponse.getErrorcode()) {
                     if (!urlParams.isEmpty()) {
                         staticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.getOutput(), cfassetService, folderUtil);
@@ -2301,5 +2313,25 @@ public class Clownfish {
             java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
         }
         return ci;
+    }
+    
+    private String getCookieVal(Cookie[] cookies, String key) {
+        if (null != cookies) {
+            if (cookies.length > 0) {
+                for (Cookie cookie : cookies) {
+                    if (0 == cookie.getName().compareToIgnoreCase(key)) {
+                        String value = cookie.getValue();
+                        cookie.setMaxAge(0);
+                        cookie.setValue("");
+                        return value;
+                    }
+                }
+                return "";
+            } else {
+                return "";
+            }
+        } else {
+            return "";
+        }
     }
 }

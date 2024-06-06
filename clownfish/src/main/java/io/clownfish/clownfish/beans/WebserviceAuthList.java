@@ -20,7 +20,6 @@ import io.clownfish.clownfish.dbentities.CfUser;
 import io.clownfish.clownfish.dbentities.CfWebservice;
 import io.clownfish.clownfish.dbentities.CfWebserviceauth;
 import io.clownfish.clownfish.dbentities.CfWebserviceauthPK;
-import io.clownfish.clownfish.serviceinterface.CfUserService;
 import io.clownfish.clownfish.serviceinterface.CfWebserviceService;
 import io.clownfish.clownfish.serviceinterface.CfWebserviceauthService;
 import io.clownfish.clownfish.utils.PasswordUtil;

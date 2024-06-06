@@ -17,8 +17,6 @@ package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
-import org.apache.commons.io.IOUtils;
-import org.apache.olingo.commons.api.data.Property;
 import org.imgscalr.AsyncScalr;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,13 +27,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.ExecutionException;
