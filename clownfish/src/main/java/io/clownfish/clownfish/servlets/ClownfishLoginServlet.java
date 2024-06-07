@@ -62,7 +62,7 @@ public class ClownfishLoginServlet extends HttpServlet {
     transient CfAttributcontentService cfattributcontentService;
     @Autowired
     transient CfAttributService cfattributService;
-    String klasse, id, pw_field, id_field, clearPw;
+    String klasse, id, pw_field, id_field, clearPw, auth_field;
     @Autowired transient AuthTokenListClasscontent authtokenlist;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ClownfishLoginServlet.class);
@@ -71,6 +71,7 @@ public class ClownfishLoginServlet extends HttpServlet {
         String inst_klasse;
         String inst_identifier;
         String inst_passwordField;
+        String inst_authField;
         String salt;
         String inst_clearTextPw;
         String inst_identifierField;
@@ -100,17 +101,23 @@ public class ClownfishLoginServlet extends HttpServlet {
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("pwField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 pw_field = values[0];
             });
+            auth_field = "";
+            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("authField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+                auth_field = values[0];
+            });
 
             inst_klasse = klasse;
             inst_identifier = id;
             inst_passwordField = pw_field;
             inst_identifierField = id_field;
             inst_clearTextPw = clearPw;
+            inst_authField = auth_field;
 
             CfClass cfclass = cfclassService.findByName(inst_klasse);
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
             CfAttribut attributField = cfattributService.findByNameAndClassref(inst_identifierField, cfclass);
             CfAttribut attributPassword = cfattributService.findByNameAndClassref(inst_passwordField, cfclass);
+            CfAttribut attributAuth = cfattributService.findByNameAndClassref(inst_authField, cfclass);
 
             for (CfClasscontent classcontent : classcontentList) {
                 CfAttributcontent attributContent = cfattributcontentService.findByAttributrefAndClasscontentref(attributField, classcontent);
@@ -118,18 +125,21 @@ public class ClownfishLoginServlet extends HttpServlet {
                     long cref = attributContent.getClasscontentref().getId();
                     for (CfClasscontent classcontent1 : classcontentList) {
                         CfAttributcontent attributContent1 = cfattributcontentService.findByAttributrefAndClasscontentref(attributPassword, classcontent1);
-                        salt = attributContent1.getSalt();
-                        if (null != salt) {
-                            String test = PasswordUtil.generateSecurePassword(inst_clearTextPw, salt);
-                            test = URLEncoder.encode(test, StandardCharsets.UTF_8.toString());
-                            if ((attributContent1.getContentString().compareTo(test) == 0) && (attributContent1.getClasscontentref().getId() == cref)) {
-                                ar.setStatus(PasswordUtil.verifyUserPassword(inst_clearTextPw, PasswordUtil.generateSecurePassword(inst_clearTextPw, salt), salt));
-                                if (ar.isStatus()) {
-                                    ar.setToken(AuthTokenClasscontent.generateToken(inst_clearTextPw, salt));
-                                    AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(60), classcontent1);      // Tokens valid for 60 minutes
-                                    ar.setValiduntil(at.getValiduntil());
-                                    authtokenlist.getAuthtokens().put(ar.getToken(), at);
-                                    break;
+                        CfAttributcontent attributContent2 = cfattributcontentService.findByAttributrefAndClasscontentref(attributAuth, classcontent1);
+                        if (attributContent2.getContentBoolean()) {
+                            salt = attributContent1.getSalt();
+                            if (null != salt) {
+                                String test = PasswordUtil.generateSecurePassword(inst_clearTextPw, salt);
+                                test = URLEncoder.encode(test, StandardCharsets.UTF_8.toString());
+                                if ((attributContent1.getContentString().compareTo(test) == 0) && (attributContent1.getClasscontentref().getId() == cref)) {
+                                    ar.setStatus(PasswordUtil.verifyUserPassword(inst_clearTextPw, PasswordUtil.generateSecurePassword(inst_clearTextPw, salt), salt));
+                                    if (ar.isStatus()) {
+                                        ar.setToken(AuthTokenClasscontent.generateToken(inst_clearTextPw, salt));
+                                        AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(60), classcontent1);      // Tokens valid for 60 minutes
+                                        ar.setValiduntil(at.getValiduntil());
+                                        authtokenlist.getAuthtokens().put(ar.getToken(), at);
+                                        break;
+                                    }
                                 }
                             }
                         }

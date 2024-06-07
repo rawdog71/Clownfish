@@ -56,8 +56,8 @@ public class GetKeywords extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            String token = request.getParameter("token");
-            if (authtokenlist.checkValidToken(token)) {
+            //String token = request.getParameter("token");
+            //if (authtokenlist.checkValidToken(token)) {
                 String apikey = request.getParameter("apikey");
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
                     List<CfKeyword> keywordList = new ArrayList<>();
@@ -74,10 +74,10 @@ public class GetKeywords extends HttpServlet {
                     PrintWriter out = response.getWriter();
                     out.print("Wrong API KEY");
                 }
-            } else {
-                PrintWriter out = response.getWriter();
-                out.print("Invalid Token");
-            }
+            //} else {
+            //    PrintWriter out = response.getWriter();
+            //    out.print("Invalid Token");
+            //}
         } catch (javax.persistence.NoResultException | java.lang.IllegalArgumentException ex) {
             response.setContentType("text/html;charset=UTF-8");
             try (PrintWriter out = response.getWriter()) {
