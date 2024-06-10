@@ -376,7 +376,11 @@ public class EntityUtil {
                                 if (null != prop) {
                                     newcontent = contentUtil.setAttributValue(newcontent, entity.getProperty(attribut.getName()).getValue().toString());
                                 } else {
-                                    newcontent = contentUtil.setAttributValue(newcontent, null);
+                                    if (!attribut.getDefault_val().isBlank()) {
+                                        newcontent = contentUtil.setAttributValue(newcontent, attribut.getDefault_val());
+                                    } else {
+                                        newcontent = contentUtil.setAttributValue(newcontent, null);
+                                    }
                                 }
 
                                 
