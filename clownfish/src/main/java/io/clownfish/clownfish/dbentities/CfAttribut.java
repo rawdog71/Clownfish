@@ -91,6 +91,8 @@ public class CfAttribut implements Serializable {
     private String description;
     @Column(name = "nodelete")
     private Boolean nodelete;
+    @Column(name = "ext_mutable")
+    private Boolean ext_mutable;
 
     public CfAttribut() {
     }
@@ -245,6 +247,14 @@ public class CfAttribut implements Serializable {
         this.nodelete = nodelete;
     }
 
+    public Boolean getExt_mutable() {
+        return ext_mutable;
+    }
+
+    public void setExt_mutable(Boolean ext_mutable) {
+        this.ext_mutable = ext_mutable;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

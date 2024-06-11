@@ -92,6 +92,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter long maxval;
     private @Getter @Setter boolean mandatory;
     private @Getter @Setter boolean nodelete;
+    private @Getter @Setter boolean extmutable;
     private @Getter @Setter String description;
     private @Getter @Setter List<CfClass> classListeRef;
     private @Getter @Setter CfClass selectedClassRef = null;
@@ -195,6 +196,7 @@ public class ClassList implements Serializable {
         mandatory = selectedAttribut.getMandatory();
         description = selectedAttribut.getDescription();
         nodelete = selectedAttribut.getNodelete();
+        extmutable = selectedAttribut.getExt_mutable();
         newAttributButtonDisabled = true;
         editAttributButtonDisabled = nodelete;
     }
@@ -245,6 +247,7 @@ public class ClassList implements Serializable {
             newattribut.setMandatory(false);
             newattribut.setDescription("Identifikation");
             newattribut.setNodelete(true);
+            newattribut.setExt_mutable(true);
             
             cfattributService.create(newattribut);
             selectedAttributList = attributlist.init(selectedClass);
@@ -312,6 +315,7 @@ public class ClassList implements Serializable {
             newattribut.setMandatory(mandatory);
             newattribut.setDescription(description);
             newattribut.setNodelete(false);
+            newattribut.setExt_mutable(extmutable);
             
             cfattributService.create(newattribut);
             selectedAttributList = attributlist.init(selectedClass);
@@ -373,6 +377,7 @@ public class ClassList implements Serializable {
             selectedAttribut.setMin_val(minval);
             selectedAttribut.setMax_val(maxval);
             selectedAttribut.setMandatory(mandatory);
+            selectedAttribut.setExt_mutable(extmutable);
             selectedAttribut.setDescription(description);
             cfattributService.edit(selectedAttribut);
             //HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);

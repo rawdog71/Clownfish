@@ -393,7 +393,7 @@ public class EntityUtil {
                                     if (null != prop) {
                                         newcontent = contentUtil.setAttributValue(newcontent, entity.getProperty(attribut.getName()).getValue().toString());
                                     } else {
-                                        if (!attribut.getDefault_val().isBlank()) {
+                                        if ((!attribut.getDefault_val().isBlank()) || (!attribut.getExt_mutable())) {
                                             newcontent = contentUtil.setAttributValue(newcontent, attribut.getDefault_val());
                                         } else {
                                             newcontent = contentUtil.setAttributValue(newcontent, null);
@@ -402,8 +402,6 @@ public class EntityUtil {
                                     cfattributcontentService.create(newcontent);
 
                                     contentUtil.indexContent();
-                                } else {
-                                    
                                 }
                             } else {
                                 if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("assetref")) {
@@ -627,20 +625,22 @@ public class EntityUtil {
                                 CfAttribut attribut = attributcontent.getAttributref();
 
                                 if ((0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 != attribut.getAttributetype().getName().compareToIgnoreCase("assetref"))) {
-                                    Property p = entity.getProperty(attributcontent.getAttributref().getName());
-                                    if (null != p) {
-                                        if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("datetime")) {
-                                            contentUtil.setAttributValue(attributcontent, p.getValue().toString());
-                                        } else {
-                                            contentUtil.setAttributValue(attributcontent, ((GregorianCalendar) p.getValue()).toZonedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-                                        }
-                                        cfattributcontentService.edit(attributcontent);
-                                        contentUtil.indexContent();
-                                    } else {
-                                        if (httpMethod.equals(HttpMethod.PUT)) {
-                                            contentUtil.setAttributValue(attributcontent, null);
+                                    if (attribut.getExt_mutable()) {
+                                        Property p = entity.getProperty(attributcontent.getAttributref().getName());
+                                        if (null != p) {
+                                            if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("datetime")) {
+                                                contentUtil.setAttributValue(attributcontent, p.getValue().toString());
+                                            } else {
+                                                contentUtil.setAttributValue(attributcontent, ((GregorianCalendar) p.getValue()).toZonedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+                                            }
                                             cfattributcontentService.edit(attributcontent);
                                             contentUtil.indexContent();
+                                        } else {
+                                            if (httpMethod.equals(HttpMethod.PUT)) {
+                                                contentUtil.setAttributValue(attributcontent, null);
+                                                cfattributcontentService.edit(attributcontent);
+                                                contentUtil.indexContent();
+                                            }
                                         }
                                     }
                                 } else {

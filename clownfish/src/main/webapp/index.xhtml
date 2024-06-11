@@ -1193,6 +1193,9 @@
                         <p:column headerText="Index">
                             <h:outputText value="#{attribut.isindex}" />
                         </p:column>
+                        <p:column headerText="Mutable">
+                            <h:outputText value="#{attribut.ext_mutable}" />
+                        </p:column>
                         <p:column headerText="Class">
                             <h:outputText value="#{attribut.relationref}" />
                         </p:column>
@@ -1242,6 +1245,11 @@
                             <div class="flex align-items-center pr-2">
                                 <p:outputLabel for="attributautoinc" value="Autoinc:" style="margin-right: 0.5rem" />
                                 <p:selectBooleanCheckbox id="attributautoinc" value="#{classList.autoinc}" />
+                            </div>
+                            
+                            <div class="flex align-items-center pr-2">
+                                <p:outputLabel for="attributextmutable" value="Mutable:" style="margin-right: 0.5rem" />
+                                <p:selectBooleanCheckbox id="attributextmutable" value="#{classList.extmutable}" />
                             </div>
 
                             <div class="flex align-items-center pr-2">
