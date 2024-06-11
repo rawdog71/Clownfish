@@ -30,6 +30,7 @@ import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.ClassUtil;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import java.io.Serializable;
 import java.util.List;
@@ -39,6 +40,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -319,6 +321,27 @@ public class ClassList implements Serializable {
             List<CfClasscontent> modifyList = cfclascontentService.findByClassref(newattribut.getClassref());
             for (CfClasscontent classcontent : modifyList) {
                 CfAttributcontent newattributcontent = new CfAttributcontent();
+                if (!newattribut.getDefault_val().isBlank()) {
+                    switch (newattribut.getAttributetype().getName()) {
+                        case "boolean":
+                            newattributcontent.setContentBoolean(ClownfishUtil.getBoolean(newattribut.getDefault_val(), false));
+                            break;
+                        case "string":
+                            newattributcontent.setContentString(newattribut.getDefault_val());
+                            break;
+                        case "integer":
+                            newattributcontent.setContentInteger(BigInteger.valueOf(Long.parseLong(newattribut.getDefault_val())));
+                            break;
+                        case "real":
+                            newattributcontent.setContentReal(Double.parseDouble(newattribut.getDefault_val()));
+                            break;
+                        case "text":
+                        case "htmltext":
+                        case "markdown":
+                            newattributcontent.setContentText(newattribut.getDefault_val());
+                            break;
+                    }
+                }
                 newattributcontent.setAttributref(newattribut);
                 newattributcontent.setClasscontentref(classcontent);
                 cfattributcontentService.create(newattributcontent);

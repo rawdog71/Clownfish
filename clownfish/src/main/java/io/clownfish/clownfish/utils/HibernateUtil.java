@@ -131,7 +131,14 @@ public class HibernateUtil implements Runnable {
                             Element elementcolumn = elementproperty.addElement("column");
                             elementcolumn.addAttribute("name", attribut.getName() + "_");
                             if ((null != attribut.getDefault_val()) && (!attribut.getDefault_val().isEmpty())) {
-                                elementcolumn.addAttribute("default", "'"+attribut.getDefault_val()+"'");
+                                switch (attribut.getAttributetype().getName()) {
+                                    case "boolean":
+                                        elementcolumn.addAttribute("default", attribut.getDefault_val());
+                                        break;
+                                    default:
+                                        elementcolumn.addAttribute("default", "'"+attribut.getDefault_val()+"'");
+                                        break;
+                                }
                                 if (attribut.getMandatory()) {
                                     elementcolumn.addAttribute("not-null", "true");
                                 } else {
@@ -220,7 +227,14 @@ public class HibernateUtil implements Runnable {
                             Element elementcolumn = elementproperty.addElement("column");
                             elementcolumn.addAttribute("name", attribut.getName() + "_");
                             if ((null != attribut.getDefault_val()) && (!attribut.getDefault_val().isEmpty())) {
-                                elementcolumn.addAttribute("default", "'"+attribut.getDefault_val()+"'");
+                                switch (attribut.getAttributetype().getName()) {
+                                    case "boolean":
+                                        elementcolumn.addAttribute("default", attribut.getDefault_val());
+                                        break;
+                                    default:
+                                        elementcolumn.addAttribute("default", "'"+attribut.getDefault_val()+"'");
+                                        break;
+                                }
                                 if (attribut.getMandatory()) {
                                     elementcolumn.addAttribute("not-null", "true");
                                 } else {

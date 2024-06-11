@@ -345,7 +345,8 @@ public class EntityUtil {
                     newclasscontent.setClassref(clazz);
                     CfClasscontent newclasscontent2 = cfclasscontentService.create(newclasscontent);
                     List<CfAttribut> attributlist = cfattributService.findByClassref(newclasscontent2.getClassref());
-                    attributlist.stream().forEach((attribut) -> {
+                    boolean canCreate = true;
+                    for (CfAttribut attribut : attributlist) {
                         if (attribut.getAutoincrementor() == true) {
                             List<CfClasscontent> classcontentlist2 = cfclasscontentService.findByClassref(newclasscontent2.getClassref());
                             long max = 0;
@@ -369,24 +370,41 @@ public class EntityUtil {
                             setPropValue(prop, max+1);
                         } else {
                             if ((0 != attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (0 != attribut.getAttributetype().getName().compareToIgnoreCase("assetref"))) {
-                                CfAttributcontent newcontent = new CfAttributcontent();
-                                newcontent.setAttributref(attribut);
-                                newcontent.setClasscontentref(newclasscontent);
-                                Property prop = entity.getProperty(attribut.getName());
-                                if (null != prop) {
-                                    newcontent = contentUtil.setAttributValue(newcontent, entity.getProperty(attribut.getName()).getValue().toString());
-                                } else {
-                                    if (!attribut.getDefault_val().isBlank()) {
-                                        newcontent = contentUtil.setAttributValue(newcontent, attribut.getDefault_val());
-                                    } else {
-                                        newcontent = contentUtil.setAttributValue(newcontent, null);
+                                boolean found = false;
+                                if (attribut.getIdentity()) {
+                                    List<CfAttributcontent> attributcontentlist = cfattributcontentService.findByAttributref(attribut);
+                                    for (CfAttributcontent attributcontent : attributcontentlist) {
+                                        switch (attribut.getAttributetype().getName()) {
+                                            case "string":
+                                                if (0 == attributcontent.getContentString().compareTo(entity.getProperty(attribut.getName()).getValue().toString())) {
+                                                    found = true;
+                                                    canCreate = false;
+                                                }
+                                                break;
+                                        }
+                                        if (found) break;
                                     }
                                 }
+                                if (!found) {
+                                    CfAttributcontent newcontent = new CfAttributcontent();
+                                    newcontent.setAttributref(attribut);
+                                    newcontent.setClasscontentref(newclasscontent);
+                                    Property prop = entity.getProperty(attribut.getName());
+                                    if (null != prop) {
+                                        newcontent = contentUtil.setAttributValue(newcontent, entity.getProperty(attribut.getName()).getValue().toString());
+                                    } else {
+                                        if (!attribut.getDefault_val().isBlank()) {
+                                            newcontent = contentUtil.setAttributValue(newcontent, attribut.getDefault_val());
+                                        } else {
+                                            newcontent = contentUtil.setAttributValue(newcontent, null);
+                                        }
+                                    }
+                                    cfattributcontentService.create(newcontent);
 
-                                
-                                cfattributcontentService.create(newcontent);
-                                
-                                contentUtil.indexContent();
+                                    contentUtil.indexContent();
+                                } else {
+                                    
+                                }
                             } else {
                                 if (0 == attribut.getAttributetype().getName().compareToIgnoreCase("assetref")) {
                                     // Create Assetlist
@@ -479,16 +497,21 @@ public class EntityUtil {
                                 }
                             }
                         }
-                    });
-                    hibernateUtil.insertContent(newclasscontent);
-                    contentUtil.commit(newclasscontent);
-
-                    try {
-                        entity.setId(new URI(String.valueOf(newmax)));
-                    } catch (URISyntaxException ex) {
-                        LOGGER.error(ex.getMessage());
+                    };
+                    if (canCreate) {
+                        hibernateUtil.insertContent(newclasscontent);
+                        contentUtil.commit(newclasscontent);
+                        try {
+                            entity.setId(new URI(String.valueOf(newmax)));
+                        } catch (URISyntaxException ex) {
+                            LOGGER.error(ex.getMessage());
+                        }
+                        return entity;
+                    } else {
+                        cfattributcontentService.delete(newclasscontent.getId());
+                        cfclasscontentService.delete(newclasscontent2);
+                        return null;
                     }
-                    return entity;
                 case 1:
                     clazz = cfclassService.findByName(edmEntityType.getName());
                     String name = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);

@@ -102,4 +102,9 @@ public class CfAttributcontentServiceImpl implements CfAttributcontentService {
     public boolean updateContentref(long contentref) {
         return this.cfattributcontentDAO.updateContentref(contentref);
     }
+
+    @Override
+    public List<CfAttributcontent> findByAttributref(CfAttribut attributref) {
+        return this.cfattributcontentDAO.findByAttributref(attributref);
+    }
 }

@@ -138,4 +138,13 @@ public class CfAttributcontentDAOImpl implements CfAttributcontentDAO {
         query.executeUpdate();
         return true;
     }
+
+    @Override
+    public List<CfAttributcontent> findByAttributref(CfAttribut attributref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfAttributcontent.findByAttributref");
+        query.setParameter("attributref", attributref);
+        List<CfAttributcontent> cfattributcontentlist = query.getResultList();
+        return cfattributcontentlist;
+    }
 }

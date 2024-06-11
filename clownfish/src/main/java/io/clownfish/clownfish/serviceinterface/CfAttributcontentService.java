@@ -30,6 +30,7 @@ public interface CfAttributcontentService {
     List<CfAttributcontent> findAll();
     List<CfAttributcontent> findByClasscontentref(CfClasscontent classcontentref);
     CfAttributcontent findByAttributrefAndClasscontentref(CfAttribut attributref, CfClasscontent classcontentref);
+    List<CfAttributcontent> findByAttributref(CfAttribut attributref);
     List<CfAttributcontent> findByIndexed(boolean indexed);
     CfAttributcontent create(CfAttributcontent entity);
     boolean delete(CfAttributcontent entity);

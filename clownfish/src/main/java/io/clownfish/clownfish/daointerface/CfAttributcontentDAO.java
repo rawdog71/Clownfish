@@ -38,4 +38,6 @@ public interface CfAttributcontentDAO {
     CfAttributcontent edit(CfAttributcontent entity);
     List<CfAttributcontent> findByContentclassRef(CfList classcontentref);
     List<CfAttributcontent> findByContentAssetRef(CfAssetlist classcontentref);
+
+    public List<CfAttributcontent> findByAttributref(CfAttribut attributref);
 }
