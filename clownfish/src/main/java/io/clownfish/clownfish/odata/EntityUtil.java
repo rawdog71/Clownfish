@@ -391,9 +391,17 @@ public class EntityUtil {
                                     newcontent.setClasscontentref(newclasscontent);
                                     Property prop = entity.getProperty(attribut.getName());
                                     if (null != prop) {
-                                        newcontent = contentUtil.setAttributValue(newcontent, entity.getProperty(attribut.getName()).getValue().toString());
+                                        if (!attribut.getExt_mutable()) {
+                                            if ((null != attribut.getDefault_val()) && (!attribut.getDefault_val().isBlank())) {
+                                                newcontent = contentUtil.setAttributValue(newcontent, attribut.getDefault_val());
+                                            } else {
+                                                newcontent = contentUtil.setAttributValue(newcontent, null);
+                                            }
+                                        } else {
+                                            newcontent = contentUtil.setAttributValue(newcontent, entity.getProperty(attribut.getName()).getValue().toString());
+                                        }
                                     } else {
-                                        if ((!attribut.getDefault_val().isBlank()) || (!attribut.getExt_mutable())) {
+                                        if ((null != attribut.getDefault_val()) && (!attribut.getDefault_val().isBlank())) {
                                             newcontent = contentUtil.setAttributValue(newcontent, attribut.getDefault_val());
                                         } else {
                                             newcontent = contentUtil.setAttributValue(newcontent, null);
