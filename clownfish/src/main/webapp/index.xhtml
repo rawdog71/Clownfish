@@ -1174,6 +1174,9 @@
                             </p:commandButton>
                             -->
                         </div>
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton value="Generate Login Form Wizard" type="button" onclick="PF('LoginWizardDlg').show()" />
+                        </div>
                     </div>
 
                     <p:dataTable id="attributlist" size="small" var="attribut" value="#{classList.selectedAttributList}" selectionMode="single" selection="#{classList.selectedAttribut}" rowKey="#{attribut.id}">
@@ -2649,6 +2652,29 @@
                     </f:facet>
                     <div class="flex">#{keyword.name}</div>
                 </p:dataScroller>
+            </p:dialog>
+
+            <p:dialog id="LoginWizardDlg" header="Login Wizard" widgetVar="LoginWizardDlg" minHeight="100" width="1200" showEffect="fade" modal="true">
+                <p:selectOneMenu id="LoginIdField" value="#{classList.idField}">
+                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                    <f:selectItems value="#{classList.getAttributenames(selectedClass)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                </p:selectOneMenu>
+
+                <p:selectOneMenu id="LoginPasswordField" value="#{classList.passwordField}">
+                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                    <f:selectItems value="#{classList.getAttributenames(selectedClass)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                </p:selectOneMenu>
+
+                <p:selectOneMenu id="LoginAuthField" value="#{classList.authField}">
+                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                    <f:selectItems value="#{classList.getAttributenames(selectedClass)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                </p:selectOneMenu>
+
+                <p:commandButton id="loginformwizard" process="form" value="Generate Login Form Wizard" actionListener="#{classList.onGenerateLogin(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                    <f:actionListener binding="#{templateList.refresh()}" />
+                    <f:actionListener binding="#{sitetree.onRefreshAll()}" />
+                </p:commandButton>
             </p:dialog>
             
             <p:dialog id="ODataWizardDlg" header="OData Formular Wizard" widgetVar="ODataWizardDlg" minHeight="100" width="1200" showEffect="fade" modal="true">
