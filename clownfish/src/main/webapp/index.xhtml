@@ -1086,7 +1086,7 @@
                     
                     <div class="flex flex-row pb-2">
                         <p:dataTable id="classlist" size="small" scrollable="true" scrollHeight="250" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}" sortMode="single">
-                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate :form:tabview:classencrypted form:wizardattributlist" />
+                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate :form:tabview:classencrypted :form:wizardattributlist :form:LoginWizardDlg" />
                             <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains" sortBy="#{clazz.name}">
                                 <h:outputText value="#{clazz.name}" />
                             </p:column>
@@ -2657,17 +2657,17 @@
             <p:dialog id="LoginWizardDlg" header="Login Wizard" widgetVar="LoginWizardDlg" minHeight="100" width="1200" showEffect="fade" modal="true">
                 <p:selectOneMenu id="LoginIdField" value="#{classList.idField}">
                     <f:selectItem itemLabel="Select One" itemValue=""/>
-                    <f:selectItems value="#{classList.getAttributenames(selectedClass)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                    <f:selectItems value="#{classList.selectedAttributList}" var="attrrelid" itemLabel="#{attrrelid.name}" itemValue="#{attrrelid.name}" />
                 </p:selectOneMenu>
 
                 <p:selectOneMenu id="LoginPasswordField" value="#{classList.passwordField}">
                     <f:selectItem itemLabel="Select One" itemValue=""/>
-                    <f:selectItems value="#{classList.getAttributenames(selectedClass)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                    <f:selectItems value="#{classList.selectedAttributList}" var="attrrelpassword" itemLabel="#{attrrelpassword.name}" itemValue="#{attrrelpassword.name}" />
                 </p:selectOneMenu>
 
                 <p:selectOneMenu id="LoginAuthField" value="#{classList.authField}">
                     <f:selectItem itemLabel="Select One" itemValue=""/>
-                    <f:selectItems value="#{classList.getAttributenames(selectedClass)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                    <f:selectItems value="#{classList.selectedAttributList}" var="attrrelauth" itemLabel="#{attrrelauth.name}" itemValue="#{attrrelauth.name}" />
                 </p:selectOneMenu>
 
                 <p:commandButton id="loginformwizard" process="form" value="Generate Login Form Wizard" actionListener="#{classList.onGenerateLogin(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">

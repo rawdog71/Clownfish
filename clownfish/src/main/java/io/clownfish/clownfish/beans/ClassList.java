@@ -139,6 +139,9 @@ public class ClassList implements Serializable {
     
     public void onSelect(SelectEvent event) {
         selectedClass = (CfClass) event.getObject();
+        idField = "";
+        passwordField = "";
+        authField = "";
         selectedAttributList = attributlist.init(selectedClass);
         odataWizardList.clear();
         for (CfAttribut attr : selectedAttributList) {
@@ -440,7 +443,7 @@ public class ClassList implements Serializable {
 
     public void onGenerateLogin(ActionEvent actionEvent) {
         if (selectedClass != null) {
-            classutil.generateLogin(selectedClass);
+            //classutil.generateLogin(selectedClass);
             FacesMessage message = new FacesMessage("Login Form template generated");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
