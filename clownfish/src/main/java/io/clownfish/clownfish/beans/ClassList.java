@@ -103,13 +103,19 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean editAttributButtonDisabled;
     private @Getter @Setter boolean renderClass;
     private @Getter @Setter int javaLanguage = 0;
-    
+    private @Getter @Setter String idField;
+    private @Getter @Setter String passwordField;
+    private @Getter @Setter String authField;
+
     @Autowired transient private @Getter @Setter AttributList attributlist;
     final transient Logger LOGGER = LoggerFactory.getLogger(ClassList.class);
 
     @PostConstruct
     public void init() {
         LOGGER.info("INIT CLASSLIST START");
+        idField = "";
+        passwordField = "";
+        authField = "";
         classListe = cfclassService.findAll();
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
@@ -427,7 +433,15 @@ public class ClassList implements Serializable {
     public void onGenerateODataForm(ActionEvent actionEvent) {
         if (selectedClass != null) {
             classutil.generateODataForm(selectedClass, odataWizardList);
-            FacesMessage message = new FacesMessage("HTML Form template generated");
+            FacesMessage message = new FacesMessage("OData Form template generated");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+
+    public void onGenerateLogin(ActionEvent actionEvent) {
+        if (selectedClass != null) {
+            classutil.generateLogin(selectedClass);
+            FacesMessage message = new FacesMessage("Login Form template generated");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
