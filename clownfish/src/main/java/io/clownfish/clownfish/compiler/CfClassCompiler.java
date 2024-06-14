@@ -52,7 +52,8 @@ public class CfClassCompiler implements Runnable
     @Getter @Setter boolean verboseCompile = true;
     private static Clownfish clownfish;
     private @Getter @Setter EditorOptions editorOptions;
-    @Getter @Setter ArrayList<Class<?>> classesList;
+    public static @Getter @Setter ArrayList<Class<?>> classesList;
+    public @Getter @Setter Class<?> selectedClass;
     public static CfCompilerLanguages compilerlanguages = null;
 
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(CfClassCompiler.class);
@@ -386,6 +387,10 @@ public class CfClassCompiler implements Runnable
                 compileOut.flush();
             }
         }
+    }
+    
+    public ArrayList<Class<?>> getClasses() {
+        return classesList;
     }
 
     @Override

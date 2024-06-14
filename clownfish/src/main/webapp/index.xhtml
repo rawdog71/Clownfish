@@ -1067,9 +1067,9 @@
                         </p:tab>
                         
                         <p:tab title="Classes" id="compiledclassespanel">
-                            <p:dataTable id="compiledclasseslist" size="small" scrollable="true" scrollHeight="250" var="compiledclass" value="#{javaCompiler.classesList}">
+                            <p:dataTable id="compiledclasseslist" size="small" scrollable="true" scrollHeight="250" var="compiledclass" value="#{javaCompiler.getClasses()}">
                                 <p:column headerText="Name">
-                                    <h:outputText value="#{compiledclass.packageName}" />
+                                    <h:outputText value="#{compiledclass.name}" />
                                 </p:column>
                             </p:dataTable>
                         </p:tab>
