@@ -2246,6 +2246,11 @@ public class ClassUtil implements Serializable {
                 case "datetime":
                     javascript.append("(entry.").append(attr.getName()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".toLowerCase())) && ");
                     break;
+                case "classref":
+                    if (1 == attr.getRelationtype()) {
+                        javascript.append("(entry.").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".toLowerCase())) && ");
+                    }
+                    break;
             }
         }
         javascript = javascript.delete(javascript.length()-4, javascript.length());
@@ -2299,6 +2304,11 @@ public class ClassUtil implements Serializable {
                     case "datetime":
                         javascript.append("(entry.").append(attr.getName().toLowerCase()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append(".toLowerCase())) && ");
                         break;
+                    case "classref":
+                        if (1 == attr.getRelationtype()) {
+                            javascript.append("(entry.").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName()).append(".toLowerCase())) && ");
+                        }
+                        break;
                 }
             }
         }
@@ -2351,6 +2361,11 @@ public class ClassUtil implements Serializable {
                     case "real":
                     case "datetime":
                         javascript.append("(entry.").append(attr.getName().toLowerCase()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append(".toLowerCase())) && ");
+                        break;
+                    case "classref":
+                        if (1 == attr.getRelationtype()) {
+                            javascript.append("(entry.").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName()).append(".toLowerCase())) && ");
+                        }
                         break;
                 }
             }
