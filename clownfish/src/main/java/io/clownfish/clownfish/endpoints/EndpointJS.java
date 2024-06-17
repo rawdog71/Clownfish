@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.endpoints;
 
+import io.clownfish.clownfish.constants.ClownfishConst.JavascriptTypes;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.utils.FolderUtil;
@@ -24,6 +25,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
@@ -42,6 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class EndpointJS {
     @Autowired private FolderUtil folderUtil;
     @Autowired CfJavascriptService cfjavascriptService;
+    private ScriptEngine myEngine;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(EndpointJS.class);
     
@@ -67,7 +73,20 @@ public class EndpointJS {
                 response.setContentType("application/javascript");
                 response.setCharacterEncoding("UTF-8");
                 PrintWriter outwriter = response.getWriter();
-                outwriter.println(cfjavascript.getContent());
+                if (cfjavascript.getType() == JavascriptTypes.TYPE_JS.getValue()) {
+                    outwriter.println(cfjavascript.getContent());
+                } else {
+                    /*
+                    ScriptEngineManager engineManager = new ScriptEngineManager();
+                    myEngine = engineManager.getEngineByName("nashorn");
+                    try {
+                        Object o = myEngine.eval(cfjavascript.getContent());
+                    } catch (ScriptException ex1) {
+                        java.util.logging.Logger.getLogger(EndpointJS.class.getName()).log(Level.SEVERE, null, ex1);
+                    }
+                    */
+                    outwriter.println(cfjavascript.getContent());
+                }
             } catch (IOException iex) {
                 System.out.println("JS NOT FOUND");
             }

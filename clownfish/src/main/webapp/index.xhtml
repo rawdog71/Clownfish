@@ -816,7 +816,7 @@
                         <div class="flex align-items-center pr-2">
                             <p:outputLabel value="Javascripts" for="@next" style="margin-right: 0.5rem" rendered="#{loginBean.cfuser.superadmin}"/>
                             <p:autoComplete id="javascriptlist" dropdown="true" value="#{javascriptList.selectedJavascript}" completeMethod="#{javascriptList.completeText}" converter="#{javascriptConverterBean}" scrollHeight="250" rendered="#{loginBean.cfuser.superadmin}">
-                                <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascriptpanel :form:tabview:javascript-invisible"/>
+                                <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascriptpanel :form:tabview:javascriptlanguage :form:tabview:javascript-invisible"/>
                             </p:autoComplete>
                         </div>
 
@@ -832,6 +832,12 @@
                             <p:inputText id="javascriptname" value="#{javascriptList.javascriptName}" >
                                 <p:ajax event="keyup" listener="#{javascriptList.onChangeName(changeEvent)}" update=":form:tabview:newjavascript :form:tabview:changejavascript" />
                             </p:inputText>
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:selectOneMenu id="javascriptlanguage" value="#{javascriptList.javascripttype}">
+                                <f:selectItems value="#{javascriptList.javascriptTypes.entrySet()}" var="entry" itemValue="#{entry.key}" itemLabel="#{entry.value}" />
+                            </p:selectOneMenu>
                         </div>
 
                         <div class="flex align-items-center pr-2">

@@ -42,4 +42,18 @@ public class ClownfishConst {
            return value;
         }
     }
+    
+    public enum JavascriptTypes {
+        TYPE_JS(0),
+        TYPE_TS(1);    
+        
+        private final int value;
+        
+        JavascriptTypes(final int value) {
+           this.value = value;
+        }
+        public int getValue(){
+           return value;
+        }
+    }
 }
