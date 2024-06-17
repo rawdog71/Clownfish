@@ -18,20 +18,21 @@ package io.clownfish.clownfish.endpoints;
 import io.clownfish.clownfish.constants.ClownfishConst.JavascriptTypes;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.FolderUtil;
+import io.clownfish.clownfish.utils.JavascriptUtil;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.logging.Level;
+import java.nio.charset.StandardCharsets;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class EndpointJS {
+    @Autowired private JavascriptUtil javascriptUtil;
     @Autowired private FolderUtil folderUtil;
     @Autowired CfJavascriptService cfjavascriptService;
     private ScriptEngine myEngine;
@@ -76,16 +78,30 @@ public class EndpointJS {
                 if (cfjavascript.getType() == JavascriptTypes.TYPE_JS.getValue()) {
                     outwriter.println(cfjavascript.getContent());
                 } else {
-                    /*
-                    ScriptEngineManager engineManager = new ScriptEngineManager();
-                    myEngine = engineManager.getEngineByName("nashorn");
-                    try {
-                        Object o = myEngine.eval(cfjavascript.getContent());
-                    } catch (ScriptException ex1) {
-                        java.util.logging.Logger.getLogger(EndpointJS.class.getName()).log(Level.SEVERE, null, ex1);
+                    javascriptUtil.writeStaticJS(name + "_ts", cfjavascript.getContent(), "ts");
+                    ProcessBuilder builder = new ProcessBuilder();
+                    if (ClownfishUtil.isWindows()) {
+                        builder.command("cmd.exe", "/c", "tsc " + folderUtil.getJs_folder() + File.separator + name + "_ts.ts");
+                    } else {
+                        builder.command("sh", "-c", "tsc " + folderUtil.getJs_folder() + File.separator + name + "_ts.ts");
                     }
-                    */
-                    outwriter.println(cfjavascript.getContent());
+                    builder.directory(new File(folderUtil.getJs_folder()));
+                    builder.redirectErrorStream(true);
+                    String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
+                    
+                    response.setContentType("application/javascript");
+                    response.setCharacterEncoding("UTF-8");
+                    br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getJs_folder() + File.separator + name + "_ts.js"), "UTF-8"));
+                    StringBuilder sb = new StringBuilder(1024);
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    br.close();
+                    outwriter = response.getWriter();
+                    outwriter.println(sb);
+                    
+                    //outwriter.println(cfjavascript.getContent());
                 }
             } catch (IOException iex) {
                 System.out.println("JS NOT FOUND");
