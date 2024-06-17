@@ -26,6 +26,7 @@ import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.JavascriptUtil;
@@ -42,10 +43,12 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import jakarta.validation.ConstraintViolationException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.IOUtils;
 import org.primefaces.event.SlideEndEvent;
 import org.primefaces.extensions.model.monacoeditor.DiffEditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
@@ -101,6 +104,7 @@ public class JavascriptList implements ISourceContentInterface {
     private @Getter @Setter boolean invisible;
     private @Getter @Setter int javascripttype;
     private @Getter @Setter HashMap<Integer, String> availableLanguages = null;
+    private @Getter @Setter boolean typescriptEnabled;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(JavascriptList.class);
 
@@ -136,10 +140,35 @@ public class JavascriptList implements ISourceContentInterface {
     @Override
     public void init() {
         LOGGER.info("INIT JAVASCRIPT START");
+        typescriptEnabled = false;
+        ProcessBuilder builder = new ProcessBuilder();
+        try {
+            if (ClownfishUtil.isWindows()) {
+                builder.command("cmd.exe", "/c", "tsc" + " -version");
+            } else {
+                builder.command("sh", "-c", "tsc" + " -version");
+            }
+            builder.redirectErrorStream(true);
+            String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
+
+            if (result.contains("Version ")) {
+                LOGGER.info("TypeScript Compiler TYPESCRIPT -> TRUE");
+                typescriptEnabled = true;
+            } else {
+                LOGGER.info("TypeScript Compiler TYPESCRIPT -> FALSE");
+                typescriptEnabled = false;
+            }
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+        
+        
         if (null == availableLanguages) {
             availableLanguages = new HashMap<>();
             availableLanguages.put(JavascriptTypes.TYPE_JS.getValue(), "Javascript");
-            availableLanguages.put(JavascriptTypes.TYPE_TS.getValue(), "Typescript");
+            if (typescriptEnabled) {
+                availableLanguages.put(JavascriptTypes.TYPE_TS.getValue(), "Typescript");
+            }
         }
         try {
             sourceindexer.initJavascript(cfjavascriptService, indexService);
