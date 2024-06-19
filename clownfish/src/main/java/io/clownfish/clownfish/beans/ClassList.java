@@ -444,6 +444,7 @@ public class ClassList implements Serializable {
     public void onGenerateLogin(ActionEvent actionEvent) {
         if (selectedClass != null) {
             //classutil.generateLogin(selectedClass);
+            classutil.generateLogin(selectedClass, idField, passwordField, authField);
             FacesMessage message = new FacesMessage("Login Form template generated");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }

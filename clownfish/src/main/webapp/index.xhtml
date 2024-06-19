@@ -2660,23 +2660,31 @@
                 </p:dataScroller>
             </p:dialog>
 
-            <p:dialog id="LoginWizardDlg" header="Login Wizard" widgetVar="LoginWizardDlg" minHeight="100" width="1200" showEffect="fade" modal="true">
-                <p:selectOneMenu id="LoginIdField" value="#{classList.idField}">
-                    <f:selectItem itemLabel="Select One" itemValue=""/>
-                    <f:selectItems value="#{classList.selectedAttributList}" var="attrrelid" itemLabel="#{attrrelid.name}" itemValue="#{attrrelid.name}" />
-                </p:selectOneMenu>
-
-                <p:selectOneMenu id="LoginPasswordField" value="#{classList.passwordField}">
-                    <f:selectItem itemLabel="Select One" itemValue=""/>
-                    <f:selectItems value="#{classList.selectedAttributList}" var="attrrelpassword" itemLabel="#{attrrelpassword.name}" itemValue="#{attrrelpassword.name}" />
-                </p:selectOneMenu>
-
-                <p:selectOneMenu id="LoginAuthField" value="#{classList.authField}">
-                    <f:selectItem itemLabel="Select One" itemValue=""/>
-                    <f:selectItems value="#{classList.selectedAttributList}" var="attrrelauth" itemLabel="#{attrrelauth.name}" itemValue="#{attrrelauth.name}" />
-                </p:selectOneMenu>
-
-                <p:commandButton id="loginformwizard" process="form" value="Generate Login Form Wizard" actionListener="#{classList.onGenerateLogin(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+            <p:dialog id="LoginWizardDlg" header="Login Wizard" widgetVar="LoginWizardDlg" minHeight="100" width="450" showEffect="fade" modal="true">
+                <div class="flex" style="flex-direction: column;">
+                    <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                        <p>Login Field</p>
+                        <p:selectOneMenu id="LoginIdField" value="#{classList.idField}" class="flex align-items-center">
+                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                            <f:selectItems value="#{classList.selectedAttributList}" var="attrrelid" itemLabel="#{attrrelid.name}" itemValue="#{attrrelid.name}" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                        <p>Password Field</p>
+                        <p:selectOneMenu id="LoginPasswordField" value="#{classList.passwordField}" class="flex align-items-center">
+                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                            <f:selectItems value="#{classList.selectedAttributList}" var="attrrelpassword" itemLabel="#{attrrelpassword.name}" itemValue="#{attrrelpassword.name}" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px; margin-bottom: 10px">
+                        <p>Auth Field</p>
+                        <p:selectOneMenu id="LoginAuthField" value="#{classList.authField}" class="flex align-items-center">
+                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                            <f:selectItems value="#{classList.selectedAttributList}" var="attrrelauth" itemLabel="#{attrrelauth.name}" itemValue="#{attrrelauth.name}" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <p:commandButton id="loginformwizard" style="width: 100%" process="form" value="Generate Login Form Wizard" actionListener="#{classList.onGenerateLogin(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
                     <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                     <f:actionListener binding="#{templateList.refresh()}" />
                     <f:actionListener binding="#{sitetree.onRefreshAll()}" />
