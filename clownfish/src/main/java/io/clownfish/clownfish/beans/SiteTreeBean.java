@@ -17,6 +17,7 @@ package io.clownfish.clownfish.beans;
 
 import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.Clownfish;
+import io.clownfish.clownfish.constants.ClownfishConst;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
 import io.clownfish.clownfish.dbentities.*;
@@ -80,7 +81,7 @@ import java.util.stream.Collectors;
 public class SiteTreeBean implements Serializable {
     @Value("${sapconnection.file}") String SAPCONNECTION;
     private static SAPConnection sapc = null;
-    
+
     private transient @Getter @Setter int tabIndex;
     private @Getter @Setter String params;
     private transient @Getter @Setter TabView tabview;
@@ -113,6 +114,8 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter RfcFunction selectedrfcfunction = null;
     private @Getter @Setter List<CfClasscontent> classcontentlist;
     private @Getter @Setter List<CfClasscontent> selectedClasscontentlist;
+    private @Getter @Setter List<CfClasscontent> accessmanagerlist;
+    private @Getter @Setter List<CfClasscontent> selectedAccessmanagerlist;
     private @Getter @Setter List<CfAssetlist> assetlist;
     private @Getter @Setter List<CfAssetlist> selectedAssetlist;
     private @Getter @Setter List<CfKeywordlist> keywordlist;
@@ -146,34 +149,34 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter String selected_asset = null;
     private @Getter @Setter String selected_assetlist = null;
     private @Getter @Setter String selected_keywordlist = null;
-    
+
     private @Getter @Setter boolean showContent;
     private @Getter @Setter CfClasscontent current_classcontent = null;
     private @Getter @Setter List<CfClasscontent> current_classcontentlist = null;
     private @Getter @Setter List<CfClasscontent> filteredContent;
-    
+
     private @Getter @Setter boolean showDatalist;
     private @Getter @Setter CfList current_list = null;
     private @Getter @Setter List<CfList> current_datalist = null;
     private @Getter @Setter List<CfList> filteredList;
-    
+
     private @Getter @Setter boolean showAsset;
     private @Getter @Setter CfAsset current_asset = null;
     private @Getter @Setter List<CfAsset> current_assetlist = null;
     private @Getter @Setter List<CfAsset> filteredAsset;
-    
+
     private @Getter @Setter boolean showAssetLibrary;
     private @Getter @Setter CfAssetlist current_assetlibrary = null;
     private @Getter @Setter List<CfAssetlist> current_assetlibrarylist = null;
     private @Getter @Setter List<CfAssetlist> filteredAssetlibrary;
-    
+
     private @Getter @Setter boolean showKeywordLibrary;
     private @Getter @Setter CfKeywordlist current_keywordlibrary = null;
     private @Getter @Setter List<CfKeywordlist> current_keywordlibrarylist = null;
     private @Getter @Setter List<CfKeywordlist> filteredKeywordlibrary;
 
     private @Getter @Setter CfLayoutcontent current_layoutcontent = null;
-    
+
     @Autowired transient CfTemplateService cftemplateService;
     @Autowired transient CfTemplateversionService cftemplateversionService;
     @Autowired transient CfStylesheetService cfstylesheetService;
@@ -187,6 +190,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfSiteassetlistService cfsiteassetlistService;
     @Autowired transient CfSitekeywordlistService cfsitekeywordlistService;
     @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired transient CfAttributService cfAttributService;
     @Autowired transient CfAssetlistcontentService cfassetlistcontentService;
     @Autowired transient CfListcontentService cflistcontentService;
     @Autowired transient CfKeywordlistcontentService cfkeywordlistcontentService;
@@ -203,6 +207,7 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfStaticsiteService cfstaticsiteService;
     @Autowired transient CfApiService cfapiService;
     @Autowired transient CfPropertyService cfpropertyService;
+    @Autowired transient CfAccessmanagerService cfAccessmanagerService;
     @Autowired transient LoginBean loginBean;
     @Autowired transient PropertyList propertylist;
     @Autowired private @Getter @Setter ContentList divcontentlist;
@@ -230,9 +235,9 @@ public class SiteTreeBean implements Serializable {
     @Inject LoginBean loginbean;
     private @Getter @Setter HashMap<String, Boolean> visibleMap = new HashMap<String, Boolean>();
     private @Getter @Setter List<CfSite> loginUrlList = new ArrayList<>();
-    
+
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
-    
+
     @PostConstruct
     public void init() {
         LOGGER.info("INIT SITETREE START");
@@ -262,12 +267,14 @@ public class SiteTreeBean implements Serializable {
         datasources = cfdatasourceService.findAll();
         contentlist = cflistService.findByMaintenance(true);
         classcontentlist = cfclasscontentService.findByMaintenance(true);
+        accessmanagerlist = findAccessmgrs();
         assetlist = cfassetlistService.findAll();
         keywordlist = cfkeywordlistService.findAll();
-        
+
         selectedDatasources = new ArrayList<>();
         selectedContentlist = new ArrayList<>();
         selectedClasscontentlist = new ArrayList<>();
+        selectedAccessmanagerlist = new ArrayList<>();
         selectedAssetlist = new ArrayList<>();
         selectedKeywordlist = new ArrayList<>();
         locale = propertymap.get("response_locale");
@@ -291,41 +298,59 @@ public class SiteTreeBean implements Serializable {
                 .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
         LOGGER.info("INIT SITETREE END");
     }
-    
+
+    public List<CfClasscontent> findAccessmgrs() {
+        List<CfClasscontent> lst = new ArrayList<>();
+
+        List<CfClasscontent> ccs = cfclasscontentService.findAll();
+        for (var cc : ccs) {
+            CfAttribut email = cfAttributService.findByNameAndClassref("email", cc.getClassref());
+            if (cc.getClassref().isLoginclass() && email != null) {
+                lst.add(cc);
+            }
+        }
+        return lst;
+    }
+
     public void initDatasources() {
         datasources = cfdatasourceService.findAll();
     }
-    
+
     public void initContentlist() {
         contentlist = cflistService.findByMaintenance(true);
     }
-    
+
     public void initClassContentlist() {
         classcontentlist = cfclasscontentService.findByMaintenance(true);
     }
-    
+
+    public void initAccessmanagerlist() {
+        accessmanagerlist = findAccessmgrs();
+    }
+
     public void initAssetlibrarylist() {
         assetlist = cfassetlistService.findAll();
     }
-    
+
     public void initKeywordlibrarylist() {
         keywordlist = cfkeywordlistService.findAll();
     }
-    
+
     public void onRefreshAll() {
         datasources = cfdatasourceService.findAll();
         contentlist = cflistService.findByMaintenance(true);
         classcontentlist = cfclasscontentService.findByMaintenance(true);
+        accessmanagerlist = findAccessmgrs();
         assetlist = cfassetlistService.findAll();
     }
-    
+
     public void onRefreshSAP(ActionEvent actionEvent) {
         clownfish.getRpytableread().init();
         clownfish.getRfcfunctioninterface().init();
         clownfish.getRfcgroupsearch().init();
         clownfish.getRfcfunctionsearch().init();
     }
-    
+
     public void onRefreshSelection() {
         if (null != selectedTemplate) {
             selectedTemplate = cftemplateService.findById(selectedTemplate.getId());
@@ -345,14 +370,14 @@ public class SiteTreeBean implements Serializable {
 
     private void fillChildren(CfSite parentid, TreeNode node) {
         List<CfSite> sitelist = cfsiteService.findByParentref(parentid);
-                
+
         for (CfSite site : sitelist) {
             TreeNode tn = new DefaultTreeNode(site);
             node.getChildren().add(tn);
             fillChildren(site, tn);
         }
     }
-    
+
     public void loadTree() {
         try {
             root = new DefaultTreeNode("Root", null);
@@ -375,7 +400,7 @@ public class SiteTreeBean implements Serializable {
             LOGGER.error(ex.getMessage());
         }
     }
- 
+
     public String getTemplate() {
         if (null != selectedTemplate) {
             return templateUtility.getVersion(selectedTemplate.getId(), cftemplateversionService.findMaxVersion(selectedTemplate.getId()));
@@ -383,7 +408,7 @@ public class SiteTreeBean implements Serializable {
             return "";
         }
     }
-    
+
     public String getStylesheet() {
         if (null != selectedStylesheet) {
             return stylesheetUtility.getVersion(selectedStylesheet.getId(), cfstylesheetversionService.findMaxVersion(selectedStylesheet.getId()));
@@ -391,7 +416,7 @@ public class SiteTreeBean implements Serializable {
             return "";
         }
     }
-    
+
     public String getJavascript() {
         if (null != selectedJavascript) {
             return javascriptUtility.getVersion(selectedJavascript.getId(), cfjavascriptversionService.findMaxVersion(selectedJavascript.getId()));
@@ -410,7 +435,7 @@ public class SiteTreeBean implements Serializable {
         return cfsiteService.findAll().stream()
                 .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
     }
-    
+
     public void onDragDrop(TreeDragDropEvent event) {
         TreeNode dragNode = event.getDragNode();
         TreeNode dropNode = event.getDropNode();
@@ -424,15 +449,15 @@ public class SiteTreeBean implements Serializable {
             dragsite.setParentref(null);
             cfsiteService.edit(dragsite);
         }
-        
+
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Dragged " + dragNode.getData(), "Dropped on " + dropNode.getData() + " at " + dropIndex);
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
-    
+
     public void onUnselect(NodeUnselectEvent event) {
         selectedNode = event.getTreeNode();
         selectedSite = null;
-        
+
         selectedTemplate = null;
         selectedStylesheet = null;
         selectedJavascript = null;
@@ -449,6 +474,7 @@ public class SiteTreeBean implements Serializable {
         selectedDatasources.clear();
         selectedContentlist.clear();
         selectedClasscontentlist.clear();
+        selectedAccessmanagerlist.clear();
         selectedAssetlist.clear();
         selectedKeywordlist.clear();
         sitejob = false;
@@ -474,23 +500,24 @@ public class SiteTreeBean implements Serializable {
         apilist = null;
         visibleMap.clear();
     }
-    
+
     public void onSelect(NodeSelectEvent event) {
         templateUtility.setLayout(null);
         selectedNode = event.getTreeNode();
         selectedSite = (CfSite) selectedNode.getData();
         params = selectedSite.getTestparams();
         classcontentlist = cfclasscontentService.findByMaintenance(true);
+        accessmanagerlist = findAccessmgrs();
         if (null != selectedSite.getTemplateref()) {
             CfTemplate template = cftemplateService.findById(selectedSite.getTemplateref().getId());
             int idx = templatelist.getTemplateListe().indexOf(template);
             selectedTemplate = templatelist.getTemplateListe().get(idx);
-            
+
             String auth_token = "";
             if (null != loginbean) {
                 auth_token = loginbean.getToken();
             }
-            
+
             iframeurl = selectedSite.getName() + "?preview=true";
             if ((null != params) && (!params.isBlank())) {
                 if (!params.startsWith("&")) {
@@ -506,7 +533,7 @@ public class SiteTreeBean implements Serializable {
                     iframeurl += "cf_login_token=" + URLEncoder.encode(auth_token, StandardCharsets.UTF_8);
                 }
             }
-                        
+
             selectedDiv = null;
             showContent = false;
             showDatalist = false;
@@ -531,7 +558,7 @@ public class SiteTreeBean implements Serializable {
                 selected_assetlist = null;
                 selected_keywordlist = null;
             }
-            
+
         } else {
             selectedTemplate = null;
         }
@@ -555,35 +582,45 @@ public class SiteTreeBean implements Serializable {
             CfDatasource ds = cfdatasourceService.findById(sitedatasource.getCfSitedatasourcePK().getDatasourceref());
             selectedDatasources.add(ds);
         }
-        
+
         selectedContentlist.clear();
         List<CfSitelist> selectedSitecontentlist = cfsitelistService.findBySiteref(selectedSite.getId());
         for (CfSitelist sitelist : selectedSitecontentlist) {
             CfList cl = cflistService.findById(sitelist.getCfSitelistPK().getListref());
             selectedContentlist.add(cl);
         }
-        
+
         selectedClasscontentlist.clear();
         List<CfSitecontent> selectedClasscontentliste = cfsitecontentService.findBySiteref(selectedSite.getId());
         for (CfSitecontent sitecontent : selectedClasscontentliste) {
             CfClasscontent cc = cfclasscontentService.findById(sitecontent.getCfSitecontentPK().getClasscontentref());
             selectedClasscontentlist.add(cc);
         }
-        
+
+        selectedAccessmanagerlist.clear();
+        List<CfAccessmanager> selectedAccessManagers = cfAccessmanagerService.findByTypeAndRef(ClownfishConst.AccessTypes.TYPE_SITE.getValue(), BigInteger.valueOf(selectedSite.getId()));
+        for (CfAccessmanager mgr : selectedAccessManagers) {
+            CfClasscontent cc = cfclasscontentService.findById(mgr.getRefclasscontent().longValue());
+            CfAttribut email = cfAttributService.findByNameAndClassref("email", cc.getClassref());
+            if (cc.getClassref().isLoginclass() && email != null) {
+                selectedAccessmanagerlist.add(cc);
+            }
+        }
+
         selectedAssetlist.clear();
         List<CfSiteassetlist> selectedAssetliste = cfsiteassetlistService.findBySiteref(selectedSite.getId());
         for (CfSiteassetlist siteassetlist : selectedAssetliste) {
             CfAssetlist csa = cfassetlistService.findById(siteassetlist.getCfSiteassetlistPK().getAssetlistref());
             selectedAssetlist.add(csa);
         }
-        
+
         selectedKeywordlist.clear();
         List<CfSitekeywordlist> selectedKeywordliste = cfsitekeywordlistService.findBySiteref(selectedSite.getId());
         for (CfSitekeywordlist sitekeywordlist : selectedKeywordliste) {
             CfKeywordlist kwl = cfkeywordlistService.findById(sitekeywordlist.getCfSitekeywordlistPK().getKeywordlistref());
             selectedKeywordlist.add(kwl);
         }
-        
+
         siteName = selectedSite.getName();
         siteTitle = selectedSite.getTitle();
         siteDescription = selectedSite.getDescription();
@@ -610,11 +647,11 @@ public class SiteTreeBean implements Serializable {
         staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
         apilist = cfapiService.findBySiteRef(selectedSite.getId());
         newButtonDisabled = true;
-        
+
         FacesMessage message = new FacesMessage("Selected " + selectedSite.getName());
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
-    
+
     public void onDelete(ActionEvent actionEvent) {
         if (null != selectedSite) {
             List<CfSite> sites = cfsiteService.findByParentref(selectedSite);
@@ -626,12 +663,12 @@ public class SiteTreeBean implements Serializable {
             loadTree();
             loginUrlList = cfsiteService.findAll().stream()
                     .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
-            
+
             FacesMessage message = new FacesMessage("Deleted " + selectedSite.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
-    
+
     public void onChange(ActionEvent actionEvent) {
         if (null != selectedSite) {
             if (null != selectedStylesheet) {
@@ -649,7 +686,7 @@ public class SiteTreeBean implements Serializable {
             } else {
                 selectedSite.setJavascriptref(null);
             }
-            
+
             // Delete siteresources first
             List<CfSitedatasource> sitedatasourceList = cfsitedatasourceService.findBySiteref(selectedSite.getId());
             for (CfSitedatasource sitedatasource : sitedatasourceList) {
@@ -666,7 +703,7 @@ public class SiteTreeBean implements Serializable {
                     cfsitedatasourceService.create(sitedatasource);
                 }
             }
-            
+
             // Delete sitelists first
             List<CfSitelist> sitelists = cfsitelistService.findBySiteref(selectedSite.getId());
             for (CfSitelist sitelist : sitelists) {
@@ -683,7 +720,7 @@ public class SiteTreeBean implements Serializable {
                     cfsitelistService.create(sitelist);
                 }
             }
-            
+
             // Delete sitecontent first
             List<CfSitecontent> contentlists = cfsitecontentService.findBySiteref(selectedSite.getId());
             for (CfSitecontent content : contentlists) {
@@ -700,7 +737,23 @@ public class SiteTreeBean implements Serializable {
                     cfsitecontentService.create(sitecontent);
                 }
             }
-            
+
+            List<CfAccessmanager> accessmgrs =
+                    cfAccessmanagerService.findByTypeAndRef(
+                            ClownfishConst.AccessTypes.TYPE_SITE.getValue(), BigInteger.valueOf(selectedSite.getId()));
+            for (var mgr : accessmgrs) {
+                cfAccessmanagerService.delete(mgr);
+            }
+            if (!selectedAccessmanagerlist.isEmpty()) {
+                for (CfClasscontent content : selectedAccessmanagerlist) {
+                    CfAccessmanager mgr = new CfAccessmanager();
+                    mgr.setType(ClownfishConst.AccessTypes.TYPE_SITE.getValue());
+                    mgr.setRefclasscontent(BigInteger.valueOf(content.getId()));
+                    mgr.setRef(BigInteger.valueOf(selectedSite.getId()));
+                    cfAccessmanagerService.create(mgr);
+                }
+            }
+
             // Delete siteassetlist first
             List<CfSiteassetlist> siteassetlists = cfsiteassetlistService.findBySiteref(selectedSite.getId());
             for (CfSiteassetlist assetList : siteassetlists) {
@@ -717,7 +770,7 @@ public class SiteTreeBean implements Serializable {
                     cfsiteassetlistService.create(siteassetlist);
                 }
             }
-            
+
             // Delete sitekeywordlist first
             List<CfSitekeywordlist> sitekeywordlists = cfsitekeywordlistService.findBySiteref(selectedSite.getId());
             for (CfSitekeywordlist keywordList : sitekeywordlists) {
@@ -734,7 +787,7 @@ public class SiteTreeBean implements Serializable {
                     cfsitekeywordlistService.create(sitekeywordlist);
                 }
             }
-            
+
             selectedSite.setName(siteName);
             selectedSite.setHtmlcompression(sitehtmlcompression);
             selectedSite.setCharacterencoding(characterEncoding);
@@ -758,18 +811,18 @@ public class SiteTreeBean implements Serializable {
             loadTree();
             loginUrlList = cfsiteService.findAll().stream()
                     .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
-            
+
             FacesMessage message = new FacesMessage("Changed " + selectedSite.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
-    
+
     public void onCopy(ActionEvent actionEvent) {
         if (null != selectedSite) {
             CfSite newsite = new CfSite();
             String newname = siteUtil.getUniqueName(selectedSite.getName());
             newsite.setName(newname);
-            
+
             newsite.setAliaspath(newname);
             newsite.setCharacterencoding(selectedSite.getCharacterencoding());
             newsite.setContenttype(selectedSite.getContenttype());
@@ -795,7 +848,7 @@ public class SiteTreeBean implements Serializable {
             newsite.setInvisible(selectedSite.getInvisible());
             newsite.setOffline(selectedSite.isOffline());
             newsite = cfsiteService.create(newsite);
-            
+
             // Add selected saprfcs
             if (!saprfclist.isEmpty()) {
                 for (CfSitesaprfc saprfc : saprfclist) {
@@ -808,7 +861,7 @@ public class SiteTreeBean implements Serializable {
                     cfsitesaprfcService.create(sitesaprfc);
                 }
             }
-            
+
             // Add selected siteresources
             if (!selectedDatasources.isEmpty()) {
                 for (CfDatasource datasource : selectedDatasources) {
@@ -820,7 +873,7 @@ public class SiteTreeBean implements Serializable {
                     cfsitedatasourceService.create(sitedatasource);
                 }
             }
-            
+
             // Add selected sitelists
             if (!selectedContentlist.isEmpty()) {
                 for (CfList contentList : selectedContentlist) {
@@ -832,7 +885,7 @@ public class SiteTreeBean implements Serializable {
                     cfsitelistService.create(sitelist);
                 }
             }
-            
+
             // Add selected sitecontent
             if (!selectedClasscontentlist.isEmpty()) {
                 for (CfClasscontent content : selectedClasscontentlist) {
@@ -844,7 +897,17 @@ public class SiteTreeBean implements Serializable {
                     cfsitecontentService.create(sitecontent);
                 }
             }
-            
+
+            if (!selectedAccessmanagerlist.isEmpty()) {
+                for (CfClasscontent content : selectedAccessmanagerlist) {
+                    CfAccessmanager mgr = new CfAccessmanager();
+                    mgr.setType(ClownfishConst.AccessTypes.TYPE_SITE.getValue());
+                    mgr.setRefclasscontent(BigInteger.valueOf(content.getId()));
+                    mgr.setRef(BigInteger.valueOf(selectedSite.getId()));
+                    cfAccessmanagerService.create(mgr);
+                }
+            }
+
             // Add selected sitecontent
             if (!selectedAssetlist.isEmpty()) {
                 for (CfAssetlist content : selectedAssetlist) {
@@ -856,7 +919,7 @@ public class SiteTreeBean implements Serializable {
                     cfsiteassetlistService.create(siteassetlist);
                 }
             }
-            
+
             // Add selected sitecontent
             if (!selectedKeywordlist.isEmpty()) {
                 for (CfKeywordlist content : selectedKeywordlist) {
@@ -871,39 +934,39 @@ public class SiteTreeBean implements Serializable {
             loadTree();
             loginUrlList = cfsiteService.findAll().stream()
                     .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
-            
+
             FacesMessage message = new FacesMessage("Copied " + selectedSite.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
-    
+
     public void onChangeContent() {
         if (null != selectedClasscontentlist) {
-            
+
         }
     }
-    
+
     public void onChangeDatalist() {
         if (null != selectedClasscontentlist) {
-            
+
         }
     }
-    
+
     public void onChangeTemplate() {
         if (null != selectedTemplate) {
-            
+
         }
     }
-    
+
     public void onChangeStylesheet() {
         if (null != selectedStylesheet) {
-            
+
         }
     }
-    
+
     public void onChangeJavascript() {
         if (null != selectedStylesheet) {
-            
+
         }
     }
 
@@ -912,7 +975,7 @@ public class SiteTreeBean implements Serializable {
 
         }
     }
-    
+
     public void onChangeName(ValueChangeEvent changeEvent) {
         CfSite newsite = cfsiteService.findByName(siteName);
         if (null == newsite) {
@@ -921,7 +984,7 @@ public class SiteTreeBean implements Serializable {
             newButtonDisabled = !siteName.isEmpty();
         }
     }
-    
+
     public void onCreate(ActionEvent actionEvent) {
         try {
             CfSite newsite = new CfSite();
@@ -972,13 +1035,13 @@ public class SiteTreeBean implements Serializable {
             LOGGER.error(ex.getMessage());
         }
     }
-    
+
     public void onPublish(ActionEvent actionEvent) {
         if (null != selectedSite) {
             siteUtil.publishSite(selectedSite, true);
         }
     }
-    
+
     public void onDeleteStaticSite(ActionEvent actionEvent) {
         if (null != folderUtil.getStatic_folder()) {
             File file = new File(folderUtil.getStatic_folder() + File.separator + selectedSite.getName());
@@ -991,34 +1054,34 @@ public class SiteTreeBean implements Serializable {
             }
         }
     }
-    
+
     public void onChangeRfCGroupInput() {
         if (!rfcgroup.isEmpty()) {
             selectedrfcgroup = null;
             rfcfunctionlist = clownfish.getRfcfunctionsearch().getRfcFunctionsList(rfcgroup);
         }
     }
-    
+
     public void onChangeRfcGroup() {
         if (null != selectedrfcgroup) {
             rfcgroup = selectedrfcgroup.getName();
             rfcfunctionlist = clownfish.getRfcfunctionsearch().getRfcFunctionsList(selectedrfcgroup.getName());
         }
     }
-    
+
     public void onChangeRfcFunction() {
         if (null != selectedrfcfunction) {
-            
+
         }
     }
-    
+
     public void onDeleteRfc(ActionEvent actionEvent) {
         if (null != selectedrfc) {
             cfsitesaprfcService.delete(selectedrfc);
             saprfclist = cfsitesaprfcService.findBySiteref(selectedSite.getId());
         }
     }
-    
+
     public void onNewRfc(ActionEvent actionEvent) {
         if (((null != selectedrfcgroup) && (null != selectedrfcfunction)) || ((!rfcgroup.isEmpty()) && (null != selectedrfcfunction))) {
             CfSitesaprfc sitesaprfc = new CfSitesaprfc();
@@ -1035,13 +1098,13 @@ public class SiteTreeBean implements Serializable {
             saprfclist = cfsitesaprfcService.findBySiteref(selectedSite.getId());
         }
     }
-    
+
     public void onRfcSelect(SelectEvent event) {
         selectedrfc = (CfSitesaprfc) event.getObject();
         selectedrfcgroup = getAsRfcGroup(selectedrfc.getCfSitesaprfcPK().getRfcgroup());
         selectedrfcfunction = getAsRfcFunction(selectedrfc.getCfSitesaprfcPK().getRfcfunction());
     }
-    
+
     private RfcGroup getAsRfcGroup(String value) {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
@@ -1057,7 +1120,7 @@ public class SiteTreeBean implements Serializable {
             return null;
         }
     }
-    
+
     private RfcFunction getAsRfcFunction(String value) {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
@@ -1071,11 +1134,11 @@ public class SiteTreeBean implements Serializable {
             return null;
         }
     }
-    
+
     public void onApiSelect(SelectEvent event) {
         selectedapi = (CfApi) event.getObject();
     }
-    
+
     public void onNewApi(ActionEvent actionEvent) {
         if (null != selectedSite) {
             CfApi api = new CfApi();
@@ -1088,22 +1151,22 @@ public class SiteTreeBean implements Serializable {
             apilist = cfapiService.findBySiteRef(selectedSite.getId());
         }
     }
-    
+
     public void onDeleteApi(ActionEvent actionEvent) {
         if (null != selectedapi) {
             cfapiService.delete(selectedapi);
             apilist = cfapiService.findBySiteRef(selectedSite.getId());
         }
     }
-    
+
     public void onStaticsiteSelect(SelectEvent event) {
         selectedstaticsite = (CfStaticsite) event.getObject();
-        
+
         String auth_token = "";
         if (null != loginbean) {
             auth_token = loginbean.getToken();
         }
-        
+
         if (!selectedstaticsite.getUrlparams().isBlank()) {
             iframeurl = selectedstaticsite.getSite() + "/" + selectedstaticsite.getUrlparams();
         } else {
@@ -1120,7 +1183,7 @@ public class SiteTreeBean implements Serializable {
         }
         */
     }
-    
+
     public void onNewStaticsite(ActionEvent actionEvent) {
         if (null != selectedSite) {
             CfStaticsite staticsite = new CfStaticsite();
@@ -1131,7 +1194,7 @@ public class SiteTreeBean implements Serializable {
             staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
         }
     }
-    
+
     public void onRecreateStaticSite(ActionEvent actionEvent) {
         if (null != selectedstaticsite) {
             if (null != folderUtil.getStatic_folder()) {
@@ -1155,7 +1218,7 @@ public class SiteTreeBean implements Serializable {
             }
         }
     }
-    
+
     public void onDestroyStaticSite(ActionEvent actionEvent) {
         if (null != selectedstaticsite) {
             if (null != folderUtil.getStatic_folder()) {
@@ -1173,7 +1236,7 @@ public class SiteTreeBean implements Serializable {
             staticsitelist = cfstaticsiteService.findBySite(selectedSite.getName());
         }
     }
-    
+
     public void onDivSelect(SelectEvent event) {
         selectedDiv = (CfDiv) event.getObject();
         if (null != selectedDiv) {
@@ -1197,14 +1260,14 @@ public class SiteTreeBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
-    
+
     public void invertShow(CfDiv div) {
         if (null != div) {
             div.setVisible(!div.isVisible());
             visibleMap.put(div.getId(), !visibleMap.get(div.getId()));
         }
     }
-    
+
     public void onChangeLayoutContent() {
         if (null != selected_contentclass) {
             current_layoutcontent = null;
@@ -1229,20 +1292,20 @@ public class SiteTreeBean implements Serializable {
                 current_classcontent = cfclasscontentService.findById(classcontentref);
             }
             current_classcontentlist = cfclasscontentService.findByClassref(selectedclass);
-            
+
             selected_datalisttclass = null;
             selected_asset = null;
             selected_assetlist = null;
             selected_keywordlist = null;
         }
     }
-    
+
     public void onSaveLayoutContent(CfClasscontent classcontent) {
         if (null != classcontent) {
             String[] contentinfos = selected_contentclass.split(":");
             int lfdnr = Integer.parseInt(contentinfos[1]);
             current_layoutcontent = new CfLayoutcontent(selectedSite.getId(), selectedDivTemplate.getId(), "C", lfdnr);
-            current_layoutcontent.setContentref(BigInteger.ZERO);          
+            current_layoutcontent.setContentref(BigInteger.ZERO);
             current_layoutcontent.setPreview_contentref(BigInteger.valueOf(classcontent.getId()));
             try {
                 cflayoutcontentService.create(current_layoutcontent);
@@ -1251,7 +1314,7 @@ public class SiteTreeBean implements Serializable {
             }
         }
     }
-    
+
     /**
      * Selects a Content
      * @param event
@@ -1267,7 +1330,7 @@ public class SiteTreeBean implements Serializable {
             previewContentOutput = output;
         }
     }
-    
+
     public void onChangeLayoutDatalist() {
         if (null != selected_datalisttclass) {
             current_layoutcontent = null;
@@ -1292,27 +1355,27 @@ public class SiteTreeBean implements Serializable {
                 current_list = cflistService.findById(listref);
             }
             current_datalist = cflistService.findByClassref(selectedclass);
-            
+
             selected_contentclass = null;
             selected_asset = null;
             selected_assetlist = null;
             selected_keywordlist = null;
         }
     }
-    
+
     /**
      * Selects a Datalist
      * @param event
      */
     public void onSelectLayoutDatalist(SelectEvent event) {
         CfList selected_datalist = (CfList) event.getObject();
-        
+
         previewDatalistOutput = "";
         for (CfListcontent datalistcontent : cflistcontentService.findByListref(selected_datalist.getId())) {
-            
+
             CfClasscontent cc = cfclasscontentService.findById(datalistcontent.getCfListcontentPK().getClasscontentref());
             String template = templateUtility.getVersion(cc.getClassref().getTemplateref().getId(), cftemplateversionService.findMaxVersion(cc.getClassref().getTemplateref().getId()));
-            
+
             if (null != cc) {
                 attributcontentlist = cfattributcontentService.findByClasscontentref(cc);
                 for (CfAttributcontent attributcontent : attributcontentlist) {
@@ -1322,7 +1385,7 @@ public class SiteTreeBean implements Serializable {
             }
         }
     }
-    
+
     public void onSaveLayoutDatalist(CfList datalist) {
         if (null != datalist) {
             if (null == current_layoutcontent) {
@@ -1339,7 +1402,7 @@ public class SiteTreeBean implements Serializable {
             }
         }
     }
-    
+
     public void onChangeLayoutAsset() {
         if (null != selected_asset) {
             current_layoutcontent = null;
@@ -1362,14 +1425,14 @@ public class SiteTreeBean implements Serializable {
                 current_asset = cfassetService.findById(assetref);
             }
             current_assetlist = cfassetService.findByScrapped(false);
-            
+
             selected_contentclass = null;
             selected_datalisttclass = null;
             selected_assetlist = null;
             selected_keywordlist = null;
         }
     }
-    
+
     public void onSaveLayoutAsset(CfAsset asset) {
         if (null != asset) {
             if (null == current_layoutcontent) {
@@ -1386,7 +1449,7 @@ public class SiteTreeBean implements Serializable {
             }
         }
     }
-    
+
     /**
      * Selects a Asset
      * @param event
@@ -1397,7 +1460,7 @@ public class SiteTreeBean implements Serializable {
             previewAssetOutput = current_asset.getId();
         }
     }
-    
+
     public void onChangeLayoutAssetlibrary() {
         if (null != selected_assetlist) {
             current_layoutcontent = null;
@@ -1420,27 +1483,27 @@ public class SiteTreeBean implements Serializable {
                 current_assetlibrary = cfassetlistService.findById(listref);
             }
             current_assetlibrarylist = cfassetlistService.findAll();
-            
+
             selected_contentclass = null;
             selected_asset = null;
             selected_datalisttclass = null;
             selected_keywordlist = null;
         }
     }
-    
+
     /**
      * Selects an Assetlibrary
      * @param event
      */
     public void onSelectLayoutAssetlibrary(SelectEvent event) {
         CfAssetlist lassetlist = (CfAssetlist) event.getObject();
-        
+
         previewAssetlistOutput.clear();
         for (CfAssetlistcontent assetlistcontent : cfassetlistcontentService.findByAssetlistref(lassetlist.getId())) {
             previewAssetlistOutput.add(cfassetService.findById(assetlistcontent.getCfAssetlistcontentPK().getAssetref()));
         }
     }
-    
+
     public void onSaveLayoutAssetlist(CfAssetlist assetlist) {
         if (null != assetlist) {
             if (null == current_layoutcontent) {
@@ -1457,7 +1520,7 @@ public class SiteTreeBean implements Serializable {
             }
         }
     }
-    
+
     public void onChangeLayoutKeywordlibrary() {
         if (null != selected_keywordlist) {
             current_layoutcontent = null;
@@ -1480,14 +1543,14 @@ public class SiteTreeBean implements Serializable {
                 current_keywordlibrary = cfkeywordlistService.findById(listref);
             }
             current_keywordlibrarylist = cfkeywordlistService.findAll();
-            
+
             selected_contentclass = null;
             selected_asset = null;
             selected_datalisttclass = null;
             selected_assetlist = null;
         }
     }
-    
+
     public void onSaveLayoutKeywordlist(CfKeywordlist keywordlist) {
         if (null != keywordlist) {
             if (null != current_keywordlibrary) {
@@ -1504,20 +1567,20 @@ public class SiteTreeBean implements Serializable {
             }
         }
     }
-    
+
     /**
      * Selects a Keywordlibrary
      * @param event
      */
     public void onSelectLayoutKeywordlibrary(SelectEvent event) {
         CfKeywordlist lkeywordlist = (CfKeywordlist) event.getObject();
-        
+
         previewKeywordlistOutput.clear();
         for (CfKeywordlistcontent keywordlistcontent : cfkeywordlistcontentService.findByKeywordlistref(lkeywordlist.getId())) {
             previewKeywordlistOutput.add(cfkeywordService.findById(keywordlistcontent.getCfKeywordlistcontentPK().getKeywordref()));
         }
     }
-    
+
     public void onGenerateShorturl() {
         if (null != selectedSite) {
             selectedSite.setShorturl(siteUtil.generateShorturl());
@@ -1529,14 +1592,14 @@ public class SiteTreeBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
-    
+
     public void onChangeParams() {
         if (null != selectedSite) {
             selectedSite.setTestparams(params);
             cfsiteService.edit(selectedSite);
         }
     }
-    
+
     public void setTab(int index) {
         tabIndex = index;
     }
