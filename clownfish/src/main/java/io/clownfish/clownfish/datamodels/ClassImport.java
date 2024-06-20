@@ -15,9 +15,10 @@
  */
 package io.clownfish.clownfish.datamodels;
 
-import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -28,5 +29,6 @@ public class ClassImport {
     private @Getter @Setter boolean searchenginerelevant;
     private @Getter @Setter boolean backendmaintenance;
     private @Getter @Setter boolean encrypted;
+    private @Getter @Setter boolean loginclass;
     private @Getter @Setter ArrayList<FieldImport> fields;
 }

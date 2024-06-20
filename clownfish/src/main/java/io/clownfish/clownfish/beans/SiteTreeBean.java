@@ -19,70 +19,11 @@ import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.Clownfish;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
-import io.clownfish.clownfish.dbentities.CfApi;
-import io.clownfish.clownfish.dbentities.CfApiPK;
-import io.clownfish.clownfish.dbentities.CfAsset;
-import io.clownfish.clownfish.dbentities.CfAssetlist;
-import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
-import io.clownfish.clownfish.dbentities.CfAttributcontent;
-import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.dbentities.CfClasscontent;
-import io.clownfish.clownfish.dbentities.CfDatasource;
-import io.clownfish.clownfish.dbentities.CfJavascript;
-import io.clownfish.clownfish.dbentities.CfKeyword;
-import io.clownfish.clownfish.dbentities.CfKeywordlist;
-import io.clownfish.clownfish.dbentities.CfKeywordlistcontent;
-import io.clownfish.clownfish.dbentities.CfLayoutcontent;
-import io.clownfish.clownfish.dbentities.CfList;
-import io.clownfish.clownfish.dbentities.CfListcontent;
-import io.clownfish.clownfish.dbentities.CfSite;
-import io.clownfish.clownfish.dbentities.CfSiteassetlist;
-import io.clownfish.clownfish.dbentities.CfSiteassetlistPK;
-import io.clownfish.clownfish.dbentities.CfSitecontent;
-import io.clownfish.clownfish.dbentities.CfSitecontentPK;
-import io.clownfish.clownfish.dbentities.CfSitedatasource;
-import io.clownfish.clownfish.dbentities.CfSitedatasourcePK;
-import io.clownfish.clownfish.dbentities.CfSitekeywordlist;
-import io.clownfish.clownfish.dbentities.CfSitekeywordlistPK;
-import io.clownfish.clownfish.dbentities.CfSitelist;
-import io.clownfish.clownfish.dbentities.CfSitelistPK;
-import io.clownfish.clownfish.dbentities.CfSitesaprfc;
-import io.clownfish.clownfish.dbentities.CfSitesaprfcPK;
-import io.clownfish.clownfish.dbentities.CfStaticsite;
-import io.clownfish.clownfish.dbentities.CfStylesheet;
-import io.clownfish.clownfish.dbentities.CfTemplate;
+import io.clownfish.clownfish.dbentities.*;
 import io.clownfish.clownfish.lucene.SourceIndexer;
 import io.clownfish.clownfish.sap.models.RfcFunction;
 import io.clownfish.clownfish.sap.models.RfcGroup;
-import io.clownfish.clownfish.serviceinterface.CfApiService;
-import io.clownfish.clownfish.serviceinterface.CfAssetService;
-import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
-import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
-import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
-import io.clownfish.clownfish.serviceinterface.CfClassService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
-import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
-import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
-import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
-import io.clownfish.clownfish.serviceinterface.CfKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
-import io.clownfish.clownfish.serviceinterface.CfKeywordlistcontentService;
-import io.clownfish.clownfish.serviceinterface.CfLayoutcontentService;
-import io.clownfish.clownfish.serviceinterface.CfListService;
-import io.clownfish.clownfish.serviceinterface.CfListcontentService;
-import io.clownfish.clownfish.serviceinterface.CfPropertyService;
-import io.clownfish.clownfish.serviceinterface.CfSiteService;
-import io.clownfish.clownfish.serviceinterface.CfSiteassetlistService;
-import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
-import io.clownfish.clownfish.serviceinterface.CfSitedatasourceService;
-import io.clownfish.clownfish.serviceinterface.CfSitekeywordlistService;
-import io.clownfish.clownfish.serviceinterface.CfSitelistService;
-import io.clownfish.clownfish.serviceinterface.CfSitesaprfcService;
-import io.clownfish.clownfish.serviceinterface.CfStaticsiteService;
-import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
-import io.clownfish.clownfish.serviceinterface.CfStylesheetversionService;
-import io.clownfish.clownfish.serviceinterface.CfTemplateService;
-import io.clownfish.clownfish.serviceinterface.CfTemplateversionService;
+import io.clownfish.clownfish.serviceinterface.*;
 import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.DatabaseUtil;
@@ -91,27 +32,7 @@ import io.clownfish.clownfish.utils.JavascriptUtil;
 import io.clownfish.clownfish.utils.SiteUtil;
 import io.clownfish.clownfish.utils.StylesheetUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.inject.Named;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
-import javax.faces.event.ValueChangeEvent;
 import jakarta.validation.ConstraintViolationException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.HashMap;
-import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.component.tabview.TabView;
@@ -127,6 +48,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import javax.faces.event.ValueChangeEvent;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -183,12 +125,14 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter boolean sitemap;
     private @Getter @Setter boolean searchresult;
     private @Getter @Setter boolean invisible;
+    private @Getter @Setter boolean isloginsite;
     private @Getter @Setter boolean offline;
     private @Getter @Setter String siteTitle;
     private @Getter @Setter String siteDescription;
     private @Getter @Setter String aliaspath;
     private @Getter @Setter String characterEncoding;
-    private @Getter @Setter String loginsite;
+    private @Getter @Setter String loginsitestr;
+    private @Getter @Setter CfSite loginsite;
     private @Getter @Setter String contentType;
     private @Getter @Setter String locale;
     private transient @Getter @Setter Map<String, String> propertymap = null;
@@ -285,6 +229,7 @@ public class SiteTreeBean implements Serializable {
     private @Getter @Setter List<CfKeyword> previewKeywordlistOutput = new ArrayList<>();
     @Inject LoginBean loginbean;
     private @Getter @Setter HashMap<String, Boolean> visibleMap = new HashMap<String, Boolean>();
+    private @Getter @Setter List<CfSite> loginUrlList = new ArrayList<>();
     
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
     
@@ -342,6 +287,8 @@ public class SiteTreeBean implements Serializable {
         classUtility.setSitetree(this);
         databaseUtility.setSitetree(this);
         visibleMap.clear();
+        loginUrlList = cfsiteService.findAll().stream()
+                .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
         LOGGER.info("INIT SITETREE END");
     }
     
@@ -456,6 +403,13 @@ public class SiteTreeBean implements Serializable {
     public void onRefresh(ActionEvent actionEvent) {
         init();
     }
+
+    public List<CfSite> completeTextLoginSites(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return cfsiteService.findAll().stream()
+                .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
+    }
     
     public void onDragDrop(TreeDragDropEvent event) {
         TreeNode dragNode = event.getDragNode();
@@ -486,7 +440,8 @@ public class SiteTreeBean implements Serializable {
         siteTitle = "";
         siteDescription = "";
         aliaspath = "";
-        loginsite = "";
+        loginsitestr = "";
+        loginsite = null;
         sitehtmlcompression = 0;
         characterEncoding = "";
         contentType = "";
@@ -637,6 +592,7 @@ public class SiteTreeBean implements Serializable {
         sitemap = selectedSite.isSitemap();
         sitestatic = selectedSite.isStaticsite();
         searchresult = selectedSite.isSearchresult();
+        isloginsite = selectedSite.getIsLoginSite();
         if (loginBean.getCfuser().getSuperadmin()) {
             invisible = selectedSite.getInvisible();
         } else {
@@ -644,7 +600,8 @@ public class SiteTreeBean implements Serializable {
         }
         offline = selectedSite.isOffline();
         aliaspath = selectedSite.getAliaspath();
-        loginsite = selectedSite.getLoginsite();
+        loginsitestr = selectedSite.getLoginsite();
+        loginsite = selectedSite.getLoginsiteref();
         sitehtmlcompression = selectedSite.getHtmlcompression();
         characterEncoding = selectedSite.getCharacterencoding();
         contentType = selectedSite.getContenttype();
@@ -667,6 +624,8 @@ public class SiteTreeBean implements Serializable {
             }
             cfsiteService.delete(selectedSite);
             loadTree();
+            loginUrlList = cfsiteService.findAll().stream()
+                    .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
             
             FacesMessage message = new FacesMessage("Deleted " + selectedSite.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -782,12 +741,14 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setContenttype(contentType);
             selectedSite.setLocale(locale);
             selectedSite.setAliaspath(aliaspath);
-            selectedSite.setLoginsite(loginsite);
+            selectedSite.setLoginsite(loginsitestr);
+            selectedSite.setLoginsiteref(loginsite);
             selectedSite.setTitle(siteTitle);
             selectedSite.setDescription(siteDescription);
             selectedSite.setJob(sitejob);
             selectedSite.setSearchrelevant(sitesearchrelevant);
             selectedSite.setSearchresult(searchresult);
+            selectedSite.setIsLoginSite(isloginsite);
             selectedSite.setInvisible(invisible);
             selectedSite.setOffline(offline);
             selectedSite.setSitemap(sitemap);
@@ -795,6 +756,8 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setTestparams(params);
             cfsiteService.edit(selectedSite);
             loadTree();
+            loginUrlList = cfsiteService.findAll().stream()
+                    .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
             
             FacesMessage message = new FacesMessage("Changed " + selectedSite.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -828,6 +791,7 @@ public class SiteTreeBean implements Serializable {
             newsite.setTemplateref(selectedSite.getTemplateref());
             newsite.setTestparams(selectedSite.getTestparams());
             newsite.setTitle(selectedSite.getTitle());
+            newsite.setIsLoginSite(selectedSite.getIsLoginSite());
             newsite.setInvisible(selectedSite.getInvisible());
             newsite.setOffline(selectedSite.isOffline());
             newsite = cfsiteService.create(newsite);
@@ -905,6 +869,8 @@ public class SiteTreeBean implements Serializable {
                 }
             }
             loadTree();
+            loginUrlList = cfsiteService.findAll().stream()
+                    .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
             
             FacesMessage message = new FacesMessage("Copied " + selectedSite.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -938,6 +904,12 @@ public class SiteTreeBean implements Serializable {
     public void onChangeJavascript() {
         if (null != selectedStylesheet) {
             
+        }
+    }
+
+    public void onChangeLoginSite() {
+        if (null != selectedSite) {
+
         }
     }
     
@@ -974,12 +946,14 @@ public class SiteTreeBean implements Serializable {
             newsite.setCharacterencoding(characterEncoding);
             newsite.setLocale(locale);
             newsite.setAliaspath(siteName);
-            newsite.setLoginsite(loginsite);
+            newsite.setLoginsite(loginsitestr);
+            newsite.setLoginsiteref(loginsite);
             newsite.setTitle(siteTitle);
             newsite.setDescription(siteDescription);
             newsite.setJob(sitejob);
             newsite.setSearchrelevant(sitesearchrelevant);
             newsite.setSearchresult(searchresult);
+            newsite.setIsLoginSite(isloginsite);
             if (loginBean.getCfuser().getSuperadmin()) {
                 newsite.setInvisible(invisible);
             } else {
@@ -992,6 +966,8 @@ public class SiteTreeBean implements Serializable {
             newsite.setTestparams(params);
             selectedSite = cfsiteService.create(newsite);
             loadTree();
+            loginUrlList = cfsiteService.findAll().stream()
+                    .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -1547,6 +1523,8 @@ public class SiteTreeBean implements Serializable {
             selectedSite.setShorturl(siteUtil.generateShorturl());
             cfsiteService.edit(selectedSite);
             loadTree();
+            loginUrlList = cfsiteService.findAll().stream()
+                    .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
             FacesMessage message = new FacesMessage("Generated shorturl for " + selectedSite.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }

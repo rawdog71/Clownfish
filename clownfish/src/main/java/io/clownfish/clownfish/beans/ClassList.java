@@ -31,17 +31,7 @@ import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
-import java.io.Serializable;
-import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.faces.event.ActionEvent;
-import javax.faces.event.ValueChangeEvent;
-import javax.inject.Named;
-import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
-import java.util.ArrayList;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.Setter;
 import org.codehaus.plexus.util.StringUtils;
@@ -51,6 +41,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import javax.faces.event.ValueChangeEvent;
+import javax.inject.Named;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -81,6 +81,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean classSearchrelevant;
     private @Getter @Setter boolean classMaintenance;
     private @Getter @Setter boolean classEncrypted;
+    private @Getter @Setter boolean isLoginClass;
     private @Getter @Setter String attributName;
     private @Getter @Setter boolean identity;
     private @Getter @Setter boolean autoinc;
@@ -165,6 +166,7 @@ public class ClassList implements Serializable {
         classSearchrelevant = selectedClass.isSearchrelevant();
         classMaintenance = selectedClass.isMaintenance();
         classEncrypted = selectedClass.isEncrypted();
+        isLoginClass = selectedClass.isLoginclass();
         selectedTemplateRef = selectedClass.getTemplateref();
         attributName = "";
         selectedAttributeType = null;
@@ -225,6 +227,7 @@ public class ClassList implements Serializable {
             newclass.setSearchrelevant(classSearchrelevant);
             newclass.setMaintenance(classMaintenance);
             newclass.setEncrypted(classEncrypted);
+            newclass.setLoginclass(isLoginClass);
             newclass.setTemplateref(selectedTemplateRef);
             CfClass createdclass = cfclassService.create(newclass);
             
@@ -264,6 +267,7 @@ public class ClassList implements Serializable {
             classSearchrelevant = false;
             classMaintenance = true;
             classEncrypted = false;
+            isLoginClass = false;
             contentlist.init();
             datalist.init();
             
@@ -280,6 +284,7 @@ public class ClassList implements Serializable {
             selectedClass.setSearchrelevant(classSearchrelevant);
             selectedClass.setMaintenance(classMaintenance);
             selectedClass.setEncrypted(classEncrypted);
+            selectedClass.setLoginclass(isLoginClass);
             selectedClass.setTemplateref(selectedTemplateRef);
             cfclassService.edit(selectedClass);
             classListe = cfclassService.findAll();

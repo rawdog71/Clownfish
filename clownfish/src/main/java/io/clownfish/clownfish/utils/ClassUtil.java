@@ -25,6 +25,15 @@ import io.clownfish.clownfish.datamodels.ODataWizard;
 import io.clownfish.clownfish.datamodels.RestContentParameter;
 import io.clownfish.clownfish.dbentities.*;
 import io.clownfish.clownfish.serviceinterface.*;
+import static j2html.TagCreator.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -39,16 +48,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
-
-import static j2html.TagCreator.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  *
@@ -94,6 +93,7 @@ public class ClassUtil implements Serializable {
         newclass.setSearchrelevant(ci.isSearchenginerelevant());
         newclass.setMaintenance(ci.isBackendmaintenance());
         newclass.setEncrypted(ci.isEncrypted());
+        newclass.setLoginclass(ci.isLoginclass());
         newclass.setTemplateref(null);
         newclass = cfclassService.create(newclass);
         
