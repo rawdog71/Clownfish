@@ -161,10 +161,10 @@ public class JavascriptUtil implements IVersioningInterface, Serializable {
         }
     }
     
-    public void writeStaticJS(String filename, String js) {
+    public void writeStaticJS(String filename, String js, String extension) {
         FileOutputStream fileStream = null;
         try {
-            fileStream = new FileOutputStream(new File(folderUtil.getJs_folder()+ File.separator + filename + ".js"));
+            fileStream = new FileOutputStream(new File(folderUtil.getJs_folder()+ File.separator + filename + "." + extension));
             OutputStreamWriter writer = new OutputStreamWriter(fileStream, "UTF-8");
             try {
                 writer.write(js);

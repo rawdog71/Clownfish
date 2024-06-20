@@ -857,7 +857,7 @@
                         <div class="flex align-items-center pr-2">
                             <p:outputLabel value="Javascripts" for="@next" style="margin-right: 0.5rem" rendered="#{loginBean.cfuser.superadmin}"/>
                             <p:autoComplete id="javascriptlist" dropdown="true" value="#{javascriptList.selectedJavascript}" completeMethod="#{javascriptList.completeText}" converter="#{javascriptConverterBean}" scrollHeight="250" rendered="#{loginBean.cfuser.superadmin}">
-                                <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascriptpanel :form:tabview:javascript-invisible"/>
+                                <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:editjavascript :form:tabview:javascriptname :form:tabview:newjavascript :form:tabview:javascriptversion :form:tabview:diffjavascriptBtnGroup :form:tabview:editjavascriptpanel :form:tabview:javascriptlanguage :form:tabview:javascript-invisible"/>
                             </p:autoComplete>
                         </div>
 
@@ -873,6 +873,12 @@
                             <p:inputText id="javascriptname" value="#{javascriptList.javascriptName}" >
                                 <p:ajax event="keyup" listener="#{javascriptList.onChangeName(changeEvent)}" update=":form:tabview:newjavascript :form:tabview:changejavascript" />
                             </p:inputText>
+                        </div>
+                        
+                        <div class="flex align-items-center pr-2">
+                            <p:selectOneMenu id="javascriptlanguage" value="#{javascriptList.javascripttype}">
+                                <f:selectItems value="#{javascriptList.javascriptTypes.entrySet()}" var="entry" itemValue="#{entry.key}" itemLabel="#{entry.value}" />
+                            </p:selectOneMenu>
                         </div>
 
                         <div class="flex align-items-center pr-2">
@@ -1108,9 +1114,9 @@
                         </p:tab>
                         
                         <p:tab title="Classes" id="compiledclassespanel">
-                            <p:dataTable id="compiledclasseslist" size="small" scrollable="true" scrollHeight="250" var="compiledclass" value="#{javaCompiler.classesList}">
+                            <p:dataTable id="compiledclasseslist" size="small" scrollable="true" scrollHeight="250" var="compiledclass" value="#{javaCompiler.getClasses()}">
                                 <p:column headerText="Name">
-                                    <h:outputText value="#{compiledclass.packageName}" />
+                                    <h:outputText value="#{compiledclass.name}" />
                                 </p:column>
                             </p:dataTable>
                         </p:tab>
@@ -1127,7 +1133,7 @@
                     
                     <div class="flex flex-row pb-2">
                         <p:dataTable id="classlist" size="small" scrollable="true" scrollHeight="250" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}" sortMode="single">
-                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate :form:tabview:classencrypted form:wizardattributlist" />
+                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate :form:tabview:classencrypted :form:wizardattributlist :form:LoginWizardDlg" />
                             <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains" sortBy="#{clazz.name}">
                                 <h:outputText value="#{clazz.name}" />
                             </p:column>
@@ -1220,6 +1226,9 @@
                             </p:commandButton>
                             -->
                         </div>
+                        <div class="flex align-items-center pr-2">
+                            <p:commandButton value="Generate Login Form Wizard" type="button" onclick="PF('LoginWizardDlg').show()" />
+                        </div>
                     </div>
 
                     <p:dataTable id="attributlist" size="small" var="attribut" value="#{classList.selectedAttributList}" selectionMode="single" selection="#{classList.selectedAttribut}" rowKey="#{attribut.id}">
@@ -1238,6 +1247,9 @@
                         </p:column>
                         <p:column headerText="Index">
                             <h:outputText value="#{attribut.isindex}" />
+                        </p:column>
+                        <p:column headerText="Mutable">
+                            <h:outputText value="#{attribut.ext_mutable}" />
                         </p:column>
                         <p:column headerText="Class">
                             <h:outputText value="#{attribut.relationref}" />
@@ -1288,6 +1300,11 @@
                             <div class="flex align-items-center pr-2">
                                 <p:outputLabel for="attributautoinc" value="Autoinc:" style="margin-right: 0.5rem" />
                                 <p:selectBooleanCheckbox id="attributautoinc" value="#{classList.autoinc}" />
+                            </div>
+                            
+                            <div class="flex align-items-center pr-2">
+                                <p:outputLabel for="attributextmutable" value="Mutable:" style="margin-right: 0.5rem" />
+                                <p:selectBooleanCheckbox id="attributextmutable" value="#{classList.extmutable}" />
                             </div>
 
                             <div class="flex align-items-center pr-2">
@@ -2687,6 +2704,37 @@
                     </f:facet>
                     <div class="flex">#{keyword.name}</div>
                 </p:dataScroller>
+            </p:dialog>
+
+            <p:dialog id="LoginWizardDlg" header="Login Wizard" widgetVar="LoginWizardDlg" minHeight="100" width="450" showEffect="fade" modal="true">
+                <div class="flex" style="flex-direction: column;">
+                    <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                        <p>Login Field</p>
+                        <p:selectOneMenu id="LoginIdField" value="#{classList.idField}" class="flex align-items-center">
+                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                            <f:selectItems value="#{classList.selectedAttributList}" var="attrrelid" itemLabel="#{attrrelid.name}" itemValue="#{attrrelid.name}" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                        <p>Password Field</p>
+                        <p:selectOneMenu id="LoginPasswordField" value="#{classList.passwordField}" class="flex align-items-center">
+                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                            <f:selectItems value="#{classList.selectedAttributList}" var="attrrelpassword" itemLabel="#{attrrelpassword.name}" itemValue="#{attrrelpassword.name}" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px; margin-bottom: 10px">
+                        <p>Auth Field</p>
+                        <p:selectOneMenu id="LoginAuthField" value="#{classList.authField}" class="flex align-items-center">
+                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                            <f:selectItems value="#{classList.selectedAttributList}" var="attrrelauth" itemLabel="#{attrrelauth.name}" itemValue="#{attrrelauth.name}" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <p:commandButton id="loginformwizard" style="width: 100%" process="form" value="Generate Login Form Wizard" actionListener="#{classList.onGenerateLogin(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                    <f:actionListener binding="#{templateList.refresh()}" />
+                    <f:actionListener binding="#{sitetree.onRefreshAll()}" />
+                </p:commandButton>
             </p:dialog>
             
             <p:dialog id="ODataWizardDlg" header="OData Formular Wizard" widgetVar="ODataWizardDlg" minHeight="100" width="1200" showEffect="fade" modal="true">

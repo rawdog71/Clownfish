@@ -68,6 +68,10 @@ public class CfJavascript implements Serializable {
     private BigInteger checkedoutby;
     @Column(name = "invisible")
     private boolean invisible;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "type")
+    private int type;
 
     public CfJavascript() {
     }
@@ -118,6 +122,14 @@ public class CfJavascript implements Serializable {
     }
     public void setInvisible(boolean invis) {
         invisible = invis;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     @Override

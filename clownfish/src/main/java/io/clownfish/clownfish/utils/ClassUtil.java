@@ -41,12 +41,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -923,7 +918,7 @@ public class ClassUtil implements Serializable {
         CfTemplate dummytemplate = null;
         CfSite site = new CfSite();
         CfJavascript js = new CfJavascript();
-        
+
         html.append("<!DOCTYPE html>").append("\n");
         html.append("<html lang=\"de\" ng-app=\"crud").append(clazz.getName()).append("App\">").append("\n");
         html.append("\t<head>").append("\n");
@@ -2246,6 +2241,11 @@ public class ClassUtil implements Serializable {
                 case "datetime":
                     javascript.append("(entry.").append(attr.getName()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".toLowerCase())) && ");
                     break;
+                case "classref":
+                    if (1 == attr.getRelationtype()) {
+                        javascript.append("(entry.").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".toLowerCase())) && ");
+                    }
+                    break;
             }
         }
         javascript = javascript.delete(javascript.length()-4, javascript.length());
@@ -2299,6 +2299,11 @@ public class ClassUtil implements Serializable {
                     case "datetime":
                         javascript.append("(entry.").append(attr.getName().toLowerCase()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName().toLowerCase()).append(".toLowerCase())) && ");
                         break;
+                    case "classref":
+                        if (1 == attr.getRelationtype()) {
+                            javascript.append("(entry.").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append("_connected.").append(attr.getName()).append(".toLowerCase())) && ");
+                        }
+                        break;
                 }
             }
         }
@@ -2351,6 +2356,11 @@ public class ClassUtil implements Serializable {
                     case "real":
                     case "datetime":
                         javascript.append("(entry.").append(attr.getName().toLowerCase()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName().toLowerCase()).append(".toLowerCase())) && ");
+                        break;
+                    case "classref":
+                        if (1 == attr.getRelationtype()) {
+                            javascript.append("(entry.").append(attr.getName()).append(".").append(odw.getRelationattribut1()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append("_disconnected.").append(attr.getName()).append(".toLowerCase())) && ");
+                        }
                         break;
                 }
             }
@@ -2901,19 +2911,19 @@ public class ClassUtil implements Serializable {
                 js.setContent(javascript.toString());
                 cfJavaScriptService.create(js);
                 javascriptutil.commit(js);
-                javascriptutil.writeStaticJS(js.getName(), js.getContent());
+                javascriptutil.writeStaticJS(js.getName(), js.getContent(), "js");
             } else {
                 dummyjs.setContent(javascript.toString());
                 cfJavaScriptService.edit(dummyjs);
                 javascriptutil.commit(dummyjs);
-                javascriptutil.writeStaticJS(dummyjs.getName(), dummyjs.getContent());
+                javascriptutil.writeStaticJS(dummyjs.getName(), dummyjs.getContent(), "js");
             }
         } catch (Exception ex) {
             js.setCheckedoutby(BigInteger.ZERO);
             js.setContent(javascript.toString());
             cfJavaScriptService.create(js);
             javascriptutil.commit(js);
-            javascriptutil.writeStaticJS(js.getName(), js.getContent());
+            javascriptutil.writeStaticJS(js.getName(), js.getContent(), "js");
         }
 
         site.setName("crud_" + clazz.getName().toLowerCase());
@@ -2947,7 +2957,465 @@ public class ClassUtil implements Serializable {
         }
         sitetree.loadTree();
     }
-    
+
+    public void generateLogin(CfClass clazz, String idField, String passwordField, String authField) {
+        List<CfAttribut> attributList = cfattributService.findByClassref(clazz);
+
+        StringBuilder html = new StringBuilder();
+        CfTemplate template = new CfTemplate();
+        CfTemplate dummytemplate = null;
+        CfSite site = new CfSite();
+
+        html.append("<!doctype html>").append("\n");
+        html.append("<html ng-app=\"dummyApp\">").append("\n");
+        html.append("\t<head>").append("\n");
+        html.append("\t\t<!-- CSS FILES -->").append("\n");
+        html.append("\t\t<link rel=\"stylesheet\" href=\"/resources/css/bootstrap5.css\">").append("\n");
+        html.append("\t\t<link rel=\"stylesheet\" href=\"/resources/css/uikit.css\">").append("\n");
+        html.append("\t\t<link rel=\"stylesheet\" href=\"/css/intranet.css\">").append("\n");
+        html.append("\t\t<link rel=\"stylesheet\" href=\"css/toaster_neu.css\">").append("\n");
+        html.append("\t\t<!-- Custom fonts for this template -->").append("\n");
+        html.append("\t\t<link href=\"/css/fonts.css\" rel=\"stylesheet\">").append("\n");
+        html.append("\t\t<script src=\"/resources/js/angular.js\"></script>").append("\n");
+        html.append("\t\t<link rel=\"stylesheet\" href=\"/css/ui-bootstrap-csp.css\">").append("\n");
+        html.append("\t\t<script src=\"/js/angular-sanitize.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/js/ui-bootstrap.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/js/ui-bootstrap-tpls.js\"></script>").append("\n");
+        html.append("\t\t<link rel=\"icon\" href=\"/GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid=337&width=50\">").append("\n");
+        html.append("\t\t<link rel=\"icon\" href=\"/GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid=337&width=50\">").append("\n");
+        html.append("\t\t<script src=\"js/toaster.js\"></script>").append("\n");
+
+
+        html.append("\t\t<style> .width-100 { width: 100%;} .upper-first {text-transform: capitalize;} .width-50 {width: 50%;} .flex-middle {display: flex;justify-content: center;} .password-forgot {font-size: 14px;text-decoration: underline;color: blue;cursor: pointer;} .password-info-text {font-size: 12px;color: #eb2828;margin: 0 !important;}</style>\n").append("\n");
+
+
+        html.append("\t\t<body ng-controller=\"DummyComponent\">").append("\n");
+        html.append("\t\t\t<div class=\"uk-container uk-container-small\">").append("\n");
+        html.append("\t\t\t\t<p class=\"flex-middle\">Diese Seite ist zugriffsbeschränkt. Bitte loggen Sie sich ein.</p>").append("\n");
+        html.append("\t\t\t</div>").append("\n");
+        html.append("\t\t\t<div ng-if=\"!forgotPassword && !createUserB && !resetPasswordEmail\" class=\"flex-middle uk-container uk-container-small uk-margin uk-form-stacked\">").append("\n");
+        html.append("\t\t\t\t<div class=\"width-50\">").append("\n");
+
+        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"form-stacked-email\">E-Mail</label>").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
+        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"loginEmail\" ng-model=\"email\" type=\"text\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+
+        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"form-stacked-password\">Password</label>").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: unlock\"></span>").append("\n");
+        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"loginPassword\" ng-model=\"password\" type=\"password\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+
+        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-form-controls\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<p class=\"width-100 password-forgot\" ng-click=\"clickForgotPassword()\">Passwort vergessen?</p>").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+
+        html.append("\t\t\t\t\t<div class=\"uk-margin\" style=\"margin-bottom: 0;\">").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-form-controls uk-flex\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" ng-click=\"login('${metainfo.referrer}')\">Login</button>").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t<div class=\"uk-form-controls uk-flex\">").append("\n");
+        html.append("\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" ng-click=\"changeCreate()\">Benutzer erstellen</button>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t</div>").append("\n");
+        html.append("\t\t\t</div>").append("\n");
+
+        // Ändern <div class="width-50">
+        html.append("\t\t\t\t<div ng-if=\"forgotPassword && !createUserB && !resetPasswordEmail\" class=\"flex-middle uk-container uk-container-small uk-margin uk-form-stacked\">").append("\n");
+        html.append("\t\t\t\t\t<div class=\"width-50\">").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"form-stacked-email\">E-Mail</label>").append("\n");
+        html.append("\t\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
+        html.append("\t\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
+        html.append("\t\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"resetEmail\" ng-model=\"email\" type=\"text\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<div class=\"uk-form-controls uk-flex\">").append("\n");
+        html.append("\t\t\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" ng-click=\"resetPassword()\">Zurücksetzen</button>").append("\n");
+        html.append("\t\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t</div>").append("\n");
+
+        html.append("\t\t\t<div ng-if=\"resetPasswordEmail\" class=\"flex-middle uk-container uk-container-small uk-margin uk-form-stacked\">").append("\n");
+        html.append("\t\t\t\t<div class=\"width-50\">").append("\n");
+        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"form-stacked-email\">Neues Passwort</label>").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
+        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"newPassword\" type=\"password\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+
+        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"form-stacked-email\">Neues Passwort wiederholen</label>").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
+        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"newPasswordRepeat\" type=\"password\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+
+        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-form-controls uk-flex\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" ng-click=\"setNewPassword()\">Neues Passwort setzen</button>").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t</div>").append("\n");
+
+        html.append("\t\t\t<div ng-if=\"createUserB\" class=\"flex-middle uk-container uk-container-small uk-margin uk-form-stacked\">").append("\n");
+        html.append("\t\t\t\t<div class=\"width-50\">").append("\n");
+
+        for (CfAttribut cfa : attributList) {
+            if(!Objects.equals(cfa.getName(), authField) && !Objects.equals(cfa.getName(), passwordField) && !Objects.equals(cfa.getName(), "id")) {
+                html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+                html.append("\t\t\t\t\t\t<label class=\"uk-form-label upper-first\" for=\"form-stacked-email\">").append(cfa.getName()).append("</label>\n");
+                html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
+                html.append("\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
+                html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"create").append(cfa.getName()).append("\" ng-model=\"").append(cfa.getName()).append("\" type=\"text\" placeholder=\"\">").append("\n");
+                html.append("\t\t\t\t\t\t</div>").append("\n");
+                html.append("\t\t\t\t\t</div>").append("\n");
+            }
+        }
+
+        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<label class=\"uk-form-label upper-first\" for=\"form-stacked-email\">").append(passwordField).append("</label>\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
+        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-change=\"checkPassword()\" ng-class=\"{'uk-form-danger': warning}\" id=\"create").append(passwordField).append("\" ng-model=\"").append(passwordField).append("\" type=\"password\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+
+        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<label class=\"uk-form-label upper-first\" for=\"form-stacked-email\">").append(passwordField).append(" widerholen</label>\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
+        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"create").append(passwordField).append("Repeat\" ng-model=\"").append(passwordField).append("Again\" type=\"password\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+
+        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-form-controls uk-flex\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" disabled=\"true\" id=\"createUserButton\" ng-click=\"createUser()\">Erstellen</button>").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t</div>").append("\n");
+        html.append("\t\t</body>").append("\n");
+
+        html.append("\t\t<!-- JS FILES -->").append("\n");
+        html.append("\t\t<script src=\"/js/intranetApp.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/bootstrap5.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/popper.min.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/uikit.min.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/uikit-icons.min.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/jquery.min.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/js/datatable.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/js/datatable_uikit.js\"></script>").append("\n");
+
+        // Javascript Login Logik
+        html.append("\t\t<script>").append("\n");
+        html.append("\t\t\tvar dummyapp = angular.module('dummyApp', ['ngSanitize', 'ui.bootstrap', 'toastr']);").append("\n");
+        html.append("\t\t\tdummyapp.controller(\"DummyComponent\", function ($scope, $uibModal, $http, toastr) {").append("\n");
+
+        html.append("\t\t\t\tconst className = \"").append(clazz.getName()).append("\";\n");
+        html.append("\t\t\t\tconst passwordField = \"").append(passwordField).append("\";\n");
+        html.append("\t\t\t\tconst idField = \"").append(idField).append("\";\n");
+        html.append("\t\t\t\tconst authfield = \"").append(authField).append("\";\n");
+        html.append("\t\t\t\tconst adminMail = \"marcel.sluganovic@koenig-neurath.de\";").append("\n");
+        html.append("\t\t\t\tconst loginSite = \"").append(clazz.getName()).append("Login\";\n");
+        html.append("\t\t\t\tconst passwordCheck = false;").append("\n\n");
+
+        html.append("\t\t\t\t$scope.forgotPassword = false;").append("\n");
+        html.append("\t\t\t\t$scope.createUserB = false;").append("\n");
+        html.append("\t\t\t\t$scope.email = \"\"").append("\n");
+        html.append("\t\t\t\t$scope.password = \"\"").append("\n");
+        html.append("\t\t\t\t$scope.password_again = \"\"").append("\n");
+        html.append("\t\t\t\t$scope.resetPasswordEmail = false;").append("\n");
+        html.append("\t\t\t\t$scope.classDataList = []").append("\n\n");
+
+        html.append("\t\t\t\tconst queryString = window.location.search;").append("\n");
+        html.append("\t\t\t\tconst urlParams = new URLSearchParams(queryString);").append("\n");
+        html.append("\t\t\t\tconst token = urlParams.get('token');").append("\n\n");
+
+        html.append("\t\t\t\tif(token) {").append("\n");
+        html.append("\t\t\t\t\t$scope.resetPasswordEmail = true;").append("\n");
+        html.append("\t\t\t\t}").append("\n\n");
+
+        html.append("\t\t\t\t$scope.clickForgotPassword = () => {").append("\n");
+        html.append("\t\t\t\t\t$scope.forgotPassword = !$scope.forgotPassword").append("\n");
+        html.append("\t\t\t\t}").append("\n\n");
+
+        html.append("\t\t\t\t$scope.changeCreate = () => {").append("\n");
+        html.append("\t\t\t\t\t$scope.createUserB = !$scope.createUserB;").append("\n");
+        html.append("\t\t\t\t}").append("\n\n");
+
+        //SetNewPassword
+        html.append("\t\t\t\t$scope.setNewPassword = () => {").append("\n");
+        html.append("\t\t\t\t\tvar newPassword = document.getElementById(\"newPassword\").value;").append("\n");
+        html.append("\t\t\t\t\tvar newPasswordRepeat = document.getElementById(\"newPasswordRepeat\").value;").append("\n");
+        html.append("\t\t\t\t\tif(newPassword == newPasswordRepeat) {").append("\n");
+        html.append("\t\t\t\t\t\t$scope.warning = false;").append("\n");
+        html.append("\t\t\t\t\t\tif(isTokenValid(token)) {").append("\n");
+        html.append("\t\t\t\t\t\t\tvar data = decodeToken(token)").append("\n");
+        html.append("\t\t\t\t\t\t\tvar userToChange = $scope.classDataList.find(user => user.").append(idField).append(" === data.").append(idField).append(");\n");
+        html.append("\t\t\t\t\t\t\tvar updateData = {").append("\n");
+
+        for (CfAttribut cfa : attributList) {
+            if(!Objects.equals(cfa.getName(), passwordField)) {
+                html.append("\t\t\t\t\t\t\t\t").append(cfa.getName()).append(": userToChange.").append(cfa.getName()).append(",\n");
+            }
+        }
+
+        html.append("\t\t\t\t\t\t\t\t").append(passwordField).append(": newPassword").append("\n");
+        html.append("\t\t\t\t\t\t\t}").append("\n");
+        StringBuilder patchParameters = new StringBuilder("\"OData/\"+className+\"(");
+        for(CfAttribut cfa: attributList) {
+            if(cfa.getIdentity()) {
+                patchParameters.append(cfa.getName()).append("=\"").append(" + userToChange.").append(cfa.getName()).append("+ \"");
+            }
+        }
+        html.append("\t\t\t\t\t\t\t$http.patch(").append(patchParameters).append("\", updateData).then(res => {\n");
+        html.append("\t\t\t\t\t\t\t\tif(res.status == 201 || res.status == 200) {").append("\n");
+        html.append("\t\t\t\t\t\t\t\t\ttoastr.success('Passwort erfolgreich geändert', 'Erfolgreich');").append("\n");
+        html.append("\t\t\t\t\t\t\t\t\topenLogin();").append("\n");
+        html.append("\t\t\t\t\t\t\t\t} else {").append("\n");
+        html.append("\t\t\t\t\t\t\t\t\ttoastr.error('Passwort konnte nicht erneuert werden.', 'Fehler');").append("\n");
+        html.append("\t\t\t\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t\t\t\t})").append("\n");
+        html.append("\t\t\t\t\t\t} else {").append("\n");
+        html.append("\t\t\t\t\t\t\ttoastr.error('Der Token ist abgelaufen', 'Fehler')").append("\n");
+        html.append("\t\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t\t} else {").append("\n");
+        html.append("\t\t\t\t\t\t$scope.warning = true;").append("\n");
+        html.append("\t\t\t\t\t\ttoastr.error('Die Passwörter stimmen nicht überein', 'Fehler')").append("\n");
+        html.append("\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t}").append("\n\n");
+        html.append("\t\t\t\t$scope.createUser = () => {").append("\n");
+        for (CfAttribut cfa : attributList) {
+            if(!Objects.equals(cfa.getName(), authField) && !Objects.equals(cfa.getName(), passwordField)&& !Objects.equals(cfa.getName(), "id")) {
+                html.append("\t\t\t\t\t").append("var ").append(cfa.getName()).append("Text = document.getElementById(\"create").append(cfa.getName()).append("\").value;\n");
+            }
+        }
+
+        html.append("\t\t\t\t\t").append("var ").append(passwordField).append("Text = document.getElementById(\"create").append(passwordField).append("\").value;\n");
+        html.append("\t\t\t\t\t").append("var ").append(passwordField).append("TextRepeat = document.getElementById(\"create").append(passwordField).append("Repeat\").value;\n");
+
+        html.append("\t\t\t\t\tvar data = {").append("\n");
+        html.append("\t\t\t\t\t\tid: null,").append("\n");
+        html.append("\t\t\t\t\t\t").append(authField).append(": false,\n");
+        for (CfAttribut cfa : attributList) {
+            if(!Objects.equals(cfa.getName(), authField) && !Objects.equals(cfa.getName(), "id")) {
+                html.append("\t\t\t\t\t\t").append(cfa.getName()).append(": ").append(cfa.getName()).append("Text,\n");
+            }
+        }
+        html.append("\t\t\t\t\t};").append("\n");
+        html.append("\t\t\t\t\tif(").append(passwordField).append("Text == ").append(passwordField).append("TextRepeat) {").append("\n");
+        html.append("\t\t\t\t\t\t$scope.warning = false;").append("\n");
+        html.append("\t\t\t\t\t\t$http.post(\"OData/\" +className , data).then(res => {").append("\n");
+        html.append("\t\t\t\t\t\tif(res.status == 201) {").append("\n");
+        html.append("\t\t\t\t\t\t\ttoastr.success('Benutzer erfolgreich erstellt. Wird vom Admin bearbeitet', 'Erfolgreich');").append("\n");
+        html.append("\t\t\t\t\t\t\t$http.get(\"sendEmail?to=\"+adminMail+\"&subject=Bestätigung für einen neuen Benutzer&body=Der Benutzer: \" + ").append(idField).append("Text + \" muss bestätigt werden.\");\n");
+        html.append("\t\t\t\t\t\t\topenLogin()").append("\n");
+        html.append("\t\t\t\t\t\t} else if(res.status == 406) {").append("\n");
+        html.append("\t\t\t\t\t\t\ttoastr.error('Der Account existiert schon. Bitte bei der IT melden.', 'Fehler');").append("\n");
+        html.append("\t\t\t\t\t\t} else {").append("\n");
+        html.append("\t\t\t\t\t\t\ttoastr.error('Es kam zu einem Fehler beim Erstellen', 'Fehler');").append("\n");
+        html.append("\t\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t\t\t}, err => {").append("\n");
+        html.append("\t\t\t\t\t\t toastr.error('Es kam zu einem Fehler beim Erstellen', 'Fehler');").append("\n");
+        html.append("\t\t\t\t\t\t})").append("\n");
+        html.append("\t\t\t\t\t } else {").append("\n");
+        html.append("\t\t\t\t\t\t$scope.warning = true;").append("\n");
+        html.append("\t\t\t\t\t\t$scope.showPasswordInfo = true;").append("\n");
+        html.append("\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t}").append("\n\n");
+        //ResetPassword
+        html.append("\t\t\t\t$scope.resetPassword = () => {").append("\n");
+        html.append("\t\t\t\t\tvar token = createToken();").append("\n");
+        html.append("\t\t\t\t\tvar resetLink = \"http://\" + window.location.hostname + \"/\"+loginSite+\"?token=\" + token;").append("\n");
+        html.append("\t\t\t\t\tvar email = document.getElementById(\"resetEmail\").value;").append("\n");
+        html.append("\t\t\t\t\t$http.get(\"sendEmail?to=\"+email+\"&subject=Passwort zurücksetzen&body=\"+ resetLink +\"\").then(res => {").append("\n");
+        html.append("\t\t\t\t\t\ttoastr.success('Sie erhalten in kürze eine Email.', 'Erfolgreich')").append("\n");
+        html.append("\t\t\t\t\t\topenLogin()").append("\n");
+        html.append("\t\t\t\t\t});").append("\n");
+        html.append("\t\t\t\t};").append("\n\n");
+
+        //Login
+        html.append("\t\t\t\t$scope.login = function(referrer) {").append("\n");
+        html.append("\t\t\t\t\t$http.get(\"Auth\", {params: { \"class\": className, \"idField\": idField, \"pwField\": passwordField, \"id\": document.getElementById(\"loginEmail\").value, \"clearPw\": document.getElementById(\"loginPassword\").value, \"authfield\": authfield}}).then(function (res) {").append("\n");
+        html.append("\t\t\t\t\t\tif (res.status === 200) {").append("\n");
+        html.append("\t\t\t\t\t\t\tif (res.data.status === true) {").append("\n");
+        html.append("\t\t\t\t\t\t\t\t$scope.warning = false;").append("\n");
+        html.append("\t\t\t\t\t\t\t\tdocument.cookie = \"cf_login_token=\"+res.data.token;").append("\n");
+        html.append("\t\t\t\t\t\t\t\tdocument.cookie = \"cf_token=\"+res.data.token;").append("\n");
+        html.append("\t\t\t\t\t\t\t\t\twindow.location = referrer;").append("\n");
+        html.append("\t\t\t\t\t\t\t} else {").append("\n");
+        html.append("\t\t\t\t\t\t\t\t$scope.warning = true;").append("\n");
+        html.append("\t\t\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t\t\t} else {").append("\n");
+        html.append("\t\t\t\t\t\t\t$scope.warning = true;").append("\n");
+        html.append("\t\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t\t}, function (res) {").append("\n");
+        html.append("\t\t\t\t\t\tconsole.log(\"ERROR\");").append("\n");
+        html.append("\t\t\t\t\t});").append("\n");
+        html.append("\t\t\t\t}").append("\n\n");
+
+        //CheckPassword
+        html.append("\t\t\t\t$scope.checkPassword = () => {").append("\n");
+        html.append("\t\t\t\t\tif(passwordCheck) {").append("\n");
+        html.append("\t\t\t\t\t\tvar password = document.getElementById('createPassword').value;").append("\n");
+        html.append("\t\t\t\t\t\tvar passwordAgain = document.getElementById('createPasswordAgain').value;").append("\n");
+        html.append("\t\t\t\t\t\tconst criteria = {").append("\n");
+        html.append("\t\t\t\t\t\t\tlength: {").append("\n");
+        html.append("\t\t\t\t\t\t\t\tisValid: password.length >= 8,").append("\n");
+        html.append("\t\t\t\t\t\t\t\tmessage: \"Mindestens 8 Zeichen lang.\"").append("\n");
+        html.append("\t\t\t\t\t\t\t},").append("\n");
+        html.append("\t\t\t\t\t\t\tlowercase: {").append("\n");
+        html.append("\t\t\t\t\t\t\t\tisValid: /[a-z]/.test(password),").append("\n");
+        html.append("\t\t\t\t\t\t\t\tmessage: \"Mindestens ein kleiner Buchstabe.\"").append("\n");
+        html.append("\t\t\t\t\t\t\t},").append("\n");
+        html.append("\t\t\t\t\t\t\tuppercase: {").append("\n");
+        html.append("\t\t\t\t\t\t\t\tisValid: /[A-Z]/.test(password),").append("\n");
+        html.append("\t\t\t\t\t\t\t\tmessage: \"Mindestens ein großer Buchstabe.\"").append("\n");
+        html.append("\t\t\t\t\t\t\t},").append("\n");
+        html.append("\t\t\t\t\t\t\tdigit: {").append("\n");
+        html.append("\t\t\t\t\t\t\t\tisValid: /\\d/.test(password),").append("\n");
+        html.append("\t\t\t\t\t\t\t\tmessage: \"Mindestens eine Nummer.\"").append("\n");
+        html.append("\t\t\t\t\t\t\t},").append("\n");
+        html.append("\t\t\t\t\t\t\tspecialChar: {").append("\n");
+        html.append("\t\t\t\t\t\t\t\tisValid: /[!@#$%^&*(){}[],.?\":{}|<>]/.test(password),").append("\n");
+        html.append("\t\t\t\t\t\t\t\tmessage: \"Mindestens ein Sonderzeichen.\"").append("\n");
+        html.append("\t\t\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t\t\t};").append("\n");
+        html.append("\t\t\t\t\t\t$scope.missingCriteria = [];").append("\n");
+        html.append("\t\t\t\t\t\tfor (const [key, value] of Object.entries(criteria)) {").append("\n");
+        html.append("\t\t\t\t\t\t\tif (!value.isValid) {").append("\n");
+        html.append("\t\t\t\t\t\t\t\t$scope.missingCriteria.push(value.message);").append("\n");
+        html.append("\t\t\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t\t\tif($scope.missingCriteria.length == 0 && password == passwordAgain) {").append("\n");
+        html.append("\t\t\t\t\t\t\tdocument.getElementById(\"createUserButton\").disabled = false").append("\n");
+        html.append("\t\t\t\t\t\t} else { ").append("\n");
+        html.append("\t\t\t\t\t\t\tdocument.getElementById(\"createUserButton\").disabled = true").append("\n");
+        html.append("\t\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t\t} else {").append("\n");
+        html.append("\t\t\t\t\t\tdocument.getElementById(\"createUserButton\").disabled = false").append("\n");
+        html.append("\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t}").append("\n\n");
+
+        html.append("\t\t\t\t/* Helper Functions */").append("\n");
+        html.append("\t\t\t\tfunction createToken() {").append("\n");
+        html.append("\t\t\t\t\tconst now = new Date();").append("\n");
+        html.append("\t\t\t\t\tconst expiresAt = new Date(now.getTime() + 20 * 60000);").append("\n");
+        html.append("\t\t\t\t\tconst token = btoa(JSON.stringify({ expiresAt: expiresAt.toISOString(), email: document.getElementById(\"resetEmail\").value }));").append("\n");
+        html.append("\t\t\t\t\treturn token;").append("\n");
+        html.append("\t\t\t\t}").append("\n\n");
+
+        html.append("\t\t\t\tfunction decodeToken(token) {").append("\n");
+        html.append("\t\t\t\t\tconst decoded = atob(token);").append("\n");
+        html.append("\t\t\t\t\tconst payload = JSON.parse(decoded);").append("\n");
+        html.append("\t\t\t\t\treturn payload;").append("\n");
+        html.append("\t\t\t\t}").append("\n\n");
+
+        html.append("\t\t\t\tfunction isTokenValid(token) {").append("\n");
+        html.append("\t\t\t\t\tconst payload = decodeToken(token);").append("\n");
+        html.append("\t\t\t\t\tconst expiresAt = new Date(payload.expiresAt);").append("\n");
+        html.append("\t\t\t\t\tconst now = new Date();").append("\n");
+        html.append("\t\t\t\t\treturn now < expiresAt;").append("\n");
+        html.append("\t\t\t\t}").append("\n");
+
+        html.append("\t\t\t\tfunction createUpdateData(userToChange, newPassword) {").append("\n");
+        html.append("\t\t\t\t\tlet updateData = {};").append("\n");
+        html.append("\t\t\t\t\tfor (let key in userToChange) {").append("\n");
+        html.append("\t\t\t\t\t\tif (userToChange.hasOwnProperty(key)) {").append("\n");
+        html.append("\t\t\t\t\t\t\tupdateData[key] = userToChange[key];").append("\n");
+        html.append("\t\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t\t}").append("\n");
+        html.append("\t\t\t\t\tupdateData.password = newPassword;").append("\n");
+        html.append("\t\t\t\t\treturn updateData;").append("\n");
+        html.append("\t\t\t\t}").append("\n");
+
+        html.append("\t\t\t\tfunction openLogin() {").append("\n");
+        html.append("\t\t\t\t\t$scope.forgotPassword = false;").append("\n");
+        html.append("\t\t\t\t\t$scope.resetPasswordEmail = false;").append("\n");
+        html.append("\t\t\t\t\t$scope.createUserB = false;").append("\n");
+        html.append("\t\t\t\t};").append("\n");
+
+        html.append("\t\t\t\tasync function getInformation() {").append("\n");
+        html.append("\t\t\t\t\tawait $http.get(\"/OData/\" + ").append("className).then(res => $scope.classDataList = res.data.value);\n");
+        html.append("\t\t\t\t}").append("\n");
+        html.append("\t\t\t\tgetInformation();").append("\n");
+
+        html.append("\t\t\t});").append("\n\n");
+        html.append("\t\t</script>").append("\n");
+
+        template.setName("login_" + clazz.getName());
+        try {
+            dummytemplate = cfTemplateService.findByName(template.getName());
+            if (null == dummytemplate) {
+                template.setScriptlanguage(0);
+                template.setCheckedoutby(BigInteger.ZERO);
+                template.setContent(html.toString());
+                cfTemplateService.create(template);
+                templateutil.commit(template);
+            } else {
+                dummytemplate.setContent(html.toString());
+                cfTemplateService.edit(dummytemplate);
+                templateutil.commit(dummytemplate);
+            }
+        } catch (Exception ex) {
+            template.setScriptlanguage(2);
+            template.setCheckedoutby(BigInteger.ZERO);
+            template.setContent(html.toString());
+            cfTemplateService.create(template);
+            templateutil.commit(template);
+        }
+
+        site.setName("login_" + clazz.getName().toLowerCase());
+        CfSite dummysite = cfSiteService.findByName(site.getName());
+        if (null == dummysite) {
+            site.setCharacterencoding("UTF-8");
+            site.setHitcounter(BigInteger.ZERO);
+            site.setTitle("");
+            site.setContenttype("text/html");
+            site.setSearchrelevant(false);
+            site.setHtmlcompression(0);
+            site.setGzip(0);
+            site.setLocale("de");
+            site.setDescription("Automatic generation");
+            site.setAliaspath(site.getName());
+            CfSite parent = cfSiteService.findByName("logins");
+            if (null != parent) {
+                site.setParentref(parent);
+            } else {
+                site.setParentref(null);
+            }
+            if (null != template.getContent()) {
+                site.setTemplateref(template);
+            } else {
+                site.setTemplateref(dummytemplate);
+            }
+            site.setShorturl(siteutil.generateShorturl());
+            site.setLoginsite("");
+            site.setTestparams("");
+            cfSiteService.create(site);
+        }
+        sitetree.loadTree();
+    }
+
     private String getAttributeJVMType(CfAttribut attribut, JVMLanguages language) {
         switch (language) {
             case JAVA:

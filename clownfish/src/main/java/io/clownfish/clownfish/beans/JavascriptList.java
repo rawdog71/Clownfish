@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.constants.ClownfishConst.JavascriptTypes;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfJavascriptversion;
 import io.clownfish.clownfish.dbentities.CfJavascriptversionPK;
@@ -25,6 +26,7 @@ import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.FolderUtil;
 import io.clownfish.clownfish.utils.JavascriptUtil;
@@ -40,16 +42,13 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.IOUtils;
 import org.primefaces.event.SlideEndEvent;
 import org.primefaces.extensions.model.monacoeditor.DiffEditorOptions;
 import org.primefaces.extensions.model.monacoeditor.EScrollbarHorizontal;
@@ -103,12 +102,18 @@ public class JavascriptList implements ISourceContentInterface {
     @Autowired private FolderUtil folderUtil;
     private @Getter @Setter SiteTreeBean sitetree;
     private @Getter @Setter boolean invisible;
+    private @Getter @Setter int javascripttype;
+    private @Getter @Setter HashMap<Integer, String> availableLanguages = null;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(JavascriptList.class);
 
     public JavascriptList() {
     }
 
+    public HashMap<Integer, String> getJavascriptTypes() {
+        return availableLanguages;
+    }
+    
     @Override
     public String getContent() {
         if (null != selectedJavascript) {
@@ -134,6 +139,13 @@ public class JavascriptList implements ISourceContentInterface {
     @Override
     public void init() {
         LOGGER.info("INIT JAVASCRIPT START");
+        if (null == availableLanguages) {
+            availableLanguages = new HashMap<>();
+            availableLanguages.put(JavascriptTypes.TYPE_JS.getValue(), "Javascript");
+            if (checkTypescript()) {
+                availableLanguages.put(JavascriptTypes.TYPE_TS.getValue(), "Typescript");
+            }
+        }
         try {
             sourceindexer.initJavascript(cfjavascriptService, indexService);
         } catch (IOException ex) {
@@ -148,8 +160,9 @@ public class JavascriptList implements ISourceContentInterface {
         javascriptUtility.setJavascriptContent("");
         checkedout = false;
         access = false;
+        javascripttype = JavascriptTypes.TYPE_JS.getValue();
         editorOptions = new EditorOptions();
-        editorOptions.setLanguage("javascript");
+        editorOptions.setLanguage(availableLanguages.get(JavascriptTypes.TYPE_JS.getValue()));
         editorOptions.setTheme(ETheme.VS_DARK);
         editorOptions.setScrollbar(new EditorScrollbarOptions().setVertical(EScrollbarVertical.VISIBLE).setHorizontal(EScrollbarHorizontal.VISIBLE));
         editorOptionsDiff = new DiffEditorOptions();
@@ -191,6 +204,7 @@ public class JavascriptList implements ISourceContentInterface {
         if (null != selectedJavascript) {
             selectedJavascript.setContent(getContent());
             selectedJavascript.setInvisible(invisible);
+            selectedJavascript.setType(javascripttype);
             cfjavascriptService.edit(selectedJavascript);
             difference = javascriptUtility.hasDifference(selectedJavascript);
             
@@ -217,7 +231,9 @@ public class JavascriptList implements ISourceContentInterface {
                         difference = javascriptUtility.hasDifference(selectedJavascript);
                         this.javascriptversionMax = javascriptUtility.getCurrentVersion();
                         this.selectedjavascriptversion = this.javascriptversionMax;
-                        writeStaticJS(selectedJavascript.getName(), content);
+                        if (0 == selectedJavascript.getType()) {
+                            writeStaticJS(selectedJavascript.getName(), content);
+                        }
 
                         FacesMessage message = new FacesMessage("Commited " + selectedJavascript.getName() + " Version: " + (maxversion + 1));
                         FacesContext.getCurrentInstance().addMessage(null, message);
@@ -225,7 +241,9 @@ public class JavascriptList implements ISourceContentInterface {
                         writeVersion(selectedJavascript.getId(), 1, output);
                         javascriptUtility.setCurrentVersion(1);
                         difference = javascriptUtility.hasDifference(selectedJavascript);
-                        writeStaticJS(selectedJavascript.getName(), content);
+                        if (0 == selectedJavascript.getType()) {
+                            writeStaticJS(selectedJavascript.getName(), content);
+                        }
 
                         FacesMessage message = new FacesMessage("Commited " + selectedJavascript.getName() + " Version: " + 1);
                         FacesContext.getCurrentInstance().addMessage(null, message);
@@ -317,6 +335,7 @@ public class JavascriptList implements ISourceContentInterface {
                 } else {
                     newjavascript.setInvisible(false);
                 }
+                newjavascript.setType(javascripttype);
                 cfjavascriptService.create(newjavascript);
                 javascriptListe = cfjavascriptService.findAll();
                 invisJavascriptList = cfjavascriptService.findAll().stream()
@@ -417,7 +436,7 @@ public class JavascriptList implements ISourceContentInterface {
     }
     
     private void writeStaticJS(String filename, String js) {
-        javascriptUtility.writeStaticJS(filename, js);
+        javascriptUtility.writeStaticJS(filename, js, "js");
     }
     
     public void selectJavascript(CfJavascript javascript) {
@@ -438,6 +457,8 @@ public class JavascriptList implements ISourceContentInterface {
             javascriptversionMax = versionlist.size();
             selectedjavascriptversion = javascriptversionMax;
             setInvisible(selectedJavascript.getInvisible());
+            javascripttype = selectedJavascript.getType();
+            editorOptions.setLanguage(availableLanguages.get(javascripttype).toLowerCase());
         } else {
             javascriptName = "";
             checkedout = false;
@@ -452,6 +473,7 @@ public class JavascriptList implements ISourceContentInterface {
             String newname = javascriptUtility.getUniqueName(selectedJavascript.getName());
             newjavascript.setName(newname);
             newjavascript.setContent(selectedJavascript.getContent());
+            newjavascript.setType(selectedJavascript.getType());
             cfjavascriptService.create(newjavascript);
             javascriptListe = cfjavascriptService.findAll();
             javascriptName = newname;
@@ -460,6 +482,30 @@ public class JavascriptList implements ISourceContentInterface {
             refresh();
             onSelect(null);
             onCheckOut(null);
+        }
+    }
+    
+    private boolean checkTypescript() {
+        ProcessBuilder builder = new ProcessBuilder();
+        try {
+            if (ClownfishUtil.isWindows()) {
+                builder.command("cmd.exe", "/c", "tsc" + " -version");
+            } else {
+                builder.command("sh", "-c", "tsc" + " -version");
+            }
+            builder.redirectErrorStream(true);
+            String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
+
+            if (result.contains("Version ")) {
+                LOGGER.info("TypeScript Compiler TYPESCRIPT -> TRUE");
+                return true;
+            } else {
+                LOGGER.info("TypeScript Compiler TYPESCRIPT -> FALSE");
+                return false;
+            }
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage());
+            return false;
         }
     }
 }

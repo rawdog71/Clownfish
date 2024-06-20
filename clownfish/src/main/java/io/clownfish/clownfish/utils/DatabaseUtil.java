@@ -1572,19 +1572,19 @@ public class DatabaseUtil {
                 js.setContent(javascript.toString());
                 cfJavaScriptService.create(js);
                 javascriptutil.commit(js);
-                javascriptutil.writeStaticJS(js.getName(), js.getContent());
+                javascriptutil.writeStaticJS(js.getName(), js.getContent(), "js");
             } else {
                 dummyjs.setContent(javascript.toString());
                 cfJavaScriptService.edit(dummyjs);
                 javascriptutil.commit(dummyjs);
-                javascriptutil.writeStaticJS(dummyjs.getName(), dummyjs.getContent());
+                javascriptutil.writeStaticJS(dummyjs.getName(), dummyjs.getContent(), "js");
             }
         } catch (Exception ex) {
             js.setCheckedoutby(BigInteger.ZERO);
             js.setContent(javascript.toString());
             cfJavaScriptService.create(js);
             javascriptutil.commit(js);
-            javascriptutil.writeStaticJS(js.getName(), js.getContent());
+            javascriptutil.writeStaticJS(js.getName(), js.getContent(), "js");
         }
 
         site.setName("crud_" + tabledata.getName().toLowerCase());

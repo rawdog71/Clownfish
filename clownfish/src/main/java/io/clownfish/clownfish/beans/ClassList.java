@@ -30,8 +30,13 @@ import io.clownfish.clownfish.serviceinterface.CfAttributetypeService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.ClassUtil;
+import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import jakarta.validation.ConstraintViolationException;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.Setter;
 import org.codehaus.plexus.util.StringUtils;
@@ -91,6 +96,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter long maxval;
     private @Getter @Setter boolean mandatory;
     private @Getter @Setter boolean nodelete;
+    private @Getter @Setter boolean extmutable;
     private @Getter @Setter String description;
     private @Getter @Setter List<CfClass> classListeRef;
     private @Getter @Setter CfClass selectedClassRef = null;
@@ -101,13 +107,19 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean editAttributButtonDisabled;
     private @Getter @Setter boolean renderClass;
     private @Getter @Setter int javaLanguage = 0;
-    
+    private @Getter @Setter String idField;
+    private @Getter @Setter String passwordField;
+    private @Getter @Setter String authField;
+
     @Autowired transient private @Getter @Setter AttributList attributlist;
     final transient Logger LOGGER = LoggerFactory.getLogger(ClassList.class);
 
     @PostConstruct
     public void init() {
         LOGGER.info("INIT CLASSLIST START");
+        idField = "";
+        passwordField = "";
+        authField = "";
         classListe = cfclassService.findAll();
         classListeRef = cfclassService.findAll();
         attributetypelist = cfattributetypeService.findAll();
@@ -131,6 +143,9 @@ public class ClassList implements Serializable {
     
     public void onSelect(SelectEvent event) {
         selectedClass = (CfClass) event.getObject();
+        idField = "";
+        passwordField = "";
+        authField = "";
         selectedAttributList = attributlist.init(selectedClass);
         odataWizardList.clear();
         for (CfAttribut attr : selectedAttributList) {
@@ -195,6 +210,7 @@ public class ClassList implements Serializable {
         mandatory = selectedAttribut.getMandatory();
         description = selectedAttribut.getDescription();
         nodelete = selectedAttribut.getNodelete();
+        extmutable = selectedAttribut.getExt_mutable();
         newAttributButtonDisabled = true;
         editAttributButtonDisabled = nodelete;
     }
@@ -246,6 +262,7 @@ public class ClassList implements Serializable {
             newattribut.setMandatory(false);
             newattribut.setDescription("Identifikation");
             newattribut.setNodelete(true);
+            newattribut.setExt_mutable(true);
             
             cfattributService.create(newattribut);
             selectedAttributList = attributlist.init(selectedClass);
@@ -315,6 +332,7 @@ public class ClassList implements Serializable {
             newattribut.setMandatory(mandatory);
             newattribut.setDescription(description);
             newattribut.setNodelete(false);
+            newattribut.setExt_mutable(extmutable);
             
             cfattributService.create(newattribut);
             selectedAttributList = attributlist.init(selectedClass);
@@ -324,6 +342,27 @@ public class ClassList implements Serializable {
             List<CfClasscontent> modifyList = cfclascontentService.findByClassref(newattribut.getClassref());
             for (CfClasscontent classcontent : modifyList) {
                 CfAttributcontent newattributcontent = new CfAttributcontent();
+                if (!newattribut.getDefault_val().isBlank()) {
+                    switch (newattribut.getAttributetype().getName()) {
+                        case "boolean":
+                            newattributcontent.setContentBoolean(ClownfishUtil.getBoolean(newattribut.getDefault_val(), false));
+                            break;
+                        case "string":
+                            newattributcontent.setContentString(newattribut.getDefault_val());
+                            break;
+                        case "integer":
+                            newattributcontent.setContentInteger(BigInteger.valueOf(Long.parseLong(newattribut.getDefault_val())));
+                            break;
+                        case "real":
+                            newattributcontent.setContentReal(Double.parseDouble(newattribut.getDefault_val()));
+                            break;
+                        case "text":
+                        case "htmltext":
+                        case "markdown":
+                            newattributcontent.setContentText(newattribut.getDefault_val());
+                            break;
+                    }
+                }
                 newattributcontent.setAttributref(newattribut);
                 newattributcontent.setClasscontentref(classcontent);
                 cfattributcontentService.create(newattributcontent);
@@ -355,6 +394,7 @@ public class ClassList implements Serializable {
             selectedAttribut.setMin_val(minval);
             selectedAttribut.setMax_val(maxval);
             selectedAttribut.setMandatory(mandatory);
+            selectedAttribut.setExt_mutable(extmutable);
             selectedAttribut.setDescription(description);
             cfattributService.edit(selectedAttribut);
             //HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
@@ -404,7 +444,16 @@ public class ClassList implements Serializable {
     public void onGenerateODataForm(ActionEvent actionEvent) {
         if (selectedClass != null) {
             classutil.generateODataForm(selectedClass, odataWizardList);
-            FacesMessage message = new FacesMessage("HTML Form template generated");
+            FacesMessage message = new FacesMessage("OData Form template generated");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+
+    public void onGenerateLogin(ActionEvent actionEvent) {
+        if (selectedClass != null) {
+            //classutil.generateLogin(selectedClass);
+            classutil.generateLogin(selectedClass, idField, passwordField, authField);
+            FacesMessage message = new FacesMessage("Login Form template generated");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
     }
