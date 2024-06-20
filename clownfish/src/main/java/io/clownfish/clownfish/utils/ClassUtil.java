@@ -2958,7 +2958,7 @@ public class ClassUtil implements Serializable {
         sitetree.loadTree();
     }
 
-    public void generateLogin(CfClass clazz, String idField, String passwordField, String authField) {
+    public void generateLogin(CfClass clazz, String idField, String passwordField, String authField, String adminMail) {
         List<CfAttribut> attributList = cfattributService.findByClassref(clazz);
 
         StringBuilder html = new StringBuilder();
@@ -2972,18 +2972,13 @@ public class ClassUtil implements Serializable {
         html.append("\t\t<!-- CSS FILES -->").append("\n");
         html.append("\t\t<link rel=\"stylesheet\" href=\"/resources/css/bootstrap5.css\">").append("\n");
         html.append("\t\t<link rel=\"stylesheet\" href=\"/resources/css/uikit.css\">").append("\n");
-        html.append("\t\t<link rel=\"stylesheet\" href=\"/css/intranet.css\">").append("\n");
-        html.append("\t\t<link rel=\"stylesheet\" href=\"css/toaster_neu.css\">").append("\n");
-        html.append("\t\t<!-- Custom fonts for this template -->").append("\n");
-        html.append("\t\t<link href=\"/css/fonts.css\" rel=\"stylesheet\">").append("\n");
+        html.append("\t\t<link rel=\"stylesheet\" href=\"/resources/css/toaster.css\">").append("\n");
+
         html.append("\t\t<script src=\"/resources/js/angular.js\"></script>").append("\n");
-        html.append("\t\t<link rel=\"stylesheet\" href=\"/css/ui-bootstrap-csp.css\">").append("\n");
-        html.append("\t\t<script src=\"/js/angular-sanitize.js\"></script>").append("\n");
-        html.append("\t\t<script src=\"/js/ui-bootstrap.js\"></script>").append("\n");
-        html.append("\t\t<script src=\"/js/ui-bootstrap-tpls.js\"></script>").append("\n");
-        html.append("\t\t<link rel=\"icon\" href=\"/GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid=337&width=50\">").append("\n");
-        html.append("\t\t<link rel=\"icon\" href=\"/GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid=337&width=50\">").append("\n");
-        html.append("\t\t<script src=\"js/toaster.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/angular-sanitize.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/ui-bootstrap.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/ui-bootstrap-tpls.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/toaster.js\"></script>").append("\n");
 
 
         html.append("\t\t<style> .width-100 { width: 100%;} .upper-first {text-transform: capitalize;} .width-50 {width: 50%;} .flex-middle {display: flex;justify-content: center;} .password-forgot {font-size: 14px;text-decoration: underline;color: blue;cursor: pointer;} .password-info-text {font-size: 12px;color: #eb2828;margin: 0 !important;}</style>\n").append("\n");
@@ -3079,7 +3074,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t<div class=\"width-50\">").append("\n");
 
         for (CfAttribut cfa : attributList) {
-            if(!Objects.equals(cfa.getName(), authField) && !Objects.equals(cfa.getName(), passwordField) && !Objects.equals(cfa.getName(), "id")) {
+            if(!Objects.equals(cfa.getName(), authField) && !Objects.equals(cfa.getName(), passwordField) && !Objects.equals(cfa.getName(), "id") && cfa.getExt_mutable()) {
                 html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                 html.append("\t\t\t\t\t\t<label class=\"uk-form-label upper-first\" for=\"form-stacked-email\">").append(cfa.getName()).append("</label>\n");
                 html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
@@ -3116,14 +3111,8 @@ public class ClassUtil implements Serializable {
         html.append("\t\t</body>").append("\n");
 
         html.append("\t\t<!-- JS FILES -->").append("\n");
-        html.append("\t\t<script src=\"/js/intranetApp.js\"></script>").append("\n");
-        html.append("\t\t<script src=\"/resources/js/bootstrap5.js\"></script>").append("\n");
-        html.append("\t\t<script src=\"/resources/js/popper.min.js\"></script>").append("\n");
         html.append("\t\t<script src=\"/resources/js/uikit.min.js\"></script>").append("\n");
         html.append("\t\t<script src=\"/resources/js/uikit-icons.min.js\"></script>").append("\n");
-        html.append("\t\t<script src=\"/resources/js/jquery.min.js\"></script>").append("\n");
-        html.append("\t\t<script src=\"/js/datatable.js\"></script>").append("\n");
-        html.append("\t\t<script src=\"/js/datatable_uikit.js\"></script>").append("\n");
 
         // Javascript Login Logik
         html.append("\t\t<script>").append("\n");
@@ -3134,8 +3123,8 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\tconst passwordField = \"").append(passwordField).append("\";\n");
         html.append("\t\t\t\tconst idField = \"").append(idField).append("\";\n");
         html.append("\t\t\t\tconst authfield = \"").append(authField).append("\";\n");
-        html.append("\t\t\t\tconst adminMail = \"marcel.sluganovic@koenig-neurath.de\";").append("\n");
-        html.append("\t\t\t\tconst loginSite = \"").append(clazz.getName()).append("Login\";\n");
+        html.append("\t\t\t\tconst adminMail = \"").append(adminMail).append("\";").append("\n");
+        html.append("\t\t\t\tconst loginSite = \"").append("login_").append(clazz.getName().toLowerCase()).append("\";\n");
         html.append("\t\t\t\tconst passwordCheck = false;").append("\n\n");
 
         html.append("\t\t\t\t$scope.forgotPassword = false;").append("\n");
@@ -3205,7 +3194,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t}").append("\n\n");
         html.append("\t\t\t\t$scope.createUser = () => {").append("\n");
         for (CfAttribut cfa : attributList) {
-            if(!Objects.equals(cfa.getName(), authField) && !Objects.equals(cfa.getName(), passwordField)&& !Objects.equals(cfa.getName(), "id")) {
+            if(!Objects.equals(cfa.getName(), authField) && !Objects.equals(cfa.getName(), passwordField)&& !Objects.equals(cfa.getName(), "id") && cfa.getExt_mutable()) {
                 html.append("\t\t\t\t\t").append("var ").append(cfa.getName()).append("Text = document.getElementById(\"create").append(cfa.getName()).append("\").value;\n");
             }
         }
@@ -3217,8 +3206,13 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t\tid: null,").append("\n");
         html.append("\t\t\t\t\t\t").append(authField).append(": false,\n");
         for (CfAttribut cfa : attributList) {
-            if(!Objects.equals(cfa.getName(), authField) && !Objects.equals(cfa.getName(), "id")) {
+            if(!Objects.equals(cfa.getName(), authField) && !Objects.equals(cfa.getName(), "id") && cfa.getExt_mutable()) {
                 html.append("\t\t\t\t\t\t").append(cfa.getName()).append(": ").append(cfa.getName()).append("Text,\n");
+            }
+        }
+        for (CfAttribut cfa : attributList) {
+            if(!Objects.equals(cfa.getName(), authField) && !Objects.equals(cfa.getName(), "id") && !cfa.getExt_mutable()) {
+                html.append("\t\t\t\t\t\t").append(cfa.getName()).append(": ").append("null,\n");
             }
         }
         html.append("\t\t\t\t\t};").append("\n");

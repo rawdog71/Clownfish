@@ -106,6 +106,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter String idField;
     private @Getter @Setter String passwordField;
     private @Getter @Setter String authField;
+    private @Getter @Setter String adminEmailField;
 
     @Autowired transient private @Getter @Setter AttributList attributlist;
     final transient Logger LOGGER = LoggerFactory.getLogger(ClassList.class);
@@ -444,7 +445,7 @@ public class ClassList implements Serializable {
     public void onGenerateLogin(ActionEvent actionEvent) {
         if (selectedClass != null) {
             //classutil.generateLogin(selectedClass);
-            classutil.generateLogin(selectedClass, idField, passwordField, authField);
+            classutil.generateLogin(selectedClass, idField, passwordField, authField, adminEmailField);
             FacesMessage message = new FacesMessage("Login Form template generated");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }

@@ -2663,22 +2663,26 @@
             <p:dialog id="LoginWizardDlg" header="Login Wizard" widgetVar="LoginWizardDlg" minHeight="100" width="450" showEffect="fade" modal="true">
                 <div class="flex" style="flex-direction: column;">
                     <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                        <p>Admin Email Field</p>
+                        <p:inputText id="AdminMailField" value="#{classList.adminEmailField}" style="width: 50%"></p:inputText>
+                    </div>
+                    <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
                         <p>Login Field</p>
-                        <p:selectOneMenu id="LoginIdField" value="#{classList.idField}" class="flex align-items-center">
+                        <p:selectOneMenu id="LoginIdField" value="#{classList.idField}" class="flex align-items-center" style="width: 50%">
                             <f:selectItem itemLabel="Select One" itemValue=""/>
                             <f:selectItems value="#{classList.selectedAttributList}" var="attrrelid" itemLabel="#{attrrelid.name}" itemValue="#{attrrelid.name}" />
                         </p:selectOneMenu>
                     </div>
                     <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
                         <p>Password Field</p>
-                        <p:selectOneMenu id="LoginPasswordField" value="#{classList.passwordField}" class="flex align-items-center">
+                        <p:selectOneMenu id="LoginPasswordField" value="#{classList.passwordField}" class="flex align-items-center" style="width: 50%">
                             <f:selectItem itemLabel="Select One" itemValue=""/>
                             <f:selectItems value="#{classList.selectedAttributList}" var="attrrelpassword" itemLabel="#{attrrelpassword.name}" itemValue="#{attrrelpassword.name}" />
                         </p:selectOneMenu>
                     </div>
                     <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px; margin-bottom: 10px">
                         <p>Auth Field</p>
-                        <p:selectOneMenu id="LoginAuthField" value="#{classList.authField}" class="flex align-items-center">
+                        <p:selectOneMenu id="LoginAuthField" value="#{classList.authField}" class="flex align-items-center" style="width: 50%">
                             <f:selectItem itemLabel="Select One" itemValue=""/>
                             <f:selectItems value="#{classList.selectedAttributList}" var="attrrelauth" itemLabel="#{attrrelauth.name}" itemValue="#{attrrelauth.name}" />
                         </p:selectOneMenu>
