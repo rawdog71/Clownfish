@@ -1755,13 +1755,13 @@ public class Clownfish {
                 }   else {
                     cfresponse.setErrorcode(4);
                     cfresponse.setOutput("Offline");
-                    cfresponse.setRelocation(cfsite.getLoginsite());
+                    cfresponse.setRelocation(cfsite.getLoginsiteref().getName());
                     return cfresponse;
                 }
             } else {
                 cfresponse.setErrorcode(3);
                 cfresponse.setOutput("No access");
-                cfresponse.setRelocation(cfsite.getLoginsite());
+                cfresponse.setRelocation(cfsite.getLoginsiteref().getName());
                 return cfresponse;
             } 
         } catch (IOException | org.apache.velocity.runtime.parser.ParseException ex) {

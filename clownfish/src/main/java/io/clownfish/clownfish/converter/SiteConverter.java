@@ -43,8 +43,13 @@ public class SiteConverter implements Converter, Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            Object o = cfsiteservice.findById(new Long(value));
-            return o;
+            try {
+                Object o = cfsiteservice.findById(new Long(value));
+                return o;
+            } catch (NumberFormatException ex) {
+                Object o = cfsiteservice.findByName(value);
+                return o;
+            }
         }
     }
 
@@ -53,7 +58,7 @@ public class SiteConverter implements Converter, Serializable {
         if (null == value) {
             return "-1";
         } else {
-            String returnname = ((CfSite) value).getId().toString();
+            String returnname = ((CfSite) value).getName();
             return  returnname;
         }
     }

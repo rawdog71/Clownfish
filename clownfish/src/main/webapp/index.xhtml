@@ -413,7 +413,7 @@
                                                 <p:row>
                                                     <p:column class="content-justify">
                                                         <p:outputLabel for="accessmanager_droplist" value="Login Classes:" />
-                                                        <p:selectCheckboxMenu class="content-items-width" id="accessmanager_droplist" value="#{sitetree.selectedAccessmanagerlist}" required="false" label="Contentlist" converter="#{classcontentConverterBean}" filter="true" filterMatchMode="startsWith" rendered="${!sitetree.contenteditable}">
+                                                        <p:selectCheckboxMenu class="content-items-width" id="accessmanager_droplist" value="#{sitetree.selectedAccessmanagerlist}" required="false" label="Contentlist" converter="#{classcontentConverterBean}" filter="true" filterMatchMode="startsWith">
                                                             <f:selectItems value="#{sitetree.accessmanagerlist}" var="accessmanager_content" itemLabel="#{accessmanager_content.name}" itemValue="#{accessmanager_content}" />
                                                         </p:selectCheckboxMenu>
                                                     </p:column>
