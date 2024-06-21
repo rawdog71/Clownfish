@@ -323,11 +323,14 @@ public class EntityUtil {
                     // get key names
                     List<String> id_names = identities.stream().map(CfAttribut::getName).collect(Collectors.toList());
                     // filter property values by key names
-                    List<Object> prop_vals = requestEntity.getProperties().stream().filter(prop -> !prop.getName().equals("id") && id_names.contains(prop.getName())).map(Property::getValue).collect(Collectors.toList());
+                    List<Object> prop_vals = requestEntity.getProperties().stream()
+                            .filter(prop -> !prop.getName().equals("id") && id_names.contains(prop.getName()))
+                            .map(Property::getValue).collect(Collectors.toList());
                     StringBuilder sb = new StringBuilder();
                     sb.append(newmax).append("_");
                     for (var id : prop_vals) {
-                        sb.append(id).append("_");
+                        String val = ((String)id).replaceAll("[^a-zA-Z0-9]", "_");
+                        sb.append(val).append("_");
                     }
                     newclasscontent.setName(clazz.getName().toUpperCase() + "_" + sb.deleteCharAt(sb.lastIndexOf("_")));
                     newclasscontent.setCheckedoutby(BigInteger.valueOf(0));
