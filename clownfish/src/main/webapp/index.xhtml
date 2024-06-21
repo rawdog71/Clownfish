@@ -5,7 +5,7 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui"
       xmlns:pe="http://primefaces.org/ui/extensions"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+>
     <h:head>
         <title>Clownfish CMS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -299,10 +299,10 @@
                                             </p:row>
                                             <p:row>
                                                 <p:column>
-                                                    <div class="content-justify">
-                                                        <p:outputLabel for="loginsite" value="Login URL" />
-                                                        <p:inputText id="loginsite" value="#{sitetree.loginsite}" maxlength="255" />
-                                                    </div>
+                                                    <p:outputLabel value="Login URL: " for="@next"/>
+                                                    <p:autoComplete id="selectloginurl" dropdown="true" value="#{sitetree.loginsite}" completeMethod="#{sitetree.completeTextLoginSites}" converter="#{siteConverterBean}" scrollHeight="250">
+                                                        <p:ajax listener="#{sitetree.onChangeLoginSite()}" />
+                                                    </p:autoComplete>
                                                 </p:column>
                                             </p:row>
                                             <p:row>
@@ -343,6 +343,22 @@
                                                     <div class="content-justify">
                                                         <p:outputLabel for="selectsitestatic" value="Static site:" />
                                                         <p:selectBooleanCheckbox id="selectsitestatic" value="#{sitetree.sitestatic}"/>
+                                                    </div>
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>
+                                                    <div class="content-justify">
+                                                        <p:outputLabel for="selectloginsite" value="Login site:" />
+                                                        <p:selectBooleanCheckbox id="selectloginsite" value="#{sitetree.isloginsite}"/>
+                                                    </div>
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>
+                                                <p:column>
+                                                    <div class="content-justify">
+                                                        <p:outputLabel for="offlineSite" value="Offline:" />
+                                                        <p:selectBooleanCheckbox id="offlineSite" value="#{sitetree.offline}"/>
                                                     </div>
                                                 </p:column>
                                             </p:row>
@@ -389,6 +405,21 @@
                                                 </p:commandButton>
                                             </p:column>
                                         </p:panelGrid>
+                                    </p:tab>
+
+                                    <p:tab title="Access Manager" id="accessmanager" class="accessmanager_tester">
+                                        <div style="width: 300px">
+                                            <p:panelGrid id="sitepanel_accessmanager" style="width: 100%">
+                                                <p:row>
+                                                    <p:column class="content-justify">
+                                                        <p:outputLabel for="accessmanager_droplist" value="Login Classes:" />
+                                                        <p:selectCheckboxMenu class="content-items-width" id="accessmanager_droplist" value="#{sitetree.selectedAccessmanagerlist}" required="false" label="Contentlist" converter="#{classcontentConverterBean}" filter="true" filterMatchMode="startsWith" rendered="${!sitetree.contenteditable}">
+                                                            <f:selectItems value="#{sitetree.accessmanagerlist}" var="accessmanager_content" itemLabel="#{accessmanager_content.name}" itemValue="#{accessmanager_content}" />
+                                                        </p:selectCheckboxMenu>
+                                                    </p:column>
+                                                </p:row>
+                                            </p:panelGrid>
+                                        </div>
                                     </p:tab>
                                     
                                     <p:tab title="Static Sites" id="site_static" rendered="#{sitetree.selectedSite.staticsite}">
@@ -1092,7 +1123,7 @@
                     
                     <div class="flex flex-row pb-2">
                         <p:dataTable id="classlist" size="small" scrollable="true" scrollHeight="250" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}" sortMode="single">
-                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate :form:tabview:classencrypted :form:wizardattributlist :form:LoginWizardDlg" />
+                            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate :form:tabview:classencrypted :form:tabview:isloginclass :form:wizardattributlist :form:LoginWizardDlg" />
                             <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains" sortBy="#{clazz.name}">
                                 <h:outputText value="#{clazz.name}" />
                             </p:column>
@@ -1121,6 +1152,11 @@
                         <div class="flex align-items-center pr-2">
                             <p:outputLabel for="classencrypted" style="margin-right: 0.5rem">Encrypted: </p:outputLabel>
                             <p:selectBooleanCheckbox id="classencrypted" value="#{classList.classEncrypted}" />
+                        </div>
+
+                        <div class="flex align-items-center pr-2">
+                            <p:outputLabel for="isloginclass" style="margin-right: 0.5rem">Login Class: </p:outputLabel>
+                            <p:selectBooleanCheckbox id="isloginclass" value="#{classList.loginClass}" />
                         </div>
                         
                         <div class="flex align-items-center pr-2">

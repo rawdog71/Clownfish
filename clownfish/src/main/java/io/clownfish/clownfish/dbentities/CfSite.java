@@ -15,24 +15,13 @@
  */
 package io.clownfish.clownfish.dbentities;
 
-import java.io.Serializable;
-import java.math.BigInteger;
-import javax.persistence.Basic;
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import javax.persistence.CascadeType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+import java.math.BigInteger;
 
 /**
  *
@@ -59,7 +48,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfSite.findBySitemap", query = "SELECT c FROM CfSite c WHERE c.sitemap = :sitemap"),
     @NamedQuery(name = "CfSite.findBySearchresult", query = "SELECT c FROM CfSite c WHERE c.searchresult = :searchresult"),
     @NamedQuery(name = "CfSite.findByShorturl", query = "SELECT c FROM CfSite c WHERE c.shorturl = :shorturl"),
-    @NamedQuery(name = "CfSite.findByInvisible", query = "SELECT c FROM CfSite c WHERE c.invisible = :invisible")
+    @NamedQuery(name = "CfSite.findByInvisible", query = "SELECT c FROM CfSite c WHERE c.invisible = :invisible"),
+    @NamedQuery(name = "CfSite.findByIsLoginSite", query = "SELECT c FROM CfSite c WHERE c.isloginsite = :isloginsite")
 })
 public class CfSite implements Serializable {
     
@@ -135,6 +125,11 @@ public class CfSite implements Serializable {
     private boolean invisible;
     @Column(name = "offline")
     private boolean offline;
+    @Column(name = "isloginsite")
+    private boolean isloginsite;
+    @JoinColumn(name = "loginsiteref", referencedColumnName = "id")
+    @ManyToOne(optional = true)
+    private CfSite loginsiteref;
     
     public CfSite() {
     }
@@ -361,11 +356,26 @@ public class CfSite implements Serializable {
         this.loginsite = loginsite;
     }
 
+    public CfSite getLoginsiteref() {
+        return loginsiteref;
+    }
+
+    public void setLoginsiteref(CfSite loginsiteref) {
+        this.loginsiteref = loginsiteref;
+    }
+
     public boolean getInvisible() {
         return invisible;
     }
     public void setInvisible(boolean invis) {
         invisible = invis;
+    }
+
+    public boolean getIsLoginSite() {
+        return isloginsite;
+    }
+    public void setIsLoginSite(boolean login) {
+        isloginsite = login;
     }
 
     public boolean isOffline() {

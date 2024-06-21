@@ -15,21 +15,12 @@
  */
 package io.clownfish.clownfish.dbentities;
 
-import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
  *
@@ -73,6 +64,8 @@ public class CfClass implements Serializable {
     @NotNull
     @Column(name = "encrypted")
     private boolean encrypted;
+    @Column(name = "loginclass")
+    private boolean loginclass;
 
     public CfClass() {
     }
@@ -135,7 +128,15 @@ public class CfClass implements Serializable {
     public void setEncrypted(boolean encrypted) {
         this.encrypted = encrypted;
     }
-    
+
+    public boolean isLoginclass() {
+        return loginclass;
+    }
+
+    public void setLoginclass(boolean loginclass) {
+        this.loginclass = loginclass;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
