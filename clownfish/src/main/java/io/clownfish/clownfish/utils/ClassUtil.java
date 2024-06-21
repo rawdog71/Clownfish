@@ -2615,7 +2615,7 @@ public class ClassUtil implements Serializable {
 	javascript.append("\t};").append("\n");
         javascript.append("\n");
         javascript.append("\t$scope.update").append(clazz.getName()).append(" = function (id) {").append("\n");
-        javascript.append("\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t$scope.inprogress = true;").append("\n");
         javascript.append("\t\tvar ").append(clazz.getName()).append(" = new Object();").append("\n");
         javascript.append("\n");
         javascript.append("\t\t").append(clazz.getName()).append(".id = id;").append("\n");
