@@ -1486,7 +1486,7 @@ public class ClassUtil implements Serializable {
 	html.append("\t\t\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
 	html.append("\t\t\t\t<p>{{").append(clazz.getName()).append(".id}}</p>").append("\n");
 	html.append("\t\t\t\t<div class=\"uk-align-right\">").append("\n");
-	html.append("\t\t\t\t\t<button class=\"uk-button uk-button-danger\" type=\"button\" ng-click=\"delete").append(clazz.getName()).append("(").append(clazz.getName()).append(".id)\" ng-disabled=\"inprogress\">Löschen <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+	html.append("\t\t\t\t\t<button class=\"uk-button uk-button-danger\" type=\"button\" ng-click=\"delete").append(clazz.getName()).append("(").append(clazz.getName()).append(")\" ng-disabled=\"inprogress\">Löschen <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
 	html.append("\t\t\t\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
 	html.append("\t\t\t\t</div>").append("\n");
 	html.append("\t\t\t</div>").append("\n");
@@ -2695,7 +2695,7 @@ public class ClassUtil implements Serializable {
         }
         
         javascript.append("\t\tvar jsonString = JSON.stringify(").append(clazz.getName()).append(");").append("\n");
-        javascript.append("\t\t$http.patch('/OData/").append(clazz.getName()).append("(' + ").append(clazz.getName()).append(".id + ')', jsonString).then(function (res) {").append("\n");
+        javascript.append("\t\t$http.patch(\"/OData/").append(clazz.getName()).append(buildIdentifier(attributList, clazz.getName())).append("\", jsonString).then(function (res) {").append("\n");
         javascript.append("\t\t\tif (res.status === 200) {").append("\n");
         javascript.append("\t\t\t\t$scope.get").append(clazz.getName()).append("list();").append("\n");
         javascript.append("\t\t\t\t$scope.inprogress = false;").append("\n");
@@ -2715,9 +2715,9 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t});").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("\n");
-        javascript.append("\t$scope.delete").append(clazz.getName()).append(" = function (id) {").append("\n");
+        javascript.append("\t$scope.delete").append(clazz.getName()).append(" = function (").append(clazz.getName()).append(") {").append("\n");
         javascript.append("\t\t$scope.inprogress = true;").append("\n");
-        javascript.append("\t\t$http.delete('/OData/").append(clazz.getName()).append("(' + id + ')').then(function (res) {").append("\n");
+        javascript.append("\t\t$http.delete(\"/OData/").append(clazz.getName()).append(buildIdentifier(attributList, clazz.getName())).append("\").then(function (res) {").append("\n");
         javascript.append("\t\tif (res.status === 200) {").append("\n");
         javascript.append("\t\t\t$scope.get").append(clazz.getName()).append("list();").append("\n");
         javascript.append("\t\t\t$scope.get").append(clazz.getName()).append("listArray();").append("\n");
@@ -3496,5 +3496,35 @@ public class ClassUtil implements Serializable {
             }
         }
         return null;
+    }
+    
+    private String buildIdentifier(List<CfAttribut> attributlist, String classname) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(");
+        for (CfAttribut at : attributlist) {
+            if (at.getIdentity()) {
+                switch (at.getAttributetypeString()) {
+                    case "integer":
+                        sb.append(at.getName());
+                        sb.append("=\" + ");
+                        sb.append(classname);
+                        sb.append(".");
+                        sb.append(at.getName());
+                        sb.append(" + \",");
+                        break;
+                    case "string":
+                        sb.append(at.getName());
+                        sb.append("='\" + ");
+                        sb.append(classname);
+                        sb.append(".");
+                        sb.append(at.getName());
+                        sb.append(" + \"',");
+                        break;
+                }
+            }
+        }
+        sb.deleteCharAt(sb.lastIndexOf(","));
+        sb.append(")");
+        return sb.toString();
     }
 }
