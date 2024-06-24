@@ -118,9 +118,8 @@ public class MavenList implements Serializable {
             maven.setMavenId(selectedMavenDoc.getId());
             maven.setMavenFilename(selectedMavenDoc.getA() + "-" + selectedMavenDoc.getLatestVersion() + "." + selectedMavenDoc.getP());
             
-            try {
-                CfMaven dummy = cfmavenService.findByMavenId(selectedMavenDoc.getId());
-            } catch (NoResultException ex) {           
+            CfMaven dummy = cfmavenService.findByMavenId(selectedMavenDoc.getId());
+            if (null == dummy) {
                 String filepath = maven.getMavenGroup().replaceAll("\\.", "/") + "/" + maven.getMavenArtifact() + "/" + maven.getMavenLatestversion();
                 downloadMaven(filepath, maven.getMavenFilename());
                 classpathUtil.addPath(mavenpath);
