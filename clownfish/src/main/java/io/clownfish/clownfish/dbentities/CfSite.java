@@ -356,6 +356,10 @@ public class CfSite implements Serializable {
         this.loginsite = loginsite;
     }
 
+    public boolean hasLoginsiteref() {
+        return (null != loginsiteref);
+    }
+    
     public CfSite getLoginsiteref() {
         return loginsiteref;
     }

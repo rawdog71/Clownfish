@@ -93,7 +93,7 @@
                                 <p:scrollPanel style="height: 400px; border: none;" mode="native">
                                     <p:tree id="sitetree" value="#{sitetree.root}" var="node" dynamic="true" selectionMode="single" draggable="true" droppable="true" dragdropScope="clownfish" rendered="#{loginBean.cfuser.superadmin}">
                                         <p:ajax event="dragdrop" listener="#{sitetree.onDragDrop}" update=":form:msgs :form:tabview:sitetreepanel" />
-                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup :form:tabview:siteparameterlist :form:tabview:tabsiteview" />
+                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup :form:tabview:siteparameterlist :form:tabview:tabsiteview :form:tabview:tabsiteview:accessmanager" />
                                         <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup :form:tabview:tabsiteview" />
                                         <p:treeNode icon="pi #{node.icon}">
                                             <h:outputText value="#{node.name}" />
@@ -101,7 +101,7 @@
                                     </p:tree>
                                     <p:tree id="invissitetree" value="#{sitetree.invisibleRoot}" var="node" dynamic="true" selectionMode="single" draggable="true" droppable="true" dragdropScope="clownfish" rendered="#{!loginBean.cfuser.superadmin}">
                                         <p:ajax event="dragdrop" listener="#{sitetree.onDragDrop}" update=":form:msgs :form:tabview:sitetreepanel" />
-                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup :form:tabview:siteparameterlist :form:tabview:tabsiteview:staticsitelist :form:tabview:tabsiteview :form:tabview:tabsiteview" />
+                                        <p:ajax event="select" listener="#{sitetree.onSelect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup :form:tabview:siteparameterlist :form:tabview:tabsiteview:staticsitelist :form:tabview:tabsiteview :form:tabview:tabsiteview :form:tabview:tabsiteview:accessmanager" />
                                         <p:ajax event="unselect" listener="#{sitetree.onUnselect}" update=":form:msgs :form:tabview:tabsiteview:sitepanel_main :form:tabview:tabsiteview:sitepanel_content :form:tabview:tabsiteview:sitepanel_seo :form:tabview:tabsiteview:sitepanel_misc :form:tabview:preview :form:tabview:tabsiteview:sitelist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:newsite :form:tabview:tabsiteview:saprfclist :form:tabview:layoutcontentedit :form:tabview:layoutcontentclassedit :form:tabview:layoutcontentclassselection :form:tabview:sitebuttongroup :form:tabview:tabsiteview:staticsitelist :form:tabview:tabsiteview" />
                                         <p:treeNode icon="pi #{node.icon}">
                                             <h:outputText value="#{node.name}" />
@@ -407,7 +407,7 @@
                                         </p:panelGrid>
                                     </p:tab>
 
-                                    <p:tab title="Access Manager" id="accessmanager" class="accessmanager_tester">
+                                    <p:tab title="Access Manager" id="accessmanager" class="accessmanager_tester" rendered="#{sitetree.selectedSite.hasLoginsiteref()}">
                                         <div style="width: 300px">
                                             <p:panelGrid id="sitepanel_accessmanager" style="width: 100%">
                                                 <p:row>
@@ -492,7 +492,7 @@
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                     </p:commandButton>
 
-                                                    <p:commandButton id="changeSiteButton" icon="pi pi-pencil" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs :form:tabview:sitetree :form:tabview:invissitetree :form:tabview:jobsiteref :form:tabview:preview :form:tabview:tabsiteview :form:tabview:tabsiteview">
+                                                    <p:commandButton id="changeSiteButton" icon="pi pi-pencil" value="Edit" actionListener="#{sitetree.onChange}" update=":form:msgs :form:tabview:sitetree :form:tabview:invissitetree :form:tabview:jobsiteref :form:tabview:preview :form:tabview:tabsiteview :form:tabview:tabsiteview :form:tabview:tabsiteview:accessmanager">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
                                                     </p:commandButton>
                                                     <p:commandButton id="copySiteButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{sitetree.onCopy}" update=":form:msgs :form:tabview:sitetree :form:tabview:jobsiteref :form:tabview:preview">
@@ -500,6 +500,7 @@
                                                     </p:commandButton>
                                                     <p:commandButton id="deleteSiteButton" icon="pi pi-trash" value="Delete" actionListener="#{sitetree.onDelete}" update=":form:msgs :form:tabview:sitetree :form:tabview:invissitetree :form:tabview:jobsiteref">
                                                         <f:actionListener binding="#{quartzlist.refresh()}" />
+                                                        <f:actionListener binding="#{sitetree.initClassContentlist()}" />
                                                         <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                                                     </p:commandButton>
                                                     <p:commandButton id="publishSiteButton" icon="pi pi-save" value="Publish" actionListener="#{sitetree.onPublish}" update=":form:msgs" rendered="${sitetree.contenteditable}">

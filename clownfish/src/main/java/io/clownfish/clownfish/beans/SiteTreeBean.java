@@ -322,6 +322,7 @@ public class SiteTreeBean implements Serializable {
 
     public void initClassContentlist() {
         classcontentlist = cfclasscontentService.findByMaintenance(true);
+        accessmanagerlist = findAccessmgrs();
     }
 
     public void initAccessmanagerlist() {

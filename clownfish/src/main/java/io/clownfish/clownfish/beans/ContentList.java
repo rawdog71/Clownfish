@@ -504,7 +504,6 @@ public class ContentList implements Serializable {
             } catch (javax.persistence.NoResultException ex) {
                 LOGGER.warn(ex.getMessage());
             }
-            //cacheManager.getCache("classcontent").clear();                      // Hazelcast Cache clearing
             classcontentlist = cfclasscontentService.findByMaintenance(true);
             FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been scrapped.");
             FacesContext.getCurrentInstance().addMessage(null, message);
