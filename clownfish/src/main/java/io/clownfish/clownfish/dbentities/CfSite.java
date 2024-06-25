@@ -396,15 +396,23 @@ public class CfSite implements Serializable {
                 if (0 == templateref.getScriptLanguageTxt().compareToIgnoreCase("jrxml")) {
                     return "pi-file-pdf";
                 } else {
-                    switch (templateref.getType()) {
-                        case 0:
-                            return "pi-file";
-                        case 1:
-                            return "pi-table";
-                        case 2:
-                            return "pi-id-card";
-                        default:
-                            return "pi-file";
+                    if (isloginsite) {
+                        return "pi-lock-open";
+                    } else {
+                        if (null != getLoginsiteref()) {
+                            return "pi-lock";
+                        } else {
+                            switch (templateref.getType()) {
+                                case 0:
+                                    return "pi-file";
+                                case 1:
+                                    return "pi-table";
+                                case 2:
+                                    return "pi-id-card";
+                                default:
+                                    return "pi-file";
+                            }
+                        }
                     }
                 }
             }
