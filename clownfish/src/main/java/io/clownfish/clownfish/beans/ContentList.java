@@ -15,59 +15,11 @@
  */
 package io.clownfish.clownfish.beans;
 
-import io.clownfish.clownfish.dbentities.CfAsset;
-import io.clownfish.clownfish.dbentities.CfAssetlist;
-import io.clownfish.clownfish.dbentities.CfAttribut;
-import io.clownfish.clownfish.dbentities.CfAttributcontent;
-import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.dbentities.CfClasscontent;
-import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
-import io.clownfish.clownfish.dbentities.CfContentversion;
-import io.clownfish.clownfish.dbentities.CfContentversionPK;
-import io.clownfish.clownfish.dbentities.CfKeyword;
-import io.clownfish.clownfish.dbentities.CfList;
-import io.clownfish.clownfish.dbentities.CfListcontent;
-import io.clownfish.clownfish.dbentities.CfSitecontent;
+import io.clownfish.clownfish.dbentities.*;
 import io.clownfish.clownfish.lucene.ContentIndexer;
-import io.clownfish.clownfish.serviceinterface.CfAssetService;
-import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
-import io.clownfish.clownfish.serviceinterface.CfAttributService;
-import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
-import io.clownfish.clownfish.serviceinterface.CfClassService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
-import io.clownfish.clownfish.serviceinterface.CfContentversionService;
-import io.clownfish.clownfish.serviceinterface.CfKeywordService;
-import io.clownfish.clownfish.serviceinterface.CfListService;
-import io.clownfish.clownfish.serviceinterface.CfListcontentService;
-import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
-import io.clownfish.clownfish.utils.CheckoutUtil;
-import io.clownfish.clownfish.utils.ClassUtil;
-import io.clownfish.clownfish.utils.ClownfishUtil;
-import io.clownfish.clownfish.utils.CompressionUtils;
-import io.clownfish.clownfish.utils.ContentUtil;
-import io.clownfish.clownfish.utils.EncryptUtil;
-import io.clownfish.clownfish.utils.FolderUtil;
-import io.clownfish.clownfish.utils.HibernateUtil;
-import io.clownfish.clownfish.utils.PasswordUtil;
-import io.clownfish.clownfish.utils.PropertyUtil;
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
-import javax.faces.event.ValueChangeEvent;
-import javax.inject.Named;
+import io.clownfish.clownfish.serviceinterface.*;
+import io.clownfish.clownfish.utils.*;
 import jakarta.validation.ConstraintViolationException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SelectEvent;
@@ -83,6 +35,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import javax.faces.event.ValueChangeEvent;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -105,6 +74,7 @@ public class ContentList implements Serializable {
     @Autowired transient CfSitecontentService cfsitecontentService;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired CfKeywordService cfkeywordService;
+    @Autowired CfAccessmanagerService cfAccessmanagerService;
     @Autowired ContentIndexer contentIndexer;
     @Autowired FolderUtil folderUtil;
     @Autowired HibernateUtil hibernateUtil;
@@ -521,6 +491,12 @@ public class ContentList implements Serializable {
             List<CfSitecontent> sitecontent = cfsitecontentService.findByClasscontentref(selectedContent.getId());
             for (CfSitecontent sc : sitecontent) {
                 cfsitecontentService.delete(sc);
+            }
+
+            // Delete from AccessManager
+            List<CfAccessmanager> mgrs = cfAccessmanagerService.findByRefclasscontent(BigInteger.valueOf(selectedContent.getId()));
+            for (CfAccessmanager mgr : mgrs) {
+                cfAccessmanagerService.delete(mgr);
             }
             
             try {
