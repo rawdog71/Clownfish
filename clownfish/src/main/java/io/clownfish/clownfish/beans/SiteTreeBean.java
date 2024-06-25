@@ -664,6 +664,12 @@ public class SiteTreeBean implements Serializable {
             loginUrlList = cfsiteService.findAll().stream()
                     .filter(CfSite::getIsLoginSite).collect(Collectors.toList());
 
+            // Delete from AccessManager
+            List<CfAccessmanager> mgrs = cfAccessmanagerService.findByTypeAndRef(ClownfishConst.AccessTypes.TYPE_SITE.getValue(), BigInteger.valueOf(selectedSite.getId()));
+            for (CfAccessmanager mgr : mgrs) {
+                cfAccessmanagerService.delete(mgr);
+            }
+
             FacesMessage message = new FacesMessage("Deleted " + selectedSite.getName());
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
