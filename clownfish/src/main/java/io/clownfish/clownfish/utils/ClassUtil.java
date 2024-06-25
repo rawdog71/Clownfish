@@ -3226,11 +3226,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t\t$http.post(\"OData/\" +className , data).then(res => {").append("\n");
         html.append("\t\t\t\t\t\tif(res.status == 201) {").append("\n");
         html.append("\t\t\t\t\t\t\ttoastr.success('Benutzer erfolgreich erstellt. Wird vom Admin bearbeitet', 'Erfolgreich');").append("\n");
-<<<<<<< Updated upstream
         html.append("\t\t\t\t\t\t\t$http.get(\"cf_sendemail?cf_job=true&to=\"+adminMail+\"&subject=Bestätigung für einen neuen Benutzer&body=Der Benutzer: \" + ").append(idField).append("Text + \" muss für die Seite: ${metainfo.referrer} bestätigt werden.\");\n");
-=======
-        html.append("\t\t\t\t\t\t\t$http.get(\"sendEmail?cf_job=true&to=\"+adminMail+\"&subject=Bestätigung für einen neuen Benutzer&body=Der Benutzer: \" + ").append(idField).append("Text + \" muss für die Seite: ${metainfo.referrer} bestätigt werden.\");\n");
->>>>>>> Stashed changes
         html.append("\t\t\t\t\t\t\topenLogin()").append("\n");
         html.append("\t\t\t\t\t\t} else if(res.status == 406) {").append("\n");
         html.append("\t\t\t\t\t\t\ttoastr.error('Der Account existiert schon. Bitte bei der IT melden.', 'Fehler');").append("\n");
