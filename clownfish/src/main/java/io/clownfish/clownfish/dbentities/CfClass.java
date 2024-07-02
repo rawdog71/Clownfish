@@ -136,6 +136,14 @@ public class CfClass implements Serializable {
     public void setLoginclass(boolean loginclass) {
         this.loginclass = loginclass;
     }
+    
+    public String getIcon() {
+        if (isLoginclass()) {
+            return "pi-user";
+        } else {
+            return "pi-stop";
+        }
+    }
 
     @Override
     public int hashCode() {

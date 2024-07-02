@@ -45,7 +45,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import javax.faces.event.ActionEvent;
-import javax.persistence.NoResultException;
 import org.apache.commons.io.FileUtils;
 
 /**

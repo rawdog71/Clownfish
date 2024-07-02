@@ -15,8 +15,8 @@
  */
 package io.clownfish.clownfish.dbrepository;
 
-import io.clownfish.clownfish.daointerface.CfMavenDAO;
-import io.clownfish.clownfish.dbentities.CfMaven;
+import io.clownfish.clownfish.daointerface.CfNpmDAO;
+import io.clownfish.clownfish.dbentities.CfNpm;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.hibernate.Session;
@@ -29,22 +29,22 @@ import org.springframework.stereotype.Repository;
  * @author sulzbachr
  */
 @Repository
-public class CfMavenDAOImpl implements CfMavenDAO {
+public class CfNpmDAOImpl implements CfNpmDAO {
 
     private final SessionFactory sessionFactory;
     
     @Autowired 
-    public CfMavenDAOImpl(SessionFactory sessionFactory) {
+    public CfNpmDAOImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
     
     @Override
-    public CfMaven findById(Long id) {
+    public CfNpm findById(Long id) {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfMaven.findById");  
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfNpm.findById");  
         query.setParameter("id", id);
         try {
-            CfMaven cfmaven = (CfMaven) query.getSingleResult();
+            CfNpm cfmaven = (CfNpm) query.getSingleResult();
             return cfmaven;
         } catch (Exception ex) {
             return null;
@@ -52,41 +52,55 @@ public class CfMavenDAOImpl implements CfMavenDAO {
     }
 
     @Override
-    public CfMaven create(CfMaven entity) {
+    public CfNpm create(CfNpm entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.persist(entity);
         return entity;
     }
 
     @Override
-    public boolean delete(CfMaven entity) {
+    public boolean delete(CfNpm entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.delete(entity);
         return true;
     }
 
     @Override
-    public CfMaven edit(CfMaven entity) {
+    public CfNpm edit(CfNpm entity) {
         Session session = this.sessionFactory.getCurrentSession();
         session.merge(entity);
         return entity;
     }
 
     @Override
-    public List<CfMaven> findAll() {
+    public List<CfNpm> findAll() {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfMaven.findAll");
-        List<CfMaven> cfmavenlist = query.getResultList();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfNpm.findAll");
+        List<CfNpm> cfmavenlist = query.getResultList();
         return cfmavenlist;
     }
 
     @Override
-    public CfMaven findByMavenId(String name) {
+    public CfNpm findByNpmId(String name) {
         Session session = this.sessionFactory.getCurrentSession();
-        TypedQuery query = (TypedQuery) session.getNamedQuery("CfMaven.findByMavenId");  
-        query.setParameter("mavenId", name);
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfNpm.findByNpmId");  
+        query.setParameter("npmId", name);
         try {
-            CfMaven cfmaven = (CfMaven) query.getSingleResult();
+            CfNpm cfmaven = (CfNpm) query.getSingleResult();
+            return cfmaven;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public CfNpm findByNpmIdAndNpmLatestversion(String name, String version) {
+        Session session = this.sessionFactory.getCurrentSession();
+        TypedQuery query = (TypedQuery) session.getNamedQuery("CfNpm.findByNpmIdAndNpmLatestversion");  
+        query.setParameter("npmId", name);
+        query.setParameter("npmLatestversion", version);
+        try {
+            CfNpm cfmaven = (CfNpm) query.getSingleResult();
             return cfmaven;
         } catch (Exception ex) {
             return null;

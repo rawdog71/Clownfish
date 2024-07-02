@@ -1,0 +1,60 @@
+/*
+ * Copyright 2024 SulzbachR.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.clownfish.clownfish.npm;
+
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONObject;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.tomcat.util.json.JSONParser;
+import org.apache.tomcat.util.json.ParseException;
+
+/**
+ *
+ * @author SulzbachR
+ */
+public class CfNpmSearch {
+    private @Getter @Setter String query;
+    private @Getter @Setter CfNpmSearchresult result;
+    
+    public void search() {
+        try {
+            URL url = new URL("https://www.npmjs.com/search/suggestions?q="+query);
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            
+            JSONParser parser = new JSONParser(in);
+            Object obj = parser.parse();
+            
+            ArrayList jsonarray = (ArrayList) obj;
+            for (Object jsonobj : jsonarray) {
+                System.out.println((LinkedHashMap) jsonobj);
+            }
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(CfNpmSearch.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | ParseException ex) {
+            Logger.getLogger(CfNpmSearch.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}
