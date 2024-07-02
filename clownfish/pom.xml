@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
-    <version>0.8.4-SNAPSHOT</version>
+    <version>0.8.5-SNAPSHOT</version>
     <packaging>war</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
         <developerConnection>scm:git:https://github.com/rawdog71/Clownfish.git</developerConnection>
-        <tag>v0.8.4</tag>
+        <tag>v0.8.5</tag>
     </scm>
     <developers>
         <developer>
@@ -384,6 +384,12 @@
             <version>5.8</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.23.0</version>
+            <type>jar</type>
+        </dependency>
 
         <!-- Database dependencies -->
         <dependency>
@@ -466,16 +472,6 @@
             <artifactId>groovy</artifactId>
             <type>jar</type>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>uikit</artifactId>
-            <version>3.15.21</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>startbootstrap-sb-admin-2</artifactId>
-            <version>4.1.3</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
