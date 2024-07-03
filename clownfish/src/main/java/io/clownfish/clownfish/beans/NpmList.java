@@ -220,7 +220,7 @@ public class NpmList implements Serializable {
                             Files.createDirectory( pathEntryOutput );
                     } else {
                         if (!Files.exists(pathEntryOutput.getParent())) {
-                            Files.createDirectory(pathEntryOutput.getParent());
+                            Files.createDirectories(pathEntryOutput.getParent());
                         }
                         Files.copy(tararchiveinputstream, pathEntryOutput);
                     }
