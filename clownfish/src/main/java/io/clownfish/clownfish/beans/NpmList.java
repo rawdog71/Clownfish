@@ -49,6 +49,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.logging.Level;
 import javax.faces.event.ActionEvent;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -164,7 +165,12 @@ public class NpmList implements Serializable {
     public void onDeinstall(ActionEvent actionEvent) {
         if (null != selectedNpm) {
             cfnpmService.delete(selectedNpm);
-            new File(npmpath + File.separator + extractFilename(selectedNpm.getNpmFilename())).delete();
+            try {
+                FileUtils.deleteDirectory(new File(npmpath + File.separator + selectedNpm.getNpmId().replaceAll("[^a-zA-Z0-9//]", "")));
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(NpmList.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            //new File(npmpath + File.separator + extractFilename(selectedNpm.getNpmId())).delete();
             npmlist = cfnpmService.findAll();
         }
     }
