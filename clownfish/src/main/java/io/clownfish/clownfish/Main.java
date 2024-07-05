@@ -68,6 +68,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.util.DefaultPropertiesPersister;
 import io.clownfish.clownfish.utils.PropertyUtil;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 
@@ -267,8 +269,11 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.mediaType("mjs", new MediaType("text","javascript"));
-        configurer.mediaType("cjs", new MediaType("text","javascript"));
+        Map<String, MediaType> mediatypes = new HashMap();
+        mediatypes.put("mjs", new MediaType("text","javascript"));
+        mediatypes.put("cjs", new MediaType("text","javascript"));
+        mediatypes.put("ts", new MediaType("text","javascript"));
+        configurer.mediaTypes(mediatypes);
     }
     
     /**
