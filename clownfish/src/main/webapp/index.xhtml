@@ -972,6 +972,11 @@
                                 <p:column headerText="Version">
                                     <h:outputText value="#{npm.npmLatestversion}" />
                                 </p:column>
+                                <p:column headerText="Version">
+                                    <p:commandButton icon="pi pi-info" action="#{npmList.onDetail}">
+                                        <f:setPropertyActionListener value="#{npm}" target="#{npmList.selectedNpm}" />
+                                    </p:commandButton>
+                                </p:column>
                             </p:dataTable>
 
                             <p:panelGrid columns="1">

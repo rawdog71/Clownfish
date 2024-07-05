@@ -166,7 +166,7 @@ public class NpmList implements Serializable {
         if (null != selectedNpm) {
             cfnpmService.delete(selectedNpm);
             try {
-                FileUtils.deleteDirectory(new File(npmpath + File.separator + selectedNpm.getNpmId().replaceAll("[^a-zA-Z0-9//]", "")));
+                FileUtils.deleteDirectory(new File(npmpath + File.separator + selectedNpm.getNpmId().replaceAll("[^a-zA-Z0-9//@]", "")));
             } catch (IOException ex) {
                 java.util.logging.Logger.getLogger(NpmList.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -176,7 +176,7 @@ public class NpmList implements Serializable {
     }
     
     /**
-     * Deletes an external datasource
+     * Searches npm Packages
      * @param actionEvent
      */
     public void onSearch(ActionEvent actionEvent) {
@@ -210,7 +210,7 @@ public class NpmList implements Serializable {
     
     private void downloadNpm(String downloadfile, String filename) {
         try {
-            filename = filename.replaceAll("[^a-zA-Z0-9//]", "");
+            filename = filename.replaceAll("[^a-zA-Z0-9//@]", "");
             FileUtils.copyURLToFile(
                 new URL(downloadfile),
                 new File(npmpath + File.separator + filename + File.separator + extractFilename(downloadfile)),
@@ -220,7 +220,7 @@ public class NpmList implements Serializable {
             try (TarArchiveInputStream tararchiveinputstream = new TarArchiveInputStream(new GzipCompressorInputStream(new BufferedInputStream(Files.newInputStream(new File(npmpath + File.separator + filename + File.separator + extractFilename(downloadfile)).toPath()))))) {
                 ArchiveEntry archiveentry = null;
                 while ((archiveentry = tararchiveinputstream.getNextEntry()) != null) {
-                    Path pathEntryOutput = new File(npmpath + File.separator + filename).toPath().resolve(archiveentry.getName());
+                    Path pathEntryOutput = new File(npmpath + File.separator + filename).toPath().resolve(archiveentry.getName().replaceFirst("package/", ""));
                     if ( archiveentry.isDirectory() ) {
                         if(!Files.exists( pathEntryOutput))
                             Files.createDirectory( pathEntryOutput );
@@ -237,6 +237,12 @@ public class NpmList implements Serializable {
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
         }
+    }
+    
+    public void onDetail() {
+        String npmid = selectedNpm.getNpmId();
+        
+        
     }
     
     private String extractFilename(String downloadfile) {

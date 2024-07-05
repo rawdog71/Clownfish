@@ -68,6 +68,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.util.DefaultPropertiesPersister;
 import io.clownfish.clownfish.utils.PropertyUtil;
+import org.springframework.http.MediaType;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 
 /**
  *
@@ -261,6 +263,12 @@ public class Main extends SpringBootServletInitializer implements ServletContext
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer.setUseTrailingSlashMatch(true);
+    }
+    
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer.mediaType("mjs", new MediaType("text","javascript"));
+        configurer.mediaType("cjs", new MediaType("text","javascript"));
     }
     
     /**
