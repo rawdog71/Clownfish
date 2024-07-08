@@ -53,7 +53,7 @@ public class EndpointJS {
     
     final transient Logger LOGGER = LoggerFactory.getLogger(EndpointJS.class);
     
-    @GetMapping(path = "/{name}.js")
+    @GetMapping(path = {"/{name}.js", "/{name}.mjs", "/{name}.cjs"})
     public void universalGetJS(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
         BufferedReader br = null;
         try {
@@ -66,8 +66,9 @@ public class EndpointJS {
                 sb.append(line);
             }
             br.close();
-            PrintWriter outwriter = response.getWriter();
-            outwriter.println(sb);
+            try (PrintWriter outwriter = response.getWriter()) {
+                outwriter.println(sb);
+            }
         } catch (IOException ex) {
             CfJavascript cfjavascript = null;
             try {
@@ -77,31 +78,44 @@ public class EndpointJS {
                 PrintWriter outwriter = response.getWriter();
                 if (cfjavascript.getType() == JavascriptTypes.TYPE_JS.getValue()) {
                     outwriter.println(cfjavascript.getContent());
+                    outwriter.close();
                 } else {
-                    javascriptUtil.writeStaticJS(name + "_ts", cfjavascript.getContent(), "ts");
-                    ProcessBuilder builder = new ProcessBuilder();
-                    if (ClownfishUtil.isWindows()) {
-                        builder.command("cmd.exe", "/c", "tsc " + folderUtil.getJs_folder() + File.separator + name + "_ts.ts");
-                    } else {
-                        builder.command("sh", "-c", "tsc " + folderUtil.getJs_folder() + File.separator + name + "_ts.ts");
+                    try {
+                        br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getJs_folder() + File.separator + name + "_ts.js"), "UTF-8"));
+                        StringBuilder sb = new StringBuilder(1024);
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+                        br.close();
+                        outwriter.println(sb);
+                    } catch (IOException ex1) {
+                        javascriptUtil.writeStaticJS(name + "_ts", cfjavascript.getContent(), "ts");
+                        ProcessBuilder builder = new ProcessBuilder();
+                        if (ClownfishUtil.isWindows()) {
+                            builder.command("cmd.exe", "/c", "tsc " + folderUtil.getJs_folder() + File.separator + name + "_ts.ts");
+                        } else {
+                            builder.command("sh", "-c", "tsc " + folderUtil.getJs_folder() + File.separator + name + "_ts.ts");
+                        }
+                        builder.directory(new File(folderUtil.getJs_folder()));
+                        builder.redirectErrorStream(true);
+                        String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
+
+                        response.setContentType("application/javascript");
+                        response.setCharacterEncoding("UTF-8");
+                        br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getJs_folder() + File.separator + name + "_ts.js"), "UTF-8"));
+                        StringBuilder sb = new StringBuilder(1024);
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+                        br.close();
+                        outwriter = response.getWriter();
+                        outwriter.println(sb);
+                        outwriter.close();
+
+                        //outwriter.println(cfjavascript.getContent());
                     }
-                    builder.directory(new File(folderUtil.getJs_folder()));
-                    builder.redirectErrorStream(true);
-                    String result = IOUtils.toString(builder.start().getInputStream(), StandardCharsets.UTF_8);
-                    
-                    response.setContentType("application/javascript");
-                    response.setCharacterEncoding("UTF-8");
-                    br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getJs_folder() + File.separator + name + "_ts.js"), "UTF-8"));
-                    StringBuilder sb = new StringBuilder(1024);
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        sb.append(line);
-                    }
-                    br.close();
-                    outwriter = response.getWriter();
-                    outwriter.println(sb);
-                    
-                    //outwriter.println(cfjavascript.getContent());
                 }
             } catch (IOException iex) {
                 System.out.println("JS NOT FOUND");

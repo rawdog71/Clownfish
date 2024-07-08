@@ -43,6 +43,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import jakarta.validation.ConstraintViolationException;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -234,7 +235,7 @@ public class JavascriptList implements ISourceContentInterface {
                         if (0 == selectedJavascript.getType()) {
                             writeStaticJS(selectedJavascript.getName(), content);
                         }
-
+                        new File(folderUtil.getJs_folder() + File.separator + selectedJavascript.getName() + "_ts.js").delete();
                         FacesMessage message = new FacesMessage("Commited " + selectedJavascript.getName() + " Version: " + (maxversion + 1));
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     } catch (NullPointerException npe) {
@@ -244,7 +245,7 @@ public class JavascriptList implements ISourceContentInterface {
                         if (0 == selectedJavascript.getType()) {
                             writeStaticJS(selectedJavascript.getName(), content);
                         }
-
+                        new File(folderUtil.getJs_folder() + File.separator + selectedJavascript.getName() + "_ts.js").delete();
                         FacesMessage message = new FacesMessage("Commited " + selectedJavascript.getName() + " Version: " + 1);
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
