@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import io.clownfish.clownfish.npm.CfNpmSearchresult;
 import io.clownfish.clownfish.npm.CfNpmVersion;
+import io.clownfish.clownfish.npm.NpmPackage;
 import io.clownfish.clownfish.serviceinterface.CfNpmService;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.BufferedInputStream;
@@ -55,6 +56,7 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -76,6 +78,8 @@ public class NpmList implements Serializable {
     private @Getter @Setter CfNpmSearchresult selectedNpmDoc = null;
     private @Getter @Setter CfNpmVersion selectedNpmVersion = null;
     String npmpath;
+    @Value("${server.port:9000}") int serverPort;
+    private @Getter @Setter NpmPackage npmpackage = null;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(NpmList.class);
 
@@ -140,6 +144,7 @@ public class NpmList implements Serializable {
      */
     public void onSelectNpm(SelectEvent event) {
         selectedNpm = (CfNpm) event.getObject();
+        onDetail();
     }
        
     public void onInstall(ActionEvent actionEvent) {
@@ -241,8 +246,46 @@ public class NpmList implements Serializable {
     
     public void onDetail() {
         String npmid = selectedNpm.getNpmId();
-        
-        
+        try {
+            StringBuilder s_url = new StringBuilder();
+            s_url.append("http://localhost:");
+            s_url.append(serverPort);
+            s_url.append("/js/");
+            s_url.append(npmid.replaceAll("[^a-zA-Z0-9//@]", ""));
+            s_url.append("/package.json");
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.getForEntity(s_url.toString(), String.class);
+            
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.getBody());
+            LinkedHashMap<String, Object> result = mapper.convertValue(root, new TypeReference<LinkedHashMap<String, Object>>(){});
+            
+            System.out.println(result.get("name").toString());
+            System.out.println(result.get("version").toString());
+            System.out.println(result.get("description").toString());
+            
+            npmpackage = new NpmPackage();
+            npmpackage.setName(result.get("name").toString());
+            try {
+                npmpackage.setType(result.get("type").toString());
+            } catch (Exception ex) {
+                npmpackage.setType("");
+            }
+            npmpackage.setVersion(result.get("version").toString());
+            try {
+                npmpackage.setMain(result.get("main").toString());
+            } catch (Exception ex) {
+                npmpackage.setMain("");
+            }
+            try {
+                npmpackage.setModule(result.get("module").toString());
+            } catch (Exception ex) {
+                npmpackage.setModule("");
+            }
+            npmpackage.setDescription(result.get("description").toString());
+        } catch (JsonProcessingException ex) {
+            LOGGER.error(ex.getMessage());
+        }
     }
     
     private String extractFilename(String downloadfile) {

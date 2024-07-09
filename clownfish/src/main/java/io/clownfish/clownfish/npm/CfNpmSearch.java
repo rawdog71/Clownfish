@@ -15,8 +15,6 @@
  */
 package io.clownfish.clownfish.npm;
 
-import com.github.openjson.JSONArray;
-import com.github.openjson.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
