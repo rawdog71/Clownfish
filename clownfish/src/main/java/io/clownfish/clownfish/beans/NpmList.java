@@ -260,9 +260,9 @@ public class NpmList implements Serializable {
             JsonNode root = mapper.readTree(response.getBody());
             LinkedHashMap<String, Object> result = mapper.convertValue(root, new TypeReference<LinkedHashMap<String, Object>>(){});
             
-            System.out.println(result.get("name").toString());
-            System.out.println(result.get("version").toString());
-            System.out.println(result.get("description").toString());
+            //System.out.println(result.get("name").toString());
+            //System.out.println(result.get("version").toString());
+            //System.out.println(result.get("description").toString());
             
             npmpackage = new NpmPackage();
             npmpackage.setName(result.get("name").toString());
@@ -281,6 +281,11 @@ public class NpmList implements Serializable {
                 npmpackage.setModule(result.get("module").toString());
             } catch (Exception ex) {
                 npmpackage.setModule("");
+            }
+            try {
+                npmpackage.setStyle(result.get("style").toString());
+            } catch (Exception ex) {
+                npmpackage.setStyle("");
             }
             npmpackage.setDescription(result.get("description").toString());
         } catch (JsonProcessingException ex) {

@@ -27,6 +27,7 @@ public class NpmPackage {
     private @Getter @Setter String version;
     private @Getter @Setter String main;
     private @Getter @Setter String module;
+    private @Getter @Setter String style;
     private @Getter @Setter String type;
     private @Getter @Setter String description;
 }
