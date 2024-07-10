@@ -973,8 +973,11 @@
                                                 <p:column headerText="Name">
                                                     <h:outputText value="#{npm.npmId}" />
                                                 </p:column>
-                                                <p:column headerText="Version">
+                                                <p:column headerText="Installed Version">
                                                     <h:outputText value="#{npm.npmLatestversion}" />
+                                                </p:column>
+                                                <p:column headerText="Newest Version">
+                                                    <h:outputText value="#{npmList.getNewestVersion(npm.npmId)}" />
                                                 </p:column>
                                             </p:dataTable>
                                         </p:card>

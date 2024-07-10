@@ -49,6 +49,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import javax.faces.event.ActionEvent;
@@ -75,6 +76,7 @@ public class NpmList implements Serializable {
     private @Getter @Setter boolean newContentButtonDisabled = false;
     private @Getter @Setter List<CfNpmSearchresult> npmDocs = null;
     private @Getter @Setter List<CfNpmVersion> npmVersions = null;
+    private @Getter @Setter HashMap<String, String> npmNewestVersions = null;
     private @Getter @Setter CfNpmSearchresult selectedNpmDoc = null;
     private @Getter @Setter CfNpmVersion selectedNpmVersion = null;
     String npmpath;
@@ -87,6 +89,8 @@ public class NpmList implements Serializable {
     public void init() {
         LOGGER.info("INIT NPMLIST START");
         npmlist = cfnpmService.findAll();
+        npmNewestVersions = new HashMap<>();
+        fetchNewestVersions(npmlist, npmNewestVersions);
         packagename = "";
         newContentButtonDisabled = false;
         npmDocs = new ArrayList<>();
@@ -97,6 +101,7 @@ public class NpmList implements Serializable {
     
     public void onRefreshAll() {
         npmlist = cfnpmService.findAll();
+        fetchNewestVersions(npmlist, npmNewestVersions);
     }
     
     /**
@@ -159,6 +164,7 @@ public class NpmList implements Serializable {
                 downloadNpm(npm.getNpmFilename(), npm.getNpmId());
                 npm = cfnpmService.create(npm);
                 npmlist = cfnpmService.findAll();
+                fetchNewestVersions(npmlist, npmNewestVersions);
             }
         }
     }
@@ -175,8 +181,8 @@ public class NpmList implements Serializable {
             } catch (IOException ex) {
                 java.util.logging.Logger.getLogger(NpmList.class.getName()).log(Level.SEVERE, null, ex);
             }
-            //new File(npmpath + File.separator + extractFilename(selectedNpm.getNpmId())).delete();
             npmlist = cfnpmService.findAll();
+            fetchNewestVersions(npmlist, npmNewestVersions);
         }
     }
     
@@ -260,10 +266,6 @@ public class NpmList implements Serializable {
             JsonNode root = mapper.readTree(response.getBody());
             LinkedHashMap<String, Object> result = mapper.convertValue(root, new TypeReference<LinkedHashMap<String, Object>>(){});
             
-            //System.out.println(result.get("name").toString());
-            //System.out.println(result.get("version").toString());
-            //System.out.println(result.get("description").toString());
-            
             npmpackage = new NpmPackage();
             npmpackage.setName(result.get("name").toString());
             try {
@@ -297,4 +299,32 @@ public class NpmList implements Serializable {
         return downloadfile.substring(downloadfile.lastIndexOf("/")+1);
     }
     
+    private void fetchNewestVersions(List<CfNpm> npmlist, HashMap<String, String> map) {
+        map.clear();
+        for (CfNpm npm : npmlist) {
+            StringBuilder s_url = new StringBuilder();
+            s_url.append("https://registry.npmjs.org/");
+            s_url.append(npm.getNpmId());
+            
+            try {
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<String> response = restTemplate.getForEntity(s_url.toString(), String.class);
+            
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(response.getBody());
+                Map<String, Object> result = mapper.convertValue(root, new TypeReference<Map<String, Object>>(){});
+            
+                LinkedHashMap<String, Object> disttags = (LinkedHashMap<String, Object>) result.get("dist-tags");
+                String latestversion = (String) disttags.get("latest");
+                
+                map.put(npm.getNpmId(), latestversion);
+            } catch (JsonProcessingException ex) {
+                java.util.logging.Logger.getLogger(NpmList.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    public String getNewestVersion(String name) {
+        return npmNewestVersions.get(name);
+    }
 }
