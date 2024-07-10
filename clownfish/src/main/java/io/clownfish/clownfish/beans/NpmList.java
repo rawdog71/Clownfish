@@ -177,7 +177,7 @@ public class NpmList implements Serializable {
         if (null != selectedNpm) {
             cfnpmService.delete(selectedNpm);
             try {
-                FileUtils.deleteDirectory(new File(npmpath + File.separator + selectedNpm.getNpmId().replaceAll("[^a-zA-Z0-9//@]", "")));
+                FileUtils.deleteDirectory(new File(npmpath + File.separator + selectedNpm.getNpmId().replaceAll("[^a-zA-Z0-9//@/-]", "")));
             } catch (IOException ex) {
                 java.util.logging.Logger.getLogger(NpmList.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -221,7 +221,7 @@ public class NpmList implements Serializable {
     
     private void downloadNpm(String downloadfile, String filename) {
         try {
-            filename = filename.replaceAll("[^a-zA-Z0-9//@]", "");
+            filename = filename.replaceAll("[^a-zA-Z0-9//@/-]", "");
             FileUtils.copyURLToFile(
                 new URL(downloadfile),
                 new File(npmpath + File.separator + filename + File.separator + extractFilename(downloadfile)),
@@ -257,7 +257,7 @@ public class NpmList implements Serializable {
             s_url.append("http://localhost:");
             s_url.append(serverPort);
             s_url.append("/js/");
-            s_url.append(npmid.replaceAll("[^a-zA-Z0-9//@]", ""));
+            s_url.append(npmid.replaceAll("[^a-zA-Z0-9//@/-]", ""));
             s_url.append("/package.json");
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.getForEntity(s_url.toString(), String.class);
