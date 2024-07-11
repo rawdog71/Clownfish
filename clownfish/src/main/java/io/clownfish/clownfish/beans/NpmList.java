@@ -133,7 +133,7 @@ public class NpmList implements Serializable {
                 }
             }
             Collections.sort(npmversions);
-            return npmVersions;
+            return npmversions;
         } catch (JsonProcessingException ex) {
             LOGGER.error(ex.getMessage());
             return null;
