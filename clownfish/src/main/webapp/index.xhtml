@@ -979,6 +979,9 @@
                                                 <p:column headerText="Newest Version">
                                                     <h:outputText value="#{npmList.getNewestVersion(npm.npmId)}" />
                                                 </p:column>
+                                                <p:column headerText="">
+                                                    <p:commandButton icon="pi pi-cloud-download" value="Update" action="#{npmList.upgrade(npm, npmList.getNewestVersion(npm.npmId))}" rendered="#{npmList.checkVersion(npmList.getNewestVersion(npm.npmId), npm.npmLatestversion)}" update=":form:tabview:javascripttabview:npminstalledlist" />
+                                                </p:column>
                                             </p:dataTable>
                                         </p:card>
                                     </p:column>

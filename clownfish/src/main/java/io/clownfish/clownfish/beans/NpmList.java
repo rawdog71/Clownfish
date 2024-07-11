@@ -104,16 +104,11 @@ public class NpmList implements Serializable {
         fetchNewestVersions(npmlist, npmNewestVersions);
     }
     
-    /**
-     * Selects an external datasource
-     * @param event
-     */
-    public void onSelectNpmDoc(SelectEvent event) {
-        selectedNpmDoc = (CfNpmSearchresult) event.getObject();
-        
+    private List<CfNpmVersion> getNpmVersions(String name) {
+        List<CfNpmVersion> npmversions = new ArrayList<>();
         StringBuilder s_url = new StringBuilder();
         s_url.append("https://registry.npmjs.org/");
-        s_url.append(selectedNpmDoc.getName());
+        s_url.append(name);
         
         try {
             RestTemplate restTemplate = new RestTemplate();
@@ -124,7 +119,7 @@ public class NpmList implements Serializable {
             Map<String, Object> result = mapper.convertValue(root, new TypeReference<Map<String, Object>>(){});
             
             LinkedHashMap<String, Object> versions = (LinkedHashMap<String, Object>) result.get("versions");
-            npmVersions.clear();
+            npmversions.clear();
             
             for (String key : versions.keySet()) {
                 CfNpmVersion version = new CfNpmVersion();
@@ -134,19 +129,27 @@ public class NpmList implements Serializable {
                     version.setVersion((String)dummyversion.get("version"));
                     LinkedHashMap<String, Object> dummydist = (LinkedHashMap<String, Object>)dummyversion.get("dist");
                     version.setTarball((String)dummydist.get("tarball"));
-                    npmVersions.add(version);
+                    npmversions.add(version);
                 }
             }
-            Collections.sort(npmVersions);
+            Collections.sort(npmversions);
+            return npmVersions;
         } catch (JsonProcessingException ex) {
             LOGGER.error(ex.getMessage());
+            return null;
         }
     }
     
-    /**
-     * Selects an external datasource
-     * @param event
-     */
+    public void onSelectNpmDoc(SelectEvent event) {
+        selectedNpmDoc = (CfNpmSearchresult) event.getObject();
+        npmVersions = getNpmVersions(selectedNpmDoc.getName());
+    }
+    
+    public CfNpmVersion getNewestNpmVersion(CfNpm npm) {
+        npmVersions = getNpmVersions(npm.getNpmId());
+        return npmVersions.get(0);
+    }
+    
     public void onSelectNpm(SelectEvent event) {
         selectedNpm = (CfNpm) event.getObject();
         onDetail();
@@ -161,6 +164,7 @@ public class NpmList implements Serializable {
             
             CfNpm dummy = cfnpmService.findByNpmIdAndNpmLatestversion(selectedNpmDoc.getName(), selectedNpmVersion.getVersion());
             if (null == dummy) {
+                deinstall(selectedNpm);
                 downloadNpm(npm.getNpmFilename(), npm.getNpmId());
                 npm = cfnpmService.create(npm);
                 npmlist = cfnpmService.findAll();
@@ -169,27 +173,28 @@ public class NpmList implements Serializable {
         }
     }
     
-    /**
-     * Deletes an external datasource
-     * @param actionEvent
-     */
-    public void onDeinstall(ActionEvent actionEvent) {
-        if (null != selectedNpm) {
-            cfnpmService.delete(selectedNpm);
-            try {
-                FileUtils.deleteDirectory(new File(npmpath + File.separator + selectedNpm.getNpmId().replaceAll("[^a-zA-Z0-9//@/-]", "")));
-            } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(NpmList.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    public void upgrade(CfNpm npm, String newestversion) {
+        if (null != npm) {
+            CfNpmVersion npmversion = getNewestNpmVersion(npm);
+            deinstall(npm);
+            npm.setNpmFilename(npmversion.getTarball());
+            npm.setNpmLatestversion(newestversion);
+            npm.setId(null);
+            downloadNpm(npm.getNpmFilename(), npm.getNpmId());
+            npm = cfnpmService.create(npm);
             npmlist = cfnpmService.findAll();
             fetchNewestVersions(npmlist, npmNewestVersions);
         }
     }
     
-    /**
-     * Searches npm Packages
-     * @param actionEvent
-     */
+    public void onDeinstall(ActionEvent actionEvent) {
+        if (null != selectedNpm) {
+            deinstall(selectedNpm);
+            npmlist = cfnpmService.findAll();
+            fetchNewestVersions(npmlist, npmNewestVersions);
+        }
+    }
+    
     public void onSearch(ActionEvent actionEvent) {
         selectedNpmDoc = null;
         StringBuilder s_url = new StringBuilder();
@@ -326,5 +331,20 @@ public class NpmList implements Serializable {
     
     public String getNewestVersion(String name) {
         return npmNewestVersions.get(name);
+    }
+    
+    public boolean checkVersion(String version, String newestversion) {
+        return (0 != version.compareToIgnoreCase(newestversion));
+    }
+    
+    private void deinstall(CfNpm npm) {
+        if (null != npm) {
+            cfnpmService.delete(npm);
+            try {
+                FileUtils.deleteDirectory(new File(npmpath + File.separator + npm.getNpmId().replaceAll("[^a-zA-Z0-9//@/-]", "")));
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(NpmList.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }
