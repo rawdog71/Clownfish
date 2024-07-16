@@ -209,6 +209,7 @@ public class Clownfish {
     CfClassCompiler cfclassCompiler;
     CfClassLoader cfclassLoader;
     @Autowired AuthTokenList authtokenlist;
+    @Autowired AuthTokenListClasscontent confirmtokenlist;
     AuthTokenListClasscontent authtokenlistclasscontent = null;
 
     private String contenttype;
@@ -306,6 +307,10 @@ public class Clownfish {
         LOGGER.info("INIT CLOWNFISH START");
         servicestatus.setMessage("Clownfish is initializing");
         servicestatus.setOnline(false);
+        
+        if (null == confirmtokenlist) {
+            confirmtokenlist = new AuthTokenListClasscontent();
+        }
         
         if (null == authtokenlist) {
             authtokenlist = new AuthTokenList();

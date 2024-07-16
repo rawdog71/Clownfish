@@ -794,6 +794,32 @@ public class HibernateUtil implements Runnable {
         return outputmap;
     }
     
+    public CfClasscontent getContentById(String tablename, long contentid) {
+        Map contentmap = null;
+        Map outputmap = new HashMap();
+        Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
+        Query query = null;
+        query = session_tables.createQuery("FROM " + tablename + " c WHERE id_ = " + contentid);
+        if (propertyUtil.getPropertyBoolean("sql_debug", true)) {
+            LOGGER.info("Query: " + query.getQueryString());
+        }
+        try {
+            contentmap = (Map) query.getSingleResult();
+            contentmap.forEach(
+                    (k, v) -> 
+                        {
+                            outputmap.put(k, v);
+                        }
+            );
+            session_tables.close();
+            
+            return cfclasscontentService.findById((long)outputmap.get("cf_contentref"));
+        } catch (NoResultException ex) {
+            LOGGER.error("HIBERNATEUTIL: " + tablename + " is empty. Please use hibernate.init=1 in application.properties");
+            return null;
+        }
+    }
+    
     private SearchValues getSearchValues(String searchvalue) {
         String comparator = "eq";
         String searchvalue1 = "";

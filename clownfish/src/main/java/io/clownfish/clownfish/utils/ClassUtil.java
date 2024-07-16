@@ -3094,7 +3094,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t</div>").append("\n");
 
         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
-        html.append("\t\t\t\t\t\t<label class=\"uk-form-label upper-first\" for=\"form-stacked-email\">").append(passwordField).append(" widerholen</label>\n");
+        html.append("\t\t\t\t\t\t<label class=\"uk-form-label upper-first\" for=\"form-stacked-email\">").append(passwordField).append(" wiederholen</label>\n");
         html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
         html.append("\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
         html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"create").append(passwordField).append("Repeat\" ng-model=\"").append(passwordField).append("Again\" type=\"password\" placeholder=\"\">").append("\n");
@@ -3225,8 +3225,9 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t\t$scope.warning = false;").append("\n");
         html.append("\t\t\t\t\t\t$http.post(\"OData/\" +className , data).then(res => {").append("\n");
         html.append("\t\t\t\t\t\tif(res.status == 201) {").append("\n");
-        html.append("\t\t\t\t\t\t\ttoastr.success('Benutzer erfolgreich erstellt. Wird vom Admin bearbeitet', 'Erfolgreich');").append("\n");
-        html.append("\t\t\t\t\t\t\t$http.get(\"cf_sendemail?cf_job=true&to=\"+adminMail+\"&subject=Bestätigung für einen neuen Benutzer&body=Der Benutzer: \" + ").append(idField).append("Text + \" muss für die Seite: ${metainfo.referrer} bestätigt werden.\");\n");
+        html.append("\t\t\t\t\t\t\ttoastr.success('Benutzer erfolgreich erstellt. eine E-Mail zum Bestätigen wurde an Sie verschickt. Anschließend wird ein Administrator die Freischaltung vornehmen.', 'Erfolgreich');").append("\n");
+        //html.append("\t\t\t\t\t\t\t$http.get(\"cf_sendemail?cf_job=true&to=\"+adminMail+\"&subject=Bestätigung für einen neuen Benutzer&body=Der Benutzer: \" + ").append(idField).append("Text + \" muss für die Seite: ${metainfo.referrer} bestätigt werden.\");\n");
+        html.append("\t\t\t\t\t\t\t$http.get(\"SendConfirmMail?class=\" + className + \"&id=\" + res.data.id + \"&password=\" + passwordText + \"&pwfield=password&confirmfield=confirmed&emailfield=email\");").append("\n");
         html.append("\t\t\t\t\t\t\topenLogin()").append("\n");
         html.append("\t\t\t\t\t\t} else if(res.status == 406) {").append("\n");
         html.append("\t\t\t\t\t\t\ttoastr.error('Der Account existiert schon. Bitte bei der IT melden.', 'Fehler');").append("\n");
