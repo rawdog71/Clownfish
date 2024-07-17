@@ -135,7 +135,7 @@ public class ClownfishLoginServlet extends HttpServlet {
                                     ar.setStatus(PasswordUtil.verifyUserPassword(inst_clearTextPw, PasswordUtil.generateSecurePassword(inst_clearTextPw, salt), salt));
                                     if (ar.isStatus()) {
                                         ar.setToken(AuthTokenClasscontent.generateToken(inst_clearTextPw, salt));
-                                        AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(60), classcontent1);      // Tokens valid for 60 minutes
+                                        AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(60), classcontent1, "");      // Tokens valid for 60 minutes
                                         ar.setValiduntil(at.getValiduntil());
                                         authtokenlist.getAuthtokens().put(ar.getToken(), at);
                                         break;

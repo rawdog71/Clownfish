@@ -29,14 +29,16 @@ public class AuthTokenClasscontent {
     private @Getter @Setter String token;
     private @Getter @Setter DateTime validuntil;
     private @Getter @Setter CfClasscontent user;
+    private @Getter @Setter String site;
 
     public AuthTokenClasscontent() {
     }
 
-    public AuthTokenClasscontent(String token, DateTime validuntil, CfClasscontent user) {
+    public AuthTokenClasscontent(String token, DateTime validuntil, CfClasscontent user, String site) {
         this.token = token;
         this.validuntil = validuntil;
         this.user = user;
+        this.site = site;
     }
     
     public static String generateToken(String password, String salt) {

@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -61,12 +62,15 @@ public class ClownfishSendConfirmMail extends HttpServlet {
     @Autowired transient AuthTokenListClasscontent confirmtokenlist;
     @Autowired PropertyUtil propertyUtil;
     
+    @Value("${server.port:9000}")
+    int serverPortHttp;
+    
     String klasse = "";
     String password = "";
     String pw_field = "";
     String id = "";
-    String confirm_field = "";
     String email_field = "";
+    String site_field = "";
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         Map<String, String[]> parameters = request.getParameterMap();
@@ -86,20 +90,20 @@ public class ClownfishSendConfirmMail extends HttpServlet {
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("id") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             id = values[0];
         });
-        confirm_field = "";
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("confirmfield") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            confirm_field = values[0];
-        });
         email_field = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("emailfield") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             email_field = values[0];
+        });
+        site_field = "";
+        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("sitefield") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
+            site_field = values[0];
         });
         
         CfClass clazz = cfclassService.findByName(klasse);
         if (null != clazz) {
             if (clazz.isLoginclass()) {
                 CfClasscontent classcontent = hibernateutil.getContentById(clazz.getName(), Long.parseLong(id));
-                sendEmail(classcontent, password, pw_field, confirm_field, email_field);
+                sendEmail(classcontent, password, pw_field, email_field, site_field);
             }
         }
     }
@@ -124,7 +128,7 @@ public class ClownfishSendConfirmMail extends HttpServlet {
 
     }
     
-    private void sendEmail(CfClasscontent user, String password, String pw_field, String confirm_field, String email_field) {
+    private void sendEmail(CfClasscontent user, String password, String pw_field, String email_field, String site) {
         AuthResponse ar = new AuthResponse();
         ar.setStatus(true);
         ar.setToken("");
@@ -135,7 +139,7 @@ public class ClownfishSendConfirmMail extends HttpServlet {
         ar.setStatus(PasswordUtil.verifyUserPassword(password, PasswordUtil.generateSecurePassword(password, attributContent.getSalt()), attributContent.getSalt()));
         if (ar.isStatus()) {
             ar.setToken(AuthTokenClasscontent.generateToken(password, attributContent.getSalt()));
-            AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(60), user);      // Tokens valid for 60 minutes
+            AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(60), user, site);      // Tokens valid for 60 minutes
             ar.setValiduntil(at.getValiduntil());
             confirmtokenlist.getAuthtokens().put(ar.getToken(), at);
             
@@ -144,7 +148,13 @@ public class ClownfishSendConfirmMail extends HttpServlet {
             
             MailUtil mailutil = new MailUtil(propertyUtil);
             try {
-                mailutil.sendRespondMail(attributContentEmail.getContentString(), "Bestätigung des Accounts", "http://localhost:9000/Confirm?token=" + URLEncoder.encode(ar.getToken(), "UTF-8") + "&confirmfield=confirmed");
+                StringBuilder domain = new StringBuilder();
+                domain.append(propertyUtil.getPropertyValue("domain"));
+                if (80 != serverPortHttp) {
+                    domain.append(":");
+                    domain.append(serverPortHttp);
+                }
+                mailutil.sendRespondMail(attributContentEmail.getContentString(), "Bestätigung des Accounts", "http://" + domain.toString() + "/Confirm?token=" + URLEncoder.encode(ar.getToken(), "UTF-8") + "&confirmfield=confirmed");
             } catch (Exception ex) {
                 Logger.getLogger(ClownfishSendConfirmMail.class.getName()).log(Level.SEVERE, null, ex);
             }

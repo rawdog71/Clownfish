@@ -3227,7 +3227,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t\tif(res.status == 201) {").append("\n");
         html.append("\t\t\t\t\t\t\ttoastr.success('Benutzer erfolgreich erstellt. eine E-Mail zum Bestätigen wurde an Sie verschickt. Anschließend wird ein Administrator die Freischaltung vornehmen.', 'Erfolgreich');").append("\n");
         //html.append("\t\t\t\t\t\t\t$http.get(\"cf_sendemail?cf_job=true&to=\"+adminMail+\"&subject=Bestätigung für einen neuen Benutzer&body=Der Benutzer: \" + ").append(idField).append("Text + \" muss für die Seite: ${metainfo.referrer} bestätigt werden.\");\n");
-        html.append("\t\t\t\t\t\t\t$http.get(\"SendConfirmMail?class=\" + className + \"&id=\" + res.data.id + \"&password=\" + passwordText + \"&pwfield=password&confirmfield=confirmed&emailfield=email\");").append("\n");
+        html.append("\t\t\t\t\t\t\t$http.get(\"SendConfirmMail?class=\" + className + \"&id=\" + res.data.id + \"&password=\" + passwordText + \"&pwfield=password&emailfield=email&sitefield=${metainfo.referrer}\");").append("\n");
         html.append("\t\t\t\t\t\t\topenLogin()").append("\n");
         html.append("\t\t\t\t\t\t} else if(res.status == 406) {").append("\n");
         html.append("\t\t\t\t\t\t\ttoastr.error('Der Account existiert schon. Bitte bei der IT melden.', 'Fehler');").append("\n");

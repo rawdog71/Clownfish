@@ -92,7 +92,7 @@ public class ClownfishConfirmServlet extends HttpServlet {
             
             MailUtil mailutil = new MailUtil(propertyUtil);
             try {
-                mailutil.sendRespondMail(propertyUtil.getPropertyValue("email_admin"), "Freischaltung des Accounts", "Freischaltung des Accounts: " + user.getName());
+                mailutil.sendRespondMail(propertyUtil.getPropertyValue("email_admin"), "Freischaltung des Accounts für die Seite " + at.getSite(), "Freischaltung des Accounts: " + user.getName());
             } catch (Exception ex) {
                 java.util.logging.Logger.getLogger(ClownfishSendConfirmMail.class.getName()).log(Level.SEVERE, null, ex);
             }
