@@ -149,12 +149,32 @@ public class ClownfishSendConfirmMail extends HttpServlet {
             MailUtil mailutil = new MailUtil(propertyUtil);
             try {
                 StringBuilder domain = new StringBuilder();
-                domain.append(propertyUtil.getPropertyValue("domain"));
-                if (80 != serverPortHttp) {
+                String strdomain = propertyUtil.getPropertyValue("domain");
+                String http = "http://";
+                if ((strdomain.startsWith("http://"))) {
+                    strdomain = strdomain.replaceFirst("http://", "");
+                }
+                if ((strdomain.startsWith("https://"))) {
+                    strdomain = strdomain.replaceFirst("https://", "");
+                    http = "https://";
+                }
+                String port = "";
+                if (strdomain.lastIndexOf(":") > 0) {
+                    port = strdomain.substring(strdomain.lastIndexOf(":")+1);
+                    strdomain = strdomain.substring(0, strdomain.lastIndexOf(":"));
+                }
+                domain.append(http);
+                domain.append(strdomain);
+                if ((80 != serverPortHttp) && (port.isBlank())) {
                     domain.append(":");
                     domain.append(serverPortHttp);
+                } else {
+                    if (0 != port.compareToIgnoreCase("80")) {
+                        domain.append(":");
+                        domain.append(port);
+                    }
                 }
-                mailutil.sendRespondMail(attributContentEmail.getContentString(), "Bestätigung des Accounts", "http://" + domain.toString() + "/Confirm?token=" + URLEncoder.encode(ar.getToken(), "UTF-8") + "&confirmfield=confirmed");
+                mailutil.sendRespondMail(attributContentEmail.getContentString(), "Bestätigung des Accounts", domain.toString() + "/Confirm?token=" + URLEncoder.encode(ar.getToken(), "UTF-8") + "&confirmfield=confirmed");
             } catch (Exception ex) {
                 Logger.getLogger(ClownfishSendConfirmMail.class.getName()).log(Level.SEVERE, null, ex);
             }

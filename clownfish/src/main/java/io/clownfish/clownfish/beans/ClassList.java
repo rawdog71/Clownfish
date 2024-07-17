@@ -263,6 +263,71 @@ public class ClassList implements Serializable {
             newattribut.setExt_mutable(true);
             
             cfattributService.create(newattribut);
+            
+            if (loginClass) {
+                // Create valid field
+                CfAttribut newattributvalid = new CfAttribut();
+                newattributvalid.setClassref(createdclass);
+                newattributvalid.setName("valid");
+                newattributvalid.setIdentity(false);
+                newattributvalid.setAutoincrementor(false);
+                newattributvalid.setIsindex(false);
+                newattributvalid.setAttributetype(cfattributetypeService.findByName("boolean"));
+                newattributvalid.setRelationtype(-1);
+                newattributvalid.setDefault_val("false");
+                newattributvalid.setMandatory(false);
+                newattributvalid.setDescription("Valid by admin");
+                newattributvalid.setNodelete(true);
+                newattributvalid.setExt_mutable(false);
+                cfattributService.create(newattributvalid);
+                // Create confirmed field
+                CfAttribut newattributconfirmed = new CfAttribut();
+                newattributconfirmed.setClassref(createdclass);
+                newattributconfirmed.setName("confirmed");
+                newattributconfirmed.setIdentity(false);
+                newattributconfirmed.setAutoincrementor(false);
+                newattributconfirmed.setIsindex(false);
+                newattributconfirmed.setAttributetype(cfattributetypeService.findByName("boolean"));
+                newattributconfirmed.setRelationtype(-1);
+                newattributconfirmed.setDefault_val("false");
+                newattributconfirmed.setMandatory(false);
+                newattributconfirmed.setDescription("Confirmed by user");
+                newattributconfirmed.setNodelete(true);
+                newattributconfirmed.setExt_mutable(false);
+                cfattributService.create(newattributconfirmed);
+                // Create email field
+                CfAttribut newattributemail = new CfAttribut();
+                newattributemail.setClassref(createdclass);
+                newattributemail.setName("email");
+                newattributemail.setIdentity(true);
+                newattributemail.setAutoincrementor(false);
+                newattributemail.setIsindex(false);
+                newattributemail.setAttributetype(cfattributetypeService.findByName("string"));
+                newattributemail.setRelationtype(-1);
+                newattributemail.setDefault_val("");
+                newattributemail.setMandatory(true);
+                newattributemail.setDescription("EMail");
+                newattributemail.setNodelete(true);
+                newattributemail.setExt_mutable(true);
+                cfattributService.create(newattributemail);
+                // Create password field
+                CfAttribut newattributpassword = new CfAttribut();
+                newattributpassword.setClassref(createdclass);
+                newattributpassword.setName("password");
+                newattributpassword.setIdentity(false);
+                newattributpassword.setAutoincrementor(false);
+                newattributpassword.setIsindex(false);
+                newattributpassword.setAttributetype(cfattributetypeService.findByName("hashstring"));
+                newattributpassword.setRelationtype(-1);
+                newattributpassword.setDefault_val("");
+                newattributpassword.setMandatory(false);
+                newattributpassword.setDescription("Passwort");
+                newattributpassword.setNodelete(true);
+                newattributpassword.setExt_mutable(true);
+                cfattributService.create(newattributpassword);
+            }
+            
+            
             selectedAttributList = attributlist.init(selectedClass);
             attributName = "";
             
