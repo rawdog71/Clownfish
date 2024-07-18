@@ -15,6 +15,8 @@
  */
 package io.clownfish.clownfish.datamodels;
 
+import io.clownfish.clownfish.beans.ContentList;
+import io.clownfish.clownfish.beans.ScrapyardList;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
@@ -33,6 +35,9 @@ import org.springframework.stereotype.Component;
 public class AuthTokenListClasscontent {
     private @Getter @Setter HashMap<String, AuthTokenClasscontent> authtokens;
     @Autowired transient PropertyUtil propertyUtil;
+    @Autowired transient ContentList contentlist;
+    @Autowired transient ScrapyardList scrapyardlist;
+    private @Getter @Setter boolean confirmation = false;
 
     public AuthTokenListClasscontent() {
         authtokens = new HashMap<>();
@@ -40,7 +45,7 @@ public class AuthTokenListClasscontent {
             deleteTokens();
         };
         ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
-        exec.scheduleAtFixedRate(gcRunnable , 0, 1, TimeUnit.MINUTES);
+        exec.scheduleAtFixedRate(gcRunnable, 0, 1, TimeUnit.MINUTES);
     }
     
     public boolean checkValidToken(String token) {
@@ -58,6 +63,11 @@ public class AuthTokenListClasscontent {
     private void deleteTokens() {
         for (String token : authtokens.keySet()) {
             if (authtokens.get(token).getValiduntil().isBeforeNow()) {
+                if (confirmation) {
+                    // kill also the user in db
+                    contentlist.deleteContent(authtokens.get(token).getUser());
+                    scrapyardlist.destroyContent(authtokens.get(token).getUser());
+                }
                 authtokens.remove(token);
             }
         }

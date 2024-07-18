@@ -224,37 +224,7 @@ public class ScrapyardList implements Serializable {
 
     public void onDeleteContent(ActionEvent actionEvent) {
         if (selectedContent != null) {
-            // Delete corresponding attributcontent entries
-            List<CfAttributcontent> attributcontentlistdummy = cfattributcontentService.findByClasscontentref(selectedContent);
-            for (CfAttributcontent attributcontent : attributcontentlistdummy) {
-                cfattributcontentService.delete(attributcontent);
-            }
-            
-            // Delete corresponding listcontent entries
-            List<CfListcontent> selectedcontent = cflistcontentService.findByClasscontentref(selectedContent.getId());
-            for (CfListcontent listcontent : selectedcontent) {
-                cflistcontentService.delete(listcontent);
-            }
-            
-            // Delete corresponding keywordcontent entries
-            List<CfClasscontentkeyword> keywordcontentdummy = cfclasscontentkeywordService.findByClassContentRef(selectedContent.getId());
-            for (CfClasscontentkeyword keywordcontent : keywordcontentdummy) {
-                cfclasscontentkeywordService.delete(keywordcontent);
-            }
-            
-            // Delete corresponding sitecontent entries
-            List<CfSitecontent> sitecontentdummy = cfsitecontentService.findByClasscontentref(selectedContent.getId());
-            for (CfSitecontent sitecontent : sitecontentdummy) {
-                cfsitecontentService.delete(sitecontent);
-            }
-            
-            cfclasscontentService.delete(selectedContent);
-            try {
-                hibernateUtil.deleteContent(selectedContent);
-            } catch (javax.persistence.NoResultException ex) {
-                LOGGER.warn(ex.getMessage());
-            }
-            classcontentlist = cfclasscontentService.findByScrapped(true);
+            destroyContent(selectedContent);
         }
     }
     
@@ -280,5 +250,39 @@ public class ScrapyardList implements Serializable {
     
     public String toString(CfAttributcontent attributcontent) {
         return contentUtil.toString(attributcontent);
+    }
+    
+    public void destroyContent(CfClasscontent content) {
+        // Delete corresponding attributcontent entries
+        List<CfAttributcontent> attributcontentlistdummy = cfattributcontentService.findByClasscontentref(content);
+        for (CfAttributcontent attributcontent : attributcontentlistdummy) {
+            cfattributcontentService.delete(attributcontent);
+        }
+
+        // Delete corresponding listcontent entries
+        List<CfListcontent> selectedcontent = cflistcontentService.findByClasscontentref(content.getId());
+        for (CfListcontent listcontent : selectedcontent) {
+            cflistcontentService.delete(listcontent);
+        }
+
+        // Delete corresponding keywordcontent entries
+        List<CfClasscontentkeyword> keywordcontentdummy = cfclasscontentkeywordService.findByClassContentRef(content.getId());
+        for (CfClasscontentkeyword keywordcontent : keywordcontentdummy) {
+            cfclasscontentkeywordService.delete(keywordcontent);
+        }
+
+        // Delete corresponding sitecontent entries
+        List<CfSitecontent> sitecontentdummy = cfsitecontentService.findByClasscontentref(content.getId());
+        for (CfSitecontent sitecontent : sitecontentdummy) {
+            cfsitecontentService.delete(sitecontent);
+        }
+
+        cfclasscontentService.delete(content);
+        try {
+            hibernateUtil.deleteContent(content);
+        } catch (javax.persistence.NoResultException ex) {
+            LOGGER.warn(ex.getMessage());
+        }
+        classcontentlist = cfclasscontentService.findByScrapped(true);
     }
 }

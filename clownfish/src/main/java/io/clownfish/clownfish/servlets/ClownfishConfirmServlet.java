@@ -62,7 +62,6 @@ public class ClownfishConfirmServlet extends HttpServlet {
     final transient Logger LOGGER = LoggerFactory.getLogger(ClownfishConfirmServlet.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
-        String inst_confirmField;
         AuthResponse ar = new AuthResponse();
         ar.setStatus(false);
         ar.setToken("");
@@ -73,18 +72,18 @@ public class ClownfishConfirmServlet extends HttpServlet {
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("token") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             token = values[0];
         });
-        confirm_field = "";
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("confirmField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            confirm_field = values[0];
-        });
-        inst_confirmField = confirm_field;
+        
+        System.out.println(token);
+        for (AuthTokenClasscontent at : confirmtokenlist.getAuthtokens().values()) {
+            System.out.println(at.getToken());
+        }
         
         AuthTokenClasscontent at = confirmtokenlist.getAuthtokens().get(token);
         if (null != at) {
             CfClasscontent user = at.getUser();
             CfClass cfclass = user.getClassref();
             
-            CfAttribut attributConfirm = cfattributService.findByNameAndClassref(inst_confirmField, cfclass);
+            CfAttribut attributConfirm = cfattributService.findByNameAndClassref("confirmed", cfclass);
             CfAttributcontent attributContent1 = cfattributcontentService.findByAttributrefAndClasscontentref(attributConfirm, user);
             attributContent1.setContentBoolean(Boolean.TRUE);
             cfattributcontentService.edit(attributContent1);

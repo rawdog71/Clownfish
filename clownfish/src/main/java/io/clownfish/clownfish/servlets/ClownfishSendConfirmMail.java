@@ -67,10 +67,8 @@ public class ClownfishSendConfirmMail extends HttpServlet {
     
     String klasse = "";
     String password = "";
-    String pw_field = "";
     String id = "";
-    String email_field = "";
-    String site_field = "";
+    String site = "";
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         Map<String, String[]> parameters = request.getParameterMap();
@@ -82,28 +80,20 @@ public class ClownfishSendConfirmMail extends HttpServlet {
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("password") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             password = values[0];
         });
-        pw_field = "";
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("pwfield") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            pw_field = values[0];
-        });
         id = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("id") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             id = values[0];
         });
-        email_field = "";
-        parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("emailfield") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            email_field = values[0];
-        });
-        site_field = "";
+        site = "";
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("sitefield") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-            site_field = values[0];
+            site = values[0];
         });
         
         CfClass clazz = cfclassService.findByName(klasse);
         if (null != clazz) {
             if (clazz.isLoginclass()) {
                 CfClasscontent classcontent = hibernateutil.getContentById(clazz.getName(), Long.parseLong(id));
-                sendEmail(classcontent, password, pw_field, email_field, site_field);
+                sendEmail(classcontent, password, site);
             }
         }
     }
@@ -128,22 +118,25 @@ public class ClownfishSendConfirmMail extends HttpServlet {
 
     }
     
-    private void sendEmail(CfClasscontent user, String password, String pw_field, String email_field, String site) {
+    private void sendEmail(CfClasscontent user, String password, String site) {
         AuthResponse ar = new AuthResponse();
         ar.setStatus(true);
         ar.setToken("");
         ar.setValiduntil(null);
         
-        CfAttribut attributPassword = cfattributService.findByNameAndClassref(pw_field, user.getClassref());
+        CfAttribut attributPassword = cfattributService.findByNameAndClassref("password", user.getClassref());
         CfAttributcontent attributContent = cfattributcontentService.findByAttributrefAndClasscontentref(attributPassword, user);
         ar.setStatus(PasswordUtil.verifyUserPassword(password, PasswordUtil.generateSecurePassword(password, attributContent.getSalt()), attributContent.getSalt()));
         if (ar.isStatus()) {
             ar.setToken(AuthTokenClasscontent.generateToken(password, attributContent.getSalt()));
-            AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(60), user, site);      // Tokens valid for 60 minutes
+            String accountconfirmtime = propertyUtil.getPropertyValue("accountconfirmtime");
+            int act = Integer.parseInt(accountconfirmtime);
+            AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(act), user, site);      // Tokens valid for 60 minutes
             ar.setValiduntil(at.getValiduntil());
+            confirmtokenlist.setConfirmation(true);
             confirmtokenlist.getAuthtokens().put(ar.getToken(), at);
             
-            CfAttribut attributEmail = cfattributService.findByNameAndClassref(email_field, user.getClassref());
+            CfAttribut attributEmail = cfattributService.findByNameAndClassref("email", user.getClassref());
             CfAttributcontent attributContentEmail = cfattributcontentService.findByAttributrefAndClasscontentref(attributEmail, user);
             
             MailUtil mailutil = new MailUtil(propertyUtil);
@@ -174,7 +167,7 @@ public class ClownfishSendConfirmMail extends HttpServlet {
                         domain.append(port);
                     }
                 }
-                mailutil.sendRespondMail(attributContentEmail.getContentString(), "Bestätigung des Accounts", domain.toString() + "/Confirm?token=" + URLEncoder.encode(ar.getToken(), "UTF-8") + "&confirmfield=confirmed");
+                mailutil.sendRespondMail(attributContentEmail.getContentString(), "Bestätigung des Accounts", "Mit folgendem Link bestätigen Sie die Authentität Ihres Accounts:\n" + domain.toString() + "/Confirm?token=" + URLEncoder.encode(ar.getToken(), "UTF-8") + "\nFalls Sie diesen Link innerhalb der nächsten " + act + " Minuten nicht anwählen, wird der Account automatisch gelöscht. Sobald Sie sich authentifiziert haben, erfolgt noch eine Freigabe durch einen Administrator." );
             } catch (Exception ex) {
                 Logger.getLogger(ClownfishSendConfirmMail.class.getName()).log(Level.SEVERE, null, ex);
             }

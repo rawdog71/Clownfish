@@ -476,35 +476,9 @@ public class ContentList implements Serializable {
      * @param actionEvent
      */
     public void onScrappContent(ActionEvent actionEvent) {
-        if (selectedContent != null) {            
-            selectedContent.setScrapped(true);
-            cfclasscontentService.edit(selectedContent);
+        if (selectedContent != null) {        
+            deleteContent(selectedContent);
             
-            // Delete from Listcontent - consistency
-            List<CfListcontent> listcontent = cflistcontentService.findByClasscontentref(selectedContent.getId());
-            for (CfListcontent lc : listcontent) {
-                cflistcontentService.delete(lc);
-                hibernateUtil.deleteRelation(cflistService.findById(lc.getCfListcontentPK().getListref()), cfclasscontentService.findById(lc.getCfListcontentPK().getClasscontentref()));
-            }
-            
-            // Delete from Sitecontent - consistency
-            List<CfSitecontent> sitecontent = cfsitecontentService.findByClasscontentref(selectedContent.getId());
-            for (CfSitecontent sc : sitecontent) {
-                cfsitecontentService.delete(sc);
-            }
-
-            // Delete from AccessManager
-            List<CfAccessmanager> mgrs = cfAccessmanagerService.findByRefclasscontent(BigInteger.valueOf(selectedContent.getId()));
-            for (CfAccessmanager mgr : mgrs) {
-                cfAccessmanagerService.delete(mgr);
-            }
-            
-            try {
-                hibernateUtil.updateContent(selectedContent);
-            } catch (javax.persistence.NoResultException ex) {
-                LOGGER.warn(ex.getMessage());
-            }
-            classcontentlist = cfclasscontentService.findByMaintenance(true);
             FacesMessage message = new FacesMessage("Succesful", selectedContent.getName() + " has been scrapped.");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
@@ -857,6 +831,37 @@ public class ContentList implements Serializable {
 
     public void selectDivContent(String contentname) {
         selectContent(cfclasscontentService.findByName(contentname));
+    }
+    
+    public void deleteContent(CfClasscontent content) {
+        content.setScrapped(true);
+        cfclasscontentService.edit(content);
+
+        // Delete from Listcontent - consistency
+        List<CfListcontent> listcontent = cflistcontentService.findByClasscontentref(content.getId());
+        for (CfListcontent lc : listcontent) {
+            cflistcontentService.delete(lc);
+            hibernateUtil.deleteRelation(cflistService.findById(lc.getCfListcontentPK().getListref()), cfclasscontentService.findById(lc.getCfListcontentPK().getClasscontentref()));
+        }
+
+        // Delete from Sitecontent - consistency
+        List<CfSitecontent> sitecontent = cfsitecontentService.findByClasscontentref(content.getId());
+        for (CfSitecontent sc : sitecontent) {
+            cfsitecontentService.delete(sc);
+        }
+
+        // Delete from AccessManager
+        List<CfAccessmanager> mgrs = cfAccessmanagerService.findByRefclasscontent(BigInteger.valueOf(content.getId()));
+        for (CfAccessmanager mgr : mgrs) {
+            cfAccessmanagerService.delete(mgr);
+        }
+
+        try {
+            hibernateUtil.updateContent(content);
+        } catch (javax.persistence.NoResultException ex) {
+            LOGGER.warn(ex.getMessage());
+        }
+        classcontentlist = cfclasscontentService.findByMaintenance(true);
     }
     
     public void selectContent(CfClasscontent content) {

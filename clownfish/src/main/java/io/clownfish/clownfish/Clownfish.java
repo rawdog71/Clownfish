@@ -310,6 +310,7 @@ public class Clownfish {
         
         if (null == confirmtokenlist) {
             confirmtokenlist = new AuthTokenListClasscontent();
+            confirmtokenlist.setConfirmation(true);
         }
         
         if (null == authtokenlist) {
@@ -318,6 +319,7 @@ public class Clownfish {
         
         if (null == authtokenlistclasscontent) {
             authtokenlistclasscontent = new AuthTokenListClasscontent();
+            authtokenlistclasscontent.setConfirmation(false);
         }
         
         // read all System Properties of the property table
