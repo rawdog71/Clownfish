@@ -28,6 +28,7 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.PasswordUtil;
+import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -64,6 +65,7 @@ public class ClownfishLoginServlet extends HttpServlet {
     transient CfAttributService cfattributService;
     String klasse, id, pw_field, id_field, clearPw, auth_field;
     @Autowired transient AuthTokenListClasscontent authtokenlist;
+    @Autowired PropertyUtil propertyUtil;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ClownfishLoginServlet.class);
 
@@ -135,7 +137,11 @@ public class ClownfishLoginServlet extends HttpServlet {
                                     ar.setStatus(PasswordUtil.verifyUserPassword(inst_clearTextPw, PasswordUtil.generateSecurePassword(inst_clearTextPw, salt), salt));
                                     if (ar.isStatus()) {
                                         ar.setToken(AuthTokenClasscontent.generateToken(inst_clearTextPw, salt));
-                                        AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(60), classcontent1, "");      // Tokens valid for 60 minutes
+                                        
+                                        String logintime = propertyUtil.getPropertyValue("logintime");
+                                        int lt = Integer.parseInt(logintime);
+                                        
+                                        AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(lt), classcontent1, "");
                                         ar.setValiduntil(at.getValiduntil());
                                         authtokenlist.getAuthtokens().put(ar.getToken(), at);
                                         break;

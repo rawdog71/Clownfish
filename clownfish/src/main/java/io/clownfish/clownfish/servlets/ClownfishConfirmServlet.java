@@ -73,10 +73,12 @@ public class ClownfishConfirmServlet extends HttpServlet {
             token = values[0];
         });
         
+        /*
         System.out.println(token);
         for (AuthTokenClasscontent at : confirmtokenlist.getAuthtokens().values()) {
             System.out.println(at.getToken());
         }
+        */
         
         AuthTokenClasscontent at = confirmtokenlist.getAuthtokens().get(token);
         if (null != at) {
