@@ -91,6 +91,8 @@ public class ClownfishConfirmServlet extends HttpServlet {
             cfattributcontentService.edit(attributContent1);
             hibernateUtil.updateContent(attributContent1.getClasscontentref());
             
+            confirmtokenlist.getAuthtokens().remove(token);
+            
             MailUtil mailutil = new MailUtil(propertyUtil);
             try {
                 mailutil.sendRespondMail(propertyUtil.getPropertyValue("email_admin"), "Freischaltung des Accounts für die Seite " + at.getSite(), "Freischaltung des Accounts: " + user.getName());

@@ -17,6 +17,12 @@ package io.clownfish.clownfish.datamodels;
 
 import io.clownfish.clownfish.beans.ContentList;
 import io.clownfish.clownfish.beans.ScrapyardList;
+import io.clownfish.clownfish.dbentities.CfAttribut;
+import io.clownfish.clownfish.dbentities.CfAttributcontent;
+import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.serviceinterface.CfAttributService;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
@@ -37,6 +43,9 @@ public class AuthTokenListClasscontent {
     @Autowired transient PropertyUtil propertyUtil;
     @Autowired transient ContentList contentlist;
     @Autowired transient ScrapyardList scrapyardlist;
+    @Autowired transient CfClasscontentService cfclasscontentService;
+    @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired transient CfAttributService cfattributService;
     private @Getter @Setter boolean confirmation = false;
 
     public AuthTokenListClasscontent() {
@@ -65,8 +74,14 @@ public class AuthTokenListClasscontent {
             if (authtokens.get(token).getValiduntil().isBeforeNow()) {
                 if (confirmation) {
                     // kill also the user in db
-                    contentlist.deleteContent(authtokens.get(token).getUser());
-                    scrapyardlist.destroyContent(authtokens.get(token).getUser());
+                    CfClasscontent user = authtokens.get(token).getUser();
+                    CfClasscontent usercheck = cfclasscontentService.findById(user.getId());
+                    CfAttribut confirmed_attr = cfattributService.findByNameAndClassref("confirmed", user.getClassref());
+                    CfAttributcontent confirmed = cfattributcontentService.findByAttributrefAndClasscontentref(confirmed_attr, usercheck);
+                    if (!confirmed.getContentBoolean()) {
+                        contentlist.deleteContent(authtokens.get(token).getUser());
+                        scrapyardlist.destroyContent(authtokens.get(token).getUser());
+                    }
                 }
                 authtokens.remove(token);
             }
