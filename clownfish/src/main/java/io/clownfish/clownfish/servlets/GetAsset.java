@@ -193,17 +193,32 @@ public class GetAsset extends HttpServlet {
                                             File f = new File(propertyUtil.getPropertyValue("folder_media") + File.separator + imagefilename);
 
                                             if ((inst_width > 0) || (inst_height > 0)) {
-                                                BufferedImage result = AsyncScalr.resize(ImageIO.read(f), inst_width).get();
-                                                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                                                ImageIO.write(result, asset.getFileextension(), os);
-                                                ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey));
+                                                if (inst_width > 0) {
+                                                    BufferedImage result = AsyncScalr.resize(ImageIO.read(f), inst_width).get();
+                                                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+                                                    ImageIO.write(result, asset.getFileextension(), os);
+                                                    ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey));
 
-                                                try (OutputStream out = acontext.getResponse().getOutputStream()) {
-                                                    in = new ByteArrayInputStream(os.toByteArray());
-                                                    IOUtils.copy(in, out);
-                                                } catch (IOException ex) {
-                                                    LOGGER.error(ex.getMessage());
-                                                    acontext.complete();
+                                                    try (OutputStream out = acontext.getResponse().getOutputStream()) {
+                                                        in = new ByteArrayInputStream(os.toByteArray());
+                                                        IOUtils.copy(in, out);
+                                                    } catch (IOException ex) {
+                                                        LOGGER.error(ex.getMessage());
+                                                        acontext.complete();
+                                                    }
+                                                } else {
+                                                    BufferedImage result = AsyncScalr.resize(ImageIO.read(f), inst_height).get();
+                                                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+                                                    ImageIO.write(result, asset.getFileextension(), os);
+                                                    ImageIO.write(result, asset.getFileextension(), new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey));
+
+                                                    try (OutputStream out = acontext.getResponse().getOutputStream()) {
+                                                        in = new ByteArrayInputStream(os.toByteArray());
+                                                        IOUtils.copy(in, out);
+                                                    } catch (IOException ex) {
+                                                        LOGGER.error(ex.getMessage());
+                                                        acontext.complete();
+                                                    }
                                                 }
                                             } else {
                                                 try (OutputStream out = acontext.getResponse().getOutputStream()) {
