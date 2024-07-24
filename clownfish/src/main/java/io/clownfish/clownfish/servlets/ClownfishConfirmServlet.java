@@ -23,14 +23,15 @@ import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
+import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.utils.HibernateUtil;
 import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
 import java.util.Map;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
@@ -53,11 +54,10 @@ public class ClownfishConfirmServlet extends HttpServlet {
     @Autowired HibernateUtil hibernateUtil;
     @Autowired PropertyUtil propertyUtil;
     @Autowired transient AuthTokenListClasscontent confirmtokenlist;
-    @Autowired
-    transient CfAttributcontentService cfattributcontentService;
-    @Autowired
-    transient CfAttributService cfattributService;
-    String confirm_field, token;
+    @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired transient CfAttributService cfattributService;
+    @Autowired CfTemplateService cftemplateService;
+    String token;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ClownfishConfirmServlet.class);
 
@@ -72,13 +72,6 @@ public class ClownfishConfirmServlet extends HttpServlet {
         parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("token") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
             token = values[0];
         });
-        
-        /*
-        System.out.println(token);
-        for (AuthTokenClasscontent at : confirmtokenlist.getAuthtokens().values()) {
-            System.out.println(at.getToken());
-        }
-        */
         
         AuthTokenClasscontent at = confirmtokenlist.getAuthtokens().get(token);
         if (null != at) {
@@ -100,10 +93,22 @@ public class ClownfishConfirmServlet extends HttpServlet {
                 java.util.logging.Logger.getLogger(ClownfishSendConfirmMail.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            response.setContentType("application/json");
+            String template = propertyUtil.getPropertyValue("template_confirmed");
+            CfTemplate cftemplate = cftemplateService.findByName(template);
+            
+            response.setContentType("text/html");
             try (PrintWriter out = response.getWriter()) {
-                Gson gson = new Gson();
-                out.print(gson.toJson(ar));
+                out.print(cftemplate.getContent());
+            } catch (IOException ex) {
+                //LOGGER.error(ex.getMessage());
+            }
+        } else {
+            String template = propertyUtil.getPropertyValue("template_notconfirmed");
+            CfTemplate cftemplate = cftemplateService.findByName(template);
+            
+            response.setContentType("text/html");
+            try (PrintWriter out = response.getWriter()) {
+                out.print(cftemplate.getContent());
             } catch (IOException ex) {
                 //LOGGER.error(ex.getMessage());
             }

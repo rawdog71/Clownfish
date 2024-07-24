@@ -104,8 +104,23 @@ public class MailUtil implements Serializable {
         } else {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(mailto));
         }
+        
+        // Create the message body part
+        BodyPart messageBodyPart = new MimeBodyPart();
+        
+        // Create a multipart message for attachment
+        Multipart multipart = new MimeMultipart();
+
+        // Fill the message
+        messageBodyPart.setContent(mailbody, "text/html; charset=utf-8");
+        // Set text message part
+        multipart.addBodyPart(messageBodyPart);
+
+        // Send the complete message parts
+        message.setContent(multipart);
+        message.saveChanges();
+        
         message.setSubject(subject);
-        message.setContent(mailbody, encodingOptions);
 
         if (mailto.compareToIgnoreCase("noreply@clownfish.io") != 0) {
             // Send the message

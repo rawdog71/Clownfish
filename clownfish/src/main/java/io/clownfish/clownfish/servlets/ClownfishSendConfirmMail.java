@@ -167,7 +167,7 @@ public class ClownfishSendConfirmMail extends HttpServlet {
                         domain.append(port);
                     }
                 }
-                mailutil.sendRespondMail(attributContentEmail.getContentString(), "Bestätigung des Accounts", "Mit folgendem Link bestätigen Sie die Authentität Ihres Accounts:\n" + domain.toString() + "/Confirm?token=" + URLEncoder.encode(ar.getToken(), "UTF-8") + "\nFalls Sie diesen Link innerhalb der nächsten " + act + " Minuten nicht anwählen, wird der Account automatisch gelöscht. Sobald Sie sich authentifiziert haben, erfolgt noch eine Freigabe durch einen Administrator." );
+                mailutil.sendRespondMail(attributContentEmail.getContentString(), "Bestätigung des Accounts", "Mit folgendem Link bestätigen Sie die Authentität Ihres Accounts:</br>" + domain.toString() + "/Confirm?token=" + URLEncoder.encode(ar.getToken(), "UTF-8") + "</br>Falls Sie diesen Link innerhalb der nächsten " + act + " Minuten nicht anwählen, wird der Account automatisch gelöscht. Sobald Sie sich authentifiziert haben, erfolgt noch eine Freigabe durch einen Administrator.</br></br>Diese Mail wurde automatisch generiert.");
             } catch (Exception ex) {
                 Logger.getLogger(ClownfishSendConfirmMail.class.getName()).log(Level.SEVERE, null, ex);
             }
