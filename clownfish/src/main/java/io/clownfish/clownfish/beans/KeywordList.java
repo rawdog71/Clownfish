@@ -74,9 +74,8 @@ public class KeywordList {
     public void onCreate(ActionEvent actionEvent) {
         try {
             items.stream().forEach((keyword) -> {
-                try {
-                    cfkeywordService.findByName(keyword);
-                } catch (NoResultException ex) {
+                CfKeyword dummykeyword = cfkeywordService.findByName(keyword);
+                if (null == dummykeyword) {
                     CfKeyword newkeyword = new CfKeyword();
                     newkeyword.setName(keyword);
                     cfkeywordService.create(newkeyword);

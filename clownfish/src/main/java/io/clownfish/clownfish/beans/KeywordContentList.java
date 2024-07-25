@@ -78,17 +78,14 @@ public class KeywordContentList implements Serializable {
     }
 
     public void onCreate(ActionEvent actionEvent) {
-        try {
-            keywordlistname = keywordlistname.trim().replaceAll("\\s+", "_");
-            cfkeywordlistService.findByName(keywordlistname);
-        } catch (NoResultException ex) {
+        keywordlistname = keywordlistname.trim().replaceAll("\\s+", "_");
+        CfKeywordlist dummykeywordlist = cfkeywordlistService.findByName(keywordlistname);
+        if (null == dummykeywordlist) {
             CfKeywordlist newkeywordlist = new CfKeywordlist();
             newkeywordlist.setName(keywordlistname);
             cfkeywordlistService.create(newkeywordlist);
             keywordlist = cfkeywordlistService.findAll();
             keywords = cfkeywordService.findAll();
-        } catch (ConstraintViolationException ex) {
-            LOGGER.error(ex.getMessage());
         }
     }
     

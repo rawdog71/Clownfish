@@ -86,17 +86,14 @@ public class AssetLibrary {
      * @param actionEvent
      */
     public void onCreate(ActionEvent actionEvent) {
-        try {
-            assetlistname = assetlistname.trim().replaceAll("\\s+", "_");
-            cfassetlistService.findByName(assetlistname);
-        } catch (NoResultException ex) {
+        assetlistname = assetlistname.trim().replaceAll("\\s+", "_");
+        CfAssetlist dummyassetlist = cfassetlistService.findByName(assetlistname);
+        if (null == dummyassetlist) {
             CfAssetlist newassetlist = new CfAssetlist();
             newassetlist.setName(assetlistname);
             cfassetlistService.create(newassetlist);
             assetlist = cfassetlistService.findAll();
             assets = cfassetService.findAll();
-        } catch (ConstraintViolationException ex) {
-            LOGGER.error(ex.getMessage());
         }
     }
     
