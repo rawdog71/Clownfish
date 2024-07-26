@@ -2988,7 +2988,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t<div class=\"uk-container uk-container-small\">").append("\n");
         html.append("\t\t\t\t<p class=\"flex-middle\">Diese Seite ist zugriffsbeschränkt. Bitte loggen Sie sich ein.</p>").append("\n");
         html.append("\t\t\t</div>").append("\n");
-        html.append("\t\t\t<div ng-if=\"!forgotPassword && !createUserB && !resetPasswordEmail\" class=\"flex-middle uk-container uk-container-small uk-margin uk-form-stacked\">").append("\n");
+        html.append("\t\t\t<div ng-if=\"!forgotPassword && !createUserB && !resetPasswordEmail && !deleteEmail\" class=\"flex-middle uk-container uk-container-small uk-margin uk-form-stacked\">").append("\n");
         html.append("\t\t\t\t<div class=\"width-50\">").append("\n");
 
         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
@@ -3010,6 +3010,12 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
         html.append("\t\t\t\t\t\t<div class=\"uk-form-controls\">").append("\n");
         html.append("\t\t\t\t\t\t\t<p class=\"width-100 password-forgot\" ng-click=\"clickForgotPassword()\">Passwort vergessen?</p>").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+
+        html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-form-controls\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<p class=\"width-100 password-forgot\" ng-click=\"changeDelete()\">Account löschen</p>").append("\n");
         html.append("\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t</div>").append("\n");
 
@@ -3039,6 +3045,23 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
         html.append("\t\t\t\t\t\t\t<div class=\"uk-form-controls uk-flex\">").append("\n");
         html.append("\t\t\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" ng-click=\"resetPassword()\">Zurücksetzen</button>").append("\n");
+        html.append("\t\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t</div>").append("\n");
+
+        html.append("\t\t\t\t<div ng-if=\"deleteEmail\" class=\"flex-middle uk-container uk-container-small uk-margin uk-form-stacked\">").append("\n");
+        html.append("\t\t\t\t\t<div class=\"width-50\">").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"form-stacked-email\">E-Mail</label>").append("\n");
+        html.append("\t\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
+        html.append("\t\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
+        html.append("\t\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"deleteEmail\" ng-model=\"email\" type=\"text\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<div class=\"uk-form-controls uk-flex\">").append("\n");
+        html.append("\t\t\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" ng-click=\"deleteAccount()\">Löschen</button>").append("\n");
         html.append("\t\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t</div>").append("\n");
@@ -3129,6 +3152,7 @@ public class ClassUtil implements Serializable {
 
         html.append("\t\t\t\t$scope.forgotPassword = false;").append("\n");
         html.append("\t\t\t\t$scope.createUserB = false;").append("\n");
+        html.append("\t\t\t\t$scope.deleteEmail = false;").append("\n");
         html.append("\t\t\t\t$scope.email = \"\"").append("\n");
         html.append("\t\t\t\t$scope.password = \"\"").append("\n");
         html.append("\t\t\t\t$scope.password_again = \"\"").append("\n");
@@ -3149,6 +3173,10 @@ public class ClassUtil implements Serializable {
 
         html.append("\t\t\t\t$scope.changeCreate = () => {").append("\n");
         html.append("\t\t\t\t\t$scope.createUserB = !$scope.createUserB;").append("\n");
+        html.append("\t\t\t\t}").append("\n\n");
+
+        html.append("\t\t\t\t$scope.changeDelete = () => {").append("\n");
+        html.append("\t\t\t\t\t$scope.deleteEmail = !$scope.deleteEmail;").append("\n");
         html.append("\t\t\t\t}").append("\n\n");
 
         //SetNewPassword
@@ -3253,6 +3281,15 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t});").append("\n");
         html.append("\t\t\t\t};").append("\n\n");
 
+
+        html.append("\t\t\t\t$scope.deleteAccount = () => {").append("\n");
+        html.append("\t\t\t\t\tvar email = document.getElementById(\"deleteEmail\").value;").append("\n");
+        html.append("\t\t\t\t\t$http.get(\"SendConfirmDeleteMail?class=\"+className+\"&email=\"+ email +\"\").then(res => {").append("\n");
+        html.append("\t\t\t\t\t\ttoastr.success('Sie erhalten in kürze eine Email.', 'Erfolgreich')").append("\n");
+        html.append("\t\t\t\t\t\topenLogin()").append("\n");
+        html.append("\t\t\t\t\t});").append("\n");
+        html.append("\t\t\t\t};").append("\n\n");
+
         //Login
         html.append("\t\t\t\t$scope.login = function(referrer) {").append("\n");
         html.append("\t\t\t\t\t$http.get(\"Auth\", {params: { \"class\": className, \"idField\": idField, \"pwField\": passwordField, \"id\": document.getElementById(\"loginEmail\").value, \"clearPw\": document.getElementById(\"loginPassword\").value, \"authfield\": authfield}}).then(function (res) {").append("\n");
@@ -3352,6 +3389,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t$scope.forgotPassword = false;").append("\n");
         html.append("\t\t\t\t\t$scope.resetPasswordEmail = false;").append("\n");
         html.append("\t\t\t\t\t$scope.createUserB = false;").append("\n");
+        html.append("\t\t\t\t\t$scope.deleteEmail = false;").append("\n");
         html.append("\t\t\t\t};").append("\n");
 
         html.append("\t\t\t\tasync function getInformation() {").append("\n");
