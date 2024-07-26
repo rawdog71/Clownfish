@@ -325,6 +325,38 @@ public class ClassList implements Serializable {
                 newattributpassword.setNodelete(true);
                 newattributpassword.setExt_mutable(true);
                 cfattributService.create(newattributpassword);
+                
+                // Create password field
+                CfAttribut newattributcreated = new CfAttribut();
+                newattributcreated.setClassref(createdclass);
+                newattributcreated.setName("created");
+                newattributcreated.setIdentity(false);
+                newattributcreated.setAutoincrementor(false);
+                newattributcreated.setIsindex(false);
+                newattributcreated.setAttributetype(cfattributetypeService.findByName("datetime"));
+                newattributcreated.setRelationtype(-1);
+                newattributcreated.setDefault_val("");
+                newattributcreated.setMandatory(false);
+                newattributcreated.setDescription("Angelegt");
+                newattributcreated.setNodelete(true);
+                newattributcreated.setExt_mutable(false);
+                cfattributService.create(newattributcreated);
+                
+                // Create password field
+                CfAttribut newattributupdated = new CfAttribut();
+                newattributupdated.setClassref(createdclass);
+                newattributupdated.setName("lastlogin");
+                newattributupdated.setIdentity(false);
+                newattributupdated.setAutoincrementor(false);
+                newattributupdated.setIsindex(false);
+                newattributupdated.setAttributetype(cfattributetypeService.findByName("datetime"));
+                newattributupdated.setRelationtype(-1);
+                newattributupdated.setDefault_val("");
+                newattributupdated.setMandatory(false);
+                newattributupdated.setDescription("Letzter Login");
+                newattributupdated.setNodelete(true);
+                newattributupdated.setExt_mutable(false);
+                cfattributService.create(newattributupdated);
             }
             
             

@@ -15,24 +15,18 @@
  */
 package io.clownfish.clownfish.servlets;
 
+import io.clownfish.clownfish.beans.ContentList;
+import io.clownfish.clownfish.beans.ScrapyardList;
 import io.clownfish.clownfish.datamodels.AuthResponse;
 import io.clownfish.clownfish.datamodels.AuthTokenClasscontent;
 import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
-import io.clownfish.clownfish.dbentities.CfAttributcontent;
-import io.clownfish.clownfish.dbentities.CfClass;
-import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfTemplate;
-import io.clownfish.clownfish.serviceinterface.CfAttributService;
-import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
-import io.clownfish.clownfish.utils.HibernateUtil;
-import io.clownfish.clownfish.utils.MailUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -47,18 +41,17 @@ import org.springframework.stereotype.Component;
  *
  * @author SulzbachR
  */
-@WebServlet(name = "Confirm", urlPatterns = {"/Confirm"})
+@WebServlet(name = "ConfirmDelete", urlPatterns = {"/ConfirmDelete"})
 @Component
-public class ClownfishConfirmServlet extends HttpServlet {
-    @Autowired HibernateUtil hibernateUtil;
+public class ClownfishConfirmDeleteServlet extends HttpServlet {
     @Autowired PropertyUtil propertyUtil;
     @Autowired transient AuthTokenListClasscontent confirmtokenlist;
-    @Autowired transient CfAttributcontentService cfattributcontentService;
-    @Autowired transient CfAttributService cfattributService;
     @Autowired CfTemplateService cftemplateService;
+    @Autowired transient ContentList contentlist;
+    @Autowired transient ScrapyardList scrapyardlist;
     String token;
     
-    final transient Logger LOGGER = LoggerFactory.getLogger(ClownfishConfirmServlet.class);
+    final transient Logger LOGGER = LoggerFactory.getLogger(ClownfishConfirmDeleteServlet.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         AuthResponse ar = new AuthResponse();
@@ -75,24 +68,13 @@ public class ClownfishConfirmServlet extends HttpServlet {
         AuthTokenClasscontent at = confirmtokenlist.getAuthtokens().get(token);
         if (null != at) {
             CfClasscontent user = at.getUser();
-            CfClass cfclass = user.getClassref();
             
-            CfAttribut attributConfirm = cfattributService.findByNameAndClassref("confirmed", cfclass);
-            CfAttributcontent attributContent1 = cfattributcontentService.findByAttributrefAndClasscontentref(attributConfirm, user);
-            attributContent1.setContentBoolean(Boolean.TRUE);
-            cfattributcontentService.edit(attributContent1);
-            hibernateUtil.updateContent(attributContent1.getClasscontentref());
+            contentlist.deleteContent(user);
+            scrapyardlist.destroyContent(user);
             
             confirmtokenlist.getAuthtokens().remove(token);
-            
-            MailUtil mailutil = new MailUtil(propertyUtil);
-            try {
-                mailutil.sendRespondMail(propertyUtil.getPropertyValue("email_admin"), "Freischaltung des Accounts für die Seite " + at.getSite(), "Freischaltung des Accounts: " + user.getName());
-            } catch (Exception ex) {
-                java.util.logging.Logger.getLogger(ClownfishSendConfirmMail.class.getName()).log(Level.SEVERE, null, ex);
-            }
 
-            String template = propertyUtil.getPropertyValue("template_confirmed");
+            String template = propertyUtil.getPropertyValue("template_deleted");
             CfTemplate cftemplate = cftemplateService.findByName(template);
             
             response.setContentType("text/html");
@@ -102,7 +84,7 @@ public class ClownfishConfirmServlet extends HttpServlet {
                 //LOGGER.error(ex.getMessage());
             }
         } else {
-            String template = propertyUtil.getPropertyValue("template_notconfirmed");
+            String template = propertyUtil.getPropertyValue("template_notdeleted");
             CfTemplate cftemplate = cftemplateService.findByName(template);
             
             response.setContentType("text/html");

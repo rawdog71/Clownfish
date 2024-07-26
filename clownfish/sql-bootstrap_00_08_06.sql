@@ -7,3 +7,5 @@ INSERT INTO `clownfish`.`cf_property` (`hashkey`, `value`, `nodelete`) VALUES ('
 INSERT INTO `clownfish`.`cf_property` (`hashkey`, `value`, `nodelete`) VALUES ('logintime', '120', '1');
 INSERT INTO `clownfish`.`cf_property` (`hashkey`, `value`, `nodelete`) VALUES ('template_confirmed', '', '1');
 INSERT INTO `clownfish`.`cf_property` (`hashkey`, `value`, `nodelete`) VALUES ('template_notconfirmed', '', '1');
+INSERT INTO `clownfish`.`cf_property` (`hashkey`, `value`, `nodelete`) VALUES ('template_deleted', '', '1');
+INSERT INTO `clownfish`.`cf_property` (`hashkey`, `value`, `nodelete`) VALUES ('template_notdeleted', '', '1');
