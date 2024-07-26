@@ -52,6 +52,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
 
 /**
  *
@@ -371,6 +374,13 @@ public class ContentList implements Serializable {
                         }
                         
                     }
+                    if ((attribut.getClassref().isLoginclass()) && (0 == attribut.getName().compareToIgnoreCase("created"))) {
+                        newcontent = contentUtil.setAttributValue(newcontent, new DateTime().toString(DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZone(DateTimeZone.forID("Europe/Berlin"))));
+                        cfattributcontentService.create(newcontent);
+
+                        contentUtil.indexContent();
+                    }
+                    
                     cfattributcontentService.create(newcontent);
                 }
             });

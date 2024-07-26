@@ -70,6 +70,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.joda.time.DateTimeZone;
 
 /**
  *
@@ -376,6 +377,16 @@ public class EntityUtil {
                                         }
                                         if (found) break;
                                     }
+                                }
+                                if ((attribut.getClassref().isLoginclass()) && (0 == attribut.getName().compareToIgnoreCase("created"))) {
+                                    CfAttributcontent newcontent = new CfAttributcontent();
+                                    newcontent.setAttributref(attribut);
+                                    newcontent.setClasscontentref(newclasscontent);
+                                    newcontent = contentUtil.setAttributValue(newcontent, new DateTime().toString(new DateTime().toString(DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZone(DateTimeZone.forID("Europe/Berlin")))));
+                                    cfattributcontentService.create(newcontent);
+
+                                    contentUtil.indexContent();
+                                    found = true;
                                 }
                                 if (!found) {
                                     CfAttributcontent newcontent = new CfAttributcontent();

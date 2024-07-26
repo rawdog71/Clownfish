@@ -27,6 +27,8 @@ import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import io.clownfish.clownfish.utils.PasswordUtil;
 import io.clownfish.clownfish.utils.PropertyUtil;
 import java.io.IOException;
@@ -42,6 +44,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,28 +59,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClownfishLoginServlet extends HttpServlet {
 
-    @Autowired
-    transient CfClassService cfclassService;
-    @Autowired
-    transient CfClasscontentService cfclasscontentService;
-    @Autowired
-    transient CfAttributcontentService cfattributcontentService;
-    @Autowired
-    transient CfAttributService cfattributService;
-    String klasse, id, pw_field, id_field, clearPw, auth_field;
+    @Autowired transient CfClassService cfclassService;
+    @Autowired transient CfClasscontentService cfclasscontentService;
+    @Autowired transient CfAttributcontentService cfattributcontentService;
+    @Autowired transient CfAttributService cfattributService;
     @Autowired transient AuthTokenListClasscontent authtokenlist;
+    @Autowired private ContentUtil contentUtil;
+    @Autowired private HibernateUtil hibernateUtil;
     @Autowired PropertyUtil propertyUtil;
+    String klasse, id, clearPw;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(ClownfishLoginServlet.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         String inst_klasse;
         String inst_identifier;
-        String inst_passwordField;
-        String inst_authField;
         String salt;
         String inst_clearTextPw;
-        String inst_identifierField;
         AuthResponse ar = new AuthResponse();
         ar.setStatus(false);
         ar.setToken("");
@@ -91,35 +90,21 @@ public class ClownfishLoginServlet extends HttpServlet {
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("clearPw") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 clearPw = values[0];
             });
-            id_field = ""; 
-            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("idField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-                id_field = values[0];
-            });
             id = "";
             parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("id") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
                 id = values[0];
             });
-            pw_field = "";
-            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("pwField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-                pw_field = values[0];
-            });
-            auth_field = "";
-            parameters.keySet().stream().filter((paramname) -> (paramname.compareToIgnoreCase("authField") == 0)).map((paramname) -> parameters.get(paramname)).forEach((values) -> {
-                auth_field = values[0];
-            });
 
             inst_klasse = klasse;
             inst_identifier = id;
-            inst_passwordField = pw_field;
-            inst_identifierField = id_field;
             inst_clearTextPw = clearPw;
-            inst_authField = auth_field;
 
             CfClass cfclass = cfclassService.findByName(inst_klasse);
             List<CfClasscontent> classcontentList = cfclasscontentService.findByClassref(cfclass);
-            CfAttribut attributField = cfattributService.findByNameAndClassref(inst_identifierField, cfclass);
-            CfAttribut attributPassword = cfattributService.findByNameAndClassref(inst_passwordField, cfclass);
-            CfAttribut attributAuth = cfattributService.findByNameAndClassref(inst_authField, cfclass);
+            CfAttribut attributField = cfattributService.findByNameAndClassref("email", cfclass);
+            CfAttribut attributPassword = cfattributService.findByNameAndClassref("password", cfclass);
+            CfAttribut attributAuth = cfattributService.findByNameAndClassref("valid", cfclass);
+            CfAttribut attributLastlogin = cfattributService.findByNameAndClassref("lastlogin", cfclass);
 
             for (CfClasscontent classcontent : classcontentList) {
                 CfAttributcontent attributContent = cfattributcontentService.findByAttributrefAndClasscontentref(attributField, classcontent);
@@ -144,6 +129,11 @@ public class ClownfishLoginServlet extends HttpServlet {
                                         AuthTokenClasscontent at = new AuthTokenClasscontent(ar.getToken(), new DateTime().plusMinutes(lt), classcontent1, "");
                                         ar.setValiduntil(at.getValiduntil());
                                         authtokenlist.getAuthtokens().put(ar.getToken(), at);
+                                        
+                                        CfAttributcontent attributContentLastlogin = cfattributcontentService.findByAttributrefAndClasscontentref(attributLastlogin, classcontent1);
+                                        attributContentLastlogin = contentUtil.setAttributValue(attributContentLastlogin, new DateTime().toString(new DateTime().toString(DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZone(DateTimeZone.forID("Europe/Berlin")))));
+                                        cfattributcontentService.edit(attributContentLastlogin);
+                                        hibernateUtil.updateContent(classcontent);
                                         break;
                                     }
                                 }
