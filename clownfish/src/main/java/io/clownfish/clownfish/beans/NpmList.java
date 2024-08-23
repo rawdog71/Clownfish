@@ -164,7 +164,9 @@ public class NpmList implements Serializable {
             
             CfNpm dummy = cfnpmService.findByNpmIdAndNpmLatestversion(selectedNpmDoc.getName(), selectedNpmVersion.getVersion());
             if (null == dummy) {
-                deinstall(selectedNpm);
+                if (0 == selectedNpm.getNpmId().compareToIgnoreCase(selectedNpmDoc.getName())) {
+                    deinstall(selectedNpm);
+                }
                 downloadNpm(npm.getNpmFilename(), npm.getNpmId());
                 npm = cfnpmService.create(npm);
                 npmlist = cfnpmService.findAll();

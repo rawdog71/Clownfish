@@ -23,6 +23,7 @@ import io.clownfish.clownfish.dbentities.CfAttributetype;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfTemplate;
+import io.clownfish.clownfish.odata.EntityUtil;
 import io.clownfish.clownfish.odata.GenericEdmProvider;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
@@ -108,6 +109,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter String passwordField;
     private @Getter @Setter String authField;
     private @Getter @Setter String adminEmailField;
+    @Autowired transient private @Getter @Setter  EntityUtil entityutil;
 
     @Autowired transient private @Getter @Setter AttributList attributlist;
     final transient Logger LOGGER = LoggerFactory.getLogger(ClassList.class);
@@ -513,6 +515,7 @@ public class ClassList implements Serializable {
         if (null != selectedClass) {
             HibernateUtil.generateTablesDatamodel(selectedClass.getName(), 1);
             edmprovider.init();
+            entityutil.clearAttributmap();
             Thread edmprovider_thread = new Thread(edmprovider);
             edmprovider_thread.start();
             FacesMessage message = new FacesMessage("Datamodel recreated with data init");

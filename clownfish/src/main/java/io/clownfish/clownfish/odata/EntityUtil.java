@@ -66,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -188,6 +189,10 @@ public class EntityUtil {
             default:
                 prop.setValue(ValueType.PRIMITIVE, null);
         }
+    }
+    
+    public void clearAttributmap() {
+        attributmap.clear();       
     }
     
     public Entity makeEntity(ContentDataOutput contentdataoutput) {
