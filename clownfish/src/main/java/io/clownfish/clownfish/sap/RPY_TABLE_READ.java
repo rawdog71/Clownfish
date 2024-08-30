@@ -41,6 +41,10 @@ public class RPY_TABLE_READ {
         RPY_TABLE_READ.sapc = (SAPConnection) sapc;
     }
     
+    public void setSapConnection(Object sapc) {
+        sapc = (SAPConnection) sapc;
+    }
+    
     public void init() {
         rpytablereadlist.clear();
     }

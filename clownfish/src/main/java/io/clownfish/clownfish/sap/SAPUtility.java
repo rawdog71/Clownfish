@@ -51,6 +51,10 @@ public class SAPUtility {
         rpytableread = new RPY_TABLE_READ((SAPConnection) sapc);
     }
     
+    public void setSapConnection(Object sapc) {
+        sapc = (SAPConnection) sapc;
+    }
+    
     /*
         getSapExport
         Übergibt die POST Parameter und ruft SAP RFC auf
@@ -197,6 +201,7 @@ public class SAPUtility {
                 }
                 // SAP RFC ausführen
                 //LOGGER.info("START SAP RFC execute");
+                
                 function.execute(sapc.getDestination());
                 //LOGGER.info("STOP SAP RFC execute");
                 HashMap<String, ArrayList> saptables = new HashMap<>();
@@ -418,6 +423,7 @@ public class SAPUtility {
         if (rpyMap.containsKey(tablename)) {
             rpytablereadlist = rpyMap.get(tablename);
         } else {
+            rpytableread.setSapConnection(sapc);
             rpytablereadlist = rpytableread.getRpyTableReadList(tablename);
             rpyMap.put(tablename, rpytablereadlist);
         }

@@ -100,6 +100,7 @@ public class RestSAPRfc {
             rfcgroupsearch = new RFC_GROUP_SEARCH(sapsystemc);
             rfcfunctionsearch = new RFC_FUNCTION_SEARCH(sapsystemc);
             SAPUtility su = new SAPUtility(sapsystemc);
+            su.setSapConnection(sapsystemc);
             rsrp.setResult(su.executeAsync(rsrp.getRfcFunction(), rsrp.getParametermap(), rfc_get_function_interface, jcofunctiontable));
         }
         return rsrp;
