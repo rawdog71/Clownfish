@@ -313,60 +313,64 @@ public class ClassUtil implements Serializable {
         List<CfAttribut> attributlist = cfattributService.findByClassref(clazz);
         for (String key : contentparameter.getAttributmap().keySet()) {
             CfAttribut attribut = getAttributFromAttributlist(attributlist, key);
-            CfAttributcontent attributcontent = new CfAttributcontent();
-            attributcontent.setAttributref(attribut);
-            switch (attribut.getAttributetype().getName()) {
-                case "boolean":
-                    attributcontent.setContentBoolean(true);
-                    break;
-                case "string":
-                case "hashstring":    
-                    attributcontent.setContentString(contentparameter.getAttributmap().get(key));
-                    break;
-                case "integer":
-                    attributcontent.setContentInteger(BigInteger.valueOf(Long.parseLong(contentparameter.getAttributmap().get(key))));
-                    break;
-                case "real":
-                    attributcontent.setContentReal(Double.parseDouble(contentparameter.getAttributmap().get(key)));
-                    break;
-                case "htmltext":
-                case "text":
-                case "markdown":
-                    attributcontent.setContentText(contentparameter.getAttributmap().get(key));
-                    break;
-                case "datetime":
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.GERMAN);
-                    Date date;
-                    try {
-                        date = formatter.parse(contentparameter.getAttributmap().get(key));
-                        attributcontent.setContentDate(date);
-                    } catch (ParseException ex) {
-                        java.util.logging.Logger.getLogger(ClassUtil.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    break;
-                case "media":
-                    CfAsset asset = cfassetService.findByName(contentparameter.getAttributmap().get(key));
-                    attributcontent.setContentInteger(BigInteger.valueOf(asset.getId()));
-                    break;
-                case "classref":
-                    // ToDo: 1:n - n:m logic
-                    try {
-                        CfList list = cflistService.findByName(contentparameter.getAttributmap().get(key));
-                        attributcontent.setClasscontentlistref(list);
-                    } catch (Exception ex) {
-                        attributcontent.setClasscontentlistref(null);
-                    }
-                    break;
-                case "assetref":
-                    try {
-                        CfAssetlist assetlist = cfassetlistService.findByName(contentparameter.getAttributmap().get(key));
-                        attributcontent.setAssetcontentlistref(assetlist);
-                    } catch (Exception ex) {
-                        attributcontent.setAssetcontentlistref(null);
-                    }
-                    break;
+            if (null != attribut) {
+                CfAttributcontent attributcontent = new CfAttributcontent();
+                attributcontent.setAttributref(attribut);
+                switch (attribut.getAttributetype().getName()) {
+                    case "boolean":
+                        attributcontent.setContentBoolean(true);
+                        break;
+                    case "string":
+                    case "hashstring":    
+                        attributcontent.setContentString(contentparameter.getAttributmap().get(key));
+                        break;
+                    case "integer":
+                        attributcontent.setContentInteger(BigInteger.valueOf(Long.parseLong(contentparameter.getAttributmap().get(key))));
+                        break;
+                    case "real":
+                        attributcontent.setContentReal(Double.parseDouble(contentparameter.getAttributmap().get(key)));
+                        break;
+                    case "htmltext":
+                    case "text":
+                    case "markdown":
+                        attributcontent.setContentText(contentparameter.getAttributmap().get(key));
+                        break;
+                    case "datetime":
+                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.GERMAN);
+                        Date date;
+                        try {
+                            date = formatter.parse(contentparameter.getAttributmap().get(key));
+                            attributcontent.setContentDate(date);
+                        } catch (ParseException ex) {
+                            java.util.logging.Logger.getLogger(ClassUtil.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        break;
+                    case "media":
+                        CfAsset asset = cfassetService.findByName(contentparameter.getAttributmap().get(key));
+                        attributcontent.setContentInteger(BigInteger.valueOf(asset.getId()));
+                        break;
+                    case "classref":
+                        // ToDo: 1:n - n:m logic
+                        try {
+                            CfList list = cflistService.findByName(contentparameter.getAttributmap().get(key));
+                            attributcontent.setClasscontentlistref(list);
+                        } catch (Exception ex) {
+                            attributcontent.setClasscontentlistref(null);
+                        }
+                        break;
+                    case "assetref":
+                        try {
+                            CfAssetlist assetlist = cfassetlistService.findByName(contentparameter.getAttributmap().get(key));
+                            attributcontent.setAssetcontentlistref(assetlist);
+                        } catch (Exception ex) {
+                            attributcontent.setAssetcontentlistref(null);
+                        }
+                        break;
+                }
+                attributcontentlist.add(attributcontent);
+            } else {
+                LOGGER.warn("Attribut " + key + " does not exist anymore!");
             }
-            attributcontentlist.add(attributcontent);
         }
         return attributcontentlist;
     }

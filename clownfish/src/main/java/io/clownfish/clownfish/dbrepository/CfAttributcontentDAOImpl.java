@@ -147,4 +147,12 @@ public class CfAttributcontentDAOImpl implements CfAttributcontentDAO {
         List<CfAttributcontent> cfattributcontentlist = query.getResultList();
         return cfattributcontentlist;
     }
+
+    @Override
+    public boolean deleteAttributref(long attributref) {
+        Session session = this.sessionFactory.getCurrentSession();
+        NativeQuery query = (NativeQuery) session.createSQLQuery("DELETE FROM cf_attributcontent WHERE attributref = " + attributref);
+        query.executeUpdate();
+        return true;
+    }
 }

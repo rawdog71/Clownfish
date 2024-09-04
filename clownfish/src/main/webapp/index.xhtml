@@ -1454,6 +1454,10 @@
                             <div class="flex align-items-center pr-2">
                                 <p:commandButton id="changeattribut" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" disabled="#{classList.editAttributButtonDisabled}" />
                             </div>
+                            
+                            <div class="flex align-items-center pr-2">
+                                <p:commandButton id="deleteattribut" icon="pi pi-trash" process="form" value="Delete" actionListener="#{classList.onDeleteAttribut}" update=":form:msgs :form:tabview:attributlist" disabled="#{classList.deleteAttributButtonDisabled}" />
+                            </div>
                         </div>
                     </p:panel>
                     
@@ -1569,6 +1573,9 @@
                             </p:column>
                             <p:column headerText="Typ" style="width: 200px;">
                                 <h:outputText value="#{attributcontent.attributref.attributetypeString}" />
+                            </p:column>
+                            <p:column headerText="Class" style="width: 200px;">
+                                <h:outputText value="#{attributcontent.attributref.relationref.name}" />
                             </p:column>
                             <p:column headerText="Wert">
                                 <p:inputText id="attributvalueString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.stringType}" required="#{classcontentList.isRequired(attributcontent)}" maxlength="#{classcontentList.getMaxlength(attributcontent)}" disabled="#{!classcontentList.checkedout}">

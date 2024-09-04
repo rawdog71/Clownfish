@@ -15,11 +15,9 @@
  */
 package io.clownfish.clownfish.dbentities;
 
-import io.clownfish.clownfish.utils.EncryptUtil;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.Locale;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;

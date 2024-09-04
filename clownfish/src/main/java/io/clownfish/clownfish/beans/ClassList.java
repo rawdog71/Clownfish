@@ -103,6 +103,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean newButtonDisabled;
     private @Getter @Setter boolean newAttributButtonDisabled;
     private @Getter @Setter boolean editAttributButtonDisabled;
+    private @Getter @Setter boolean deleteAttributButtonDisabled;
     private @Getter @Setter boolean renderClass;
     private @Getter @Setter int javaLanguage = 0;
     private @Getter @Setter String idField;
@@ -213,6 +214,7 @@ public class ClassList implements Serializable {
         extmutable = selectedAttribut.getExt_mutable();
         newAttributButtonDisabled = true;
         editAttributButtonDisabled = nodelete;
+        deleteAttributButtonDisabled = nodelete;
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
@@ -498,6 +500,19 @@ public class ClassList implements Serializable {
             
             FacesMessage message = new FacesMessage("Attribute changed");
             FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public void onDeleteAttribut(ActionEvent actionEvent) {
+        if (selectedAttribut != null) {
+            if (0 != selectedAttribut.getName().compareToIgnoreCase("id")) {
+                cfattributcontentService.deleteAttributref(selectedAttribut.getId());
+                
+                cfattributService.delete(selectedAttribut);
+
+                FacesMessage message = new FacesMessage("Attribute deleted");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
         }
     }
     

@@ -35,6 +35,7 @@ public interface CfAttributcontentService {
     CfAttributcontent create(CfAttributcontent entity);
     boolean delete(CfAttributcontent entity);
     boolean delete(long classcontentref);
+    boolean deleteAttributref(long attributref);
     boolean updateContentref(long contentref);
     CfAttributcontent edit(CfAttributcontent entity);
     List<CfAttributcontent> findByContentclassRef(CfList classcontentref);
