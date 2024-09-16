@@ -95,6 +95,7 @@ public class ContentList implements Serializable {
     private @Getter @Setter String contentName;
     private @Getter @Setter CfClass selectedClass;
     private transient @Getter @Setter List<CfClass> classlist = null;
+    private transient @Getter @Setter List<CfClass> classmaintenancelist = null;
     private transient @Getter @Setter List<CfAssetlist> assetlibrarylist = null;
     private @Getter @Setter boolean newContentButtonDisabled = false;
     private @Getter @Setter boolean contentValueBoolean = false;
@@ -206,6 +207,10 @@ public class ContentList implements Serializable {
         classcontentlist = cfclasscontentService.findByMaintenance(true);
         classlist = cfclassService.findAll();
         classlist.sort((CfClass c1, CfClass c2) -> c1.getName().compareToIgnoreCase(c2.getName()));
+        
+        classmaintenancelist = cfclassService.findByMaintenance(true);
+        classmaintenancelist.sort((CfClass c1, CfClass c2) -> c1.getName().compareToIgnoreCase(c2.getName()));
+        
         assetlist = cfassetService.findAll();
         selectedAssetList = cfassetlistService.findAll();
         editContent = "";
@@ -651,6 +656,7 @@ public class ContentList implements Serializable {
     public void onRefreshAll() {
         classcontentlist = cfclasscontentService.findByMaintenance(true);
         classlist = cfclassService.findAll();
+        classmaintenancelist = cfclassService.findByMaintenance(true);
         assetlist = cfassetService.findAll();
         keywordSource = cfkeywordService.findAll();
         assetlist = cfassetService.findAll();
