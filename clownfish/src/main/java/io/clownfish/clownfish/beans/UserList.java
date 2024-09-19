@@ -120,20 +120,20 @@ public class UserList implements Serializable {
             String secure = PasswordUtil.generateSecurePassword(passwort, salt);
             newuser.setSalt(salt);
             newuser.setPasswort(secure);
-
-            if (!selectedbackendListcontent.isEmpty()) {
-                for (CfBackend selected : selectedbackendListcontent) {
-                    CfUserbackend listcontent = new CfUserbackend();
-                    CfUserbackendPK cflistcontentPK = new CfUserbackendPK();
-                    cflistcontentPK.setUserref(selectedUser.getId());
-                    cflistcontentPK.setBackendref(selected.getId());
-                    listcontent.setCfUserbackendPK(cflistcontentPK);
-                    cfuserbackendService.create(listcontent);
+            
+            newuser = cfuserService.create(newuser);
+            if (null != newuser) {
+                if (!selectedbackendListcontent.isEmpty()) {
+                    for (CfBackend selected : selectedbackendListcontent) {
+                        CfUserbackend listcontent = new CfUserbackend();
+                        CfUserbackendPK cflistcontentPK = new CfUserbackendPK();
+                        cflistcontentPK.setUserref(newuser.getId());
+                        cflistcontentPK.setBackendref(selected.getId());
+                        listcontent.setCfUserbackendPK(cflistcontentPK);
+                        cfuserbackendService.create(listcontent);
+                    }
                 }
             }
-
-            cfuserService.create(newuser);
-
             userlist = cfuserService.findAll();
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
