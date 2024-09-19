@@ -51,14 +51,16 @@ public class RestKeywordListContent {
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = iklp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
-                    try {
-                        CfKeywordlistcontent keywordlistcontent = cfkeywordlistcontentService.findByKeywordrefAndKeywordlistref(iklp.getKeywordref(), iklp.getKeywordlistref());
+                    CfKeywordlistcontent keywordlistcontent = cfkeywordlistcontentService.findByKeywordrefAndKeywordlistref(iklp.getKeywordref(), iklp.getKeywordlistref());
+                    if (null != keywordlistcontent) {
                         LOGGER.warn("Duplicate Keywordlistcontent");
                         iklp.setReturncode("Duplicate Keywordlistcontent");
-                    } catch (javax.persistence.NoResultException ex) {
+                    } else {
                         CfKeywordlistcontent newkeywordlistcontent = new CfKeywordlistcontent();
                         newkeywordlistcontent.setCfKeywordlistcontentPK(new CfKeywordlistcontentPK(iklp.getKeywordlistref(), iklp.getKeywordref()));
                         CfKeywordlistcontent newkeywordliscontent2 = cfkeywordlistcontentService.create(newkeywordlistcontent);
+                        iklp.setKeywordlistref(newkeywordlistcontent.getCfKeywordlistcontentPK().getKeywordlistref());
+                        iklp.setKeywordref(newkeywordlistcontent.getCfKeywordlistcontentPK().getKeywordref());
                         iklp.setReturncode("OK");
                     }
                 } else {

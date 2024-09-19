@@ -50,14 +50,15 @@ public class RestKeyword {
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = ikp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
-                    try {
-                        CfKeyword keyword = cfkeywordService.findByName(ikp.getKeyword());
+                    CfKeyword keyword = cfkeywordService.findByName(ikp.getKeyword());
+                    if (null != keyword) {
                         LOGGER.warn("Duplicate Keyword");
                         ikp.setReturncode("Duplicate Keyword");
-                    } catch (javax.persistence.NoResultException ex) {
+                    } else {
                         CfKeyword newkeyword = new CfKeyword();
                         newkeyword.setName(ikp.getKeyword());
                         CfKeyword newkeyword2 = cfkeywordService.create(newkeyword);
+                        ikp.setId(newkeyword2.getId());
                         ikp.setReturncode("OK");
                     }
                 } else {

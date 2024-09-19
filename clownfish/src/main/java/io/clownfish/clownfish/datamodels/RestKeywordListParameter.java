@@ -27,6 +27,7 @@ public class RestKeywordListParameter {
     private @Getter @Setter String apikey;
     private @Getter @Setter String token;
     private @Getter @Setter String keywordlist;
+    private @Getter @Setter long id;
 
     public RestKeywordListParameter() {
     }

@@ -22,7 +22,6 @@ import io.clownfish.clownfish.dbentities.CfAssetlistcontent;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistcontentService;
 import io.clownfish.clownfish.utils.ApiKeyUtil;
-import io.clownfish.clownfish.utils.FolderUtil;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -82,10 +80,10 @@ public class RestAssetlist {
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = idp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
-                    try {
-                        CfAssetlist list = cfassetlistService.findByName(idp.getListname().trim().replaceAll("\\s+", "_"));
+                    CfAssetlist list = cfassetlistService.findByName(idp.getListname().trim().replaceAll("\\s+", "_"));
+                    if (null != list) {
                         idp.setReturncode("Duplicate Assetlistcontent");
-                    } catch (javax.persistence.NoResultException ex) {
+                    } else {
                         CfAssetlist newlist = new CfAssetlist();
                         newlist.setName(idp.getListname().trim().replaceAll("\\s+", "_"));
 
