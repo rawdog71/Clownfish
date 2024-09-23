@@ -914,7 +914,7 @@ public class ClassUtil implements Serializable {
         sitetree.loadTree();
     }
     
-    public void generateODataForm(CfClass clazz, List<ODataWizard> wizardlist) {
+    public String generateODataForm(CfClass clazz, List<ODataWizard> wizardlist, boolean generatelistform) {
         List<CfAttribut> attributList = cfattributService.findByClassref(clazz);
         StringBuilder html = new StringBuilder();
         StringBuilder javascript = new StringBuilder();
@@ -922,6 +922,8 @@ public class ClassUtil implements Serializable {
         CfTemplate dummytemplate = null;
         CfSite site = new CfSite();
         CfJavascript js = new CfJavascript();
+        
+        boolean created = true;
 
         html.append("<!DOCTYPE html>").append("\n");
         html.append("<html lang=\"de\" ng-app=\"crud").append(clazz.getName()).append("App\">").append("\n");
@@ -934,12 +936,15 @@ public class ClassUtil implements Serializable {
         html.append("\t\t<script src=\"/resources/js/angular.js\"></script>").append("\n");
         html.append("\t\t<script src=\"/js/crud_").append(clazz.getName().toLowerCase()).append(".js\"></script>").append("\n");
         html.append("\t\t<script src=\"/resources/js/pikaday.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"./js/luxon/build/global/luxon.js\"></script>").append("\n");
         html.append("\t</head>").append("\n");
         html.append("\t<body id=\"page-top\" ng-controller=\"Crud").append(clazz.getName()).append("Controller\" data-ng-init=\"init()\">").append("\n");
         
         html.append("\t\t<ul class=\"uk-subnav uk-subnav-pill\" uk-switcher>").append("\n");
 	html.append("\t\t\t<li><a href=\"#\">").append(clazz.getName()).append("</a></li>").append("\n");
-	html.append("\t\t\t<li><a href=\"#\">").append(clazz.getName()).append(" Listen</a></li>").append("\n");
+        if (generatelistform) {
+            html.append("\t\t\t<li><a href=\"#\">").append(clazz.getName()).append(" Listen</a></li>").append("\n");
+        }
 	html.append("\t\t</ul>").append("\n");
 	html.append("\t\t<ul class=\"uk-switcher uk-margin\">").append("\n");
 	html.append("\t\t\t<li>").append("\n");
@@ -951,6 +956,27 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t<thead style=\"position: sticky !important;top: 0;background: white;z-index: 1;\">").append("\n");
         html.append("\t\t\t\t\t\t<tr>").append("\n");
         html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append(" == 'id', 'descending': order_").append(clazz.getName().toLowerCase()).append(" == '-id'}\">ID</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('id')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('-id')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
+
+        for (ODataWizard odw : wizardlist) {
+            CfAttribut attr = odw.getAttribut();
+            if (attr.getAutoincrementor() || !created) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "classref":
+                    created = false;
+                    if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
+                        created = true;
+                    }
+                    if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
+                        created = true;
+                    }
+                    if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
+                        created = true;
+                    }
+                    break;
+            }
+        }
         
         for (ODataWizard odw : wizardlist) {
             if (odw.isTableheader()) {
@@ -1083,7 +1109,7 @@ public class ClassUtil implements Serializable {
         
         for (ODataWizard odw : wizardlist) {
             CfAttribut attr = odw.getAttribut();
-            if (attr.getAutoincrementor()) {
+            if (attr.getAutoincrementor() || !attr.getExt_mutable()) {
                 continue;
             }
             switch (attr.getAttributetype().getName()) {
@@ -1287,7 +1313,7 @@ public class ClassUtil implements Serializable {
 					
         for (ODataWizard odw : wizardlist) {
             CfAttribut attr = odw.getAttribut();
-            if (attr.getAutoincrementor()) {
+            if (attr.getAutoincrementor() || !attr.getExt_mutable()) {
                 continue;
             }
             switch (attr.getAttributetype().getName()) {
@@ -1980,30 +2006,33 @@ public class ClassUtil implements Serializable {
         html.append("\t<script src=\"/resources/js/uikit-icons.min.js\"></script>").append("\n");
         html.append("</html>").append("\n");
         
-        template.setName("crud_" + clazz.getName());
-        try {
-            dummytemplate = cfTemplateService.findByName(template.getName());
-            if (null == dummytemplate) {
+        if (created) {
+            template.setName("crud_" + clazz.getName());
+            try {
+                dummytemplate = cfTemplateService.findByName(template.getName());
+                if (null == dummytemplate) {
+                    template.setScriptlanguage(2);
+                    template.setCheckedoutby(BigInteger.ZERO);
+                    template.setContent(html.toString());
+                    cfTemplateService.create(template);
+                    templateutil.commit(template);
+                } else {
+                    dummytemplate.setContent(html.toString());
+                    cfTemplateService.edit(dummytemplate);
+                    templateutil.commit(dummytemplate);
+                }
+            } catch (Exception ex) {
                 template.setScriptlanguage(2);
                 template.setCheckedoutby(BigInteger.ZERO);
                 template.setContent(html.toString());
                 cfTemplateService.create(template);
                 templateutil.commit(template);
-            } else {
-                dummytemplate.setContent(html.toString());
-                cfTemplateService.edit(dummytemplate);
-                templateutil.commit(dummytemplate);
             }
-        } catch (Exception ex) {
-            template.setScriptlanguage(2);
-            template.setCheckedoutby(BigInteger.ZERO);
-            template.setContent(html.toString());
-            cfTemplateService.create(template);
-            templateutil.commit(template);
         }
         
         javascript.append("var crud").append(clazz.getName()).append(" = angular.module('crud").append(clazz.getName()).append("App', []);").append("\n");
         javascript.append("crud").append(clazz.getName()).append(".controller('Crud").append(clazz.getName()).append("Controller', function($scope, $http) {").append("\n");
+        javascript.append("\tvar DateTime = luxon.DateTime;").append("\n");
         javascript.append("\t$scope.loading = false;").append("\n");
         javascript.append("\t$scope.inprogress = false;").append("\n");
         javascript.append("\n");
@@ -2497,7 +2526,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t").append(clazz.getName()).append(".id = null;").append("\n");
         
         for (CfAttribut attr : attributList) {
-            if (attr.getAutoincrementor()) {
+            if (attr.getAutoincrementor() || !attr.getExt_mutable()) {
                 continue;
             }
             switch (attr.getAttributetype().getName()) {
@@ -2522,7 +2551,8 @@ public class ClassUtil implements Serializable {
                     break;
                 case "datetime":
                     javascript.append("\t\tif ($scope.").append(attr.getName()).append(" != null) {").append("\n");
-                    javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = $scope.").append(attr.getName()).append(";").append("\n");
+                    javascript.append("d = DateTime.fromISO($scope.").append(attr.getName()).append(");").append("\n");
+                    javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = d.toFormat('yyyy-MM-dd') + \"T\" + d.toFormat('hh:mm:ss');").append("\n");
                     javascript.append("\t\t}").append("\n");
                     break;
                 case "boolean":
@@ -2625,7 +2655,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t").append(clazz.getName()).append(".id = id;").append("\n");
         
         for (CfAttribut attr : attributList) {
-            if (attr.getAutoincrementor()) {
+            if (attr.getAutoincrementor() || !attr.getExt_mutable()) {
                 continue;
             }
             switch (attr.getAttributetype().getName()) {
@@ -2656,7 +2686,8 @@ public class ClassUtil implements Serializable {
                     break;
                 case "datetime":
                     javascript.append("\t\tif ($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
-                    javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = $scope.").append(clazz.getName()).append(".").append(attr.getName()).append(";").append("\n");
+                    javascript.append("d = DateTime.fromISO($scope.").append(attr.getName()).append(");").append("\n");
+                    javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = d.toFormat('yyyy-MM-dd') + \"T\" + d.toFormat('hh:mm:ss');").append("\n");
                     javascript.append("\t\t}").append("\n");
                     break;
                 case "boolean":
@@ -2907,59 +2938,64 @@ public class ClassUtil implements Serializable {
         javascript.append("\t};").append("\n");
         javascript.append("});").append("\n");
         
-        js.setName("crud_" + clazz.getName().toLowerCase());
-        try {
-            CfJavascript dummyjs = cfJavaScriptService.findByName(js.getName());
-            if (null == dummyjs) {
+        if (created) {
+            js.setName("crud_" + clazz.getName().toLowerCase());
+            try {
+                CfJavascript dummyjs = cfJavaScriptService.findByName(js.getName());
+                if (null == dummyjs) {
+                    js.setCheckedoutby(BigInteger.ZERO);
+                    js.setContent(javascript.toString());
+                    cfJavaScriptService.create(js);
+                    javascriptutil.commit(js);
+                    javascriptutil.writeStaticJS(js.getName(), js.getContent(), "js");
+                } else {
+                    dummyjs.setContent(javascript.toString());
+                    cfJavaScriptService.edit(dummyjs);
+                    javascriptutil.commit(dummyjs);
+                    javascriptutil.writeStaticJS(dummyjs.getName(), dummyjs.getContent(), "js");
+                }
+            } catch (Exception ex) {
                 js.setCheckedoutby(BigInteger.ZERO);
                 js.setContent(javascript.toString());
                 cfJavaScriptService.create(js);
                 javascriptutil.commit(js);
                 javascriptutil.writeStaticJS(js.getName(), js.getContent(), "js");
-            } else {
-                dummyjs.setContent(javascript.toString());
-                cfJavaScriptService.edit(dummyjs);
-                javascriptutil.commit(dummyjs);
-                javascriptutil.writeStaticJS(dummyjs.getName(), dummyjs.getContent(), "js");
             }
-        } catch (Exception ex) {
-            js.setCheckedoutby(BigInteger.ZERO);
-            js.setContent(javascript.toString());
-            cfJavaScriptService.create(js);
-            javascriptutil.commit(js);
-            javascriptutil.writeStaticJS(js.getName(), js.getContent(), "js");
-        }
 
-        site.setName("crud_" + clazz.getName().toLowerCase());
-        CfSite dummysite = cfSiteService.findByName(site.getName());
-        if (null == dummysite) {
-            site.setCharacterencoding("UTF-8");
-            site.setHitcounter(BigInteger.ZERO);
-            site.setTitle("");
-            site.setContenttype("text/html");
-            site.setSearchrelevant(false);
-            site.setHtmlcompression(0);
-            site.setGzip(0);
-            site.setLocale("de");
-            site.setDescription("Automatic generation");
-            site.setAliaspath(site.getName());
-            CfSite parent = cfSiteService.findByName("crud");
-            if (null != parent) {
-                site.setParentref(parent);
-            } else {
-                site.setParentref(null);
+            site.setName("crud_" + clazz.getName().toLowerCase());
+            CfSite dummysite = cfSiteService.findByName(site.getName());
+            if (null == dummysite) {
+                site.setCharacterencoding("UTF-8");
+                site.setHitcounter(BigInteger.ZERO);
+                site.setTitle("");
+                site.setContenttype("text/html");
+                site.setSearchrelevant(false);
+                site.setHtmlcompression(0);
+                site.setGzip(0);
+                site.setLocale("de");
+                site.setDescription("Automatic generation");
+                site.setAliaspath(site.getName());
+                CfSite parent = cfSiteService.findByName("crud");
+                if (null != parent) {
+                    site.setParentref(parent);
+                } else {
+                    site.setParentref(null);
+                }
+                if (null != template.getContent()) {
+                    site.setTemplateref(template);
+                } else {
+                    site.setTemplateref(dummytemplate);
+                }
+                site.setShorturl(siteutil.generateShorturl());
+                site.setLoginsite("");
+                site.setTestparams("");
+                cfSiteService.create(site);
             }
-            if (null != template.getContent()) {
-                site.setTemplateref(template);
-            } else {
-                site.setTemplateref(dummytemplate);
-            }
-            site.setShorturl(siteutil.generateShorturl());
-            site.setLoginsite("");
-            site.setTestparams("");
-            cfSiteService.create(site);
+            sitetree.loadTree();
+            return "OData Form template generated";
+        } else {
+            return "OData Form template NOT generated - Relation refs not set";
         }
-        sitetree.loadTree();
     }
 
     public void generateLogin(CfClass clazz, String idField, String passwordField, String authField, String adminMail) {

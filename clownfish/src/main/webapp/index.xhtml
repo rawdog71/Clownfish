@@ -2875,6 +2875,16 @@
                         </p:selectOneMenu>
                     </p:column>
                 </p:dataTable>
+                
+                <p:row>
+                    <p:column>
+                        <div class="content-justify">
+                            <p:outputLabel for="generateListform" value="Generate List form:" />
+                            <p:selectBooleanCheckbox id="generateListform" value="#{classList.generatelistform}"/>
+                        </div>
+                    </p:column>
+                </p:row>
+                
                 <p:commandButton id="odataformwizard" process="form" value="Generate OData Form Wizard" actionListener="#{classList.onGenerateODataForm(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
                     <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
                     <f:actionListener binding="#{templateList.refresh()}" />
