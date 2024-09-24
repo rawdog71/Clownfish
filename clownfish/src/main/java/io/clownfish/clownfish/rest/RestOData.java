@@ -23,9 +23,7 @@ import org.apache.olingo.commons.api.edm.provider.CsdlEdmProvider;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataHttpHandler;
 import org.apache.olingo.server.api.ServiceMetadata;
-import org.apache.olingo.server.api.processor.EntityCollectionProcessor;
-import org.apache.olingo.server.api.processor.EntityProcessor;
-import org.apache.olingo.server.api.processor.PrimitiveProcessor;
+import org.apache.olingo.server.api.processor.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +49,10 @@ public class RestOData {
     
     @Autowired
     PrimitiveProcessor primitiveprocessor;
+    @Autowired
+    ComplexProcessor complexprocessor;
+    @Autowired
+    ComplexCollectionProcessor complexcollectionprocessor;
     
     @Value("${odata.use:0}") int odata_use;
 
@@ -63,6 +65,8 @@ public class RestOData {
             handler.register(processor);
             handler.register(singletonprocessor);
             handler.register(primitiveprocessor);
+            handler.register(complexprocessor);
+            handler.register(complexcollectionprocessor);
             handler.process(new HttpServletRequestWrapper(request) {
                 @Override
                 public String getServletPath() {
