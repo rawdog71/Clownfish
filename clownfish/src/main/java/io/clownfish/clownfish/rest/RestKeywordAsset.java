@@ -51,14 +51,16 @@ public class RestKeywordAsset {
             if (authtokenlist.checkValidToken(token)) {
                 String apikey = iklp.getApikey();
                 if (apikeyutil.checkApiKey(apikey, "RestService")) {
-                    try {
-                        CfAssetkeyword assetkeyword = cfassetkeywordService.findByAssetRefAndKeywordRef(iklp.getAssetref(), iklp.getKeywordref());
+                    CfAssetkeyword assetkeyword = cfassetkeywordService.findByAssetRefAndKeywordRef(iklp.getAssetref(), iklp.getKeywordref());
+                    if (null != assetkeyword) {
                         LOGGER.warn("Duplicate AssetKeyword");
                         iklp.setReturncode("Duplicate AssetKeyword");
-                    } catch (javax.persistence.NoResultException ex) {
+                    } else {
                         CfAssetkeyword newassetkeyword = new CfAssetkeyword();
                         newassetkeyword.setCfAssetkeywordPK(new CfAssetkeywordPK(iklp.getAssetref(), iklp.getKeywordref()));
                         CfAssetkeyword newassetkeyword2 = cfassetkeywordService.create(newassetkeyword);
+                        iklp.setAssetref(newassetkeyword2.getCfAssetkeywordPK().getAssetref());
+                        iklp.setKeywordref(newassetkeyword2.getCfAssetkeywordPK().getKeywordref());
                         iklp.setReturncode("OK");
                     }
                 } else {
