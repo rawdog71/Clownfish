@@ -622,6 +622,16 @@ public class EntityUtil {
             }
         }
     }
+
+    public Entity createEntity(ComplexValue value) {
+        Entity entity = new Entity();
+
+        for (Property cv: value.getValue()) {
+            entity.addProperty(cv);
+        }
+
+        return entity;
+    }
     
     public boolean updateEntity(EdmEntitySet edmEntitySet, List<UriParameter> keyParams, Entity entity, HttpMethod httpMethod, SourceStructure source) {
         if (0 == source.getSource()) {
