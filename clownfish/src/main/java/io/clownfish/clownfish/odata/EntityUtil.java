@@ -91,6 +91,8 @@ public class EntityUtil {
     @Autowired private CfAssetlistService cfassetlistService;
     @Autowired private CfAssetlistcontentService cfassetlistcontentService;
     @Autowired private CfKeywordService cfkeywordService;
+    @Autowired private CfKeywordlistcontentService cfkeywordlistcontentService;
+    @Autowired private CfAssetKeywordService cfassetkeywordService;
     @Autowired private ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     GenericEdmProvider edmprovider;
@@ -998,6 +1000,36 @@ public class EntityUtil {
                         Thread edmprovider_thread = new Thread(edmprovider);
                         edmprovider_thread.start();
                         return true;
+                    }
+                case 5:                                                         // handle CfKeywords
+                    id = null;
+                    for (UriParameter param : keyParams) {
+                        if (0 == param.getName().compareToIgnoreCase("id")) {
+                            id = Long.parseLong(param.getText());
+                        }
+                    }
+                    CfKeyword keyword = cfkeywordService.findById(id);
+                    if (null != keyword) {
+                        // delete keywordlist entries
+                        List<CfKeywordlistcontent> reflist = cfkeywordlistcontentService.findByKeywordref(id);
+                        for (CfKeywordlistcontent entry : reflist) {
+                            cfkeywordlistcontentService.delete(entry);
+                        }
+                        // delete classcontentkeyword entries
+                        List<CfClasscontentkeyword> reflist2 = cfclasscontentkeywordService.findByKeywordRef(id);
+                        for (CfClasscontentkeyword entry : reflist2) {
+                            cfclasscontentkeywordService.delete(entry);
+                        }
+                        // delete assetkeyword entries
+                        List<CfAssetkeyword> reflist3 = cfassetkeywordService.findByKeywordRef(id);
+                        for (CfAssetkeyword entry : reflist3) {
+                            cfassetkeywordService.delete(entry);
+                        }
+                        cfkeywordService.delete(keyword);
+                        
+                        return true;
+                    } else {
+                        return false;
                     }
                 default:
                     return false;
