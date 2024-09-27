@@ -195,6 +195,24 @@ public class EntityUtil {
         attributmap.clear();       
     }
     
+    public Entity makeEntity(CfKeyword keyword) {
+        Entity entity = new Entity();
+        
+        Property prop_id = new Property();
+        prop_id.setName("id");
+        prop_id.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+        setPropValue(prop_id, keyword.getId());
+        entity.addProperty(prop_id);
+        
+        Property prop_name = new Property();
+        prop_name.setName("name");
+        prop_name.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName().getFullQualifiedNameAsString());
+        setPropValue(prop_name, keyword.getName());
+        entity.addProperty(prop_name);
+        
+        return entity;
+    }
+    
     public Entity makeEntity(ContentDataOutput contentdataoutput) {
         Entity entity = new Entity();
         String id = "";

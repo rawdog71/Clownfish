@@ -116,6 +116,19 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
         entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFListEntry"), new SourceStructure(0, 3, null, null, null, null, null));
         CsdlEntityType listentryet = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFListEntry"));
         entityTypes.add(listentryet);
+        
+        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordEntry"), new SourceStructure(0, 4, null, null, null, null, null));
+        CsdlEntityType keywordentryet = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordEntry"));
+        entityTypes.add(keywordentryet);
+        
+        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywords"), new SourceStructure(0, 5, null, null, null, null, null));
+        CsdlEntityType keywordset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywords"));
+        entityTypes.add(keywordset);
+        /*
+        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLibs"), new SourceStructure(0, 6, null, null, null, null, null));
+        CsdlEntityType keywordlibset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLibs"));
+        entityTypes.add(keywordlibset);
+        */
 
         for (CfClass clazz : cfclassservice.findAll()) {
             entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()), new SourceStructure(0, 0, null, null, null, null, null));
@@ -231,6 +244,14 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
             // create EntitySets
             List<CsdlEntitySet> entitySets = new ArrayList<>();
             List<CsdlSingleton> singletons = new ArrayList<>();
+            // Add EntitySet container for Keywords + KeywordLists
+            CsdlEntitySet es_keywords = getEntitySet(CONTAINER, "CFKeywords");
+            entitySets.add(es_keywords);
+            /*
+            CsdlEntitySet es_keywordlibs = getEntitySet(CONTAINER, "CFKeywordLibs");
+            entitySets.add(es_keywordlibs);
+            */
+            // Add EntitySet container for all backend classes
             for (CfClass clazz : cfclassservice.findAll()) {
                 if (!getKeys(clazz).isEmpty()) {
                     CsdlSingleton si = getSingleton(CONTAINER, clazz.getName());
@@ -241,6 +262,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                     }
                 }
             }
+            // Add EntitySet container for all backend datalists
             for (CfClass clazz : cfclassservice.findByMaintenance(true)) {
                 if (!getKeys(clazz).isEmpty()) {
                     CsdlEntitySet es = getEntitySet(CONTAINER, clazz.getName()+"Lists");
@@ -249,6 +271,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                     }
                 }
             }
+            // Add EntitySet container for all backend datalists entries
             for (CfList list : cflistservice.findAll()) {
                 CfClass clazz = list.getClassref();
                 if (!getKeys(clazz).isEmpty()) {
@@ -316,54 +339,108 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
             if (entityUtil.getEntitysourcelist().containsKey(entityTypeName)) {
                 if (0 == entityUtil.getEntitysourcelist().get(entityTypeName).getSource()) {
                     //System.out.println(entityTypeName.getFullQualifiedNameAsString());
-                    if (3 != entityUtil.getEntitysourcelist().get(entityTypeName).getList()) {
-                        CfClass classref = cfclassservice.findByName(entityTypeName.getName());
-                        List propsList = new ArrayList();
-                        List keysList = new ArrayList();
-                        for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
-                            CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
-                            propsList.add(prop);
-                            if (attribut.getIdentity()) {
-                                CsdlPropertyRef propertyRef = new CsdlPropertyRef();
-                                propertyRef.setName(attribut.getName());
-                                keysList.add(propertyRef);
+                    CsdlEntityType entityType = new CsdlEntityType();
+                    List propsList = new ArrayList();
+                    List keysList = new ArrayList();
+                    switch (entityUtil.getEntitysourcelist().get(entityTypeName).getList()) {
+                        case 0:
+                        case 1:
+                        case 2:
+                            CfClass classref = cfclassservice.findByName(entityTypeName.getName());
+                            
+                            for (CfAttribut attribut : cfattributservice.findByClassref(classref)) {
+                                CsdlProperty prop = new CsdlProperty().setName(attribut.getName()).setType(getODataType(attribut)).setCollection(getODataCollection(attribut));
+                                propsList.add(prop);
+                                if (attribut.getIdentity()) {
+                                    CsdlPropertyRef propertyRef = new CsdlPropertyRef();
+                                    propertyRef.setName(attribut.getName());
+                                    keysList.add(propertyRef);
+                                }
                             }
-                        }
-                        CsdlEntityType entityType = new CsdlEntityType();
-                        entityType.setName(entityTypeName.getName());
-                        entityType.setProperties(propsList);
-                        entityType.setKey(keysList);
+                            entityType.setName(entityTypeName.getName());
+                            entityType.setProperties(propsList);
+                            entityType.setKey(keysList);
 
-                        if (!keysList.isEmpty()) {
-                            entityUtil.getEntitytypelist().put(entityTypeName, entityType);
-                            LOGGER.info(entityUtil.getEntitytypelist().get(entityTypeName).getName());
+                            if (!keysList.isEmpty()) {
+                                entityUtil.getEntitytypelist().put(entityTypeName, entityType);
+                                LOGGER.info(entityUtil.getEntitytypelist().get(entityTypeName).getName());
+                                return entityType;
+                            } else {
+                                LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
+                                return null;
+                            }
+                        case 3:                                                 // CFListEntry
+                            entityType.setName(entityTypeName.getName());
+
+                            CsdlProperty prop_id = new CsdlProperty().setName("id").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop_id);
+                            CsdlPropertyRef propertyRef_id = new CsdlPropertyRef();
+                            propertyRef_id.setName("id");
+                            keysList.add(propertyRef_id);
+
+                            CsdlProperty prop_name = new CsdlProperty().setName("name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop_name);
+
+                            CsdlProperty prop_listset = new CsdlProperty().setName("listset").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(true);
+                            propsList.add(prop_listset);
+
+                            entityType.setProperties(propsList);
+                            entityType.setKey(keysList);
+                            LOGGER.info(entityType.getName());
                             return entityType;
-                        } else {
-                            LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
+                        case 4:                                                 // KeywordEntry
+                            entityType.setName(entityTypeName.getName());
+
+                            CsdlProperty prop2_id = new CsdlProperty().setName("id").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop2_id);
+                            CsdlPropertyRef propertyRef2_id = new CsdlPropertyRef();
+                            propertyRef2_id.setName("id");
+                            keysList.add(propertyRef2_id);
+
+                            CsdlProperty prop2_name = new CsdlProperty().setName("name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop2_name);
+
+                            entityType.setProperties(propsList);
+                            entityType.setKey(keysList);
+                            LOGGER.info(entityType.getName());
+                            return entityType;
+                        case 5:                                                 // Keywords
+                            entityType.setName(entityTypeName.getName());
+
+                            CsdlProperty prop3_id = new CsdlProperty().setName("id").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop3_id);
+                            CsdlPropertyRef propertyRef3_id = new CsdlPropertyRef();
+                            propertyRef3_id.setName("id");
+                            keysList.add(propertyRef3_id);
+
+                            CsdlProperty prop3_name = new CsdlProperty().setName("name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop3_name);
+
+                            entityType.setProperties(propsList);
+                            entityType.setKey(keysList);
+                            LOGGER.info(entityType.getName());
+                            return entityType;
+                        case 6:                                                 // KeywordLibs
+                            entityType.setName(entityTypeName.getName());
+
+                            CsdlProperty prop4_id = new CsdlProperty().setName("id").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop4_id);
+                            CsdlPropertyRef propertyRef4_id = new CsdlPropertyRef();
+                            propertyRef4_id.setName("id");
+                            keysList.add(propertyRef4_id);
+
+                            CsdlProperty prop4_name = new CsdlProperty().setName("name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop4_name);
+                            
+                            CsdlProperty prop4_listset = new CsdlProperty().setName("listset").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(true);
+                            propsList.add(prop4_listset);
+
+                            entityType.setProperties(propsList);
+                            entityType.setKey(keysList);
+                            LOGGER.info(entityType.getName());
+                            return entityType;
+                        default:
                             return null;
-                        }
-                    } else {
-                        CsdlEntityType entityType = new CsdlEntityType();
-                        entityType.setName(entityTypeName.getName());
-                        List propsList = new ArrayList();
-                        List keysList = new ArrayList();
-                        
-                        CsdlProperty prop_id = new CsdlProperty().setName("id").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(false);
-                        propsList.add(prop_id);
-                        CsdlPropertyRef propertyRef_id = new CsdlPropertyRef();
-                        propertyRef_id.setName("id");
-                        keysList.add(propertyRef_id);
-                        
-                        CsdlProperty prop_name = new CsdlProperty().setName("name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
-                        propsList.add(prop_name);
-                        
-                        CsdlProperty prop_listset = new CsdlProperty().setName("listset").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(true);
-                        propsList.add(prop_listset);
-                        
-                        entityType.setProperties(propsList);
-                        entityType.setKey(keysList);
-                        LOGGER.info(entityType.getName());
-                        return entityType;
                     }
                 } else {
                     //System.out.println(entityTypeName.getFullQualifiedNameAsString());
@@ -460,6 +537,12 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
             } else {
                 CsdlEntitySet entitySet = new CsdlEntitySet();
                 entitySet.setName(entitySetName);
+                if (0 == entitySetName.compareToIgnoreCase("CFKeywords")) {
+                    entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordEntry"));
+                }
+                if (0 == entitySetName.compareToIgnoreCase("CFKeywordLibs")) {
+                    entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordEntry"));
+                }
                 if ((entitySetName.endsWith("Set")) || (entitySetName.endsWith("Lists"))) {
                     int postlength = 3;
                     if (entitySetName.endsWith("Lists")) postlength = 5;

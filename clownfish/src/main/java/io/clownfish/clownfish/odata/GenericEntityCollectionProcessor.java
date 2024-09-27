@@ -19,6 +19,7 @@ import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
@@ -27,6 +28,7 @@ import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
@@ -97,6 +99,7 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
     @Autowired private CfListcontentService cflistcontentservice;
     @Autowired private CfClasscontentService cfclasscontentService;
     @Autowired private CfAttributcontentService cfattributcontentservice;
+    @Autowired private CfKeywordService cfkeywordService;
     @Autowired ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     @Autowired EntityUtil entityUtil;
@@ -138,95 +141,104 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         FilterOption filterOption = uriInfo.getFilterOption();
 
         String entityname;
-        if (edmEntitySet.getName().endsWith("Set")) {
-            entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
-        } else {
-            if (edmEntitySet.getName().endsWith("List")) {
-                entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
-            } else {
-                if (edmEntitySet.getName().endsWith("Lists")) {
-                    entityname = edmEntitySet.getName();
-                } else {
-                    entityname = edmEntitySet.getName();
-                }
-            }
-        }
-        Expression filterexpression = null;
-        if (null != filterOption) {
-            filterexpression = filterOption.getExpression();
-        }
-        EntityCollection entitySet = getData(edmEntitySet, filterexpression, orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
+        List<Entity> entityList = null;
         EntityCollection returnCollection = new EntityCollection();
-
-        List<Entity> entityList = entitySet.getEntities();
-        Iterator<Entity> entityIterator = entityList.iterator();
-
-        // handle $count
-        if (countOption != null) {
-            if (countOption.getValue()) {
-                returnCollection.setCount(entityList.size());
-            }
-        }
-
-        // handle $skip
-        if (skipOption != null) {
-            int skipNumber = skipOption.getValue();
-            if (skipNumber >= 0) {
-                if (skipNumber <= entityList.size()) {
-                    entityList = entityList.subList(skipNumber, entityList.size());
+        if (0 == edmEntitySet.getName().compareToIgnoreCase("CFKeywords")) {
+            EntityCollection genericCollection = new EntityCollection();
+            EntityCollection entitySet = getKeywords(genericCollection);
+            entityList = entitySet.getEntities();
+        } else {
+            if (edmEntitySet.getName().endsWith("Set")) {
+                entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+            } else {
+                if (edmEntitySet.getName().endsWith("List")) {
+                    entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
                 } else {
-                    // The client skipped all entities
-                    entityList.clear();
-                }
-            } else {
-                throw new ODataApplicationException("Invalid value for $skip", HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
-            }
-        }
-
-        // handle $top
-        if (topOption != null) {
-            int topNumber = topOption.getValue();
-            if (topNumber >= 0) {
-                if (topNumber <= entityList.size()) {
-                    entityList = entityList.subList(0, topNumber);
-                }  // else the client has requested more entities than available, just return what we have
-            } else {
-                throw new ODataApplicationException("Invalid value for $top", HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
-            }
-        }
-
-        // handle $filter
-        if (filterOption != null) {
-            // Apply $filter system query option
-            try {
-                // Evaluate the expression for each entity
-                // If the expression is evaluated to "true", keep the entity, otherwise remove it from the entityList
-                while (entityIterator.hasNext()) {
-                    // To evaluate the expression, create an instance of the Filter Expression Visitor and pass
-                    // the current entity to the constructor
-                    Entity currentEntity = entityIterator.next();
-                    Expression filterExpression = filterOption.getExpression();
-                    GenericFilterExpressionVisitor expressionVisitor = new GenericFilterExpressionVisitor(currentEntity);
-
-                    // Start evaluating the expression
-                    Object visitorResult = filterExpression.accept(expressionVisitor);
-
-                    // The result of the filter expression must be of type Edm.Boolean
-                    if (visitorResult instanceof Boolean) {
-                        if (!Boolean.TRUE.equals(visitorResult)) {
-                            // The expression evaluated to false (or null), so we have to remove the currentEntity from entityList
-                            entityIterator.remove();
-                        }
+                    if (edmEntitySet.getName().endsWith("Lists")) {
+                        entityname = edmEntitySet.getName();
                     } else {
-                        throw new ODataApplicationException("A filter expression must evaulate to type Edm.Boolean",
-                                HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ENGLISH);
+                        entityname = edmEntitySet.getName();
                     }
                 }
-
-            } catch (ExpressionVisitException e) {
-                throw new ODataApplicationException("Exception in filter evaluation",
-                    HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
             }
+            
+            Expression filterexpression = null;
+            if (null != filterOption) {
+                filterexpression = filterOption.getExpression();
+            }
+            EntityCollection entitySet = getData(edmEntitySet, filterexpression, orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
+
+            entityList = entitySet.getEntities();
+            Iterator<Entity> entityIterator = entityList.iterator();
+
+            // handle $count
+            if (countOption != null) {
+                if (countOption.getValue()) {
+                    returnCollection.setCount(entityList.size());
+                }
+            }
+
+            // handle $skip
+            if (skipOption != null) {
+                int skipNumber = skipOption.getValue();
+                if (skipNumber >= 0) {
+                    if (skipNumber <= entityList.size()) {
+                        entityList = entityList.subList(skipNumber, entityList.size());
+                    } else {
+                        // The client skipped all entities
+                        entityList.clear();
+                    }
+                } else {
+                    throw new ODataApplicationException("Invalid value for $skip", HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
+                }
+            }
+
+            // handle $top
+            if (topOption != null) {
+                int topNumber = topOption.getValue();
+                if (topNumber >= 0) {
+                    if (topNumber <= entityList.size()) {
+                        entityList = entityList.subList(0, topNumber);
+                    }  // else the client has requested more entities than available, just return what we have
+                } else {
+                    throw new ODataApplicationException("Invalid value for $top", HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ROOT);
+                }
+            }
+
+            // handle $filter
+            if (filterOption != null) {
+                // Apply $filter system query option
+                try {
+                    // Evaluate the expression for each entity
+                    // If the expression is evaluated to "true", keep the entity, otherwise remove it from the entityList
+                    while (entityIterator.hasNext()) {
+                        // To evaluate the expression, create an instance of the Filter Expression Visitor and pass
+                        // the current entity to the constructor
+                        Entity currentEntity = entityIterator.next();
+                        Expression filterExpression = filterOption.getExpression();
+                        GenericFilterExpressionVisitor expressionVisitor = new GenericFilterExpressionVisitor(currentEntity);
+
+                        // Start evaluating the expression
+                        Object visitorResult = filterExpression.accept(expressionVisitor);
+
+                        // The result of the filter expression must be of type Edm.Boolean
+                        if (visitorResult instanceof Boolean) {
+                            if (!Boolean.TRUE.equals(visitorResult)) {
+                                // The expression evaluated to false (or null), so we have to remove the currentEntity from entityList
+                                entityIterator.remove();
+                            }
+                        } else {
+                            throw new ODataApplicationException("A filter expression must evaulate to type Edm.Boolean",
+                                    HttpStatusCode.BAD_REQUEST.getStatusCode(), Locale.ENGLISH);
+                        }
+                    }
+
+                } catch (ExpressionVisitException e) {
+                    throw new ODataApplicationException("Exception in filter evaluation",
+                        HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
+                }
+            }
+
         }
 
         for (Entity entity : entityList) {
@@ -514,5 +526,16 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
             }
         }
         return -1L;
+    }
+
+    private EntityCollection getKeywords(EntityCollection genericCollection) {
+        List<CfKeyword> keywordlist;
+        List<Entity> genericList = genericCollection.getEntities();
+        keywordlist = cfkeywordService.findAll();
+        for (CfKeyword kw : keywordlist) {
+            Entity entity = entityUtil.makeEntity(kw);
+            genericList.add(entity);
+        }
+        return genericCollection;
     }
 }
