@@ -22,7 +22,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
-import javax.persistence.NoResultException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;

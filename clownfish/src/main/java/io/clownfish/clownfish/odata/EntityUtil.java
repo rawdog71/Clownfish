@@ -66,7 +66,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -91,6 +90,7 @@ public class EntityUtil {
     @Autowired private CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired private CfAssetlistService cfassetlistService;
     @Autowired private CfAssetlistcontentService cfassetlistcontentService;
+    @Autowired private CfKeywordService cfkeywordService;
     @Autowired private ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     GenericEdmProvider edmprovider;
@@ -596,6 +596,24 @@ public class EntityUtil {
                     } else {
                         return null;
                     }
+                case 5:                                                         // handle CfKeywords
+                    name = entity.getProperty("name").getValue().toString();
+                    CfKeyword keyword = cfkeywordService.findByName(name);
+                    if (null != keyword) {
+                        return null;
+                    } else {
+                        keyword = new CfKeyword();
+                        keyword.setName(name);
+                        cfkeywordService.create(keyword);
+                        
+                        Property prop_id = new Property();
+                        prop_id.setName("id");
+                        prop_id.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+                        entity.addProperty(prop_id);
+                        entity.getProperty("id").setValue(ValueType.PRIMITIVE, keyword.getId());
+                        
+                        return entity;
+                    }
                 default:
                     return null;
             }
@@ -800,6 +818,23 @@ public class EntityUtil {
                         Thread edmprovider_thread = new Thread(edmprovider);
                         edmprovider_thread.start();
                         return true;
+                    }
+                case 5:                                                         // handle CfKeywords
+                    id = null;
+                    for (UriParameter param : keyParams) {
+                        if (0 == param.getName().compareToIgnoreCase("id")) {
+                            id = Long.parseLong(param.getText());
+                        }
+                    }
+                    name = entity.getProperty("name").getValue().toString();
+                    CfKeyword keyword = cfkeywordService.findById(id);
+                    if (null != keyword) {
+                        keyword.setName(name);
+                        cfkeywordService.edit(keyword);
+                        
+                        return true;
+                    } else {
+                        return false;
                     }
                 default:
                     return false;
