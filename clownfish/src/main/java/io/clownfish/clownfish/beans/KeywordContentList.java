@@ -28,8 +28,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Named;
-import javax.persistence.NoResultException;
-import jakarta.validation.ConstraintViolationException;
 import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;

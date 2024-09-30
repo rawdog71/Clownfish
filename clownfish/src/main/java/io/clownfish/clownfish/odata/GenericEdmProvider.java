@@ -117,18 +117,13 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
         CsdlEntityType listentryet = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFListEntry"));
         entityTypes.add(listentryet);
         
-        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordEntry"), new SourceStructure(0, 4, null, null, null, null, null));
-        CsdlEntityType keywordentryet = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordEntry"));
-        entityTypes.add(keywordentryet);
-        
         entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywords"), new SourceStructure(0, 5, null, null, null, null, null));
         CsdlEntityType keywordset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywords"));
         entityTypes.add(keywordset);
-        /*
+
         entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLibs"), new SourceStructure(0, 6, null, null, null, null, null));
         CsdlEntityType keywordlibset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLibs"));
         entityTypes.add(keywordlibset);
-        */
 
         for (CfClass clazz : cfclassservice.findAll()) {
             entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()), new SourceStructure(0, 0, null, null, null, null, null));
@@ -247,10 +242,10 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
             // Add EntitySet container for Keywords + KeywordLists
             CsdlEntitySet es_keywords = getEntitySet(CONTAINER, "CFKeywords");
             entitySets.add(es_keywords);
-            /*
+            
             CsdlEntitySet es_keywordlibs = getEntitySet(CONTAINER, "CFKeywordLibs");
             entitySets.add(es_keywordlibs);
-            */
+            
             // Add EntitySet container for all backend classes
             for (CfClass clazz : cfclassservice.findAll()) {
                 if (!getKeys(clazz).isEmpty()) {

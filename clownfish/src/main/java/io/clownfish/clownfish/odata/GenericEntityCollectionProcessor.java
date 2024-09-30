@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfKeyword;
+import io.clownfish.clownfish.dbentities.CfKeywordlist;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
@@ -29,6 +30,7 @@ import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
@@ -100,6 +102,7 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
     @Autowired private CfClasscontentService cfclasscontentService;
     @Autowired private CfAttributcontentService cfattributcontentservice;
     @Autowired private CfKeywordService cfkeywordService;
+    @Autowired private CfKeywordlistService cfkeywordlistService;
     @Autowired ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     @Autowired EntityUtil entityUtil;
@@ -148,27 +151,31 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
             EntityCollection entitySet = getKeywords(genericCollection);
             entityList = entitySet.getEntities();
         } else {
-            if (edmEntitySet.getName().endsWith("Set")) {
-                entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+            if (0 == edmEntitySet.getName().compareToIgnoreCase("CFKeywordLibs")) {
+                EntityCollection genericCollection = new EntityCollection();
+                EntityCollection entitySet = getKeywordLibs(genericCollection);
+                entityList = entitySet.getEntities();
             } else {
-                if (edmEntitySet.getName().endsWith("List")) {
-                    entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
+                if (edmEntitySet.getName().endsWith("Set")) {
+                    entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
                 } else {
-                    if (edmEntitySet.getName().endsWith("Lists")) {
-                        entityname = edmEntitySet.getName();
+                    if (edmEntitySet.getName().endsWith("List")) {
+                        entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
                     } else {
-                        entityname = edmEntitySet.getName();
+                        if (edmEntitySet.getName().endsWith("Lists")) {
+                            entityname = edmEntitySet.getName();
+                        } else {
+                            entityname = edmEntitySet.getName();
+                        }
                     }
                 }
+                Expression filterexpression = null;
+                if (null != filterOption) {
+                    filterexpression = filterOption.getExpression();
+                }
+                EntityCollection entitySet = getData(edmEntitySet, filterexpression, orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
+                entityList = entitySet.getEntities();
             }
-            
-            Expression filterexpression = null;
-            if (null != filterOption) {
-                filterexpression = filterOption.getExpression();
-            }
-            EntityCollection entitySet = getData(edmEntitySet, filterexpression, orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
-
-            entityList = entitySet.getEntities();
             Iterator<Entity> entityIterator = entityList.iterator();
 
             // handle $count
@@ -533,6 +540,17 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         List<Entity> genericList = genericCollection.getEntities();
         keywordlist = cfkeywordService.findAll();
         for (CfKeyword kw : keywordlist) {
+            Entity entity = entityUtil.makeEntity(kw);
+            genericList.add(entity);
+        }
+        return genericCollection;
+    }
+
+    private EntityCollection getKeywordLibs(EntityCollection genericCollection) {
+        List<CfKeywordlist> keywordlist;
+        List<Entity> genericList = genericCollection.getEntities();
+        keywordlist = cfkeywordlistService.findAll();
+        for (CfKeywordlist kw : keywordlist) {
             Entity entity = entityUtil.makeEntity(kw);
             genericList.add(entity);
         }

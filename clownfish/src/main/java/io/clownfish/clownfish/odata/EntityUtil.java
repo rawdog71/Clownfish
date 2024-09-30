@@ -215,6 +215,35 @@ public class EntityUtil {
         return entity;
     }
     
+    public Entity makeEntity(CfKeywordlist keywordlist) {
+        Entity entity = new Entity();
+        
+        Property prop_id = new Property();
+        prop_id.setName("id");
+        prop_id.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+        setPropValue(prop_id, keywordlist.getId());
+        entity.addProperty(prop_id);
+        
+        Property prop_name = new Property();
+        prop_name.setName("name");
+        prop_name.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName().getFullQualifiedNameAsString());
+        setPropValue(prop_name, keywordlist.getName());
+        entity.addProperty(prop_name);
+        
+        List<CfKeywordlistcontent> kwlistcontent = cfkeywordlistcontentService.findByKeywordlistref(keywordlist.getId());
+        ArrayList<Long> listset = new ArrayList<>();
+        for (CfKeywordlistcontent entry : kwlistcontent) {
+            listset.add(entry.getCfKeywordlistcontentPK().getKeywordref());
+        }
+        Property prop_listset = new Property();
+        prop_listset.setName("listset");
+        prop_listset.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+        prop_listset.setValue(ValueType.COLLECTION_PRIMITIVE, listset);
+        entity.addProperty(prop_listset);
+        
+        return entity;
+    }
+    
     public Entity makeEntity(ContentDataOutput contentdataoutput) {
         Entity entity = new Entity();
         String id = "";
