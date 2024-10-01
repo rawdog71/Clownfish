@@ -1,5 +1,11 @@
 package io.clownfish.clownfish.odata;
 
+import io.clownfish.clownfish.dbentities.*;
+import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
+import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfListcontentService;
+import io.clownfish.clownfish.utils.ContentUtil;
+import io.clownfish.clownfish.utils.HibernateUtil;
 import org.apache.olingo.commons.api.data.*;
 import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
@@ -7,20 +13,22 @@ import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
+import org.apache.olingo.commons.api.http.HttpMethod;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.*;
+import org.apache.olingo.server.api.deserializer.DeserializerException;
+import org.apache.olingo.server.api.deserializer.DeserializerResult;
+import org.apache.olingo.server.api.deserializer.ODataDeserializer;
 import org.apache.olingo.server.api.processor.ComplexCollectionProcessor;
 import org.apache.olingo.server.api.serializer.ComplexSerializerOptions;
 import org.apache.olingo.server.api.serializer.EntityCollectionSerializerOptions;
 import org.apache.olingo.server.api.serializer.ODataSerializer;
 import org.apache.olingo.server.api.serializer.SerializerResult;
-import org.apache.olingo.server.api.uri.UriInfo;
-import org.apache.olingo.server.api.uri.UriResource;
-import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
-import org.apache.olingo.server.api.uri.UriResourceEntitySet;
+import org.apache.olingo.server.api.uri.*;
 import org.apache.olingo.server.api.uri.queryoption.*;
 import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitException;
+import org.apache.olingo.server.core.uri.UriResourceComplexPropertyImpl;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,9 +45,13 @@ import static org.apache.olingo.commons.api.data.ValueType.COLLECTION_COMPLEX;
 @Component
 public class GenericComplexCollectionProcessor implements ComplexCollectionProcessor {
     @Autowired OdataUtil odatautil;
+    @Autowired private CfAttributcontentService cfattributcontentService;
+    @Autowired private CfClasscontentService cfclasscontentService;
+    @Autowired private CfListcontentService cflistcontentService;
+    @Autowired private ContentUtil contentUtil;
+    @Autowired HibernateUtil hibernateUtil;
     @Autowired EntityUtil entityUtil;
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GenericComplexCollectionProcessor.class);
-
     private OData odata;
     private ServiceMetadata serviceMetadata;
 
@@ -63,7 +75,6 @@ public class GenericComplexCollectionProcessor implements ComplexCollectionProce
         Property prop = entitySet.getEntities().get(0).getProperty(property.getProperty().getName());
 
         if(null != prop) {
-
             // handle $filter
             ArrayList propList = (ArrayList) prop.getValue();
             Iterator<ComplexValue> entityIterator = propList.iterator();
@@ -124,11 +135,109 @@ public class GenericComplexCollectionProcessor implements ComplexCollectionProce
 
     @Override
     public void updateComplexCollection(ODataRequest oDataRequest, ODataResponse oDataResponse, UriInfo uriInfo, ContentType contentType, ContentType contentType1) throws ODataApplicationException, ODataLibraryException {
+        List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+        UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+        UriResourceComplexPropertyImpl uriResourceComplexProperty = (UriResourceComplexPropertyImpl) resourcePaths.get(1);
+        EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+        EdmEntityType edmEntityType = edmEntitySet.getEntityType();
 
+        String entityname;
+        String propertyName = uriResourceComplexProperty.getProperty().getName();
+        if (edmEntitySet.getName().endsWith("Set")) {
+            entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        } else {
+            entityname = edmEntitySet.getName();
+        }
+
+        InputStream requestInputStream = oDataRequest.getBody();
+        ODataDeserializer deserializer = this.odata.createDeserializer(contentType);
+        Entity requestEntity = null;
+        try {
+            DeserializerResult result = deserializer.entity(requestInputStream, edmEntityType);
+            requestEntity = result.getEntity();
+        } catch (DeserializerException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+
+        List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
+        CfClasscontent cfclasscontent = null;
+        List<CfAttributcontent> attributContentList = null;
+
+        try {
+            for (UriParameter param : keyPredicates) {
+                if (0 == param.getName().compareToIgnoreCase("id")) {
+                    cfclasscontent = cfclasscontentService.findById(hibernateUtil.getContentRef(entityname, "id", Long.parseLong(param.getText())));
+                    attributContentList = cfattributcontentService.findByClasscontentref(cfclasscontent);
+                }
+            }
+
+            assert attributContentList != null;
+            for (CfAttributcontent attributcontent : attributContentList) {
+                if (!attributcontent.getAttributref().getIdentity()) {
+                    CfAttribut attribut = attributcontent.getAttributref();
+                    if (attribut.getExt_mutable()) {
+                        if(attribut.getAttributetype().getName().compareToIgnoreCase("classref") == 0 && attribut.getName().equals(propertyName)) {
+                            assert requestEntity != null;
+                            contentUtil.setAttributValue(attributcontent, String.valueOf(requestEntity.getProperty("id").getValue()));
+                            cfattributcontentService.edit(attributcontent);
+                            contentUtil.indexContent();
+                        }
+                    }
+                }
+            }
+
+
+            hibernateUtil.updateContent(cfclasscontent);
+            contentUtil.commit(cfclasscontent);
+
+            oDataResponse.setStatusCode(HttpStatusCode.OK.getStatusCode());
+        } catch (Error e) {
+            oDataResponse.setStatusCode(HttpStatusCode.NOT_MODIFIED.getStatusCode());
+        }
     }
 
     @Override
     public void deleteComplexCollection(ODataRequest oDataRequest, ODataResponse oDataResponse, UriInfo uriInfo) throws ODataApplicationException, ODataLibraryException {
+        List<UriResource> resourcePaths = uriInfo.getUriResourceParts();
+        UriResourceEntitySet uriResourceEntitySet = (UriResourceEntitySet) resourcePaths.get(0);
+        UriResourceComplexProperty property = (UriResourceComplexProperty) resourcePaths.get(1);
+        EdmEntitySet edmEntitySet = uriResourceEntitySet.getEntitySet();
+
+        String entityname;
+        if (edmEntitySet.getName().endsWith("Set")) {
+            entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+        } else {
+            entityname = edmEntitySet.getName();
+        }
+        List<UriParameter> keyPredicates = uriResourceEntitySet.getKeyPredicates();
+        CfClasscontent cfclasscontent = null;
+        List<CfAttributcontent> attributContentList = null;
+
+        try {
+            for (UriParameter param : keyPredicates) {
+                if (0 == param.getName().compareToIgnoreCase("id")) {
+                    cfclasscontent = cfclasscontentService.findById(hibernateUtil.getContentRef(entityname, "id", Long.parseLong(param.getText())));
+                    attributContentList = cfattributcontentService.findByClasscontentref(cfclasscontent);
+                }
+            }
+
+            assert attributContentList != null;
+            for (CfAttributcontent attributcontent : attributContentList) {
+                CfAttribut attribut = attributcontent.getAttributref();
+                if(attribut.getName().equals(property.getProperty().getName()) && attribut.getAttributetype().getName().compareToIgnoreCase("classref") == 0) {
+                    contentUtil.setAttributValue(attributcontent, null);
+                    cfattributcontentService.edit(attributcontent);
+                    contentUtil.indexContent();
+                    break;
+                }
+            }
+
+            hibernateUtil.updateContent(cfclasscontent);
+            contentUtil.commit(cfclasscontent);
+            oDataResponse.setStatusCode(HttpStatusCode.OK.getStatusCode());
+        } catch (Error e) {
+            oDataResponse.setStatusCode(HttpStatusCode.NOT_MODIFIED.getStatusCode());
+        }
 
     }
 
