@@ -120,6 +120,8 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
         entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywords"), new SourceStructure(0, 5, null, null, null, null, null));
         CsdlEntityType keywordset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywords"));
         entityTypes.add(keywordset);
+        //CsdlComplexType ct_keyword = getComplexType(new FullQualifiedName(NAMESPACE_COMPLEX, "CFKeywords"));
+        //complexTypes.add(ct_keyword);
 
         entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLibs"), new SourceStructure(0, 6, null, null, null, null, null));
         CsdlEntityType keywordlibset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLibs"));
@@ -533,10 +535,10 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                 CsdlEntitySet entitySet = new CsdlEntitySet();
                 entitySet.setName(entitySetName);
                 if (0 == entitySetName.compareToIgnoreCase("CFKeywords")) {
-                    entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordEntry"));
+                    entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeyword"));
                 }
                 if (0 == entitySetName.compareToIgnoreCase("CFKeywordLibs")) {
-                    entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordEntry"));
+                    entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeyword"));
                 }
                 if ((entitySetName.endsWith("Set")) || (entitySetName.endsWith("Lists"))) {
                     int postlength = 3;

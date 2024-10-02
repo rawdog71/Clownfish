@@ -91,6 +91,7 @@ public class EntityUtil {
     @Autowired private CfAssetlistService cfassetlistService;
     @Autowired private CfAssetlistcontentService cfassetlistcontentService;
     @Autowired private CfKeywordService cfkeywordService;
+    @Autowired private CfKeywordlistService cfkeywordlistService;
     @Autowired private CfKeywordlistcontentService cfkeywordlistcontentService;
     @Autowired private CfAssetKeywordService cfassetkeywordService;
     @Autowired private ContentUtil contentUtil;
@@ -645,6 +646,35 @@ public class EntityUtil {
                         
                         return entity;
                     }
+                case 6:                                                         // handle CfKeywordLibs
+                    name = entity.getProperty("name").getValue().toString();
+                    CfKeywordlist keywordlist = cfkeywordlistService.findByName(name);
+                    if (null != keywordlist) {
+                        return null;
+                    } else {
+                        keywordlist = new CfKeywordlist();
+                        keywordlist.setName(name);
+                        keywordlist = cfkeywordlistService.create(keywordlist);
+                        
+                        Property prop_id = new Property();
+                        prop_id.setName("id");
+                        prop_id.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+                        entity.addProperty(prop_id);
+                        entity.getProperty("id").setValue(ValueType.PRIMITIVE, keywordlist.getId());
+                        
+                        ArrayList listset = (ArrayList) entity.getProperty("listset").getValue();
+                        for (Object entry : listset) {
+                            CfKeywordlistcontent keywordlistcontententry = new CfKeywordlistcontent();
+                            keywordlistcontententry.setCfKeywordlistcontentPK(new CfKeywordlistcontentPK(keywordlist.getId(), Long.valueOf((Integer)entry)));
+                            cfkeywordlistcontentService.create(keywordlistcontententry);
+                        }
+                        Property prop_listset = new Property();
+                        prop_listset.setName("listset");
+                        prop_listset.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+                        prop_listset.setValue(ValueType.COLLECTION_PRIMITIVE, listset);
+                        
+                        return entity;
+                    }
                 default:
                     return null;
             }
@@ -867,6 +897,43 @@ public class EntityUtil {
                     } else {
                         return false;
                     }
+                case 6:                                                         // handle CfKeywordLibs
+                    id = null;
+                    for (UriParameter param : keyParams) {
+                        if (0 == param.getName().compareToIgnoreCase("id")) {
+                            id = Long.parseLong(param.getText());
+                        }
+                    }
+                    CfKeywordlist keywordlist = cfkeywordlistService.findById(id);
+                    if (null != keywordlist) {
+                        name = entity.getProperty("name").getValue().toString();
+                        CfKeywordlist keywordlist_search = cfkeywordlistService.findByName(name);
+                        if (null == keywordlist_search) {
+                            keywordlist.setName(name);
+                        }
+                            
+                        // delete keywordlist entries
+                        List<CfKeywordlistcontent> reflist = cfkeywordlistcontentService.findByKeywordlistref(id);
+                        for (CfKeywordlistcontent entry : reflist) {
+                            cfkeywordlistcontentService.delete(entry);
+                        }
+                        ArrayList listset = (ArrayList) entity.getProperty("listset").getValue();
+                        for (Object entry : listset) {
+                            CfKeywordlistcontent keywordlistcontententry = new CfKeywordlistcontent();
+                            keywordlistcontententry.setCfKeywordlistcontentPK(new CfKeywordlistcontentPK(keywordlist.getId(), Long.valueOf((Integer)entry)));
+                            cfkeywordlistcontentService.create(keywordlistcontententry);
+                        }
+                        Property prop_listset = new Property();
+                        prop_listset.setName("listset");
+                        prop_listset.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+                        prop_listset.setValue(ValueType.COLLECTION_PRIMITIVE, listset);
+                        
+                        cfkeywordlistService.edit(keywordlist);
+                        
+                        return true;
+                    } else {
+                        return false;
+                    }
                 default:
                     return false;
             }
@@ -1056,6 +1123,25 @@ public class EntityUtil {
                         }
                         cfkeywordService.delete(keyword);
                         
+                        return true;
+                    } else {
+                        return false;
+                    }
+                case 6:                                                         // handle CfKeywordLibs
+                    id = null;
+                    for (UriParameter param : keyParams) {
+                        if (0 == param.getName().compareToIgnoreCase("id")) {
+                            id = Long.parseLong(param.getText());
+                        }
+                    }
+                    CfKeywordlist keywordlist = cfkeywordlistService.findById(id);
+                    if (null != keywordlist) {
+                        // delete keywordlist entries
+                        List<CfKeywordlistcontent> reflist = cfkeywordlistcontentService.findByKeywordlistref(id);
+                        for (CfKeywordlistcontent entry : reflist) {
+                            cfkeywordlistcontentService.delete(entry);
+                        }
+                        cfkeywordlistService.delete(keywordlist);
                         return true;
                     } else {
                         return false;

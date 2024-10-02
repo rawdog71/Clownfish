@@ -341,6 +341,8 @@ public class SiteTreeBean implements Serializable {
         datasources = cfdatasourceService.findAll();
         contentlist = cflistService.findByMaintenance(true);
         classcontentlist = cfclasscontentService.findByMaintenance(true);
+        
+        keywordlist = cfkeywordlistService.findAll();
         accessmanagerlist = findAccessmgrs();
         assetlist = cfassetlistService.findAll();
     }
