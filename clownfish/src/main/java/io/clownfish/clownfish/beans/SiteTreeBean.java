@@ -1612,4 +1612,12 @@ public class SiteTreeBean implements Serializable {
     public void setTab(int index) {
         tabIndex = index;
     }
+    
+    public String getNodeName(CfSite site) {
+        if (site.isStaticsite()) {
+            return site.getName() + " [S]";
+        } else {
+            return site.getName();
+        }
+    }
 }
