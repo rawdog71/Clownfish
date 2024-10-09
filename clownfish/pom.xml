@@ -20,6 +20,22 @@
                 <role>Head of development</role>
             </roles>
         </developer>
+        <developer>
+            <name>Philip Lozanoski</name>
+            <email>philip.lozanoski@koenig-neurath.de</email>
+            <organization>König + Neurath AG</organization>
+            <roles>
+                <role>development</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Marcel Sluganovic</name>
+            <email>marcel.sluganovic@koenig-neurath.de</email>
+            <organization>König + Neurath AG</organization>
+            <roles>
+                <role>development</role>
+            </roles>
+        </developer>
     </developers>
    
     <parent>
@@ -29,8 +45,6 @@
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
         <log4j2.version>2.17.0</log4j2.version>
     </properties>
     
@@ -60,7 +74,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>20.1</version>
+            <version>20.9</version>
         </dependency>
 
         <!-- DEPENDENCIES FROM EMBEDDED TOMCAT -->
@@ -305,8 +319,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
             <type>jar</type>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
