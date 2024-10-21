@@ -41,6 +41,10 @@ public class RFC_GET_FUNCTION_INTERFACE {
         RFC_GET_FUNCTION_INTERFACE.sapc = (SAPConnection) sapc;
     }
     
+    public void setSapConnection(Object sapc) {
+        sapc = (SAPConnection) sapc;
+    }
+    
     public void init() {
         rfcfunctionsparamlist.clear();
     }

@@ -164,6 +164,7 @@ public class SAPUtility {
             HashMap<String, HashMap> sapexport = new HashMap<>();
             HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
             List<RfcFunctionParam> rfcfunctionparamlist = new ArrayList<>();
+            rfc_get_function_interface.setSapConnection(sapc);
             rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction));
             saprfcfunctionparamMap.put(rfcFunction, rfcfunctionparamlist);
 

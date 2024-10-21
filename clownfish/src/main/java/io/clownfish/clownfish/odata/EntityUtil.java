@@ -503,19 +503,28 @@ public class EntityUtil {
                                 } else {
                                     if ((0 == attribut.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == attribut.getRelationtype())) { // 1:n
                                         CfClass relationref = attribut.getRelationref();
-                                        ComplexValue complex = (ComplexValue) entity.getProperty(attribut.getName()).getValue();
-                                        for (Property prop : complex.getValue()) {
-                                            //System.out.println(prop.getName());
-                                            if (0 == prop.getName().compareToIgnoreCase("id")) {
-                                                CfClasscontent cfclasscontent = cfclasscontentService.findById(hibernateUtil.getContentRef(relationref.getName(), "id", ((Integer) prop.getValue()).longValue()));
+                                        try {
+                                            ComplexValue complex = (ComplexValue) entity.getProperty(attribut.getName()).getValue();
+                                            for (Property prop : complex.getValue()) {
+                                                //System.out.println(prop.getName());
+                                                if (0 == prop.getName().compareToIgnoreCase("id")) {
+                                                    CfClasscontent cfclasscontent = cfclasscontentService.findById(hibernateUtil.getContentRef(relationref.getName(), "id", ((Integer) prop.getValue()).longValue()));
 
-                                                CfAttributcontent newcontent = new CfAttributcontent();
-                                                newcontent.setAttributref(attribut);
-                                                newcontent.setClasscontentref(newclasscontent);
-                                                newcontent = contentUtil.setAttributValue(newcontent, cfclasscontent.getId().toString());
+                                                    CfAttributcontent newcontent = new CfAttributcontent();
+                                                    newcontent.setAttributref(attribut);
+                                                    newcontent.setClasscontentref(newclasscontent);
+                                                    newcontent = contentUtil.setAttributValue(newcontent, cfclasscontent.getId().toString());
 
-                                                cfattributcontentService.create(newcontent);
+                                                    cfattributcontentService.create(newcontent);
+                                                }
                                             }
+                                        } catch (Exception ex) {
+                                            CfAttributcontent newcontent = new CfAttributcontent();
+                                            newcontent.setAttributref(attribut);
+                                            newcontent.setClasscontentref(newclasscontent);
+                                            newcontent = contentUtil.setAttributValue(newcontent, null);
+
+                                            cfattributcontentService.create(newcontent);
                                         }
                                     } else {                                                // n:m Relation
                                         // Create Datalist
@@ -803,29 +812,68 @@ public class EntityUtil {
                                             }
                                         } else {                                                // n:m Relation
                                             // Delete listcontent first
-                                            List<CfListcontent> contentList = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
-                                            for (CfListcontent content : contentList) {
-                                                cflistcontentService.delete(content);
-                                            }
+                                            try {
+                                                List<CfListcontent> contentList = cflistcontentService.findByListref(attributcontent.getClasscontentlistref().getId());
+                                                for (CfListcontent content : contentList) {
+                                                    cflistcontentService.delete(content);
+                                                }
 
-                                            List<ComplexValue> complexList = (List<ComplexValue>) entity.getProperty(attribut.getName()).getValue();
-                                            for (ComplexValue complexval : complexList) {
-                                                for (Property prop : complexval.getValue()) {
-                                                    //System.out.println(prop.getName());
-                                                    if (0 == prop.getName().compareToIgnoreCase("id")) {
-                                                        // Add selected listcontent
-                                                        CfClasscontent cfclasscontententry = cfclasscontentService.findById(hibernateUtil.getContentRef(attribut.getRelationref().getName(), "id", ((Integer) prop.getValue()).longValue()));
-                                                        CfListcontent listcontent = new CfListcontent();
-                                                        CfListcontentPK cflistcontentPK = new CfListcontentPK();
-                                                        cflistcontentPK.setListref(attributcontent.getClasscontentlistref().getId());
+                                                List<ComplexValue> complexList = (List<ComplexValue>) entity.getProperty(attribut.getName()).getValue();
+                                                for (ComplexValue complexval : complexList) {
+                                                    for (Property prop : complexval.getValue()) {
+                                                        //System.out.println(prop.getName());
+                                                        if (0 == prop.getName().compareToIgnoreCase("id")) {
+                                                            // Add selected listcontent
+                                                            CfClasscontent cfclasscontententry = cfclasscontentService.findById(hibernateUtil.getContentRef(attribut.getRelationref().getName(), "id", ((Integer) prop.getValue()).longValue()));
+                                                            CfListcontent listcontent = new CfListcontent();
+                                                            CfListcontentPK cflistcontentPK = new CfListcontentPK();
+                                                            cflistcontentPK.setListref(attributcontent.getClasscontentlistref().getId());
 
-                                                        cflistcontentPK.setClasscontentref(cfclasscontententry.getId());
-                                                        listcontent.setCfListcontentPK(cflistcontentPK);
-                                                        cflistcontentService.create(listcontent);
+                                                            cflistcontentPK.setClasscontentref(cfclasscontententry.getId());
+                                                            listcontent.setCfListcontentPK(cflistcontentPK);
+                                                            cflistcontentService.create(listcontent);
+                                                        }
                                                     }
                                                 }
+                                            } catch (Exception ex) {
+                                                // Create Datalist
+                                                String listname = getNewListName(attribut.getClassref(), attribut.getRelationref());
+                                                CfList newlist = new CfList();
+                                                newlist.setName(listname);
+                                                newlist.setClassref(attribut.getRelationref());
+                                                CfList newlist2 = cflistService.create(newlist);
+
+                                                attributcontent.setAttributref(attribut);
+                                                attributcontent.setClasscontentref(cfclasscontent);
+                                                attributcontent = contentUtil.setAttributValue(attributcontent, newlist2.getId().toString());
+                                                attributcontent.setClasscontentlistref(newlist2);
+
+                                                cfattributcontentService.edit(attributcontent);
+
+                                                // Delete listcontent first
+                                                List<CfListcontent> contentList = cflistcontentService.findByListref(newlist2.getId());
+                                                for (CfListcontent content : contentList) {
+                                                    cflistcontentService.delete(content);
+                                                }
+
+                                                List<ComplexValue> complexList = (List<ComplexValue>) entity.getProperty(attribut.getName()).getValue();
+                                                for (ComplexValue complexval : complexList) {
+                                                    for (Property prop : complexval.getValue()) {
+                                                        //System.out.println(prop.getName());
+                                                        if (0 == prop.getName().compareToIgnoreCase("id")) {
+                                                            // Add selected listcontent
+                                                            CfListcontent listcontent = new CfListcontent();
+                                                            CfListcontentPK cflistcontentPK = new CfListcontentPK();
+                                                            cflistcontentPK.setListref(newlist2.getId());
+
+                                                            cflistcontentPK.setClasscontentref(cfclasscontent.getId());
+                                                            listcontent.setCfListcontentPK(cflistcontentPK);
+                                                            cflistcontentService.create(listcontent);
+                                                        }
+                                                    }
+                                                }
+                                                hibernateUtil.updateRelation(newlist2);
                                             }
-                                            hibernateUtil.updateRelation(attributcontent.getClasscontentlistref());
                                         }
                                     }
                                 }
