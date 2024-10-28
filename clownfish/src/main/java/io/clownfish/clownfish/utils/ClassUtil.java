@@ -76,7 +76,8 @@ public class ClassUtil implements Serializable {
     @Autowired JavascriptUtil javascriptutil;
     private @Getter @Setter SiteTreeBean sitetree;
     private @Getter @Setter SiteUtil siteutil;
-    
+
+    private boolean isClassrefMandatory = false;
     final transient Logger LOGGER = LoggerFactory.getLogger(ClassUtil.class);
     
     public ClassUtil() {
@@ -1106,7 +1107,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t<button class=\"uk-modal-close-default\" type=\"button\" uk-close></button>").append("\n");
         html.append("\t\t\t\t<h2 class=\"uk-modal-title\">").append(clazz.getName()).append(" hinzufügen</h2>").append("\n");
         html.append("\t\t\t\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
-        
+        html.append("\t\t\t\t\t<form name=\"").append(clazz.getName().toLowerCase()).append("FormAdd\" novalidate>\n");
         for (ODataWizard odw : wizardlist) {
             CfAttribut attr = odw.getAttribut();
             if (attr.getAutoincrementor() || !attr.getExt_mutable()) {
@@ -1116,13 +1117,23 @@ public class ClassUtil implements Serializable {
                 case "string":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\" required>").append("\n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Add.$touched &&").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Add.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append(" \n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "hashstring":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"password\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"password\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\"required >").append(" \n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Add.$touched &&").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Add.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"password\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append(" \n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "text":
@@ -1130,20 +1141,35 @@ public class ClassUtil implements Serializable {
                 case "markdown":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<textarea id=\"input-").append(attr.getName()).append("-add\" class=\"uk-textarea\" rows=\"5\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\"></textarea>").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<textarea id=\"input-").append(attr.getName()).append("-add\" class=\"uk-textarea\" rows=\"5\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\"required></textarea>").append(" \n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Add.$touched &&").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Add.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<textarea id=\"input-").append(attr.getName()).append("-add\" class=\"uk-textarea\" rows=\"5\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\"></textarea>").append("\n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "integer":
                 case "real":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\"required>").append("\n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Add.$touched &&").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Add.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append(" \n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "datetime":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\"required>").append(" \n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Add.$touched &&").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Add.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append(" \n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     html.append("\t\t\t\t\t<script>").append("\n");
                     html.append("\t\t\t\t\t\tvar picker = new Pikaday({ field: document.getElementById('input-").append(attr.getName()).append("-add'), firstDay:1, i18n: { previousMonth: 'Previous Month', nextMonth: 'Next Month', months: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'], weekdays: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'], weekdaysShort : ['So','Mo','Di','Mi','Do','Fr','Sa']}, showWeekNumber: true, toString: function(date) {").append("\n");
@@ -1155,7 +1181,12 @@ public class ClassUtil implements Serializable {
                 case "boolean":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(attr.getName()).append("\">").append("required \n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Add.$touched &&").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Add.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "media":
@@ -1179,7 +1210,12 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t</thead>").append("\n");
                     html.append("\t\t\t\t\t<tbody>").append("\n");
                     html.append("\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter: {name: filter_media_").append(attr.getName()).append("_name_add} | filter: {description: filter_media_").append(attr.getName()).append("_description_add} | filter:filterByMimetypes\">").append("\n");
-                    html.append("\t\t\t\t\t<td><input class=\"uk-radio\" type=\"radio\" name=\"radio-").append(attr.getName()).append("\" ng-value=\"media.id\" ng-model=\"media_").append(attr.getName()).append(".").append(attr.getName()).append("\"></td>").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t<td><input id=\"input-").append(attr.getName()).append("-add\"").append("class=\"uk-radio\" type=\"radio\" ng-click=\"checkMedia(media.id)\" name=\"radio-").append(attr.getName()).append("\" ng-value=\"media.id\" ng-model=\"media_").append(attr.getName()).append(".").append(attr.getName()).append("\" required></td>").append("\n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Add.$touched &&").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Add.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t<td><input class=\"uk-radio\" type=\"radio\" ng-click=\"checkMedia(media.id)\" name=\"radio-").append(attr.getName()).append("\" ng-value=\"media.id\" ng-model=\"media_").append(attr.getName()).append(".").append(attr.getName()).append("\"></td>").append("\n");
+                    }
                     html.append("\t\t\t\t\t<td><img class=\"uk-preserve-width\" src=\"GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid={{media.id}}\" width=\"40\" height=\"40\" alt=\"\"></td>").append("\n");
                     html.append("\t\t\t\t\t<td class=\"uk-table-link\">").append("\n");
                     html.append("\t\t\t\t\t<a class=\"uk-link-reset\" href=\"\">{{media.name}}</a>").append("\n");
@@ -1195,11 +1231,21 @@ public class ClassUtil implements Serializable {
                     if (1 == attr.getRelationtype()) {
                         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                         html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                        html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-add\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(attr.getName()).append("\" >").append("\n");
-                        html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
-                        html.append("\t\t\t\t\t\t</select>").append("\n");
+
+                        if(attr.getMandatory()) {
+                            html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-add\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(attr.getName()).append("\" required>").append("\n");
+                            html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
+                            html.append("\t\t\t\t\t\t</select>").append("\n");html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Add.$touched &&").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Add.$invalid\">THis field is required.</span>\n");
+                        } else {
+                            html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-add\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(attr.getName()).append("\" >").append("\n");
+                            html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
+                            html.append("\t\t\t\t\t\t</select>").append("\n");
+                        }
                         html.append("\t\t\t\t\t</div>").append("\n");
                     } else {
+                        if(attr.getMandatory()) {
+                            isClassrefMandatory = true;
+                        }
                         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                         html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"").append(attr.getName()).append("-list-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
                         html.append("\t\t\t\t\t\t<div class=\"uk-overflow-auto\" style=\"height: 370px\">").append("\n");
@@ -1298,9 +1344,14 @@ public class ClassUtil implements Serializable {
         }
         
         html.append("\t\t\t\t\t<div class=\"uk-align-right\">").append("\n");
-        html.append("\t\t\t\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"save").append(clazz.getName()).append("()\" ng-disabled=\"inprogress\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+        if(isClassrefMandatory) {
+            html.append("\t\t\t\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"save").append(clazz.getName()).append("()\" ng-disabled=\"").append(clazz.getName().toLowerCase()).append("FormAdd.$invalid || isMediaSelected || inprogress || !isAnyCheckboxSelectedAssetRef || !isAnyCheckboxSelected\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+        } else {
+            html.append("\t\t\t\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"save").append(clazz.getName()).append("()\" ng-disabled=\"").append(clazz.getName().toLowerCase()).append("FormAdd.$invalid || isMediaSelected || !isAnyCheckboxSelectedAssetRef || inprogress\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+        }
         html.append("\t\t\t\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
         html.append("\t\t\t\t</div>").append("\n");
+        html.append("\t\t\t\t</form>").append("\n");
         html.append("\t\t\t</div>").append("\n");
         html.append("\t\t</div>").append("\n");
 	html.append("\t</div>").append("\n");
@@ -1310,7 +1361,10 @@ public class ClassUtil implements Serializable {
 	html.append("\t\t\t\t<button class=\"uk-modal-close-default\" type=\"button\" uk-close></button>").append("\n");
 	html.append("\t\t\t\t<h2 class=\"uk-modal-title\">").append(clazz.getName()).append(" ändern</h2>").append("\n");
 	html.append("\t\t\t\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
-					
+        html.append("\t\t\t\t\t<form name=\"").append(clazz.getName().toLowerCase()).append("FormUpd\" novalidate>\n");
+
+        isClassrefMandatory = false;
+
         for (ODataWizard odw : wizardlist) {
             CfAttribut attr = odw.getAttribut();
             if (attr.getAutoincrementor() || !attr.getExt_mutable()) {
@@ -1320,13 +1374,23 @@ public class ClassUtil implements Serializable {
                 case "string":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" required>").append("\n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Upd.$touched && ").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Upd.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "hashstring":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName().toLowerCase()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"password\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"password\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" required>").append("\n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Upd.$touched && ").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Upd.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"password\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "text":
@@ -1334,20 +1398,35 @@ public class ClassUtil implements Serializable {
                 case "markdown":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<textarea id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-textarea\" rows=\"5\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}</textarea>").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<textarea id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-textarea\" rows=\"5\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" required>{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}</textarea>").append("\n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Upd.$touched && ").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Upd.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<textarea id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-textarea\" rows=\"5\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}</textarea>").append("\n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "integer":
                 case "real":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" required>").append("\n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Upd.$touched && ").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Upd.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "datetime":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" required>").append("\n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Upd.$touched && ").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Upd.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     html.append("\t\t\t\t\t<script>").append("\n");
                     html.append("\t\t\t\t\t\tvar picker = new Pikaday({ field: document.getElementById('input-").append(attr.getName()).append("-upd'), firstDay:1, i18n: { previousMonth: 'Previous Month', nextMonth: 'Next Month', months: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'], weekdays: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'], weekdaysShort : ['So','Mo','Di','Mi','Do','Fr','Sa']}, showWeekNumber: true, toString: function(date) {").append("\n");
@@ -1359,7 +1438,12 @@ public class ClassUtil implements Serializable {
                 case "boolean":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                    html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-checkbox\" type=\"checkbox\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-checkbox\" type=\"checkbox\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" required>").append("\n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Upd.$touched && ").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Upd.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-checkbox\" type=\"checkbox\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                    }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     break;
                 case "media":
@@ -1383,7 +1467,12 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t</thead>").append("\n");
                     html.append("\t\t\t\t\t<tbody>").append("\n");
                     html.append("\t\t\t\t\t<tr ng-repeat=\"media in MEDIALIST | filter: {name: filter_media_").append(attr.getName()).append("_name_upd} | filter: {description: filter_media_").append(attr.getName()).append("_description_upd} | filter:filterByMimetypes\">").append("\n");
-                    html.append("<td><input class=\"uk-radio\" type=\"radio\" name=\"radio-").append(attr.getName()).append("\" ng-value=\"media.id\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" ng-checked=\"media.id == ").append(clazz.getName()).append(".").append(attr.getName()).append("\"></td>").append("\n");
+                    if(attr.getMandatory()) {
+                        html.append("\t\t\t\t\t<td><input id=\"input-").append(attr.getName()).append("-upd\"").append("class=\"uk-radio\" type=\"radio\" ng-click=\"checkMedia(media.id)\" name=\"radio-").append(attr.getName()).append("\" ng-value=\"media.id\" ng-model=\"media_").append(attr.getName()).append(".").append(attr.getName()).append("\" required></td>").append("\n");
+                        html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Add.$touched &&").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Add.$invalid\">THis field is required.</span>\n");
+                    } else {
+                        html.append("\t\t\t\t\t<td><input class=\"uk-radio\" type=\"radio\" ng-click=\"checkMedia(media.id)\" name=\"radio-").append(attr.getName()).append("\" ng-value=\"media.id\" ng-model=\"media_").append(attr.getName()).append(".").append(attr.getName()).append("\"></td>").append("\n");
+                    }
                     html.append("\t\t\t\t\t<td><img class=\"uk-preserve-width\" src=\"GetAsset?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=&mediaid={{media.id}}\" width=\"40\" height=\"40\" alt=\"\"></td>").append("\n");
                     html.append("\t\t\t\t\t<td class=\"uk-table-link\">").append("\n");
                     html.append("\t\t\t\t\t<a class=\"uk-link-reset\" href=\"\">{{media.name}}</a>").append("\n");
@@ -1399,11 +1488,23 @@ public class ClassUtil implements Serializable {
                     if (1 == attr.getRelationtype()) {
                         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                         html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
-                        html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" >").append("\n");
-                        html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
-                        html.append("\t\t\t\t\t\t</select>").append("\n");
+                        if(attr.getMandatory()) {
+                            html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" required>").append("\n");
+                            html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
+                            html.append("\t\t\t\t\t\t</select>").append("\n");
+                            html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Upd.$touched && ").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Upd.$invalid\">THis field is required.</span>\n");
+                        } else {
+                            html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" >").append("\n");
+                            html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
+                            html.append("\t\t\t\t\t\t</select>").append("\n");
+                        }
                         html.append("\t\t\t\t\t</div>").append("\n");
                     } else {
+                        if(attr.getMandatory()) {
+                            isClassrefMandatory = true;
+                        } else {
+                            isClassrefMandatory = false;
+                        }
                         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                         html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"").append(attr.getName()).append("-list-update\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
                         html.append("\t\t\t\t\t\t<div class=\"uk-overflow-auto\" style=\"height: 370px\">").append("\n");
@@ -1502,9 +1603,14 @@ public class ClassUtil implements Serializable {
         }
 
 	html.append("\t\t\t\t<div class=\"uk-align-right\">").append("\n");
-	html.append("\t\t\t\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"update").append(clazz.getName()).append("(").append(clazz.getName()).append(".id)\" ng-disabled=\"inprogress\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
-	html.append("\t\t\t\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
+        if(isClassrefMandatory) {
+            html.append("\t\t\t\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"update").append(clazz.getName()).append("(").append(clazz.getName()).append(".id)\" ng-disabled=\"").append(clazz.getName().toLowerCase()).append("FormUpd.$invalid || isMediaSelected || inprogress || !isAnyCheckboxSelectedAssetRef || !isAnyCheckboxSelected\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+        } else {
+            html.append("\t\t\t\t\t<button class=\"uk-button uk-button-primary\" type=\"button\" ng-click=\"update").append(clazz.getName()).append("(").append(clazz.getName()).append(".id)\" ng-disabled=\"").append(clazz.getName().toLowerCase()).append("FormUpd.$invalid || isMediaSelected || !isAnyCheckboxSelectedAssetRef || inprogress\">Speichern <span ng-show=\"inprogress\" class=\"uk-spinner\" uk-icon=\"icon: cog\"></span></button>").append("\n");
+        }
+    html.append("\t\t\t\t\t<button class=\"uk-button uk-button-secondary uk-modal-close\" type=\"button\" ng-disabled=\"inprogress\">Abbrechen</button>").append("\n");
 	html.append("\t\t\t\t</div>").append("\n");
+    html.append("\t\t\t</form>").append("\n");
 	html.append("\t\t\t</div>").append("\n");
 	html.append("\t\t</div>").append("\n");
 	html.append("\t</div>").append("\n");
@@ -2035,6 +2141,12 @@ public class ClassUtil implements Serializable {
         javascript.append("\tvar DateTime = luxon.DateTime;").append("\n");
         javascript.append("\t$scope.loading = false;").append("\n");
         javascript.append("\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t$scope.selectedIds = [];").append("\n");
+        javascript.append("\t$scope.selectedIdsAssetRef = [];").append("\n");
+        javascript.append("\t$scope.isAnyCheckboxSelectedAssetRef = true;").append("\n");
+
+        javascript.append("\t$scope.isAnyCheckboxSelected = true;").append("\n");
+        javascript.append("\t$scope.isMediaSelected = true;").append("\n");
         javascript.append("\n");
         javascript.append("\t$scope.selectedMimetypes = ['image/jpeg','image/png'];").append("\n");
         javascript.append("\n");
@@ -2054,12 +2166,21 @@ public class ClassUtil implements Serializable {
             }
             switch (attr.getAttributetype().getName()) {
                 case "media":
+                    if(attr.getMandatory()) {
+                        javascript.append("\n\t\t$scope.isMediaSelected = false;").append("\n");
+                    } else {
+                        javascript.append("\n\t\t$scope.isMediaSelected = true;").append("\n");
+                    }
                     javascript.append("\t$scope.media_").append(attr.getName()).append(" = {};").append("\n");
                     javascript.append("\t$scope.media_").append(attr.getName()).append(".").append(attr.getName()).append(" = null;").append("\n");
                     javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_name_add = \"\";").append("\n");
                     javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_description_add = \"\";").append("\n");
                     javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_name_upd = \"\";").append("\n");
                     javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_description_upd = \"\";").append("\n");
+
+                    javascript.append("\n\t$scope.checkMedia = (id) => {");
+                    javascript.append("\n\t\t$scope.isMediaSelected = false;").append("\n");
+                    javascript.append("\t}\n");
                     break;
                 case "classref":
                     if (0 == attr.getRelationtype()) {
@@ -2085,6 +2206,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED = [];").append("\n");
         javascript.append("\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED = [];").append("\n");
         javascript.append("\n");
+
         javascript.append("\t$scope.getMediaList = function() {").append("\n");
         javascript.append("\t\t$http.get('/GetAssetList?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=').then(function (res) {").append("\n");
         javascript.append("\t\t\t$scope.MEDIALIST = res.data;").append("\n");
@@ -2438,7 +2560,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t});").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("\n");
-        
+
         for (ODataWizard odw : wizardlist) {
             CfAttribut attr = odw.getAttribut();
             if (attr.getAutoincrementor()) {
@@ -2447,8 +2569,22 @@ public class ClassUtil implements Serializable {
             switch (attr.getAttributetype().getName()) {
                 case "classref":
                     if (0 == attr.getRelationtype()) {
+                        if(attr.getMandatory()) {
+                            javascript.append("\t\t$scope.isAnyCheckboxSelected = false").append("\n");
+                        } else {
+                            javascript.append("\t\t$scope.isAnyCheckboxSelected = true").append("\n");
+                        }
                         javascript.append("\t$scope.select").append(clazz.getName()).append("").append(attr.getName()).append(" = function(id) {").append("\n");
                         javascript.append("\t\tselect = true;").append("\n");
+                        javascript.append("\t\tconst index = $scope.selectedIds.indexOf(id);").append("\n");
+                        javascript.append("\t\tif (index === -1) {").append("\n");
+                        javascript.append("\t\t\t$scope.selectedIds.push(id);").append("\n");
+                        javascript.append("\t\t} else {").append("\n");
+                        javascript.append("\t\t$scope.selectedIds.splice(index, 1);").append("\n");
+                        javascript.append("\t\t}").append("\n");
+                        if(attr.getMandatory()) {
+                            javascript.append("\t\t$scope.isAnyCheckboxSelected = $scope.selectedIds.length > 0;").append("\n");
+                        }
                         javascript.append("\t\tfor (const element of $scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED) {").append("\n");
                         javascript.append("\t\t\tif (element.id == id) {").append("\n");
                         javascript.append("\t\t\t\tselect = false;").append("\n");
@@ -2471,8 +2607,22 @@ public class ClassUtil implements Serializable {
                     }
                     break;
                 case "assetref":
+                    if(attr.getMandatory()) {
+                        javascript.append("\t\t$scope.isAnyCheckboxSelectedAssetRef = false").append("\n");
+                    } else {
+                        javascript.append("\t\t$scope.isAnyCheckboxSelectedAssetRef = true").append("\n");
+                    }
                     javascript.append("\t$scope.select").append(clazz.getName()).append("").append(attr.getName()).append(" = function(id) {").append("\n");
                     javascript.append("\t\tselect = true;").append("\n");
+                    javascript.append("\t\tconst index = $scope.selectedIdsAssetRef.indexOf(id);").append("\n");
+                    javascript.append("\t\tif (index === -1) {").append("\n");
+                    javascript.append("\t\t\t$scope.selectedIdsAssetRef.push(id);").append("\n");
+                    javascript.append("\t\t} else {").append("\n");
+                    javascript.append("\t\t$scope.selectedIdsAssetRef.splice(index, 1);").append("\n");
+                    javascript.append("\t\t}").append("\n");
+                    if(attr.getMandatory()) {
+                        javascript.append("\t\t$scope.isAnyCheckboxSelectedAssetRef = $scope.selectedIdsAssetRef.length > 0;").append("\n");
+                    }
                     javascript.append("\t\tfor (const element of $scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED) {").append("\n");
                     javascript.append("\t\t\tif (element == id) {").append("\n");
                     javascript.append("\t\t\t\tselect = false;").append("\n");
@@ -2625,6 +2775,7 @@ public class ClassUtil implements Serializable {
                         javascript.append("\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED = [];").append("\n");
                         javascript.append("\t\t\tfor (const element of $scope.").append(clazz.getName()).append(".").append(attr.getName()).append(") {").append("\n");
                         javascript.append("\t\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED.push(element);").append("\n");
+                        javascript.append("\t\t\t\t$scope.selectedIds.push(element.id)").append("\n");
                         javascript.append("\t\t\t}").append("\n");
                     }
                     break;
@@ -2632,10 +2783,18 @@ public class ClassUtil implements Serializable {
                     javascript.append("\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED = [];").append("\n");
                     javascript.append("\t\t\tfor (const element of $scope.").append(clazz.getName()).append(".").append(attr.getName()).append(") {").append("\n");
                     javascript.append("\t\t\t\t$scope.").append(attr.getName().toUpperCase()).append("LIST_SELECTED.push(element);").append("\n");
+                    javascript.append("\t\t\t\t$scope.selectedIdsAssetRef.push(element)").append("\n");
                     javascript.append("\t\t\t}").append("\n");
                     break;
             }
         }
+        javascript.append("\t\t\tif($scope.selectedIds.length > 0) {").append("\n");
+        javascript.append("\t\t\t\t$scope.isAnyCheckboxSelected = true;").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t\tif($scope.selectedIdsAssetRef.length > 0) {").append("\n");
+        javascript.append("\t\t\t\t$scope.isAnyCheckboxSelectedAssetRef = true;").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+
         javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\t});").append("\n");
         javascript.append("\t};").append("\n");
