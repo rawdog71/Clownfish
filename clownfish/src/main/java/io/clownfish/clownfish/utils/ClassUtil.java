@@ -3206,7 +3206,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"form-stacked-password\">Password</label>").append("\n");
         html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
         html.append("\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: unlock\"></span>").append("\n");
-        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"loginPassword\" ng-model=\"password\" type=\"password\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"loginPassword\" ng-model=\"password\" type=\"password\" placeholder=\"\" onkeydown = \"if (event.keyCode == 13) document.getElementById('login-button').click()\">").append("\n");
         html.append("\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t</div>").append("\n");
 
@@ -3224,7 +3224,7 @@ public class ClassUtil implements Serializable {
 
         html.append("\t\t\t\t\t<div class=\"uk-margin\" style=\"margin-bottom: 0;\">").append("\n");
         html.append("\t\t\t\t\t\t<div class=\"uk-form-controls uk-flex\">").append("\n");
-        html.append("\t\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" ng-click=\"login('${metainfo.referrer}')\">Login</button>").append("\n");
+        html.append("\t\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" id=\"login-button\" ng-click=\"login('${metainfo.referrer}')\">Login</button>").append("\n");
         html.append("\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t<div class=\"uk-margin\">").append("\n");
@@ -3242,12 +3242,12 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"form-stacked-email\">E-Mail</label>").append("\n");
         html.append("\t\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
         html.append("\t\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
-        html.append("\t\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"resetEmail\" ng-model=\"email\" type=\"text\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"resetEmail\" ng-model=\"email\" type=\"text\" placeholder=\"\" onkeydown = \"if (event.keyCode == 13) document.getElementById('reset-button').click()\">").append("\n");
         html.append("\t\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
         html.append("\t\t\t\t\t\t\t<div class=\"uk-form-controls uk-flex\">").append("\n");
-        html.append("\t\t\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" ng-click=\"resetPassword()\">Zurücksetzen</button>").append("\n");
+        html.append("\t\t\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" id=\"reset-button\" ng-click=\"resetPassword()\">Zurücksetzen</button>").append("\n");
         html.append("\t\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t</div>").append("\n");
@@ -3284,13 +3284,13 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"form-stacked-email\">Neues Passwort wiederholen</label>").append("\n");
         html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
         html.append("\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
-        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"newPasswordRepeat\" type=\"password\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"newPasswordRepeat\" type=\"password\" placeholder=\"\" onkeydown = \"if (event.keyCode == 13) document.getElementById('new-button').click()\">").append("\n");
         html.append("\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t</div>").append("\n");
 
         html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
         html.append("\t\t\t\t\t\t<div class=\"uk-form-controls uk-flex\">").append("\n");
-        html.append("\t\t\t\t\t\t\t<button class=\"width-100 uk-button uk-button-primary\" ng-click=\"setNewPassword()\">Neues Passwort setzen</button>").append("\n");
+        html.append("\t\t\t\t\t\t\t<button id=\"new-button\" class=\"width-100 uk-button uk-button-primary\" ng-click=\"setNewPassword()\">Neues Passwort setzen</button>").append("\n");
         html.append("\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t</div>").append("\n");
@@ -3323,7 +3323,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t\t<label class=\"uk-form-label upper-first\" for=\"form-stacked-email\">").append(passwordField).append(" wiederholen</label>\n");
         html.append("\t\t\t\t\t\t<div class=\"uk-inline width-100 uk-form-width-large uk-form-controls\">").append("\n");
         html.append("\t\t\t\t\t\t\t<span class=\"uk-form-icon\" uk-icon=\"icon: user\"></span>").append("\n");
-        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"create").append(passwordField).append("Repeat\" ng-model=\"").append(passwordField).append("Again\" type=\"password\" placeholder=\"\">").append("\n");
+        html.append("\t\t\t\t\t\t\t<input class=\"uk-input width-100\" ng-class=\"{'uk-form-danger': warning}\" id=\"create").append(passwordField).append("Repeat\" ng-model=\"").append(passwordField).append("Again\" type=\"password\" placeholder=\"\" onkeydown = \"if (event.keyCode == 13) document.getElementById('createUserButton').click()\">").append("\n");
         html.append("\t\t\t\t\t\t</div>").append("\n");
         html.append("\t\t\t\t\t</div>").append("\n");
 
@@ -3390,7 +3390,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t\t$scope.warning = false;").append("\n");
         html.append("\t\t\t\t\t\tif(isTokenValid(token)) {").append("\n");
         html.append("\t\t\t\t\t\t\tvar data = decodeToken(token)").append("\n");
-        html.append("\t\t\t\t\t\t\tvar userToChange = $scope.classDataList.find(user => user.").append(idField).append(" === data.").append(idField).append(");\n");
+        html.append("\t\t\t\t\t\t\tvar userToChange = $scope.classDataList.find(user => user.").append(idField).append(" == data.").append(idField).append(");\n");
         html.append("\t\t\t\t\t\t\tvar updateData = {").append("\n");
 
         for (CfAttribut cfa : attributList) {
@@ -3459,6 +3459,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t\t\ttoastr.success('Benutzer erfolgreich erstellt. eine E-Mail zum Bestätigen wurde an Sie verschickt. Anschließend wird ein Administrator die Freischaltung vornehmen.', 'Erfolgreich');").append("\n");
         //html.append("\t\t\t\t\t\t\t$http.get(\"cf_sendemail?cf_job=true&to=\"+adminMail+\"&subject=Bestätigung für einen neuen Benutzer&body=Der Benutzer: \" + ").append(idField).append("Text + \" muss für die Seite: ${metainfo.referrer} bestätigt werden.\");\n");
         html.append("\t\t\t\t\t\t\t$http.get(\"SendConfirmMail?class=\" + className + \"&id=\" + res.data.id + \"&password=\" + passwordText + \"&pwfield=password&emailfield=email&sitefield=${metainfo.referrer}\");").append("\n");
+        html.append("\t\t\t\t\t\t\tgetInformation()").append("\n");
         html.append("\t\t\t\t\t\t\topenLogin()").append("\n");
         html.append("\t\t\t\t\t\t} else if(res.status == 406) {").append("\n");
         html.append("\t\t\t\t\t\t\ttoastr.error('Der Account existiert schon. Bitte bei der IT melden.', 'Fehler');").append("\n");
@@ -3496,8 +3497,8 @@ public class ClassUtil implements Serializable {
         //Login
         html.append("\t\t\t\t$scope.login = function(referrer) {").append("\n");
         html.append("\t\t\t\t\t$http.get(\"Auth\", {params: { \"class\": className, \"idField\": idField, \"pwField\": passwordField, \"id\": document.getElementById(\"loginEmail\").value, \"clearPw\": document.getElementById(\"loginPassword\").value, \"authfield\": authfield}}).then(function (res) {").append("\n");
-        html.append("\t\t\t\t\t\tif (res.status === 200) {").append("\n");
-        html.append("\t\t\t\t\t\t\tif (res.data.status === true) {").append("\n");
+        html.append("\t\t\t\t\t\tif (res.status == 200) {").append("\n");
+        html.append("\t\t\t\t\t\t\tif (res.data.status == true) {").append("\n");
         html.append("\t\t\t\t\t\t\t\t$scope.warning = false;").append("\n");
         html.append("\t\t\t\t\t\t\t\tdocument.cookie = \"cf_login_token=\"+res.data.token;").append("\n");
         html.append("\t\t\t\t\t\t\t\tdocument.cookie = \"cf_token=\"+res.data.token;").append("\n");
