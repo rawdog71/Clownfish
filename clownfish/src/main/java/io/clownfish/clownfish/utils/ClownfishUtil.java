@@ -99,8 +99,8 @@ public class ClownfishUtil {
                 if (jfp.getName().compareToIgnoreCase("db$table") == 0) {
                     if (null == datatableproperties.get((String)jfp.getValue())) {
                         DatatableProperties dtp = new DatatableProperties();
-                        dtp.setTablename((String)(String)jfp.getValue());
-                        datatableproperties.put((String)(String)jfp.getValue(), dtp);
+                        dtp.setTablename((String)jfp.getValue());
+                        datatableproperties.put((String)jfp.getValue(), dtp);
                     }
                 }
                 if (jfp.getName().startsWith("db$table$")) {
@@ -112,7 +112,7 @@ public class ClownfishUtil {
                             dtp.setTablename(values[0]);
                             datatableproperties.put(values[0], dtp);
                         }
-                        datatableproperties.get(values[0]).setOrderby((String)(String)jfp.getValue());
+                        datatableproperties.get(values[0]).setOrderby(String)jfp.getValue());
                     }
                     if (values[1].compareToIgnoreCase("orderdir") == 0) {
                         if (datatableproperties.isEmpty()) {
@@ -120,7 +120,7 @@ public class ClownfishUtil {
                             dtp.setTablename(values[0]);
                             datatableproperties.put(values[0], dtp);
                         }
-                        datatableproperties.get(values[0]).setOrderdir((String)(String)jfp.getValue());
+                        datatableproperties.get(values[0]).setOrderdir((String)jfp.getValue());
                     }
                     if (values[1].compareToIgnoreCase("pagination") == 0) {
                         if (datatableproperties.isEmpty()) {
@@ -128,7 +128,7 @@ public class ClownfishUtil {
                             dtp.setTablename(values[0]);
                             datatableproperties.put(values[0], dtp);
                         }
-                        datatableproperties.get(values[0]).setPagination(Integer.parseInt((String)(String)jfp.getValue()));
+                        datatableproperties.get(values[0]).setPagination(Integer.parseInt((String)jfp.getValue()));
                     }
                     if (values[1].compareToIgnoreCase("page") == 0) {
                         if (datatableproperties.isEmpty()) {
@@ -136,7 +136,7 @@ public class ClownfishUtil {
                             dtp.setTablename(values[0]);
                             datatableproperties.put(values[0], dtp);
                         }
-                        datatableproperties.get(values[0]).setPage(Integer.parseInt((String)(String)jfp.getValue()));
+                        datatableproperties.get(values[0]).setPage(Integer.parseInt((String)jfp.getValue()));
                     }
                     if (values[1].compareToIgnoreCase("groupbycount") == 0) {
                         if (datatableproperties.isEmpty()) {
