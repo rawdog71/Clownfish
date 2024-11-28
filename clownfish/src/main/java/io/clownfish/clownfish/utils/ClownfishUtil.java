@@ -27,15 +27,15 @@ import io.clownfish.clownfish.jdbc.DatatableUpdateProperties;
 import io.clownfish.clownfish.mail.EmailProperties;
 import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
 import io.clownfish.clownfish.sap.models.RfcFunctionParam;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -55,7 +55,7 @@ public class ClownfishUtil {
         Map parametermap = new HashMap<>();
         if (postmap != null) {
             postmap.stream().forEach((jfp) -> {
-                parametermap.put(jfp.getName(), jfp.getValue());
+                parametermap.put(jfp.getName(), (String)jfp.getValue());
             });
         }
         return parametermap;
@@ -67,7 +67,7 @@ public class ClownfishUtil {
             for (Object param : parameterlist.keySet()) {
                 JsonFormParameter jsfp = new JsonFormParameter();
                 jsfp.setName((String) param);
-                jsfp.setValue((String) parameterlist.get(param));
+                jsfp.setValue(parameterlist.get(param));
                 jsonlist.add(jsfp);
             }
         }
@@ -97,10 +97,10 @@ public class ClownfishUtil {
             for (JsonFormParameter jfp : postmap) {
                 // Datenbank READ Parameter
                 if (jfp.getName().compareToIgnoreCase("db$table") == 0) {
-                    if (null == datatableproperties.get(jfp.getValue())) {
+                    if (null == datatableproperties.get((String)jfp.getValue())) {
                         DatatableProperties dtp = new DatatableProperties();
-                        dtp.setTablename(jfp.getValue());
-                        datatableproperties.put(jfp.getValue(), dtp);
+                        dtp.setTablename((String)(String)jfp.getValue());
+                        datatableproperties.put((String)(String)jfp.getValue(), dtp);
                     }
                 }
                 if (jfp.getName().startsWith("db$table$")) {
@@ -112,7 +112,7 @@ public class ClownfishUtil {
                             dtp.setTablename(values[0]);
                             datatableproperties.put(values[0], dtp);
                         }
-                        datatableproperties.get(values[0]).setOrderby(jfp.getValue());
+                        datatableproperties.get(values[0]).setOrderby((String)(String)jfp.getValue());
                     }
                     if (values[1].compareToIgnoreCase("orderdir") == 0) {
                         if (datatableproperties.isEmpty()) {
@@ -120,7 +120,7 @@ public class ClownfishUtil {
                             dtp.setTablename(values[0]);
                             datatableproperties.put(values[0], dtp);
                         }
-                        datatableproperties.get(values[0]).setOrderdir(jfp.getValue());
+                        datatableproperties.get(values[0]).setOrderdir((String)(String)jfp.getValue());
                     }
                     if (values[1].compareToIgnoreCase("pagination") == 0) {
                         if (datatableproperties.isEmpty()) {
@@ -128,7 +128,7 @@ public class ClownfishUtil {
                             dtp.setTablename(values[0]);
                             datatableproperties.put(values[0], dtp);
                         }
-                        datatableproperties.get(values[0]).setPagination(Integer.parseInt(jfp.getValue()));
+                        datatableproperties.get(values[0]).setPagination(Integer.parseInt((String)(String)jfp.getValue()));
                     }
                     if (values[1].compareToIgnoreCase("page") == 0) {
                         if (datatableproperties.isEmpty()) {
@@ -136,7 +136,7 @@ public class ClownfishUtil {
                             dtp.setTablename(values[0]);
                             datatableproperties.put(values[0], dtp);
                         }
-                        datatableproperties.get(values[0]).setPage(Integer.parseInt(jfp.getValue()));
+                        datatableproperties.get(values[0]).setPage(Integer.parseInt((String)(String)jfp.getValue()));
                     }
                     if (values[1].compareToIgnoreCase("groupbycount") == 0) {
                         if (datatableproperties.isEmpty()) {
@@ -144,7 +144,7 @@ public class ClownfishUtil {
                             dtp.setTablename(values[0]);
                             datatableproperties.put(values[0], dtp);
                         }
-                        datatableproperties.get(values[0]).setGroupbycount(jfp.getValue());
+                        datatableproperties.get(values[0]).setGroupbycount((String)jfp.getValue());
                     }
                     if (values[1].compareToIgnoreCase("groupby") == 0) {
                         if (datatableproperties.isEmpty()) {
@@ -152,13 +152,13 @@ public class ClownfishUtil {
                             dtp.setTablename(values[0]);
                             datatableproperties.put(values[0], dtp);
                         }
-                        datatableproperties.get(values[0]).getGroupbylist().add(jfp.getValue());
+                        datatableproperties.get(values[0]).getGroupbylist().add((String)jfp.getValue());
                     }
                     if (values[1].compareToIgnoreCase("condition") == 0) {
                         DatatableCondition dtc = new DatatableCondition();
                         dtc.setField(values[2]);
                         dtc.setOperand(values[3]);
-                        dtc.setValue(jfp.getValue());
+                        dtc.setValue((String)jfp.getValue());
                         if (datatableproperties.isEmpty()) {
                             DatatableProperties dtp = new DatatableProperties();
                             dtp.setTablename(values[0]);
@@ -183,8 +183,8 @@ public class ClownfishUtil {
                 // Datenbank INSERT Parameter
                 if (jfp.getName().compareToIgnoreCase("db$tablenew") == 0) {
                     DatatableNewProperties dtnp = new DatatableNewProperties();
-                    dtnp.setTablename(jfp.getValue());
-                    datatablenewproperties.put(jfp.getValue(), dtnp);
+                    dtnp.setTablename((String)jfp.getValue());
+                    datatablenewproperties.put((String)jfp.getValue(), dtnp);
                 }
                 return jfp;
             }).filter((jfp) -> (jfp.getName().startsWith("db$tablenew$"))).forEach((jfp) -> {
@@ -192,7 +192,7 @@ public class ClownfishUtil {
                 String[] values = rest.split("\\$");
                 DatatableNewValue dtnv = new DatatableNewValue();
                 dtnv.setField(values[1]);
-                dtnv.setValue(jfp.getValue());
+                dtnv.setValue((String)jfp.getValue());
                 datatablenewproperties.get(values[0]).getValuelist().add(dtnv);
             });
         }
@@ -210,8 +210,8 @@ public class ClownfishUtil {
                 // Datenbank DELETE Parameter
                 if (jfp.getName().compareToIgnoreCase("db$tabledelete") == 0) {
                     DatatableDeleteProperties dtdp = new DatatableDeleteProperties();
-                    dtdp.setTablename(jfp.getValue());
-                    datatabledeleteproperties.put(jfp.getValue(), dtdp);
+                    dtdp.setTablename((String)jfp.getValue());
+                    datatabledeleteproperties.put((String)jfp.getValue(), dtdp);
                 }
                 return jfp;
             }).filter((jfp) -> (jfp.getName().startsWith("db$tabledelete$"))).forEach((jfp) -> {
@@ -219,7 +219,7 @@ public class ClownfishUtil {
                 String[] values = rest.split("\\$");
                 DatatableDeleteValue dtdv = new DatatableDeleteValue();
                 dtdv.setField(values[1]);
-                dtdv.setValue(jfp.getValue());
+                dtdv.setValue((String)jfp.getValue());
                 datatabledeleteproperties.get(values[0]).getValuelist().add(dtdv);
             });
         }
@@ -237,8 +237,8 @@ public class ClownfishUtil {
                 // Datenbank UPDATE Parameter
                 if (jfp.getName().compareToIgnoreCase("db$tableupdate") == 0) {
                     DatatableUpdateProperties dtup = new DatatableUpdateProperties();
-                    dtup.setTablename(jfp.getValue());
-                    datatableupdateproperties.put(jfp.getValue(), dtup);
+                    dtup.setTablename((String)jfp.getValue());
+                    datatableupdateproperties.put((String)jfp.getValue(), dtup);
                 }
                 return jfp;
             }).filter((jfp) -> (jfp.getName().startsWith("db$tableupdate$"))).forEach((jfp) -> {
@@ -248,12 +248,12 @@ public class ClownfishUtil {
                     DatatableCondition dtc = new DatatableCondition();
                     dtc.setField(values[2]);
                     dtc.setOperand(values[3]);
-                    dtc.setValue(jfp.getValue());
+                    dtc.setValue((String)jfp.getValue());
                     datatableupdateproperties.get(values[0]).getConditionlist().add(dtc);
                 } else {
                     DatatableNewValue dtnv = new DatatableNewValue();
                     dtnv.setField(values[1]);
-                    dtnv.setValue(jfp.getValue());
+                    dtnv.setValue((String)jfp.getValue());
                     datatableupdateproperties.get(values[0]).getValuelist().add(dtnv);
                 }
             });
@@ -274,19 +274,19 @@ public class ClownfishUtil {
                     if (null == emailproperties) {
                         emailproperties = new EmailProperties();
                     }
-                    emailproperties.setSendto(jfp.getValue());
+                    emailproperties.setSendto((String)jfp.getValue());
                 }
                 if (jfp.getName().compareToIgnoreCase("email$subject") == 0) {
                     if (null == emailproperties) {
                         emailproperties = new EmailProperties();
                     }
-                    emailproperties.setSubject(jfp.getValue());
+                    emailproperties.setSubject((String)jfp.getValue());
                 }
                 if (jfp.getName().compareToIgnoreCase("email$body") == 0) {
                     if (null == emailproperties) {
                         emailproperties = new EmailProperties();
                     }
-                    emailproperties.setBody(jfp.getValue());
+                    emailproperties.setBody((String)jfp.getValue());
                 }
             }
         }
