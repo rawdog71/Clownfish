@@ -31,13 +31,6 @@ import io.clownfish.clownfish.sap.SAPDATATYPE;
 import io.clownfish.clownfish.sap.models.RfcFunctionParam;
 import io.clownfish.clownfish.sap.models.RpyTableRead;
 import io.clownfish.clownfish.utils.ClownfishUtil;
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.DateTime;
@@ -45,6 +38,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -123,6 +125,20 @@ public class SAPTemplateBean implements Serializable {
                         if (null != postmap_async) {
                             postmap_async.stream().filter((jfp) -> (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0)).forEach((jfp) -> {
                                 function.getImportParameterList().setValue(rfcfunctionparam.getParameter(), jfp.getValue());
+                            });
+                        }
+                    }
+
+                    if (rfcfunctionparam.getParamclass().compareToIgnoreCase("C") == 0) {
+                        if (null != postmap_async) {
+                            postmap_async.stream().filter((jfp) -> (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0)).forEach((jfp) -> {
+                                ArrayList<LinkedHashMap<String, String>> val = (ArrayList<LinkedHashMap<String, String>>)jfp.getValue();
+                                JCoTable table = function.getChangingParameterList().getTable("I_ZPRUDRUCK");
+                                for (int i = 0; i < val.size(); i++) {
+                                    table.appendRow();
+                                    val.get(i).forEach(table::setValue);
+                                }
+                                function.getChangingParameterList().setValue(rfcfunctionparam.getParameter(), table);
                             });
                         }
                     }
