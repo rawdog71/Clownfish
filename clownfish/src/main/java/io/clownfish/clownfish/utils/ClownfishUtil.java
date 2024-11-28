@@ -112,7 +112,7 @@ public class ClownfishUtil {
                             dtp.setTablename(values[0]);
                             datatableproperties.put(values[0], dtp);
                         }
-                        datatableproperties.get(values[0]).setOrderby(String)jfp.getValue());
+                        datatableproperties.get(values[0]).setOrderby((String)jfp.getValue());
                     }
                     if (values[1].compareToIgnoreCase("orderdir") == 0) {
                         if (datatableproperties.isEmpty()) {
