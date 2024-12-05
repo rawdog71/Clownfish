@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.beans.JsonFormParameter;
+import io.clownfish.clownfish.beans.JsonSAPFormParameter;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.jdbc.DatatableCondition;
 import io.clownfish.clownfish.jdbc.DatatableDeleteProperties;
@@ -66,6 +67,19 @@ public class ClownfishUtil {
         if (null != parameterlist) {
             for (Object param : parameterlist.keySet()) {
                 JsonFormParameter jsfp = new JsonFormParameter();
+                jsfp.setName((String) param);
+                jsfp.setValue((String)parameterlist.get(param));
+                jsonlist.add(jsfp);
+            }
+        }
+        return jsonlist;
+    }
+    
+    public static List<JsonSAPFormParameter> getJsonSAPFormParameterList(Map parameterlist) {
+        List<JsonSAPFormParameter> jsonlist = new ArrayList<>();
+        if (null != parameterlist) {
+            for (Object param : parameterlist.keySet()) {
+                JsonSAPFormParameter jsfp = new JsonSAPFormParameter();
                 jsfp.setName((String) param);
                 jsfp.setValue(parameterlist.get(param));
                 jsonlist.add(jsfp);

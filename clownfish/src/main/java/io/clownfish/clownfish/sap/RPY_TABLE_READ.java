@@ -108,6 +108,7 @@ public class RPY_TABLE_READ {
                 rpytablereadlist.put(tablename, tablefieldList);
                 return tablefieldList;
             } catch (JCoException ex) {
+                LOGGER.error("TABLENAME:" + tablename);
                 LOGGER.error(ex.getMessage());
                 return null;
             }

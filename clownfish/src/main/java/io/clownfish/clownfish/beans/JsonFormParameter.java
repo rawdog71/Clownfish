@@ -24,12 +24,12 @@ import lombok.Setter;
  */
 public class JsonFormParameter {
     private @Getter @Setter String name;
-    private @Getter @Setter Object value;
+    private @Getter @Setter String value;
 
     public JsonFormParameter() {
     }
 
-    public JsonFormParameter(String name, Object value) {
+    public JsonFormParameter(String name, String value) {
         this.name = name;
         this.value = value;
     }

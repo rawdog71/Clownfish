@@ -22,6 +22,7 @@ import com.sap.conn.jco.JCoStructure;
 import com.sap.conn.jco.JCoTable;
 import de.destrukt.sapconnection.SAPConnection;
 import io.clownfish.clownfish.beans.JsonFormParameter;
+import io.clownfish.clownfish.beans.JsonSAPFormParameter;
 import io.clownfish.clownfish.datamodels.WebserviceCache;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
@@ -97,7 +98,7 @@ public class SAPTemplateBean implements Serializable {
             rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction));
             saprfcfunctionparamMap.put(rfcFunction, rfcfunctionparamlist);
 
-            List<JsonFormParameter> postmap_async = ClownfishUtil.getJsonFormParameterList(parametermap);
+            List<JsonSAPFormParameter> postmap_async = ClownfishUtil.getJsonSAPFormParameterList(parametermap);
             
             HashMap<String, Object> sapvalues = new HashMap<>();
             List<RfcFunctionParam> paramlist = saprfcfunctionparamMap.get(rfcFunction);

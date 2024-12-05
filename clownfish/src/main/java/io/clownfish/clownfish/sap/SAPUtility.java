@@ -21,7 +21,7 @@ import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoStructure;
 import com.sap.conn.jco.JCoTable;
 import de.destrukt.sapconnection.SAPConnection;
-import io.clownfish.clownfish.beans.JsonFormParameter;
+import io.clownfish.clownfish.beans.JsonSAPFormParameter;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.sap.models.RfcFunctionParam;
 import io.clownfish.clownfish.sap.models.RpyTableRead;
@@ -63,7 +63,7 @@ public class SAPUtility {
         Setzt die Ergebnisse in eine Hashmap zur Ausgabe in Freemarker
     */
     @Deprecated
-    public static HashMap<String, HashMap> getSapExport(List<CfSitesaprfc> sitesaprfclist, HashMap<String, List> saprfcfunctionparamMap, List<JsonFormParameter> postmap, RPY_TABLE_READ rpytableread) {
+    public static HashMap<String, HashMap> getSapExport(List<CfSitesaprfc> sitesaprfclist, HashMap<String, List> saprfcfunctionparamMap, List<JsonSAPFormParameter> postmap, RPY_TABLE_READ rpytableread) {
         JCoTable functions_table = null;
         HashMap<String, HashMap> sapexport = new HashMap<>();
         for (CfSitesaprfc cfsitesaprfc : sitesaprfclist) {
@@ -76,7 +76,7 @@ public class SAPUtility {
                 for (RfcFunctionParam rfcfunctionparam : paramlist) {
                     if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
                         if (null != postmap) {
-                            for (JsonFormParameter jfp : postmap) {
+                            for (JsonSAPFormParameter jfp : postmap) {
                                 if (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0) {
                                     function.getImportParameterList().setValue(rfcfunctionparam.getParameter(), jfp.getValue());
                                 }
@@ -170,7 +170,7 @@ public class SAPUtility {
             rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction));
             saprfcfunctionparamMap.put(rfcFunction, rfcfunctionparamlist);
 
-            List<JsonFormParameter> postmap_async = ClownfishUtil.getJsonFormParameterList(parametermap);
+            List<JsonSAPFormParameter> postmap_async = ClownfishUtil.getJsonSAPFormParameterList(parametermap);
 
             HashMap<String, Object> sapvalues = new HashMap<>();
             List<RfcFunctionParam> paramlist = saprfcfunctionparamMap.get(rfcFunction);
