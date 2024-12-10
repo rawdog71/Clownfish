@@ -415,6 +415,7 @@ public class DatabaseTemplateBean implements Serializable {
                             break;
                         case -7:      // bit, boolean
                         case 16:
+                        case -2:
                             tableFieldsList.add(new TableField(columnName, "BOOLEAN", columnTypeName, false, columnsize, decimaldigits, String.valueOf(isNullable)));
                             break;
                         case 93:      // Date

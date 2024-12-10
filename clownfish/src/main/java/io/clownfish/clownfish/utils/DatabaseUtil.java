@@ -875,6 +875,7 @@ public class DatabaseUtil {
             switch (attr.getType()) {
                 case -6:
                 case -7:
+                case -2:
                     html.append("\t\t\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(attr.getName()).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t").append(input().withType("checkbox").withId(attr.getName())).append("\n");
@@ -943,6 +944,7 @@ public class DatabaseUtil {
             switch (attr.getType()) {
                 case -6:
                 case -7:
+                case -2:
                     html.append("\t\t\t\t").append(("<div class=\"col-md-6\">")).append("\n");
                     html.append("\t\t").append(label(attr.getName()).withFor(attr.getName()).withClass("form-label")).append("\n");
                     html.append("\t\t\t\t").append(("<input type=\"checkbox\" id=\"" + attr.getName() + "\" ng-checked=\"{{info['" + attr.getName() + "']}}\">")).append("\n");
@@ -1199,6 +1201,7 @@ public class DatabaseUtil {
                     html.append("\t\t\t\t\t</script>").append("\n");
                     break;
                 case "BIT":
+                case "BINARY":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
                     html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(attr.getName()).append("\">").append("\n");
@@ -1253,6 +1256,7 @@ public class DatabaseUtil {
                     html.append("\t\t\t\t\t</script>").append("\n");
                     break;
                 case "BIT":
+                case "BINARY":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
                     html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-checkbox\" type=\"checkbox\" value=\"{{").append(tabledata.getName()).append(".").append(attr.getName()).append("}}\" ng-model=\"").append(tabledata.getName()).append(".").append(attr.getName()).append("\">").append("\n");
@@ -1341,6 +1345,7 @@ public class DatabaseUtil {
                     javascript.append("\t\t$scope.filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(" = \"\";").append("\n");
                     break;
                 case "BIT":
+                case "BINARY":
                     javascript.append("\t\t$scope.filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(" = false;").append("\n");
                     break;
             }
@@ -1366,6 +1371,7 @@ public class DatabaseUtil {
                     javascript.append("\t\t$scope.").append(attr.getName()).append(" = \"\";").append("\n");
                     break;
                 case "BIT":
+                case "BINARY":
                     javascript.append("\t\t$scope.").append(attr.getName()).append(" = false;").append("\n");
                     break;
             }
@@ -1426,6 +1432,7 @@ public class DatabaseUtil {
                     javascript.append("\t\t}").append("\n");
                     break;
                 case "BIT":
+                case "BINARY":
                     javascript.append("\t\tif ($scope.").append(attr.getName()).append(" != null) {").append("\n");
                     javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = $scope.").append(attr.getName()).append(";").append("\n");
                     javascript.append("\t\t}").append("\n");
@@ -1495,6 +1502,7 @@ public class DatabaseUtil {
                     javascript.append("\t\t}").append("\n");
                     break;
                 case "BIT":
+                case "BINARY":
                     javascript.append("\t\tif ($scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
                     javascript.append("\t\t\t").append(tabledata.getName()).append(".").append(attr.getName()).append(" = $scope.").append(tabledata.getName()).append(".").append(attr.getName()).append(";").append("\n");
                     javascript.append("\t\t}").append("\n");

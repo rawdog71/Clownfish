@@ -379,6 +379,7 @@ public class JDBCUtil {
                     } else {
                         if (null != attributmap.get((String) tf.getName())) {
                             String value = attributmap.get((String) tf.getName());
+                            value = value.replace("\\", "\\\\");
                             value = value.replace("'", "''");
                             sql_insert.append("'").append(value).append("', ");
                         } else {
@@ -670,6 +671,7 @@ public class JDBCUtil {
                             break;
                         case "-6":      // bit
                         case "-7":      // bit
+                        case "-2":      // bit
                             tf = new TableField(columnName, "BOOLEAN", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                             tableFieldsList.add(tf);
                             break;    
@@ -734,49 +736,63 @@ public class JDBCUtil {
                     String fieldType = getFieldType(tableFieldsList, (String) key);
 
                     sql_set.append(" = ");
-                    if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
-                        if (0 == fieldType.compareToIgnoreCase("date")) {
-                            String pattern = "dd.MM.yyyy HH:mm:ss";
-                            DateTime dt = null;
-                            try {
-                                dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                            } catch (Exception ex) {
+                    switch (fieldType.toLowerCase()) {
+                        case "string":
+                        case "date":
+                    //if ((fieldType.compareToIgnoreCase("string") == 0) || (fieldType.compareToIgnoreCase("date") == 0)) {
+                            if (0 == fieldType.compareToIgnoreCase("date")) {
+                                String pattern = "dd.MM.yyyy HH:mm:ss";
+                                DateTime dt = null;
                                 try {
-                                    pattern = "yyyy-MM-dd HH:mm:ss";
                                     dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                                } catch (Exception ex1) {
+                                } catch (Exception ex) {
                                     try {
-                                        pattern = "yyyy-MM-dd";
+                                        pattern = "yyyy-MM-dd HH:mm:ss";
                                         dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                                    } catch (Exception ex4) {
+                                    } catch (Exception ex1) {
                                         try {
-                                            pattern = "dd.MM.yyyy";
+                                            pattern = "yyyy-MM-dd";
                                             dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
-                                        } catch (Exception ex5) {
+                                        } catch (Exception ex4) {
+                                            try {
+                                                pattern = "dd.MM.yyyy";
+                                                dt = DateTime.parse(attributmap.get(key), DateTimeFormat.forPattern(pattern));
+                                            } catch (Exception ex5) {
 
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            if (null != dt) {
-                                DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-                                sql_set.append("'").append(dt.toString(dtf)).append("'");
+                                if (null != dt) {
+                                    DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+                                    sql_set.append("'").append(dt.toString(dtf)).append("'");
+                                } else {
+                                    sql_set.append(dt);
+                                }
                             } else {
-                                sql_set.append(dt);
+                                if (null != (String) attributmap.get(key)) {
+                                    String value = (String) attributmap.get(key);
+                                    value = value.replace("\\", "\\\\");
+                                    value = value.replace("'", "''");
+                                    sql_set.append("'").append(value).append("'");
+                                } else {
+                                    sql_set.append((String) attributmap.get(key));
+                                }
                             }
-                        } else {
-                            if (null != (String) attributmap.get(key)) {
-                                String value = (String) attributmap.get(key);
-                                value = value.replace("'", "''");
-                                sql_set.append("'").append(value).append("'");
+                            sql_set.append(", ");
+                            break;
+                    //} else {
+                        case "boolean":
+                            if (0 == attributmap.get(key).compareToIgnoreCase("true")) {
+                                sql_set.append(1);
                             } else {
-                                sql_set.append((String) attributmap.get(key));
+                                sql_set.append(0);
                             }
-                        }
-                        sql_set.append(", ");
-                    } else {
-                        sql_set.append((String) attributmap.get(key));
-                        sql_set.append(", ");
+                            sql_set.append(", ");
+                            break;
+                        default:
+                            sql_set.append((String) attributmap.get(key));
+                            sql_set.append(", ");
                     }
                     //}
                 }

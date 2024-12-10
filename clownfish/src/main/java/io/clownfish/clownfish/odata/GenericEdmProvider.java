@@ -641,6 +641,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                 return EdmPrimitiveTypeKind.Double.getFullQualifiedName();
             case -6:        // TINYINT
             case -7:      // bit, boolean
+            case -2:
             case 16:
                 return EdmPrimitiveTypeKind.Boolean.getFullQualifiedName();
             default:
