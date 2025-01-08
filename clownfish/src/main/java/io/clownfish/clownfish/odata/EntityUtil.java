@@ -550,18 +550,20 @@ public class EntityUtil {
 
                                         List<ComplexValue> complexList = (List<ComplexValue>) entity.getProperty(attribut.getName()).getValue();
                                         for (ComplexValue complexval : complexList) {
-                                            for (Property prop : complexval.getValue()) {
-                                                //System.out.println(prop.getName());
-                                                if (0 == prop.getName().compareToIgnoreCase("id")) {
-                                                    // Add selected listcontent
-                                                    CfClasscontent cfclasscontent = cfclasscontentService.findById(hibernateUtil.getContentRef(attribut.getRelationref().getName(), "id", ((Integer) prop.getValue()).longValue()));
-                                                    CfListcontent listcontent = new CfListcontent();
-                                                    CfListcontentPK cflistcontentPK = new CfListcontentPK();
-                                                    cflistcontentPK.setListref(newlist2.getId());
+                                            if (null != complexval) {
+                                                for (Property prop : complexval.getValue()) {
+                                                    //System.out.println(prop.getName());
+                                                    if (0 == prop.getName().compareToIgnoreCase("id")) {
+                                                        // Add selected listcontent
+                                                        CfClasscontent cfclasscontent = cfclasscontentService.findById(hibernateUtil.getContentRef(attribut.getRelationref().getName(), "id", ((Integer) prop.getValue()).longValue()));
+                                                        CfListcontent listcontent = new CfListcontent();
+                                                        CfListcontentPK cflistcontentPK = new CfListcontentPK();
+                                                        cflistcontentPK.setListref(newlist2.getId());
 
-                                                    cflistcontentPK.setClasscontentref(cfclasscontent.getId());
-                                                    listcontent.setCfListcontentPK(cflistcontentPK);
-                                                    cflistcontentService.create(listcontent);
+                                                        cflistcontentPK.setClasscontentref(cfclasscontent.getId());
+                                                        listcontent.setCfListcontentPK(cflistcontentPK);
+                                                        cflistcontentService.create(listcontent);
+                                                    }
                                                 }
                                             }
                                         }

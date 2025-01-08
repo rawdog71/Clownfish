@@ -184,7 +184,7 @@ public class ClassList implements Serializable {
         classSearchrelevant = selectedClass.isSearchrelevant();
         classMaintenance = selectedClass.isMaintenance();
         classEncrypted = selectedClass.isEncrypted();
-        loginClass = selectedClass.isLoginclass();
+        //loginClass = selectedClass.isLoginclass();
         selectedTemplateRef = selectedClass.getTemplateref();
         attributName = "";
         selectedAttributeType = null;
@@ -331,8 +331,7 @@ public class ClassList implements Serializable {
                 newattributpassword.setNodelete(true);
                 newattributpassword.setExt_mutable(true);
                 cfattributService.create(newattributpassword);
-                
-                // Create password field
+                // Create created field
                 CfAttribut newattributcreated = new CfAttribut();
                 newattributcreated.setClassref(createdclass);
                 newattributcreated.setName("created");
@@ -347,8 +346,7 @@ public class ClassList implements Serializable {
                 newattributcreated.setNodelete(true);
                 newattributcreated.setExt_mutable(false);
                 cfattributService.create(newattributcreated);
-                
-                // Create password field
+                // Create lastlogin field
                 CfAttribut newattributupdated = new CfAttribut();
                 newattributupdated.setClassref(createdclass);
                 newattributupdated.setName("lastlogin");
@@ -394,6 +392,11 @@ public class ClassList implements Serializable {
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
+    }
+    
+    public void onCreateLoginclass(ActionEvent actionEvent) {
+        loginClass = true;
+        onCreate(actionEvent);
     }
     
     public void onEdit(ActionEvent actionEvent) {

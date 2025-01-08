@@ -3448,7 +3448,22 @@ public class ClassUtil implements Serializable {
         }
         for (CfAttribut cfa : attributList) {
             if(!Objects.equals(cfa.getName(), authField) && !Objects.equals(cfa.getName(), "id") && !cfa.getExt_mutable()) {
-                html.append("\t\t\t\t\t\t").append(cfa.getName()).append(": ").append("null,\n");
+                if (!cfa.getDefault_val().isEmpty()) {
+                    switch (cfa.getAttributetypeString()) {
+                        case "boolean":
+                        case "integer":
+                            html.append("\t\t\t\t\t\t").append(cfa.getName()).append(": ").append(cfa.getDefault_val()).append(",\n");
+                            break;
+                        default:
+                            html.append("\t\t\t\t\t\t").append(cfa.getName()).append(": '").append(cfa.getDefault_val()).append("',\n");
+                    }
+                } else {
+                    if (0 == cfa.getRelationtype()) {
+                        html.append("\t\t\t\t\t\t").append(cfa.getName()).append(": ").append("[],\n");
+                    } else {
+                        html.append("\t\t\t\t\t\t").append(cfa.getName()).append(": ").append("null,\n");
+                    }
+                }
             }
         }
         html.append("\t\t\t\t\t};").append("\n");
