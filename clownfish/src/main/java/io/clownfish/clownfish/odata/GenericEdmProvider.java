@@ -357,6 +357,10 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                             entityType.setName(entityTypeName.getName());
                             entityType.setProperties(propsList);
                             entityType.setKey(keysList);
+                            
+                            CsdlProperty prop_keywordset = new CsdlProperty().setName("keywordset").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(true);
+                            propsList.add(prop_keywordset);
+                            entityType.setProperties(propsList);
 
                             if (!keysList.isEmpty()) {
                                 entityUtil.getEntitytypelist().put(entityTypeName, entityType);

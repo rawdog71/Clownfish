@@ -341,6 +341,18 @@ public class EntityUtil {
                 }
             }
         }
+        
+        List<CfClasscontentkeyword> kwlistcontent = cfclasscontentkeywordService.findByClassContentRef(contentdataoutput.getContent().getId());
+        ArrayList<Long> listset = new ArrayList<>();
+        for (CfClasscontentkeyword entry : kwlistcontent) {
+            listset.add(entry.getCfClasscontentkeywordPK().getKeywordref());
+        }
+        Property prop_listset = new Property();
+        prop_listset.setName("keywordset");
+        prop_listset.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+        prop_listset.setValue(ValueType.COLLECTION_PRIMITIVE, listset);
+        entity.addProperty(prop_listset);
+        
         entity.setId(createId(contentdataoutput.getContent().getClassref().getName(), id));
         return entity;
     }
@@ -574,6 +586,15 @@ public class EntityUtil {
                         }
                     };
                     if (canCreate) {
+                        ArrayList al = (ArrayList) requestEntity.getProperty("keywordset").getValue();
+                        for (Object o : al) {
+                            CfClasscontentkeyword cckw = new CfClasscontentkeyword();
+                            CfClasscontentkeywordPK cfClasscontentkeywordPK = new CfClasscontentkeywordPK();
+                            cfClasscontentkeywordPK.setClasscontentref(newclasscontent2.getId());
+                            cfClasscontentkeywordPK.setKeywordref(Long.parseLong(o.toString()));
+                            cckw.setCfClasscontentkeywordPK(cfClasscontentkeywordPK);
+                            cfclasscontentkeywordService.create(cckw);
+                        }
                         hibernateUtil.insertContent(newclasscontent);
                         contentUtil.commit(newclasscontent);
                         try {
@@ -881,6 +902,22 @@ public class EntityUtil {
                                 }
                             }
                         }
+                        
+                        // Delete corresponding keywordcontent entries
+                        List<CfClasscontentkeyword> keywordcontentdummy = cfclasscontentkeywordService.findByClassContentRef(cfclasscontent.getId());
+                        for (CfClasscontentkeyword keywordcontent : keywordcontentdummy) {
+                            cfclasscontentkeywordService.delete(keywordcontent);
+                        }
+                        ArrayList al = (ArrayList) entity.getProperty("keywordset").getValue();
+                        for (Object o : al) {
+                            CfClasscontentkeyword cckw = new CfClasscontentkeyword();
+                            CfClasscontentkeywordPK cfClasscontentkeywordPK = new CfClasscontentkeywordPK();
+                            cfClasscontentkeywordPK.setClasscontentref(cfclasscontent.getId());
+                            cfClasscontentkeywordPK.setKeywordref(Long.parseLong(o.toString()));
+                            cckw.setCfClasscontentkeywordPK(cfClasscontentkeywordPK);
+                            cfclasscontentkeywordService.create(cckw);
+                        }
+                        
                         hibernateUtil.updateContent(cfclasscontent);
                         contentUtil.commit(cfclasscontent);
                         return true;
