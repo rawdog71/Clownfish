@@ -20,6 +20,8 @@ import io.clownfish.clownfish.datamodels.SearchValues;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
+import io.clownfish.clownfish.dbentities.CfKeyword;
+import io.clownfish.clownfish.dbentities.CfKeywordlist;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
@@ -28,6 +30,8 @@ import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordService;
+import io.clownfish.clownfish.serviceinterface.CfKeywordlistService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.utils.ContentUtil;
@@ -69,6 +73,8 @@ public class OdataUtil {
     @Autowired private CfAttributcontentService cfattributcontentservice;
     @Autowired private CfListService cflistservice;
     @Autowired private CfListcontentService cflistcontentservice;
+    @Autowired private CfKeywordService cfkeywordservice;
+    @Autowired private CfKeywordlistService cfkeywordlistservice;
     @Autowired ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     @Autowired EntityUtil entityUtil;
@@ -105,6 +111,14 @@ public class OdataUtil {
         EntityCollection genericCollection = new EntityCollection();
         
         if (0 == source.getSource()) {
+            if (0 == edmEntitySet.getName().compareToIgnoreCase("CFKeyword")) {
+                getKeywordList(keypredicates, genericCollection);
+                return genericCollection;
+            }
+            if (0 == edmEntitySet.getName().compareToIgnoreCase("CFKeywordLib")) {
+                getKeywordLibList(keypredicates, genericCollection);
+                return genericCollection;
+            }
             if (0 != edmEntitySet.getEntityType().getName().compareToIgnoreCase("CFListEntry")) {
                 getList(cfclassservice.findByName(classname), searchmap, genericCollection, orderbyoption);
             } else {
@@ -114,6 +128,38 @@ public class OdataUtil {
             getListDB(classname, genericCollection, attributmap, source);
         }
         return genericCollection;
+    }
+    
+    private void getKeywordList(List keypredicates, EntityCollection genericCollection) {
+        List<Entity> genericList = genericCollection.getEntities();
+        Long id = null;
+        for (Object entry : keypredicates) {
+            String attributname = ((UriParameterImpl) entry).getName();
+            String attributvalue = ((UriParameterImpl) entry).getText().replaceAll("^'", "")
+                    .replaceAll("'$", "");
+            if (0 == attributname.compareToIgnoreCase("id")) {
+                id = Long.valueOf(attributvalue);
+            }
+        }
+        CfKeyword keyword = cfkeywordservice.findById(id);
+        Entity entity = entityUtil.makeEntity(keyword);
+        genericList.add(entity);
+    }
+    
+    private void getKeywordLibList(List keypredicates, EntityCollection genericCollection) {
+        List<Entity> genericList = genericCollection.getEntities();
+        Long id = null;
+        for (Object entry : keypredicates) {
+            String attributname = ((UriParameterImpl) entry).getName();
+            String attributvalue = ((UriParameterImpl) entry).getText().replaceAll("^'", "")
+                    .replaceAll("'$", "");
+            if (0 == attributname.compareToIgnoreCase("id")) {
+                id = Long.valueOf(attributvalue);
+            }
+        }
+        CfKeywordlist keywordlist = cfkeywordlistservice.findById(id);
+        Entity entity = entityUtil.makeEntity(keywordlist);
+        genericList.add(entity);
     }
     
     private void getList(CfClass clazz, HashMap searchmap, EntityCollection genericCollection, OrderByOption orderbyoption) {

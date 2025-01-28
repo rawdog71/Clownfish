@@ -82,7 +82,12 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
     
     @Override
     public List<CsdlSchema> getSchemas() throws ODataException {
-        return schemas;
+        if (null != schemas) {
+            return schemas;
+        } else {
+            getNewSchemas();
+            return schemas;
+        }
     }
 
     public void getNewSchemas() throws ODataException {
@@ -126,6 +131,14 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
         entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLibs"), new SourceStructure(0, 6, null, null, null, null, null));
         CsdlEntityType keywordlibset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLibs"));
         entityTypes.add(keywordlibset);
+        
+        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeyword"), new SourceStructure(0, 5, null, null, null, null, null));
+        CsdlEntityType keyword = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeyword"));
+        entityTypes.add(keyword);
+
+        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLib"), new SourceStructure(0, 6, null, null, null, null, null));
+        CsdlEntityType keywordlib = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLib"));
+        entityTypes.add(keywordlib);
 
         for (CfClass clazz : cfclassservice.findAll()) {
             entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()), new SourceStructure(0, 0, null, null, null, null, null));
@@ -247,6 +260,12 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
             
             CsdlEntitySet es_keywordlibs = getEntitySet(CONTAINER, "CFKeywordLibs");
             entitySets.add(es_keywordlibs);
+            
+            CsdlSingleton si_keyword = getSingleton(CONTAINER, "CFKeyword");
+            singletons.add(si_keyword);
+            
+            CsdlSingleton si_keywordlib = getSingleton(CONTAINER, "CFKeywordLib");
+            singletons.add(si_keywordlib);
             
             // Add EntitySet container for all backend classes
             for (CfClass clazz : cfclassservice.findAll()) {
