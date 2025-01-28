@@ -198,6 +198,65 @@ public class EntityUtil {
         attributmap.clear();       
     }
     
+    public Entity makeEntity(CfAsset asset) {
+        Entity entity = new Entity();
+        
+        Property prop_id = new Property();
+        prop_id.setName("id");
+        prop_id.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+        setPropValue(prop_id, asset.getId());
+        entity.addProperty(prop_id);
+        
+        Property prop_name = new Property();
+        prop_name.setName("name");
+        prop_name.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName().getFullQualifiedNameAsString());
+        setPropValue(prop_name, asset.getName());
+        entity.addProperty(prop_name);
+        
+        Property prop_fileextension = new Property();
+        prop_fileextension.setName("fileextension");
+        prop_fileextension.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName().getFullQualifiedNameAsString());
+        setPropValue(prop_fileextension, asset.getFileextension());
+        entity.addProperty(prop_fileextension);
+        
+        Property prop_mimetype = new Property();
+        prop_mimetype.setName("mimetype");
+        prop_mimetype.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName().getFullQualifiedNameAsString());
+        setPropValue(prop_mimetype, asset.getMimetype());
+        entity.addProperty(prop_mimetype);
+        
+        Property prop_description = new Property();
+        prop_description.setName("description");
+        prop_description.setType(EdmPrimitiveTypeKind.String.getFullQualifiedName().getFullQualifiedNameAsString());
+        setPropValue(prop_description, asset.getDescription());
+        entity.addProperty(prop_description);
+        
+        Property prop_filesize = new Property();
+        prop_filesize.setName("filesize");
+        prop_filesize.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+        setPropValue(prop_filesize, asset.getFilesize());
+        entity.addProperty(prop_filesize);
+        
+        Property prop_downloads = new Property();
+        prop_downloads.setName("downloads");
+        prop_downloads.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+        setPropValue(prop_downloads, asset.getDownloads());
+        entity.addProperty(prop_downloads);
+        
+        List<CfAssetkeyword> kwlistcontent = cfassetkeywordService.findByAssetRef(asset.getId());
+        ArrayList<Long> listset = new ArrayList<>();
+        for (CfAssetkeyword entry : kwlistcontent) {
+            listset.add(entry.getCfAssetkeywordPK().getKeywordref());
+        }
+        Property prop_listset = new Property();
+        prop_listset.setName("keywordset");
+        prop_listset.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+        prop_listset.setValue(ValueType.COLLECTION_PRIMITIVE, listset);
+        entity.addProperty(prop_listset);
+        
+        return entity;
+    }
+    
     public Entity makeEntity(CfKeyword keyword) {
         Entity entity = new Entity();
         

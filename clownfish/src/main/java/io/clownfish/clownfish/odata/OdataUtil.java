@@ -17,6 +17,7 @@ package io.clownfish.clownfish.odata;
 
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.datamodels.SearchValues;
+import io.clownfish.clownfish.dbentities.CfAsset;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
@@ -27,6 +28,7 @@ import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.TableFieldStructure;
+import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
@@ -75,6 +77,7 @@ public class OdataUtil {
     @Autowired private CfListcontentService cflistcontentservice;
     @Autowired private CfKeywordService cfkeywordservice;
     @Autowired private CfKeywordlistService cfkeywordlistservice;
+    @Autowired private CfAssetService cfassetservice;
     @Autowired ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     @Autowired EntityUtil entityUtil;
@@ -117,6 +120,10 @@ public class OdataUtil {
             }
             if (0 == edmEntitySet.getName().compareToIgnoreCase("CFKeywordLib")) {
                 getKeywordLibList(keypredicates, genericCollection);
+                return genericCollection;
+            }
+            if (0 == edmEntitySet.getName().compareToIgnoreCase("CFAssets")) {
+                getAssetList(keypredicates, genericCollection);
                 return genericCollection;
             }
             if (0 != edmEntitySet.getEntityType().getName().compareToIgnoreCase("CFListEntry")) {
@@ -349,5 +356,21 @@ public class OdataUtil {
             searchvalue1 = searchvalue;
             return new SearchValues(comparator, searchvalue1.toLowerCase(), searchvalue2.toLowerCase());
         }
+    }
+
+    private void getAssetList(List keypredicates, EntityCollection genericCollection) {
+        List<Entity> genericList = genericCollection.getEntities();
+        Long id = null;
+        for (Object entry : keypredicates) {
+            String attributname = ((UriParameterImpl) entry).getName();
+            String attributvalue = ((UriParameterImpl) entry).getText().replaceAll("^'", "")
+                    .replaceAll("'$", "");
+            if (0 == attributname.compareToIgnoreCase("id")) {
+                id = Long.valueOf(attributvalue);
+            }
+        }
+        CfAsset asset = cfassetservice.findById(id);
+        Entity entity = entityUtil.makeEntity(asset);
+        genericList.add(entity);
     }
 }

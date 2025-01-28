@@ -139,6 +139,10 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
         entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLib"), new SourceStructure(0, 6, null, null, null, null, null));
         CsdlEntityType keywordlib = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeywordLib"));
         entityTypes.add(keywordlib);
+        
+        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFAssets"), new SourceStructure(0, 7, null, null, null, null, null));
+        CsdlEntityType asset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFAssets"));
+        entityTypes.add(asset);
 
         for (CfClass clazz : cfclassservice.findAll()) {
             entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()), new SourceStructure(0, 0, null, null, null, null, null));
@@ -266,6 +270,10 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
             
             CsdlSingleton si_keywordlib = getSingleton(CONTAINER, "CFKeywordLib");
             singletons.add(si_keywordlib);
+            
+            // Add EntitySet container for Assets
+            CsdlEntitySet es_assets = getEntitySet(CONTAINER, "CFAssets");
+            entitySets.add(es_assets);
             
             // Add EntitySet container for all backend classes
             for (CfClass clazz : cfclassservice.findAll()) {
@@ -459,6 +467,36 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                             entityType.setKey(keysList);
                             LOGGER.info(entityType.getName());
                             return entityType;
+                        case 7:                                                 // Asset
+                            entityType.setName(entityTypeName.getName());
+
+                            CsdlProperty prop5_id = new CsdlProperty().setName("id").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop5_id);
+                            CsdlPropertyRef propertyRef5_id = new CsdlPropertyRef();
+                            propertyRef5_id.setName("id");
+                            keysList.add(propertyRef5_id);
+
+                            CsdlProperty prop5_name = new CsdlProperty().setName("name").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop5_name);
+                            CsdlProperty prop5_fileextension = new CsdlProperty().setName("fileextension").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop5_fileextension);
+                            CsdlProperty prop5_mimetype = new CsdlProperty().setName("mimetype").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop5_mimetype);
+                            CsdlProperty prop5_description = new CsdlProperty().setName("description").setType(EdmPrimitiveTypeKind.String.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop5_description);
+                            CsdlProperty prop5_filesize = new CsdlProperty().setName("filesize").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop5_filesize);
+                            CsdlProperty prop5_downloads = new CsdlProperty().setName("downloads").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(false);
+                            propsList.add(prop5_downloads);
+                            
+                            CsdlProperty prop_keywordset2 = new CsdlProperty().setName("keywordset").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(true);
+                            propsList.add(prop_keywordset2);
+                            entityType.setProperties(propsList);
+
+                            entityType.setProperties(propsList);
+                            entityType.setKey(keysList);
+                            LOGGER.info(entityType.getName());
+                            return entityType;
                         default:
                             return null;
                     }
@@ -562,6 +600,9 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                 }
                 if (0 == entitySetName.compareToIgnoreCase("CFKeywordLibs")) {
                     entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, "CFKeyword"));
+                }
+                if (0 == entitySetName.compareToIgnoreCase("CFAssets")) {
+                    entitySet.setType(new FullQualifiedName(NAMESPACE_ENTITY, "CFAssets"));
                 }
                 if ((entitySetName.endsWith("Set")) || (entitySetName.endsWith("Lists"))) {
                     int postlength = 3;
