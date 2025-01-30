@@ -143,6 +143,10 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
         entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFAssets"), new SourceStructure(0, 7, null, null, null, null, null));
         CsdlEntityType asset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFAssets"));
         entityTypes.add(asset);
+        
+        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFAssetLibs"), new SourceStructure(0, 6, null, null, null, null, null));
+        CsdlEntityType assetlibset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFAssetLibs"));
+        entityTypes.add(assetlibset);
 
         for (CfClass clazz : cfclassservice.findAll()) {
             entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, clazz.getName()), new SourceStructure(0, 0, null, null, null, null, null));
@@ -274,6 +278,9 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
             // Add EntitySet container for Assets
             CsdlEntitySet es_assets = getEntitySet(CONTAINER, "CFAssets");
             entitySets.add(es_assets);
+            
+            CsdlEntitySet es_assetlibs = getEntitySet(CONTAINER, "CFAssetLibs");
+            entitySets.add(es_assetlibs);
             
             // Add EntitySet container for all backend classes
             for (CfClass clazz : cfclassservice.findAll()) {
@@ -448,7 +455,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                             entityType.setKey(keysList);
                             LOGGER.info(entityType.getName());
                             return entityType;
-                        case 6:                                                 // KeywordLibs
+                        case 6:                                                 // KeywordLibs and AssetLibs
                             entityType.setName(entityTypeName.getName());
 
                             CsdlProperty prop4_id = new CsdlProperty().setName("id").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(false);

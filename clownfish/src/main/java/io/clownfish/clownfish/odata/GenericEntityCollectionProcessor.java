@@ -17,6 +17,7 @@ package io.clownfish.clownfish.odata;
 
 import io.clownfish.clownfish.datamodels.ContentDataOutput;
 import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfAssetlist;
 import io.clownfish.clownfish.dbentities.CfAttributcontent;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
@@ -28,6 +29,7 @@ import io.clownfish.clownfish.jdbc.DatatableProperties;
 import io.clownfish.clownfish.jdbc.JDBCUtil;
 import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
+import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
@@ -106,6 +108,7 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
     @Autowired private CfKeywordService cfkeywordService;
     @Autowired private CfKeywordlistService cfkeywordlistService;
     @Autowired private CfAssetService cfassetService;
+    @Autowired private CfAssetlistService cfassetlistService;
     @Autowired ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
     @Autowired EntityUtil entityUtil;
@@ -164,25 +167,31 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
                     EntityCollection entitySet = getAssets(genericCollection);
                     entityList = entitySet.getEntities();
                 } else {
-                    if (edmEntitySet.getName().endsWith("Set")) {
-                        entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
+                    if (0 == edmEntitySet.getName().compareToIgnoreCase("CFAssetLibs")) {
+                        EntityCollection genericCollection = new EntityCollection();
+                        EntityCollection entitySet = getAssetLibs(genericCollection);
+                        entityList = entitySet.getEntities();
                     } else {
-                        if (edmEntitySet.getName().endsWith("List")) {
-                            entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
+                        if (edmEntitySet.getName().endsWith("Set")) {
+                            entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-3);
                         } else {
-                            if (edmEntitySet.getName().endsWith("Lists")) {
-                                entityname = edmEntitySet.getName();
+                            if (edmEntitySet.getName().endsWith("List")) {
+                                entityname = edmEntitySet.getName().substring(0, edmEntitySet.getName().length()-4);
                             } else {
-                                entityname = edmEntitySet.getName();
+                                if (edmEntitySet.getName().endsWith("Lists")) {
+                                    entityname = edmEntitySet.getName();
+                                } else {
+                                    entityname = edmEntitySet.getName();
+                                }
                             }
                         }
+                        Expression filterexpression = null;
+                        if (null != filterOption) {
+                            filterexpression = filterOption.getExpression();
+                        }
+                        EntityCollection entitySet = getData(edmEntitySet, filterexpression, orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
+                        entityList = entitySet.getEntities();
                     }
-                    Expression filterexpression = null;
-                    if (null != filterOption) {
-                        filterexpression = filterOption.getExpression();
-                    }
-                    EntityCollection entitySet = getData(edmEntitySet, filterexpression, orderbyoption, entityUtil.getEntitysourcelist().get(new FullQualifiedName(NAMESPACE_ENTITY, entityname)));
-                    entityList = entitySet.getEntities();
                 }
             }
             Iterator<Entity> entityIterator = entityList.iterator();
@@ -572,6 +581,17 @@ public class GenericEntityCollectionProcessor implements EntityCollectionProcess
         assetlist = cfassetService.findAll();
         for (CfAsset asset : assetlist) {
             Entity entity = entityUtil.makeEntity(asset);
+            genericList.add(entity);
+        }
+        return genericCollection;
+    }
+
+    private EntityCollection getAssetLibs(EntityCollection genericCollection) {
+        List<CfAssetlist> assetlist;
+        List<Entity> genericList = genericCollection.getEntities();
+        assetlist = cfassetlistService.findAll();
+        for (CfAssetlist kw : assetlist) {
+            Entity entity = entityUtil.makeEntity(kw);
             genericList.add(entity);
         }
         return genericCollection;
