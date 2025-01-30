@@ -144,7 +144,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
         CsdlEntityType asset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFAssets"));
         entityTypes.add(asset);
         
-        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFAssetLibs"), new SourceStructure(0, 6, null, null, null, null, null));
+        entityUtil.getEntitysourcelist().put(new FullQualifiedName(NAMESPACE_ENTITY, "CFAssetLibs"), new SourceStructure(0, 8, null, null, null, null, null));
         CsdlEntityType assetlibset = getEntityType(new FullQualifiedName(NAMESPACE_ENTITY, "CFAssetLibs"));
         entityTypes.add(assetlibset);
 
@@ -455,7 +455,8 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                             entityType.setKey(keysList);
                             LOGGER.info(entityType.getName());
                             return entityType;
-                        case 6:                                                 // KeywordLibs and AssetLibs
+                        case 6:                                                 // KeywordLibs
+                        case 8:                                                 // AssetLibs
                             entityType.setName(entityTypeName.getName());
 
                             CsdlProperty prop4_id = new CsdlProperty().setName("id").setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName()).setCollection(false);

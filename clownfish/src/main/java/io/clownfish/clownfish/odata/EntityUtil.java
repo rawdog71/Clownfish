@@ -89,6 +89,7 @@ public class EntityUtil {
     @Autowired private CfSitelistService cfsitelistService;
     @Autowired private CfClasscontentKeywordService cfclasscontentkeywordService;
     @Autowired private CfAssetlistService cfassetlistService;
+    @Autowired private CfAssetService cfassetService;
     @Autowired private CfAssetlistcontentService cfassetlistcontentService;
     @Autowired private CfKeywordService cfkeywordService;
     @Autowired private CfKeywordlistService cfkeywordlistService;
@@ -797,6 +798,35 @@ public class EntityUtil {
                         
                         return entity;
                     }
+                case 8:                                                         // handle CfAssetlist
+                    name = entity.getProperty("name").getValue().toString();
+                    CfAssetlist assetlist = cfassetlistService.findByName(name);
+                    if (null != assetlist) {
+                        return null;
+                    } else {
+                        assetlist = new CfAssetlist();
+                        assetlist.setName(name);
+                        assetlist = cfassetlistService.create(assetlist);
+                        
+                        Property prop_id = new Property();
+                        prop_id.setName("id");
+                        prop_id.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+                        entity.addProperty(prop_id);
+                        entity.getProperty("id").setValue(ValueType.PRIMITIVE, assetlist.getId());
+                        
+                        ArrayList listset = (ArrayList) entity.getProperty("listset").getValue();
+                        for (Object entry : listset) {
+                            CfAssetlistcontent assetlistcontententry = new CfAssetlistcontent();
+                            assetlistcontententry.setCfAssetlistcontentPK(new CfAssetlistcontentPK(assetlist.getId(), Long.valueOf((Integer)entry)));
+                            cfassetlistcontentService.create(assetlistcontententry);
+                        }
+                        Property prop_listset = new Property();
+                        prop_listset.setName("listset");
+                        prop_listset.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+                        prop_listset.setValue(ValueType.COLLECTION_PRIMITIVE, listset);
+                        
+                        return entity;
+                    }    
                 default:
                     return null;
             }
@@ -1115,6 +1145,74 @@ public class EntityUtil {
                     } else {
                         return false;
                     }
+                case 7:                                                         // handle CfAsset
+                    id = null;
+                    for (UriParameter param : keyParams) {
+                        if (0 == param.getName().compareToIgnoreCase("id")) {
+                            id = Long.parseLong(param.getText());
+                        }
+                    }
+                    CfAsset asset = cfassetService.findById(id);
+                    if (null != asset) {
+                        if (null != entity.getProperty("keywordset")) {
+                            // Delete corresponding keywordcontent entries
+                            List<CfAssetkeyword> keywordcontentdummy = cfassetkeywordService.findByAssetRef(asset.getId());
+                            for (CfAssetkeyword keywordcontent : keywordcontentdummy) {
+                                cfassetkeywordService.delete(keywordcontent);
+                            }
+                            ArrayList al = (ArrayList) entity.getProperty("keywordset").getValue();
+                            for (Object o : al) {
+                                CfAssetkeyword cckw = new CfAssetkeyword();
+                                CfAssetkeywordPK cfAssetkeywordPK = new CfAssetkeywordPK();
+                                cfAssetkeywordPK.setAssetref(asset.getId());
+                                cfAssetkeywordPK.setKeywordref(Long.parseLong(o.toString()));
+                                cckw.setCfAssetkeywordPK(cfAssetkeywordPK);
+                                cfassetkeywordService.create(cckw);
+                            }
+                        }
+                        return true;
+                    } else {
+                        return false;
+                    }
+                case 8:                                                         // handle CfAssetlist
+                    id = null;
+                    for (UriParameter param : keyParams) {
+                        if (0 == param.getName().compareToIgnoreCase("id")) {
+                            id = Long.parseLong(param.getText());
+                        }
+                    }
+                    CfAssetlist assetlist = cfassetlistService.findById(id);
+                    if (null != assetlist) {
+                        name = entity.getProperty("name").getValue().toString();
+                        CfAssetlist assetlist_search = cfassetlistService.findByName(name);
+                        if (null == assetlist_search) {
+                            assetlist.setName(name);
+                        } else {
+                            return false;
+                        }
+                            
+                        // delete assetlist entries
+                        List<CfAssetlistcontent> reflist = cfassetlistcontentService.findByAssetlistref(id);
+                        for (CfAssetlistcontent entry : reflist) {
+                            cfassetlistcontentService.delete(entry);
+                        }
+                        ArrayList listset = (ArrayList) entity.getProperty("listset").getValue();
+                        for (Object entry : listset) {
+                            CfAssetlistcontent assetlistcontententry = new CfAssetlistcontent();
+                            assetlistcontententry.setCfAssetlistcontentPK(new CfAssetlistcontentPK(assetlist.getId(), Long.valueOf((Integer)entry)));
+                            cfassetlistcontentService.create(assetlistcontententry);
+                        }
+                        Property prop_listset = new Property();
+                        prop_listset.setName("listset");
+                        prop_listset.setType(EdmPrimitiveTypeKind.Int32.getFullQualifiedName().getFullQualifiedNameAsString());
+                        prop_listset.setValue(ValueType.COLLECTION_PRIMITIVE, listset);
+                        
+                        cfassetlistService.edit(assetlist);
+                        
+                        return true;
+                    } else {
+                        return false;
+                    }
                 default:
                     return false;
             }
@@ -1323,6 +1421,25 @@ public class EntityUtil {
                             cfkeywordlistcontentService.delete(entry);
                         }
                         cfkeywordlistService.delete(keywordlist);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                case 8:                                                         // handle CfAssetLibs
+                    id = null;
+                    for (UriParameter param : keyParams) {
+                        if (0 == param.getName().compareToIgnoreCase("id")) {
+                            id = Long.parseLong(param.getText());
+                        }
+                    }
+                    CfAssetlist assetlist = cfassetlistService.findById(id);
+                    if (null != assetlist) {
+                        // delete assetlist entries
+                        List<CfAssetlistcontent> reflist = cfassetlistcontentService.findByAssetlistref(id);
+                        for (CfAssetlistcontent entry : reflist) {
+                            cfassetlistcontentService.delete(entry);
+                        }
+                        cfassetlistService.delete(assetlist);
                         return true;
                     } else {
                         return false;
