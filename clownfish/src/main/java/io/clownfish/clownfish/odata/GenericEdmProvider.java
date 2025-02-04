@@ -364,7 +364,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
     @Override
     public CsdlEntityType getEntityType(FullQualifiedName entityTypeName) throws ODataException {
         if (entityUtil.getEntitytypelist().containsKey(entityTypeName)) {
-            LOGGER.info(entityUtil.getEntitytypelist().get(entityTypeName).getName());
+            //LOGGER.info(entityUtil.getEntitytypelist().get(entityTypeName).getName());
             return entityUtil.getEntitytypelist().get(entityTypeName);
         } else {
             if (entityUtil.getEntitysourcelist().containsKey(entityTypeName)) {
@@ -398,7 +398,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
 
                             if (!keysList.isEmpty()) {
                                 entityUtil.getEntitytypelist().put(entityTypeName, entityType);
-                                LOGGER.info(entityUtil.getEntitytypelist().get(entityTypeName).getName());
+                                //LOGGER.info(entityUtil.getEntitytypelist().get(entityTypeName).getName());
                                 return entityType;
                             } else {
                                 LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
@@ -421,7 +421,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
 
                             entityType.setProperties(propsList);
                             entityType.setKey(keysList);
-                            LOGGER.info(entityType.getName());
+                            //LOGGER.info(entityType.getName());
                             return entityType;
                         case 4:                                                 // KeywordEntry
                             entityType.setName(entityTypeName.getName());
@@ -437,7 +437,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
 
                             entityType.setProperties(propsList);
                             entityType.setKey(keysList);
-                            LOGGER.info(entityType.getName());
+                            //LOGGER.info(entityType.getName());
                             return entityType;
                         case 5:                                                 // Keywords
                             entityType.setName(entityTypeName.getName());
@@ -453,7 +453,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
 
                             entityType.setProperties(propsList);
                             entityType.setKey(keysList);
-                            LOGGER.info(entityType.getName());
+                            //LOGGER.info(entityType.getName());
                             return entityType;
                         case 6:                                                 // KeywordLibs
                         case 8:                                                 // AssetLibs
@@ -473,7 +473,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
 
                             entityType.setProperties(propsList);
                             entityType.setKey(keysList);
-                            LOGGER.info(entityType.getName());
+                            //LOGGER.info(entityType.getName());
                             return entityType;
                         case 7:                                                 // Asset
                             entityType.setName(entityTypeName.getName());
@@ -503,7 +503,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
 
                             entityType.setProperties(propsList);
                             entityType.setKey(keysList);
-                            LOGGER.info(entityType.getName());
+                            //LOGGER.info(entityType.getName());
                             return entityType;
                         default:
                             return null;
@@ -529,7 +529,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
 
                     if (!keysList.isEmpty()) {
                         entityUtil.getEntitytypelist().put(entityTypeName, entityType);
-                        LOGGER.info(entityUtil.getEntitytypelist().get(entityTypeName).getName());
+                        //LOGGER.info(entityUtil.getEntitytypelist().get(entityTypeName).getName());
                         return entityType;
                     } else {
                         LOGGER.warn("OData - Missing identifier for " + entityTypeName.getName());
@@ -537,7 +537,7 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                     }
                 }
             } else {
-                LOGGER.info(entityTypeName.getName() + " NOT FOUND");
+                LOGGER.warn(entityTypeName.getName() + " NOT FOUND");
                 return null;
             }
         }
