@@ -61,6 +61,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,6 +71,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import org.joda.time.DateTimeZone;
 
@@ -906,7 +909,17 @@ public class EntityUtil {
                                             if (0 != attribut.getAttributetype().getName().compareToIgnoreCase("datetime")) {
                                                 contentUtil.setAttributValue(attributcontent, p.getValue().toString());
                                             } else {
-                                                contentUtil.setAttributValue(attributcontent, ((GregorianCalendar) p.getValue()).toZonedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+                                                try {
+                                                    contentUtil.setAttributValue(attributcontent, ((GregorianCalendar) p.getValue()).toZonedDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));        
+                                                } catch(Exception ex){
+                                                    Timestamp timestamp = (Timestamp)p.getValue();
+                                                    Date date = new Date();
+                                                    date.setTime(timestamp.getTime());
+                                                    SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yyyy");
+                                                    outputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                                    String outputString = outputFormat.format(date);
+                                                    contentUtil.setAttributValue(attributcontent, outputString);  
+                                                }
                                             }
                                             cfattributcontentService.edit(attributcontent);
                                             contentUtil.indexContent();
