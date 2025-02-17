@@ -220,7 +220,7 @@ public class NpmList implements Serializable {
                 searchresult.setVersion(doc.get("version").toString());
                 searchresult.setDate(doc.get("date").toString());
                 searchresult.setDescription(doc.get("description").toString());
-                searchresult.setScope(doc.get("scope").toString());
+                //searchresult.setScope(doc.get("scope").toString());
                 npmDocs.add(searchresult);
             }
         } catch (JsonProcessingException ex) {

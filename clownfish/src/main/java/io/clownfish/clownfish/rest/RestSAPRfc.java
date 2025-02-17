@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -58,7 +60,7 @@ public class RestSAPRfc {
     private PropertyUtil propertyUtil;
     @Autowired PropertyList propertylist;
     @Value("${sapconnection.file}") String SAPCONNECTION;
-    
+    final transient Logger LOGGER = LoggerFactory.getLogger(RestSAPRfc.class);
     
     /*
     this.sapc = (SAPConnection) sapc;
@@ -141,6 +143,7 @@ public class RestSAPRfc {
             SAPUtility su = new SAPUtility(sapsystemc);
             rsrp.setResult(su.getMetadata(rsrp.getRfcFunction(), rsrp.getParametermap(), rfc_get_function_interface));
         }
+        LOGGER.info(sapsystemc.getDestination().getR3Name());
         return rsrp;
     }
 }

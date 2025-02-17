@@ -42,16 +42,16 @@ public class RPY_TABLE_READ {
     }
     
     public void setSapConnection(Object sapc) {
-        sapc = (SAPConnection) sapc;
+        this.sapc = (SAPConnection) sapc;
     }
     
     public void init() {
         rpytablereadlist.clear();
     }
     
-    public List<RpyTableRead> getRpyTableReadList(String tablename) {
-        if (rpytablereadlist.containsKey(tablename)) {
-            return rpytablereadlist.get(tablename);
+    public List<RpyTableRead> getRpyTableReadList(String tablename, SAPConnection sapc) {
+        if (rpytablereadlist.containsKey(sapc.getDestination().getDestinationID() + "_" + tablename)) {
+            return rpytablereadlist.get(sapc.getDestination().getDestinationID() + "_" + tablename);
         } else {
             try {
                 JCoFunction function = sapc.getDestination().getRepository().getFunction("RPY_TABLE_READ");
@@ -105,7 +105,7 @@ public class RPY_TABLE_READ {
                     );
                     tablefieldList.add(tablefield);
                 }
-                rpytablereadlist.put(tablename, tablefieldList);
+                rpytablereadlist.put(sapc.getDestination().getDestinationID() + "_" + tablename, tablefieldList);
                 return tablefieldList;
             } catch (JCoException ex) {
                 LOGGER.error("SAPSYSTEM: " + sapc.getDestination().getProperties().get("jco.client.ashost"));

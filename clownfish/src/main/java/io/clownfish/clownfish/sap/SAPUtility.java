@@ -97,7 +97,7 @@ public class SAPUtility {
                     if (rfcfunctionparam.getParamclass().compareToIgnoreCase("T") == 0) {
                         ArrayList<HashMap> tablevalues = new ArrayList<>();
                         functions_table = function.getTableParameterList().getTable(paramname);
-                        List<RpyTableRead> rpytablereadlist = rpytableread.getRpyTableReadList(tablename);
+                        List<RpyTableRead> rpytablereadlist = rpytableread.getRpyTableReadList(tablename, sapc);
                         for (int i = 0; i < functions_table.getNumRows(); i++) {
                             HashMap<String, String> sapexportvalues = new HashMap<>();
                             functions_table.setRow(i);
@@ -441,7 +441,7 @@ public class SAPUtility {
             rpytablereadlist = rpyMap.get(tablename);
         } else {
             rpytableread.setSapConnection(sapc);
-            rpytablereadlist = rpytableread.getRpyTableReadList(tablename);
+            rpytablereadlist = rpytableread.getRpyTableReadList(tablename, sapc);
             rpyMap.put(tablename, rpytablereadlist);
         }
         return rpytablereadlist;

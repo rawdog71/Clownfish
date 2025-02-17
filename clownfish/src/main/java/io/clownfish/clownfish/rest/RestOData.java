@@ -96,7 +96,6 @@ public class RestOData {
     
     @Autowired CfAssetService cfassetService;
     @Autowired AssetIndexer assetIndexer;
-    @Autowired IndexService indexService;
     @Autowired CfKeywordService cfkeywordService;
     @Autowired CfAssetKeywordService cfassetkeywordService;
     @Autowired FolderUtil folderUtil;
