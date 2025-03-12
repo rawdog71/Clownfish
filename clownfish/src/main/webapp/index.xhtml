@@ -31,6 +31,13 @@
                     </f:facet>
 
                     <f:facet name="right">
+                        <h:outputText value="Suche:" rendered="#{loginBean.login}" />
+                        <p:inputText type="text" value="#{searchBean.searchphrase}" required="false" rendered="#{loginBean.login}" />
+
+                        <p:commandButton id="SearchButton" value="Search" icon="pi pi-search" actionListener="#{searchBean.onSearch}" update=":form" rendered="#{loginBean.login}" >
+                            <f:actionListener binding="#{sitetree.setTab(19)}" />
+                        </p:commandButton>
+                        
                         <p:commandButton id="userButton" value="User" type="button" icon="pi pi-user" rendered="#{loginBean.login}" />
                         <p:outputLabel value="&nbsp;" />
                         <p:menu overlay="true" trigger="userButton" my="left top" at="left bottom">
@@ -2765,6 +2772,13 @@
 
                     </h:panelGrid>
 
+                </p:tab>
+                
+                <p:tab title="Search" id="searchpanel" rendered="#{loginBean.login and loginBean.hasRights(2)}">
+                    <f:facet name="title">
+                        <i class="pi pi-search"></i><h:outputText value="&nbsp;"/>
+                        <h:outputText value="Search"/>
+                    </f:facet>
                 </p:tab>
 
             </p:tabView>
