@@ -21,21 +21,28 @@ import io.clownfish.clownfish.dbentities.CfAssetkeyword;
 import io.clownfish.clownfish.dbentities.CfClass;
 import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
+import io.clownfish.clownfish.dbentities.CfJava;
+import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfKeyword;
 import io.clownfish.clownfish.dbentities.CfListcontent;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.dbentities.CfSitecontent;
+import io.clownfish.clownfish.dbentities.CfStylesheet;
+import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.serviceinterface.CfAssetKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
+import io.clownfish.clownfish.serviceinterface.CfJavaService;
+import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfKeywordService;
 import io.clownfish.clownfish.serviceinterface.CfListService;
 import io.clownfish.clownfish.serviceinterface.CfListcontentService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
 import io.clownfish.clownfish.serviceinterface.CfSitecontentService;
 import io.clownfish.clownfish.serviceinterface.CfSitelistService;
+import io.clownfish.clownfish.serviceinterface.CfStylesheetService;
 import io.clownfish.clownfish.serviceinterface.CfTemplateService;
 import io.clownfish.clownfish.utils.AssetUtil;
 import io.clownfish.clownfish.utils.ClassUtil;
@@ -78,6 +85,10 @@ public class Searcher implements Serializable {
     Query query;
     ArrayList<CfSite> foundSites;
     ArrayList<CfAsset> foundAssets;
+    ArrayList<CfJava> foundJavas;
+    ArrayList<CfJavascript> foundJavascripts;
+    ArrayList<CfStylesheet> foundStylesheets;
+    ArrayList<CfTemplate> foundTemplates;
     AssetUtil assetutil;
     PropertyUtil propertyUtil;
     boolean getAssetMetadata;
@@ -92,6 +103,9 @@ public class Searcher implements Serializable {
     @Autowired CfClassService cfclassservice;
     @Autowired CfClasscontentService cfclasscontentservice;
     @Autowired CfTemplateService cftemplateservice;
+    @Autowired CfStylesheetService cfstylesheetservice;
+    @Autowired CfJavascriptService cfjavascriptservice;
+    @Autowired CfJavaService cfjavaservice;
     @Autowired ClassUtil classutil;
     @Autowired CfKeywordService cfkeywordservice;
     @Autowired CfClasscontentKeywordService cfclasscontentkeywordservice;
@@ -104,6 +118,10 @@ public class Searcher implements Serializable {
         foundAssets = new ArrayList<>();
         foundClasscontent = new HashMap<>();
         foundAssetMetadata = new HashMap<>();
+        foundJavas = new ArrayList<>();
+        foundJavascripts = new ArrayList<>();
+        foundStylesheets = new ArrayList<>();
+        foundTemplates = new ArrayList<>();
     }
     
     public void setPropertyList(PropertyList propertylist) {
@@ -130,6 +148,10 @@ public class Searcher implements Serializable {
         if (!searchQuery.isBlank()) {
             foundSites.clear();
             foundAssets.clear();
+            foundJavas.clear();
+            foundJavascripts.clear();
+            foundStylesheets.clear();
+            foundTemplates.clear();
             query = queryParser.parse(searchQuery);
             TopDocs hits = indexSearcher.search(query, searchlimit);
             foundClasscontent.clear();
@@ -137,37 +159,61 @@ public class Searcher implements Serializable {
             HashMap searchclasscontentmap = new HashMap<>();       
             for (ScoreDoc scoreDoc : hits.scoreDocs) {
                 Document doc = getDocument(scoreDoc);
-                String contenttype = doc.get(LuceneConstants.CONTENT_TYPE);           
-                if (0 == contenttype.compareToIgnoreCase("Clownfish/Content")) {
-                    long classcontentref = Long.parseLong(doc.get(LuceneConstants.CLASSCONTENT_REF));
-                    // Search directly in site
-                    List<CfSitecontent> sitelist = sitecontentservice.findByClasscontentref(classcontentref);
-                    sitelist.stream().map((sitecontent) -> siteservice.findById(sitecontent.getCfSitecontentPK().getSiteref())).filter((foundsite) -> ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant()))).forEach((foundsite) -> {
-                        foundSites.add(foundsite);
-                    });
-                    // Search in sitelists
-                    List<CfListcontent> listcontent = sitelistservice.findByClasscontentref(classcontentref);
-                    listcontent.stream().map((listcontententry) -> cflistservice.findById(listcontententry.getCfListcontentPK().getListref())).map((foundlist) -> cfsitelistservice.findByListref(foundlist.getId())).forEach((foundsitelist) -> {
-                        foundsitelist.stream().map((sitelistentry) -> siteservice.findById(sitelistentry.getCfSitelistPK().getSiteref())).filter((foundsite) -> ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant()))).forEach((foundsite) -> {
+                String contenttype = doc.get(LuceneConstants.CONTENT_TYPE);
+                switch (contenttype) {
+                    case "Clownfish/Content":
+                        long classcontentref = Long.parseLong(doc.get(LuceneConstants.CLASSCONTENT_REF));
+                        // Search directly in site
+                        List<CfSitecontent> sitelist = sitecontentservice.findByClasscontentref(classcontentref);
+                        sitelist.stream().map((sitecontent) -> siteservice.findById(sitecontent.getCfSitecontentPK().getSiteref())).filter((foundsite) -> ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant()))).forEach((foundsite) -> {
                             foundSites.add(foundsite);
                         });
-                    });                
-                    addClasscontentMap(classcontentref, searchclasscontentmap);
-                } else {
-                    try {
-                        String assetid = doc.getField(LuceneConstants.ID).stringValue();
-                        CfAsset asset = cfassetservice.findById(Long.parseLong(assetid));
-                        if (!foundAssets.contains(asset)) {
-                            foundAssets.add(asset);
-                            if (getAssetMetadata) {
-                                HashMap<String, String> metamap = new HashMap<>();
-                                assetutil.getMetadata(asset, metamap);
-                                foundAssetMetadata.put(asset.getName(), metamap);
-                            }
+                        // Search in sitelists
+                        List<CfListcontent> listcontent = sitelistservice.findByClasscontentref(classcontentref);
+                        listcontent.stream().map((listcontententry) -> cflistservice.findById(listcontententry.getCfListcontentPK().getListref())).map((foundlist) -> cfsitelistservice.findByListref(foundlist.getId())).forEach((foundsitelist) -> {
+                            foundsitelist.stream().map((sitelistentry) -> siteservice.findById(sitelistentry.getCfSitelistPK().getSiteref())).filter((foundsite) -> ((!foundSites.contains(foundsite)) && (foundsite.isSearchrelevant()))).forEach((foundsite) -> {
+                                foundSites.add(foundsite);
+                            });
+                        });                
+                        addClasscontentMap(classcontentref, searchclasscontentmap);
+                        break;
+                    case "Clownfish/Source":
+                        long templateref = Long.parseLong(doc.get(LuceneConstants.ID));
+                        CfTemplate template = cftemplateservice.findById(templateref);
+                        foundTemplates.add(template);
+                        break;
+                    case "Clownfish/CSS":
+                        long stylesheetref = Long.parseLong(doc.get(LuceneConstants.ID));
+                        CfStylesheet stylesheet = cfstylesheetservice.findById(stylesheetref);
+                        foundStylesheets.add(stylesheet);
+                        break;
+                    case "Clownfish/JS":
+                        long javascriptref = Long.parseLong(doc.get(LuceneConstants.ID));
+                        CfJavascript javascript = cfjavascriptservice.findById(javascriptref);
+                        foundJavascripts.add(javascript);
+                        break;
+                    case "Clownfish/Java":
+                        long javaref = Long.parseLong(doc.get(LuceneConstants.ID));
+                        CfJava java = cfjavaservice.findById(javaref);
+                        if (!foundJavas.contains(java)) {
+                            foundJavas.add(java);
                         }
-                    } catch (IOException | NumberFormatException ex) {
-                        LOGGER.warn(ex.getMessage());
-                    }
+                        break;
+                    default:
+                        try {
+                            String assetid = doc.getField(LuceneConstants.ID).stringValue();
+                            CfAsset asset = cfassetservice.findById(Long.parseLong(assetid));
+                            if (!foundAssets.contains(asset)) {
+                                foundAssets.add(asset);
+                                if (getAssetMetadata) {
+                                    HashMap<String, String> metamap = new HashMap<>();
+                                    assetutil.getMetadata(asset, metamap);
+                                    foundAssetMetadata.put(asset.getName(), metamap);
+                                }
+                            }
+                        } catch (IOException | NumberFormatException ex) {
+                            LOGGER.warn(ex.getMessage());
+                        }
                 }
             }
 
@@ -205,6 +251,10 @@ public class Searcher implements Serializable {
             searchresult.foundAssets = foundAssets;
             searchresult.foundClasscontent = searchclasscontentmap;
             searchresult.foundAssetsMetadata = foundAssetMetadata;
+            searchresult.foundJavas = foundJavas;
+            searchresult.foundJavascripts = foundJavascripts;
+            searchresult.foundTemplates = foundTemplates;
+            searchresult.foundStylesheets = foundStylesheets;
         }
         
         return searchresult;

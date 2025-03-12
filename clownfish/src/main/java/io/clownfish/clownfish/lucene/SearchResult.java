@@ -16,7 +16,11 @@
 package io.clownfish.clownfish.lucene;
 
 import io.clownfish.clownfish.dbentities.CfAsset;
+import io.clownfish.clownfish.dbentities.CfJava;
+import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfSite;
+import io.clownfish.clownfish.dbentities.CfStylesheet;
+import io.clownfish.clownfish.dbentities.CfTemplate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import lombok.Getter;
@@ -31,6 +35,10 @@ public class SearchResult {
     @Getter @Setter ArrayList<CfAsset> foundAssets;
     @Getter @Setter HashMap<String, HashMap> foundAssetsMetadata;
     @Getter @Setter HashMap<String, ArrayList> foundClasscontent;
+    @Getter @Setter ArrayList<CfTemplate> foundTemplates;
+    @Getter @Setter ArrayList<CfJavascript> foundJavascripts;
+    @Getter @Setter ArrayList<CfStylesheet> foundStylesheets;
+    @Getter @Setter ArrayList<CfJava> foundJavas;
 
     public SearchResult() {
     }
