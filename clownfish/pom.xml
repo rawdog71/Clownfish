@@ -4,7 +4,7 @@
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
     <version>0.8.8-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
@@ -83,7 +83,7 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <scope>compile</scope>
-            <version>9.0.98</version>
+            <version>9.0.99</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -632,6 +632,13 @@
                  <configuration>
                      <source>11</source>
                      <target>11</target>
+                     <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.34</version>
+                        </path>
+                    </annotationProcessorPaths>
                  </configuration>
              </plugin>
         </plugins>
