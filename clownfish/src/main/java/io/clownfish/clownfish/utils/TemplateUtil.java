@@ -30,6 +30,7 @@ import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.dbentities.CfTemplateversion;
 import io.clownfish.clownfish.dbentities.CfTemplateversionPK;
+import io.clownfish.clownfish.lucene.SourceIndexer;
 import io.clownfish.clownfish.serviceinterface.CfAssetService;
 import io.clownfish.clownfish.serviceinterface.CfAssetlistService;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
@@ -81,6 +82,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfAttributService cfattributService;
     @Autowired transient CfAssetlistService cfassetlistService;
+    @Autowired @Getter @Setter SourceIndexer sourceindexer;
     
     private @Getter @Setter long currentVersion;
     private @Getter @Setter String templateContent = "";
@@ -496,6 +498,7 @@ public class TemplateUtil implements IVersioningInterface, Serializable {
                     writeVersion(selectedTemplate.getId(), 1, output, 0);
                     setCurrentVersion(1);
                 }
+                sourceindexer.indexTemplate(selectedTemplate);
             } catch (IOException ex) {
                 LOGGER.error(ex.getMessage());
             }

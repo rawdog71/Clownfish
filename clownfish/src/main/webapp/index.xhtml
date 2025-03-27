@@ -2779,6 +2779,23 @@
                         <i class="pi pi-search"></i><h:outputText value="&nbsp;"/>
                         <h:outputText value="Search"/>
                     </f:facet>
+                    
+                    <div class="card">
+                        <p:dataTable var="searchlist" value="#{searchBean.searchlist}">
+                            <p:column headerText="id">
+                                <h:outputText value="#{searchlist.id}" />
+                            </p:column>
+
+                            <p:column headerText="Name">
+                                <h:outputText value="#{searchlist.name}" />
+                            </p:column>
+
+                            <p:column headerText="Category">
+                                <h:outputText value="#{searchlist.category}" />
+                            </p:column>
+
+                        </p:dataTable>
+                    </div>
                 </p:tab>
 
             </p:tabView>

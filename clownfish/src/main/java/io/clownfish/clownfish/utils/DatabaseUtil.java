@@ -17,7 +17,9 @@ package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.beans.SiteTreeBean;
 import io.clownfish.clownfish.datamodels.ColumnData;
+import io.clownfish.clownfish.datamodels.ODataWizard;
 import io.clownfish.clownfish.datamodels.TableData;
+import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfSite;
@@ -1114,22 +1116,7 @@ public class DatabaseUtil {
         html.append("\t\t\t\t</thead>").append("\n");
         html.append("\t\t\t\t<tbody>").append("\n");
 	html.append("\t\t\t\t\t<tr ng-repeat=\"").append(tabledata.getName().toLowerCase()).append(" in ").append(tabledata.getName().toUpperCase()).append("LIST ");
-        for (ColumnData attr : tabledata.getColumns()) {
-            //if (odw.isTableheader()) {
-                //CfAttribut attr = odw.getAttribut();
-                if (attr.isPrimarykey()) {
-                    continue;
-                }
-                switch (attr.getTypename().toUpperCase()) {
-                    case "VARCHAR":
-                    case "INT":
-                    case "DOUBLE":
-                    case "DATETIME":
-                        html.append("| filter: {").append(attr.getName()).append(": filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("} ");
-                        break;
-                }
-            //}
-        }
+        html.append("| filter: ").append(tabledata.getName().toLowerCase()).append("_filter ");
         html.append("| orderBy: order_").append(tabledata.getName().toLowerCase()).append("\">").append("\n");
         
 	html.append("\t\t\t\t\t\t<td>{{").append(tabledata.getName().toLowerCase()).append(".id}}</td>").append("\n");
@@ -1384,6 +1371,60 @@ public class DatabaseUtil {
         javascript.append("\t$scope.sort").append(tabledata.getName()).append(" = function(field) {").append("\n");
         javascript.append("\t\t$scope.order_").append(tabledata.getName().toLowerCase()).append(" = field;").append("\n");
         javascript.append("\t};").append("\n");
+        javascript.append("\n");
+        
+        javascript.append("\t$scope.").append(tabledata.getName().toLowerCase()).append("_filter = function(entry) {").append("\n");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            if (attr.isPrimarykey()) {
+                continue;
+            }
+            switch (attr.getTypename().toUpperCase()) {
+                case "VARCHAR":
+                case "DATETIME":
+                    javascript.append("\tif (entry.").append(attr.getName()).append(" === null) {").append("\n");
+                    javascript.append("\t\tentry.").append(attr.getName()).append(" = \"\";").append("\n");
+                    javascript.append("\t}").append("\n");
+                    break;
+                case "INT":
+                case "DOUBLE":
+                case "BIT":
+                case "BINARY":
+                    javascript.append("\tif (entry.").append(attr.getName()).append(" === null) {").append("\n");
+                    javascript.append("\t\tentry.").append(attr.getName()).append(" = \"\";").append("\n");
+                    javascript.append("\t} else {").append("\n");
+                    javascript.append("\t\tentry.").append(attr.getName()).append(" = entry.").append(attr.getName()).append(".toString();").append("\n");
+                    javascript.append("\t}").append("\n");
+                    break;
+            }
+        }
+        
+        javascript.append("\tif ( ");
+        
+        for (ColumnData attr : tabledata.getColumns()) {
+            if (attr.isPrimarykey()) {
+                continue;
+            }
+            switch (attr.getTypename().toUpperCase()) {
+                case "VARCHAR":
+                case "DATETIME":
+                case "INT":
+                case "DOUBLE":
+                case "BIT":
+                case "BINARY":
+                    javascript.append("(entry.").append(attr.getName()).append(".toLowerCase().includes($scope.filter_").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(".toLowerCase())) && ");
+                    break;
+            }
+        }
+        
+        javascript = javascript.delete(javascript.length()-4, javascript.length());
+        javascript.append(") {").append("\n");
+        javascript.append("\t    return true;").append("\n");
+        javascript.append("\t} else {").append("\n");
+        javascript.append("\treturn false;").append("\n");
+        javascript.append("\t}").append("\n");
+        javascript.append("\t};").append("\n");
+        
         javascript.append("\n");
         
         javascript.append("\t$scope.get").append(tabledata.getName()).append("list = function() {").append("\n");

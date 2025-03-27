@@ -937,7 +937,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t<script src=\"/resources/js/angular.js\"></script>").append("\n");
         html.append("\t\t<script src=\"/js/crud_").append(clazz.getName().toLowerCase()).append(".js\"></script>").append("\n");
         html.append("\t\t<script src=\"/resources/js/pikaday.js\"></script>").append("\n");
-        html.append("\t\t<script src=\"./js/luxon/build/global/luxon.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/luxon.js\"></script>").append("\n");
         html.append("\t</head>").append("\n");
         html.append("\t<body id=\"page-top\" ng-controller=\"Crud").append(clazz.getName()).append("Controller\" data-ng-init=\"init()\">").append("\n");
         

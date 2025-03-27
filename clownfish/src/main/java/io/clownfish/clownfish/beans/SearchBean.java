@@ -15,11 +15,14 @@
  */
 package io.clownfish.clownfish.beans;
 
+import io.clownfish.clownfish.datamodels.SearchEntry;
+import io.clownfish.clownfish.dbentities.CfTemplate;
 import io.clownfish.clownfish.lucene.SearchResult;
 import io.clownfish.clownfish.lucene.Searcher;
 import io.clownfish.clownfish.utils.FolderUtil;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.event.ActionEvent;
@@ -38,6 +41,8 @@ import org.springframework.context.annotation.Scope;
 @Named("searchBean")
 public class SearchBean implements Serializable {
     private @Getter @Setter String searchphrase;
+    private @Getter @Setter SearchResult searchresult;
+    private @Getter @Setter ArrayList<SearchEntry> searchlist = new ArrayList<>();
     @Autowired Searcher searcher;
     @Autowired private FolderUtil folderUtil;
     
@@ -48,7 +53,16 @@ public class SearchBean implements Serializable {
                 
                 searcher.setIndexPath(folderUtil.getIndex_folder());
 
-                SearchResult sr = searcher.search(searchphrase, 100);
+                searchresult = searcher.search(searchphrase, 100);
+                searchlist.clear();
+                
+                for(CfTemplate template : searchresult.getFoundTemplates()) {
+                    SearchEntry entry = new SearchEntry();
+                    entry.setId(template.getId());
+                    entry.setName(template.getName());
+                    entry.setCategory("Template");
+                    searchlist.add(entry);
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(SearchBean.class.getName()).log(Level.SEVERE, null, ex);

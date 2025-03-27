@@ -92,7 +92,7 @@ public class Searcher implements Serializable {
     AssetUtil assetutil;
     PropertyUtil propertyUtil;
     boolean getAssetMetadata;
-    HashMap<String, HashMap> foundAssetMetadata;
+    HashMap<String, HashMap> foundAssetsMetadata;
     HashMap<String, String> foundClasscontent;
     @Autowired CfSitecontentService sitecontentservice;
     @Autowired CfSiteService siteservice;
@@ -117,7 +117,7 @@ public class Searcher implements Serializable {
         foundSites = new ArrayList<>();
         foundAssets = new ArrayList<>();
         foundClasscontent = new HashMap<>();
-        foundAssetMetadata = new HashMap<>();
+        foundAssetsMetadata = new HashMap<>();
         foundJavas = new ArrayList<>();
         foundJavascripts = new ArrayList<>();
         foundStylesheets = new ArrayList<>();
@@ -155,7 +155,7 @@ public class Searcher implements Serializable {
             query = queryParser.parse(searchQuery);
             TopDocs hits = indexSearcher.search(query, searchlimit);
             foundClasscontent.clear();
-            foundAssetMetadata.clear();
+            foundAssetsMetadata.clear();
             HashMap searchclasscontentmap = new HashMap<>();       
             for (ScoreDoc scoreDoc : hits.scoreDocs) {
                 Document doc = getDocument(scoreDoc);
@@ -208,7 +208,7 @@ public class Searcher implements Serializable {
                                 if (getAssetMetadata) {
                                     HashMap<String, String> metamap = new HashMap<>();
                                     assetutil.getMetadata(asset, metamap);
-                                    foundAssetMetadata.put(asset.getName(), metamap);
+                                    foundAssetsMetadata.put(asset.getName(), metamap);
                                 }
                             }
                         } catch (IOException | NumberFormatException ex) {
@@ -235,7 +235,7 @@ public class Searcher implements Serializable {
                             try {
                                 HashMap<String, String> metamap = new HashMap<>();
                                 assetutil.getMetadata(asset, metamap);
-                                foundAssetMetadata.put(asset.getName(), metamap);
+                                foundAssetsMetadata.put(asset.getName(), metamap);
                             } catch (IOException ex) {
                                 LOGGER.error(ex.getMessage());
                             }
@@ -247,14 +247,14 @@ public class Searcher implements Serializable {
                 }
             }
 
-            searchresult.foundSites = foundSites;
-            searchresult.foundAssets = foundAssets;
-            searchresult.foundClasscontent = searchclasscontentmap;
-            searchresult.foundAssetsMetadata = foundAssetMetadata;
-            searchresult.foundJavas = foundJavas;
-            searchresult.foundJavascripts = foundJavascripts;
-            searchresult.foundTemplates = foundTemplates;
-            searchresult.foundStylesheets = foundStylesheets;
+            searchresult.setFoundSites(foundSites);
+            searchresult.setFoundAssets(foundAssets);
+            searchresult.setFoundClasscontent(foundClasscontent);
+            searchresult.setFoundAssetsMetadata(foundAssetsMetadata);
+            searchresult.setFoundJavas(foundJavas);
+            searchresult.setFoundJavascripts(foundJavascripts);
+            searchresult.setFoundTemplates(foundTemplates);
+            searchresult.setFoundStylesheets(foundStylesheets);
         }
         
         return searchresult;

@@ -31,14 +31,14 @@ import lombok.Setter;
  * @author sulzbachr
  */
 public class SearchResult {
-    @Getter @Setter ArrayList<CfSite> foundSites;
-    @Getter @Setter ArrayList<CfAsset> foundAssets;
-    @Getter @Setter HashMap<String, HashMap> foundAssetsMetadata;
-    @Getter @Setter HashMap<String, ArrayList> foundClasscontent;
-    @Getter @Setter ArrayList<CfTemplate> foundTemplates;
-    @Getter @Setter ArrayList<CfJavascript> foundJavascripts;
-    @Getter @Setter ArrayList<CfStylesheet> foundStylesheets;
-    @Getter @Setter ArrayList<CfJava> foundJavas;
+    private @Getter @Setter ArrayList<CfSite> foundSites;
+    private @Getter @Setter ArrayList<CfAsset> foundAssets;
+    private @Getter @Setter HashMap<String, HashMap> foundAssetsMetadata;
+    private @Getter @Setter HashMap<String, String> foundClasscontent;
+    private @Getter @Setter ArrayList<CfTemplate> foundTemplates;
+    private @Getter @Setter ArrayList<CfJavascript> foundJavascripts;
+    private @Getter @Setter ArrayList<CfStylesheet> foundStylesheets;
+    private @Getter @Setter ArrayList<CfJava> foundJavas;
 
     public SearchResult() {
     }

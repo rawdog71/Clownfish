@@ -20,6 +20,7 @@ import com.github.difflib.patch.Patch;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfJavascriptversion;
 import io.clownfish.clownfish.dbentities.CfJavascriptversionPK;
+import io.clownfish.clownfish.lucene.SourceIndexer;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptService;
 import io.clownfish.clownfish.serviceinterface.CfJavascriptversionService;
 import java.io.File;
@@ -55,6 +56,7 @@ public class JavascriptUtil implements IVersioningInterface, Serializable {
     @Autowired transient CfJavascriptService cfjavascriptService;
     @Autowired transient CfJavascriptversionService cfjavascriptversionService;
     @Autowired private FolderUtil folderUtil;
+    @Autowired @Getter @Setter SourceIndexer sourceindexer;
     
     private @Getter @Setter long currentVersion;
     private @Getter @Setter String javascriptContent = "";
@@ -155,6 +157,7 @@ public class JavascriptUtil implements IVersioningInterface, Serializable {
                     writeVersion(selectedJavascript.getId(), 1, output, 0);
                     setCurrentVersion(1);
                 }
+                sourceindexer.indexJavascript(selectedJavascript);
             } catch (IOException ex) {
                 LOGGER.error(ex.getMessage());
             }
