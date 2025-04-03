@@ -52,6 +52,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -748,6 +749,41 @@ public class ContentList implements Serializable {
                         this.contentversionMax = contentUtility.getCurrentVersion();
                         this.selectedcontentversion = this.contentversionMax;
                         //refresh();
+
+                        // Send E-Mail to User, when content is loginclass -> confirmed == true && valid == true && lastlogin == null
+                        if (selectedContent.getClassref().isLoginclass()) {
+                            boolean sendconfirmmail = true;
+                            String email = "";
+                            for (CfAttributcontent attcont : attributcontentlist) {
+                                if (0 == attcont.getAttributref().getName().compareToIgnoreCase("lastlogin")) {
+                                    if (null != attcont.getContentDate()) {
+                                        sendconfirmmail = false;
+                                    }
+                                }
+                                if (0 == attcont.getAttributref().getName().compareToIgnoreCase("valid")) {
+                                    if (!attcont.getContentBoolean()) {
+                                        sendconfirmmail = false;
+                                    }
+                                }
+                                if (0 == attcont.getAttributref().getName().compareToIgnoreCase("confirmed")) {
+                                    if (!attcont.getContentBoolean()) {
+                                        sendconfirmmail = false;
+                                    }
+                                }
+                                if (0 == attcont.getAttributref().getName().compareToIgnoreCase("email")) {
+                                    email = attcont.getContentString();
+                                }
+                            }
+                            if (sendconfirmmail) {
+                                System.out.println("Email");
+                                MailUtil mailutil = new MailUtil(propertyUtil);
+                                try {
+                                    mailutil.sendRespondMail(email, "Freischaltung Account", "Ihr Account wurde von einem Administrator freigeschaltet.");
+                                } catch (Exception ex) {
+                                    java.util.logging.Logger.getLogger(ContentList.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        }
                         
                         FacesMessage message = new FacesMessage("Commited " + selectedContent.getName() + " Version: " + (maxversion + 1));
                         FacesContext.getCurrentInstance().addMessage(null, message);
