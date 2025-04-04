@@ -193,6 +193,12 @@ public class AssetList {
             } else {
                 if (overwrite) {
                     newasset = cfassetService.findByName(filename);
+                    // Cache löschen
+                    String cacheKey = "cache" + filename;
+                    if (new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey).exists()) {
+                        File f = new File(propertyUtil.getPropertyValue("folder_cache") + File.separator + cacheKey);
+                        f.delete();
+                    }
                 }
             }
             if (null != newasset) {
