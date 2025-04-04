@@ -1890,6 +1890,8 @@
                             <p:pickList id="assetkeywordpicklist" value="#{assetList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" converter="#{keywordConverterBean}" showCheckbox="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains">
                                 <f:facet name="sourceCaption">Unattached</f:facet>
                                 <f:facet name="targetCaption">Attached</f:facet>
+                                
+                                <p:ajax event="transfer" listener="#{assetList.onTransfer}" update=":form:tabview:assetkeywordpicklist"/>
                             </p:pickList>
                             <p:commandButton id="attachassetkeyword" value="Attach" actionListener="#{assetList.onAttach}">
 

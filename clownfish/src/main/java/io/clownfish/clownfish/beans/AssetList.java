@@ -51,6 +51,7 @@ import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.joda.time.DateTime;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -222,6 +223,21 @@ public class AssetList {
             }
             assetlist = cfassetService.findAll();
             
+            // Automatically assign keywords after uploading
+            assetkeywordlist = cfassetkeywordService.findByAssetRef(newasset.getId());
+            for (CfAssetkeyword assetkeyword : assetkeywordlist) {
+                cfassetkeywordService.delete(assetkeyword);
+            }
+            List<CfKeyword> selectedkeyword = keywords.getTarget();
+            try {
+                for (Object keyword : selectedkeyword) {
+                    CfAssetkeyword assetkeyword = new CfAssetkeyword(newasset.getId(), ((CfKeyword)keyword).getId());
+                    cfassetkeywordService.create(assetkeyword);
+                }
+            } catch (ConstraintViolationException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+            
             // Index the uploaded assets and merge the Index files
             if ((null != folderUtil.getIndex_folder()) && (!folderUtil.getMedia_folder().isEmpty())) {
                 Thread assetindexer_thread = new Thread(assetIndexer);
@@ -344,4 +360,7 @@ public class AssetList {
         System.out.println(overwrite);
     }
         
+    public void onTransfer(TransferEvent event) {
+        System.out.println("Transfer");
+    }
 }
