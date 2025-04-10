@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
-    <version>0.8.8-SNAPSHOT</version>
+    <version>0.8.9-SNAPSHOT</version>
     <packaging>jar</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
         <developerConnection>scm:git:https://github.com/rawdog71/Clownfish.git</developerConnection>
-        <tag>v0.8.8</tag>
+        <tag>v0.8.9</tag>
     </scm>
     <developers>
         <developer>
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>9.0.91</version>
+            <version>9.0.96</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
@@ -136,26 +136,26 @@
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>primefaces-extensions</artifactId>
-            <version>12.0.11</version>
+            <version>12.0.12</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.primefaces.extensions</groupId>
             <artifactId>resources-monacoeditor</artifactId>
-            <version>12.0.11</version>
+            <version>12.0.12</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>primeflex</artifactId>
-            <version>3.3.1</version>
+            <version>4.0.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>font-awesome</artifactId>
-            <version>6.5.2</version>
+            <version>6.7.2</version>
         </dependency>
         <!--
         <dependency>
@@ -169,7 +169,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.16.1</version>
+            <version>2.18.0</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
@@ -242,20 +242,20 @@
         <dependency>
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
-            <version>0.9.5.5</version>
+            <version>0.10.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
-            <version>2.3.32</version>
+            <version>2.3.34</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
-            <version>2.3</version>
+            <version>2.4.1</version>
             <scope>compile</scope>
             <type>jar</type>
           </dependency>
@@ -272,7 +272,7 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.12.7</version>
+            <version>2.13.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -312,25 +312,26 @@
         <dependency>
             <groupId>io.github.java-diff-utils</groupId>
             <artifactId>java-diff-utils</artifactId>
-            <version>4.12</version>
+            <version>4.15</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
+            <version>1.18.36</version>
             <type>jar</type>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>2.8.0</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers-standard-package</artifactId>
-            <version>2.8.0</version>
+            <version>3.1.0</version>
           </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -349,7 +350,7 @@
         <dependency>
             <groupId>org.fusesource.jansi</groupId>
             <artifactId>jansi</artifactId>
-            <version>2.4.0</version>
+            <version>2.4.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -395,13 +396,13 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.8</version>
+            <version>5.10</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.26.0</version>
+            <version>1.27.1</version>
             <type>jar</type>
         </dependency>
 
@@ -472,12 +473,12 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <type>jar</type>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
-            <version>3.9.4</version>
+            <version>3.9.9</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -491,12 +492,12 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
-            <version>1.9.0</version>
+            <version>2.1.20</version>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala3-library_3</artifactId>
-            <version>3.2.0</version>
+            <version>3.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.j2html</groupId>
@@ -506,7 +507,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <version>2.12.1</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -533,18 +534,18 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.16.1</version>
+            <version>1.19.1</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
-            <version>3.5.2</version>
+            <version>3.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.zxing</artifactId>
-            <version>3.4.1_1</version>
+            <version>3.5.3_1</version>
             <type>jar</type>
         </dependency>
     </dependencies>
@@ -553,7 +554,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.1</version>
                 <executions>
                   <execution>
                     <id>buildnumber</id>
@@ -584,7 +585,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.4.2</version>
 		<configuration>
 		    <classifier>classes</classifier>
                     <archive>                   
@@ -606,7 +607,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>3.4.0</version>
                 <configuration>
                     <archive>                   
                         <manifest>
@@ -619,7 +620,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>3.1.1</version>
                 <configuration>
                    <tagNameFormat>v@{project.version}-${buildNumber}</tagNameFormat>
                    <autoVersionSubmodules>true</autoVersionSubmodules>
