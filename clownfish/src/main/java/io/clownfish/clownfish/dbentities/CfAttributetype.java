@@ -57,6 +57,10 @@ public class CfAttributetype implements Serializable {
     @NotNull
     @Column(name = "searchrelevant")
     private boolean searchrelevant;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "canidentity")
+    private boolean canidentity;
 
     public CfAttributetype() {
     }
@@ -94,6 +98,14 @@ public class CfAttributetype implements Serializable {
 
     public void setSearchrelevant(boolean searchrelevant) {
         this.searchrelevant = searchrelevant;
+    }
+    
+    public boolean isCanidentity() {
+        return canidentity;
+    }
+
+    public void setCanidentity(boolean canidentity) {
+        this.canidentity = canidentity;
     }
 
     @Override
