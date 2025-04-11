@@ -61,6 +61,14 @@ public class CfAttributetype implements Serializable {
     @NotNull
     @Column(name = "canidentity")
     private boolean canidentity;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "canautoinc")
+    private boolean canautoinc;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "canindex")
+    private boolean canindex;
 
     public CfAttributetype() {
     }
@@ -106,6 +114,22 @@ public class CfAttributetype implements Serializable {
 
     public void setCanidentity(boolean canidentity) {
         this.canidentity = canidentity;
+    }
+    
+    public boolean isCanautoinc() {
+        return canautoinc;
+    }
+
+    public void setCanautoinc(boolean canautoinc) {
+        this.canautoinc = canautoinc;
+    }
+    
+    public boolean isCanindex() {
+        return canindex;
+    }
+
+    public void setCanindex(boolean canindex) {
+        this.canindex = canindex;
     }
 
     @Override

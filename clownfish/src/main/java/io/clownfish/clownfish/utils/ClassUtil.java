@@ -2176,7 +2176,7 @@ public class ClassUtil implements Serializable {
                         javascript.append("\t$scope.isMediaSelected = true;").append("\n");
                     }
                     javascript.append("\t$scope.media_").append(attr.getName()).append(" = {};").append("\n");
-                    javascript.append("\t$scope.media_").append(attr.getName()).append(".").append(attr.getName()).append(" = ").append(attr.getDefault_val() != null ? attr.getDefault_val() + ";" : "null;").append("\n");
+                    javascript.append("\t$scope.media_").append(attr.getName()).append(".").append(attr.getName()).append(" = 0").append("\n");
                     javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_name_add = \"\";").append("\n");
                     javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_description_add = \"\";").append("\n");
                     javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_name_upd = \"\";").append("\n");
@@ -2280,7 +2280,7 @@ public class ClassUtil implements Serializable {
                     javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(" = false;").append("\n");
                     break;
                 case "media":
-                    javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(" = null;").append("\n");
+                    javascript.append("\t\t$scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(" = 0;").append("\n");
                     break;
                 case "classref":
                     javascript.append("\t\t$scope.get").append(StringUtils.capitalise(attr.getName())).append("list();").append("\n");
@@ -2349,7 +2349,7 @@ public class ClassUtil implements Serializable {
                     javascript.append("\t\t$scope.").append(attr.getName()).append(" = ").append(attr.getDefault_val() != null ? attr.getDefault_val() + ";" : "false;").append("\n");
                     break;
                 case "media":
-                    javascript.append("\t\t$scope.").append(attr.getName()).append(" = ").append(attr.getDefault_val() != null ? attr.getDefault_val() + ";" : "null;").append("\n");
+                    javascript.append("\t\t$scope.").append(attr.getName()).append(" = 0").append("\n");
                     break;
                 case "classref":
                     if (1 == attr.getRelationtype()) {
