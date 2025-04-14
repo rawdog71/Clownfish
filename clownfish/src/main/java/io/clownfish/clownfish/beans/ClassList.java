@@ -89,6 +89,11 @@ public class ClassList implements Serializable {
     private @Getter @Setter boolean identity;
     private @Getter @Setter boolean autoinc;
     private @Getter @Setter boolean isindex;
+    
+    private @Getter @Setter boolean canidentity;
+    private @Getter @Setter boolean canautoinc;
+    private @Getter @Setter boolean canindex;
+    
     private @Getter @Setter String defaultval;
     private @Getter @Setter long minval;
     private @Getter @Setter long maxval;
@@ -217,6 +222,9 @@ public class ClassList implements Serializable {
         newAttributButtonDisabled = true;
         editAttributButtonDisabled = nodelete;
         deleteAttributButtonDisabled = nodelete;
+        canidentity = selectedAttribut.getAttributetype().isCanidentity();
+        canautoinc = selectedAttribut.getAttributetype().isCanautoinc();
+        canindex = selectedAttribut.getAttributetype().isCanindex();
     }
     
     public void onChangeName(ValueChangeEvent changeEvent) {
@@ -522,12 +530,25 @@ public class ClassList implements Serializable {
     }
     
     public void onChangeAttributtype() {
+        System.out.println(selectedAttribut.getAttributetype().getName());
         if (null != selectedAttributeType) {
             if (0 == selectedAttributeType.getName().compareToIgnoreCase("classref")) {
                 renderClass = true;
             } else {
+                selectedClassRef = null;
+                selectedRelType = -1;
                 renderClass = false;
             }
+            if (!selectedAttributeType.isCanautoinc()) selectedAttribut.setAutoincrementor(false);
+            if (!selectedAttributeType.isCanidentity()) selectedAttribut.setIdentity(false);
+            if (!selectedAttributeType.isCanindex()) selectedAttribut.setIsindex(false);
+            
+            identity = selectedAttribut.getIdentity();
+            autoinc = selectedAttribut.getAutoincrementor();
+            isindex = selectedAttribut.getIsindex();
+            canidentity = selectedAttributeType.isCanidentity();
+            canautoinc = selectedAttributeType.isCanautoinc();
+            canindex = selectedAttributeType.isCanindex();
         }
     }
     

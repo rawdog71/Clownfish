@@ -1398,12 +1398,12 @@
 
                             <div class="flex align-items-center pr-2">
                                 <p:outputLabel for="attributidentity" value="Identity:" style="margin-right: 0.5rem" />
-                                <p:selectBooleanCheckbox id="attributidentity" value="#{classList.identity}" disabled="#{!classList.selectedAttribut.attributetype.canidentity}" />
+                                <p:selectBooleanCheckbox id="attributidentity" value="#{classList.identity}" disabled="#{!classList.canidentity}" />
                             </div>
 
                             <div class="flex align-items-center pr-2">
                                 <p:outputLabel for="attributautoinc" value="Autoinc:" style="margin-right: 0.5rem" />
-                                <p:selectBooleanCheckbox id="attributautoinc" value="#{classList.autoinc}" disabled="#{!classList.selectedAttribut.attributetype.canautoinc}" />
+                                <p:selectBooleanCheckbox id="attributautoinc" value="#{classList.autoinc}" disabled="#{!classList.canautoinc}" />
                             </div>
                             
                             <div class="flex align-items-center pr-2">
@@ -1413,7 +1413,7 @@
 
                             <div class="flex align-items-center pr-2">
                             <p:outputLabel for="attributisindex" value="Index:" style="margin-right: 0.5rem" />
-                            <p:selectBooleanCheckbox id="attributisindex" value="#{classList.isindex}" disabled="#{!classList.selectedAttribut.attributetype.canindex}" />
+                            <p:selectBooleanCheckbox id="attributisindex" value="#{classList.isindex}" disabled="#{!classList.canindex}" />
                             </div>
                             
                             <div class="flex align-items-center pr-2">
