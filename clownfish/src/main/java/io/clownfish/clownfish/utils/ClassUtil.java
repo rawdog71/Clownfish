@@ -938,6 +938,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t<script src=\"/js/crud_").append(clazz.getName().toLowerCase()).append(".js\"></script>").append("\n");
         html.append("\t\t<script src=\"/resources/js/pikaday.js\"></script>").append("\n");
         html.append("\t\t<script src=\"/resources/js/luxon.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/angularjs-websocket.js\"></script>").append("\n");
         html.append("\t</head>").append("\n");
         html.append("\t<body id=\"page-top\" ng-controller=\"Crud").append(clazz.getName()).append("Controller\" data-ng-init=\"init()\">").append("\n");
         
@@ -2136,8 +2137,8 @@ public class ClassUtil implements Serializable {
             }
         }
         
-        javascript.append("var crud").append(clazz.getName()).append(" = angular.module('crud").append(clazz.getName()).append("App', []);").append("\n");
-        javascript.append("crud").append(clazz.getName()).append(".controller('Crud").append(clazz.getName()).append("Controller', function($scope, $http) {").append("\n");
+        javascript.append("var crud").append(clazz.getName()).append(" = angular.module('crud").append(clazz.getName()).append("App', ['ngWebSocket']);").append("\n");
+        javascript.append("crud").append(clazz.getName()).append(".controller('Crud").append(clazz.getName()).append("Controller', function($scope, $http, $websocket) {").append("\n");
         javascript.append("\tvar DateTime = luxon.DateTime;").append("\n");
         javascript.append("\t$scope.loading = false;").append("\n");
         javascript.append("\t$scope.inprogress = false;").append("\n");
@@ -2181,9 +2182,16 @@ public class ClassUtil implements Serializable {
                     javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_description_add = \"\";").append("\n");
                     javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_name_upd = \"\";").append("\n");
                     javascript.append("\t$scope.filter_media_").append(attr.getName()).append("_description_upd = \"\";").append("\n");
-
+                    javascript.append("\n\t$scope.switchMedia = false;");
+                    
                     javascript.append("\n\t$scope.checkMedia = (id) => {");
-                    javascript.append("\n\t\t$scope.isMediaSelected = true;").append("\n");
+                    javascript.append("\n\t\t$scope.switchMedia = !$scope.switchMedia;");
+                    javascript.append("\n\t\tif(!$scope.switchMedia){");
+                    javascript.append("\n\t\t$scope.media_asset.asset = 0;");
+                    javascript.append("\n\t\t}");
+                    if(attr.getMandatory()) {
+                        javascript.append("\n\t\t$scope.isMediaSelected = $scope.switchMedia;").append("\n");
+                    }
                     javascript.append("\t}\n");
                     break;
                 case "classref":
@@ -2212,12 +2220,57 @@ public class ClassUtil implements Serializable {
         javascript.append("\n");
 
         javascript.append("\t$scope.getMediaList = function() {").append("\n");
-        javascript.append("\t\t$http.get('/GetAssetList?apikey=%2b4eTZVN0a3GZZN9JWtA5DAIWXVFTtXgCLIgos2jkr7I=').then(function (res) {").append("\n");
-        javascript.append("\t\t\t$scope.MEDIALIST = res.data;").append("\n");
+        javascript.append("\t\t$http.get('/OData/CFAssets').then(function (res) {").append("\n");
+        javascript.append("\t\t\t$scope.MEDIALIST = res.data.value;").append("\n");
         javascript.append("\t\t});").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("\n");
         
+        javascript.append("\tfunction sendWebsocket(app, message) {").append("\n");
+        javascript.append("\t\t$http.get(`/ws_freemarker?app=${app}&message=${message}&class=").append(clazz.getName().toUpperCase()).append("`);").append("\n");
+        javascript.append("\t}").append("\n");
+        javascript.append("\n");
+        
+        javascript.append("\t$scope.websocket_broadcast = $websocket(\'ws://localhost:9001/websocket\');").append("\n");
+        
+        String siteRelation = "";
+             
+        for (CfAttribut attr : attributList) {
+            if (attr.getAutoincrementor()) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "classref":
+                        siteRelation += " || payload.class == " + "'" + attr.getRelationref().getName().toUpperCase() + "'";
+                    break;
+            }
+        }
+        
+        
+        javascript.append("\t$scope.websocket_broadcast.onMessage(function(message) {").append("\n");
+        javascript.append("\t\tvar payload = JSON.parse(message.data);").append("\n");       
+        javascript.append("\t\tif(payload.class == '").append(clazz.getName().toUpperCase()).append("'").append(siteRelation).append("){").append("\n");
+        javascript.append("\t\t\t$scope.get").append(clazz.getName()).append("list();").append("\n");
+        javascript.append("\t\t\t$scope.getMediaList();").append("\n");
+        javascript.append("\t\t\t$scope.get").append(clazz.getName()).append("listArray();").append("\n");
+        
+        for (ODataWizard odw : wizardlist) {
+            CfAttribut attr = odw.getAttribut();
+            if (attr.getAutoincrementor()) {
+                continue;
+            }
+            
+            switch (attr.getAttributetype().getName()) {
+                case "classref":
+                    javascript.append("\t\t$scope.get").append(StringUtils.capitalise(attr.getName())).append("list();").append("\n");
+                    break;
+            }
+        }
+        
+        javascript.append("\t\t};").append("\n");
+        javascript.append("\t});").append("\n");
+        
+        javascript.append("\n");
         for (CfAttribut attr : attributList) {
             if (attr.getAutoincrementor()) {
                 continue;
@@ -2753,6 +2806,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t\tif (res.status === 201) {").append("\n");
         javascript.append("\t\t\t\t$scope.get").append(clazz.getName()).append("list();").append("\n");
         javascript.append("\t\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("sendWebsocket(\"crud\", \"SAVE\")").append("\n");
         javascript.append("\t\t\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-add').hide();").append("\n");
         javascript.append("\t\t\t}").append("\n");
         javascript.append("\t\t}, function (res) {").append("\n");
@@ -2798,7 +2852,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t\tif($scope.selectedIdsAssetRef.length > 0) {").append("\n");
         javascript.append("\t\t\t\t$scope.isAnyCheckboxSelectedAssetRef = true;").append("\n");
         javascript.append("\t\t\t}").append("\n");
-
+        javascript.append("sendWebsocket(\"crud\", \"UPDATE\")").append("\n");
         javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\t});").append("\n");
         javascript.append("\t};").append("\n");
@@ -2808,6 +2862,7 @@ public class ClassUtil implements Serializable {
 	javascript.append("\t\t\t$scope.").append(clazz.getName()).append(" = res.data.value[0];").append("\n");
         javascript.append("\t\t\t$scope.").append(clazz.getName()).append("[field] = value;").append("\n");
         javascript.append("\t\t\t$scope.update").append(clazz.getName()).append("(id);").append("\n");
+        javascript.append("sendWebsocket(\"crud\", \"UPDATE\")").append("\n");
 	javascript.append("\t\t});").append("\n");
 	javascript.append("\t};").append("\n");
         javascript.append("\n");
@@ -2920,6 +2975,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t\t$scope.get").append(clazz.getName()).append("list();").append("\n");
         javascript.append("\t\t\t$scope.get").append(clazz.getName()).append("listArray();").append("\n");
         javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\tsendWebsocket(\"crud\", \"DELETE\")").append("\n");
         javascript.append("\t\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-delete').hide();").append("\n");
         javascript.append("\t\t}").append("\n");
         javascript.append("\t\t}, function (res) {").append("\n");
@@ -2998,6 +3054,7 @@ public class ClassUtil implements Serializable {
         javascript.append("if (res.status === 201) {").append("\n");
         javascript.append("$scope.get").append(clazz.getName()).append("listArray();").append("\n");
         javascript.append("$scope.inprogress = false;").append("\n");
+        javascript.append("sendWebsocket(\"crud\", \"CREATE\")").append("\n");
         javascript.append("UIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-add').hide();").append("\n");
         javascript.append("}").append("\n");
         javascript.append("}, function (res) {").append("\n");
