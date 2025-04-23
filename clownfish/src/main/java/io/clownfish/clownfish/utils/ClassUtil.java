@@ -76,6 +76,7 @@ public class ClassUtil implements Serializable {
     @Autowired JavascriptUtil javascriptutil;
     private @Getter @Setter SiteTreeBean sitetree;
     private @Getter @Setter SiteUtil siteutil;
+    @Autowired private PropertyUtil propertyUtil;
 
     private boolean isClassrefMandatory = false;
     final transient Logger LOGGER = LoggerFactory.getLogger(ClassUtil.class);
@@ -2231,7 +2232,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t}").append("\n");
         javascript.append("\n");
         
-        javascript.append("\t$scope.websocket_broadcast = $websocket(\'ws://localhost:9001/websocket\');").append("\n");
+        javascript.append("\t$scope.websocket_broadcast = $websocket(\'ws://").append(propertyUtil.getPropertyValue("domain")).append(":9001/websocket\');").append("\n");
         
         String siteRelation = "";
              
@@ -2245,7 +2246,6 @@ public class ClassUtil implements Serializable {
                     break;
             }
         }
-        
         
         javascript.append("\t$scope.websocket_broadcast.onMessage(function(message) {").append("\n");
         javascript.append("\t\tvar payload = JSON.parse(message.data);").append("\n");       
@@ -2806,7 +2806,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t\tif (res.status === 201) {").append("\n");
         javascript.append("\t\t\t\t$scope.get").append(clazz.getName()).append("list();").append("\n");
         javascript.append("\t\t\t\t$scope.inprogress = false;").append("\n");
-        javascript.append("sendWebsocket(\"crud\", \"SAVE\")").append("\n");
+        javascript.append("\t\t\t\tsendWebsocket(\"crud\", \"SAVE\");").append("\n");
         javascript.append("\t\t\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-add').hide();").append("\n");
         javascript.append("\t\t\t}").append("\n");
         javascript.append("\t\t}, function (res) {").append("\n");
@@ -2852,7 +2852,6 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t\tif($scope.selectedIdsAssetRef.length > 0) {").append("\n");
         javascript.append("\t\t\t\t$scope.isAnyCheckboxSelectedAssetRef = true;").append("\n");
         javascript.append("\t\t\t}").append("\n");
-        javascript.append("sendWebsocket(\"crud\", \"UPDATE\")").append("\n");
         javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\t});").append("\n");
         javascript.append("\t};").append("\n");
@@ -2862,7 +2861,7 @@ public class ClassUtil implements Serializable {
 	javascript.append("\t\t\t$scope.").append(clazz.getName()).append(" = res.data.value[0];").append("\n");
         javascript.append("\t\t\t$scope.").append(clazz.getName()).append("[field] = value;").append("\n");
         javascript.append("\t\t\t$scope.update").append(clazz.getName()).append("(id);").append("\n");
-        javascript.append("sendWebsocket(\"crud\", \"UPDATE\")").append("\n");
+        javascript.append("\t\t\tsendWebsocket(\"crud\", \"UPDATE\");").append("\n");
 	javascript.append("\t\t});").append("\n");
 	javascript.append("\t};").append("\n");
         javascript.append("\n");
@@ -2953,6 +2952,7 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t\t\t$scope.get").append(clazz.getName()).append("list();").append("\n");
         javascript.append("\t\t\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\t\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-update').hide();").append("\n");
+        javascript.append("\t\t\t\tsendWebsocket(\"crud\", \"UPDATE\");").append("\n");
         javascript.append("\t\t\t}").append("\n");
         javascript.append("\t\t}, function (res) {").append("\n");
         javascript.append("\t\t\tconsole.log(\"ERROR\");").append("\n");
@@ -2975,8 +2975,8 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t\t$scope.get").append(clazz.getName()).append("list();").append("\n");
         javascript.append("\t\t\t$scope.get").append(clazz.getName()).append("listArray();").append("\n");
         javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
-        javascript.append("\t\tsendWebsocket(\"crud\", \"DELETE\")").append("\n");
         javascript.append("\t\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-delete').hide();").append("\n");
+        javascript.append("\t\t\tsendWebsocket(\"crud\", \"DELETE\");").append("\n");
         javascript.append("\t\t}").append("\n");
         javascript.append("\t\t}, function (res) {").append("\n");
         javascript.append("\t\t\tconsole.log(\"ERROR\");").append("\n");
