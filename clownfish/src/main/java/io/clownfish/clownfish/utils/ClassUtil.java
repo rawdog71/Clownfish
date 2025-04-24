@@ -2414,13 +2414,13 @@ public class ClassUtil implements Serializable {
                     break;
                 case "integer":
                 case "real":
-                    javascript.append("\t\t$scope.").append(attr.getName()).append(" = ").append(attr.getDefault_val() != null ? attr.getDefault_val() + ";" : "0;").append("\n");
+                    javascript.append("\t\t$scope.").append(attr.getName()).append(" = ").append(((attr.getDefault_val() != null) && ((!attr.getDefault_val().isEmpty()))) ? attr.getDefault_val() + ";" : "0;").append("\n");
                     break;
                 case "datetime":
                     javascript.append("\t\t$scope.").append(attr.getName()).append(" = \"").append(attr.getDefault_val() != null ? attr.getDefault_val() : "").append("\";").append("\n");
                     break;
                 case "boolean":
-                    javascript.append("\t\t$scope.").append(attr.getName()).append(" = ").append(attr.getDefault_val() != null ? attr.getDefault_val() + ";" : "false;").append("\n");
+                    javascript.append("\t\t$scope.").append(attr.getName()).append(" = ").append(((attr.getDefault_val() != null) && ((!attr.getDefault_val().isEmpty()))) ? attr.getDefault_val() + ";" : "false;").append("\n");
                     break;
                 case "media":
                     javascript.append("\t\t$scope.").append(attr.getName()).append(" = 0").append("\n");
