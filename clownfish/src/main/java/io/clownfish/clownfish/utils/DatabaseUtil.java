@@ -17,9 +17,7 @@ package io.clownfish.clownfish.utils;
 
 import io.clownfish.clownfish.beans.SiteTreeBean;
 import io.clownfish.clownfish.datamodels.ColumnData;
-import io.clownfish.clownfish.datamodels.ODataWizard;
 import io.clownfish.clownfish.datamodels.TableData;
-import io.clownfish.clownfish.dbentities.CfAttribut;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfJavascript;
 import io.clownfish.clownfish.dbentities.CfSite;
@@ -80,6 +78,7 @@ public class DatabaseUtil {
     @Autowired JavascriptUtil javascriptutil;
     private @Getter @Setter SiteTreeBean sitetree;
     private @Getter @Setter SiteUtil siteutil;
+    @Autowired private PropertyUtil propertyUtil;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(DatabaseUtil.class);
 
@@ -1056,6 +1055,8 @@ public class DatabaseUtil {
         html.append("\t\t<script src=\"/resources/js/angular.js\"></script>").append("\n");
         html.append("\t\t<script src=\"/js/crud_").append(tabledata.getName().toLowerCase()).append(".js\"></script>").append("\n");
         html.append("\t\t<script src=\"/resources/js/pikaday.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/luxon.js\"></script>").append("\n");
+        html.append("\t\t<script src=\"/resources/js/angularjs-websocket.js\"></script>").append("\n");
         html.append("\t</head>").append("\n");
         html.append("\t<body id=\"page-top\" ng-controller=\"Crud").append(tabledata.getName()).append("Controller\" data-ng-init=\"init()\">").append("\n");
         html.append("\t\t<div class=\"uk-container-large uk-align-center\">").append("\n");
@@ -1130,8 +1131,8 @@ public class DatabaseUtil {
                     case "VARCHAR":
                     case "INT":
                     case "DOUBLE":
-                        html.append("\t\t\t\t\t\t<td ng-show=\"!").append(tabledata.getName().toLowerCase()).append(".editable\" ng-mouseover=\"").append(tabledata.getName().toLowerCase()).append(".editable=true\">{{").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
-                        html.append("\t\t\t\t\t\t<td ng-show=\"").append(tabledata.getName().toLowerCase()).append(".editable\" ng-mouseleave=\"").append(tabledata.getName().toLowerCase()).append(".editable=false\"><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(tabledata.getName()).append("Instant(").append(tabledata.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        html.append("\t\t\t\t\t\t<td ng-show=\"!").append(tabledata.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\" ng-mouseover=\"").append(tabledata.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable=true\">{{").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
+                        html.append("\t\t\t\t\t\t<td ng-show=\"").append(tabledata.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\" ng-mouseleave=\"").append(tabledata.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable=false\"><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(tabledata.getName()).append("Instant(").append(tabledata.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
                         break;
                     case "DATETIME":
                         html.append("\t\t\t\t\t\t<td>{{").append(tabledata.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
@@ -1301,11 +1302,27 @@ public class DatabaseUtil {
             templateutil.commit(template);
         }
         
-        javascript.append("var crud").append(tabledata.getName()).append(" = angular.module('crud").append(tabledata.getName()).append("App', []);").append("\n");
-        javascript.append("crud").append(tabledata.getName()).append(".controller('Crud").append(tabledata.getName()).append("Controller', function($scope, $http) {").append("\n");
+        javascript.append("var crud").append(tabledata.getName()).append(" = angular.module('crud").append(tabledata.getName()).append("App', ['ngWebSocket']);").append("\n");
+        javascript.append("crud").append(tabledata.getName()).append(".controller('Crud").append(tabledata.getName()).append("Controller', function($scope, $http, $websocket) {").append("\n");
         javascript.append("\t$scope.loading = false;").append("\n");
         javascript.append("\t$scope.inprogress = false;").append("\n");
         javascript.append("\n");
+        
+        javascript.append("\tfunction sendWebsocket(app, message) {").append("\n");
+        javascript.append("\t\t$http.get(`/ws_freemarker?app=${app}&message=${message}&class=").append(tabledata.getName().toUpperCase()).append("`);").append("\n");
+        javascript.append("\t}").append("\n");
+        javascript.append("\n");
+        
+        javascript.append("\t$scope.websocket_broadcast = $websocket(\'ws://").append(propertyUtil.getPropertyValue("domain")).append(":9001/websocket\');").append("\n");
+        
+        javascript.append("\t$scope.websocket_broadcast.onMessage(function(message) {").append("\n");
+        javascript.append("\t\tvar payload = JSON.parse(message.data);").append("\n");       
+        javascript.append("\t\tif(payload.class == '").append(tabledata.getName().toUpperCase()).append("'").append("){").append("\n");
+        javascript.append("\t\t\t$scope.get").append(tabledata.getName()).append("list();").append("\n");
+        javascript.append("\t\t\t$scope.get").append(tabledata.getName()).append("listArray();").append("\n");
+        javascript.append("\t\t};").append("\n");
+        javascript.append("\t});").append("\n");
+        
         javascript.append("\t$scope.").append(tabledata.getName().toUpperCase()).append("LIST = [];").append("\n");
         
         javascript.append("\t$scope.filter_").append(tabledata.getName().toLowerCase()).append(" = {};").append("\n");
@@ -1486,6 +1503,7 @@ public class DatabaseUtil {
         javascript.append("\t\t\tif (res.status === 201) {").append("\n");
         javascript.append("\t\t\t\t$scope.get").append(tabledata.getName()).append("list();").append("\n");
         javascript.append("\t\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t\t\tsendWebsocket(\"crud\", \"SAVE\");").append("\n");
         javascript.append("\t\t\t\tUIkit.modal('#modal-").append(tabledata.getName().toLowerCase()).append("-add').hide();").append("\n");
         javascript.append("\t\t\t}").append("\n");
         javascript.append("\t\t}, function (res) {").append("\n");
@@ -1557,6 +1575,7 @@ public class DatabaseUtil {
         javascript.append("\t\t\t\t$scope.get").append(tabledata.getName()).append("list();").append("\n");
         javascript.append("\t\t\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\t\t\tUIkit.modal('#modal-").append(tabledata.getName().toLowerCase()).append("-update').hide();").append("\n");
+        javascript.append("\t\t\t\tsendWebsocket(\"crud\", \"UPDATE\");").append("\n");
         javascript.append("\t\t\t}").append("\n");
         javascript.append("\t\t}, function (res) {").append("\n");
         javascript.append("\t\t\tconsole.log(\"ERROR\");").append("\n");
@@ -1579,6 +1598,7 @@ public class DatabaseUtil {
         javascript.append("\t\t\t$scope.get").append(tabledata.getName()).append("list();").append("\n");
         javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\t\tUIkit.modal('#modal-").append(tabledata.getName().toLowerCase()).append("-delete').hide();").append("\n");
+        javascript.append("\t\t\tsendWebsocket(\"crud\", \"DELETE\");").append("\n");
         javascript.append("\t\t}").append("\n");
         javascript.append("\t\t}, function (res) {").append("\n");
         javascript.append("\t\t\tconsole.log(\"ERROR\");").append("\n");
