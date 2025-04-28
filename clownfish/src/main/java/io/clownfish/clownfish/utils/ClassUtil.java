@@ -2779,7 +2779,7 @@ public class ClassUtil implements Serializable {
                     break;
                 case "datetime":
                     javascript.append("\t\tif ($scope.").append(attr.getName()).append(" != null) {").append("\n");
-                    javascript.append("d = DateTime.fromISO($scope.").append(attr.getName()).append(");").append("\n");
+                    javascript.append("d = DateTime.fromISO($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(");").append("\n");
                     javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = d.toFormat('yyyy-MM-dd') + \"T\" + d.toFormat('hh:mm:ss');").append("\n");
                     javascript.append("\t\t}").append("\n");
                     break;
@@ -2924,7 +2924,7 @@ public class ClassUtil implements Serializable {
                     break;
                 case "datetime":
                     javascript.append("\t\tif ($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
-                    javascript.append("d = DateTime.fromISO($scope.").append(attr.getName()).append(");").append("\n");
+                    javascript.append("d = DateTime.fromISO($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(");").append("\n");
                     javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = d.toFormat('yyyy-MM-dd') + \"T\" + d.toFormat('hh:mm:ss');").append("\n");
                     javascript.append("\t\t}").append("\n");
                     break;
