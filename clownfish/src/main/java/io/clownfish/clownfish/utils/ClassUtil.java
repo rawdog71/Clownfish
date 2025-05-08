@@ -2616,9 +2616,14 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\treturn date.substring(date.length - 4,date.length) + '-' + date.substring(date.length - 7,date.length-5) + '-' + date.substring(0,2)").append("\n");
         javascript.append("\t}").append("\n").append("\n");
         
-        javascript.append("\t$scope.createNewDate = (date) => {").append("\n");
+        javascript.append("\t$scope.createNewDate = (date, update) => {").append("\n");
         javascript.append("\t\tvar newDate = new Date(date);").append("\n");
-        javascript.append("\t\tvar day = newDate.getDate() + 1;").append("\n");
+        javascript.append("\t\tvar day;").append("\n");
+        javascript.append("\t\tif(update) {").append("\n");
+        javascript.append("\t\t\tday = newDate.getDate() + 1;").append("\n");
+        javascript.append("\t\t} else {").append("\n");
+        javascript.append("\t\t\tday = newDate.getDate();").append("\n");
+        javascript.append("\t\t}").append("\n");
         javascript.append("\t\tvar month = newDate.getMonth() + 1;").append("\n");
         javascript.append("\t\tvar year = newDate.getFullYear();").append("\n");
         javascript.append("\t\treturn `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`").append("\n");
@@ -3031,6 +3036,18 @@ public class ClassUtil implements Serializable {
 	javascript.append("\t\t$http.get('/OData/").append(clazz.getName()).append("Set?$filter=id eq ' + id).then(function (res) {").append("\n");
 	javascript.append("\t\t\t$scope.").append(clazz.getName()).append(" = res.data.value[0];").append("\n");
         javascript.append("\t\t\t$scope.").append(clazz.getName()).append("[field] = value;").append("\n");
+        
+        for (CfAttribut attr : attributList) {
+            if (attr.getAutoincrementor() || !attr.getExt_mutable()) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "datetime":     
+                    javascript.append("\t\t\t$scope.").append(clazz.getName()).append(".").append(attr.getName()).append("= $scope.convertDates($scope.createNewDate($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(".substring(0,10)), false)\n");
+                    break;
+            }
+        }
+        
         javascript.append("\t\t\t$scope.update").append(clazz.getName()).append("(id);").append("\n");
         javascript.append("\t\t\tsendWebsocket(\"crud\", \"UPDATE\");").append("\n");
 	javascript.append("\t\t});").append("\n");
