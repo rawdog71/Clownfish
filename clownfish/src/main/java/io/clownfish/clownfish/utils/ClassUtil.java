@@ -3043,7 +3043,7 @@ public class ClassUtil implements Serializable {
             }
             switch (attr.getAttributetype().getName()) {
                 case "datetime":     
-                    javascript.append("\t\t\t$scope.").append(clazz.getName()).append(".").append(attr.getName()).append("= $scope.convertDates($scope.createNewDate($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(".substring(0,10)), false)\n");
+                    javascript.append("\t\t\t$scope.").append(clazz.getName()).append(".").append(attr.getName()).append("= $scope.createNewDate($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(".substring(0,10))\n");
                     break;
             }
         }
@@ -3091,7 +3091,7 @@ public class ClassUtil implements Serializable {
                     break;
                 case "datetime":
                     javascript.append("\t\tif ($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
-                    javascript.append("\t\t\td = DateTime.fromISO($scope.convertDates($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(",true)").append(");").append("\n");
+                    javascript.append("\t\t\td ").append("= $scope.").append(clazz.getName()).append(".").append(attr.getName()).append(".includes('-') ? ").append("DateTime.fromISO($scope.createNewDate($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(",true)").append(") : ").append("DateTime.fromISO($scope.createNewDate($scope.convertDates($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(",true)").append(", true));\n");
                     javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = d.toFormat('yyyy-MM-dd') + \"T\" + d.toFormat('hh:mm:ss');").append("\n");
                     javascript.append("\t\t}").append("\n");
                     break;
