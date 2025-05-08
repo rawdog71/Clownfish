@@ -916,7 +916,7 @@ public class ClassUtil implements Serializable {
         sitetree.loadTree();
     }
     
-    public String generateODataForm(CfClass clazz, List<ODataWizard> wizardlist, boolean generatelistform) {
+    public String generateODataForm(CfClass clazz, List<ODataWizard> wizardlist, boolean generatelistform, boolean generateInPlaceEditing) {
         List<CfAttribut> attributList = cfattributService.findByClassref(clazz);
         StringBuilder html = new StringBuilder();
         StringBuilder javascript = new StringBuilder();
@@ -1068,8 +1068,13 @@ public class ClassUtil implements Serializable {
                     case "string":
                     case "integer":
                     case "real":
-                        html.append("\t\t\t\t\t\t<td ng-show=\"!").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\" ng-mouseover=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable=true\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
-                        html.append("\t\t\t\t\t\t<td ng-show=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\" ng-mouseleave=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable=false\"><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        if(!generateInPlaceEditing) {
+                            html.append("\t\t\t\t\t\t<td ng-show=\"!").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
+                            html.append("\t\t\t\t\t\t<td ng-show=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\"><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        } else {
+                            html.append("\t\t\t\t\t\t<td ng-show=\"!").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\" ng-mouseover=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable=true\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
+                            html.append("\t\t\t\t\t\t<td ng-show=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\" ng-mouseleave=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable=false\"><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        }
                         break;
                     case "boolean":
                         html.append("\t\t\t\t\t\t<td><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
@@ -1080,8 +1085,13 @@ public class ClassUtil implements Serializable {
                     case "classref":
                         if (1 == attr.getRelationtype()) {
                             if ((null != odw.getRelationattribut1()) && (!odw.getRelationattribut1().isBlank())) {
-                                html.append("\t\t\t\t\t\t<td ng-show=\"!").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseover=\"").append(attr.getName().toLowerCase()).append(".editable=true\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("}}</td>").append("\n");
-                                html.append("\t\t\t\t\t\t<td ng-show=\"").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseleave=\"").append(attr.getName().toLowerCase()).append(".editable=false\">").append("\n");
+                                if(!generateInPlaceEditing) {
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"!").append(attr.getName().toLowerCase()).append(".editable\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("}}</td>").append("\n");
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"").append(attr.getName().toLowerCase()).append(".editable\">").append("\n");
+                                } else {
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"!").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseover=\"").append(attr.getName().toLowerCase()).append(".editable=true\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append("}}</td>").append("\n");
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseleave=\"").append(attr.getName().toLowerCase()).append(".editable=false\">").append("\n");
+                                }
                                 html.append("\t\t\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                                 html.append("\t\t\t\t\t\t\t\t<select id=\"input-").append(attr.getName().toLowerCase()).append("-upd\" class=\"uk-select\" ng-options=\"").append(attr.getName().toLowerCase()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName().toLowerCase()).append(".id\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName().toLowerCase()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append(")\">").append("\n");
                                 html.append("\t\t\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
@@ -1090,8 +1100,13 @@ public class ClassUtil implements Serializable {
                                 html.append("\t\t\t\t\t\t</td>").append("\n");
                             }
                             if ((null != odw.getRelationattribut2()) && (!odw.getRelationattribut2().isBlank())) {
-                                html.append("\t\t\t\t\t\t<td ng-show=\"!").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseover=\"").append(attr.getName().toLowerCase()).append(".editable=true\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("}}</td>").append("\n");
-                                html.append("\t\t\t\t\t\t<td ng-show=\"").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseleave=\"").append(attr.getName().toLowerCase()).append(".editable=false\">").append("\n");
+                                if(!generateInPlaceEditing) {
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"!").append(attr.getName().toLowerCase()).append(".editable\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("}}</td>").append("\n");
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"").append(attr.getName().toLowerCase()).append(".editable\">").append("\n");
+                                } else {
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"!").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseover=\"").append(attr.getName().toLowerCase()).append(".editable=true\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut2().toLowerCase()).append("}}</td>").append("\n");
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseleave=\"").append(attr.getName().toLowerCase()).append(".editable=false\">").append("\n");
+                                }
                                 html.append("\t\t\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                                 html.append("\t\t\t\t\t\t\t\t<select id=\"input-").append(attr.getName().toLowerCase()).append("-upd\" class=\"uk-select\" ng-options=\"").append(attr.getName().toLowerCase()).append(".").append(odw.getRelationattribut2().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName().toLowerCase()).append(".id\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName().toLowerCase()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append(")\">").append("\n");
                                 html.append("\t\t\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
@@ -1100,8 +1115,13 @@ public class ClassUtil implements Serializable {
                                 html.append("\t\t\t\t\t\t</td>").append("\n");
                             }
                             if ((null != odw.getRelationattribut3()) && (!odw.getRelationattribut3().isBlank())) {
-                                html.append("\t\t\t\t\t\t<td ng-show=\"!").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseover=\"").append(attr.getName().toLowerCase()).append(".editable=true\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("}}</td>").append("\n");
-                                html.append("\t\t\t\t\t\t<td ng-show=\"").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseleave=\"").append(attr.getName().toLowerCase()).append(".editable=false\">").append("\n");
+                                if(!generateInPlaceEditing) {
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"!").append(attr.getName().toLowerCase()).append(".editable\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("}}</td>").append("\n");
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"").append(attr.getName().toLowerCase()).append(".editable\">").append("\n");
+                                } else {
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"!").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseover=\"").append(attr.getName().toLowerCase()).append(".editable=true\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".").append(odw.getRelationattribut3().toLowerCase()).append("}}</td>").append("\n");
+                                    html.append("\t\t\t\t\t\t<td ng-show=\"").append(attr.getName().toLowerCase()).append(".editable\" ng-mouseleave=\"").append(attr.getName().toLowerCase()).append(".editable=false\">").append("\n");
+                                }
                                 html.append("\t\t\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                                 html.append("\t\t\t\t\t\t\t\t<select id=\"input-").append(attr.getName().toLowerCase()).append("-upd\" class=\"uk-select\" ng-options=\"").append(attr.getName().toLowerCase()).append(".").append(odw.getRelationattribut3().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName().toLowerCase()).append(".id\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName().toLowerCase()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName().toLowerCase()).append(")\">").append("\n");
                                 html.append("\t\t\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
@@ -1131,6 +1151,9 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t<h2 class=\"uk-modal-title\">").append(clazz.getName()).append(" hinzufügen</h2>").append("\n");
         html.append("\t\t\t\t<div class=\"uk-overflow-auto\" style=\"max-height: 600px;\">").append("\n");
         html.append("\t\t\t\t\t<form name=\"").append(clazz.getName().toLowerCase()).append("FormAdd\" novalidate>\n");
+        
+        
+        int datumCounterHtml = 0;
         for (ODataWizard odw : wizardlist) {
             CfAttribut attr = odw.getAttribut();
             if (attr.getAutoincrementor() || !attr.getExt_mutable()) {
@@ -1188,10 +1211,10 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
                     if(attr.getMandatory()) {
-                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\"required>").append(" \n");
+                        html.append("\t\t\t\t\t\t<input ng-change='").append("changeAddDatumAppearance").append(datumCounterHtml).append("()'").append("id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\"required>").append(" \n");
                         html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Add.$touched &&").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Add.$invalid\">THis field is required.</span>\n");
                     } else {
-                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append(" \n");
+                        html.append("\t\t\t\t\t\t<input ng-change='").append("changeAddDatumAppearance").append(datumCounterHtml).append("()'").append("id=\"input-").append(attr.getName()).append("-add\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(attr.getName()).append("\">").append(" \n");
                     }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     html.append("\t\t\t\t\t<script>").append("\n");
@@ -1200,6 +1223,7 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t\treturn parts.join(\"-\");").append("\n");
                     html.append("\t\t\t\t\t\t}});").append("\n");
                     html.append("\t\t\t\t\t</script>").append("\n");
+                    datumCounterHtml++;
                     break;
                 case "boolean":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
@@ -1256,11 +1280,11 @@ public class ClassUtil implements Serializable {
                         html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-add\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
 
                         if(attr.getMandatory()) {
-                            html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-add\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(attr.getName()).append("\" required>").append("\n");
+                            html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-add\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(attr.getName()).append("\" required>").append("\n");
                             html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
                             html.append("\t\t\t\t\t\t</select>").append("\n");html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Add.$touched &&").append(clazz.getName().toLowerCase()).append("FormAdd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Add.$invalid\">THis field is required.</span>\n");
                         } else {
-                            html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-add\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName().toLowerCase()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(attr.getName()).append("\" >").append("\n");
+                            html.append("\t\t\t\t\t\t<select id=\"input-").append(attr.getName()).append("-add\" class=\"uk-select\" ng-options=\"").append(attr.getName()).append(".").append(odw.getRelationattribut1().toLowerCase()).append(" for ").append(attr.getName()).append(" in ").append(attr.getName().toUpperCase()).append("LIST track by ").append(attr.getName()).append(".id\" ng-model=\"").append(attr.getName()).append("\" >").append("\n");
                             html.append("\t\t\t\t\t\t\t<option value=\"\">-- Select ").append(StringUtils.capitalise(attr.getName())).append(" --</option>").append("\n");
                             html.append("\t\t\t\t\t\t</select>").append("\n");
                         }
@@ -1387,7 +1411,7 @@ public class ClassUtil implements Serializable {
         html.append("\t\t\t\t\t<form name=\"").append(clazz.getName().toLowerCase()).append("FormUpd\" novalidate>\n");
 
         isClassrefMandatory = false;
-
+        datumCounterHtml = 0;
         for (ODataWizard odw : wizardlist) {
             CfAttribut attr = odw.getAttribut();
             if (attr.getAutoincrementor() || !attr.getExt_mutable()) {
@@ -1445,10 +1469,10 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
                     html.append("\t\t\t\t\t\t<label class=\"uk-form-label\" for=\"input-").append(attr.getName()).append("-upd\">").append(StringUtils.capitalise(attr.getName())).append("</label>").append("\n");
                     if(attr.getMandatory()) {
-                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" required>").append("\n");
+                        html.append("\t\t\t\t\t\t<input ng-change='").append("changeUpdateDatumAppearance").append(datumCounterHtml).append("()'").append("id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" required>").append("\n");
                         html.append("\t\t\t\t\t\t<span ng-show=\"").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1)).append("Upd.$touched && ").append(clazz.getName().toLowerCase()).append("FormUpd.").append("input"+ attr.getName().substring(0, 1).toUpperCase() + attr.getName().substring(1) + "Upd.$invalid\">THis field is required.</span>\n");
                     } else {
-                        html.append("\t\t\t\t\t\t<input id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
+                        html.append("\t\t\t\t\t\t<input ng-change='").append("changeUpdateDatumAppearance").append(datumCounterHtml).append("()'").append("id=\"input-").append(attr.getName()).append("-upd\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" value=\"{{").append(clazz.getName()).append(".").append(attr.getName()).append("}}\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\">").append("\n");
                     }
                     html.append("\t\t\t\t\t</div>").append("\n");
                     html.append("\t\t\t\t\t<script>").append("\n");
@@ -1457,6 +1481,7 @@ public class ClassUtil implements Serializable {
                     html.append("\t\t\t\t\t\treturn parts.join(\"-\");").append("\n");
                     html.append("\t\t\t\t\t\t}});").append("\n");
                     html.append("\t\t\t\t\t</script>").append("\n");
+                    datumCounterHtml++;
                     break;
                 case "boolean":
                     html.append("\t\t\t\t\t<div class=\"uk-margin\">").append("\n");
@@ -2445,23 +2470,39 @@ public class ClassUtil implements Serializable {
             switch (attr.getAttributetype().getName()) {
                 case "string":
                 case "datetime":
-                    javascript.append("\tif (entry.").append(attr.getName()).append(" === null) {").append("\n");
-                    javascript.append("\t\tentry.").append(attr.getName()).append(" = \"\";").append("\n");
-                    javascript.append("\t}").append("\n");
+                    javascript.append("\t\tif (entry.").append(attr.getName()).append(" === null) {").append("\n");
+                    javascript.append("\t\t\tentry.").append(attr.getName()).append(" = \"\";").append("\n");
+                    javascript.append("\t\t}").append("\n");
                     break;
                 case "integer":
                 case "real":
-                    javascript.append("\tif (entry.").append(attr.getName()).append(" === null) {").append("\n");
-                    javascript.append("\t\tentry.").append(attr.getName()).append(" = \"\";").append("\n");
-                    javascript.append("\t} else {").append("\n");
-                    javascript.append("\t\tentry.").append(attr.getName()).append(" = entry.").append(attr.getName()).append(".toString();").append("\n");
-                    javascript.append("\t}").append("\n");
+                    javascript.append("\t\tif (entry.").append(attr.getName()).append(" === null) {").append("\n");
+                    javascript.append("\t\t\tentry.").append(attr.getName()).append(" = \"\";").append("\n");
+                    javascript.append("\t\t} else {").append("\n");
+                    javascript.append("\t\t\tentry.").append(attr.getName()).append(" = entry.").append(attr.getName()).append(".toString();").append("\n");
+                    javascript.append("\t\t}").append("\n");
                     break;
             }
         }
         
-        javascript.append("\tif ( ");
+        for (ODataWizard odw : wizardlist) {
+            CfAttribut attr = odw.getAttribut();
+            if (attr.getAutoincrementor()) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "classref":
+                    if (1 == attr.getRelationtype()) {
+                        javascript.append("\t\tif (");
+                        javascript.append("entry.").append(attr.getName()).append(" == null) {\n");
+                        javascript.append("\t\t\treturn false\n");
+                        javascript.append("\t\t}\n");
+                    }
+                    break;
+            }
+        }
         
+        javascript.append("\t\tif ( ");
         for (ODataWizard odw : wizardlist) {
             CfAttribut attr = odw.getAttribut();
             if (attr.getAutoincrementor()) {
@@ -2472,6 +2513,7 @@ public class ClassUtil implements Serializable {
                 case "integer":
                 case "real":
                 case "datetime":
+                    javascript.append("");
                     javascript.append("(entry.").append(attr.getName()).append(".toLowerCase().includes($scope.filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".toLowerCase())) && ");
                     break;
                 case "classref":
@@ -2483,10 +2525,10 @@ public class ClassUtil implements Serializable {
         }
         javascript = javascript.delete(javascript.length()-4, javascript.length());
         javascript.append(") {").append("\n");
-        javascript.append("\t    return true;").append("\n");
-        javascript.append("\t} else {").append("\n");
-        javascript.append("\treturn false;").append("\n");
-        javascript.append("\t}").append("\n");
+        javascript.append("\t\t\treturn true;").append("\n");
+        javascript.append("\t\t} else {").append("\n");
+        javascript.append("\t\t\treturn false;").append("\n");
+        javascript.append("\t\t}").append("\n");
         javascript.append("\t};").append("\n");
         
         javascript.append("\n");
@@ -2501,24 +2543,41 @@ public class ClassUtil implements Serializable {
                 switch (attr.getAttributetype().getName()) {
                     case "string":
                     case "datetime":
-                        javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
-                        javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
-                        javascript.append("\t}").append("\n");
+                        javascript.append("\t\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
+                        javascript.append("\t\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        javascript.append("\t\t}").append("\n");
                         break;
                     case "integer":
                     case "real":
-                        javascript.append("\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
-                        javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
-                        javascript.append("\t} else {").append("\n");
-                        javascript.append("\t\tentry.").append(attr.getName().toLowerCase()).append(" = entry.").append(attr.getName().toLowerCase()).append(".toString();").append("\n");
-                        javascript.append("\t}").append("\n");
+                        javascript.append("\t\tif (entry.").append(attr.getName().toLowerCase()).append(" === null) {").append("\n");
+                        javascript.append("\t\t\tentry.").append(attr.getName().toLowerCase()).append(" = \"\";").append("\n");
+                        javascript.append("\t\t} else {").append("\n");
+                        javascript.append("\t\t\tentry.").append(attr.getName().toLowerCase()).append(" = entry.").append(attr.getName().toLowerCase()).append(".toString();").append("\n");
+                        javascript.append("\t\t}").append("\n");
                         break;
                 }
             }
         }
         
-        javascript.append("\tif ( ");
+        for (ODataWizard odw : wizardlist) {
+            CfAttribut attr = odw.getAttribut();
+            if (attr.getAutoincrementor()) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "classref":
+                    if (1 == attr.getRelationtype()) {
+                        javascript.append("\t\tif (");
+                        javascript.append("entry.").append(attr.getName()).append(" == null) {\n");
+                        javascript.append("\t\t\treturn false\n");
+                        javascript.append("\t\t}\n");
+                    }
+                    break;
+            }
+        }
         
+        
+        javascript.append("\t\tif (");
         for (ODataWizard odw : wizardlist) {
             if (odw.isTableheader()) {
                 CfAttribut attr = odw.getAttribut();
@@ -2542,12 +2601,66 @@ public class ClassUtil implements Serializable {
         }
         javascript = javascript.delete(javascript.length()-4, javascript.length());
         javascript.append(") {").append("\n");
-        javascript.append("\t    return true;").append("\n");
-        javascript.append("\t} else {").append("\n");
-        javascript.append("\treturn false;").append("\n");
-        javascript.append("\t}").append("\n");
+        javascript.append("\t\t\treturn true;").append("\n");
+        javascript.append("\t\t} else {").append("\n");
+        javascript.append("\t\t\treturn false;").append("\n");
+        javascript.append("\t\t}").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("\n");
+        
+        
+        javascript.append("\t$scope.convertDates = (date, sql) => {").append("\n");
+        javascript.append("\t\tif(!sql) {").append("\n");
+        javascript.append("\t\t\treturn  date.substring(date.length - 2,date.length) + '.' + date.substring(date.length - 3,date.length - 5) + '.' + date.substring(0,4); 	").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t\treturn date.substring(date.length - 4,date.length) + '-' + date.substring(date.length - 7,date.length-5) + '-' + date.substring(0,2)").append("\n");
+        javascript.append("\t}").append("\n").append("\n");
+        
+        javascript.append("\t$scope.createNewDate = (date) => {").append("\n");
+        javascript.append("\t\tvar newDate = new Date(date);").append("\n");
+        javascript.append("\t\tvar day = newDate.getDate() + 1;").append("\n");
+        javascript.append("\t\tvar month = newDate.getMonth() + 1;").append("\n");
+        javascript.append("\t\tvar year = newDate.getFullYear();").append("\n");
+        javascript.append("\t\treturn `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`").append("\n");
+        javascript.append("\t}").append("\n").append("\n");
+        
+        
+        int datumCounter = 0;
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "datetime":
+                        javascript.append("\t$scope.changeAddDatumAppearance").append(datumCounter).append(" = () => {").append("\n");
+                        javascript.append("\t\t$scope.").append(attr.getName()).append(" = $scope.convertDates($scope.").append(attr.getName()).append(", false)").append("\n");
+                        javascript.append("\t}").append("\n").append("\n");
+                        datumCounter++;
+                        break;
+                }
+            }
+        }
+        
+        datumCounter = 0;
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "datetime":
+                        javascript.append("\t$scope.changeUpdateDatumAppearance").append(datumCounter).append(" = () => {").append("\n");
+                        javascript.append("\t\t$scope.").append(clazz.getName()).append(".").append(attr.getName()).append(" = $scope.convertDates($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(", false)").append("\n");
+                        javascript.append("\t}").append("\n").append("\n");
+                        datumCounter++;
+                        break;
+                }
+            }
+        }        
+        
         javascript.append("\t$scope.").append(clazz.getName().toLowerCase()).append("disconnected_filter = function(entry) {").append("\n");
         
         for (ODataWizard odw : wizardlist) {
@@ -2635,7 +2748,24 @@ public class ClassUtil implements Serializable {
         javascript.append("\t$scope.get").append(clazz.getName()).append("list = function() {").append("\n");
         javascript.append("\t\t$http.get('/OData/").append(clazz.getName()).append("Set').then(function (res) {").append("\n");
         javascript.append("\t\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST = res.data.value;").append("\n");
-        javascript.append("\t\t});").append("\n");
+        javascript.append("\t\t\tfor(let i = 0; i < $scope.").append(clazz.getName().toUpperCase()).append("LIST.length; i++) {").append("\n");
+        for (ODataWizard odw : wizardlist) {
+            if (odw.isTableheader()) {
+                CfAttribut attr = odw.getAttribut();
+                if (attr.getAutoincrementor()) {
+                    continue;
+                }
+                switch (attr.getAttributetype().getName()) {
+                    case "datetime":
+                        javascript.append("\t\t\t\tif($scope.").append(clazz.getName().toUpperCase()).append("LIST[i].").append(attr.getName()).append(" != null) {\n");
+                        javascript.append("\t\t\t\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST[i].").append(attr.getName()).append("=").append("$scope.convertDates($scope.createNewDate($scope.").append(clazz.getName().toUpperCase()).append("LIST[i].").append(attr.getName()).append(".substring(0,10)), false)").append("\n");
+                        javascript.append("\t\t\t\t}\n");
+                        break;
+                }
+            }
+        }
+        javascript.append("\n\t\t\t}");
+        javascript.append("\n\t\t});").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("\n");
 
@@ -2728,6 +2858,18 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t$scope.inprogress = false;").append("\n");
         javascript.append("\t\t$scope.init").append(clazz.getName()).append("();").append("\n");
         
+        for (CfAttribut attr : attributList) {
+            if (attr.getAutoincrementor() || !attr.getExt_mutable()) {
+                continue;
+            }
+            switch (attr.getAttributetype().getName()) {
+                case "media":
+                    javascript.append("\t\t$scope.media_").append(attr.getName()).append(".").append(attr.getName()).append(" = 0;").append("\n");
+                    break;
+            }
+        }
+        
+        
         for (ODataWizard odw : wizardlist) {
             CfAttribut attr = odw.getAttribut();
             if (attr.getAutoincrementor()) {
@@ -2779,7 +2921,7 @@ public class ClassUtil implements Serializable {
                     break;
                 case "datetime":
                     javascript.append("\t\tif ($scope.").append(attr.getName()).append(" != null) {").append("\n");
-                    javascript.append("d = DateTime.fromISO($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(");").append("\n");
+                    javascript.append("\t\t\td = DateTime.fromISO($scope.convertDates($scope.").append(attr.getName()).append(",true));").append("\n");
                     javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = d.toFormat('yyyy-MM-dd') + \"T\" + d.toFormat('hh:mm:ss');").append("\n");
                     javascript.append("\t\t}").append("\n");
                     break;
@@ -2846,6 +2988,14 @@ public class ClassUtil implements Serializable {
                 continue;
             }
             switch (attr.getAttributetype().getName()) {
+                case "datetime":
+                    javascript.append("\tif($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(" != null) {");
+                    javascript.append("\t\t\t$scope.").append(clazz.getName()).append(".").append(attr.getName()).append(" = $scope.convertDates($scope.createNewDate($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(".substring(0,10)), false)").append("\n");
+                    javascript.append("\t}");
+                    break;
+                case "media":
+                    javascript.append("\t\t\t$scope.media_").append(attr.getName()).append(".").append(attr.getName()).append(" = $scope.").append(clazz.getName()).append(".").append(attr.getName()).append("\n");
+                    break;
                 case "hashstring":
                     javascript.append("\t\t\t$scope.").append(clazz.getName()).append(".").append(attr.getName()).append(" = \"\";").append("\n");
                     break;
@@ -2924,7 +3074,7 @@ public class ClassUtil implements Serializable {
                     break;
                 case "datetime":
                     javascript.append("\t\tif ($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
-                    javascript.append("d = DateTime.fromISO($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(");").append("\n");
+                    javascript.append("\t\t\td = DateTime.fromISO($scope.convertDates($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(",true)").append(");").append("\n");
                     javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = d.toFormat('yyyy-MM-dd') + \"T\" + d.toFormat('hh:mm:ss');").append("\n");
                     javascript.append("\t\t}").append("\n");
                     break;
@@ -2934,8 +3084,8 @@ public class ClassUtil implements Serializable {
                     javascript.append("\t\t}").append("\n");
                     break;
                 case "media":
-                    javascript.append("\t\tif ($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
-                    javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = $scope.").append(clazz.getName()).append(".").append(attr.getName()).append(";").append("\n");
+                    javascript.append("\t\tif ($scope.media_").append(attr.getName()).append(".").append(attr.getName()).append(" != null) {").append("\n");
+                    javascript.append("\t\t\t").append(clazz.getName()).append(".").append(attr.getName()).append(" = $scope.media_").append(attr.getName()).append(".").append(attr.getName()).append(";").append("\n");
                     javascript.append("\t\t}").append("\n");
                     break;
                 case "classref":
@@ -3047,113 +3197,113 @@ public class ClassUtil implements Serializable {
         javascript.append("\t\t}").append("\n");
         javascript.append("\t};").append("\n");
         javascript.append("\n");
-        javascript.append("$scope.disconnect").append(clazz.getName()).append("Item = function (id) {").append("\n");
-        javascript.append("for (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST) {").append("\n");
-        javascript.append("if (element.id == id) {").append("\n");
-        javascript.append("$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED.push(element);").append("\n");
-        javascript.append("break;").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("const index = getIndex($scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED, id);").append("\n");
-        javascript.append("if (index > -1) {").append("\n");
-        javascript.append("$scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED.splice(index, 1);").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("};").append("\n");
+        javascript.append("\t$scope.disconnect").append(clazz.getName()).append("Item = function (id) {").append("\n");
+        javascript.append("\t\tfor (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST) {").append("\n");
+        javascript.append("\t\t\tif (element.id == id) {").append("\n");
+        javascript.append("\t\t\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED.push(element);").append("\n");
+        javascript.append("\t\t\t\tbreak;").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t\tconst index = getIndex($scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED, id);").append("\n");
+        javascript.append("\t\tif (index > -1) {").append("\n");
+        javascript.append("\t\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED.splice(index, 1);").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t};").append("\n");
 
-        javascript.append("$scope.save").append(clazz.getName()).append("Item = function() {").append("\n");
-        javascript.append("$scope.inprogress = true;").append("\n");
-        javascript.append("var identifier = new Object();").append("\n");
-        javascript.append("identifier.id = null;").append("\n");
-        javascript.append("identifier.name = $scope.").append(clazz.getName().toLowerCase()).append("list_name;").append("\n");
-        javascript.append("var ").append(clazz.getName().toLowerCase()).append("set_ref = [];").append("\n");
-        javascript.append("for (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED) {").append("\n");
-        javascript.append("").append(clazz.getName().toLowerCase()).append("set_ref.push(element.id);").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("identifier.listset = ").append(clazz.getName().toLowerCase()).append("set_ref;").append("\n");
-        javascript.append("var jsonString = JSON.stringify(identifier);").append("\n");
-        javascript.append("$http.post('/OData/").append(clazz.getName()).append("Lists', jsonString).then(function (res) {").append("\n");
-        javascript.append("if (res.status === 201) {").append("\n");
-        javascript.append("$scope.get").append(clazz.getName()).append("listArray();").append("\n");
-        javascript.append("$scope.inprogress = false;").append("\n");
-        javascript.append("sendWebsocket(\"crud\", \"CREATE\")").append("\n");
-        javascript.append("UIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-add').hide();").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("}, function (res) {").append("\n");
-        javascript.append("console.log(\"ERROR\");").append("\n");
-        javascript.append("});").append("\n");
-        javascript.append("};").append("\n");
+        javascript.append("\n\t$scope.save").append(clazz.getName()).append("Item = function() {").append("\n");
+        javascript.append("\t\t$scope.inprogress = true;").append("\n");
+        javascript.append("\t\tvar identifier = new Object();").append("\n");
+        javascript.append("\t\tidentifier.id = null;").append("\n");
+        javascript.append("\t\tidentifier.name = $scope.").append(clazz.getName().toLowerCase()).append("list_name;").append("\n");
+        javascript.append("\t\tvar ").append(clazz.getName().toLowerCase()).append("set_ref = [];").append("\n");
+        javascript.append("\t\tfor (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED) {").append("\n");
+        javascript.append("\t\t\t").append(clazz.getName().toLowerCase()).append("set_ref.push(element.id);").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t\tidentifier.listset = ").append(clazz.getName().toLowerCase()).append("set_ref;").append("\n");
+        javascript.append("\t\tvar jsonString = JSON.stringify(identifier);").append("\n");
+        javascript.append("\t\t$http.post('/OData/").append(clazz.getName()).append("Lists', jsonString).then(function (res) {").append("\n");
+        javascript.append("\t\t\tif (res.status === 201) {").append("\n");
+        javascript.append("\t\t\t\t$scope.get").append(clazz.getName()).append("listArray();").append("\n");
+        javascript.append("\t\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t\t\tsendWebsocket(\"crud\", \"CREATE\")").append("\n");
+        javascript.append("\t\t\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-add').hide();").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t}, function (res) {").append("\n");
+        javascript.append("\t\t\tconsole.log(\"ERROR\");").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
 
-        javascript.append("$scope.update").append(clazz.getName()).append("ItemModal = function (id) {").append("\n");
-        javascript.append("$scope.inprogress = true;").append("\n");
-        javascript.append("UIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-update').show();").append("\n");
-        javascript.append("$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED = [];").append("\n");
-        javascript.append("$http.get('/OData/").append(clazz.getName()).append("Lists?$filter=id eq ' + id ).then(function (res) {").append("\n");
-        javascript.append("$scope.IDENTIFIER = res.data.value[0];").append("\n");
-        javascript.append("$scope.").append(clazz.getName().toLowerCase()).append("list_id = $scope.IDENTIFIER.id;").append("\n");
-        javascript.append("$scope.").append(clazz.getName().toLowerCase()).append("list_name = $scope.IDENTIFIER.name;").append("\n");
+        javascript.append("\n\t$scope.update").append(clazz.getName()).append("ItemModal = function (id) {").append("\n");
+        javascript.append("\t\t$scope.inprogress = true;").append("\n");
+        javascript.append("\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-update').show();").append("\n");
+        javascript.append("\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED = [];").append("\n");
+        javascript.append("\t\t$http.get('/OData/").append(clazz.getName()).append("Lists?$filter=id eq ' + id ).then(function (res) {").append("\n");
+        javascript.append("\t\t\t$scope.IDENTIFIER = res.data.value[0];").append("\n");
+        javascript.append("\t\t\t$scope.").append(clazz.getName().toLowerCase()).append("list_id = $scope.IDENTIFIER.id;").append("\n");
+        javascript.append("\t\t\t$scope.").append(clazz.getName().toLowerCase()).append("list_name = $scope.IDENTIFIER.name;").append("\n");
 
-        javascript.append("$http.get('/OData/' + $scope.").append(clazz.getName().toLowerCase()).append("list_name + 'List').then(function (res2) {").append("\n");
-        javascript.append("$scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED = res2.data.value;").append("\n");
-        javascript.append("for (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST) {").append("\n");
-        javascript.append("found = false;").append("\n");
-        javascript.append("for (const element2 of $scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED) {").append("\n");
-        javascript.append("if (element2.id === element.id) {").append("\n");
-        javascript.append("found = true;").append("\n");
-        javascript.append("break;").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("if (!found) {").append("\n");
-        javascript.append("$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED.push(element);").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("});").append("\n");
-        javascript.append("$scope.inprogress = false;").append("\n");
-        javascript.append("});").append("\n");
-        javascript.append("};").append("\n");
+        javascript.append("\t\t\t$http.get('/OData/' + $scope.").append(clazz.getName().toLowerCase()).append("list_name + 'List').then(function (res2) {").append("\n");
+        javascript.append("\t\t\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED = res2.data.value;").append("\n");
+        javascript.append("\t\t\t\tfor (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST) {").append("\n");
+        javascript.append("\t\t\t\t\tfound = false;").append("\n");
+        javascript.append("\t\t\t\t\tfor (const element2 of $scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED) {").append("\n");
+        javascript.append("\t\t\t\t\t\tif (element2.id === element.id) {").append("\n");
+        javascript.append("\t\t\t\t\t\t\tfound = true;").append("\n");
+        javascript.append("\t\t\t\t\t\t\tbreak;").append("\n");
+        javascript.append("\t\t\t\t\t\t}").append("\n");
+        javascript.append("\t\t\t\t\t}").append("\n");
+        javascript.append("\t\t\t\t\tif (!found) {").append("\n");
+        javascript.append("\t\t\t\t\t\t$scope.").append(clazz.getName().toUpperCase()).append("LIST_DISCONNECTED.push(element);").append("\n");
+        javascript.append("\t\t\t\t\t}").append("\n");
+        javascript.append("\t\t\t\t}").append("\n");
+        javascript.append("\t\t\t});").append("\n");
+        javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
 
-        javascript.append("$scope.update").append(clazz.getName()).append("Item = function(id) {").append("\n");
-        javascript.append("$scope.inprogress = true;").append("\n");
-        javascript.append("var identifier = new Object();").append("\n");
-        javascript.append("identifier.id = id;").append("\n");
-        javascript.append("identifier.name = $scope.").append(clazz.getName().toLowerCase()).append("list_name;").append("\n");
-        javascript.append("var ").append(clazz.getName().toLowerCase()).append("set_ref = [];").append("\n");
-        javascript.append("for (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED) {").append("\n");
-        javascript.append("").append(clazz.getName().toLowerCase()).append("set_ref.push(element.id);").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("identifier.listset = ").append(clazz.getName().toLowerCase()).append("set_ref;").append("\n");
-        javascript.append("var jsonString = JSON.stringify(identifier);").append("\n");
-        javascript.append("$http.patch('/OData/").append(clazz.getName()).append("Lists(' + id + ')', jsonString).then(function (res_patch) {").append("\n");
-        javascript.append("if (res_patch.status === 200) {").append("\n");
-        javascript.append("$scope.get").append(clazz.getName()).append("listArray();").append("\n");
-        javascript.append("$scope.inprogress = false;").append("\n");
-        javascript.append("UIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-update').hide();").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("}, function (res) {").append("\n");
-        javascript.append("console.log(\"ERROR\");").append("\n");
-        javascript.append("});").append("\n");
-        javascript.append("};").append("\n");
+        javascript.append("\n\t$scope.update").append(clazz.getName()).append("Item = function(id) {").append("\n");
+        javascript.append("\t\t$scope.inprogress = true;").append("\n");
+        javascript.append("\t\tvar identifier = new Object();").append("\n");
+        javascript.append("\t\tidentifier.id = id;").append("\n");
+        javascript.append("\t\tidentifier.name = $scope.").append(clazz.getName().toLowerCase()).append("list_name;").append("\n");
+        javascript.append("\t\tvar ").append(clazz.getName().toLowerCase()).append("set_ref = [];").append("\n");
+        javascript.append("\t\tfor (const element of $scope.").append(clazz.getName().toUpperCase()).append("LIST_CONNECTED) {").append("\n");
+        javascript.append("\t\t\t").append(clazz.getName().toLowerCase()).append("set_ref.push(element.id);").append("\n");
+        javascript.append("\t\t}").append("\n");
+        javascript.append("\t\tidentifier.listset = ").append(clazz.getName().toLowerCase()).append("set_ref;").append("\n");
+        javascript.append("\t\tvar jsonString = JSON.stringify(identifier);").append("\n");
+        javascript.append("\t\t$http.patch('/OData/").append(clazz.getName()).append("Lists(' + id + ')', jsonString).then(function (res_patch) {").append("\n");
+        javascript.append("\t\t\tif (res_patch.status === 200) {").append("\n");
+        javascript.append("\t\t\t\t$scope.get").append(clazz.getName()).append("listArray();").append("\n");
+        javascript.append("\t\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-update').hide();").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t}, function (res) {").append("\n");
+        javascript.append("\t\t\tconsole.log(\"ERROR\");").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
 
-        javascript.append("$scope.delete").append(clazz.getName()).append("ItemModal = function (id) {").append("\n");
-        javascript.append("$scope.inprogress = true;").append("\n");
-        javascript.append("UIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-delete').show();").append("\n");
-        javascript.append("$http.get('/OData/").append(clazz.getName()).append("Lists?$filter=id eq ' + id).then(function (res) {").append("\n");
-        javascript.append("$scope.IDENTIFIER = res.data.value[0];").append("\n");
-        javascript.append("$scope.inprogress = false;").append("\n");
-        javascript.append("});").append("\n");
-        javascript.append("};").append("\n");
+        javascript.append("\n\t$scope.delete").append(clazz.getName()).append("ItemModal = function (id) {").append("\n");
+        javascript.append("\t\t$scope.inprogress = true;").append("\n");
+        javascript.append("\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-delete').show();").append("\n");
+        javascript.append("\t\t$http.get('/OData/").append(clazz.getName()).append("Lists?$filter=id eq ' + id).then(function (res) {").append("\n");
+        javascript.append("\t\t\t$scope.IDENTIFIER = res.data.value[0];").append("\n");
+        javascript.append("\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
 
-        javascript.append("$scope.delete").append(clazz.getName()).append("Item = function (id) {").append("\n");
-        javascript.append("$scope.inprogress = true;").append("\n");
-        javascript.append("$http.delete('/OData/").append(clazz.getName()).append("Lists(' + id + ')').then(function (res) {").append("\n");
-        javascript.append("if (res.status === 200) {").append("\n");
-        javascript.append("$scope.get").append(clazz.getName()).append("listArray();").append("\n");
-        javascript.append("$scope.inprogress = false;").append("\n");
-        javascript.append("UIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-delete').hide();").append("\n");
-        javascript.append("}").append("\n");
-        javascript.append("}, function (res) {").append("\n");
-        javascript.append("console.log(\"ERROR\");").append("\n");
-        javascript.append("});").append("\n");
-        javascript.append("};").append("\n");
+        javascript.append("\n\t$scope.delete").append(clazz.getName()).append("Item = function (id) {").append("\n");
+        javascript.append("\t\t$scope.inprogress = true;").append("\n");
+        javascript.append("\t\t$http.delete('/OData/").append(clazz.getName()).append("Lists(' + id + ')').then(function (res) {").append("\n");
+        javascript.append("\t\t\tif (res.status === 200) {").append("\n");
+        javascript.append("\t\t\t\t$scope.get").append(clazz.getName()).append("listArray();").append("\n");
+        javascript.append("\t\t\t\t$scope.inprogress = false;").append("\n");
+        javascript.append("\t\t\t\tUIkit.modal('#modal-").append(clazz.getName().toLowerCase()).append("-liste-delete').hide();").append("\n");
+        javascript.append("\t\t\t}").append("\n");
+        javascript.append("\t\t}, function (res) {").append("\n");
+        javascript.append("\t\t\tconsole.log(\"ERROR\");").append("\n");
+        javascript.append("\t\t});").append("\n");
+        javascript.append("\t};").append("\n");
         
         javascript.append("\n");
         javascript.append("\tgetIndex = function(array, id) {").append("\n");

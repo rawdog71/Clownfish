@@ -27,7 +27,7 @@
                         <p:outputLabel value="&nbsp;" />
                         <p:outputLabel value="Clownfish CMS" />
                         <p:outputLabel value="&nbsp;" />
-                        <p:outputLabel value="#{versionBean.clownfishUtil.version}" />
+                        <p:outputLabel value="#{versionBean.clownfishUtil.version}"/>
                     </f:facet>
 
                     <f:facet name="right">
@@ -2919,6 +2919,15 @@
                         <div class="content-justify">
                             <p:outputLabel for="generateListform" value="Generate List form:" />
                             <p:selectBooleanCheckbox id="generateListform" value="#{classList.generatelistform}"/>
+                        </div>
+                    </p:column>
+                </p:row>
+                
+                <p:row>
+                    <p:column>
+                        <div style="margin-top: 8px; margin-bottom: 8px" class="content-justify">
+                            <p:outputLabel for="generateListform" value="In-place editing:" />
+                            <p:selectBooleanCheckbox id="generateInPlaceEditing" value="#{classList.generateInPlaceEditing}"/>
                         </div>
                     </p:column>
                 </p:row>

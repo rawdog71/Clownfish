@@ -116,6 +116,7 @@ public class ClassList implements Serializable {
     private @Getter @Setter String authField;
     private @Getter @Setter String adminEmailField;
     private @Getter @Setter boolean generatelistform;
+    private @Getter @Setter boolean generateInPlaceEditing;
     @Autowired transient private @Getter @Setter  EntityUtil entityutil;
 
     @Autowired transient private @Getter @Setter AttributList attributlist;
@@ -133,6 +134,7 @@ public class ClassList implements Serializable {
         odataWizardList = new ArrayList<>();
         renderClass = false;
         generatelistform = true;
+        generateInPlaceEditing = true;
         LOGGER.info("INIT CLASSLIST END");
     }
     
@@ -582,7 +584,7 @@ public class ClassList implements Serializable {
     
     public void onGenerateODataForm(ActionEvent actionEvent) {
         if (selectedClass != null) {
-            String return_message = classutil.generateODataForm(selectedClass, odataWizardList, generatelistform);
+            String return_message = classutil.generateODataForm(selectedClass, odataWizardList, generatelistform, generateInPlaceEditing);
             FacesMessage message = new FacesMessage(return_message);
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
