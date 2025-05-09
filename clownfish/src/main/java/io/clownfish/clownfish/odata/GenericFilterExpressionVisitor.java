@@ -15,6 +15,14 @@
  */
 package io.clownfish.clownfish.odata;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.edm.EdmEnumType;
@@ -42,6 +50,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
+import org.apache.olingo.commons.core.edm.primitivetype.EdmDateTimeOffset;
 import org.apache.olingo.commons.core.edm.primitivetype.EdmInt16;
 import org.apache.olingo.commons.core.edm.primitivetype.EdmInt64;
 
@@ -156,7 +166,12 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
                             if (literal.getType() instanceof EdmDecimal) {
                                 return Double.valueOf(literalAsString);
                             } else {
-                                return null;
+                                if (literal.getType() instanceof EdmDateTimeOffset) {
+                                    OffsetDateTime ofsetttime = OffsetDateTime.parse(literalAsString);
+                                    return Timestamp.valueOf(ofsetttime.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
+                                } else {
+                                    return null;
+                                }
                             }
                         }
                     }
@@ -261,8 +276,10 @@ public class GenericFilterExpressionVisitor implements ExpressionVisitor<Object>
                 result = ((String) left).compareTo((String) right);
             } else if(left instanceof Boolean) {
                 result = ((Boolean) left).compareTo((Boolean) right);
-            }  else if(left instanceof Double) {
+            } else if(left instanceof Double) {
                 result = ((Double) left).compareTo((Double) right);
+            } else if(left instanceof Timestamp) {
+                result = ((Timestamp) left).compareTo((Timestamp) right);    
             } else {
                 throw new ODataApplicationException("Class " + left.getClass().getCanonicalName() + " not expected",
                         HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), Locale.ENGLISH);
