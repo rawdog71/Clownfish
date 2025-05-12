@@ -165,6 +165,9 @@ public class ClassList implements Serializable {
                 case "integer":
                 case "real":
                 case "datetime":
+                case "text":
+                case "markdown":
+                case "htmltext":
                 case "boolean":
                     odw.setHeaderenabled(true);
                     odw.setRelationenabled(false);

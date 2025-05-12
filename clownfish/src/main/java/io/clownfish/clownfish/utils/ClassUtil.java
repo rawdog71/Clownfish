@@ -988,6 +988,9 @@ public class ClassUtil implements Serializable {
                     continue;
                 }
                 switch (attr.getAttributetype().getName()) {
+                    case "text":
+                    case "htmltext":
+                    case "markdown":
                     case "string":
                         html.append("\t\t\t\t\t\t\t<th><span ng-class=\"{'ascending': order_").append(clazz.getName().toLowerCase()).append(" == '").append(attr.getName()).append("', 'descending': order_").append(clazz.getName().toLowerCase()).append(" == '-").append(attr.getName()).append("'}\">").append(StringUtils.capitalise(attr.getName())).append("</span> <a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('").append(attr.getName()).append("')\" uk-icon=\"chevron-up\"></a><a href=\"\" class=\"uk-icon\" ng-click=\"sort").append(clazz.getName()).append("('-").append(attr.getName()).append("')\" uk-icon=\"chevron-down\"></a></th>").append("\n");
                         break;
@@ -1029,6 +1032,9 @@ public class ClassUtil implements Serializable {
                     continue;
                 }
                 switch (attr.getAttributetype().getName()) {
+                    case "text":
+                    case "htmltext":
+                    case "markdown":
                     case "string":
                         html.append("\t\t\t\t\t\t\t<th><input id=\"filter_").append(attr.getName()).append("\" class=\"uk-input uk-form-width-small\" ng-class=\"{'uk-form-success': filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(".length != 0}\" type=\"text\" placeholder=\"\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"filter_").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\"></th>").append("\n");
                         break;
@@ -1058,6 +1064,8 @@ public class ClassUtil implements Serializable {
         html.append("| orderBy: order_").append(clazz.getName().toLowerCase()).append("\">").append("\n");
         
 	html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".id}}</td>").append("\n");
+        
+        int dateCounterInput = 0;
         for (ODataWizard odw : wizardlist) {
             if (odw.isTableheader()) {
                 CfAttribut attr = odw.getAttribut();
@@ -1065,6 +1073,17 @@ public class ClassUtil implements Serializable {
                     continue;
                 }
                 switch (attr.getAttributetype().getName()) {
+                    case "text":
+                    case "htmltext":
+                    case "markdown":
+                        if(!generateInPlaceEditing) {
+                            html.append("\t\t\t\t\t\t<td ng-show=\"!").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\"><span style='display: inline-block;width: 250px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding: 5px;'>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</span></td>").append("\n");
+                            html.append("\t\t\t\t\t\t<td ng-show=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\"><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        } else {
+                            html.append("\t\t\t\t\t\t<td ng-show=\"!").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\" ng-mouseover=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable=true\"><span style='display: inline-block;width: 250px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding: 5px;'>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</span</td>").append("\n");
+                            html.append("\t\t\t\t\t\t<td ng-show=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\" ng-mouseleave=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable=false\"><textarea style='height: 250px !important' id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</textarea></td>").append("\n");
+                        }
+                        break;
                     case "string":
                     case "integer":
                     case "real":
@@ -1080,7 +1099,14 @@ public class ClassUtil implements Serializable {
                         html.append("\t\t\t\t\t\t<td><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
                         break;
                     case "datetime":
-                        html.append("\t\t\t\t\t\t<td>{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
+                        if(!generateInPlaceEditing) {
+                            html.append("\t\t\t\t\t\t<td ng-show=\"!").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
+                            html.append("\t\t\t\t\t\t<td ng-show=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\"><input id=\"input-").append(attr.getName()).append("-inst").append("\"class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" ng-model=\"").append(clazz.getName()).append(".").append(attr.getName()).append("\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        } else {
+                            html.append("\t\t\t\t\t\t<td ng-show=\"!").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\" ng-mouseover=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable=true\">{{").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("}}</td>").append("\n");
+                            html.append("\t\t\t\t\t\t<td ng-show=\"").append(clazz.getName().toLowerCase()).append("_").append(attr.getName()).append(".editable\"><input id=\"input-").append(attr.getName()).append("-inst").append(dateCounterInput).append("\" class=\"uk-input\" type=\"text\" placeholder=\"").append(StringUtils.capitalise(attr.getName())).append("\" aria-label=\"").append(StringUtils.capitalise(attr.getName())).append("\" pikaday ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-model-options=\"{debounce: 1000}\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        }
+                        dateCounterInput++;
                         break;
                     case "classref":
                         if (1 == attr.getRelationtype()) {
@@ -2185,6 +2211,49 @@ public class ClassUtil implements Serializable {
         }
         
         javascript.append("var crud").append(clazz.getName()).append(" = angular.module('crud").append(clazz.getName()).append("App', ['ngWebSocket']);").append("\n");
+        
+        
+        
+        javascript.append("\tcrudOdatanewformtest.directive('pikaday', function($rootScope) {").append("\n");
+        javascript.append("\t\treturn {").append("\n");
+        javascript.append("\t\trestrict: 'A',").append("\n");
+        javascript.append("\trequire: 'ngModel',").append("\n");
+        javascript.append("\tlink: function(scope, element, attrs, ngModel) {").append("\n");
+        javascript.append("\tvar picker = new Pikaday({").append("\n");
+        javascript.append("\tfield: element[0],").append("\n");
+        javascript.append("\tfirstDay: 1,").append("\n");
+        javascript.append("\ti18n: { ").append("\n");
+        javascript.append("\tpreviousMonth: 'Previous Month', ").append("\n");
+        javascript.append("\tnextMonth: 'Next Month', ").append("\n");
+        javascript.append("\t months: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'], ").append("\n");
+        javascript.append("\tweekdays: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'], ").append("\n");
+        javascript.append("\t weekdaysShort : ['So','Mo','Di','Mi','Do','Fr','Sa']").append("\n");
+        javascript.append("\t},").append("\n");
+        javascript.append("\tshowWeekNumber: true,").append("\n");
+        javascript.append("\ttoString: function(date) {").append("\n");
+        javascript.append("\t var parts = [date.getFullYear(), ('0' + (date.getMonth() + 1)).slice(-2), ('0' + date.getDate()).slice(-2)];").append("\n");
+        javascript.append("\treturn parts.join(\"-\");").append("\n");
+        javascript.append("\t},").append("\n");
+        javascript.append("\tonSelect: function(date) {").append("\n");
+        javascript.append("\t var formattedDate = picker.toString();").append("\n");
+        javascript.append("\t scope.$apply(function() {").append("\n");
+        javascript.append("\tngModel.$setViewValue(formattedDate);").append("\n");
+        javascript.append("\t});").append("\n");
+        javascript.append("\t},").append("\n");
+        javascript.append("\tonOpen: function() {").append("\n");
+        javascript.append("\tif (scope.closeTimeout) clearTimeout(scope.closeTimeout);").append("\n");
+        javascript.append("\t },").append("\n");
+        javascript.append("\tonClose: function() {").append("\n");
+        javascript.append("\t scope.$apply(function() {").append("\n");
+        javascript.append("\tscope['").append(clazz.getName().toLowerCase()).append("_' + attrs.id.split('-')[1]].editable = false;});").append("\n");
+        javascript.append("\t}").append("\n");
+        javascript.append("\t});").append("\n");
+        javascript.append("\t}").append("\n");
+        javascript.append("\t};").append("\n");
+        javascript.append("\t});").append("\n");
+           
+        
+        
         javascript.append("crud").append(clazz.getName()).append(".controller('Crud").append(clazz.getName()).append("Controller', function($scope, $http, $websocket) {").append("\n");
         javascript.append("\tvar DateTime = luxon.DateTime;").append("\n");
         javascript.append("\t$scope.loading = false;").append("\n");
@@ -2617,17 +2686,19 @@ public class ClassUtil implements Serializable {
         javascript.append("\t}").append("\n").append("\n");
         
         javascript.append("\t$scope.createNewDate = (date, update) => {").append("\n");
-        javascript.append("\t\tvar newDate = new Date(date);").append("\n");
-        javascript.append("\t\tvar day;").append("\n");
+        javascript.append("\t\tvar parts = date.split('-');").append("\n");
+        javascript.append("\t\tvar year = parseInt(parts[0], 10);").append("\n");
+        javascript.append("\t\tvar month = parseInt(parts[1], 10) - 1;").append("\n");
+        javascript.append("\t\tvar day = parseInt(parts[2], 10);").append("\n");
         javascript.append("\t\tif(update) {").append("\n");
-        javascript.append("\t\t\tday = newDate.getDate() + 1;").append("\n");
-        javascript.append("\t\t} else {").append("\n");
-        javascript.append("\t\t\tday = newDate.getDate();").append("\n");
+        javascript.append("\t\t\tday += 1;").append("\n");
         javascript.append("\t\t}").append("\n");
-        javascript.append("\t\tvar month = newDate.getMonth() + 1;").append("\n");
-        javascript.append("\t\tvar year = newDate.getFullYear();").append("\n");
-        javascript.append("\t\treturn `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`").append("\n");
-        javascript.append("\t}").append("\n").append("\n");
+        javascript.append("\t\tvar newDate = new Date(year, month, day);").append("\n");
+        javascript.append("\t\tvar newYear = newDate.getFullYear();").append("\n");
+        javascript.append("\t\tvar newMonth = (newDate.getMonth() + 1).toString().padStart(2, '0');").append("\n");
+        javascript.append("\t\tvar newDay = newDate.getDate().toString().padStart(2, '0');").append("\n");
+        javascript.append("\t\treturn `${newYear}-${newMonth}-${newDay}`;").append("\n");
+        javascript.append("\t}").append("\n");
         
         
         int datumCounter = 0;
@@ -3043,7 +3114,7 @@ public class ClassUtil implements Serializable {
             }
             switch (attr.getAttributetype().getName()) {
                 case "datetime":     
-                    javascript.append("\t\t\t$scope.").append(clazz.getName()).append(".").append(attr.getName()).append("= $scope.createNewDate($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(".substring(0,10))\n");
+                    javascript.append("\t\t\t$scope.").append(clazz.getName()).append(".").append(attr.getName()).append("= $scope.convertDates($scope.").append(clazz.getName()).append(".").append(attr.getName()).append(".substring(0,10))\n");
                     break;
             }
         }
