@@ -2212,9 +2212,7 @@ public class ClassUtil implements Serializable {
         
         javascript.append("var crud").append(clazz.getName()).append(" = angular.module('crud").append(clazz.getName()).append("App', ['ngWebSocket']);").append("\n");
         
-        
-        
-        javascript.append("\tcrudOdatanewformtest.directive('pikaday', function($rootScope) {").append("\n");
+        javascript.append("\tcrud").append(clazz.getName()).append(".directive('pikaday', function($rootScope) {").append("\n");
         javascript.append("\t\treturn {").append("\n");
         javascript.append("\t\trestrict: 'A',").append("\n");
         javascript.append("\trequire: 'ngModel',").append("\n");
@@ -2252,8 +2250,6 @@ public class ClassUtil implements Serializable {
         javascript.append("\t};").append("\n");
         javascript.append("\t});").append("\n");
            
-        
-        
         javascript.append("crud").append(clazz.getName()).append(".controller('Crud").append(clazz.getName()).append("Controller', function($scope, $http, $websocket) {").append("\n");
         javascript.append("\tvar DateTime = luxon.DateTime;").append("\n");
         javascript.append("\t$scope.loading = false;").append("\n");
