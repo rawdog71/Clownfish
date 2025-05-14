@@ -83,7 +83,7 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <scope>compile</scope>
-            <version>9.0.99</version>
+            <version>9.0.104</version>
             <type>jar</type>
         </dependency>
         <dependency>
