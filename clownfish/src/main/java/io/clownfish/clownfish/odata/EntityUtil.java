@@ -1560,6 +1560,15 @@ public class EntityUtil {
                     CfClasscontent cfclasscontentref = cfclasscontentService.findById(content_id);
                     class_prop.setValue(ValueType.COMPLEX, createComplexVal(cfclasscontentref));
                     class_prop.setType("OData.Complex." + cfclasscontentref.getClassref().getName());
+                } else if (0 == cfAtt.getAttributetype().getName().compareToIgnoreCase("assetref")) {
+                    class_prop.setType("OData.Complex.Collection(Int32)");
+                    List<Long> values = new ArrayList<>();
+                    CfAssetlist assetlist = cfassetlistService.findByName((String)(value));
+                    List<CfAssetlistcontent> medialist = cfassetlistcontentService.findByAssetlistref(assetlist.getId());
+                    for (CfAssetlistcontent listcontent : medialist) {
+                        values.add(listcontent.getCfAssetlistcontentPK().getAssetref());
+                    }
+                    class_prop.setValue(ValueType.COLLECTION_PRIMITIVE, values);        
                 } else {
                     setPropValue(class_prop, value);
                 }
