@@ -397,6 +397,10 @@ public class EntityUtil {
                                     prop.setValue(ValueType.COMPLEX, createComplexVal(cfclasscontent));
                                     prop.setType("OData.Complex." + cfclasscontent.getClassref().getName());
                                     entity.addProperty(prop);
+                                } else {
+                                    prop.setValue(ValueType.COMPLEX, createComplexVal(null));
+                                    prop.setType("OData.Complex." + attribut.getClassref().getName());
+                                    entity.addProperty(prop);
                                 }
                             } else {                                                // n:m Relation
                                 Property coll_prop = new Property();
@@ -1556,10 +1560,15 @@ public class EntityUtil {
                 class_prop.setName(key);
                 class_prop.setType(GenericEdmProvider.getODataType(cfAtt).getFullQualifiedNameAsString());
                 if ((0 == cfAtt.getAttributetype().getName().compareToIgnoreCase("classref")) && (1 == cfAtt.getRelationtype())) { // 1:n
-                    Long content_id = Long.valueOf((String)value);
-                    CfClasscontent cfclasscontentref = cfclasscontentService.findById(content_id);
-                    class_prop.setValue(ValueType.COMPLEX, createComplexVal(cfclasscontentref));
-                    class_prop.setType("OData.Complex." + cfclasscontentref.getClassref().getName());
+                    if (null != value) {
+                        Long content_id = Long.valueOf((String)value);
+                        CfClasscontent cfclasscontentref = cfclasscontentService.findById(content_id);
+                        class_prop.setValue(ValueType.COMPLEX, createComplexVal(cfclasscontentref));
+                        class_prop.setType("OData.Complex." + cfclasscontentref.getClassref().getName());
+                    } else {
+                        class_prop.setValue(ValueType.COMPLEX, createComplexVal(null));
+                        class_prop.setType("OData.Complex." + cfAtt.getClassref().getName());
+                    }
                 } else if (0 == cfAtt.getAttributetype().getName().compareToIgnoreCase("assetref")) {
                     class_prop.setType("OData.Complex.Collection(Int32)");
                     List<Long> values = new ArrayList<>();
@@ -1568,7 +1577,7 @@ public class EntityUtil {
                     for (CfAssetlistcontent listcontent : medialist) {
                         values.add(listcontent.getCfAssetlistcontentPK().getAssetref());
                     }
-                    class_prop.setValue(ValueType.COLLECTION_PRIMITIVE, values);        
+                    class_prop.setValue(ValueType.COLLECTION_PRIMITIVE, values);
                 } else {
                     setPropValue(class_prop, value);
                 }
