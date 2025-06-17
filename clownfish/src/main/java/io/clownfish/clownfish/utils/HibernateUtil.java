@@ -26,6 +26,7 @@ import io.clownfish.clownfish.dbentities.CfClasscontent;
 import io.clownfish.clownfish.dbentities.CfClasscontentkeyword;
 import io.clownfish.clownfish.dbentities.CfList;
 import io.clownfish.clownfish.dbentities.CfListcontent;
+import io.clownfish.clownfish.odata.ComplexValCache;
 import io.clownfish.clownfish.serviceinterface.CfAttributService;
 import io.clownfish.clownfish.serviceinterface.CfAttributcontentService;
 import io.clownfish.clownfish.serviceinterface.CfClassService;
@@ -75,6 +76,7 @@ public class HibernateUtil implements Runnable {
     private static ServiceStatus serviceStatus;
     private static String datasourceURL;
     @Autowired MarkdownUtil markdownUtil;
+    @Autowired ComplexValCache cvc;
     private @Getter @Setter int hibernateInit = 0;
     @Autowired private PropertyUtil propertyUtil;
     public @Getter @Setter ContentUtil contentUtil;
@@ -315,6 +317,7 @@ public class HibernateUtil implements Runnable {
     }
     
     public void updateContent(CfClasscontent classcontent) {
+        
         String classname = classcontent.getClassref().getName();
         Session session_tables = classsessions.get("tables").getSessionFactory().openSession();
         Map entity = (Map) session_tables.createQuery("FROM " + classname + " c WHERE c.cf_contentref = " + classcontent.getId()).getSingleResult();
@@ -324,6 +327,7 @@ public class HibernateUtil implements Runnable {
             Transaction tx = session_tables.beginTransaction();
             session_tables.update(classname, entity);
             tx.commit();
+            cvc.getCache().remove(classcontent.getId());
             //session.close();
         } catch (org.hibernate.id.IdentifierGenerationException ex) {
             LOGGER.warn("NOT SAVED:" + classcontent.getName());
@@ -343,6 +347,7 @@ public class HibernateUtil implements Runnable {
             Transaction tx = session_tables.beginTransaction();
             session_tables.delete(classname, entity);
             tx.commit();
+            cvc.getCache().remove(classcontent.getId());
             //session.close();
         } catch (org.hibernate.id.IdentifierGenerationException ex) {
             LOGGER.warn("NOT SAVED:" + classcontent.getName());
