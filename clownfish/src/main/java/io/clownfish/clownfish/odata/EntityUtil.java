@@ -100,6 +100,7 @@ public class EntityUtil {
     @Autowired private CfAssetKeywordService cfassetkeywordService;
     @Autowired private ContentUtil contentUtil;
     @Autowired HibernateUtil hibernateUtil;
+    @Autowired ComplexValCache cvc;
     GenericEdmProvider edmprovider;
     
     private @Getter @Setter HashMap<String, CsdlSingleton> singletonlist = new HashMap<>();
@@ -393,10 +394,17 @@ public class EntityUtil {
                                 prop.setName(attribut.getName());
                                 Long content_id = (Long)hm.get(attributname);
                                 if (null != content_id) {
-                                    CfClasscontent cfclasscontent = cfclasscontentService.findById(content_id);
-                                    prop.setValue(ValueType.COMPLEX, createComplexVal(cfclasscontent));
-                                    prop.setType("OData.Complex." + cfclasscontent.getClassref().getName());
-                                    entity.addProperty(prop);
+                                    if (cvc.getCache().containsKey(content_id)) {
+                                        prop = cvc.getCache().get(content_id);
+                                        entity.addProperty(prop);
+                                    } else {
+                                        CfClasscontent cfclasscontent = cfclasscontentService.findById(content_id);
+                                        ComplexValue cv = createComplexVal(cfclasscontent);
+                                        prop.setValue(ValueType.COMPLEX, cv);
+                                        prop.setType("OData.Complex." + cfclasscontent.getClassref().getName());
+                                        entity.addProperty(prop);
+                                        cvc.getCache().put(content_id, prop);
+                                    }
                                 } else {
                                     prop.setValue(ValueType.COMPLEX, createComplexVal(null));
                                     prop.setType("OData.Complex." + attribut.getClassref().getName());
