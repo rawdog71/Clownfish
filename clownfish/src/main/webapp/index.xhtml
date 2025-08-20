@@ -2882,6 +2882,9 @@
                     <p:column headerText="Header">
                         <p:selectBooleanCheckbox value="#{attribut.tableheader}" disabled="#{!attribut.headerenabled}" />
                     </p:column>
+                    <p:column headerText="Use Description">
+                        <p:selectBooleanCheckbox value="#{attribut.usedescriptrion}" title="#{attribut.attribut.description}" disabled="#{empty attribut.attribut.description}" />
+                    </p:column>
                     <p:column headerText="Name">
                         <h:outputText value="#{attribut.attribut.name}" />
                     </p:column>

@@ -31,4 +31,5 @@ public class ODataWizard {
     private @Getter @Setter String relationattribut1;
     private @Getter @Setter String relationattribut2;
     private @Getter @Setter String relationattribut3;
+    private @Getter @Setter boolean usedescriptrion;
 }

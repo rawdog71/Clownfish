@@ -302,6 +302,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
                 System.out.println(ansi().reset());
                 JDBCUtil jdbcutil = new JDBCUtil(dbclass, dburl, dbuser, dbpassword);
                 ScriptRunner runner = new ScriptRunner(jdbcutil.getConnection(), false, false);
+                //String file = "bootstrap/sql-bootstrap.sql";
                 String file = "sql-bootstrap.sql";
                 runner.runScript(new BufferedReader(new FileReader(file)));
             }
@@ -339,6 +340,7 @@ public class Main extends SpringBootServletInitializer implements ServletContext
             String dbuser = props.getProperty("app.datasource.username");
             String dbpassword = props.getProperty("app.datasource.password");
         
+            //String path = new File("./bootstrap").getCanonicalPath();
             String path = new File(".").getCanonicalPath();
             File bootstrapDirectory = new File(path);
             

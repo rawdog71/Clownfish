@@ -188,6 +188,7 @@ public class ClassList implements Serializable {
             odw.setRelationattribut2(null);
             odw.setRelationattribut3(null);
             odw.setAttribut(attr);
+            odw.setUsedescriptrion(false);
             odataWizardList.add(odw);
         }
         className = selectedClass.getName();
