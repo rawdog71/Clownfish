@@ -1096,7 +1096,11 @@ public class ClassUtil implements Serializable {
                         }
                         break;
                     case "boolean":
-                        html.append("\t\t\t\t\t\t<td><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        if(!generateInPlaceEditing) {
+                            html.append("\t\t\t\t\t\t<td><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" disabled></td>").append("\n");
+                        } else {
+                            html.append("\t\t\t\t\t\t<td><input id=\"input-").append(attr.getName()).append("-inst\" class=\"uk-checkbox\" type=\"checkbox\" ng-model=\"").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append("\" ng-change=\"update").append(clazz.getName()).append("Instant(").append(clazz.getName().toLowerCase()).append(".id, '").append(attr.getName()).append("', ").append(clazz.getName().toLowerCase()).append(".").append(attr.getName()).append(")\"></td>").append("\n");
+                        }
                         break;
                     case "datetime":
                         if(!generateInPlaceEditing) {

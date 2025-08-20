@@ -4,7 +4,7 @@
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
     <version>0.8.9-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
         <url>https://github.com/rawdog71/Clownfish</url>
