@@ -249,6 +249,7 @@ public class QuartzJob implements Job {
             NetworkTemplateBean networkbean = new NetworkTemplateBean();
             DatabaseTemplateBean databasebean = new DatabaseTemplateBean(propertyUtil);
             databasebean.initjob(sitedatasourcelist, cfdatasourceService);
+            DownloadTemplateBean downloadbean = new DownloadTemplateBean(propertyUtil);
             ContentTemplateBean contentbean = new ContentTemplateBean(propertyUtil, contentUtil);
             contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService, cfclassService, cfassetlistService, cfassetlistcontentService, cfassetService, useHibernate);
             ImportTemplateBean importBean = new ImportTemplateBean();
@@ -275,6 +276,7 @@ public class QuartzJob implements Job {
                     }
 
                     fmRoot.put("databaseBean", databasebean);
+                    fmRoot.put("downloadBean", downloadbean);
                     fmRoot.put("networkBean", networkbean);
                     fmRoot.put("importBean", importBean);
                     fmRoot.put("pdfBean", pdfBean);
@@ -317,6 +319,7 @@ public class QuartzJob implements Job {
                         velContext.put("sapBean", sapbean);
                     }
                     velContext.put("databaseBean", databasebean);
+                    velContext.put("downloadBean", downloadbean);
                     velContext.put("networkBean", networkbean);
                     velContext.put("importBean", importBean);
                     velContext.put("webserviceBean", webServiceBean);

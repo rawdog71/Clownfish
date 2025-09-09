@@ -196,6 +196,7 @@ public class Clownfish {
     @Autowired GenericEdmProvider edmprovider;
     
     DatabaseTemplateBean databasebean;
+    DownloadTemplateBean downloadbean;
     ContentTemplateBean contentbean;
     EmailTemplateBean emailbean;
     SAPTemplateBean sapbean;
@@ -1468,6 +1469,7 @@ public class Clownfish {
                                     }
 
                                     databasebean = new DatabaseTemplateBean(propertyUtil);
+                                    downloadbean = new DownloadTemplateBean(propertyUtil);
                                     importbean = new ImportTemplateBean();
                                     pdfbean = new PDFTemplateBean();
                                     pdfbean.init(pdfUtil);
@@ -1495,6 +1497,7 @@ public class Clownfish {
                                                         fmRoot.put("sapBean", sapbean);
                                                     }
                                                     fmRoot.put("databaseBean", databasebean);
+                                                    fmRoot.put("downloadBean", downloadbean);
                                                     fmRoot.put("importBean", importbean);
                                                     fmRoot.put("networkBean", networkbean);
                                                     fmRoot.put("webserviceBean", webservicebean);
@@ -1610,6 +1613,7 @@ public class Clownfish {
                                                         velContext.put("sapBean", sapbean);
                                                     }
                                                     velContext.put("databaseBean", databasebean);
+                                                    velContext.put("downloadBean", downloadbean);
                                                     velContext.put("importBean", importbean);
                                                     velContext.put("networkBean", networkbean);
                                                     velContext.put("webserviceBean", webservicebean);
