@@ -167,7 +167,7 @@ public class SAPUtility {
             HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
             List<RfcFunctionParam> rfcfunctionparamlist = new ArrayList<>();
             rfc_get_function_interface.setSapConnection(sapc);
-            rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction));
+            rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction, sapc));
             saprfcfunctionparamMap.put(rfcFunction, rfcfunctionparamlist);
 
             List<JsonSAPFormParameter> postmap_async = ClownfishUtil.getJsonSAPFormParameterList(parametermap);
@@ -306,7 +306,7 @@ public class SAPUtility {
         HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
         try {
             List<RfcFunctionParam> rfcfunctionparamlist = new ArrayList<>();
-            rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction));
+            rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction, sapc));
             saprfcfunctionparamMap.put(rfcFunction, rfcfunctionparamlist);
 
             return saprfcfunctionparamMap;

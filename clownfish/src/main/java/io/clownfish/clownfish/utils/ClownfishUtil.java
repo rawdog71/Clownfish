@@ -95,7 +95,7 @@ public class ClownfishUtil {
         HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
         sitesaprfclist.stream().forEach((knsitesaprfc) -> {
             List<RfcFunctionParam> rfcfunctionparamlist = new ArrayList<>();
-            rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(knsitesaprfc.getCfSitesaprfcPK().getRfcfunction()));
+            rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(knsitesaprfc.getCfSitesaprfcPK().getRfcfunction(), null));
             saprfcfunctionparamMap.put(knsitesaprfc.getCfSitesaprfcPK().getRfcfunction(), rfcfunctionparamlist);
         });
         return saprfcfunctionparamMap;

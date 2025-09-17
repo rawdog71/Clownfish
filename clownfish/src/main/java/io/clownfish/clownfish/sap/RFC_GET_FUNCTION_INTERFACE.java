@@ -49,7 +49,7 @@ public class RFC_GET_FUNCTION_INTERFACE {
         rfcfunctionsparamlist.clear();
     }
     
-    public List<RfcFunctionParam> getRfcFunctionsParamList(String funcname) {
+    public List<RfcFunctionParam> getRfcFunctionsParamList(String funcname, SAPConnection sapc) {
         if (rfcfunctionsparamlist.containsKey(funcname)) {
             return rfcfunctionsparamlist.get(funcname);
         } else {

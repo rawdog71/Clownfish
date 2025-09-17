@@ -111,7 +111,7 @@ public class SAPTemplateBean implements Serializable {
             HashMap<String, HashMap> sapexport = new HashMap<>();
             HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
             List<RfcFunctionParam> rfcfunctionparamlist = new ArrayList<>();
-            rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction));
+            rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction, sapc));
             saprfcfunctionparamMap.put(rfcFunction, rfcfunctionparamlist);
 
             List<JsonSAPFormParameter> postmap_async = ClownfishUtil.getJsonSAPFormParameterList(parametermap);
@@ -261,7 +261,7 @@ public class SAPTemplateBean implements Serializable {
             HashMap<String, HashMap> sapexport = new HashMap<>();
             HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
             List<RfcFunctionParam> rfcfunctionparamlist = new ArrayList<>();
-            rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction));
+            rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction, this.sapc));
             saprfcfunctionparamMap.put(rfcFunction, rfcfunctionparamlist);
 
             List<JsonSAPFormParameter> postmap_async = ClownfishUtil.getJsonSAPFormParameterList(parametermap);
@@ -442,7 +442,7 @@ public class SAPTemplateBean implements Serializable {
         HashMap<String, HashMap> sapexport = new HashMap<>();
         HashMap<String, List> saprfcfunctionparamMap = new HashMap<>();
         List<RfcFunctionParam> rfcfunctionparamlist = new ArrayList<>();
-        rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction));
+        rfcfunctionparamlist.addAll(rfc_get_function_interface.getRfcFunctionsParamList(rfcFunction, this.sapc));
         saprfcfunctionparamMap.put(rfcFunction, rfcfunctionparamlist);
         
         try {
