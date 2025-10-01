@@ -260,6 +260,8 @@ public class QuartzJob implements Job {
             UploadTemplateBean uploadBean = new UploadTemplateBean();
             PDFTemplateBean pdfBean = new PDFTemplateBean();
             pdfBean.initjob(pdfUtil);
+            JSONatorBean jsonatorbean = new JSONatorBean();
+            jsonatorbean.init(cftemplateService);
 
             // write the output
             Writer out = new StringWriter();
@@ -284,6 +286,7 @@ public class QuartzJob implements Job {
                     fmRoot.put("webserviceBean", webServiceBean);
                     fmRoot.put("websocketBean", webSocketBean);
                     fmRoot.put("uploadBean", uploadBean);
+                    fmRoot.put("jsonatorBean", jsonatorbean);
                     fmRoot.put("property", propertymap);
                     fmRoot.put("parameter", paramMap);
                     
@@ -326,6 +329,7 @@ public class QuartzJob implements Job {
                     velContext.put("websocketBean", webSocketBean);
                     velContext.put("uploadBean", uploadBean);
                     velContext.put("pdfBean", pdfBean);
+                    velContext.put("jsonatorBean", jsonatorbean);
                     velContext.put("contentBean", contentbean);
                     velContext.put("parameter", paramMap);
                     

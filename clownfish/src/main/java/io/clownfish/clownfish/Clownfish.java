@@ -206,6 +206,7 @@ public class Clownfish {
     UploadTemplateBean uploadbean;
     ImportTemplateBean importbean;
     PDFTemplateBean pdfbean;
+    JSONatorBean jsonatorbean;
     ExternalClassProvider externalclassproviderbean;
     CfClassCompiler cfclassCompiler;
     CfClassLoader cfclassLoader;
@@ -1481,7 +1482,8 @@ public class Clownfish {
                                     contentUtil.init(markdownUtil, name, urlParams);
                                     contentbean = new ContentTemplateBean(propertyUtil, contentUtil);
                                     contentbean.init(cfclasscontentService, cfattributcontentService, cflistService, cflistcontentService, cfclassService, cfassetlistService, cfassetlistcontentService, cfassetService, useHibernate);
-
+                                    jsonatorbean = new JSONatorBean();
+                                    jsonatorbean.init(cftemplateService);
                                     if (isScripted) {                                                                           // NORMAL Template
                                         switch (cftemplate.getScriptlanguage()) {
                                             case 0:                                             // FREEMARKER
@@ -1506,6 +1508,7 @@ public class Clownfish {
                                                     fmRoot.put("pdfBean", pdfbean);
                                                     fmRoot.put("classBean", externalclassproviderbean);
                                                     fmRoot.put("contentBean", contentbean);
+                                                    fmRoot.put("jsonatorBean", jsonatorbean);
 
                                                     fmRoot.put("parameter", parametermap);
                                                     if (!searchmetadata.isEmpty()) {
@@ -1622,6 +1625,7 @@ public class Clownfish {
                                                     velContext.put("pdfBean", pdfbean);
                                                     velContext.put("classBean", externalclassproviderbean);
                                                     velContext.put("contentBean", contentbean);
+                                                    velContext.put("jsonatorBean", jsonatorbean);
 
                                                     velContext.put("parameter", parametermap);
                                                     velContext.put("property", propertyUtil.getPropertymap());
