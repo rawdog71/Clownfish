@@ -42,6 +42,7 @@ public class MetaApi implements IMetaJson {
     private String contentfield;
     private String condition;
     private String listcondition;
+    private String nullval;
     private boolean output;
     private ArrayList<ICondition> conditions;
     
@@ -226,5 +227,10 @@ public class MetaApi implements IMetaJson {
     @Override
     public String getListcondition() {
         return listcondition;
+    }
+
+    @Override
+    public String getNullval() {
+        return nullval;
     }
 }

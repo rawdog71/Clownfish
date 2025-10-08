@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import static com.fasterxml.jackson.databind.node.JsonNodeType.OBJECT;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.clownfish.clownfish.jsonator.conditions.ConditionsWrapper;
 import io.clownfish.clownfish.jsonator.conditions.ICondition;
@@ -194,6 +195,9 @@ public class JsonMapper {
                                                         ObjectNode listentry = (ObjectNode)listNode.get(i);
                                                         if (null != listentry) {
                                                             listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
+                                                            if (listentry.get(mapping.getTag()).isMissingNode()) {
+                                                                listentry.put(mapping.getTag(), mapping.getNullval());
+                                                            }
                                                             listNode.set(i, listentry);
                                                         } else {
                                                             listentry = objectMapper.createObjectNode();
@@ -400,7 +404,11 @@ public class JsonMapper {
         } else {
             value = mapping.getValue(mapping.getContenttype(), jn, mapping.getContenttable()+mapping.getContentfield());
         }
-        return value;
+        if (null != value) {
+            return value;
+        } else {
+            return mapping.getNullval();
+        }
     }
     
     private String getStringValDB(IMetaJson mapping, Optional<IDatasource> result, ObjectNode mainNode) {
@@ -496,4 +504,12 @@ public class JsonMapper {
             return value;
         }        
     }
+
+    /*
+    private String nullcheck(JsonNode jn, IMetaJson mapping) {
+        if (null != jn.at(mapping.getContentfield()) {
+            return jn.at(mapping.getContentfield());
+        }
+    }
+*/
 }

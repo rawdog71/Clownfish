@@ -39,6 +39,7 @@ public interface IMetaJson {
     public String getContentfield();
     public Object getCondition();
     public String getListcondition();
+    public String getNullval();
     public boolean getOutput();
     public String getValue(String type, JsonNode jn, String xpath);
     public JsonNode getNode(JsonNode jn, String xpath);
