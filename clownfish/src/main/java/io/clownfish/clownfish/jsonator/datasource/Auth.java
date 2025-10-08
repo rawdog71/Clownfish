@@ -11,6 +11,7 @@ package io.clownfish.clownfish.jsonator.datasource;
 public class Auth {
     private String url;
     private String token;
+    private String type;
 
     public String getUrl() {
         return url;
@@ -27,6 +28,12 @@ public class Auth {
     public void setToken(String token) {
         this.token = token;
     }
-    
-    
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

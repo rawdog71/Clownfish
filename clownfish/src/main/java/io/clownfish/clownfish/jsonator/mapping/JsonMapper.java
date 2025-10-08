@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import static com.fasterxml.jackson.databind.node.JsonNodeType.OBJECT;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.clownfish.clownfish.jsonator.conditions.ConditionsWrapper;
 import io.clownfish.clownfish.jsonator.conditions.ICondition;
@@ -120,7 +121,7 @@ public class JsonMapper {
                                     case "string", "number", "boolean" -> {
                                         // Single Verarbeitung
                                         if (mapping.getParent().isEmpty()) {
-                                            String value = getStringValAPI(mapping, result, mainNode);
+                                            String value = getStringValAPI(mapping, result, mainNode, 0);
                                             //System.out.println("VALUE: " + value);
                                             mainNode.put(mapping.getTag(), value);
                                             if (mapping.getOutput()) {
@@ -133,16 +134,51 @@ public class JsonMapper {
                                             if (0 == parent.get().getContentvalue().compareToIgnoreCase("STRUCT")) {
                                                 // Parent als Struktur Verarbeitung
                                                 //System.out.println("PARENT: " + mapping.getParent());
-                                                JsonNode parentNode = mainNode.findPath(mapping.getParent());
-                                                ObjectNode objectNode = (ObjectNode) parentNode;
-                                                String value = getStringValAPI(mapping, result, mainNode);
-                                                objectNode.put(mapping.getTag(), value);
                                                 
-                                                if (mapping.getOutput()) {
-                                                    JsonNode parentoutNode = outputNode.findPath(mapping.getParent());
-                                                    ObjectNode objectoutNode = (ObjectNode) parentoutNode;
-                                                    String outvalue = getStringValAPI(mapping, result, mainNode);
-                                                    objectoutNode.put(mapping.getTag(), outvalue);
+                                                if (!parent.get().getParent().isEmpty()) {                                         
+                                                    JsonNode parentNodeUp = mainNode.findPath(parent.get().getParent());
+                                                    switch (parentNodeUp.getNodeType()) {
+                                                        case OBJECT -> {
+                                                            JsonNode parentNode = mainNode.findPath(mapping.getParent());
+                                                            ObjectNode objectNode = (ObjectNode) parentNode;
+                                                            String value = getStringValAPI(mapping, result, mainNode, 0);
+                                                            objectNode.put(mapping.getTag(), value);
+
+                                                            if (mapping.getOutput()) {
+                                                                JsonNode parentoutNode = outputNode.findPath(mapping.getParent());
+                                                                ObjectNode objectoutNode = (ObjectNode) parentoutNode;
+                                                                //String outvalue = getStringValAPI(mapping, result, mainNode, 0);
+                                                                objectoutNode.put(mapping.getTag(), value);
+                                                            }
+                                                        }
+                                                        case ARRAY -> {
+                                                            for (int i=0; i<parentNodeUp.size(); i++) {
+                                                                JsonNode parentNode = jsonarray.get(parent.get().getParent()).get(i);
+                                                                ObjectNode objectNode = (ObjectNode) parentNode.get(mapping.getParent());
+                                                                String value = getStringValAPI(mapping, result, mainNode, i);
+                                                                objectNode.put(mapping.getTag(), value);
+
+                                                                if (mapping.getOutput()) {
+                                                                    JsonNode parentoutNode = jsonarray.get(parent.get().getParent()).get(i);
+                                                                    ObjectNode objectoutNode = (ObjectNode) parentoutNode.get(mapping.getParent());
+                                                                    //String outvalue = getStringValAPI(mapping, result, mainNode, 0);
+                                                                    objectoutNode.put(mapping.getTag(), value);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                } else {
+                                                    JsonNode parentNode = mainNode.findPath(mapping.getParent());
+                                                    ObjectNode objectNode = (ObjectNode) parentNode;
+                                                    String value = getStringValAPI(mapping, result, mainNode, 0);
+                                                    objectNode.put(mapping.getTag(), value);
+
+                                                    if (mapping.getOutput()) {
+                                                        JsonNode parentoutNode = outputNode.findPath(mapping.getParent());
+                                                        ObjectNode objectoutNode = (ObjectNode) parentoutNode;
+                                                        //String outvalue = getStringValAPI(mapping, result, mainNode, 0);
+                                                        objectoutNode.put(mapping.getTag(), value);
+                                                    }
                                                 }
                                             } else {
                                                 ArrayNode listNode;
@@ -157,16 +193,16 @@ public class JsonMapper {
                                                     if (listNode.size()>0) {
                                                         ObjectNode listentry = (ObjectNode)listNode.get(i);
                                                         if (null != listentry) {
-                                                            listentry.put(mapping.getTag(), jn.get(mapping.getContentfield()));
+                                                            listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
                                                             listNode.set(i, listentry);
                                                         } else {
                                                             listentry = objectMapper.createObjectNode();
-                                                            listentry.put(mapping.getTag(), jn.get(mapping.getContentfield()));
+                                                            listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
                                                             listNode.add(listentry);
                                                         }
                                                     } else {
                                                         ObjectNode listentry = objectMapper.createObjectNode();
-                                                        listentry.put(mapping.getTag(), jn.get(mapping.getContentfield()));
+                                                        listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
                                                         listNode.add(listentry);
                                                     }
                                                     i++;
@@ -227,16 +263,16 @@ public class JsonMapper {
                                                     if (listNode.size()>0) {
                                                         ObjectNode listentry = (ObjectNode)listNode.get(i);
                                                         if (null != listentry) {
-                                                            listentry.put(mapping.getTag(), jn.get(mapping.getContentfield()));
+                                                            listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
                                                             listNode.set(i, listentry);
                                                         } else {
                                                             listentry = objectMapper.createObjectNode();
-                                                            listentry.put(mapping.getTag(), jn.get(mapping.getContentfield()));
+                                                            listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
                                                             listNode.add(listentry);
                                                         }
                                                     } else {
                                                         ObjectNode listentry = objectMapper.createObjectNode();
-                                                        listentry.put(mapping.getTag(), jn.get(mapping.getContentfield()));
+                                                        listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
                                                         listNode.add(listentry);
                                                     }
                                                     i++;
@@ -313,11 +349,29 @@ public class JsonMapper {
                                 }
                             } else {
                                 JsonNode parentNode = mainNode.findPath(mapping.getParent());
-                                ObjectNode objectNode = (ObjectNode) parentNode;
-                                objectNode.putObject(mapping.getTag());
-                                parentNode = outputNode.findPath(mapping.getParent());
-                                objectNode = (ObjectNode) parentNode;
-                                objectNode.putObject(mapping.getTag());
+                                switch (parentNode.getNodeType()) {
+                                    case OBJECT -> {
+                                        ObjectNode objectNode = (ObjectNode) parentNode;
+                                        objectNode.putObject(mapping.getTag());
+                                        /*
+                                        parentNode = outputNode.findPath(mapping.getParent());
+                                        objectNode = (ObjectNode) parentNode;
+                                        objectNode.putObject(mapping.getTag());
+                                        */
+                                    }
+                                    case ARRAY -> {
+                                        ArrayNode arrayNode = (ArrayNode) parentNode;
+                                        for (int i = 0; i<arrayNode.size(); i++) {
+                                            JsonNode jn = arrayNode.get(i);
+                                            ((ObjectNode)jn).putObject(mapping.getTag());
+                                        }                                   
+                                        /*
+                                        parentNode = outputNode.findPath(mapping.getParent());
+                                        arrayNode = (ArrayNode) parentNode;
+                                        arrayNode.add(mapping.getTag());
+                                        */
+                                    }
+                                }
                             }
                         }
                     }
@@ -334,17 +388,17 @@ public class JsonMapper {
         }
     }
     
-    private String getStringValAPI(IMetaJson mapping, Optional<IDatasource> result, ObjectNode mainNode) {
+    private String getStringValAPI(IMetaJson mapping, Optional<IDatasource> result, ObjectNode mainNode, int index) {
         String condition = Replacer.replaceVariables((String) mapping.getCondition(), mainNode);
         condition = Replacer.processSubstringPattern(condition);
         
         JsonNode jn = mapping.getJson(result.get().getConnection(), condition, "",  "", result.get().getMethod());
-        JsonNode checkNode = jn.at("/"+mapping.getContenttable());
+        JsonNode checkNode = jn.at(mapping.getContenttable());
         String value;
         if (checkNode.isArray()) {
-            value = mapping.getValue(mapping.getContenttype(), jn, "/"+mapping.getContenttable()+"/0/"+mapping.getContentfield());
+            value = mapping.getValue(mapping.getContenttype(), jn, mapping.getContenttable()+"/"+index+mapping.getContentfield());
         } else {
-            value = mapping.getValue(mapping.getContenttype(), jn, "/"+mapping.getContenttable()+"/"+mapping.getContentfield());
+            value = mapping.getValue(mapping.getContenttype(), jn, mapping.getContenttable()+mapping.getContentfield());
         }
         return value;
     }
@@ -399,10 +453,10 @@ public class JsonMapper {
                 listconditions = ListConditionParser.parseConditions(mapping.getListcondition());
             }
             if (!mapping.getContenttable().isEmpty()) {
-                JsonNode checkNode = jn.at("/"+mapping.getContenttable());
+                JsonNode checkNode = jn.at(mapping.getContenttable());
                 JsonNode value = null;
                 if (checkNode.isArray()) {
-                    value = mapping.getNode(jn, "/"+mapping.getContenttable());
+                    value = mapping.getNode(jn, mapping.getContenttable());
                 } else {
                     System.out.println("NODE: " + mapping.getContenttable() + " is not a list");
                 }
@@ -414,20 +468,25 @@ public class JsonMapper {
                 return jn;
             }
         } else {
-            BearerToken bt = new BearerToken();
-            AccessToken accesstoken = bt.getAccessToken(result.get().getAuth().getUrl());
+            AccessToken accesstoken = null;
+            switch (result.get().getAuth().getType()) {
+                case "Bearer" -> { 
+                    BearerToken bt = new BearerToken();
+                    accesstoken = bt.getAccessToken(result.get().getAuth().getUrl());
+                }
+            }
             List<ListCondition> listconditions = null;
             
             JsonNode jn = mapping.getJson(result.get().getConnection(), condition, "", accesstoken.getAccesstoken(), result.get().getMethod());
-            JsonNode checkNode = jn.at("/"+mapping.getContenttable());
+            JsonNode checkNode = jn.at(mapping.getContenttable());
             JsonNode value = null;
             if (!mapping.getListcondition().isEmpty()) {
-                System.out.println("LISTCONDTION:" + mapping.getListcondition());
+                //System.out.println("LISTCONDTION:" + mapping.getListcondition());
                 listconditions = ListConditionParser.parseConditions(mapping.getListcondition());
             }
             
             if (checkNode.isArray()) {
-                value = mapping.getNode(jn, "/"+mapping.getContenttable());
+                value = mapping.getNode(jn, mapping.getContenttable());
                 if (null != listconditions) {
                     value = ListConditionParser.filterNodes(value, listconditions);
                 }
