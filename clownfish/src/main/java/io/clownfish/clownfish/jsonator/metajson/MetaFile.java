@@ -27,6 +27,13 @@ public class MetaFile implements IMetaJson {
     private ArrayList<ICondition> conditions;
 
     @Override
+    public boolean init(boolean refresh) {
+        //if (refresh)
+            //static_refresh = true;
+        return false;
+    }
+    
+    @Override
     public String getTag() {
         return tag;
     }
@@ -72,7 +79,7 @@ public class MetaFile implements IMetaJson {
     }
 
     @Override
-    public JsonNode getJson(String url, String condition, String conditiontype, String authtoken, String method) {
+    public JsonNode getJson(String url, String condition, String conditiontype, String authtoken, String method, boolean refresh) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

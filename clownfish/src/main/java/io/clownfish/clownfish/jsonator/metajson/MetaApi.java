@@ -45,9 +45,17 @@ public class MetaApi implements IMetaJson {
     private String nullval;
     private boolean output;
     private ArrayList<ICondition> conditions;
+    private static boolean static_refresh = true;
     
     private static HashMap<String, JsonNode> jsonmap = new HashMap<>();
 
+    @Override
+    public boolean init(boolean refresh) {
+        if (refresh)
+            static_refresh = true;
+        return false;
+    }
+    
     @Override
     public String getTag() {
         return tag;
@@ -104,11 +112,15 @@ public class MetaApi implements IMetaJson {
     }
     
     @Override
-    public JsonNode getJson(String url, String condition, String conditiontype, String authtoken, String method) {
+    public JsonNode getJson(String url, String condition, String conditiontype, String authtoken, String method, boolean refresh) {
+        if (static_refresh) {
+            static_refresh = refresh;
+        }
         if (0 == method.compareToIgnoreCase("GET")) {
-            if (jsonmap.containsKey(url+"_"+condition)) {
+            if (jsonmap.containsKey(url+"_"+condition) && !static_refresh) {
                 return jsonmap.get(url+"_"+condition);
             } else {
+                static_refresh = false;
                 String finalQuery = "";
                 String[] params = condition.split("&");
                 String encodedValue;
@@ -124,27 +136,16 @@ public class MetaApi implements IMetaJson {
                 HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(fullUrl))
                     .build();
-
                 try {
                     HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
                     if (response.statusCode() == 200) {
                         String jsonBody = response.body();
-
                         // Jackson ObjectMapper erstellen
                         ObjectMapper mapper = new ObjectMapper();
-
                         // Den JSON-String als JsonNode parsen
                         JsonNode rootNode = mapper.readTree(jsonBody);
-
-                        // Nun kannst du auf die Daten zugreifen, ohne die Struktur zu kennen
-                        //System.out.println("JSON-Struktur erfolgreich als Baummodell geparst.");
-
-                        //String jsonOutput = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
-                        //System.out.println(jsonOutput);
-
                         jsonmap.put(url+"_"+condition, rootNode);
-
                         return rootNode;
                     } else {
                         System.out.println("Fehler beim Aufruf des Webservices. Statuscode: " + response.statusCode());
@@ -168,32 +169,17 @@ public class MetaApi implements IMetaJson {
                         .header("Authorization", "Bearer " + authtoken)
                         .POST(HttpRequest.BodyPublishers.ofString(condition))
                         .build();
-
                 try {
                     // Anfrage senden und Antwort erhalten
                     HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-                    // Statuscode und Body der Antwort ausgeben
-                    //System.out.println("Status Code: " + response.statusCode());
-                    //System.out.println("Response Body: " + response.body());
-
                     if (response.statusCode() == 200) {
                             String jsonBody = response.body();
-
                             // Jackson ObjectMapper erstellen
                             ObjectMapper mapper = new ObjectMapper();
-
                             // Den JSON-String als JsonNode parsen
                             JsonNode rootNode = mapper.readTree(jsonBody);
-
-                            // Nun kannst du auf die Daten zugreifen, ohne die Struktur zu kennen
-                            //System.out.println("JSON-Struktur erfolgreich als Baummodell geparst.");
-
-                            //String jsonOutput = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
-                            //System.out.println(jsonOutput);
-
                             jsonmap.put(url+"_"+condition, rootNode);
-
                             return rootNode;
                         } else {
                             System.out.println("Fehler beim Aufruf des Webservices. Statuscode: " + response.statusCode());

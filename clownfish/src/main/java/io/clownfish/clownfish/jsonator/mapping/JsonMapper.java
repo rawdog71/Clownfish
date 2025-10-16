@@ -43,8 +43,10 @@ public class JsonMapper {
         this.paramnode = rootNode;
     }
     
+    private static boolean static_refresh;
     
-    public String map(String mappingcontent) {
+    public String map(String mappingcontent, boolean refresh) {
+        static_refresh = refresh;
         ObjectMapper outputMapper = new ObjectMapper();
         // Ein Haupt-Objekt erstellen
         ObjectNode mainNode = outputMapper.createObjectNode();
@@ -89,6 +91,7 @@ public class JsonMapper {
             // Iteriere durch die Liste und zeige die Klassentypen an
             for (IMetaJson mapping : mappings) {
                 mapping.setConditions(conditions);
+                static_refresh = mapping.init(static_refresh);
                 /*
                 System.out.println("TAG: " + mapping.getTag());
                 System.out.println("Parent: " + mapping.getParent());
@@ -116,13 +119,13 @@ public class JsonMapper {
                                 switch (mapping.getContenttype()) {
                                     case "list" -> {
                                         // Listen Verarbeitung
-                                        JsonNode value = getJsonNodeVal(mapping, result, mainNode);
+                                        JsonNode value = getJsonNodeVal(mapping, result, mainNode, refresh);
                                         jsonlists.put(mapping.getTag(), value);
                                     }
                                     case "string", "number", "boolean" -> {
                                         // Single Verarbeitung
                                         if (mapping.getParent().isEmpty()) {
-                                            String value = getStringValAPI(mapping, result, mainNode, 0);
+                                            String value = getStringValAPI(mapping, result, mainNode, 0, refresh);
                                             //System.out.println("VALUE: " + value);
                                             mainNode.put(mapping.getTag(), value);
                                             if (mapping.getOutput()) {
@@ -142,7 +145,7 @@ public class JsonMapper {
                                                         case OBJECT -> {
                                                             JsonNode parentNode = mainNode.findPath(mapping.getParent());
                                                             ObjectNode objectNode = (ObjectNode) parentNode;
-                                                            String value = getStringValAPI(mapping, result, mainNode, 0);
+                                                            String value = getStringValAPI(mapping, result, mainNode, 0, refresh);
                                                             objectNode.put(mapping.getTag(), value);
 
                                                             if (mapping.getOutput()) {
@@ -156,7 +159,7 @@ public class JsonMapper {
                                                             for (int i=0; i<parentNodeUp.size(); i++) {
                                                                 JsonNode parentNode = jsonarray.get(parent.get().getParent()).get(i);
                                                                 ObjectNode objectNode = (ObjectNode) parentNode.get(mapping.getParent());
-                                                                String value = getStringValAPI(mapping, result, mainNode, i);
+                                                                String value = getStringValAPI(mapping, result, mainNode, i, refresh);
                                                                 objectNode.put(mapping.getTag(), value);
 
                                                                 if (mapping.getOutput()) {
@@ -171,7 +174,7 @@ public class JsonMapper {
                                                 } else {
                                                     JsonNode parentNode = mainNode.findPath(mapping.getParent());
                                                     ObjectNode objectNode = (ObjectNode) parentNode;
-                                                    String value = getStringValAPI(mapping, result, mainNode, 0);
+                                                    String value = getStringValAPI(mapping, result, mainNode, 0, refresh);
                                                     objectNode.put(mapping.getTag(), value);
 
                                                     if (mapping.getOutput()) {
@@ -224,13 +227,13 @@ public class JsonMapper {
                                 switch (mapping.getContenttype()) {
                                     case "list" -> {
                                         // Listen Verarbeitung
-                                        JsonNode value = getJsonNodeVal(mapping, result, mainNode);
+                                        JsonNode value = getJsonNodeVal(mapping, result, mainNode, refresh);
                                         jsonlists.put(mapping.getTag(), value);
                                     }
                                     case "string", "number", "boolean" -> {
                                         // Single Verarbeitung
                                         if (mapping.getParent().isEmpty()) {
-                                            String value = getStringValDB(mapping, result, mainNode);
+                                            String value = getStringValDB(mapping, result, mainNode, refresh);
                                             //System.out.println("VALUE: " + value);
                                             mainNode.put(mapping.getTag(), value);
                                             if (mapping.getOutput()) {
@@ -245,13 +248,13 @@ public class JsonMapper {
                                                 //System.out.println("PARENT: " + mapping.getParent());
                                                 JsonNode parentNode = mainNode.findPath(mapping.getParent());
                                                 ObjectNode objectNode = (ObjectNode) parentNode;
-                                                String value = getStringValDB(mapping, result, mainNode);
+                                                String value = getStringValDB(mapping, result, mainNode, refresh);
                                                 objectNode.put(mapping.getTag(), value);
                                                 
                                                 if (mapping.getOutput()) {
                                                     JsonNode parentoutNode = outputNode.findPath(mapping.getParent());
                                                     ObjectNode objectoutNode = (ObjectNode) parentoutNode;
-                                                    String outvalue = getStringValDB(mapping, result, mainNode);
+                                                    String outvalue = getStringValDB(mapping, result, mainNode, refresh);
                                                     objectoutNode.put(mapping.getTag(), outvalue);
                                                 }
                                             } else {
@@ -392,11 +395,11 @@ public class JsonMapper {
         }
     }
     
-    private String getStringValAPI(IMetaJson mapping, Optional<IDatasource> result, ObjectNode mainNode, int index) {
+    private String getStringValAPI(IMetaJson mapping, Optional<IDatasource> result, ObjectNode mainNode, int index, boolean refresh) {
         String condition = Replacer.replaceVariables((String) mapping.getCondition(), mainNode);
         condition = Replacer.processSubstringPattern(condition);
         
-        JsonNode jn = mapping.getJson(result.get().getConnection(), condition, "",  "", result.get().getMethod());
+        JsonNode jn = mapping.getJson(result.get().getConnection(), condition, "",  "", result.get().getMethod(), refresh);
         JsonNode checkNode = jn.at(mapping.getContenttable());
         String value;
         if (checkNode.isArray()) {
@@ -411,11 +414,11 @@ public class JsonMapper {
         }
     }
     
-    private String getStringValDB(IMetaJson mapping, Optional<IDatasource> result, ObjectNode mainNode) {
+    private String getStringValDB(IMetaJson mapping, Optional<IDatasource> result, ObjectNode mainNode, boolean refresh) {
         String condition = Replacer.replaceVariables((String) mapping.getCondition(), mainNode);
         condition = Replacer.processSubstringPattern(condition);
         
-        JsonNode jn = mapping.getJson(result.get().getConnection(), condition, "", result.get().getUser(), result.get().getPassword());
+        JsonNode jn = mapping.getJson(result.get().getConnection(), condition, "", result.get().getUser(), result.get().getPassword(), refresh);
         
         ObjectMapper mapper = new ObjectMapper();
         
@@ -442,7 +445,7 @@ public class JsonMapper {
         
     }
     
-    private JsonNode getJsonNodeVal(IMetaJson mapping, Optional<IDatasource> result, ObjectNode mainNode) {
+    private JsonNode getJsonNodeVal(IMetaJson mapping, Optional<IDatasource> result, ObjectNode mainNode, boolean refresh) {
         String condition = Replacer.replaceVariables((String) mapping.getCondition(), mainNode);
         condition = Replacer.processSubstringPattern(condition);
         if (result.get().getAuth().getUrl().isEmpty()) {
@@ -450,10 +453,10 @@ public class JsonMapper {
             List<ListCondition> listconditions = null;
             switch (mapping.getContentvalue()) {
                 case "API" -> {
-                    jn = mapping.getJson(result.get().getConnection(), condition, "", "", result.get().getMethod());
+                    jn = mapping.getJson(result.get().getConnection(), condition, "", "", result.get().getMethod(), refresh);
                 }
                 case "DB" -> {
-                    jn = mapping.getJson(result.get().getConnection(), condition, "", result.get().getUser(), result.get().getPassword());
+                    jn = mapping.getJson(result.get().getConnection(), condition, "", result.get().getUser(), result.get().getPassword(), refresh);
                 }
             }
             if (!mapping.getListcondition().isEmpty()) {
@@ -485,7 +488,7 @@ public class JsonMapper {
             }
             List<ListCondition> listconditions = null;
             
-            JsonNode jn = mapping.getJson(result.get().getConnection(), condition, "", accesstoken.getAccesstoken(), result.get().getMethod());
+            JsonNode jn = mapping.getJson(result.get().getConnection(), condition, "", accesstoken.getAccesstoken(), result.get().getMethod(), refresh);
             JsonNode checkNode = jn.at(mapping.getContenttable());
             JsonNode value = null;
             if (!mapping.getListcondition().isEmpty()) {

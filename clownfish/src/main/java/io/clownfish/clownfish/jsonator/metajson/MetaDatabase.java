@@ -39,6 +39,13 @@ public class MetaDatabase implements IMetaJson {
     private static HashMap<String, JsonNode> jsonmap = new HashMap<>();
 
     @Override
+    public boolean init(boolean refresh) {
+        //if (refresh)
+            //static_refresh = true;
+        return false;
+    }
+    
+    @Override
     public String getTag() {
         return tag;
     }
@@ -88,8 +95,8 @@ public class MetaDatabase implements IMetaJson {
     }
 
     @Override
-    public JsonNode getJson(String url, String condition, String conditiontype, String authtoken, String method) {
-        if (jsonmap.containsKey(url+"_"+condition)) {
+    public JsonNode getJson(String url, String condition, String conditiontype, String authtoken, String method, boolean refresh) {
+        if (jsonmap.containsKey(url+"_"+condition) && !refresh) {
             return jsonmap.get(url+"_"+condition);
         } else {
             String user = authtoken;

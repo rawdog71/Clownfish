@@ -40,7 +40,7 @@ public class JSONatorBean {
         this.cftemplateService = cftemplateService;
     }
     
-    public String mapJSON(String templateName, Map parametermap) throws IOException
+    public String mapJSON(String templateName, Map parametermap, boolean refresh) throws IOException
     {
         List<JsonSAPFormParameter> postmap = ClownfishUtil.getJsonSAPFormParameterList(parametermap);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -49,6 +49,6 @@ public class JSONatorBean {
             on.put(param.getName(), (String) param.getValue());
         }
         JsonMapper jsonmapper = new JsonMapper(on);
-        return jsonmapper.map(cftemplateService.findByName(templateName).getContent());
+        return jsonmapper.map(cftemplateService.findByName(templateName).getContent(), refresh);
     }
 }

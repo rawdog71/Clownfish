@@ -30,6 +30,7 @@ import java.util.ArrayList;
     @JsonSubTypes.Type(value = MetaFile.class, name = "FILE")
 })
 public interface IMetaJson {
+    public boolean init(boolean refresh);
     public String getTag();
     public String getParent();
     public String getContenttype();
@@ -43,6 +44,6 @@ public interface IMetaJson {
     public boolean getOutput();
     public String getValue(String type, JsonNode jn, String xpath);
     public JsonNode getNode(JsonNode jn, String xpath);
-    public JsonNode getJson(String url, String condition, String conditiontype, String authtoken, String method); 
+    public JsonNode getJson(String url, String condition, String conditiontype, String authtoken, String method, boolean refresh); 
     public void setConditions(ArrayList<ICondition> conditions);
 }
