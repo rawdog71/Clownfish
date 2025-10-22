@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import static com.fasterxml.jackson.databind.node.JsonNodeType.OBJECT;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import io.clownfish.clownfish.jsonator.conditions.ConditionsWrapper;
 import io.clownfish.clownfish.jsonator.conditions.ICondition;
 import io.clownfish.clownfish.jsonator.datasource.DatasourceWrapper;
@@ -122,7 +123,7 @@ public class JsonMapper {
                                         JsonNode value = getJsonNodeVal(mapping, result, mainNode, refresh);
                                         jsonlists.put(mapping.getTag(), value);
                                     }
-                                    case "string", "number", "boolean" -> {
+                                    case "string", "number", "boolean", "json", "string/json" -> {
                                         // Single Verarbeitung
                                         if (mapping.getParent().isEmpty()) {
                                             String value = getStringValAPI(mapping, result, mainNode, 0, refresh);
@@ -197,9 +198,36 @@ public class JsonMapper {
                                                     if (listNode.size()>0) {
                                                         ObjectNode listentry = (ObjectNode)listNode.get(i);
                                                         if (null != listentry) {
-                                                            listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
-                                                            if (listentry.get(mapping.getTag()).isMissingNode()) {
-                                                                listentry.put(mapping.getTag(), mapping.getNullval());
+                                                            if (0==mapping.getContenttype().compareToIgnoreCase("string/json")) {
+                                                                String format = jn.at(mapping.getListcondition()).asText();
+                                                                switch (format) {
+                                                                    case "string" -> {
+                                                                        listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
+                                                                        if (listentry.get(mapping.getTag()).isMissingNode()) {
+                                                                            listentry.put(mapping.getTag(), mapping.getNullval());
+                                                                        }
+                                                                    }
+                                                                    case "json" -> {
+                                                                        ObjectMapper mapper = new ObjectMapper();
+                                                                        // Schritt 1: Erstelle einen TextNode (simuliert deinen Ausgangszustand)
+                                                                        TextNode inputTextNode = TextNode.valueOf(jn.at(mapping.getContentfield()).asText());
+                                                                        // --- Konvertierung ---
+                                                                        // Schritt 2: Extrahiere den reinen String-Wert aus dem TextNode
+                                                                        String extractedString = inputTextNode.asText();
+                                                                        // Schritt 3: Parse den extrahierten String mit dem ObjectMapper in einen neuen JsonNode
+                                                                        JsonNode resultNode = mapper.readTree(extractedString);                                                                    
+                                                                        
+                                                                        listentry.put(mapping.getTag(), resultNode);
+                                                                        if (listentry.get(mapping.getTag()).isMissingNode()) {
+                                                                            listentry.put(mapping.getTag(), mapping.getNullval());
+                                                                        }
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
+                                                                if (listentry.get(mapping.getTag()).isMissingNode()) {
+                                                                    listentry.put(mapping.getTag(), mapping.getNullval());
+                                                                }
                                                             }
                                                             listNode.set(i, listentry);
                                                         } else {
