@@ -80,7 +80,7 @@ public class HibernateUtil implements Runnable {
     private @Getter @Setter int hibernateInit = 0;
     @Autowired private PropertyUtil propertyUtil;
     public @Getter @Setter ContentUtil contentUtil;
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     
     public void init(HibernateInit hibernateInit) {

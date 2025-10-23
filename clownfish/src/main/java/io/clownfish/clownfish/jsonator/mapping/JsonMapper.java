@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import static com.fasterxml.jackson.databind.node.JsonNodeType.OBJECT;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import io.clownfish.clownfish.jsonator.conditions.ConditionsWrapper;
@@ -32,6 +31,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -202,7 +203,8 @@ public class JsonMapper {
                                                                 String format = jn.at(mapping.getListcondition()).asText();
                                                                 switch (format) {
                                                                     case "string" -> {
-                                                                        listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
+                                                                        putVal(listentry, jn, mapping);
+                                                                        //listentry.put(mapping.getTag(), getVal(jn, mapping));
                                                                         if (listentry.get(mapping.getTag()).isMissingNode()) {
                                                                             listentry.put(mapping.getTag(), mapping.getNullval());
                                                                         }
@@ -224,7 +226,8 @@ public class JsonMapper {
                                                                     }
                                                                 }
                                                             } else {
-                                                                listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
+                                                                putVal(listentry, jn, mapping);
+                                                                //listentry.put(mapping.getTag(), getVal(jn, mapping));
                                                                 if (listentry.get(mapping.getTag()).isMissingNode()) {
                                                                     listentry.put(mapping.getTag(), mapping.getNullval());
                                                                 }
@@ -232,12 +235,14 @@ public class JsonMapper {
                                                             listNode.set(i, listentry);
                                                         } else {
                                                             listentry = objectMapper.createObjectNode();
-                                                            listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
+                                                            putVal(listentry, jn, mapping);
+                                                            //listentry.put(mapping.getTag(), getVal(jn, mapping));
                                                             listNode.add(listentry);
                                                         }
                                                     } else {
                                                         ObjectNode listentry = objectMapper.createObjectNode();
-                                                        listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
+                                                        putVal(listentry, jn, mapping);
+                                                        //listentry.put(mapping.getTag(), getVal(jn, mapping));
                                                         listNode.add(listentry);
                                                     }
                                                     i++;
@@ -298,16 +303,19 @@ public class JsonMapper {
                                                     if (listNode.size()>0) {
                                                         ObjectNode listentry = (ObjectNode)listNode.get(i);
                                                         if (null != listentry) {
-                                                            listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
+                                                            //listentry.put(mapping.getTag(), getVal(jn, mapping));
+                                                            putVal(listentry, jn, mapping);
                                                             listNode.set(i, listentry);
                                                         } else {
                                                             listentry = objectMapper.createObjectNode();
-                                                            listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
+                                                            //listentry.put(mapping.getTag(), getVal(jn, mapping));
+                                                            putVal(listentry, jn, mapping);
                                                             listNode.add(listentry);
                                                         }
                                                     } else {
                                                         ObjectNode listentry = objectMapper.createObjectNode();
-                                                        listentry.put(mapping.getTag(), jn.at(mapping.getContentfield()));
+                                                        //listentry.put(mapping.getTag(), getVal(jn, mapping));
+                                                        putVal(listentry, jn, mapping);
                                                         listNode.add(listentry);
                                                     }
                                                     i++;
@@ -536,6 +544,69 @@ public class JsonMapper {
         }        
     }
 
+    private void putVal(ObjectNode listentry, JsonNode jn, IMetaJson mapping) {
+        if (mapping.getContentfield().startsWith("#")) {
+           Pattern pattern = Pattern.compile("\\#CONCAT\\{(.*?)\\}");
+           Matcher matcher = pattern.matcher(mapping.getContentfield());
+           
+           if (matcher.find()) {
+                // Der gesamte Inhalt zwischen den Klammern (z.B. "#,/test/name")
+                String content = matcher.group(1);
+
+                // 2. Zerlege den Inhalt anhand des Kommas (,)
+                // Die Methode split() gibt ein Array von Strings zurück
+                String[] parts = content.split(",");
+
+                // StringBuilder ist effizienter zum Zusammenfügen von Strings
+                StringBuilder resultBuilder = new StringBuilder();
+
+                // 3. Füge die Teile zusammen und ignoriere leere Strings (vom führenden Komma)
+                for (String part : parts) {
+                    String trimmedPart = part.trim();
+                    if (!trimmedPart.isEmpty()) {
+                        if (trimmedPart.startsWith("/")) {
+                            resultBuilder.append(jn.at(trimmedPart).asText());
+                        } else {
+                            resultBuilder.append(trimmedPart);
+                        }
+                    }
+                }
+                if (resultBuilder.length()>1) {
+                    //return resultBuilder.toString();
+                    listentry.put(mapping.getTag(), resultBuilder.toString());
+                } else {
+                    listentry.put(mapping.getTag(), "");
+                    //return "";
+                }
+            } else {
+                // Gib den ursprünglichen String zurück oder eine Fehlermeldung, 
+                // wenn das Muster nicht gefunden wurde
+                listentry.put(mapping.getTag(), mapping.getContentfield());
+                //return mapping.getContentfield();
+            }
+        } else {
+            String retval = jn.at(mapping.getContentfield()).asText();
+            switch (mapping.getContenttype()) {
+                case "string" -> {
+                    listentry.put(mapping.getTag(), (String) retval);
+                    //return (String) retval;
+                }
+                case "boolean" -> {
+                    listentry.put(mapping.getTag(), Boolean.valueOf(retval));
+                    //return Boolean.valueOf(retval);
+                }
+                case "number" -> {
+                    listentry.put(mapping.getTag(), Integer.valueOf(retval));
+                    //return Integer.valueOf(retval);
+                }
+                default -> {
+                    listentry.put(mapping.getTag(), (String) retval);
+                    //return (String) retval;
+                }
+            }
+        }
+    }
+    
     /*
     private String nullcheck(JsonNode jn, IMetaJson mapping) {
         if (null != jn.at(mapping.getContentfield()) {
