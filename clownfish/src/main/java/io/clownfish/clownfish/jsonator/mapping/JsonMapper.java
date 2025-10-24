@@ -195,57 +195,59 @@ public class JsonMapper {
                                                     jsonarray.put(mapping.getParent(), listNode);
                                                 }
                                                 int i = 0;
-                                                for (JsonNode jn : jsonlists.get(mapping.getParent())) {
-                                                    if (listNode.size()>0) {
-                                                        ObjectNode listentry = (ObjectNode)listNode.get(i);
-                                                        if (null != listentry) {
-                                                            if (0==mapping.getContenttype().compareToIgnoreCase("string/json")) {
-                                                                String format = jn.at(mapping.getListcondition()).asText();
-                                                                switch (format) {
-                                                                    case "string" -> {
-                                                                        putVal(listentry, jn, mapping);
-                                                                        //listentry.put(mapping.getTag(), getVal(jn, mapping));
-                                                                        if (listentry.get(mapping.getTag()).isMissingNode()) {
-                                                                            listentry.put(mapping.getTag(), mapping.getNullval());
+                                                if (null != jsonlists.get(mapping.getParent())) {
+                                                    for (JsonNode jn : jsonlists.get(mapping.getParent())) {
+                                                        if (listNode.size()>0) {
+                                                            ObjectNode listentry = (ObjectNode)listNode.get(i);
+                                                            if (null != listentry) {
+                                                                if (0==mapping.getContenttype().compareToIgnoreCase("string/json")) {
+                                                                    String format = jn.at(mapping.getListcondition()).asText();
+                                                                    switch (format) {
+                                                                        case "string" -> {
+                                                                            putVal(listentry, jn, mapping);
+                                                                            //listentry.put(mapping.getTag(), getVal(jn, mapping));
+                                                                            if (listentry.get(mapping.getTag()).isMissingNode()) {
+                                                                                listentry.put(mapping.getTag(), mapping.getNullval());
+                                                                            }
+                                                                        }
+                                                                        case "json" -> {
+                                                                            ObjectMapper mapper = new ObjectMapper();
+                                                                            // Schritt 1: Erstelle einen TextNode (simuliert deinen Ausgangszustand)
+                                                                            TextNode inputTextNode = TextNode.valueOf(jn.at(mapping.getContentfield()).asText());
+                                                                            // --- Konvertierung ---
+                                                                            // Schritt 2: Extrahiere den reinen String-Wert aus dem TextNode
+                                                                            String extractedString = inputTextNode.asText();
+                                                                            // Schritt 3: Parse den extrahierten String mit dem ObjectMapper in einen neuen JsonNode
+                                                                            JsonNode resultNode = mapper.readTree(extractedString);                                                                    
+
+                                                                            listentry.put(mapping.getTag(), resultNode);
+                                                                            if (listentry.get(mapping.getTag()).isMissingNode()) {
+                                                                                listentry.put(mapping.getTag(), mapping.getNullval());
+                                                                            }
                                                                         }
                                                                     }
-                                                                    case "json" -> {
-                                                                        ObjectMapper mapper = new ObjectMapper();
-                                                                        // Schritt 1: Erstelle einen TextNode (simuliert deinen Ausgangszustand)
-                                                                        TextNode inputTextNode = TextNode.valueOf(jn.at(mapping.getContentfield()).asText());
-                                                                        // --- Konvertierung ---
-                                                                        // Schritt 2: Extrahiere den reinen String-Wert aus dem TextNode
-                                                                        String extractedString = inputTextNode.asText();
-                                                                        // Schritt 3: Parse den extrahierten String mit dem ObjectMapper in einen neuen JsonNode
-                                                                        JsonNode resultNode = mapper.readTree(extractedString);                                                                    
-                                                                        
-                                                                        listentry.put(mapping.getTag(), resultNode);
-                                                                        if (listentry.get(mapping.getTag()).isMissingNode()) {
-                                                                            listentry.put(mapping.getTag(), mapping.getNullval());
-                                                                        }
+                                                                } else {
+                                                                    putVal(listentry, jn, mapping);
+                                                                    //listentry.put(mapping.getTag(), getVal(jn, mapping));
+                                                                    if (listentry.get(mapping.getTag()).isMissingNode()) {
+                                                                        listentry.put(mapping.getTag(), mapping.getNullval());
                                                                     }
                                                                 }
+                                                                listNode.set(i, listentry);
                                                             } else {
+                                                                listentry = objectMapper.createObjectNode();
                                                                 putVal(listentry, jn, mapping);
                                                                 //listentry.put(mapping.getTag(), getVal(jn, mapping));
-                                                                if (listentry.get(mapping.getTag()).isMissingNode()) {
-                                                                    listentry.put(mapping.getTag(), mapping.getNullval());
-                                                                }
+                                                                listNode.add(listentry);
                                                             }
-                                                            listNode.set(i, listentry);
                                                         } else {
-                                                            listentry = objectMapper.createObjectNode();
+                                                            ObjectNode listentry = objectMapper.createObjectNode();
                                                             putVal(listentry, jn, mapping);
                                                             //listentry.put(mapping.getTag(), getVal(jn, mapping));
                                                             listNode.add(listentry);
                                                         }
-                                                    } else {
-                                                        ObjectNode listentry = objectMapper.createObjectNode();
-                                                        putVal(listentry, jn, mapping);
-                                                        //listentry.put(mapping.getTag(), getVal(jn, mapping));
-                                                        listNode.add(listentry);
+                                                        i++;
                                                     }
-                                                    i++;
                                                 }
                                                 mainNode.set(mapping.getParent(), listNode);
                                                 if (mapping.getOutput()) {
@@ -436,15 +438,19 @@ public class JsonMapper {
         condition = Replacer.processSubstringPattern(condition);
         
         JsonNode jn = mapping.getJson(result.get().getConnection(), condition, "",  "", result.get().getMethod(), refresh);
-        JsonNode checkNode = jn.at(mapping.getContenttable());
-        String value;
-        if (checkNode.isArray()) {
-            value = mapping.getValue(mapping.getContenttype(), jn, mapping.getContenttable()+"/"+index+mapping.getContentfield());
-        } else {
-            value = mapping.getValue(mapping.getContenttype(), jn, mapping.getContenttable()+mapping.getContentfield());
-        }
-        if (null != value) {
-            return value;
+        if (null != jn) {
+            JsonNode checkNode = jn.at(mapping.getContenttable());
+            String value;
+            if (checkNode.isArray()) {
+                value = mapping.getValue(mapping.getContenttype(), jn, mapping.getContenttable()+"/"+index+mapping.getContentfield());
+            } else {
+                value = mapping.getValue(mapping.getContenttype(), jn, mapping.getContenttable()+mapping.getContentfield());
+            }
+            if (null != value) {
+                return value;
+            } else {
+                return mapping.getNullval();
+            }
         } else {
             return mapping.getNullval();
         }
@@ -500,17 +506,21 @@ public class JsonMapper {
                 listconditions = ListConditionParser.parseConditions(mapping.getListcondition());
             }
             if (!mapping.getContenttable().isEmpty()) {
-                JsonNode checkNode = jn.at(mapping.getContenttable());
-                JsonNode value = null;
-                if (checkNode.isArray()) {
-                    value = mapping.getNode(jn, mapping.getContenttable());
+                if (null != jn) {
+                    JsonNode checkNode = jn.at(mapping.getContenttable());
+                    JsonNode value = null;
+                    if (checkNode.isArray()) {
+                        value = mapping.getNode(jn, mapping.getContenttable());
+                    } else {
+                        System.out.println("NODE: " + mapping.getContenttable() + " is not a list");
+                    }
+                    if (null != listconditions) {
+                        value = ListConditionParser.filterNodes(value, listconditions);
+                    }
+                    return value;
                 } else {
-                    System.out.println("NODE: " + mapping.getContenttable() + " is not a list");
+                    return null;
                 }
-                if (null != listconditions) {
-                    value = ListConditionParser.filterNodes(value, listconditions);
-                }
-                return value;
             } else {
                 return jn;
             }

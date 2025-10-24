@@ -126,7 +126,11 @@ public class MetaApi implements IMetaJson {
                 String encodedValue;
                 for (String param : params) {
                     String[] values = param.split("=");
-                    encodedValue = values[0] + "=" + URLEncoder.encode(values[1], StandardCharsets.UTF_8);
+                    if (values.length>1) {
+                        encodedValue = values[0] + "=" + URLEncoder.encode(values[1], StandardCharsets.UTF_8);
+                    } else {
+                        encodedValue = values[0] + "=" + "";
+                    }
                     String correctedValue = encodedValue.replace("+", "%20");
                     finalQuery += correctedValue + "&";
                 }
