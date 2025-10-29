@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.clownfish</groupId>
     <artifactId>clownfish</artifactId>
-    <version>0.8.9-SNAPSHOT</version>
+    <version>0.8.10-SNAPSHOT</version>
     <packaging>war</packaging>
     <scm>
         <connection>scm:git:https://github.com/rawdog71/Clownfish</connection>
@@ -83,7 +83,7 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <scope>compile</scope>
-            <version>9.0.108</version>
+            <version>9.0.110</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -96,19 +96,21 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>9.0.108</version>
+            <version>9.0.110</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
+            <version>1.2</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.el</artifactId>
+            <version>4.0.2</version>
             <scope>compile</scope>
         </dependency>
         
@@ -155,7 +157,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>font-awesome</artifactId>
-            <version>6.7.2</version>
+            <version>7.0.1</version>
         </dependency>
         <!--
         <dependency>
@@ -195,6 +197,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
+            <version>5.4.3.Final</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -208,6 +211,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-c3p0</artifactId>
+            <version>5.4.3.Final</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -319,7 +323,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.36</version>
+            <version>1.18.42</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
