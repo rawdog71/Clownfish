@@ -258,6 +258,7 @@ public class QuartzJob implements Job {
             WebSocketTemplateBean webSocketBean = new WebSocketTemplateBean();
             webSocketBean.setWebsocketPort(websocketPort);
             UploadTemplateBean uploadBean = new UploadTemplateBean();
+            uploadBean.init(cftemplateService, propertyUtil, cfdatasourceService);
             PDFTemplateBean pdfBean = new PDFTemplateBean();
             pdfBean.initjob(pdfUtil);
             JSONatorBean jsonatorbean = new JSONatorBean();

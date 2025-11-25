@@ -1447,6 +1447,7 @@ public class Clownfish {
                                     websocketbean = new WebSocketTemplateBean();
                                     websocketbean.setWebsocketPort(websocketPort);
                                     uploadbean = new UploadTemplateBean();
+                                    uploadbean.init(cftemplateService, propertyUtil, cfdatasourceService);
                                     if (null != fileitems) {
                                         uploadbean.setFileitemlist(fileitems);
                                     }

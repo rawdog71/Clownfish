@@ -15,6 +15,10 @@
  */
 package io.clownfish.clownfish.templatebeans;
 
+import io.clownfish.clownfish.serviceinterface.CfDatasourceService;
+import io.clownfish.clownfish.serviceinterface.CfTemplateService;
+import io.clownfish.clownfish.utils.PropertyUtil;
+import io.clownfish.clownfish.utils.UploadUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -37,6 +41,15 @@ public class UploadTemplateBean implements Serializable {
     private @Getter @Setter String uploadpath;
     private @Getter @Setter List<FileItem> fileitemlist;
     private @Getter @Setter Map<String, Boolean> fileitemmap;
+    private PropertyUtil propertyUtil;
+    UploadUtil uploadutil;
+    private CfTemplateService cftemplateService;
+    
+    public void init(CfTemplateService cftemplateService, PropertyUtil propertyUtil, CfDatasourceService cfdatasourceService) {
+        this.cftemplateService = cftemplateService;
+        this.propertyUtil = propertyUtil;
+        uploadutil = new UploadUtil(cfdatasourceService);
+    }
     
     final transient Logger LOGGER = LoggerFactory.getLogger(UploadTemplateBean.class);
     
@@ -50,5 +63,9 @@ public class UploadTemplateBean implements Serializable {
     
     public void addFileitemMapEntry(String name, boolean upload) {
         fileitemmap.put(name, upload);
+    }
+    
+    public void uploadJson(String ruletemplate, String uploadproperty, String filename) {
+        uploadutil.uploadJson(cftemplateService.findByName(ruletemplate).getContent(), propertyUtil.getPropertyValue(uploadproperty), filename);
     }
 }
