@@ -16,9 +16,10 @@
 package io.clownfish.clownfish.websocket;
 
 import com.google.gson.Gson;
-import io.clownfish.clownfish.Clownfish;
-import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.datamodels.ClownfishResponse;
+import io.clownfish.clownfish.datamodels.JsonFormParameter;
+import io.clownfish.clownfish.datamodels.RenderContext;
+import io.clownfish.clownfish.service.PageRenderService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -32,12 +33,12 @@ import java.util.concurrent.Future;
  * @author SulzbachR
  */
 public class CustomTextFrameHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
-    private final Clownfish clownfish;
+    private final PageRenderService renderservice;
     private static Set<ChannelHandlerContext> sessions = null;
 
-    public CustomTextFrameHandler(Clownfish clownfish, Set<ChannelHandlerContext> sessions) {
+    public CustomTextFrameHandler(PageRenderService renderservice, Set<ChannelHandlerContext> sessions) {
         this.sessions = sessions;
-        this.clownfish = clownfish;
+        this.renderservice = renderservice;
     }
     
     @Override
@@ -62,7 +63,18 @@ public class CustomTextFrameHandler extends SimpleChannelInboundHandler<TextWebS
             jfp.setValue(value);
             postmap.add(jfp);
         });
-        ClownfishResponse cfResponse = clownfish.makeResponse(wsbm.getWebservice(), postmap, new ArrayList<>(), false, null, null, "");
+        
+        RenderContext rc = new RenderContext();
+        rc.setName(wsbm.getWebservice());
+        rc.setPostmap(postmap);
+        rc.setUrlParams(new ArrayList<>());
+        rc.setMakestatic(false);
+        rc.setFileitems(null);
+        rc.setClientinfo(null);
+        rc.setReferrer("");
+        ClownfishResponse cfResponse = renderservice.renderPage(rc);
+        
+        //ClownfishResponse cfResponse = clownfish.makeResponse(wsbm.getWebservice(), postmap, new ArrayList<>(), false, null, null, "");
         
         if (wsbm.isBroadcast()) {
             for (ChannelHandlerContext session : sessions) {

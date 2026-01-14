@@ -18,8 +18,9 @@ package io.clownfish.clownfish.endpoints;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.clownfish.clownfish.Clownfish;
-import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.PropertyList;
+import io.clownfish.clownfish.datamodels.JsonFormParameter;
+import io.clownfish.clownfish.datamodels.SearchContext;
 import io.clownfish.clownfish.lucene.LuceneConstants;
 import io.clownfish.clownfish.lucene.SearchResult;
 import io.clownfish.clownfish.lucene.Searcher;
@@ -70,6 +71,7 @@ public class EndpointSearch {
     @PostConstruct
     public void init() {
         // Init Lucene Search Map
+        /*
         if (null == clownfish.getSearchcontentmap()) {
             clownfish.setSearchcontentmap(new HashMap<>());
         }
@@ -85,11 +87,20 @@ public class EndpointSearch {
         if (null == clownfish.getSearchmetadata()) {
             clownfish.setSearchmetadata(new HashMap<>());
         }
-        clownfish.setSearchlimit(propertyUtil.getPropertyInt("lucene_searchlimit", LuceneConstants.MAX_SEARCH));
+        */
+        //clownfish.setSearchlimit(propertyUtil.getPropertyInt("lucene_searchlimit", LuceneConstants.MAX_SEARCH));
     }
     
     @PostMapping(path = "/search")
     public void postsearch(@Context HttpServletRequest request, @Context HttpServletResponse response) throws ParseException {
+        Map searchcontentmap = new HashMap<>();
+        Map searchassetmap = new HashMap<>();
+        Map searchassetmetadatamap = new HashMap<>();
+        Map searchclasscontentmap = new HashMap<>();
+        Map searchmetadata = new HashMap<>();
+        
+        SearchContext searchctx = new SearchContext();
+        
         try {
             userSession = request.getSession();
             String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
@@ -110,24 +121,24 @@ public class EndpointSearch {
             long endTime = System.currentTimeMillis();
             
             LOGGER.info("Search Time :" + (endTime - startTime));
-            clownfish.getSearchmetadata().clear();
-            clownfish.getSearchmetadata().put("cfSearchQuery", parametermap.get("searchparam").toString());
-            clownfish.getSearchmetadata().put("cfSearchTime", String.valueOf(endTime - startTime));
-            clownfish.getSearchcontentmap().clear();
+            searchmetadata.clear();
+            searchmetadata.put("cfSearchQuery", parametermap.get("searchparam").toString());
+            searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
+            searchcontentmap.clear();
             searchresult.getFoundSites().stream().forEach((site) -> {
-                clownfish.getSearchcontentmap().put(site.getName(), site);
+                searchcontentmap.put(site.getName(), site);
             });
-            clownfish.getSearchassetmap().clear();
+            searchassetmap.clear();
             searchresult.getFoundAssets().stream().forEach((asset) -> {
-                clownfish.getSearchassetmap().put(asset.getName(), asset);
+                searchassetmap.put(asset.getName(), asset);
             });
-            clownfish.getSearchassetmetadatamap().clear();
+            searchassetmetadatamap.clear();
             searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
-                clownfish.getSearchassetmetadatamap().put(key, searchresult.getFoundAssetsMetadata().get(key));
+                searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
             });
-            clownfish.getSearchclasscontentmap().clear();
+            searchclasscontentmap.clear();
             searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
-                clownfish.getSearchclasscontentmap().put(key, searchresult.getFoundClasscontent().get(key));
+                searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
             });
             
             String search_site = propertyUtil.getPropertyValue("site_search");
@@ -135,7 +146,13 @@ public class EndpointSearch {
                 search_site = "searchresult";
             }
             request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, search_site);
-            clownfish.universalGet(search_site, request, response);
+            
+            searchctx.setSearchassetmap(searchassetmap);
+            searchctx.setSearchassetmetadatamap(searchassetmetadatamap);
+            searchctx.setSearchclasscontentmap(searchclasscontentmap);
+            searchctx.setSearchcontentmap(searchcontentmap);
+            searchctx.setSearchmetadata(searchmetadata);
+            clownfish.universalGet(search_site, request, response, searchctx);
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
         }    
@@ -152,6 +169,14 @@ public class EndpointSearch {
      */
     @GetMapping(path = "/search/{query}")
     public void search(@PathVariable("query") String query, @Context HttpServletRequest request, @Context HttpServletResponse response) {
+        Map searchcontentmap = new HashMap<>();
+        Map searchassetmap = new HashMap<>();
+        Map searchassetmetadatamap = new HashMap<>();
+        Map searchclasscontentmap = new HashMap<>();
+        Map searchmetadata = new HashMap<>();
+        
+        SearchContext searchctx = new SearchContext();
+        
         try {
             String[] searchexpressions = query.split(" ");
             searchUtil.updateSearchhistory(searchexpressions);
@@ -162,28 +187,28 @@ public class EndpointSearch {
             long endTime = System.currentTimeMillis();
             
             LOGGER.info("Search Time :" + (endTime - startTime));
-            clownfish.getSearchmetadata().clear();
-            clownfish.getSearchmetadata().put("cfSearchQuery", query);
-            clownfish.getSearchmetadata().put("cfSearchTime", String.valueOf(endTime - startTime));
-            clownfish.getSearchcontentmap().clear();
+            searchmetadata.clear();
+            searchmetadata.put("cfSearchQuery", query);
+            searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
+            searchcontentmap.clear();
             searchresult.getFoundSites().stream().forEach((site) -> {
                 if (null != site) {
-                    clownfish.getSearchcontentmap().put(site.getName(), site);
+                    searchcontentmap.put(site.getName(), site);
                 }
             });
-            clownfish.getSearchassetmap().clear();
+            searchassetmap.clear();
             searchresult.getFoundAssets().stream().forEach((asset) -> {
                 if (null != asset) {
-                    clownfish.getSearchassetmap().put(asset.getName(), asset);
+                    searchassetmap.put(asset.getName(), asset);
                 }
             });
-            clownfish.getSearchassetmetadatamap().clear();
+            searchassetmetadatamap.clear();
             searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
-                clownfish.getSearchassetmetadatamap().put(key, searchresult.getFoundAssetsMetadata().get(key));
+                searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
             });
-            clownfish.getSearchclasscontentmap().clear();
+            searchclasscontentmap.clear();
             searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
-                clownfish.getSearchclasscontentmap().put(key, searchresult.getFoundClasscontent().get(key));
+                searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
             });
             
             String search_site = propertyUtil.getPropertyValue("site_search");
@@ -191,14 +216,20 @@ public class EndpointSearch {
                 search_site = "searchresult";
             }
             request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, search_site);
-            clownfish.universalGet(search_site, request, response);
+            
+            searchctx.setSearchassetmap(searchassetmap);
+            searchctx.setSearchassetmetadatamap(searchassetmetadatamap);
+            searchctx.setSearchclasscontentmap(searchclasscontentmap);
+            searchctx.setSearchcontentmap(searchcontentmap);
+            searchctx.setSearchmetadata(searchmetadata);
+            clownfish.universalGet(search_site, request, response, searchctx);
         } catch (IOException | ParseException ex) {
             LOGGER.error(ex.getMessage());
             String search_site = propertyUtil.getPropertyValue("site_search");
             if (null == search_site) {
                 search_site = "searchresult";
             }
-            clownfish.universalGet(search_site, request, response);
+            clownfish.universalGet(search_site, request, response, searchctx);
         }
     }
 }

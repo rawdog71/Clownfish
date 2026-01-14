@@ -15,7 +15,7 @@
  */
 package io.clownfish.clownfish.websocket;
 
-import io.clownfish.clownfish.Clownfish;
+import io.clownfish.clownfish.service.PageRenderService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -40,12 +40,12 @@ import lombok.Setter;
  * @author SulzbachR
  */
 public class WebSocketServer implements Runnable {
-    private Clownfish clownfish;
+    private PageRenderService renderservice;
     private @Getter @Setter int port;
     private static Set<ChannelHandlerContext> sessions = null;
 
-    public WebSocketServer(Clownfish clownfish) {
-        this.clownfish = clownfish;
+    public WebSocketServer(PageRenderService renderservice) {
+        this.renderservice = renderservice;
         sessions = new CopyOnWriteArraySet<>();
     }
 
@@ -65,7 +65,7 @@ public class WebSocketServer implements Runnable {
                         new HttpObjectAggregator(65536),
                         new HttpResponseEncoder(),
                         new WebSocketServerProtocolHandler("/websocket"),
-                        new CustomTextFrameHandler(clownfish, sessions));
+                        new CustomTextFrameHandler(renderservice, sessions));
                 }
             });
 

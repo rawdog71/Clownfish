@@ -49,7 +49,6 @@ public class IndexService {
     
     final transient org.slf4j.Logger LOGGER = LoggerFactory.getLogger(IndexService.class);
     
-    @PostConstruct
     public void init() {
         if (null == propertymap) {
             // read all System Properties of the property table

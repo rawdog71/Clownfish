@@ -15,8 +15,8 @@
  */
 package io.clownfish.clownfish.utils;
 
-import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.JsonSAPFormParameter;
+import io.clownfish.clownfish.datamodels.JsonFormParameter;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.jdbc.DatatableCondition;
 import io.clownfish.clownfish.jdbc.DatatableDeleteProperties;

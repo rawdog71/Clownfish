@@ -21,8 +21,8 @@ import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoStructure;
 import com.sap.conn.jco.JCoTable;
 import de.destrukt.sapconnection.SAPConnection;
-import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.JsonSAPFormParameter;
+import io.clownfish.clownfish.datamodels.JsonFormParameter;
 import io.clownfish.clownfish.datamodels.WebserviceCache;
 import io.clownfish.clownfish.dbentities.CfSitesaprfc;
 import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
@@ -39,13 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -147,17 +145,9 @@ public class SAPTemplateBean implements Serializable {
                     }
 
                     if (rfcfunctionparam.getParamclass().compareToIgnoreCase("C") == 0) {
-                        if (null != postmap_async) {
-                            postmap_async.stream().filter((jfp) -> (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0)).forEach((jfp) -> {
-                                ArrayList<LinkedHashMap<String, String>> val = (ArrayList<LinkedHashMap<String, String>>)jfp.getValue();
-                                JCoTable table = function.getChangingParameterList().getTable("I_ZPRUDRUCK");
-                                for (int i = 0; i < val.size(); i++) {
-                                    table.appendRow();
-                                    val.get(i).forEach(table::setValue);
-                                }
-                                function.getChangingParameterList().setValue(rfcfunctionparam.getParameter(), table);
-                            });
-                        }
+                        JCoTable table = function.getChangingParameterList().getTable(rfcfunctionparam.getParameter()); 
+                        insertMapToJCoTable(parametermap, table);
+                        function.getChangingParameterList().setValue(rfcfunctionparam.getParameter(), table);
                     }
                 }
                 // SAP RFC ausführen
@@ -297,17 +287,9 @@ public class SAPTemplateBean implements Serializable {
                     }
 
                     if (rfcfunctionparam.getParamclass().compareToIgnoreCase("C") == 0) {
-                        if (null != postmap_async) {
-                            postmap_async.stream().filter((jfp) -> (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0)).forEach((jfp) -> {
-                                ArrayList<LinkedHashMap<String, String>> val = (ArrayList<LinkedHashMap<String, String>>)jfp.getValue();
-                                JCoTable table = function.getChangingParameterList().getTable("I_ZPRUDRUCK");
-                                for (int i = 0; i < val.size(); i++) {
-                                    table.appendRow();
-                                    val.get(i).forEach(table::setValue);
-                                }
-                                function.getChangingParameterList().setValue(rfcfunctionparam.getParameter(), table);
-                            });
-                        }
+                        JCoTable table = function.getChangingParameterList().getTable(rfcfunctionparam.getParameter()); 
+                        insertMapToJCoTable(parametermap, table);
+                        function.getChangingParameterList().setValue(rfcfunctionparam.getParameter(), table);
                     }
                 }
                 // SAP RFC ausführen
@@ -638,7 +620,6 @@ public class SAPTemplateBean implements Serializable {
         }
     }
     
-
     private void setStructureValues(JCoStructure functions_table, List<RpyTableRead> rpytablereadlist, ArrayList<HashMap> tablevalues) {
         try {
             tablevalues.clear();
@@ -706,5 +687,37 @@ public class SAPTemplateBean implements Serializable {
             rpyMap.put(sapc.getDestination().getDestinationID() + "_" + tablename, rpytablereadlist);
         }
         return rpytablereadlist;
+    }
+    
+    /**
+     * Fügt die Daten aus einer Java Map in eine JCoTable ein. Es wird
+     * angenommen, dass die Map die Daten für eine einzelne Zeile enthält.
+     * @param data
+     * @param table
+     * @throws java.lang.Exception
+     */
+    public void insertMapToJCoTable(Map<String, Object> data, JCoTable table) throws Exception {
+        if (data == null || data.isEmpty()) {
+            // Optionale Behandlung: Map ist leer
+            System.out.println("Die Eingabe-Map ist leer, es werden keine Daten eingefügt.");
+            return;
+        }
+        // 1. Eine neue, leere Zeile an das Ende der JCoTable anhängen
+        table.appendRow();
+        // 2. Map durchlaufen und die Werte in die entsprechenden Spalten kopieren
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            // 4. Den Wert in die aktuelle Zeile der JCoTable setzen
+            if (value != null) {
+                // Konvertierung des Java-Werts in den geeigneten JCo-Datentyp
+                // JCo ist intelligent genug, die meisten einfachen Java-Typen 
+                // (String, Integer, Double, Boolean) korrekt zu setzen.
+                table.setValue(key, value);
+            } else {
+                // Optional: Behandlung von Null-Werten, z.B. Setzen auf Standardwert oder leeren String
+                table.setValue(key, "");
+            }
+        }
     }
 }

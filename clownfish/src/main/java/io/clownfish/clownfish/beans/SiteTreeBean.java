@@ -70,12 +70,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.web.context.annotation.SessionScope;
 
 /**
  *
  * @author sulzbachr
  */
-@Scope("session")
+@SessionScope
 @Named("sitetree")
 @Component
 public class SiteTreeBean implements Serializable {

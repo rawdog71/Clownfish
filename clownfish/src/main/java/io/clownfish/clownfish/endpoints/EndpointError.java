@@ -47,6 +47,6 @@ public class EndpointError {
             error_site = "error";
         }
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, error_site);
-        clownfish.universalGet(error_site, request, response);
+        clownfish.universalGet(error_site, request, response, null);
     }
 }
