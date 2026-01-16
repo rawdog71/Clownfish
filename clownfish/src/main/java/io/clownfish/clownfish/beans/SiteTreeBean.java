@@ -16,7 +16,7 @@
 package io.clownfish.clownfish.beans;
 
 import de.destrukt.sapconnection.SAPConnection;
-import io.clownfish.clownfish.Clownfish;
+import io.clownfish.clownfish.ClownfishInitializer;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import io.clownfish.clownfish.datamodels.CfDiv;
 import io.clownfish.clownfish.datamodels.CfLayout;
@@ -36,7 +36,6 @@ import io.clownfish.clownfish.utils.TemplateUtil;
 import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
-import org.primefaces.component.tabview.TabView;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.NodeUnselectEvent;
 import org.primefaces.event.SelectEvent;
@@ -47,7 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -80,12 +78,13 @@ import org.springframework.web.context.annotation.SessionScope;
 @Named("sitetree")
 @Component
 public class SiteTreeBean implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     @Value("${sapconnection.file}") String SAPCONNECTION;
     private static SAPConnection sapc = null;
 
-    private transient @Getter @Setter int tabIndex;
+    private @Getter @Setter int tabIndex;
     private @Getter @Setter String params;
-    private transient @Getter @Setter TabView tabview;
     private transient @Getter @Setter TreeNode root;
     private transient @Getter @Setter TreeNode invisibleRoot;
     private transient @Getter @Setter TreeNode selectedNode = null;
@@ -203,11 +202,10 @@ public class SiteTreeBean implements Serializable {
     @Autowired transient CfAssetService cfassetService;
     @Autowired transient CfAssetlistService cfassetlistService;
     @Autowired transient CfKeywordlistService cfkeywordlistService;
-    @Autowired CfLayoutcontentService cflayoutcontentService;
+    @Autowired transient CfLayoutcontentService cflayoutcontentService;
     @Autowired transient CfSitesaprfcService cfsitesaprfcService;
     @Autowired transient CfStaticsiteService cfstaticsiteService;
     @Autowired transient CfApiService cfapiService;
-    @Autowired transient CfPropertyService cfpropertyService;
     @Autowired transient CfAccessmanagerService cfAccessmanagerService;
     @Autowired transient LoginBean loginBean;
     @Autowired transient PropertyList propertylist;
@@ -223,27 +221,30 @@ public class SiteTreeBean implements Serializable {
     @Autowired private @Getter @Setter DatabaseUtil databaseUtility;
     @Autowired transient FolderUtil folderUtil;
     @Autowired transient SiteUtil siteUtil;
-    @Autowired private ContentUtil contentUtil;
+    @Autowired transient private ContentUtil contentUtil;
+    @Autowired transient ClownfishInitializer clownfishinit;
+    
     private SourceIndexer sourceindexer;
     private @Getter @Setter String iframeurl = "";
-    @Autowired transient Clownfish clownfish;
     private transient @Getter @Setter List<CfAttributcontent> attributcontentlist = null;
     private @Getter @Setter String previewContentOutput = "";
     private @Getter @Setter long previewAssetOutput = 0;
     private @Getter @Setter List<CfAsset> previewAssetlistOutput = new ArrayList<>();
     private @Getter @Setter String previewDatalistOutput = "";
     private @Getter @Setter List<CfKeyword> previewKeywordlistOutput = new ArrayList<>();
-    @Inject LoginBean loginbean;
+    private List<CfSite> loginUrlList = new ArrayList<>();
+    
     private @Getter @Setter HashMap<String, Boolean> visibleMap = new HashMap<String, Boolean>();
-    private @Getter @Setter List<CfSite> loginUrlList = new ArrayList<>();
+    
+    @Inject LoginBean loginbean;
 
     final transient Logger LOGGER = LoggerFactory.getLogger(SiteTreeBean.class);
 
     @PostConstruct
     public void init() {
         LOGGER.info("INIT SITETREE START");
-        if (null != clownfish) {
-            clownfish.setSitetree(this);
+        if (null != clownfishinit) {
+            //clownfishinit.setSitetree(this);
         }
         if (null == sourceindexer) {
             sourceindexer = new SourceIndexer();
@@ -260,7 +261,7 @@ public class SiteTreeBean implements Serializable {
             }
             if (sapSupport) {
                 sapc = new SAPConnection(SAPCONNECTION, "Clownfish4");
-                rfcgrouplist = clownfish.getRfcgroupsearch().getRfcGroupList();
+                rfcgrouplist = clownfishinit.getRfcgroupsearch().getRfcGroupList();
             }
         }
         //root = new DefaultTreeNode("Root", null);
@@ -349,10 +350,10 @@ public class SiteTreeBean implements Serializable {
     }
 
     public void onRefreshSAP(ActionEvent actionEvent) {
-        clownfish.getRpytableread().init();
-        clownfish.getRfcfunctioninterface().init();
-        clownfish.getRfcgroupsearch().init();
-        clownfish.getRfcfunctionsearch().init();
+        clownfishinit.getRpytableread().init();
+        clownfishinit.getRfcfunctioninterface().init();
+        clownfishinit.getRfcgroupsearch().init();
+        clownfishinit.getRfcfunctionsearch().init();
     }
 
     public void onRefreshSelection() {
@@ -1068,14 +1069,14 @@ public class SiteTreeBean implements Serializable {
     public void onChangeRfCGroupInput() {
         if (!rfcgroup.isEmpty()) {
             selectedrfcgroup = null;
-            rfcfunctionlist = clownfish.getRfcfunctionsearch().getRfcFunctionsList(rfcgroup);
+            rfcfunctionlist = clownfishinit.getRfcfunctionsearch().getRfcFunctionsList(rfcgroup);
         }
     }
 
     public void onChangeRfcGroup() {
         if (null != selectedrfcgroup) {
             rfcgroup = selectedrfcgroup.getName();
-            rfcfunctionlist = clownfish.getRfcfunctionsearch().getRfcFunctionsList(selectedrfcgroup.getName());
+            rfcfunctionlist = clownfishinit.getRfcfunctionsearch().getRfcFunctionsList(selectedrfcgroup.getName());
         }
     }
 
@@ -1120,7 +1121,7 @@ public class SiteTreeBean implements Serializable {
             return null;
         } else {
             if (sapSupport) {
-                rfcgrouplist = clownfish.getRfcgroupsearch().getRfcGroupList();
+                rfcgrouplist = clownfishinit.getRfcgroupsearch().getRfcGroupList();
                 for (RfcGroup rfcGroup : rfcgrouplist) {
                     if (rfcGroup.getName().compareToIgnoreCase(value) == 0 ) {
                         return rfcGroup;
@@ -1135,7 +1136,7 @@ public class SiteTreeBean implements Serializable {
         if (value.compareToIgnoreCase("-1") == 0) {
             return null;
         } else {
-            rfcfunctionlist = clownfish.getRfcfunctionsearch().getRfcFunctionsList(selectedrfc.getCfSitesaprfcPK().getRfcgroup());
+            rfcfunctionlist = clownfishinit.getRfcfunctionsearch().getRfcFunctionsList(selectedrfc.getCfSitesaprfcPK().getRfcgroup());
             for (RfcFunction rfcfunction : rfcfunctionlist) {
                 if (rfcfunction.getName().compareToIgnoreCase(value) == 0 ) {
                     return rfcfunction;

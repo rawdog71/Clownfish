@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.beans;
 
 import io.clownfish.clownfish.Clownfish;
+import io.clownfish.clownfish.ClownfishInitializer;
 import io.clownfish.clownfish.dbentities.CfProperty;
 import io.clownfish.clownfish.serviceinterface.CfPropertyService;
 import java.util.HashMap;
@@ -54,7 +55,7 @@ public class PropertyList {
     private @Getter @Setter String propertykey;
     private @Getter @Setter String propertyvalue;
     private @Getter @Setter boolean deletePropertyButtonDisabled;
-    private Clownfish clownfish;
+    private ClownfishInitializer clownfishinit;
     
     final transient Logger LOGGER = LoggerFactory.getLogger(PropertyList.class);
 
@@ -71,8 +72,8 @@ public class PropertyList {
         LOGGER.info("INIT PROPERTYLIST END");
     }
     
-    public void setClownfish(Clownfish clownfish) {
-        this.clownfish = clownfish;
+    public void setClownfish(ClownfishInitializer clownfishinit) {
+        this.clownfishinit = clownfishinit;
     }
     
     public Map<String, String> fillPropertyMap() {
@@ -102,8 +103,8 @@ public class PropertyList {
             newproperty.setNodelete(false);
             cfpropertyService.create(newproperty);
             fillPropertyMap();
-            clownfish.setInitmessage(false);
-            clownfish.init();
+            clownfishinit.setInitmessage(false);
+            clownfishinit.init();
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
         }
@@ -118,8 +119,8 @@ public class PropertyList {
                 selectedProperty.setValue(propertyvalue);
                 cfpropertyService.edit(selectedProperty);
                 fillPropertyMap();
-                clownfish.setInitmessage(false);
-                clownfish.init();
+                clownfishinit.setInitmessage(false);
+                clownfishinit.init();
             }
         } catch (ConstraintViolationException ex) {
             LOGGER.error(ex.getMessage());
@@ -130,8 +131,8 @@ public class PropertyList {
         if (null != selectedProperty) {
             cfpropertyService.delete(selectedProperty);
             fillPropertyMap();
-            clownfish.setInitmessage(false);
-            clownfish.init();
+            clownfishinit.setInitmessage(false);
+            clownfishinit.init();
         }
     }
     

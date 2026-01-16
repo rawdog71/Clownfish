@@ -17,62 +17,26 @@ package io.clownfish.clownfish;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import de.destrukt.sapconnection.SAPConnection;
-import io.clownfish.clownfish.beans.MavenList;
-import io.clownfish.clownfish.beans.PropertyList;
-import io.clownfish.clownfish.beans.QuartzList;
 import io.clownfish.clownfish.beans.ServiceStatus;
 import io.clownfish.clownfish.beans.SiteTreeBean;
-import io.clownfish.clownfish.compiler.CfClassCompiler;
-import io.clownfish.clownfish.compiler.CfClassLoader;
-import io.clownfish.clownfish.constants.ClownfishConst;
-import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
-import io.clownfish.clownfish.datamodels.AuthTokenList;
-import io.clownfish.clownfish.datamodels.AuthTokenListClasscontent;
 import io.clownfish.clownfish.datamodels.ClientInformation;
 import io.clownfish.clownfish.datamodels.ClownfishResponse;
-import io.clownfish.clownfish.datamodels.HibernateInit;
 import io.clownfish.clownfish.datamodels.JsonFormParameter;
 import io.clownfish.clownfish.datamodels.RenderContext;
 import io.clownfish.clownfish.datamodels.SearchContext;
 import io.clownfish.clownfish.dbentities.*;
 import io.clownfish.clownfish.exceptions.PageNotFoundException;
-import io.clownfish.clownfish.interceptor.GzipSwitch;
-import io.clownfish.clownfish.lucene.LuceneConstants;
 import io.clownfish.clownfish.lucene.SearchResult;
 import io.clownfish.clownfish.lucene.Searcher;
-import io.clownfish.clownfish.odata.GenericEdmProvider;
-import io.clownfish.clownfish.sap.RFC_FUNCTION_SEARCH;
-import io.clownfish.clownfish.sap.RFC_GET_FUNCTION_INTERFACE;
-import io.clownfish.clownfish.sap.RFC_GROUP_SEARCH;
-import io.clownfish.clownfish.sap.RPY_TABLE_READ;
 import io.clownfish.clownfish.service.PageRenderService;
-import io.clownfish.clownfish.serviceimpl.CfStringTemplateLoaderImpl;
 import io.clownfish.clownfish.serviceinterface.*;
 import io.clownfish.clownfish.templatebeans.*;
 import io.clownfish.clownfish.utils.*;
-import io.clownfish.clownfish.websocket.WebSocketServer;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.catalina.util.ServerInfo;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import static org.fusesource.jansi.Ansi.Color.GREEN;
-import static org.fusesource.jansi.Ansi.Color.RED;
-import static org.fusesource.jansi.Ansi.ansi;
-import org.fusesource.jansi.AnsiConsole;
 import org.primefaces.webapp.MultipartRequest;
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import org.quartz.CronTrigger;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,15 +47,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.stereotype.Component;
-import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.HandlerMapping;
-import javax.annotation.PostConstruct;
-import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -104,10 +65,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -125,86 +84,58 @@ import java.util.stream.Collectors;
     @PropertySource("file:application.properties")
 })
 public class Clownfish {
-    @Autowired CfSiteService cfsiteService;
-    @Autowired CfListcontentService cflistcontentService;
-    @Autowired @Getter @Setter CfAssetService cfassetService;
-    @Autowired @Getter @Setter CfAttributcontentService cfattributcontentService;
-    @Autowired CfSitedatasourceService cfsitedatasourceService;
-    @Autowired CfTemplateService cftemplateService;
-    @Autowired CfTemplateversionService cftemplateversionService;
-    @Autowired CfJavaService cfjavaService;
-    @Autowired TemplateUtil templateUtil;
-    @Autowired PropertyList propertylist;
-    @Autowired QuartzList quartzlist;
-    @Autowired CfDatasourceService cfdatasourceService;
-    @Autowired CfClassService cfclassService;
-    @Autowired CfAttributService cfattributService;
-    @Autowired CfClasscontentService cfclasscontentService;
-    @Autowired CfClasscontentKeywordService cfclasscontentkeywordService;
-    @Autowired CfKeywordService cfkeywordService;
-    @Autowired private Scheduler scheduler;
-    @Autowired private FolderUtil folderUtil;
-    @Autowired Searcher searcher;
-    @Autowired ConsistencyUtil consistencyUtil;
-    @Autowired HibernateUtil hibernateUtil;
-    @Autowired ServiceStatus servicestatus;
-    @Autowired SearchUtil searchUtil;
-    @Autowired GenericEdmProvider edmprovider;
-    @Autowired PageRenderService pagerenderservice;
+    final transient Logger LOGGER = LoggerFactory.getLogger(Clownfish.class);
+    
+    private final CfSiteService cfsiteService;
+    private final PropertyUtil propertyUtil;
+    private final Searcher searcher;
+    private final SearchUtil searchUtil;
+    private final FolderUtil folderUtil;
+    private final ClownfishUtil clownfishUtil;
+    private final ServiceStatus servicestatus;
+    private final PageRenderService pagerenderservice;
+    private final @Getter MarkdownUtil markdownUtil;
     
     UploadTemplateBean uploadbean;
-    CfClassCompiler cfclassCompiler;
-    CfClassLoader cfclassLoader;
-    @Autowired AuthTokenList authtokenlist;
-    @Autowired AuthTokenListClasscontent confirmtokenlist;
-    AuthTokenListClasscontent authtokenlistclasscontent = null;
-
     private String contenttype;
     private String characterencoding;
     private String locale;
-
-    private GzipSwitch gzipswitch;
-    private @Getter @Setter RPY_TABLE_READ rpytableread = null;
-    private @Getter @Setter RFC_GET_FUNCTION_INTERFACE rfcfunctioninterface = null;
-    private @Getter @Setter RFC_GROUP_SEARCH rfcgroupsearch = null;
-    private @Getter @Setter RFC_FUNCTION_SEARCH rfcfunctionsearch = null;
-    private static SAPConnection sapc = null;
-    private boolean sapSupport = false;
-    private boolean jobSupport = false;
     private HttpSession userSession;
-    private ClownfishConst.ViewModus modus = STAGING;
-    private boolean preview = false;
-    private boolean cf_job = false;
-    private ClownfishUtil clownfishutil;
-    private PropertyUtil propertyUtil;
-    private MailUtil mailUtil;
-    private DefaultUtil defaultUtil;
-    private PDFUtil pdfUtil;
-    private BeanUtil beanUtil;
-    private ClassPathUtil classpathUtil;
-    private MavenList mavenlist;
-    private StaticSiteUtil staticSiteUtil;
-    private @Getter @Setter MarkdownUtil markdownUtil;
     private @Getter @Setter int searchlimit;
     private @Getter @Setter Map<String, String> metainfomap;
-    private static HibernateInit hibernateInitializer = null;
-        
-    private WebSocketServer wss;
-    
-    final transient Logger LOGGER = LoggerFactory.getLogger(Clownfish.class);
-    @Value("${bootstrap}") int bootstrap;
-    @Value("${app.datasource.url}") String dburl;
-    @Value("${check.consistency:0}") int checkConsistency;
-    @Value("${hibernate.init:0}") int hibernateInit;
-    @Value("${sapconnection.file}") String SAPCONNECTION;
-    @Value("${websocket.use:0}") int websocketUse;
-    @Value("${websocket.port:9001}") int websocketPort;
-    String libloaderpath;
-    String mavenpath;
     private @Getter @Setter boolean initmessage = false;
     private @Getter @Setter SiteTreeBean sitetree;
-    @Value("${server.name:Clownfish Server Open Source}") String servername;
-    @Value("${server.x-powered:Clownfish Server Open Source by Rainer Sulzbach}") String serverxpowered;
+    
+    @Value("${server.name:Clownfish Server Open Source}") 
+    String servername;
+    @Value("${server.x-powered:Clownfish Server Open Source by Rainer Sulzbach}") 
+    String serverxpowered;
+    
+    @Autowired @Getter @Setter CfAssetService cfassetService;
+    @Autowired @Getter @Setter CfAttributcontentService cfattributcontentService;
+    
+    // Constructor Injection
+    public Clownfish(CfSiteService cfsiteService, 
+                        PageRenderService pageRenderService, 
+                        PropertyUtil propertyUtil, 
+                        Searcher searcher, 
+                        SearchUtil searchUtil, 
+                        FolderUtil folderUtil, 
+                        ServiceStatus serviceStatus, 
+                        ClownfishUtil clownfishUtil,
+                        ServiceStatus servicestatus,
+                        PageRenderService pagerenderservice,
+                        MarkdownUtil markdownUtil) {
+        this.cfsiteService = cfsiteService;
+        this.propertyUtil = propertyUtil;
+        this.searcher = searcher;
+        this.searchUtil = searchUtil;
+        this.folderUtil = folderUtil;
+        this.clownfishUtil = clownfishUtil;
+        this.servicestatus = servicestatus;
+        this.pagerenderservice = pagerenderservice;
+        this.markdownUtil = markdownUtil;
+    }
     
     /**
      * Call of the "root" site
@@ -220,300 +151,6 @@ public class Clownfish {
         }
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, root_site);
         universalGet(root_site, request, response, null);
-    }
-    
-    public void initClasspath() {
-        cfclassLoader = null;
-        cfclassCompiler = null;
-        initmessage = true;
-        init();
-    }
-    
-    /**
-     * Call of the "init" site
-     * Init is called at the beginning of the Clownfish startup and after changing system properties
-     * Checks the bootstrap flag of the application.properties and calls a bootstrap routine
-     * Initializes several variables and starts Quartz job triggers
-     */
-    @PostConstruct
-    public void init() {
-        LOGGER.info("INIT CLOWNFISH START");
-        servicestatus.setMessage("Clownfish is initializing");
-        servicestatus.setOnline(false);
-        
-        if (null == confirmtokenlist) {
-            confirmtokenlist = new AuthTokenListClasscontent();
-            confirmtokenlist.setConfirmation(true);
-        }
-        
-        if (null == authtokenlist) {
-            authtokenlist = new AuthTokenList();
-        }
-        
-        if (null == authtokenlistclasscontent) {
-            authtokenlistclasscontent = new AuthTokenListClasscontent();
-            authtokenlistclasscontent.setConfirmation(false);
-        }
-        
-        // read all System Properties of the property table
-        if (null == propertyUtil) {
-            propertyUtil = new PropertyUtil(propertylist);
-        }
-
-        if (null == staticSiteUtil) {
-            staticSiteUtil = new StaticSiteUtil(propertyUtil);
-        }
-
-        if (null == cfclassLoader)
-        {
-            cfclassLoader = new CfClassLoader();
-        }
-        
-        if (null == cfclassCompiler)
-        {
-            cfclassCompiler = new CfClassCompiler();
-            cfclassCompiler.setClownfish(this);
-            cfclassCompiler.init(cfclassLoader, propertyUtil, cfjavaService);
-        }
-        
-        libloaderpath = propertyUtil.getPropertyValue("folder_libs");
-        
-        if (null == beanUtil)
-            beanUtil = new BeanUtil();
-        if ((!libloaderpath.isBlank()) && (null != libloaderpath)) 
-            beanUtil.init(libloaderpath);
-        
-        mavenpath = propertyUtil.getPropertyValue("folder_maven");
-        
-        if ((!mavenpath.isBlank()) && (null != mavenpath)) {
-            if (null == classpathUtil) {
-                classpathUtil = new ClassPathUtil();
-                classpathUtil.init(cfclassLoader);
-            }
-            classpathUtil.addPath(mavenpath);
-        }
-        
-        if (null == mavenlist) {
-            mavenlist = new MavenList();
-            mavenlist.setClasspathUtil(classpathUtil);
-        }
-        
-        Thread compileThread = new Thread(cfclassCompiler);
-        compileThread.start();
-        
-        if (1 == bootstrap) {
-            bootstrap = 0;
-            try {
-                AnsiConsole.systemInstall();
-                System.out.println(ansi().fg(GREEN));
-                System.out.println("BOOTSTRAPPING II");
-                System.out.println(ansi().reset());
-                
-                Properties props = new Properties();
-                String propsfile = "application.properties";
-                InputStream is = new FileInputStream(propsfile);
-                if (null != is) {
-                    props.load(is);
-                    props.setProperty("bootstrap", String.valueOf(bootstrap));
-                    File f = new File("application.properties");
-
-                    bootstrap();
-
-                    OutputStream out = new FileOutputStream(f);
-                    DefaultPropertiesPersister p = new DefaultPropertiesPersister();
-                    p.store(props, out, "Application properties");
-                } else {
-                    LOGGER.error("application.properties file not found");
-                }
-              } catch (IOException ex) {
-                  LOGGER.error(ex.getMessage());
-              }
-        }
-        
-        Package p = FacesContext.class.getPackage();
-        if (null == clownfishutil) {
-            clownfishutil = new ClownfishUtil();
-        }
-        
-        edmprovider.init();
-        Thread edmprovider_thread = new Thread(edmprovider);
-        edmprovider_thread.start();
-        
-        MavenXpp3Reader reader = new MavenXpp3Reader();
-        Model model = null;
-        if ((new File("pom.xml")).exists()) {
-            try {
-                model = reader.read(new FileReader("pom.xml"));
-            } catch (FileNotFoundException ex) {
-                LOGGER.error(ex.getMessage());
-            } catch (IOException | XmlPullParserException ex) {
-                LOGGER.error(ex.getMessage());
-            }
-        }
-        if (null != model) {
-            clownfishutil.setVersion(model.getVersion()).setVersionMojarra(p.getImplementationVersion()).setVersionTomcat(ServerInfo.getServerNumber());
-        } else {
-            clownfishutil.setVersion(getClass().getPackage().getImplementationVersion()).setVersionMojarra(p.getImplementationVersion()).setVersionTomcat(ServerInfo.getServerNumber());
-        }
-        try {
-            AnsiConsole.systemInstall();
-            System.out.println(ansi().fg(GREEN));
-            System.out.println("INIT CLOWNFISH CMS");
-            System.out.println(ansi().fg(RED));
-            System.out.println("                               ...                                             ");
-            System.out.println("                            &@@@@@@@                                           ");
-            System.out.println("                          .&&%%%@%@@@@                                         ");
-            System.out.println("                          %%%%%%%%&%%@                                         ");
-            System.out.println("                         .%%%%%%%%#%%&                                         ");
-            System.out.println("                         /%%%%%%%%%##%         &&@@.                           ");
-            System.out.println("                    .,*//#############%        %#%#%@@                          ");
-            System.out.println("                     #((###############       ###%#%%&@                         ");
-            System.out.println("           //          #((((/(/(((((((/       (###(###&%                        ");
-            System.out.println("        *((//((#/       #((((#(((((((#         (((##%##@                        ");
-            System.out.println("      /(((((#(////#     .((((((((((((*         *((((###%                        ");
-            System.out.println("     /(((((#((######     #(((((##((@@@@&        ((((((##                        ");
-            System.out.println("    (((((((####@@&#(%     #((((####((((&@/      #(((((((*            (&@@&#     ");
-            System.out.println("   /(((((((#######(((&    *((((##(((((((#@/     #(((((((/          &&%%%%&@@@,  ");
-            System.out.println("  /((((((((((((((#((((&    (#((#(##((##((@@     #(#####(*       *########%%&@@@.");
-            System.out.println("  /%#(((((((((((((/((((.   ###########(((#@*    ((#####(.      /#########%%%@@@@");
-            System.out.println("   ,(((((((((((((((((((/   ###########((((@,   ((#######       ###########%%%@@@");
-            System.out.println("    .(((((((((((((/((((*   (#########((((#@    ((######%      .##########%%%&@@@");
-            System.out.println("       ,/(((((((((((((&   #(#########((((@/  .#((###((((       #########%%%%&@@@");
-            System.out.println("           /((((((##(&   %(((((######(((&/  .#(((((((((.       *########%%%&&@@@");
-            System.out.println("              ,//(#@   /(#(####(((##(((&.  (((((((((/           /######%%%&&@@@@");
-            System.out.println("                ./* .#(########((#((*/.  *#(((((((###.           /%##%%%%@@@@@@ ");
-            System.out.println("                /######((#######(    ./#######(###(#@              .&@@@@@@@%   ");
-            System.out.println("               /#######%%#(((#((((@.  /@%#####(##((@#                           ");
-            System.out.println("              /####%%#@& *#(((//(/(%@   *@@@@%#%&@@                             ");
-            System.out.println("              %#%&&@&*    *((((///(@@&     .##/*                                ");
-            System.out.println("                  ,,***,   *((/(#@@@@@,                                         ");
-            System.out.println("                            *@@@@@@@@%          [" + clownfishutil.getVersion() + "] on Tomcat " + clownfishutil.getVersionTomcat()+ " with Mojarra " + clownfishutil.getVersionMojarra());
-            System.out.println(ansi().reset());
-            
-            // Check Consistence
-            if (checkConsistency > 0) {
-                consistencyUtil.checkConsistency();
-            }
-            
-            // Generate Hibernate DOM Mapping
-            if (null == hibernateInitializer) {
-                hibernateInitializer = new HibernateInit(servicestatus, cfclassService, cfattributService, cfclasscontentService, cfattributcontentService, cflistcontentService, cfclasscontentkeywordService, cfkeywordService, dburl);
-                hibernateUtil.init(hibernateInitializer);
-                hibernateUtil.setHibernateInit(hibernateInit);
-                
-                Thread hibernateThread = new Thread(hibernateUtil);
-                hibernateThread.start();
-            }
-            
-            propertylist.setClownfish(this);
-            if (null == defaultUtil) {
-                defaultUtil = new DefaultUtil();
-            }
-
-            if (null == mailUtil)
-                mailUtil = new MailUtil(propertyUtil);
-
-            if (null == pdfUtil)
-                pdfUtil = new PDFUtil(cftemplateService, cftemplateversionService, cfsitedatasourceService, cfdatasourceService, cfsiteService, propertyUtil, templateUtil);
-
-            // Set default values
-            modus = STAGING;    // 1 = Staging mode (fetch sourcecode from commited repository) <= default
-                                // 0 = Development mode (fetch sourcecode from database)
-            defaultUtil.setCharacterEncoding("UTF-8")
-                       .setContentType("text/html")
-                       .setLocale(new Locale("de"));
-            
-            sapSupport = propertyUtil.getPropertyBoolean("sap_support", sapSupport);
-            if (sapSupport) {
-                if (null == sapc) {
-                    sapc = new SAPConnection(SAPCONNECTION, "Clownfish1");
-                    rpytableread = new RPY_TABLE_READ(sapc);
-                    rfcfunctioninterface = new RFC_GET_FUNCTION_INTERFACE(sapc);
-                    rfcgroupsearch = new RFC_GROUP_SEARCH(sapc);
-                    rfcfunctionsearch = new RFC_FUNCTION_SEARCH(sapc);
-                }
-            }
-            // Override default values with system properties
-            String systemContentType = propertyUtil.getPropertyValue("response_contenttype");
-            String systemCharacterEncoding = propertyUtil.getPropertyValue("response_characterencoding");
-            String systemLocale = propertyUtil.getPropertyValue("response_locale");
-            if (!systemCharacterEncoding.isEmpty()) {
-                defaultUtil.setCharacterEncoding(systemCharacterEncoding);
-            }
-            if (!systemContentType.isEmpty()) {
-                defaultUtil.setContentType(systemContentType);
-            }
-            if (!systemLocale.isEmpty()) {
-                defaultUtil.setLocale(new Locale(systemLocale));
-            }
-            if (null == gzipswitch) {
-                gzipswitch = new GzipSwitch();
-            }
-            
-            if (null == markdownUtil) {
-                markdownUtil = new MarkdownUtil(propertylist);
-                markdownUtil.initOptions();
-            } else {
-                markdownUtil.initOptions();
-            }
-           
-            // Init Site Metadata Map
-            if (null == metainfomap) {
-                metainfomap = new HashMap();
-            }
-            metainfomap.put("version", clownfishutil.getVersion());
-            metainfomap.put("versionMojarra", clownfishutil.getVersionMojarra());
-            metainfomap.put("versionTomcat", clownfishutil.getVersionTomcat());
-            
-            
-            searchlimit = propertyUtil.getPropertyInt("lucene_searchlimit", LuceneConstants.MAX_SEARCH);
-            
-            jobSupport = propertyUtil.getPropertyBoolean("job_support", jobSupport);
-            if (jobSupport) {
-                scheduler.clear();
-                // Fetch the Quartz jobs
-                quartzlist.init();
-                quartzlist.setClownfish(this);
-                List<CfQuartz> joblist = quartzlist.getQuartzlist();
-                joblist.stream().forEach((quartz) -> {
-                    try {
-                        if (quartz.isActive()) {
-                            JobDetail job = newJob(quartz.getName());
-                            scheduler.scheduleJob(job, trigger(job, quartz.getSchedule()));
-                            System.out.println(ansi().fg(GREEN));
-                            System.out.println("JOB SCHEDULE: " + quartz.getName());
-                            System.out.println(ansi().reset());
-
-                        }
-                    } catch (SchedulerException ex) {
-                        LOGGER.error(ex.getMessage());
-                    }
-                });
-            }
-            AnsiConsole.systemUninstall();
-        } catch (SchedulerException ex) {
-            LOGGER.error(ex.getMessage());
-        }
-        folderUtil.init();
-        servicestatus.setMessage("Clownfish is online");
-        servicestatus.setOnline(true);
-        LOGGER.info("INIT CLOWNFISH END");
-        
-        if (1 == websocketUse) {
-            if (null == wss) {
-                wss = new WebSocketServer(pagerenderservice);
-                wss.setPort(websocketPort);
-                try {
-                    Thread websocketserver_thread = new Thread(wss);
-                    websocketserver_thread.start();
-                } catch (Exception ex) {
-                    java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
-    public Clownfish() {
     }
     
     /**
@@ -560,7 +197,7 @@ public class Clownfish {
             
             Cookie[] cookies = request.getCookies();
             String referrer = getCookieVal(cookies, "cf_referrer");
-            addHeader(response, clownfishutil.getVersion());
+            addHeader(response, clownfishUtil.getVersion());
             ClientInformation clientinfo = getClientinformation(request.getRemoteAddr());
             String token = getCookieVal(cookies, "cf_token");
             String login_token = getCookieVal(cookies, "cf_login_token");
@@ -806,7 +443,7 @@ public class Clownfish {
                     map.add(new JsonFormParameter(key, parameterMap.get(key)[0]));
                 }
                 
-                addHeader(response, clownfishutil.getVersion());
+                addHeader(response, clownfishUtil.getVersion());
                 
                 RenderContext rc = new RenderContext();
                 rc.setName(name);
@@ -927,7 +564,7 @@ public class Clownfish {
                     }
                 }
 
-                addHeader(response, clownfishutil.getVersion());
+                addHeader(response, clownfishUtil.getVersion());
                 
                 RenderContext rc = new RenderContext();
                 rc.setName(name);
@@ -944,7 +581,6 @@ public class Clownfish {
                 rc.setSearchmetadata(searchmetadata);
                 ClownfishResponse cfResponse = pagerenderservice.renderPage(rc);
                 
-                //ClownfishResponse cfResponse = makeResponse(name, map, urlParams, false, null, clientinfo, "");
                 if (cfResponse.getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
@@ -1065,7 +701,7 @@ public class Clownfish {
                 }
             }
 
-            addHeader(response, clownfishutil.getVersion());
+            addHeader(response, clownfishUtil.getVersion());
             
             RenderContext rc = new RenderContext();
             rc.setName(name);
@@ -1108,49 +744,6 @@ public class Clownfish {
         String serverxpowerdedString = serverxpowered.replaceAll("#version#", version);
         response.addHeader("Server", serverString);
         response.addHeader("X-Powered-By", serverxpowerdedString);
-    }
-
-    /**
-     * newJob
-     * 
-     */
-    private JobDetail newJob(String identity) {
-        return JobBuilder.newJob().ofType(QuartzJob.class).storeDurably()
-            .withIdentity(JobKey.jobKey(identity))
-            .build();
-    }
-
-    /**
-     * trigger
-     * 
-     */
-    private CronTrigger trigger(JobDetail jobDetail, String schedule) {
-        return TriggerBuilder.newTrigger().forJob(jobDetail)
-            .withIdentity(jobDetail.getKey().getName(), jobDetail.getKey().getGroup())
-            .withSchedule(cronSchedule(schedule))
-            .build();
-    }
-    
-    
-    /**
-     * bootstrap
-     * 
-     */
-    private void bootstrap() throws FileNotFoundException {
-        List<CfTemplate> cftemplatelist = cftemplateService.findAll();
-        for (CfTemplate template : cftemplatelist) {
-            try {
-                templateUtil.setTemplateContent(template.getContent());
-
-                String content = templateUtil.getTemplateContent();
-                byte[] output = CompressionUtils.compress(content.getBytes("UTF-8"));
-
-                templateUtil.setCurrentVersion(1);
-                templateUtil.writeVersion(template.getId(), templateUtil.getCurrentVersion(), output, 0);
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage());
-            }
-        }
     }
 
     private ClientInformation getClientinformation(String ip) {

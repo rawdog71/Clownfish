@@ -19,11 +19,13 @@ import java.util.Locale;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author sulzbachr
  */
+@Component
 @Accessors(chain = true)
 public class DefaultUtil {
     private @Getter @Setter String characterEncoding;

@@ -35,11 +35,13 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.ExecutionException;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author raine
  */
+@Component
 public class StaticSiteUtil {
     private PropertyUtil propertyUtil;
 

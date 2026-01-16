@@ -127,12 +127,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**
  *
  * @author SulzbachR
  */
+@Component
 @Service
 public class PageRenderService {
     @Value("${websocket.port:9001}") int websocketPort;
@@ -146,33 +148,36 @@ public class PageRenderService {
     private String characterencoding;
     private String locale;
     private String libloaderpath; 
-    
     private HttpSession userSession;
     private Map<String, String> metainfomap;
-    //private freemarker.template.Configuration freemarkerCfg;
-    
-    private final LayoutService layoutService;
     private boolean sapSupport = false;
     private static SAPConnection sapc = null;
     private RPY_TABLE_READ rpytableread = null;
     private RFC_GET_FUNCTION_INTERFACE rfcfunctioninterface = null;
     private RFC_GROUP_SEARCH rfcgroupsearch = null;
     private RFC_FUNCTION_SEARCH rfcfunctionsearch = null;
-    private StaticSiteUtil staticSiteUtil;
     private SiteTreeBean sitetree;
     private Map sitecontentmap;
     private RenderContext rendercontext;
+    
+    private final LayoutService layoutService;
     private final FreemarkerService freemarkerService;
     private final VelocityService velocityService;
+    private final AccessManagerUtil accessmanager;
+    private final AuthTokenList authtokenlist;
+    private final ClownfishUtil clownfishutil;
+    private final FolderUtil folderUtil;
+    private final TemplateUtil templateUtil;
+    private final DatabaseUtil databaseUtil;
+    private final ContentUtil contentUtil;
+    private final SiteUtil siteutil;
+    private final PropertyUtil propertyUtil;
+    private final MailUtil mailUtil;
+    private final PDFUtil pdfUtil;
+    private final MarkdownUtil markdownUtil;
+    private final CfClassCompiler cfclassCompiler;
+    private final StaticSiteUtil staticSiteUtil;
     
-    @Autowired AccessManagerUtil accessmanager;
-    @Autowired AuthTokenList authtokenlist;
-    @Autowired ClownfishUtil clownfishutil;
-    @Autowired private FolderUtil folderUtil;
-    @Autowired TemplateUtil templateUtil;
-    @Autowired DatabaseUtil databaseUtil;
-    @Autowired ContentUtil contentUtil;
-    @Autowired SiteUtil siteutil;
     @Autowired CfTemplateService cftemplateService;
     @Autowired CfAssetService cfassetService;
     @Autowired CfSiteService cfsiteService;
@@ -193,24 +198,62 @@ public class PageRenderService {
     @Autowired CfAttributcontentService cfattributcontentService;
     @Autowired CfListcontentService cflistcontentService;
     @Autowired CfClassService cfclassService;
-    @Autowired PropertyUtil propertyUtil;
-    @Autowired MailUtil mailUtil;
-    @Autowired PDFUtil pdfUtil;
-    @Autowired MarkdownUtil markdownUtil;
-    @Autowired CfClassCompiler cfclassCompiler;
+    
     
     /**
      *
      * @param fs
      * @param vs
      * @param layoutService
+     * @param propertyUtil
+     * @param mailUtil
+     * @param pdfUtil
+     * @param markdownUtil
+     * @param cfclassCompiler
+     * @param staticSiteUtil
+     * @param accessmanager
+     * @param authtokenlist
+     * @param clownfishutil
+     * @param folderUtil
+     * @param templateUtil
+     * @param databaseUtil
+     * @param contentUtil
+     * @param siteutil
      */
     public PageRenderService(FreemarkerService fs, 
                                 VelocityService vs, 
-                                LayoutService layoutService) {
+                                LayoutService layoutService, 
+                                PropertyUtil propertyUtil, 
+                                MailUtil mailUtil, 
+                                PDFUtil pdfUtil, 
+                                MarkdownUtil markdownUtil, 
+                                CfClassCompiler cfclassCompiler, 
+                                StaticSiteUtil staticSiteUtil, 
+                                AccessManagerUtil accessmanager, 
+                                AuthTokenList authtokenlist, 
+                                ClownfishUtil clownfishutil, 
+                                FolderUtil folderUtil, 
+                                TemplateUtil templateUtil, 
+                                DatabaseUtil databaseUtil, 
+                                ContentUtil contentUtil, 
+                                SiteUtil siteutil) {
         this.freemarkerService = fs;
         this.velocityService = vs;
         this.layoutService = layoutService;
+        this.propertyUtil = propertyUtil;
+        this.mailUtil = mailUtil;
+        this.pdfUtil = pdfUtil;
+        this.markdownUtil = markdownUtil;
+        this.cfclassCompiler = cfclassCompiler;
+        this.staticSiteUtil = staticSiteUtil;
+        this.accessmanager = accessmanager;
+        this.authtokenlist = authtokenlist;
+        this.clownfishutil = clownfishutil;
+        this.folderUtil = folderUtil;
+        this.templateUtil = templateUtil;
+        this.databaseUtil = databaseUtil;
+        this.contentUtil = contentUtil;
+        this.siteutil = siteutil;
     }
 
     public ClownfishResponse renderPage(RenderContext renderctx) throws PageNotFoundException {
@@ -331,11 +374,10 @@ public class PageRenderService {
                             }
 
                             if ((authtokenlist.checkValidToken(login_token)) || (isOnline(renderctx.getName(), renderctx.getUrlParams()))) {
-                                cfresponse = getStaticSite(renderctx.getName(), getUrlParamName(renderctx.getName(), renderctx.getUrlParams()), renderctx.getPostmap(), renderctx.getUrlParams());
+                                cfresponse = getStaticSite(renderctx);
                                 if (0 == cfresponse.getErrorcode()) {
                                     return cfresponse;
                                 } else {
-                                    
                                     renderctx.setClientinfo(renderctx.getClientinfo());
                                     renderctx.setFileitems(renderctx.getFileitems());
                                     renderctx.setMakestatic(true);
@@ -852,11 +894,11 @@ public class PageRenderService {
      * getStaticSite
      * 
      */
-    private ClownfishResponse getStaticSite(String sitename, String siteurlname, List<JsonFormParameter> postmap, List urlParams) {
+    private ClownfishResponse getStaticSite(RenderContext rc) {
         ClownfishResponse cfResponse = new ClownfishResponse();
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getStatic_folder() + File.separator + siteurlname), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(folderUtil.getStatic_folder() + File.separator + rc.getName()), "UTF-8"));
             StringBuilder sb = new StringBuilder(1024);
             String line;
             while ((line = br.readLine()) != null) {
@@ -868,30 +910,27 @@ public class PageRenderService {
             br.close();
             return cfResponse;
         } catch (IOException ex) {
-            CfSite cfsite = cfsiteService.findByName(sitename);
+            CfSite cfsite = cfsiteService.findByName(rc.getName());
             String aliasname = cfsite.getAliaspath();
             ClownfishResponse cfStaticResponse;
             try {
-                
-                RenderContext rc = new RenderContext();
-                rc.setName(sitename);
-                rc.setPostmap(postmap);
-                rc.setUrlParams(urlParams);
+                rc.setName(rc.getName());
+                rc.setPostmap(rc.getPostmap());
+                rc.setUrlParams(rc.getUrlParams());
                 rc.setMakestatic(true);
                 rc.setFileitems(null);
                 rc.setClientinfo(null);
                 rc.setReferrer("");
                 cfStaticResponse = renderPage(rc);
                 
-                //cfStaticResponse = makeResponse(sitename, postmap, urlParams, true, null, null, "");
                 if (0 == cfStaticResponse.getErrorcode()) {
-                    if (!urlParams.isEmpty()) {
-                        staticSiteUtil.generateStaticSite(siteurlname, "", cfStaticResponse.getOutput(), cfassetService, folderUtil);
+                    if (!rc.getUrlParams().isEmpty()) {
+                        staticSiteUtil.generateStaticSite(rc.getName(), "", cfStaticResponse.getOutput(), cfassetService, folderUtil);
                     } else {
-                        staticSiteUtil.generateStaticSite(siteurlname, aliasname, cfStaticResponse.getOutput(), cfassetService, folderUtil);
+                        staticSiteUtil.generateStaticSite(rc.getName(), aliasname, cfStaticResponse.getOutput(), cfassetService, folderUtil);
                     }
                 } else {
-                    deleteStaticSite(sitename, urlParams);
+                    deleteStaticSite(rc.getName(), rc.getUrlParams());
                 }
             } catch (PageNotFoundException ex1) {
                 LOGGER.error(ex.getMessage());

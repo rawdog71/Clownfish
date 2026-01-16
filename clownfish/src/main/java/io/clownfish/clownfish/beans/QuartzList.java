@@ -16,6 +16,7 @@
 package io.clownfish.clownfish.beans;
 
 import io.clownfish.clownfish.Clownfish;
+import io.clownfish.clownfish.ClownfishInitializer;
 import io.clownfish.clownfish.dbentities.CfQuartz;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.serviceinterface.CfQuartzService;
@@ -49,7 +50,7 @@ public class QuartzList {
     @Autowired CfQuartzService cfquartzService;
     @Autowired CfSiteService cfsiteService;
     
-    private Clownfish clownfish;
+    private ClownfishInitializer clownfish;
     
     private @Getter @Setter List<CfQuartz> quartzlist;
     private @Getter @Setter CfQuartz selectedQuartz;
@@ -265,7 +266,7 @@ public class QuartzList {
         LOGGER.info("INIT QUARTZLIST END");
     }
     
-    public void setClownfish(Clownfish clownfish) {
+    public void setClownfish(ClownfishInitializer clownfish) {
         this.clownfish = clownfish;
     }
     

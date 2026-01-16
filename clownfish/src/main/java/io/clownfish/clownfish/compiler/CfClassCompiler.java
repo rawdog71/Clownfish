@@ -1,6 +1,7 @@
 package io.clownfish.clownfish.compiler;
 
 import io.clownfish.clownfish.Clownfish;
+import io.clownfish.clownfish.ClownfishInitializer;
 import io.clownfish.clownfish.beans.LoginBean;
 import io.clownfish.clownfish.dbentities.CfJava;
 import io.clownfish.clownfish.serviceinterface.CfJavaService;
@@ -50,7 +51,7 @@ public class CfClassCompiler implements Runnable
     private static @Getter @Setter Path tmpdir;
     @Getter @Setter StringWriter compileOut;
     @Getter @Setter boolean verboseCompile = true;
-    private static Clownfish clownfish;
+    private static ClownfishInitializer clownfishinit;
     private @Getter @Setter EditorOptions editorOptions;
     public static @Getter @Setter ArrayList<Class<?>> classesList;
     public @Getter @Setter Class<?> selectedClass;
@@ -67,8 +68,8 @@ public class CfClassCompiler implements Runnable
         }
     }
 
-    public void setClownfish(Clownfish clownfish) {
-        this.clownfish = clownfish;
+    public void setClownfish(ClownfishInitializer clownfish) {
+        this.clownfishinit = clownfish;
     }
 
     public void init(CfClassLoader cfclassLoader_, PropertyUtil propertyUtil_, CfJavaService cfjavaService_)
@@ -240,7 +241,7 @@ public class CfClassCompiler implements Runnable
     }
 
     public void initClasspath() {
-        clownfish.initClasspath();
+        clownfishinit.initClasspath();
     }
 
     public void compileAll(boolean withMessage) {
