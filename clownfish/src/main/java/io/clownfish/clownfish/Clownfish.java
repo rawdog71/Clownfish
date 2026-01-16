@@ -40,7 +40,6 @@ import org.primefaces.webapp.MultipartRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
@@ -57,17 +56,13 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 import java.io.*;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 
@@ -95,21 +90,17 @@ public class Clownfish {
     private final ServiceStatus servicestatus;
     private final PageRenderService pagerenderservice;
     private final @Getter MarkdownUtil markdownUtil;
+    private final HttpUtil httpUtil;
     
     UploadTemplateBean uploadbean;
     private String contenttype;
     private String characterencoding;
     private String locale;
-    private HttpSession userSession;
+    //private HttpSession userSession;
     private @Getter @Setter int searchlimit;
     private @Getter @Setter Map<String, String> metainfomap;
     private @Getter @Setter boolean initmessage = false;
     private @Getter @Setter SiteTreeBean sitetree;
-    
-    @Value("${server.name:Clownfish Server Open Source}") 
-    String servername;
-    @Value("${server.x-powered:Clownfish Server Open Source by Rainer Sulzbach}") 
-    String serverxpowered;
     
     @Autowired @Getter @Setter CfAssetService cfassetService;
     @Autowired @Getter @Setter CfAttributcontentService cfattributcontentService;
@@ -125,7 +116,8 @@ public class Clownfish {
                         ClownfishUtil clownfishUtil,
                         ServiceStatus servicestatus,
                         PageRenderService pagerenderservice,
-                        MarkdownUtil markdownUtil) {
+                        MarkdownUtil markdownUtil,
+                        HttpUtil httpUtil) {
         this.cfsiteService = cfsiteService;
         this.propertyUtil = propertyUtil;
         this.searcher = searcher;
@@ -135,6 +127,7 @@ public class Clownfish {
         this.servicestatus = servicestatus;
         this.pagerenderservice = pagerenderservice;
         this.markdownUtil = markdownUtil;
+        this.httpUtil = httpUtil;
     }
     
     /**
@@ -196,11 +189,11 @@ public class Clownfish {
             }
             
             Cookie[] cookies = request.getCookies();
-            String referrer = getCookieVal(cookies, "cf_referrer");
-            addHeader(response, clownfishUtil.getVersion());
-            ClientInformation clientinfo = getClientinformation(request.getRemoteAddr());
-            String token = getCookieVal(cookies, "cf_token");
-            String login_token = getCookieVal(cookies, "cf_login_token");
+            String referrer = httpUtil.getCookieVal(cookies, "cf_referrer");
+            httpUtil.addHeader(response, clownfishUtil.getVersion());
+            ClientInformation clientinfo = httpUtil.getClientInformation(request.getRemoteAddr());
+            String token = httpUtil.getCookieVal(cookies, "cf_token");
+            String login_token = httpUtil.getCookieVal(cookies, "cf_login_token");
             boolean alias = false;
             String aliasname = "";
             try {
@@ -325,7 +318,7 @@ public class Clownfish {
                     }
                 }
 
-                userSession = request.getSession();
+                //userSession = request.getSession();
                 Map<String, String[]> querymap = request.getParameterMap();
 
                 ArrayList queryParams = new ArrayList();
@@ -430,11 +423,11 @@ public class Clownfish {
         
         boolean alias = false;
         try {
-            ClientInformation clientinfo = getClientinformation(request.getRemoteAddr());
+            ClientInformation clientinfo = httpUtil.getClientInformation(request.getRemoteAddr());
             ArrayList urlParams = new ArrayList();
             String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
             
-            userSession = request.getSession();
+            //userSession = request.getSession();
             if (request.getContentType().startsWith("multipart/form-data")) {
                 Map<String, String[]> parameterMap = request.getParameterMap();
                 List<FileItem> fis = request.getFileItems("file");
@@ -443,7 +436,7 @@ public class Clownfish {
                     map.add(new JsonFormParameter(key, parameterMap.get(key)[0]));
                 }
                 
-                addHeader(response, clownfishUtil.getVersion());
+                httpUtil.addHeader(response, clownfishUtil.getVersion());
                 
                 RenderContext rc = new RenderContext();
                 rc.setName(name);
@@ -460,7 +453,6 @@ public class Clownfish {
                 rc.setSearchmetadata(searchmetadata);
                 ClownfishResponse cfResponse = pagerenderservice.renderPage(rc);
                 
-                //ClownfishResponse cfResponse = makeResponse(name, map, urlParams, false, fis, clientinfo, "");
                 if (cfResponse.getErrorcode() == 0) {
                     response.setContentType(this.contenttype);
                     response.setCharacterEncoding(this.characterencoding);
@@ -470,23 +462,23 @@ public class Clownfish {
                             if ((uploadbean.getFileitemmap().get(fi.getName())) || (uploadbean.getFileitemmap().isEmpty())) {
                                 File result = new File(uploadbean.getUploadpath() + File.separator + fi.getName());
                                 boolean fileexists = result.exists();
-                                InputStream inputStream = fi.getInputStream();
-                                if (!fileexists) {
-                                    try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
-                                        byte[] buffer = new byte[64535];
-                                        int bulk;
-                                        while (true) {
-                                            bulk = inputStream.read(buffer);
-                                            if (bulk < 0) {
-                                                break;
+                                try (InputStream inputStream = fi.getInputStream()) {
+                                    if (!fileexists) {
+                                        try (FileOutputStream fileOutputStream = new FileOutputStream(result)) {
+                                            byte[] buffer = new byte[64535];
+                                            int bulk;
+                                            while (true) {
+                                                bulk = inputStream.read(buffer);
+                                                if (bulk < 0) {
+                                                    break;
+                                                }
+                                                fileOutputStream.write(buffer, 0, bulk);
+                                                fileOutputStream.flush();
                                             }
-                                            fileOutputStream.write(buffer, 0, bulk);
-                                            fileOutputStream.flush();
+                                            fileOutputStream.close();
                                         }
-                                        fileOutputStream.close();
                                     }
                                 }
-                                inputStream.close();
                             }
                         }
                     }
@@ -564,7 +556,7 @@ public class Clownfish {
                     }
                 }
 
-                addHeader(response, clownfishUtil.getVersion());
+                httpUtil.addHeader(response, clownfishUtil.getVersion());
                 
                 RenderContext rc = new RenderContext();
                 rc.setName(name);
@@ -616,7 +608,7 @@ public class Clownfish {
         
         boolean alias = false;
         try {
-            ClientInformation clientinfo = getClientinformation(request.getRemoteAddr());
+            ClientInformation clientinfo = httpUtil.getClientInformation(request.getRemoteAddr());
             ArrayList urlParams = new ArrayList();
             String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
             if (path.contains("/")) {
@@ -636,7 +628,7 @@ public class Clownfish {
                 }
             }
             
-            userSession = request.getSession();
+            //userSession = request.getSession();
             String content = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 
             Gson gson = new Gson();
@@ -701,7 +693,7 @@ public class Clownfish {
                 }
             }
 
-            addHeader(response, clownfishUtil.getVersion());
+            httpUtil.addHeader(response, clownfishUtil.getVersion());
             
             RenderContext rc = new RenderContext();
             rc.setName(name);
@@ -731,51 +723,6 @@ public class Clownfish {
             }
         } catch (IOException | PageNotFoundException | IllegalStateException | ParseException ex) {
             LOGGER.error(ex.getMessage());
-        }
-    }
-
-
-    /**
-     * addHeader
-     * 
-     */
-    private void addHeader(HttpServletResponse response, String version) {
-        String serverString = servername.replaceAll("#version#", version);
-        String serverxpowerdedString = serverxpowered.replaceAll("#version#", version);
-        response.addHeader("Server", serverString);
-        response.addHeader("X-Powered-By", serverxpowerdedString);
-    }
-
-    private ClientInformation getClientinformation(String ip) {
-        ClientInformation ci = new ClientInformation();
-        ci.setIpadress(ip);
-        InetAddress addr = null;
-        try {
-            addr = InetAddress.getByName(ip);
-            ci.setHostname(addr.getHostName());
-        } catch (UnknownHostException ex) {
-            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return ci;
-    }
-    
-    private String getCookieVal(Cookie[] cookies, String key) {
-        if (null != cookies) {
-            if (cookies.length > 0) {
-                for (Cookie cookie : cookies) {
-                    if (0 == cookie.getName().compareToIgnoreCase(key)) {
-                        String value = cookie.getValue();
-                        cookie.setMaxAge(0);
-                        cookie.setValue("");
-                        return value;
-                    }
-                }
-                return "";
-            } else {
-                return "";
-            }
-        } else {
-            return "";
         }
     }
 }
