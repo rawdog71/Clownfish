@@ -12,7 +12,6 @@ import io.clownfish.clownfish.serviceinterface.CfJavaversionService;
 import io.clownfish.clownfish.utils.CheckoutUtil;
 import io.clownfish.clownfish.utils.CompressionUtils;
 import io.clownfish.clownfish.utils.JavaUtil;
-import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.event.SlideEndEvent;
@@ -39,6 +38,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintViolationException;
 import org.primefaces.extensions.model.monaco.MonacoDiffEditorModel;
 
 @Named("javaList")

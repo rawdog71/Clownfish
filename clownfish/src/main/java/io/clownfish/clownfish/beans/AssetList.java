@@ -39,7 +39,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.persistence.PersistenceException;
-import jakarta.validation.ConstraintViolationException;
+import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;

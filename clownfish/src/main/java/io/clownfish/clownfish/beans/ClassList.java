@@ -33,7 +33,6 @@ import io.clownfish.clownfish.serviceinterface.CfClasscontentService;
 import io.clownfish.clownfish.utils.ClassUtil;
 import io.clownfish.clownfish.utils.ClownfishUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
-import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.codehaus.plexus.util.StringUtils;
@@ -54,6 +53,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.ConstraintViolationException;
 
 /**
  *

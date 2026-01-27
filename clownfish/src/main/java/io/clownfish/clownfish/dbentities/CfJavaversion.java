@@ -1,12 +1,12 @@
 package io.clownfish.clownfish.dbentities;
 
-import jakarta.validation.constraints.NotNull;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "cf_javaversion", catalog = "clownfish", schema = "")

@@ -1,11 +1,11 @@
 package io.clownfish.clownfish.dbentities;
 
-import jakarta.validation.constraints.NotNull;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
+import javax.validation.constraints.NotNull;
 
 @Embeddable
 public class CfJavaversionPK implements Serializable

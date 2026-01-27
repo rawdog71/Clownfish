@@ -33,7 +33,6 @@ import io.clownfish.clownfish.utils.JavascriptUtil;
 import io.clownfish.clownfish.utils.SiteUtil;
 import io.clownfish.clownfish.utils.StylesheetUtil;
 import io.clownfish.clownfish.utils.TemplateUtil;
-import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.component.tabview.TabView;
@@ -70,6 +69,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintViolationException;
 
 /**
  *

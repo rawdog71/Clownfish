@@ -22,7 +22,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
-import jakarta.validation.ConstraintViolationException;
+import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
