@@ -149,13 +149,65 @@ public class SAPTemplateBean implements Serializable {
                     if (rfcfunctionparam.getParamclass().compareToIgnoreCase("C") == 0) {
                         if (null != postmap_async) {
                             postmap_async.stream().filter((jfp) -> (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0)).forEach((jfp) -> {
-                                ArrayList<LinkedHashMap<String, String>> val = (ArrayList<LinkedHashMap<String, String>>)jfp.getValue();
-                                JCoTable table = function.getChangingParameterList().getTable("I_ZPRUDRUCK");
-                                for (int i = 0; i < val.size(); i++) {
-                                    table.appendRow();
-                                    val.get(i).forEach(table::setValue);
+
+                                String paramName = rfcfunctionparam.getParameter();
+                                Object rawValue = jfp.getValue();
+
+                                try {
+                                    // 1. Prüfen: Ist es eine Tabelle oder eine Struktur?
+                                    boolean isTable = false;
+                                    try {
+                                        isTable = function.getChangingParameterList().getListMetaData().isTable(paramName);
+                                    } catch (Exception e) { isTable = false; }
+
+                                    if (isTable) {
+                                        // --- FALL: TABELLE ---
+                                        JCoTable table = function.getChangingParameterList().getTable(paramName); // WICHTIG: Nicht hardcoded "I_ZPRUDRUCK"!
+
+                                        if (rawValue instanceof List) {
+                                            // Es wurde eine Liste übergeben (mehrere Zeilen)
+                                            List<Map<String, Object>> listVal = (List<Map<String, Object>>) rawValue;
+                                            for (Map<String, Object> row : listVal) {
+                                                table.appendRow();
+                                                for (Map.Entry<String, Object> entry : row.entrySet()) {
+                                                    if (table.getMetaData().hasField(entry.getKey())) {
+                                                        table.setValue(entry.getKey(), entry.getValue());
+                                                    }
+                                                }
+                                            }
+                                        } else if (rawValue instanceof Map) {
+                                            // Es wurde eine Map übergeben (nur eine Zeile) -> Das fixt deinen aktuellen Fehler
+                                            Map<String, Object> mapVal = (Map<String, Object>) rawValue;
+                                            table.appendRow();
+                                            for (Map.Entry<String, Object> entry : mapVal.entrySet()) {
+                                                if (table.getMetaData().hasField(entry.getKey())) {
+                                                    table.setValue(entry.getKey(), entry.getValue());
+                                                }
+                                            }
+                                        }
+                                        // Hinweis: table ist eine Referenz, setValue auf function ist oft nicht nötig, aber schadet nicht
+                                        // function.getChangingParameterList().setValue(paramName, table); 
+
+                                    } else {
+                                        // --- FALL: STRUKTUR ---
+                                        // Changing Parameter können auch Strukturen sein
+                                        if (function.getChangingParameterList().getListMetaData().isStructure(paramName)) {
+                                            JCoStructure structure = function.getChangingParameterList().getStructure(paramName);
+
+                                            if (rawValue instanceof Map) {
+                                                Map<String, Object> mapVal = (Map<String, Object>) rawValue;
+                                                for (Map.Entry<String, Object> entry : mapVal.entrySet()) {
+                                                    if (structure.getMetaData().hasField(entry.getKey())) {
+                                                        structure.setValue(entry.getKey(), entry.getValue());
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    LOGGER.error("Fehler beim Setzen des Changing-Parameters " + paramName + ": " + e.getMessage());
+                                    e.printStackTrace();
                                 }
-                                function.getChangingParameterList().setValue(rfcfunctionparam.getParameter(), table);
                             });
                         }
                     }
@@ -225,19 +277,32 @@ public class SAPTemplateBean implements Serializable {
                             */
                             break;
                         case "c":
-                            String param = new RFC_READ_TABLE(sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
-                            functions_table = function.getChangingParameterList().getTable(paramname);
-                            try {
+                            // Metadaten holen, um zu prüfen, was es wirklich ist
+                            com.sap.conn.jco.JCoMetaData meta = function.getChangingParameterList().getListMetaData();
+
+                            if (meta.isTable(paramname)) {
+                                // --- ES IST EINE TABELLE ---
+                                String param = new RFC_READ_TABLE(this.sapc).getTableStructureName("DD40L", "TYPENAME = '" + tablename + "'", 3);
+                                functions_table = function.getChangingParameterList().getTable(paramname);
+
                                 if (!functions_table.isEmpty()) {
                                     rpytablereadlist = getRpytablereadlist(param.trim(), sapc);
-                                    //rpytablereadlist = rpytableread.getRpyTableReadList(param);
                                     setTableValues(functions_table, rpytablereadlist, tablevalues);
                                     saptables.put(paramname, tablevalues);
                                 }
-                            } catch(ConversionException ex) {
-                                LOGGER.error(ex.getMessage());
+                            } else if (meta.isStructure(paramname)) {
+                                // --- ES IST EINE STRUKTUR (Hier lag der Fehler) ---
+                                JCoStructure functions_structure = function.getChangingParameterList().getStructure(paramname);
+
+                                // Da 'tablename' hier oft der Struktur-Name ist, nutzen wir diesen direkt
+                                // Falls DD40L nötig ist, Logik analog zu oben anpassen, meist reicht aber:
+                                rpytablereadlist = getRpytablereadlist(tablename, sapc);
+
+                                // Du hast bereits eine Hilfsmethode 'setStructureValues', nutzen wir sie:
+                                setStructureValues(functions_structure, rpytablereadlist, tablevalues);
+                                saptables.put(paramname, tablevalues);
                             }
-                        break;
+                            break;
                     }
                 }
                 sapvalues.put("table", saptables);
