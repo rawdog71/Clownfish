@@ -52,7 +52,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import javax.persistence.NoResultException;
 import java.math.BigInteger;
 import java.net.URI;
@@ -185,7 +184,12 @@ public class EntityUtil {
                                 pattern = "yyyy-MM-dd HH:mm:ss.SSS";
                                 dt = DateTime.parse((String)value, DateTimeFormat.forPattern(pattern));
                             } catch (Exception ex2) {
-
+                                try {
+                                    pattern = "HH:mm:ss";
+                                    dt = DateTime.parse((String)value, DateTimeFormat.forPattern(pattern));
+                                } catch (Exception ex3) {
+                                    
+                                }
                             }
                         }
                     }
@@ -193,7 +197,7 @@ public class EntityUtil {
                 } else {
                     prop.setValue(ValueType.PRIMITIVE, ((Date)value));
                 }
-                break;
+                break;  
             default:
                 prop.setValue(ValueType.PRIMITIVE, null);
         }

@@ -731,6 +731,8 @@ public class GenericEdmProvider extends CsdlAbstractEdmProvider implements Runna
                 return EdmPrimitiveTypeKind.String.getFullQualifiedName();
             case "DATE":      // Date
                 return EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName();
+            case "TIME":      // Time
+                return EdmPrimitiveTypeKind.DateTimeOffset.getFullQualifiedName();
             case "INT":       // int, smallint, tinyint
                 return EdmPrimitiveTypeKind.Int32.getFullQualifiedName();
             case "LONG":   

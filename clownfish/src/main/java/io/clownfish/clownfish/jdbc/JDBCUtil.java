@@ -595,6 +595,10 @@ public class JDBCUtil {
                             tf = new TableField(columnName, "DATE", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
                             tableFieldsList.add(tf);
                             break;
+                        case "92":      // Time
+                            tf = new TableField(columnName, "TIME", colomuntypename, pkList.contains(columnName), Integer.parseInt(columnsize), Integer.parseInt(decimaldigits), isNullable);
+                            tableFieldsList.add(tf);
+                            break;    
                     }
                 }
             }
