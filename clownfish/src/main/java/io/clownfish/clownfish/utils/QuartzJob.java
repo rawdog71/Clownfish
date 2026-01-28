@@ -20,6 +20,7 @@ import freemarker.core.ParseException;
 import freemarker.template.MalformedTemplateNameException;
 import io.clownfish.clownfish.beans.PropertyList;
 import io.clownfish.clownfish.beans.QuartzList;
+import io.clownfish.clownfish.compiler.CfClassCompiler;
 //import static io.clownfish.clownfish.beans.SiteTreeBean.SAPCONNECTION;
 import io.clownfish.clownfish.constants.ClownfishConst;
 import static io.clownfish.clownfish.constants.ClownfishConst.ViewModus.STAGING;
@@ -97,6 +98,7 @@ public class QuartzJob implements Job {
     @Autowired ContentUtil contentUtil;
     @Autowired MailUtil mailUtil;
     @Autowired PDFUtil pdfUtil;
+    @Autowired CfClassCompiler cfclassCompiler;
     private @Getter @Setter BeanUtil beanUtil;
     private @Getter @Setter List<CfSitedatasource> sitedatasourcelist;
     private @Getter @Setter Map<String, String> propertymap = null;
@@ -263,6 +265,7 @@ public class QuartzJob implements Job {
             pdfBean.initjob(pdfUtil);
             JSONatorBean jsonatorbean = new JSONatorBean();
             jsonatorbean.init(cftemplateService);
+            ExternalClassProvider externalclassproviderbean = new ExternalClassProvider(cfclassCompiler);
 
             // write the output
             Writer out = new StringWriter();
@@ -288,6 +291,7 @@ public class QuartzJob implements Job {
                     fmRoot.put("websocketBean", webSocketBean);
                     fmRoot.put("uploadBean", uploadBean);
                     fmRoot.put("jsonatorBean", jsonatorbean);
+                    fmRoot.put("classBean", externalclassproviderbean);
                     fmRoot.put("property", propertymap);
                     fmRoot.put("parameter", paramMap);
                     
@@ -301,6 +305,22 @@ public class QuartzJob implements Job {
                             LOGGER.error(ex.getMessage());
                         }
                     }
+
+                    Map finalFmRoot = fmRoot;
+                    cfclassCompiler.getClassMethodMap().forEach((k, v) ->
+                    {
+                        Constructor<?> ctor;
+                        try
+                        {
+                            ctor = k.getConstructor();
+                            Object object = ctor.newInstance();
+                            finalFmRoot.put(k.getName().replaceAll("\\.", "_"), object);
+                        }
+                        catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex)
+                        {
+                            LOGGER.error(ex.getMessage());
+                        }
+                    });
                     
                     try {
                         if (null != fmTemplate) {
@@ -331,6 +351,7 @@ public class QuartzJob implements Job {
                     velContext.put("uploadBean", uploadBean);
                     velContext.put("pdfBean", pdfBean);
                     velContext.put("jsonatorBean", jsonatorbean);
+                    velContext.put("classBean", externalclassproviderbean);
                     velContext.put("contentBean", contentbean);
                     velContext.put("parameter", paramMap);
                     
@@ -344,6 +365,22 @@ public class QuartzJob implements Job {
                             LOGGER.error(ex.getMessage());
                         }
                     }
+                    
+                    org.apache.velocity.VelocityContext finalvelContext = velContext;
+                    cfclassCompiler.getClassMethodMap().forEach((k, v) ->
+                    {
+                        Constructor<?> ctor;
+                        try
+                        {
+                            ctor = k.getConstructor();
+                            Object object = ctor.newInstance();
+                            finalvelContext.put(k.getName().replaceAll("\\.", "_"), object);
+                        }
+                        catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex)
+                        {
+                            LOGGER.error(ex.getMessage());
+                        }
+                    });
 
                     velContext.put("property", propertymap);
                     if (null != velTemplate) {
