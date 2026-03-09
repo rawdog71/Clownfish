@@ -39,8 +39,10 @@ public class DownloadUtil {
     public void downloadJson(String url, String path, String filename) {
         try {
             String jsoncontent = getJsonFromWebservice(url);
-            String jsoncontentformatted = formatJsonString(jsoncontent);
-            saveJsonToFile(jsoncontentformatted, path + File.separator + filename);
+            if (!jsoncontent.isEmpty()) {
+                String jsoncontentformatted = formatJsonString(jsoncontent);
+                saveJsonToFile(jsoncontentformatted, path + File.separator + filename);
+            }
         } catch (IOException ex) {
             Logger.getLogger(DownloadUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
