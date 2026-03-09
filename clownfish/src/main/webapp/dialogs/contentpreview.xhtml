@@ -1,0 +1,10 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <p:dialog id="contentpreviewDlg" header="Content Preview" widgetVar="contentpreviewDlg" minHeight="100" width="500" showEffect="fade">
+        <h:outputText value="#{sitetree.previewContentOutput}" escape="false" />
+    </p:dialog>
+</ui:composition>

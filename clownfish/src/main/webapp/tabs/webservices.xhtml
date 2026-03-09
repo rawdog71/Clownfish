@@ -1,0 +1,26 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <p:dataTable id="webserviceauthlist" size="small" scrollable="true" scrollHeight="250" var="webserviceauth" value="#{webserviceauthlist.webserviceauthlist}" 
+                selectionMode="single" selection="#{webserviceauthlist.selectedWebserviceauth}" rowKey="#{webserviceauth.hash}"
+               emptyMessage="No content available">
+       <p:ajax event="rowSelect" listener="#{webserviceauthlist.onSelect}" />
+       <p:column headerText="Webservice" filterBy="#{webserviceauth.cfWebserviceauthPK.webserviceRef}" filterMatchMode="contains">
+           <h:outputText value="#{webserviceauth.cfWebserviceauthPK.webserviceRef}" />
+       </p:column>
+       <p:column headerText="Hash">
+           <h:outputText value="#{webserviceauth.hash}" />
+       </p:column>
+    </p:dataTable>
+
+    <p:outputLabel for="webservicelist" value="Webservices" />
+    <p:selectOneMenu id="webservicelist" value="#{webserviceauthlist.selectedWebservice}" required="false" converter="#{webserviceConverterBean}">
+        <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+        <f:selectItems value="#{webserviceauthlist.webservicelist}" />
+    </p:selectOneMenu>
+    <p:commandButton id="newwebserviceauth" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{webserviceauthlist.onCreateWebserviceAuth}" update=":form:msgs :form:tabview:webserviceauthlist :form:tabview:webservicelist" disabled="#{webserviceauthlist.newAuthButtonDisabled}" />
+    
+</ui:composition>

@@ -1,0 +1,9 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dialog id="assetpreviewDlg" header="Asset Preview" widgetVar="assetpreviewDlg" minHeight="100" width="500" showEffect="fade">
+        <p:graphicImage url="GetAssetPreview?apikey=#{loginBean.apikey}&amp;mediaid=#{sitetree.previewAssetOutput}&amp;width=400" width="400"></p:graphicImage>
+    </p:dialog>
+</ui:composition>

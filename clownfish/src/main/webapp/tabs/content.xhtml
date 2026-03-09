@@ -1,0 +1,184 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <div class="flex flex-row pb-2">
+        <p:panel id="contentpanel">
+            <p:dataTable id="classcontentlist" size="small" scrollable="true" scrollHeight="250" var="classcontent" value="#{classcontentList.classcontentlist}" 
+                         paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                         rowsPerPageTemplate="10,50,100"
+                         selectionMode="single" selection="#{classcontentList.selectedContent}" rowKey="#{classcontent.id}"
+                         emptyMessage="No content available" filteredValue="#{classcontentList.filteredContent}" widgetVar="classcontentlist" sortMode="single">
+                <p:ajax event="rowSelect" listener="#{classcontentList.onSelect}" update=":form:msgs :form:tabview:attributcontentlist :form:tabview:contentname :form:tabview:contentclass :form:tabview:contentbtnpanel :form:tabview:contentkeywordpicklist :form:tabview:contentpreview" />
+                <p:column headerText="Name" filterBy="#{classcontent.name}" filterMatchMode="contains" sortBy="#{classcontent.name}">
+                    <h:outputText value="#{classcontent.name}" />
+                </p:column>
+                <p:column headerText="Klasse" filterBy="#{classcontent.classref}" filterMatchMode="exact">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('classcontentlist').filter()" styleClass="custom-filter">
+                            <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{classcontentList.classmaintenancelist}" />
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{classcontent.classref}" />
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+    </div>
+
+    <p:panel id="contentbtnpanel">
+        <div class="flex flex-row pb-2">
+            <div class="flex align-items-center pr-2">
+                <p:commandButton id="refreshcontent" icon="pi pi-refresh" process="form" value="Refresh" actionListener="#{classcontentList.onRefreshContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist">
+                </p:commandButton>
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:outputLabel for="contentname" style="margin-right: 0.5rem">Name</p:outputLabel>
+                <p:inputText id="contentname" value="#{classcontentList.contentName}" required="false">
+                    <f:validateRegex pattern="^([a-zA-ZäöüÄÖÜ][0-9a-zA-ZäöüÄÖÜ_ ()]+)?$"/>
+                    <p:ajax event="keyup" listener="#{classcontentList.onChangeName(changeEvent)}" update="newcontent" />
+                </p:inputText>
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:outputLabel for="contentclass" value="Class:" style="margin-right: 0.5rem" />
+                <p:selectOneMenu id="contentclass" value="#{classcontentList.selectedClass}" required="false" converter="#{classConverterBean}">
+                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                    <f:selectItems value="#{classcontentList.classlist}" />
+                </p:selectOneMenu>
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:commandButton id="newcontent" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{classcontentList.onCreateContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}">
+                    <f:actionListener binding="#{sitetree.initClassContentlist()}" />
+                </p:commandButton>
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:commandButton id="changecontentname" icon="pi pi-save" process="form" value="Change name" actionListener="#{classcontentList.onChangeContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:contentname :form:tabview:tabsiteview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}">
+                    <f:actionListener binding="#{sitetree.initClassContentlist()}" />
+                </p:commandButton>
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:commandButton id="copycontent" icon="pi pi-copy" process="form" value="Copy content" actionListener="#{classcontentList.onCopyContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:contentname :form:tabview:tabsiteview:classcontentdroplist" disabled="#{classcontentlist.newContentButtonDisabled}">
+                    <f:actionListener binding="#{sitetree.initClassContentlist()}" />
+                </p:commandButton>
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:commandButton id="deletecontent" icon="pi pi-trash" process="form" value="Delete" actionListener="#{classcontentList.onScrappContent}" update=":form:msgs :form:tabview:classcontentlist :form:tabview:tabsiteview:classcontentdroplist :form:tabview:tabsiteview:accessmanager_droplist">
+                    <f:actionListener binding="#{sitetree.initClassContentlist()}" />
+                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                </p:commandButton>
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:commandButton id="checkincontent" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{classcontentList.checkedout}" actionListener="#{classcontentList.onCheckIn}"  update=":form:msgs :form:tabview:templateversion :form:tabview:contentbtnpanel :form:tabview:edittemplate" />
+            </div>
+            <div class="flex align-items-center pr-2">
+                <p:commandButton id="checkoutcontent" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!classcontentList.checkedout and classcontentList.access}" actionListener="#{classcontentList.onCheckOut}" update=":form:msgs :form:tabview:templateversion :form:tabview:contentbtnpanel :form:tabview:edittemplatepanel" />
+            </div>
+            <div class="flex align-items-center pr-2">
+                <p:commandButton id="commitcontent" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{!classcontentList.checkedout and classcontentList.access and classcontentList.difference}" actionListener="#{classcontentList.onCommit}" update=":form:msgs :form:tabview:templateversion :form:tabview:contentbtnpanel :form:tabview:selectedtemplateversion :form:tabview:contentpreview">
+                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                </p:commandButton>
+            </div>
+
+            <h:panelGroup id="versioncontentBtnGroup">
+                <p:outputLabel> Version </p:outputLabel><p:outputLabel id="contentversion">#{classcontentList.contentUtility.currentVersion}</p:outputLabel>
+
+                <h5>Select Version</h5>           
+                <p:inputText id="selectedcontentversion" value="#{classcontentList.selectedcontentversion}" disabled="true" />
+                <p:slider id="selectedcontentversionslider" for="selectedcontentversion" minValue="#{classcontentList.contentversionMin}" maxValue="#{classcontentList.contentversionMax}">
+                    <p:ajax event="slideEnd" listener="#{classcontentList.onSlideEnd}" update=":form:msgs :form:tabview:contentversion :form:tabview:selectedcontentversion :form:tabview:contentbtnpanel :form:tabview:attributcontentlist" />
+                </p:slider>
+            </h:panelGroup>
+        </div>
+    </p:panel>
+
+    <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
+        <p:dataTable id="attributcontentlist" size="small" var="attributcontent" value="#{classcontentList.attributcontentlist}" selectionMode="single" selection="#{classcontentList.selectedAttributContent}" rowKey="#{attributcontent.id}">
+            <p:ajax event="rowSelect" listener="#{classcontentList.onSelectAttribut}" update=":form:tabview:attributcontentlist" />
+            <p:column headerText="Name" style="width: 200px;">
+                <h:outputText value="#{attributcontent.attributref.name}" />
+            </p:column>
+            <p:column headerText="Typ" style="width: 200px;">
+                <h:outputText value="#{attributcontent.attributref.attributetypeString}" />
+            </p:column>
+            <p:column headerText="Class" style="width: 200px;">
+                <h:outputText value="#{attributcontent.attributref.relationref.name}" />
+            </p:column>
+            <p:column headerText="Wert">
+                <p:inputText id="attributvalueString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.stringType}" required="#{classcontentList.isRequired(attributcontent)}" maxlength="#{classcontentList.getMaxlength(attributcontent)}" disabled="#{!classcontentList.checkedout}">
+                    <f:validateLength minimum="#{classcontentList.getMinlength(attributcontent)}"></f:validateLength>
+                </p:inputText>
+                <p:password id="attributvalueHashString" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.hashStringType}" required="#{classcontentList.isRequired(attributcontent)}"  disabled="#{!classcontentList.checkedout}" />
+                <p:inputNumber id="attributvalueInt" value="#{classcontentList.editContent}" decimalPlaces="0" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.integerType}" required="#{classcontentList.isRequired(attributcontent)}" minValue="#{classcontentList.getMinlength(attributcontent)}" maxValue="#{classcontentList.getMaxlength(attributcontent)}" disabled="#{!classcontentList.checkedout}" />
+                <p:inputNumber id="attributvalueReal" value="#{classcontentList.editContent}" decimalPlaces="2" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.realType}" required="#{classcontentList.isRequired(attributcontent)}" minValue="#{classcontentList.getMinlength(attributcontent)}" maxValue="#{classcontentList.getMaxlength(attributcontent)}" disabled="#{!classcontentList.checkedout}" />
+                <pe:monacoEditor id="attributvalueHtmlText" disabled="#{!classcontentList.checkedout}" widgetVar="editor1" editorOptions="#{classcontentList.editorOptions}" value="#{classcontentList.editContent}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.HTMLTextType}" required="#{classcontentList.isRequired(attributcontent)}" />
+                <p:inputTextarea id="attributvalueText" widgetVar="editor12" rows="8" cols="50" value="#{classcontentList.editContent}" style="margin-bottom:10px; width:100%" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.textType}" required="#{classcontentList.isRequired(attributcontent)}" maxlength="#{classcontentList.getMaxlength(attributcontent)}" disabled="#{!classcontentList.checkedout}" />
+                <pe:monacoEditor id="attributvalueMarkdown" disabled="#{!classcontentList.checkedout}" widgetVar="editor13" editorOptions="#{classcontentList.editorOptions}" value="#{classcontentList.editContent}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.markdownType}" required="#{classcontentList.isRequired(attributcontent)}" />
+                <p:selectBooleanCheckbox id="attributvalueBoolean" value="#{classcontentList.editContent}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.booleanType}" required="#{classcontentList.isRequired(attributcontent)}" disabled="#{!classcontentList.checkedout}" />
+                <p:calendar id="attributvalueDatetime" value="#{classcontentList.editCalendar}" locale="de" navigator="true" pattern="dd.MM.yyyy" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.datetimeType}" required="#{classcontentList.isRequired(attributcontent)}" disabled="#{!classcontentList.checkedout}" />
+                <p:selectOneMenu id="media" value="#{classcontentList.selectedMedia}" var="mp" converter="#{assetConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.mediaType}" required="#{classcontentList.isRequired(attributcontent)}" disabled="#{!classcontentList.checkedout}">
+                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                    <f:selectItems value="#{classcontentList.assetlist}" var="media" itemLabel="#{media.name}" itemValue="#{media}" />
+                    <p:column>
+                    <p:graphicImage url="GetAssetPreview?apikey=#{loginBean.apikey}&amp;mediaid=#{mp.id}&amp;width=50" width="50" alt="#{mp.name}" title="#{mp.name}" /> 
+                    </p:column>
+                    <p:column>
+                    #{mp.name}
+                    </p:column>
+                </p:selectOneMenu>
+                <p:selectOneMenu dynamic="true" id="classref_1" value="#{classcontentList.editDatalist}" converter="#{sitelistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType and (attributcontent.attributref.relationtype==0)}" required="#{classcontentList.isRequired(attributcontent)}" disabled="#{!classcontentList.checkedout}">
+                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                    <f:selectItems value="#{classcontentList.selectedList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
+                </p:selectOneMenu>
+                <p:selectOneMenu dynamic="true" id="classref_2" value="#{classcontentList.editDataContentlist}" converter="#{classcontentConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.classrefType and (attributcontent.attributref.relationtype==1)}" required="#{classcontentList.isRequired(attributcontent)}" disabled="#{!classcontentList.checkedout}">
+                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                    <f:selectItems value="#{classcontentList.selectedContentList}" var="datalist" itemLabel="#{datalist.name}" itemValue="#{datalist}" />
+                </p:selectOneMenu>
+                <p:selectOneMenu dynamic="true" id="assetref" value="#{classcontentList.editAssetlist}" converter="#{assetlistConverterBean}" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.assetrefType}" required="#{classcontentList.isRequired(attributcontent)}" disabled="#{!classcontentList.checkedout}">
+                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                    <f:selectItems value="#{classcontentList.selectedAssetList}" var="assetdatalist" itemLabel="#{assetdatalist.name}" itemValue="#{assetdatalist}" />
+                </p:selectOneMenu>
+
+                <h:outputText value="#{classcontentList.toString(attributcontent)}" rendered="#{not classcontentList.renderSelected(attributcontent)}" />
+                <p:commandButton id="editattribut" icon="pi pi-pencil" process="form" value="Change" actionListener="#{classcontentList.onEditAttribut}" update=":form:msgs :form:tabview:classcontentlist" rendered="#{classcontentList.renderSelected(attributcontent) and classcontentList.checkedout}" >
+
+                </p:commandButton>
+                <p:focus for="attributvalueString" />
+                <p:focus for="attributvalueInt" />
+                <p:focus for="attributvalueReal" />
+                <p:focus for="attributvalueHtmlText" />
+                <p:focus for="attributvalueText" />
+                <p:focus for="attributvalueMarkdown" />
+            </p:column>
+            <p:column headerText="Description">
+                <h:outputText value="#{attributcontent.attributref.description}" />
+            </p:column>
+        </p:dataTable>
+    </h:panelGrid>
+
+    <p:panel id="contentkeywordattacher">
+        <p:pickList id="contentkeywordpicklist" value="#{classcontentList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" converter="#{keywordConverterBean}" showCheckbox="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains">
+            <f:facet name="sourceCaption">Unattached</f:facet>
+            <f:facet name="targetCaption">Attached</f:facet>
+        </p:pickList>
+        <p:inputTextarea id="contentJson" value="#{classcontentList.contentJson}" rows="8" cols="50"></p:inputTextarea>
+        <p:commandButton id="attachcontentkeyword" value="Attach" actionListener="#{classcontentList.onAttach}">
+        </p:commandButton>
+        <p:commandButton id="generateJsonContent" value="Json Export" actionListener="#{classcontentList.jsonExport}" update=":form:tabview:contentJson">
+        </p:commandButton>
+    </p:panel>  
+
+    <p:panel id="contentpreview">
+        <h:outputText value="#{classcontentList.contentpreview}" escape="false" />
+    </p:panel>
+    
+</ui:composition>

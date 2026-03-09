@@ -1,0 +1,23 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dialog id="assetlistpreviewDlg" header="Assetlist Preview" widgetVar="assetlistpreviewDlg" minHeight="100" width="500" showEffect="fade">
+        <p:dataScroller value="#{sitetree.previewAssetlistOutput}" var="asset" chunkSize="10" mode="inline"
+                    scrollHeight="500">
+            <f:facet name="header">
+                Assets
+            </f:facet>
+            <div class="flex flex-row">
+                <div class="flex align-items-center justify-content-center w-10rem h-10rem">
+                    <p:graphicImage url="GetAssetPreview?apikey=#{loginBean.apikey}&amp;mediaid=#{asset.id}&amp;width=200" width="200"></p:graphicImage>
+                </div>
+                <div class="flex flex-column align-items-center justify-content-center w-20rem h-10rem">
+                    <div class="flex w-10rem">#{asset.name}</div>
+                    <div class="flex w-10rem">#{asset.description}</div>
+                </div>
+            </div>
+        </p:dataScroller>
+    </p:dialog>
+</ui:composition>

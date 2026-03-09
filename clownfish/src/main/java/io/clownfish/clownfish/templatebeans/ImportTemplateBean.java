@@ -19,6 +19,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import com.opencsv.ICSVParser;
 import com.opencsv.exceptions.CsvValidationException;
 import io.clownfish.clownfish.dbentities.CfDatasource;
 import io.clownfish.clownfish.dbentities.CfSitedatasource;
@@ -125,7 +126,7 @@ public class ImportTemplateBean implements Serializable
                         if (bHeader)
                         {
                             Reader readr = new BufferedReader(new InputStreamReader(new FileInputStream(fileIn1), encoding));
-                            CSVParser prsr = new CSVParserBuilder().withSeparator(';').withIgnoreLeadingWhiteSpace(true).build();
+                            CSVParser prsr = new CSVParserBuilder().withSeparator(';').withIgnoreLeadingWhiteSpace(true).withEscapeChar(ICSVParser.NULL_CHARACTER).build();
                             CSVReader csvReadr = new CSVReaderBuilder(readr).withCSVParser(prsr).build();
                             Collections.addAll(header, csvReadr.readNext());
                             bSkipFirstLine = true;
@@ -151,58 +152,58 @@ public class ImportTemplateBean implements Serializable
                         }
 
                         Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileIn1), encoding));
-                        CSVParser parser = new CSVParserBuilder().withSeparator(';').withIgnoreLeadingWhiteSpace(true).build();
+                        CSVParser parser = new CSVParserBuilder().withSeparator(';').withIgnoreLeadingWhiteSpace(true).withEscapeChar(ICSVParser.NULL_CHARACTER).build();
                         CSVReader csvReader;
                         
                         if (bSkipFirstLine)
                             csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).withSkipLines(1).build();
                         else
                             csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).build();
-                            
-                        String[] nextLine;
-                        int iLines = 0;
-                        final int iBatchSize = 10;
+                                 
+                            String[] nextLine;
+                            int iLines = 0;
+                            final int iBatchSize = 10;
 
-                        if (bTruncate)
-                        {
-                            Statement truncate = connection.createStatement();
-                            truncate.execute("TRUNCATE TABLE " + tblName + ";");
-                        }
-
-                        PreparedStatement statement = connection.prepareStatement(generateSqlStatement(header, tblName));
-
-                        // Read CSV and write to database in batches
-                        while ((nextLine = csvReader.readNext()) != null)
-                        {
-                            iLines++;
-
-                            // Add results to batch
-                            for (int i = 0; i < header.size(); i++)
+                            if (bTruncate)
                             {
-                                statement.setString(i + 1, nextLine[i].trim());
-                            }
-                            statement.addBatch();
-
-                            // Execute SQL statement once batch size is reached
-                            if (iLines >= iBatchSize)
-                            {
-                                iTotalRecords += doExecute(statement);
-                                iLines = 0;
+                                Statement truncate = connection.createStatement();
+                                truncate.execute("TRUNCATE TABLE " + tblName + ";");
                             }
 
-                            // Finish up remaining rows
-                            if (iLines >= 0)
-                            {
-                                System.out.println(statement.toString());
-                                iTotalRecords += doExecute(statement);
+                            PreparedStatement statement = connection.prepareStatement(generateSqlStatement(header, tblName));
+
+                            // Read CSV and write to database in batches
+                            while ((nextLine = csvReader.readNext()) != null)
+                            {   
+                                iLines++;
+
+                                // Add results to batch
+                                for (int i = 0; i < header.size(); i++)
+                                {
+                                    statement.setString(i + 1, nextLine[i].trim());
+                                }
+                                statement.addBatch();
+
+                                // Execute SQL statement once batch size is reached
+                                if (iLines >= iBatchSize)
+                                {
+                                    iTotalRecords += doExecute(statement);
+                                    iLines = 0;
+                                }
+
+                                // Finish up remaining rows
+                                if (iLines >= 0)
+                                {
+                                    //System.out.println(statement.toString());
+                                    iTotalRecords += doExecute(statement);
+                                } 
                             }
-                        }
 
-                        status = true;
-                        LOGGER.info("Finished database import successfully! " + iTotalRecords + " records added.");
+                            status = true;
+                            LOGGER.info("Finished database import for " + fileIn + " successfully! " + iTotalRecords + " records added to " + tblName + ".");
 
-                        csvReader.close();
-                        reader.close();
+                            csvReader.close();
+                            reader.close();
                     }
                     connection.close();
                     return iTotalRecords;
@@ -243,78 +244,20 @@ public class ImportTemplateBean implements Serializable
 
             for (int i : result)
             {
-                iTotalRecords += result[i];
+                iTotalRecords += i;
             }
+            LOGGER.error("DOPPELT");
         }
         catch (SQLException e)
         {
             e.printStackTrace();
         }
+        catch (IndexOutOfBoundsException ex) {
+            LOGGER.error("DOPPELT");
+            LOGGER.error(ex.getMessage());
+            return -1;
+        }
 
         return iTotalRecords;
-    }
-
-    private TableFieldStructure getTableFieldsList(ResultSetMetaData dmd)
-    {
-        try
-        {
-            TableFieldStructure tfs = new TableFieldStructure();
-            ArrayList<TableField> tableFieldsList = new ArrayList<>();
-            int columncount = dmd.getColumnCount();
-            for (int i = 1; i <= columncount; i++)
-            {
-                String columnName = dmd.getColumnName(i);
-                int colomuntype = dmd.getColumnType(i);
-                String colomuntypename = dmd.getColumnTypeName(i);
-                int columnsize = dmd.getColumnDisplaySize(i);
-                int decimaldigits = dmd.getPrecision(i);
-                /*
-                if (decimaldigits == null)
-                {
-                    decimaldigits = "0";
-                }
-                 */
-                int isNullable = dmd.isNullable(i);
-                //String is_autoIncrment = columns.getString("IS_AUTOINCREMENT");
-                String is_autoIncrment = "";
-
-                switch (colomuntype)
-                {
-                    case 1:      // varchar -> String
-                    case 12:
-                    case 2005:    // text -> String
-                        tableFieldsList.add(new TableField(columnName, "STRING", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 2:       // int
-                    case 4:
-                    case 5:       // smallint
-                        tableFieldsList.add(new TableField(columnName, "INT", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 7:       // real
-                        tableFieldsList.add(new TableField(columnName, "REAL", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 8:       // float
-                        tableFieldsList.add(new TableField(columnName, "FLOAT", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case -5:      // long
-                        tableFieldsList.add(new TableField(columnName, "LONG", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case -7:      // bit
-                        tableFieldsList.add(new TableField(columnName, "BOOLEAN", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                    case 93:      // Date
-                        tableFieldsList.add(new TableField(columnName, "DATE", colomuntypename, false, columnsize, decimaldigits, String.valueOf(isNullable)));
-                        break;
-                }
-            }
-            tfs.setDefault_order("");
-            tfs.setTableFieldsList(tableFieldsList);
-            return tfs;
-        }
-        catch (SQLException ex)
-        {
-            LOGGER.error(ex.getMessage());
-            return null;
-        }
     }
 }

@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dialog id="ODataWizardDlg" header="OData Formular Wizard" widgetVar="ODataWizardDlg" minHeight="100" width="1200" showEffect="fade" modal="true">
+        <p:dataTable id="wizardattributlist" size="small" var="attribut" value="#{classList.odataWizardList}" selectionMode="single" rowKey="#{attribut.attribut.id}">
+            <p:column headerText="Header">
+                <p:selectBooleanCheckbox value="#{attribut.tableheader}" disabled="#{!attribut.headerenabled}" />
+            </p:column>
+            <p:column headerText="Use Description">
+                <p:selectBooleanCheckbox value="#{attribut.usedescriptrion}" title="#{attribut.attribut.description}" disabled="#{empty attribut.attribut.description}" />
+            </p:column>
+            <p:column headerText="Name">
+                <h:outputText value="#{attribut.attribut.name}" />
+            </p:column>
+            <p:column headerText="Type">
+                <h:outputText value="#{attribut.attribut.attributetype}" />
+            </p:column>
+            <p:column headerText="Class">
+                <h:outputText value="#{attribut.attribut.relationref}" />
+            </p:column>
+            <p:column headerText="Relation">
+                <h:outputText value="#{attribut.attribut.relationtypeFull}" />
+            </p:column>
+            <p:column headerText="RelAttr1">
+                <p:selectOneMenu id="RelAttrOption1" value="#{attribut.relationattribut1}" rendered="#{attribut.relationenabled}">
+                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                    <f:selectItems value="#{classList.getAttributenames(attribut.attribut.relationref)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                </p:selectOneMenu>
+            </p:column>
+            <p:column headerText="RelAttr2">
+                <p:selectOneMenu id="RelAttrOption2" value="#{attribut.relationattribut2}" rendered="#{attribut.relationenabled}">
+                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                    <f:selectItems value="#{classList.getAttributenames(attribut.attribut.relationref)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                </p:selectOneMenu>
+            </p:column>
+            <p:column headerText="RelAttr3">
+                <p:selectOneMenu id="RelAttrOption3" value="#{attribut.relationattribut3}" rendered="#{attribut.relationenabled}">
+                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                    <f:selectItems value="#{classList.getAttributenames(attribut.attribut.relationref)}" var="attrrel" itemLabel="#{attrrel.name}" itemValue="#{attrrel.name}" />
+                </p:selectOneMenu>
+            </p:column>
+        </p:dataTable>
+
+        <p:row>
+            <p:column>
+                <div class="content-justify">
+                    <p:outputLabel for="generateListform" value="Generate List form:" />
+                    <p:selectBooleanCheckbox id="generateListform" value="#{classList.generatelistform}"/>
+                </div>
+            </p:column>
+        </p:row>
+
+        <p:row>
+            <p:column>
+                <div style="margin-top: 8px; margin-bottom: 8px" class="content-justify">
+                    <p:outputLabel for="generateListform" value="In-place editing:" />
+                    <p:selectBooleanCheckbox id="generateInPlaceEditing" value="#{classList.generateInPlaceEditing}"/>
+                </div>
+            </p:column>
+        </p:row>
+
+        <p:commandButton id="odataformwizard" process="form" value="Generate OData Form Wizard" actionListener="#{classList.onGenerateODataForm(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+            <f:actionListener binding="#{templateList.refresh()}" />
+            <f:actionListener binding="#{javascriptList.refresh()}" />
+            <f:actionListener binding="#{sitetree.onRefreshAll()}" />
+        </p:commandButton>
+    </p:dialog>
+</ui:composition>

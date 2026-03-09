@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <p:panel id="datapanel">
+        <p:dataTable id="datalistcontent" size="small" scrollable="true" scrollHeight="250" var="datalist" value="#{datacontentList.datacontentlist}" 
+                     paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                     rowsPerPageTemplate="10,50,100"
+                     selectionMode="single" selection="#{datacontentList.selectedList}" rowKey="#{datalist.id}" widgetVar="datalistcontent" sortMode="single">
+            <p:ajax event="rowSelect" listener="#{datacontentList.onSelect}" update=":form:msgs :form:tabview:datacontentname :form:tabview:datacontentclass :form:tabview:newcontentlist :form:tabview:datacontentlistbox" />
+            <p:column headerText="Name" filterBy="#{datalist.name}" filterMatchMode="contains" sortBy="#{datalist.name}">
+                <h:outputText value="#{datalist.name}" />
+            </p:column>
+            <p:column headerText="Klasse" filterBy="#{datalist.classref}" filterMatchMode="exact">
+                <f:facet name="filter">
+                    <p:selectOneMenu onchange="PF('datalistcontent').filter()" styleClass="custom-filter">
+                        <f:selectItem itemLabel="Select One" itemValue="#{null}" noSelectionOption="true" />
+                        <f:selectItems value="#{datacontentList.classlist}" />
+                    </p:selectOneMenu>
+                </f:facet>
+                <h:outputText value="#{datalist.classref}" />
+            </p:column>
+        </p:dataTable>
+    </p:panel>
+
+    <p:outputLabel for="datacontentname" style="margin-right: 0.5rem">Name</p:outputLabel>
+    <p:inputText id="datacontentname" value="#{datacontentList.contentName}" required="false">
+        <f:validateRegex pattern="^([a-zA-Z][0-9a-zA-Z_]+)?$"/>
+        <p:ajax event="keyup" listener="#{datacontentList.onChangeName(changeEvent)}" update="newcontentlist" />
+    </p:inputText>
+
+    <p:outputLabel for="datacontentclass" value="Class:" style="margin-right: 0.5rem" />
+    <p:selectOneMenu id="datacontentclass" value="#{datacontentList.selectedClass}" required="false" converter="#{classConverterBean}">
+        <f:selectItems value="#{datacontentList.classlist}" />
+    </p:selectOneMenu>
+
+    <p:commandButton id="newcontentlist" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{datacontentList.onCreateContent}" update=":form:msgs :form:tabview:tabsiteview:sitelist :form:tabview:datalistcontent" disabled="#{datacontentlist.newContentButtonDisabled}">
+        <f:actionListener binding="#{sitetree.initContentlist()}" />
+    </p:commandButton>
+    <p:commandButton id="deletecontentlist" icon="pi pi-trash" process="form" value="Delete" actionListener="#{datacontentList.onDeleteContent}" update=":form:msgs :form:tabview:tabsiteview:sitelist :form:tabview:datalistcontent">
+        <f:actionListener binding="#{sitetree.initContentlist()}" />
+        <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+    </p:commandButton>
+
+    <p:selectManyCheckbox id="datacontentlistbox" value="#{datacontentList.selectedListcontent}" layout="responsive" columns="4" converter="#{classcontentConverterBean}">
+        <f:selectItems value="#{datacontentList.filteredclasscontentlist}" var="content" itemLabel="#{content.name}" itemValue="#{content}" />
+        <p:ajax listener="#{datacontentList.onChangeContent}" />
+    </p:selectManyCheckbox>
+</ui:composition>

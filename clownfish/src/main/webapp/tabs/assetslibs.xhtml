@@ -1,0 +1,29 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <p:dataTable id="assetlistcontent" size="small" scrollable="true" scrollHeight="250" var="assetlistcontent" value="#{assetLibrary.assetlist}" 
+                selectionMode="single" selection="#{assetLibrary.selectedAssetlist}" rowKey="#{assetlistcontent.id}"
+                emptyMessage="No content available" filteredValue="#{assetLibrary.filteredAssetlist}" widgetVar="assetcontentlist" sortMode="single">
+       <p:ajax event="rowSelect" listener="#{assetLibrary.onSelect}" update=":form:msgs :form:tabview:assetcontentlist :form:tabview:assetcontentlistbox" />
+       <p:column headerText="Name" filterBy="#{assetlistcontent.name}" filterMatchMode="contains" sortBy="#{assetlistcontent.name}">
+           <h:outputText value="#{assetlistcontent.name}" />
+       </p:column>
+   </p:dataTable>
+
+   <h:panelGrid columns="2">
+       <p:outputLabel for="assetcontentlist" value="Assetlist: " />
+       <p:inputText id="assetcontentlist" value="#{assetLibrary.assetlistname}" />
+
+       <p:commandButton id="newassetlist" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{assetLibrary.onCreate}" update=":form:tabview:assetlistcontent :form:tabview:tabsiteview:assetlibrarydroplist">
+           <f:actionListener binding="#{sitetree.initAssetlibrarylist()}" />
+       </p:commandButton>
+   </h:panelGrid>
+
+   <p:selectManyCheckbox id="assetcontentlistbox" value="#{assetLibrary.selectedAssetcontent}" layout="responsive" columns="4" converter="#{assetConverterBean}">
+       <f:selectItems value="#{assetLibrary.filteredAssetcontent}" var="asset" itemLabel="#{asset.name}" itemValue="#{asset}" />
+       <p:ajax listener="#{assetLibrary.onChangeContent}" />
+   </p:selectManyCheckbox>
+</ui:composition>

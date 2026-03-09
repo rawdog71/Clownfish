@@ -1,0 +1,192 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <p:tabView id="javatabview">
+        <p:tab title="JVM Source" id="javasourcepanel">
+            <div class="flex flex-row pb-2">
+                <div class="flex align-items-center pr-2">
+                    <p:outputLabel value="JVM" for="@next" style="margin-right: 0.5rem" rendered="#{loginBean.cfuser.superadmin}"/>
+                    <p:autoComplete id="javalist" dropdown="true" value="#{javaList.selectedJava}" completeMethod="#{javaList.completeText}" converter="#{javaConverterBean}" scrollHeight="250" rendered="#{loginBean.cfuser.superadmin}">
+                        <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:javatabview:editjava :form:tabview:javatabview:javaname :form:tabview:javatabview:newjava :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjavapanel :form:tabview:javatabview:javalanguage :form:tabview:javatabview:java-invisible"/>
+                    </p:autoComplete>
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:outputLabel value="JVM" for="@next" style="margin-right: 0.5rem" rendered="#{!loginBean.cfuser.superadmin}"/>
+                    <p:autoComplete id="invis-javalist" dropdown="true" value="#{javaList.selectedJava}" completeMethod="#{javaList.completeInvisText}" converter="#{javaConverterBean}" scrollHeight="250" rendered="#{!loginBean.cfuser.superadmin}">
+                        <p:ajax listener="#{javaList.onSelect}" update=":form:tabview:javatabview:editjava :form:tabview:javatabview:javaname :form:tabview:javatabview:newjava :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjavapanel :form:tabview:javatabview:javalanguage :form:tabview:javatabview:java-invisible"/>
+                    </p:autoComplete>
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:outputLabel for="javaname" style="margin-right: 0.5rem">Name</p:outputLabel>
+                    <p:inputText id="javaname" value="#{javaList.javaName}" >
+                        <p:ajax event="keyup" listener="#{javaList.onChangeName(changeEvent)}" update=":form:tabview:javatabview:newjava :form:tabview:javatabview:changejava" />
+                    </p:inputText>
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:selectOneMenu id="javalanguage" value="#{javaList.javaLanguage}">
+                        <f:selectItems value="#{javaList.getJvmLanguages().entrySet()}" var="entry" itemValue="#{entry.key}" itemLabel="#{entry.value}" />
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:commandButton id="newjava" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{javaList.onCreate}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname" disabled="#{javaList.newButtonDisabled}" />
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:commandButton id="changejava" icon="pi pi-pencil" process="form" value="Change" actionListener="#{javaList.onChange}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname" disabled="#{javaList.newButtonDisabled}" />
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:commandButton id="copyjavaButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{javaList.onCopy}" update=":form:msgs :form:tabview:javatabview:javalist :form:tabview:javatabview:javaname">
+                    </p:commandButton>
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:commandButton id="deletejavaButton" icon="pi pi-trash" value="Delete" actionListener="#{javaList.onDelete}" update=":form:msgs :form:tabview:javatabview:javalist">
+                        <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                    </p:commandButton>
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:selectBooleanCheckbox id="java-invisible" value="#{javaList.invisible}" disabled="#{javaList.selectedJava == null}" rendered="#{loginBean.cfuser.superadmin}"/>
+                    <p:outputLabel for="java-invisible" value="Invisible" rendered="#{loginBean.cfuser.superadmin}"/>
+                </div>
+            </div>
+
+            <h:panelGroup id="editjavapanel">
+                <div class="flex flex-row pb-2">
+                    <pe:monacoEditor id="editjava" disabled="false" widgetVar="monacojava" readonly="#{!javaList.checkedout}" editorOptions="#{javaList.editorOptions}" value="#{javaList.content}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{!javaList.showDiff}" />
+                    <pe:monacoDiffEditor id="editjavadiff" widgetVar="monacojavadiff" rendered="#{javaList.showDiff}" 
+                                         value="#{javaList.contentDiff}" editorOptions="#{javaList.editorOptionsDiff}" language="#{javaList.editorOptions.language}" readonly="#{!javaList.checkedout}"
+                                         locale="de" width="100%" height="600px" autoResize="true" />
+                </div>
+            </h:panelGroup>
+
+            <h:panelGroup id="diffjavaBtnGroup">
+                <p:commandButton id="savejava" icon="pi pi-save" process="form" value="Save" rendered="#{javaList.checkedout}" actionListener="#{javaList.onSave}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup" />
+                <p:commandButton id="checkinjava" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{javaList.checkedout}" actionListener="#{javaList.onCheckIn}"  update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjava" />
+                <p:commandButton id="checkoutjava" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!javaList.checkedout and javaList.access}" actionListener="#{javaList.onCheckOut}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjava :form:tabview:javatabview:editjavapanel" />
+                <p:commandButton id="commitjava" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{javaList.difference and !javaList.checkedout and javaList.access}" actionListener="#{javaList.onCommit}" update=":form:msgs :form:tabview:javatabview:javaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:selectedjavaversion">
+                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                </p:commandButton>
+
+                <p:outputLabel> Version </p:outputLabel><p:outputLabel id="javaversion">#{javaList.javaUtility.currentVersion}</p:outputLabel>
+
+                <h5>Select Version</h5>
+                <p:inputText id="selectedjavaversion" value="#{javaList.selectedjavaversion}" disabled="true"/>
+                <p:slider for="selectedjavaversion" minValue="#{javaList.javaversionMin}" maxValue="#{javaList.javaversionMax}">
+                    <p:ajax event="slideEnd" listener="#{javaList.onSlideEnd}" update=":form:tabview:javatabview:editjava :form:tabview:javatabview:javaname :form:tabview:javatabview:newjava :form:tabview:javatabview:selectedjavaversion :form:tabview:javatabview:diffjavaBtnGroup :form:tabview:javatabview:editjavapanel" />
+                </p:slider>
+            </h:panelGroup>
+        </p:tab>
+
+        <p:tab title="Compile" id="compilepanel">
+            <div class="flex flex-row pb-2">
+                <div class="flex align-items-center pr-2">
+                    <p:selectCheckboxMenu id="compilejavalist" value="#{javaCompiler.javaListSelected}" label="Java" required="false" converter="#{javaConverterBean}" filter="true" filterMatchMode="startsWith">
+                        <f:selectItems value="#{javaList.javaListe}" var="compilejavalist" itemLabel="#{compilejavalist.nameExt}" itemValue="#{compilejavalist}" />
+                    </p:selectCheckboxMenu>
+                </div>
+                <div class="flex align-items-center pr-2">
+                    <p:commandButton id="compileall" icon="pi pi-cog" process="form" value="Compile all" update=":form:msgs :form:tabview:javatabview:compilelog">
+                        <f:actionListener binding="#{javaCompiler.initClasspath()}" />
+                    </p:commandButton>
+                </div>
+                <div class="flex align-items-center pr-2">
+                    <p:outputLabel for="compileverbose">Verbose compile output:</p:outputLabel>
+                </div>
+                <div class="flex align-items-center pr-2">
+                    <p:selectBooleanCheckbox id="compileverbose" value="#{javaCompiler.verboseCompile}" />
+                </div>
+                <div class="flex align-items-center pr-2">
+                    <p:outputLabel for="compilelog">Compile log:</p:outputLabel>
+                </div>
+                <pe:monacoEditor id="compilelog" disabled="false" widgetVar="monacocompilelog" readonly="true" editorOptions="#{javaCompiler.editorOptions}" value="#{javaCompiler.compileOut}" locale="de" width="85%" height="300px" autoResize="true" />
+            </div>
+        </p:tab>
+
+        <p:tab title="Maven" id="mavenpanel">
+            <p:panelGrid columns="2">
+                <p:outputLabel for="mavengroup" style="margin-right: 0.5rem">Group</p:outputLabel>
+                <p:inputText id="mavengroup" value="#{mavenList.group}" ></p:inputText>
+
+                <p:outputLabel for="mavenartifact" style="margin-right: 0.5rem">Artifact</p:outputLabel>
+                <p:inputText id="mavenartifact" value="#{mavenList.artifact}" ></p:inputText>
+
+                <p:outputLabel for="mavenversion" style="margin-right: 0.5rem">Version</p:outputLabel>
+                <p:inputText id="mavenversion" value="#{mavenList.version}" ></p:inputText>
+            </p:panelGrid>
+
+            <p:panelGrid columns="3">
+                <p:commandButton id="mavensearch" icon="pi pi-search" process="form" value="Search" actionListener="#{mavenList.onSearch}" update=":form:tabview:javatabview:mavensearchlist">
+                </p:commandButton>
+            </p:panelGrid>
+
+            <p:dataTable id="mavensearchlist" size="small" scrollable="true" scrollHeight="250" var="mvndoc" value="#{mavenList.mvnDocs}" selectionMode="single" selection="#{mavenList.selectedMavenDoc}" rowKey="#{mvndoc.id}">
+                <p:ajax event="rowSelect" listener="#{mavenList.onSelectMavenDoc}" />
+                <p:column headerText="ID">
+                    <h:outputText value="#{mvndoc.id}" />
+                </p:column>
+                <p:column headerText="Group">
+                    <h:outputText value="#{mvndoc.g}" />
+                </p:column>
+                <p:column headerText="Artifact">
+                    <h:outputText value="#{mvndoc.a}" />
+                </p:column>
+                <p:column headerText="Latest Version">
+                    <h:outputText value="#{mvndoc.latestVersion}" />
+                </p:column>
+                <p:column headerText="Repository">
+                    <h:outputText value="#{mvndoc.repositoryId}" />
+                </p:column>
+                <p:column headerText="Package">
+                    <h:outputText value="#{mvndoc.p}" />
+                </p:column>
+            </p:dataTable>
+
+            <p:panelGrid columns="1">
+                <p:commandButton id="maveninstall" icon="fas fa-download" process="form" value="Install" actionListener="#{mavenList.onInstall}" update=":form:tabview:javatabview:maveninstalledlist">
+                </p:commandButton>
+            </p:panelGrid>
+
+            <p:dataTable id="maveninstalledlist" size="small" var="mvn" value="#{mavenList.mavenlist}" selectionMode="single" selection="#{mavenList.selectedMaven}" rowKey="#{mvn.id}">
+                <p:ajax event="rowSelect" listener="#{mavenList.onSelectMaven}" />
+                <p:column headerText="ID">
+                    <h:outputText value="#{mvn.mavenId}" />
+                </p:column>
+                <p:column headerText="Group">
+                    <h:outputText value="#{mvn.mavenGroup}" />
+                </p:column>
+                <p:column headerText="Artifact">
+                    <h:outputText value="#{mvn.mavenArtifact}" />
+                </p:column>
+                <p:column headerText="Latest Version">
+                    <h:outputText value="#{mvn.mavenLatestversion}" />
+                </p:column>
+            </p:dataTable>
+
+            <p:panelGrid columns="1">
+                <p:commandButton id="mavendeinstall" icon="pi pi-times-circle" process="form" value="Deinstall" actionListener="#{mavenList.onDeinstall}" update=":form:tabview:javatabview:maveninstalledlist">
+                </p:commandButton>
+            </p:panelGrid>
+
+        </p:tab>
+
+        <p:tab title="Classes" id="compiledclassespanel">
+            <p:dataTable id="compiledclasseslist" size="small" scrollable="true" scrollHeight="250" var="compiledclass" value="#{javaCompiler.getClasses()}">
+                <p:column headerText="Name">
+                    <h:outputText value="#{compiledclass.name}" />
+                </p:column>
+            </p:dataTable>
+        </p:tab>
+
+    </p:tabView>
+    
+</ui:composition>

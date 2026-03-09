@@ -1,0 +1,15 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dialog id="keywordlistpreviewDlg" header="Keywordlist Preview" widgetVar="keywordlistpreviewDlg" minHeight="100" width="500" showEffect="fade">
+        <p:dataScroller value="#{sitetree.previewKeywordlistOutput}" var="keyword" chunkSize="10" mode="inline"
+                    scrollHeight="500">
+            <f:facet name="header">
+                Keywords
+            </f:facet>
+            <div class="flex">#{keyword.name}</div>
+        </p:dataScroller>
+    </p:dialog>
+</ui:composition>

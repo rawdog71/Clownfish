@@ -1,0 +1,96 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <div class="flex flex-row pb-2">
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel value="Templates" for="@next" style="margin-right: 0.5rem" rendered="#{loginBean.cfuser.superadmin}"/>
+            <p:autoComplete id="templatelist" dropdown="true" value="#{templateList.selectedTemplate}" completeMethod="#{templateList.completeText}" converter="#{templateConverterBean}" scrollHeight="250" rendered="#{loginBean.cfuser.superadmin}">
+                <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplatepanel :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:templatelayout :form:tabview:template-invisible"/>
+            </p:autoComplete>
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel value="Templates" for="@next" style="margin-right: 0.5rem" rendered="#{!loginBean.cfuser.superadmin}"/>
+            <p:autoComplete id="invistemplatelist" dropdown="true" value="#{templateList.selectedTemplate}" completeMethod="#{templateList.completeInvisText}" converter="#{templateConverterBean}" scrollHeight="250" rendered="#{!loginBean.cfuser.superadmin}">
+                <p:ajax listener="#{templateList.onSelect}" update=":form:msgs :form:tabview:edittemplatepanel :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:templatelayout :form:tabview:template-invisible"/>
+            </p:autoComplete>
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel for="templatename" style="margin-right: 0.5rem">Name</p:outputLabel>
+            <p:inputText id="templatename" value="#{templateList.templateName}" >
+                <p:ajax event="keyup" listener="#{templateList.onChangeName(changeEvent)}" update=":form:tabview:newtemplate :form:tabview:changetemplate" />
+            </p:inputText>
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel for="templatelanguage" style="margin-right: 0.5rem">Type</p:outputLabel>
+            <p:selectOneMenu id="templatelanguage" value="#{templateList.templateScriptLanguage}">
+                <f:selectItem itemValue="0" itemLabel="Freemarker" />
+                <f:selectItem itemValue="1" itemLabel="Velocity" />
+                <f:selectItem itemValue="2" itemLabel="HTML" />
+                <f:selectItem itemValue="3" itemLabel="JRXML" />
+            </p:selectOneMenu>
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel for="templatelayout" style="margin-right: 0.5rem">Layout</p:outputLabel>
+            <p:selectOneMenu id="templatelayout" value="#{templateList.type}">
+                <f:selectItem itemValue="0" itemLabel="Normal" />
+                <f:selectItem itemValue="1" itemLabel="Layout" />
+                <f:selectItem itemValue="2" itemLabel="Preview" />
+            </p:selectOneMenu>
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="newtemplate" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{templateList.onCreate}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate :form:tabview:edittemplate :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:classtemplate" disabled="#{templateList.newButtonDisabled}" />
+        </div>
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="changetemplate" icon="pi pi-pencil" process="form" value="Change" actionListener="#{templateList.onChange}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate :form:tabview:classtemplate" disabled="#{templateList.newButtonDisabled}" />
+        </div>
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="copytemplateButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{templateList.onCopy}" update=":form:msgs :form:tabview:templatelist :form:tabview:templatename :form:tabview:tabsiteview:selecttemplate :form:tabview:edittemplate :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:selectedtemplateversionslider :form:tabview:difftemplateBtnGroup :form:tabview:classtemplate">
+            </p:commandButton>
+        </div>
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="deletetemplateButton" icon="pi pi-trash" value="Delete" actionListener="#{templateList.onDelete}" update=":form:msgs :form:tabview:templatelist :form:tabview:tabsiteview:selecttemplate :form:tabview:classtemplate">
+                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+            </p:commandButton>
+        </div>
+        <div class="flex align-items-center pr-2">
+            <p:selectBooleanCheckbox id="template-invisible" value="#{templateList.invisible}" disabled="#{templateList.selectedTemplate == null}" rendered="#{loginBean.cfuser.superadmin}"/>
+            <p:outputLabel for="template-invisible" value="Invisible" rendered="#{loginBean.cfuser.superadmin}"/>
+        </div>
+    </div>
+
+    <h:panelGroup id="edittemplatepanel">
+        <div class="flex flex-row pb-2">
+            <pe:monacoEditor id="edittemplate" disabled="false" widgetVar="monacotemplate" readonly="#{!templateList.checkedout}" editorOptions="#{templateList.editorOptions}" value="#{templateList.content}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{!templateList.showDiff}" />
+            <pe:monacoDiffEditor id="edittemplatediff" widgetVar="monacotemplatediff" rendered="#{templateList.showDiff}" 
+                                 value="#{templateList.contentDiff}" editorOptions="#{templateList.editorOptionsDiff}" language="#{templateList.editorOptions.language}" readonly="#{!templateList.checkedout}"
+                                 locale="de" width="100%" height="600px" autoResize="true" />
+        </div>
+    </h:panelGroup>
+
+    <h:panelGroup id="difftemplateBtnGroup">
+        <p:commandButton id="savetemplate" icon="pi pi-save" process="form" value="Save" rendered="#{templateList.checkedout}" actionListener="#{templateList.onSave}" update=":form:msgs :form:tabview:templateversion :form:tabview:difftemplateBtnGroup" />
+        <p:commandButton id="checkintemplate" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{templateList.checkedout}" actionListener="#{templateList.onCheckIn}"  update=":form:msgs :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplate" />
+        <p:commandButton id="checkouttemplate" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!templateList.checkedout and templateList.access}" actionListener="#{templateList.onCheckOut}" update=":form:msgs :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:edittemplatepanel" />
+        <p:commandButton id="committemplate" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{templateList.difference and !templateList.checkedout and templateList.access}" actionListener="#{templateList.onCommit}" update=":form:msgs :form:tabview:templateversion :form:tabview:difftemplateBtnGroup :form:tabview:selectedtemplateversion">
+            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+        </p:commandButton>
+
+        <p:outputLabel> Version </p:outputLabel><p:outputLabel id="templateversion">#{templateList.templateUtility.currentVersion}</p:outputLabel>
+
+        <h5>Select Version</h5>           
+        <p:inputText id="selectedtemplateversion" value="#{templateList.selectedtemplateversion}" disabled="true" />
+        <p:slider id="selectedtemplateversionslider" for="selectedtemplateversion" minValue="#{templateList.templateversionMin}" maxValue="#{templateList.templateversionMax}">
+            <p:ajax event="slideEnd" listener="#{templateList.onSlideEnd}" update=":form:msgs :form:tabview:edittemplatepanel :form:tabview:templatename :form:tabview:newtemplate :form:tabview:templatelanguage :form:tabview:templateversion :form:tabview:selectedtemplateversion :form:tabview:difftemplateBtnGroup" />
+        </p:slider>
+    </h:panelGroup>
+    
+</ui:composition>

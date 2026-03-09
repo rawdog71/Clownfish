@@ -1,0 +1,30 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <p:dataTable id="keywordlistcontent" size="small" scrollable="true" scrollHeight="250" var="keywordlistcontent" value="#{keywordContentList.keywordlist}" 
+                selectionMode="single" selection="#{keywordContentList.selectedKeywordlist}" rowKey="#{keywordlistcontent.id}"
+                emptyMessage="No content available" filteredValue="#{keywordContentList.filteredKeywordlist}" widgetVar="keywordcontentlist" sortMode="single">
+       <p:ajax event="rowSelect" listener="#{keywordContentList.onSelect}" update=":form:msgs :form:tabview:keywordcontentlist :form:tabview:keywordcontentlistbox" />
+       <p:column headerText="Name" filterBy="#{keywordlistcontent.name}" filterMatchMode="contains" sortBy="#{keywordlistcontent.name}">
+           <h:outputText value="#{keywordlistcontent.name}" />
+       </p:column>
+   </p:dataTable>
+
+   <h:panelGrid columns="2">
+       <p:outputLabel for="keywordcontentlist" value="Keywordlist: " />
+       <p:inputText id="keywordcontentlist" value="#{keywordContentList.keywordlistname}" />
+
+       <p:commandButton id="newkeywordlist" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{keywordContentList.onCreate}" update=":form:tabview:keywordlistcontent :form:tabview:tabsiteview:keywordlibrarydroplist">
+           <f:actionListener binding="#{sitetree.initKeywordlibrarylist()}" />
+       </p:commandButton>
+       <p:commandButton id="refreshkeywordlist" icon="pi pi-refresh" value="Refresh" actionListener="#{keywordContentList.onRefreshAll}" update=":form:tabview:keywordlistcontent :form:tabview:tabsiteview:keywordlibrarydroplist" />
+   </h:panelGrid>
+
+   <p:selectManyCheckbox id="keywordcontentlistbox" value="#{keywordContentList.selectedKeywordcontent}" layout="responsive" columns="4" converter="#{keywordConverterBean}">
+       <f:selectItems value="#{keywordContentList.filteredKeywordcontent}" var="keyword" itemLabel="#{keyword.name}" itemValue="#{keyword}" />
+       <p:ajax listener="#{keywordContentList.onChangeContent}" />
+   </p:selectManyCheckbox>
+</ui:composition>

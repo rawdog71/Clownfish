@@ -1,0 +1,90 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <p:dataTable id="datasourcelist" size="small" scrollable="true" scrollHeight="250" var="datasource" value="#{datasourceList.datasourcelist}" selectionMode="single" selection="#{datasourceList.selectedDatasource}" rowKey="#{datasource.id}">
+        <p:ajax event="rowSelect" listener="#{datasourceList.onSelect}" update=":form:tabview:newdatasource :form:msgs :form:tabview:datasourcename :form:tabview:datasourceserver :form:tabview:datasourceurl :form:tabview:datasourceport :form:tabview:datasourcedbname :form:tabview:datasourceuser :form:tabview:datasourcepassword :form:tabview:datasourcedriver :form:tabview:datasourceserver :form:tabview:tablelist :form:tabview:checksearchdatabase :form:tabview:datasourcerestservice" />
+        <p:column headerText="Name" filterBy="#{datasource.name}" filterMatchMode="contains">
+            <h:outputText value="#{datasource.name}" />
+        </p:column>
+    </p:dataTable>
+
+    <div style="display: flex; margin-bottom: 20px" class="datasource-table">
+        <p:panelGrid columns="2">
+            <p:panelGrid columns="2" style="width: 150px">
+                <p:outputLabel for="datasourcename">Name</p:outputLabel>
+                <p:inputText id="datasourcename" value="#{datasourceList.datasourceName}" >
+                    <p:ajax event="keyup" listener="#{datasourceList.onChangeName(changeEvent)}" update="newdatasource" />
+                </p:inputText>
+
+                <p:outputLabel for="datasourceserver">Server</p:outputLabel>
+                <p:inputText id="datasourceserver" value="#{datasourceList.datasourceServer}" ></p:inputText>
+
+                <p:outputLabel for="datasourceurl">URL</p:outputLabel>
+                <p:inputText id="datasourceurl" value="#{datasourceList.datasourceURL}" ></p:inputText>
+
+                <p:outputLabel for="datasourceport">Port</p:outputLabel>
+                <p:inputText id="datasourceport" value="#{datasourceList.datasourcePort}" ></p:inputText>
+            </p:panelGrid>
+
+            <p:panelGrid columns="2" style="margin-left: 30px !important">
+                <p:outputLabel for="datasourcedbname">Database Name</p:outputLabel>
+                <p:inputText id="datasourcedbname" value="#{datasourceList.datasourceDatabasename}" ></p:inputText>
+
+                <p:outputLabel for="datasourceuser">User</p:outputLabel>
+                <p:inputText id="datasourceuser" value="#{datasourceList.datasourceUser}" ></p:inputText>
+
+                <p:outputLabel for="datasourcepassword">Password</p:outputLabel>
+                <p:inputText id="datasourcepassword" value="#{datasourceList.datasourcePassword}" ></p:inputText>
+
+                <p:outputLabel for="datasourcedriver">Driver Class</p:outputLabel>
+                <p:inputText id="datasourcedriver" value="#{datasourceList.datasourceDriverclass}" ></p:inputText>
+
+                <p:outputLabel for="datasourcerestservice">Restservice enabled</p:outputLabel>
+                <p:selectBooleanCheckbox id="datasourcerestservice" value="#{datasourceList.datasourceRestservice}" ></p:selectBooleanCheckbox>
+            </p:panelGrid>
+        </p:panelGrid>
+        <p:panelGrid columns="1">
+            <p:dataTable id="tablelist" size="small" scrollable="true" scrollHeight="250" var="table" value="#{datasourceList.tablelist}" selectionMode="single" selection="#{datasourceList.selectedTable}" rowKey="#{table.name}">
+                <p:ajax event="rowSelect" listener="#{datasourceList.onTableSelect}" update=":form:tabview:columnlist :form:tabview:checksearchdatabase" />
+                <p:column headerText="Name" filterBy="#{table.name}" filterMatchMode="contains">
+                    <h:outputText value="#{table.name}" />
+                </p:column>
+                <p:column headerText="Type" filterBy="#{table.type}" filterMatchMode="contains">
+                    <h:outputText value="#{table.type}" />
+                </p:column>
+            </p:dataTable>
+        </p:panelGrid>
+        <p:panelGrid columns="1">
+            <p:dataTable lazy="true" id="columnlist" size="small" scrollable="true" scrollHeight="250" var="column" value="#{datasourceList.selectedTable.columns}" selectionMode="single" selection="#{datasourceList.selectedColumn}" rowKey="#{column.name}">
+                <p:column headerText="Name" filterBy="#{column.name}" filterMatchMode="contains">
+                    <h:outputText value="#{column.name} #{datasourceList.showPrimaryKey(column.primarykey)}" />
+                </p:column>
+                <p:column headerText="Type" filterBy="#{column.typename}" filterMatchMode="contains">
+                    <h:outputText value="#{column.typename}" />
+                </p:column>
+            </p:dataTable>
+        </p:panelGrid>
+    </div>
+
+    <p:panelGrid columns="7">
+        <p:commandButton id="newdatasource" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{datasourceList.onCreateContent}" update=":form:msgs :form:tabview:datasourcename :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist" disabled="#{datasourceList.newContentButtonDisabled}">
+            <f:actionListener binding="#{sitetree.initDatasources()}" />
+        </p:commandButton>
+        <p:commandButton id="editdatasource" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{datasourceList.onEditContent}" update=":form:msgs :form:tabview:datasourcename :form:tabview:datalistcontent :form:tabview:datasourcelist" />
+        <p:commandButton id="deletedatasource" icon="pi pi-trash" process="form" value="Delete" actionListener="#{datasourceList.onDeleteContent}" update=":form:msgs :form:tabview:tabsiteview:sitedatasource :form:tabview:datasourcelist">
+            <f:actionListener binding="#{sitetree.initDatasources()}" />
+            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+        </p:commandButton>
+        <p:commandButton id="checkdatasource" process="form" value="Check connection" actionListener="#{datasourceList.onConnectionCheck}" update=":form:msgs" />
+        <p:commandButton id="generatehtml" process="form" value="Generate HTML" actionListener="#{datasourceList.onGenerateHTML}" update=":form:msgs" />
+        <p:commandButton id="generateodata" process="form" value="Generate OData" actionListener="#{datasourceList.onGenerateODATA}" update=":form:msgs" />
+        <p:outputLabel for="checksearchdatabase" value="Use in Lucene searchengine:" />
+        <p:selectBooleanCheckbox id="checksearchdatabase" value="#{datasourceList.searchdatabseflag}">
+            <p:ajax listener="#{datasourceList.onSetSearchdatabse}" />
+        </p:selectBooleanCheckbox>
+    </p:panelGrid>
+    
+</ui:composition>

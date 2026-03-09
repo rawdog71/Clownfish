@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <h:form enctype="multipart/form-data">
+        <p:outputLabel for="uploadpublicuse" value="For public use:" />
+        <p:selectBooleanCheckbox id="uploadpublicuse" value="#{assetList.publicusage}">
+            <p:ajax listener="#{assetList.onChangePublicusage}"/>
+        </p:selectBooleanCheckbox>
+        <p:outputLabel for="uploadoverwrite" value="Overwrite existing file:" />
+        <p:selectBooleanCheckbox id="uploadoverwrite" value="#{assetList.overwrite}">
+            <p:ajax listener="#{assetList.onChangeOverwrite}"/>
+        </p:selectBooleanCheckbox>
+        <p:fileUpload listener="#{assetList.handleFileUpload}" mode="advanced" dragDropSupport="true" 
+                      update="messages :form:tabview:assetlist" maxChunkSize="1000000000" sizeLimit="1000000000" allowTypes="/(\.|\/)(gif|jpe?g|png|webp|mov|mp4|mp3|wav|ogg|pdf|doc|docx|dotx|svg|ppt|potx|pptx|xls|xlsx|zip|jar|xml)$/i" >
+        </p:fileUpload>
+        <p:growl id="messages" showDetail="true" />
+    </h:form>
+    <h:panelGrid columns="2" style="width:100%" columnClasses="logo,detail">
+        <p:dataTable id="assetlist" size="small" var="media" value="#{assetList.assetlist}" paginator="true" rows="5"
+                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                     rowsPerPageTemplate="5,10,25,50,100" rowKey="#{media.id}"
+                     emptyMessage="No content available">
+            <p:column headerText="Filename" filterBy="#{media.name}">
+                <div style="display: flex; align-items: center">
+                    <p:graphicImage url="GetAssetPreview?apikey=#{loginBean.apikey}&amp;mediaid=#{media.id}&amp;width=150" width="150" alt="#{media.name}" title="#{media.name}" /> 
+                    <div align="right" style="display: flex; justify-content: end; align-items: center; width: 100%">
+                        <h:outputText value="#{media.name}" />
+                        <div class="assets-list-buttons">
+                            <h:selectBooleanCheckbox value="#{assetList.checkedAsset}" />
+                        </div>
+                        <div class="assets-list-buttons">
+                            <p:commandButton icon="pi pi-trash" action="#{assetList.onScrap}" update=":form:tabview:assetlist :form:tabview:scrapassetlist :form:msgs">
+                                <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
+                                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+                        <div class="assets-list-buttons">
+                            <p:commandButton update=":form:tabview:assetDetail" icon="pi pi-info" action="#{assetList.onDetail}">
+                                <f:setPropertyActionListener value="#{media}" target="#{assetList.selectedAsset}" />
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </div>
+            </p:column>
+        </p:dataTable>
+        <p:outputPanel id="assetDetail">
+            <p:graphicImage url="GetAssetPreview?apikey=#{loginBean.apikey}&amp;mediaid=#{assetList.selectedAsset.id}&amp;width=500" width="500" alt="#{assetList.selectedAsset.name}" title="#{assetList.selectedAsset.name}" rendered="#{assetList.renderDetail}" /> 
+            <h:panelGrid columns="1" style="width:100%" columnClasses="detail">
+                <p:outputPanel>
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <h:outputText value="Id:" />
+                        <h:outputText value="#{assetList.selectedAsset.id}" style="font-weight: bold"/>
+
+                        <h:outputText value="Name:" />
+                        <p:inputText id="assetName" value="#{assetList.assetName}" style="font-weight: bold"/>
+
+                        <h:outputText value="Description:" />
+                        <p:inputText id="assetDescription" value="#{assetList.description}"></p:inputText>
+
+                        <h:outputText value="Public use:" />
+                        <p:selectBooleanCheckbox id="assetpublicuse" value="#{assetList.assetpublicusage}"/>
+
+                        <h:outputText value="Mimetype:" />
+                        <h:outputText value="#{assetList.selectedAsset.mimetype}" style="font-weight: bold"/>
+
+                        <h:outputText value="Width:" rendered="#{assetList.image}" />
+                        <h:outputText value="#{assetList.selectedAsset.imagewidth}" rendered="#{assetList.image}" style="font-weight: bold"/>
+
+                        <h:outputText value="Height:" rendered="#{assetList.image}" />
+                        <h:outputText value="#{assetList.selectedAsset.imageheight}" rendered="#{assetList.image}" style="font-weight: bold"/>
+
+                        <h:outputText value="Size:"/>
+                        <h:outputText value="#{assetList.selectedAsset.filesize}" style="font-weight: bold"/>
+
+                        <h:outputText value="Downloads:"/>
+                        <h:outputText value="#{assetList.selectedAsset.downloads}" style="font-weight: bold"/>
+
+                        <p:commandButton id="editDescription" icon="pi pi-pencil" value="Edit" actionListener="#{assetList.editDescription}" update=":form:msgs :form:tabview:assetlist :form:tabview:assetName" />
+                    </h:panelGrid>
+                </p:outputPanel>
+            </h:panelGrid>
+            <p:pickList id="assetkeywordpicklist" value="#{assetList.keywords}" var="keyword" itemLabel="#{keyword}" itemValue="#{keyword}" converter="#{keywordConverterBean}" showCheckbox="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains">
+                <f:facet name="sourceCaption">Unattached</f:facet>
+                <f:facet name="targetCaption">Attached</f:facet>
+
+                <p:ajax event="transfer" listener="#{assetList.onTransfer}" update=":form:tabview:assetkeywordpicklist"/>
+            </p:pickList>
+            <p:commandButton id="attachassetkeyword" value="Attach" actionListener="#{assetList.onAttach}">
+
+            </p:commandButton>
+        </p:outputPanel>
+    </h:panelGrid>
+    
+</ui:composition>

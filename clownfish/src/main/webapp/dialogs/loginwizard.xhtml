@@ -1,0 +1,40 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:dialog id="LoginWizardDlg" header="Login Wizard" widgetVar="LoginWizardDlg" minHeight="100" width="450" showEffect="fade" modal="true">
+        <div class="flex" style="flex-direction: column;">
+            <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                <p>Admin Email Field</p>
+                <p:inputText id="AdminMailField" value="#{classList.adminEmailField}" style="width: 50%"></p:inputText>
+            </div>
+            <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                <p>Login Field</p>
+                <p:selectOneMenu id="LoginIdField" value="#{classList.idField}" class="flex align-items-center" style="width: 50%">
+                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                    <f:selectItems value="#{classList.selectedAttributList}" var="attrrelid" itemLabel="#{attrrelid.name}" itemValue="#{attrrelid.name}" />
+                </p:selectOneMenu>
+            </div>
+            <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                <p>Password Field</p>
+                <p:selectOneMenu id="LoginPasswordField" value="#{classList.passwordField}" class="flex align-items-center" style="width: 50%">
+                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                    <f:selectItems value="#{classList.selectedAttributList}" var="attrrelpassword" itemLabel="#{attrrelpassword.name}" itemValue="#{attrrelpassword.name}" />
+                </p:selectOneMenu>
+            </div>
+            <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px; margin-bottom: 10px">
+                <p>Auth Field</p>
+                <p:selectOneMenu id="LoginAuthField" value="#{classList.authField}" class="flex align-items-center" style="width: 50%">
+                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                    <f:selectItems value="#{classList.selectedAttributList}" var="attrrelauth" itemLabel="#{attrrelauth.name}" itemValue="#{attrrelauth.name}" />
+                </p:selectOneMenu>
+            </div>
+        </div>
+        <p:commandButton id="loginformwizard" style="width: 100%" process="form" value="Generate Login Form Wizard" actionListener="#{classList.onGenerateLogin(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+            <f:actionListener binding="#{templateList.refresh()}" />
+            <f:actionListener binding="#{sitetree.onRefreshAll()}" />
+        </p:commandButton>
+    </p:dialog>
+</ui:composition>

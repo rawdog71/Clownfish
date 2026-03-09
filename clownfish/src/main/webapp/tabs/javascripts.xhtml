@@ -1,0 +1,192 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <p:tabView id="javascripttabview">
+        <p:tab title="Javascript Source" id="javascriptsourcepanel">
+            <div class="flex flex-row pb-2">
+                <div class="flex align-items-center pr-2">
+                    <p:outputLabel value="Javascripts" for="@next" style="margin-right: 0.5rem" rendered="#{loginBean.cfuser.superadmin}"/>
+                    <p:autoComplete id="javascriptlist" dropdown="true" value="#{javascriptList.selectedJavascript}" completeMethod="#{javascriptList.completeText}" converter="#{javascriptConverterBean}" scrollHeight="250" rendered="#{loginBean.cfuser.superadmin}">
+                        <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:javascripttabview:editjavascript :form:tabview:javascripttabview:javascriptname :form:tabview:javascripttabview:newjavascript :form:tabview:javascripttabview:javascriptversion :form:tabview:javascripttabview:diffjavascriptBtnGroup :form:tabview:javascripttabview:editjavascriptpanel :form:tabview:javascripttabview:javascriptlanguage :form:tabview:javascripttabview:javascript-invisible"/>
+                    </p:autoComplete>
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:outputLabel value="Javascripts" for="@next" style="margin-right: 0.5rem" rendered="#{!loginBean.cfuser.superadmin}"/>
+                    <p:autoComplete id="invis-javascriptlist" dropdown="true" value="#{javascriptList.selectedJavascript}" completeMethod="#{javascriptList.completeInvisText}" converter="#{javascriptConverterBean}" scrollHeight="250" rendered="#{!loginBean.cfuser.superadmin}">
+                        <p:ajax listener="#{javascriptList.onSelect}" update=":form:tabview:javascripttabview:editjavascript :form:tabview:javascripttabview:javascriptname :form:tabview:javascripttabview:newjavascript :form:tabview:javascripttabview:javascriptversion :form:tabview:javascripttabview:diffjavascriptBtnGroup :form:tabview:javascripttabview:editjavascriptpanel :form:tabview:javascripttabview:javascript-invisible"/>
+                    </p:autoComplete>
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:outputLabel for="javascriptname" style="margin-right: 0.5rem">Name</p:outputLabel>
+                    <p:inputText id="javascriptname" value="#{javascriptList.javascriptName}" >
+                        <p:ajax event="keyup" listener="#{javascriptList.onChangeName(changeEvent)}" update=":form:tabview:javascripttabview:newjavascript :form:tabview:javascripttabview:changejavascript" />
+                    </p:inputText>
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:selectOneMenu id="javascriptlanguage" value="#{javascriptList.javascripttype}">
+                        <f:selectItems value="#{javascriptList.javascriptTypes.entrySet()}" var="entry" itemValue="#{entry.key}" itemLabel="#{entry.value}" />
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:commandButton id="newjavascript" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{javascriptList.onCreate}" update=":form:msgs :form:tabview:javascripttabview:javascriptlist :form:tabview:javascripttabview:javascriptname :form:tabview:javascripttabview:editjavascript :form:tabview:tabsiteview:selectjavascript :form:tabview:javascripttabview:javascriptversion :form:tabview:javascripttabview:diffjavascriptBtnGroup" disabled="#{javascriptList.newButtonDisabled}" />
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:commandButton id="changejavascript" icon="pi pi-pencil" process="form" value="Change" actionListener="#{javascriptList.onChange}" update=":form:msgs :form:tabview:javascripttabview:javascriptlist :form:tabview:javascripttabview:javascriptname :form:tabview:tabsiteview:selectjavascript" disabled="#{javascriptList.newButtonDisabled}" />
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:commandButton id="copyjavascriptButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{javascriptList.onCopy}" update=":form:msgs :form:tabview:javascripttabview:javascriptlist :form:tabview:javascripttabview:javascriptname :form:tabview:javascripttabview:editjavascript :form:tabview:tabsiteview:selectjavascript :form:tabview:javascripttabview:javascriptversion :form:tabview:javascripttabview:diffjavascriptBtnGroup">
+                    </p:commandButton>
+                </div>
+
+                <div class="flex align-items-center pr-2">
+                    <p:commandButton id="deletejavascriptButton" icon="pi pi-trash" value="Delete" actionListener="#{javascriptList.onDelete}" update=":form:msgs :form:tabview:javascripttabview:javascriptlist :form:tabview:tabsiteview:selectjavascript">
+                        <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                    </p:commandButton>
+                </div>
+                <div class="flex align-items-center pr-2">
+                    <p:selectBooleanCheckbox id="javascript-invisible" value="#{javascriptList.invisible}" disabled="#{javascriptList.selectedJavascript == null}" rendered="#{loginBean.cfuser.superadmin}"/>
+                    <p:outputLabel for="javascript-invisible" value="Invisible" rendered="#{loginBean.cfuser.superadmin}"/>
+                </div>
+            </div>
+
+            <h:panelGroup id="editjavascriptpanel">
+                <div class="flex flex-row pb-2">
+                    <pe:monacoEditor id="editjavascript" disabled="false" widgetVar="monacojavascript" readonly="#{!javascriptList.checkedout}" editorOptions="#{javascriptList.editorOptions}" value="#{javascriptList.content}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{!javascriptList.showDiff}" />
+                    <pe:monacoDiffEditor id="editjavascriptdiff" widgetVar="monacojavascriptdiff" rendered="#{javascriptList.showDiff}" 
+                                         value="#{javascriptList.contentDiff}" editorOptions="#{javascriptList.editorOptionsDiff}" language="#{javascriptList.editorOptions.language}" readonly="#{!javascriptList.checkedout}"
+                                         locale="de" width="100%" height="600px" autoResize="true" />
+                </div>
+            </h:panelGroup>
+
+            <h:panelGroup id="diffjavascriptBtnGroup">
+                <p:commandButton id="savejavascript" icon="pi pi-save" process="form" value="Save" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onSave}" update=":form:msgs :form:tabview:javascripttabview:javascriptversion :form:tabview:javascripttabview:diffjavascriptBtnGroup" />
+                <p:commandButton id="checkinjavascript" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{javascriptList.checkedout}" actionListener="#{javascriptList.onCheckIn}"  update=":form:msgs :form:tabview:javascripttabview:javascriptversion :form:tabview:javascripttabview:diffjavascriptBtnGroup :form:tabview:javascripttabview:editjavascript" />
+                <p:commandButton id="checkoutjavascript" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCheckOut}" update=":form:msgs :form:tabview:javascripttabview:javascriptversion :form:tabview:javascripttabview:diffjavascriptBtnGroup :form:tabview:javascripttabview:editjavascript :form:tabview:javascripttabview:editjavascriptpanel" />
+                <p:commandButton id="commitjavascript" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{javascriptList.difference and !javascriptList.checkedout and javascriptList.access}" actionListener="#{javascriptList.onCommit}" update=":form:msgs :form:tabview:javascripttabview:javascriptversion :form:tabview:javascripttabview:diffjavascriptBtnGroup :form:tabview:javascripttabview:selectedjavascriptversion">
+                    <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                </p:commandButton>
+
+                <p:outputLabel> Version </p:outputLabel><p:outputLabel id="javascriptversion">#{javascriptList.javascriptUtility.currentVersion}</p:outputLabel>
+
+                <h5>Select Version</h5>           
+                <p:inputText id="selectedjavascriptversion" value="#{javascriptList.selectedjavascriptversion}" disabled="true"/>
+                <p:slider id="selectedjavascriptversionslider" for="selectedjavascriptversion" minValue="#{javascriptList.javascriptversionMin}" maxValue="#{javascriptList.javascriptversionMax}">
+                    <p:ajax event="slideEnd" listener="#{javascriptList.onSlideEnd}" update=":form:tabview:javascripttabview:editjavascript :form:tabview:javascripttabview:javascriptname :form:tabview:javascripttabview:newjavascript :form:tabview:javascripttabview:selectedjavascriptversion :form:tabview:javascripttabview:diffjavascriptBtnGroup :form:tabview:javascripttabview:editjavascriptpanel" />
+                </p:slider>
+            </h:panelGroup>
+        </p:tab>
+
+        <p:tab title="NPM" id="npmpanel">
+            <p:panelGrid columns="2">
+                <p:outputLabel for="npmpackage" style="margin-right: 0.5rem">Package</p:outputLabel>
+                <p:inputText id="npmpackage" value="#{npmList.packagename}" ></p:inputText>
+            </p:panelGrid>
+
+            <p:panelGrid columns="3">
+                <p:commandButton id="npmsearch" icon="pi pi-search" process="form" value="Search" actionListener="#{npmList.onSearch}" update=":form:tabview:javascripttabview:npmsearchlist">
+                </p:commandButton>
+            </p:panelGrid>
+
+            <p:dataTable id="npmsearchlist" size="small" scrollable="true" scrollHeight="250" var="npmdoc" value="#{npmList.npmDocs}" selectionMode="single" selection="#{npmList.selectedNpmDoc}" rowKey="#{npmdoc.name}">
+                <p:ajax event="rowSelect" listener="#{npmList.onSelectNpmDoc}" update=":form:tabview:javascripttabview:npmversionlist" />
+                <p:column headerText="Name">
+                    <h:outputText value="#{npmdoc.name}" />
+                </p:column>
+                <p:column headerText="Version">
+                    <h:outputText value="#{npmdoc.version}" />
+                </p:column>
+                <p:column headerText="Scope">
+                    <h:outputText value="#{npmdoc.scope}" />
+                </p:column>
+                <p:column headerText="Date">
+                    <h:outputText value="#{npmdoc.date}" />
+                </p:column>
+            </p:dataTable>
+
+            <div class="flex align-items-center pr-2">
+                <p:selectOneMenu id="npmversionlist" value="#{npmList.selectedNpmVersion}" converter="#{npmConverterBean}" >
+                    <f:selectItem itemLabel="Version selektieren" itemValue="#{null}" />
+                    <f:selectItems value="#{npmList.npmVersions}" var="entry" itemValue="#{entry.version}" itemLabel="#{entry.name}" />
+                </p:selectOneMenu>
+            </div>
+
+            <p:panelGrid columns="1">
+                <p:commandButton id="npminstall" icon="fas fa-download" process="form" value="Install" actionListener="#{npmList.onInstall}" update=":form:tabview:javascripttabview:npminstalledlist">
+                </p:commandButton>
+            </p:panelGrid>
+
+            <p:panelGrid columns="2">
+                <p:row>
+                    <p:column>
+                        <p:card id="npminstalledtable">
+                            <p:dataTable id="npminstalledlist" size="small" var="npm" value="#{npmList.npmlist}" scrollable="true" scrollHeight="250" selectionMode="single" selection="#{npmList.selectedNpm}" rowKey="#{npm.npmId}">
+                                <p:ajax event="rowSelect" listener="#{npmList.onSelectNpm}" update=":form:tabview:javascripttabview:npminstalledinfo" />
+                                <p:column headerText="Name">
+                                    <h:outputText value="#{npm.npmId}" />
+                                </p:column>
+                                <p:column headerText="Installed Version">
+                                    <h:outputText value="#{npm.npmLatestversion}" />
+                                </p:column>
+                                <p:column headerText="Newest Version">
+                                    <h:outputText value="#{npmList.getNewestVersion(npm.npmId)}" />
+                                </p:column>
+                                <p:column headerText="">
+                                    <p:commandButton icon="pi pi-cloud-download" value="Update" action="#{npmList.upgrade(npm, npmList.getNewestVersion(npm.npmId))}" rendered="#{npmList.checkVersion(npmList.getNewestVersion(npm.npmId), npm.npmLatestversion)}" update=":form:tabview:javascripttabview:npminstalledlist" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:card>
+                    </p:column>
+
+                    <p:column>
+                        <p:card id="npminstalledinfo">
+                            <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                                <p>Name:</p>
+                                <p:inputText id="npminfoname" disabled="true" value="#{npmList.npmpackage.name}" style="width: 50%"></p:inputText>
+                            </div>
+                            <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                                <p>Beschreibung:</p>
+                                <p:inputText id="npminfodescription" disabled="true" value="#{npmList.npmpackage.description}" style="width: 50%"></p:inputText>
+                            </div>
+                            <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                                <p>Version:</p>
+                                <p:inputText id="npminfoversion" disabled="true" value="#{npmList.npmpackage.version}" style="width: 50%"></p:inputText>
+                            </div>
+                            <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                                <p>Type:</p>
+                                <p:inputText id="npminfotype" disabled="true" value="#{npmList.npmpackage.type}" style="width: 50%"></p:inputText>
+                            </div>
+                            <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                                <p>Main:</p>
+                                <p:inputText id="npminfomain" disabled="true" value="#{npmList.npmpackage.main}" style="width: 50%"></p:inputText>
+                            </div>
+                            <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                                <p>Module:</p>
+                                <p:inputText id="npminfomodule" disabled="true" value="#{npmList.npmpackage.module}" style="width: 50%"></p:inputText>
+                            </div>
+                            <div class="flex" style="width: 100%;justify-content: space-between; margin: 5px">
+                                <p>Style:</p>
+                                <p:inputText id="npminfostyle" disabled="true" value="#{npmList.npmpackage.style}" style="width: 50%"></p:inputText>
+                            </div>
+                        </p:card>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+
+            <p:panelGrid columns="1">
+                <p:commandButton id="npmdeinstall" icon="pi pi-times-circle" process="form" value="Deinstall" actionListener="#{npmList.onDeinstall}" update=":form:tabview:javascripttabview:npminstalledlist :form:tabview:javascripttabview:npminfoname">
+                </p:commandButton>
+            </p:panelGrid>
+        </p:tab>
+    </p:tabView>
+    
+</ui:composition>

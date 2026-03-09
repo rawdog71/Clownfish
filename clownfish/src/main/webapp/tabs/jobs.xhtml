@@ -1,0 +1,427 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <p:dataTable id="joblist" size="small" scrollable="true" scrollHeight="250" var="jobcontent" value="#{quartzlist.quartzlist}" 
+                selectionMode="single" selection="#{quartzlist.selectedQuartz}" rowKey="#{jobcontent.id}"
+                emptyMessage="No content available" filteredValue="#{quartzlist.filteredQuartz}" widgetVar="quartzlist" sortMode="single">
+       <p:ajax event="rowSelect" listener="#{quartzlist.onSelect}" update=":form:tabview:jobpanel :form:tabview:jobbtnpanel" />
+       <p:column headerText="Name" filterBy="#{jobcontent.name}" filterMatchMode="contains" sortBy="#{jobcontent.name}">
+           <h:outputText value="#{jobcontent.name}" />
+       </p:column>
+       <p:column headerText="Value" filterBy="#{jobcontent.schedule}" filterMatchMode="contains">
+           <h:outputText value="#{jobcontent.schedule}" />
+       </p:column>
+   </p:dataTable>
+
+   <p:panelGrid id="jobpanelcustomize" columns="3">
+       <p:panelGrid id="jobpanel" columns="2">
+           <p:outputLabel for="jobname">Name</p:outputLabel>
+           <p:inputText id="jobname" value="#{quartzlist.jobname}" >
+               <p:ajax event="keyup" listener="#{quartzlist.onChangeName(changeEvent)}" update=":form:tabview:jobbtnpanel" />
+           </p:inputText>
+
+           <p:outputLabel for="propertyvalue">Job Value</p:outputLabel>
+           <p:inputText id="jobvalue" value="#{quartzlist.jobvalue}" ></p:inputText>
+
+           <p:outputLabel for="jobactive">Active</p:outputLabel>
+           <p:selectBooleanCheckbox id="jobactive" value="#{quartzlist.active}" />
+
+           <p:outputLabel for="jobsiteref" value="Site" />
+           <p:selectOneMenu id="jobsiteref" value="#{quartzlist.siteref}" required="false" converter="#{siteConverterBean}">
+               <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+               <f:selectItems value="#{quartzlist.sitelist}" />
+           </p:selectOneMenu>
+
+           <p:outputLabel for="jobparameterlist" value="Parameters" />
+           <p:inputText id="jobparameterlist" value="#{quartzlist.params}"/>
+       </p:panelGrid>
+
+       <p:tabView>
+           <p:tab title="Seconds">
+               <p:selectOneRadio id="customRadioSecond" value="#{quartzlist.secondsType}" layout="custom">
+                   <p:ajax event="change" listener="#{quartzlist.secondsValueChange}" update=":form:tabview:jobpreview" />
+                   <f:selectItem itemLabel="Every second" itemValue="0" />
+                   <f:selectItem itemLabel="Every" itemValue="1" />
+                   <f:selectItem itemLabel="Specific second (choose one or many)" itemValue="2" />
+                   <f:selectItem itemLabel="Every second between second" itemValue="3" />
+               </p:selectOneRadio>
+
+               <h:panelGrid columns="5" cellpadding="5">
+                   <p:radioButton id="opt1_second" for="customRadioSecond" itemIndex="0" />
+                   <h:outputLabel for="opt1_second" value="Every second" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt2_second" for="customRadioSecond" itemIndex="1" />
+                   <h:outputLabel for="opt2_second" value="Every" />
+                   <p:selectOneMenu id="everysecond" value="#{quartzlist.everysecond}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.everysecondsValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.secondslist1}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="second(s) starting at second" />
+                   <p:selectOneMenu id="startingatsecond" value="#{quartzlist.startingsecond}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingatsecondValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.secondslist2}" />
+                   </p:selectOneMenu>
+
+                   <p:radioButton id="opt3_second" for="customRadioSecond" itemIndex="2" />
+                   <h:outputLabel for="opt3_second" value="Specific second (choose one or many)" />
+                   <p:selectCheckboxMenu id="multipleseconds" value="#{quartzlist.selectedSeconds}" label="Seconds">
+                       <p:ajax event="change" listener="#{quartzlist.multisecondsValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.secondslist2}" />
+                   </p:selectCheckboxMenu>
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt4_second" for="customRadioSecond" itemIndex="3" />
+                   <h:outputLabel for="opt4_second" value="Every second between second" />
+                   <p:selectOneMenu id="startingsecond" value="#{quartzlist.startingatsecond}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.secondslist2}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="and second" />
+                   <p:selectOneMenu id="endingsecond" value="#{quartzlist.endingatsecond}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.endingValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.secondslist2}" />
+                   </p:selectOneMenu>
+               </h:panelGrid>
+           </p:tab>
+           <p:tab title="Minutes">
+               <p:selectOneRadio id="customRadioMinute" value="#{quartzlist.minutesType}" layout="custom">
+                   <p:ajax event="change" listener="#{quartzlist.minutesValueChange}" update=":form:tabview:jobpreview" />
+                   <f:selectItem itemLabel="Every minute" itemValue="0" />
+                   <f:selectItem itemLabel="Every" itemValue="1" />
+                   <f:selectItem itemLabel="Specific minute (choose one or many)" itemValue="2" />
+                   <f:selectItem itemLabel="Every minute between minute" itemValue="3" />
+               </p:selectOneRadio>
+
+               <h:panelGrid columns="5" cellpadding="5">
+                   <p:radioButton id="opt1_minute" for="customRadioMinute" itemIndex="0" />
+                   <h:outputLabel for="opt1_minute" value="Every minute" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt2_minute" for="customRadioMinute" itemIndex="1" />
+                   <h:outputLabel for="opt2_minute" value="Every" />
+                   <p:selectOneMenu id="everyminute" value="#{quartzlist.everyminute}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.everyminutesValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.minuteslist1}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="minute(s) starting at minute" />
+                   <p:selectOneMenu id="startingatminute" value="#{quartzlist.startingminute}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingatminuteValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.minuteslist2}" />
+                   </p:selectOneMenu>
+
+                   <p:radioButton id="opt3_minute" for="customRadioMinute" itemIndex="2" />
+                   <h:outputLabel for="opt3_minute" value="Specific minute (choose one or many)" />
+                   <p:selectCheckboxMenu id="multipleminutes" value="#{quartzlist.selectedMinutes}" label="Minutes">
+                       <p:ajax event="change" listener="#{quartzlist.multiminutesValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.minuteslist2}" />
+                   </p:selectCheckboxMenu>
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt4_minute" for="customRadioMinute" itemIndex="3" />
+                   <h:outputLabel for="opt4_minute" value="Every minute between minute" />
+                   <p:selectOneMenu id="startingminute" value="#{quartzlist.startingatminute}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingMinutesValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.minuteslist2}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="and minute" />
+                   <p:selectOneMenu id="endingminute" value="#{quartzlist.endingatminute}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.endingMinutesValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.minuteslist2}" />
+                   </p:selectOneMenu>
+               </h:panelGrid>
+           </p:tab>
+           <p:tab title="Hours">
+               <p:selectOneRadio id="customRadioHour" value="#{quartzlist.hoursType}" layout="custom">
+                   <p:ajax event="change" listener="#{quartzlist.hoursValueChange}" update=":form:tabview:jobpreview" />
+                   <f:selectItem itemLabel="Every hour" itemValue="0" />
+                   <f:selectItem itemLabel="Every" itemValue="1" />
+                   <f:selectItem itemLabel="Specific hour (choose one or many)" itemValue="2" />
+                   <f:selectItem itemLabel="Every hour between hour" itemValue="3" />
+               </p:selectOneRadio>
+
+               <h:panelGrid columns="5" cellpadding="5">
+                   <p:radioButton id="opt1_hour" for="customRadioHour" itemIndex="0" />
+                   <h:outputLabel for="opt1_hour" value="Every hour" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt2_hour" for="customRadioHour" itemIndex="1" />
+                   <h:outputLabel for="opt2_hour" value="Every" />
+                   <p:selectOneMenu id="everyhour" value="#{quartzlist.everyhour}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.everyhoursValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.hourslist1}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="hour(s) starting at hour" />
+                   <p:selectOneMenu id="startingathour" value="#{quartzlist.startinghour}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingathourValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.hourslist2}" />
+                   </p:selectOneMenu>
+
+                   <p:radioButton id="opt3_hour" for="customRadioHour" itemIndex="2" />
+                   <h:outputLabel for="opt3_hour" value="Specific hour (choose one or many)" />
+                   <p:selectCheckboxMenu id="multiplehours" value="#{quartzlist.selectedHours}" label="Hours">
+                       <p:ajax event="change" listener="#{quartzlist.multihoursValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.hourslist2}" />
+                   </p:selectCheckboxMenu>
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt4_hour" for="customRadioHour" itemIndex="3" />
+                   <h:outputLabel for="opt4_hour" value="Every hour between hour" />
+                   <p:selectOneMenu id="startinhour" value="#{quartzlist.startingathour}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingHoursValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.hourslist2}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="and hour" />
+                   <p:selectOneMenu id="endinghour" value="#{quartzlist.endingathour}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.endingHoursValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.hourslist2}" />
+                   </p:selectOneMenu>
+               </h:panelGrid>
+           </p:tab>
+           <p:tab title="Day">
+               <p:selectOneRadio id="customRadioDay" value="#{quartzlist.daysType}" layout="custom">
+                   <p:ajax event="change" listener="#{quartzlist.daysValueChange}" update=":form:tabview:jobpreview" />
+                   <f:selectItem itemLabel="Every day" itemValue="0" />
+                   <f:selectItem itemLabel="Every" itemValue="1" />
+                   <f:selectItem itemLabel="Every" itemValue="2" />
+                   <f:selectItem itemLabel="Specific days of week (choose one or many)" itemValue="3" />
+                   <f:selectItem itemLabel="Specific days of month (choose one or many)" itemValue="4" />
+                   <f:selectItem itemLabel="On the last day of the month" itemValue="5" />
+                   <f:selectItem itemLabel="On the last weekday of the month" itemValue="6" />
+                   <f:selectItem itemLabel="On the last" itemValue="7" />
+                   <f:selectItem itemLabel="Days before" itemValue="8" />
+                   <f:selectItem itemLabel="Nearest weekday" itemValue="9" />
+                   <f:selectItem itemLabel="On the" itemValue="10" />
+               </p:selectOneRadio>
+
+               <h:panelGrid columns="5" cellpadding="5">
+                   <p:radioButton id="opt1_day" for="customRadioDay" itemIndex="0" />
+                   <h:outputLabel for="opt1_day" value="Every day" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt2_day" for="customRadioDay" itemIndex="1" />
+                   <h:outputLabel for="opt2_day" value="Every" />
+                   <p:selectOneMenu id="everyday" value="#{quartzlist.everyday}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.everydayValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.dayslist1}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="days(s) starting on" />
+                   <p:selectOneMenu id="startingatweekday" value="#{quartzlist.startingweekday}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingatweekdayValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.weekdaylist}" />
+                   </p:selectOneMenu>
+
+                   <p:radioButton id="opt3_day" for="customRadioDay" itemIndex="2" />
+                   <h:outputLabel for="opt3_day" value="Every" />
+                   <p:selectOneMenu id="everyday2" value="#{quartzlist.everyday}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.everydayValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.dayslist1}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="days(s) starting on" />
+                   <p:selectOneMenu id="startingatday" value="#{quartzlist.startingday}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingatdayValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.dayslist1}" />
+                   </p:selectOneMenu>
+
+                   <p:radioButton id="opt4_day" for="customRadioDay" itemIndex="3" />
+                   <h:outputLabel for="opt4_day" value="Specific weekdays (choose one or many)" />
+                   <p:selectCheckboxMenu id="multipleweekdays" value="#{quartzlist.selectedWeekdays}" label="Weekdays">
+                       <p:ajax event="change" listener="#{quartzlist.multiweekdaysValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.weekdaylist}" />
+                   </p:selectCheckboxMenu>
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt5_day" for="customRadioDay" itemIndex="4" />
+                   <h:outputLabel for="opt5_day" value="Specific days (choose one or many)" />
+                   <p:selectCheckboxMenu id="multipledays" value="#{quartzlist.selectedDays}" label="Days">
+                       <p:ajax event="change" listener="#{quartzlist.multidaysValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.dayslist1}" />
+                   </p:selectCheckboxMenu>
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt6_day" for="customRadioDay" itemIndex="5" />
+                   <h:outputLabel for="opt6_day" value="On the last day of the month" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt7_day" for="customRadioDay" itemIndex="6" />
+                   <h:outputLabel for="opt7_day" value="On the last weekday of the month" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt8_day" for="customRadioDay" itemIndex="7" />
+                   <h:outputLabel for="opt8_day" value="On the last" />
+                   <p:selectOneMenu id="lastweekday" value="#{quartzlist.lastweekday}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.lastweekdayValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.weekdaylist}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="of the month" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt9_day" for="customRadioDay" itemIndex="8" />
+                   <p:selectOneMenu id="daybeforeend" value="#{quartzlist.daysbeforeend}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.daysbeforemonthValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.dayslist1}" />
+                   </p:selectOneMenu>
+                   <h:outputLabel value="day(s) before the end of the month" />
+                   <h:outputLabel value="" />
+                   <h:outputLabel value="" />
+
+                   <p:radioButton id="opt10_day" for="customRadioDay" itemIndex="9" />
+                   <h:outputLabel for="opt10_day" value="Nearest weekday (Monday to Friday) to the" />
+                   <p:selectOneMenu id="nearestweekday" value="#{quartzlist.nearestweekday}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.nearestweekdayValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.dayslist1}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="of the month" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt11_day" for="customRadioDay" itemIndex="10" />
+                   <h:outputLabel for="opt11_day" value="On the" />
+                   <p:selectOneMenu id="factorday" value="#{quartzlist.factorday}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.factordayValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.factorlist}" />
+                   </p:selectOneMenu>
+                   <p:selectOneMenu id="factorweekday" value="#{quartzlist.factorweekday}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.factorweekdayValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.weekdaylist}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="of the month" />
+               </h:panelGrid>
+           </p:tab>
+           <p:tab title="Month">
+               <p:selectOneRadio id="customRadioMonth" value="#{quartzlist.monthType}" layout="custom">
+                   <p:ajax event="change" listener="#{quartzlist.monthsValueChange}" update=":form:tabview:jobpreview" />
+                   <f:selectItem itemLabel="Every month" itemValue="0" />
+                   <f:selectItem itemLabel="Every" itemValue="1" />
+                   <f:selectItem itemLabel="Specific month (choose one or many)" itemValue="2" />
+                   <f:selectItem itemLabel="Every month between month" itemValue="3" />
+               </p:selectOneRadio>
+
+               <h:panelGrid columns="5" cellpadding="5">
+                   <p:radioButton id="opt1_month" for="customRadioMonth" itemIndex="0" />
+                   <h:outputLabel for="opt1_month" value="Every month" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt2_month" for="customRadioMonth" itemIndex="1" />
+                   <h:outputLabel for="opt2_month" value="Every" />
+                   <p:selectOneMenu id="everymonth" value="#{quartzlist.everymonth}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.everymonthsValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.monthslist1}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="month(s) starting at month" />
+                   <p:selectOneMenu id="startingatmonth" value="#{quartzlist.startingmonth}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingatmonthValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.monthlist}" />
+                   </p:selectOneMenu>
+
+                   <p:radioButton id="opt3_month" for="customRadioMonth" itemIndex="2" />
+                   <h:outputLabel for="opt3_month" value="Specific month (choose one or many)" />
+                   <p:selectCheckboxMenu id="multiplemonth" value="#{quartzlist.selectedMonths}" label="Months">
+                       <p:ajax event="change" listener="#{quartzlist.multimonthsValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.monthlist}" />
+                   </p:selectCheckboxMenu>
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt4_month" for="customRadioMonth" itemIndex="3" />
+                   <h:outputLabel for="opt4_month" value="Every month between month" />
+                   <p:selectOneMenu id="startinmonth" value="#{quartzlist.startingatmonth}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingMonthsValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.monthlist}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="and month" />
+                   <p:selectOneMenu id="endingmonth" value="#{quartzlist.endingatmonth}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.endingMonthsValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.monthlist}" />
+                   </p:selectOneMenu>
+               </h:panelGrid>
+           </p:tab>
+           <p:tab title="Year">
+               <p:selectOneRadio id="customRadioYear" value="#{quartzlist.yearType}" layout="custom">
+                   <p:ajax event="change" listener="#{quartzlist.yearsValueChange}" update=":form:tabview:jobpreview" />
+                   <f:selectItem itemLabel="Any year" itemValue="0" />
+                   <f:selectItem itemLabel="Every" itemValue="1" />
+                   <f:selectItem itemLabel="Specific year (choose one or many)" itemValue="2" />
+                   <f:selectItem itemLabel="Every year between year" itemValue="3" />
+               </p:selectOneRadio>
+
+               <h:panelGrid columns="5" cellpadding="5">
+                   <p:radioButton id="opt1_year" for="customRadioYear" itemIndex="0" />
+                   <h:outputLabel for="opt1_year" value="Any year" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt2_year" for="customRadioYear" itemIndex="1" />
+                   <h:outputLabel for="opt2_year" value="Every" />
+                   <p:selectOneMenu id="everyyear" value="#{quartzlist.everyyear}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.everyyearsValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.yearlist1}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="year(s) starting at year" />
+                   <p:selectOneMenu id="startingatyear" value="#{quartzlist.startingyear}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingatyearValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.yearlist2}" />
+                   </p:selectOneMenu>
+
+                   <p:radioButton id="opt3_year" for="customRadioYear" itemIndex="2" />
+                   <h:outputLabel for="opt3_year" value="Specific year (choose one or many)" />
+                   <p:selectCheckboxMenu id="multipleyears" value="#{quartzlist.selectedYears}" label="Years">
+                       <p:ajax event="change" listener="#{quartzlist.multiyearsValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.yearlist2}" />
+                   </p:selectCheckboxMenu>
+                   <h:outputText value="" />
+                   <h:outputText value="" />
+
+                   <p:radioButton id="opt4_year" for="customRadioYear" itemIndex="3" />
+                   <h:outputLabel for="opt4_year" value="Every year between year" />
+                   <p:selectOneMenu id="startingyear" value="#{quartzlist.startingatyear}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.startingYearsValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.yearlist2}" />
+                   </p:selectOneMenu>
+                   <h:outputText value="and year" />
+                   <p:selectOneMenu id="endingyear" value="#{quartzlist.endingatyear}" required="false">
+                       <p:ajax event="change" listener="#{quartzlist.endingYearsValueChange}" update=":form:tabview:jobpreview" />
+                       <f:selectItems value="#{quartzlist.yearlist2}" />
+                   </p:selectOneMenu>
+               </h:panelGrid>
+           </p:tab>
+       </p:tabView>
+
+       <p:panelGrid id="jobpreviewpanel" columns="2">
+           <p:outputLabel for="jobpreview">Preview</p:outputLabel>
+           <p:inputText id="jobpreview" value="#{quartzlist.jobPreview}" disabled="true" />
+
+           <p:commandButton id="transferjob" icon="pi pi-arrow-circle-left" process="form" value="Transfer to job" actionListener="#{quartzlist.onTransferJob}" update=":form:msgs :form:tabview:jobpanel" />
+       </p:panelGrid>
+   </p:panelGrid>
+
+   <p:panelGrid id="jobbtnpanel" columns="3">
+       <p:commandButton id="newjob" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{quartzlist.onCreateJob}" update=":form:msgs :form:tabview:joblist" disabled="#{quartzlist.newJobButtonDisabled}" />
+       <p:commandButton id="editjob" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{quartzlist.onEditJob}" update=":form:msgs :form:tabview:joblist" />
+       <p:commandButton id="deletejob" icon="pi pi-trash" process="form" value="Delete" actionListener="#{quartzlist.onDeleteJob}" disabled="#{quartzlist.deleteJobButtonDisabled}" update=":form:msgs :form:tabview:joblist">
+           <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+       </p:commandButton>
+   </p:panelGrid>
+</ui:composition>

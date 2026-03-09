@@ -51,6 +51,7 @@
     <class>io.clownfish.clownfish.dbentities.CfStaticsite</class>
     <class>io.clownfish.clownfish.dbentities.CfApi</class>
     <class>io.clownfish.clownfish.dbentities.CfNpm</class>
+    <class>io.clownfish.clownfish.CfFoldertrigger</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/clownfish?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.user" value="clownfish"/>

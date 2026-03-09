@@ -1,0 +1,19 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <p:panelGrid columns="1" style="width: 100%;">
+        <p:dataTable id="folderrriggerlist" size="small" scrollable="true" scrollHeight="250" var="propertycontent" value="#{propertylist.propertylist}" 
+                 selectionMode="single" selection="#{propertylist.selectedProperty}" rowKey="#{propertycontent.hashkey}"
+                 emptyMessage="No content available" filteredValue="#{propertylist.filteredProperty}" widgetVar="propertylist" sortMode="single">
+            <p:ajax event="rowSelect" listener="#{propertylist.onSelect}" update=":form:tabview:propertypanel :form:tabview:propertybtnpanel" />
+            <p:column headerText="Key" filterBy="#{propertycontent.hashkey}" filterMatchMode="contains" sortBy="#{propertycontent.hashkey}">
+                <h:outputText value="#{propertycontent.hashkey}" />
+            </p:column>
+            <p:column headerText="Value" filterBy="#{propertycontent.value}" filterMatchMode="contains">
+                <h:outputText value="#{propertycontent.value}" />
+            </p:column>
+        </p:dataTable>
+    </p:panelGrid>
+</ui:composition>

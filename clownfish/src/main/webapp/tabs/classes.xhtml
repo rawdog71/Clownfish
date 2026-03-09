@@ -1,0 +1,245 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <div class="flex flex-row pb-2">
+        <p:dataTable id="classlist" size="small" scrollable="true" scrollHeight="250" var="clazz" value="#{classList.classListe}" selectionMode="single" selection="#{classList.selectedClass}" rowKey="#{clazz.id}" sortMode="single">
+            <p:ajax event="rowSelect" listener="#{classList.onSelect}" update=":form:msgs :form:tabview:attributlist :form:tabview:attributname :form:tabview:attributtype :form:tabview:classname :form:tabview:classsearchrelevant :form:tabview:classmaintenance :form:tabview:newclass :form:tabview:classtemplate :form:tabview:classencrypted :form:wizardattributlist :form:LoginWizardDlg :form:tabview:generateloginform" />
+            <p:column headerText="" width="2%">
+                <i class="pi #{clazz.icon}"></i>
+            </p:column>
+            <p:column headerText="Name" filterBy="#{clazz.name}" filterMatchMode="contains" sortBy="#{clazz.name}" width="98%">
+                <h:outputText value="#{clazz.name}" />
+            </p:column>
+        </p:dataTable>
+    </div>
+
+    <div class="flex flex-row pb-2">
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel for="classname" style="margin-right: 0.5rem">Name: </p:outputLabel>
+            <p:inputText id="classname" value="#{classList.className}" required="false">
+                <f:validateRegex pattern="^([a-zA-Z][0-9a-zA-Z_]+)?$"/>
+                <p:ajax event="keyup" listener="#{classList.onChangeName(changeEvent)}" update=":form:tabview:newclass" />
+            </p:inputText>
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel for="classsearchrelevant" style="margin-right: 0.5rem">Search engine relevant: </p:outputLabel>
+            <p:selectBooleanCheckbox id="classsearchrelevant" value="#{classList.classSearchrelevant}" />
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel for="classmaintenance" style="margin-right: 0.5rem">Backend maintenance: </p:outputLabel>
+            <p:selectBooleanCheckbox id="classmaintenance" value="#{classList.classMaintenance}" />
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel for="classencrypted" style="margin-right: 0.5rem">Encrypted: </p:outputLabel>
+            <p:selectBooleanCheckbox id="classencrypted" value="#{classList.classEncrypted}" />
+        </div>
+
+        <!--
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel for="isloginclass" style="margin-right: 0.5rem">Login Class: </p:outputLabel>
+            <p:selectBooleanCheckbox id="isloginclass" value="#{classList.loginClass}" />
+        </div>
+        -->
+
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel for="classtemplate" style="margin-right: 0.5rem">Preview Template: </p:outputLabel>
+            <p:autoComplete id="classtemplate" dropdown="true" value="#{classList.selectedTemplateRef}" completeMethod="#{templateList.completeTextPreview}" converter="#{templateConverterBean}" scrollHeight="250">
+            </p:autoComplete>
+        </div>
+
+        <div class="flex align-items-center pr-2">    
+            <p:commandButton id="newclass" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{classList.onCreate}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass :form:tabview:generateloginform" disabled="#{classlist.newButtonDisabled}" />
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="updateclass" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{classList.onEdit}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass :form:tabview:tabsiteview:classcontentdroplist :form:tabview:tabsiteview:sitelist :form:tabview:generateloginform">
+                <f:actionListener binding="#{sitetree.initClassContentlist()}" />
+                <f:actionListener binding="#{sitetree.initContentlist()}" />
+            </p:commandButton>
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="recreatetable" process="form" value="Recreate Datatable" actionListener="#{classList.onRecreateDatamodel(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+            </p:commandButton>
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="generatejvmclass" process="form" value="Generate JVM Class" actionListener="#{classList.onGenerateJVMClass(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                <f:actionListener binding="#{javaList.refresh()}" />
+            </p:commandButton>
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:selectOneMenu id="javalanguage" value="#{classList.javaLanguage}">
+                <f:selectItems value="#{javaList.getJvmLanguages().entrySet()}" var="entry" itemValue="#{entry.key}" itemLabel="#{entry.value}" />
+            </p:selectOneMenu>
+        </div>
+    </div>
+
+    <div class="flex flex-row pb-2">
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="generatehtmlform" process="form" value="Generate HTML Webform" actionListener="#{classList.onGenerateHTMLForm(actionEvent)}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass">
+                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+                <f:actionListener binding="#{templateList.refresh()}" />
+                <f:actionListener binding="#{sitetree.onRefreshAll()}" />
+            </p:commandButton>
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="generateodataform" value="Generate OData Form Wizard" type="button" onclick="PF('ODataWizardDlg').show()" />
+        </div>
+        <div class="flex align-items-center pr-2">    
+            <p:commandButton id="newloginclass" icon="pi pi-user" process="form" value="Generate Login Class" actionListener="#{classList.onCreateLoginclass}" update=":form:msgs :form:tabview:classlist :form:tabview:classname :form:tabview:contentpanel :form:tabview:contentclass :form:tabview:datapanel :form:tabview:datacontentclass :form:tabview:generateloginform" disabled="#{classlist.newButtonDisabled}" />
+        </div>
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="generateloginform" value="Generate Login Form Wizard" type="button" onclick="PF('LoginWizardDlg').show()" />
+        </div>
+    </div>
+
+    <p:dataTable id="attributlist" size="small" var="attribut" value="#{classList.selectedAttributList}" selectionMode="single" selection="#{classList.selectedAttribut}" rowKey="#{attribut.id}">
+        <p:ajax event="rowSelect" listener="#{classList.onSelectAttribute}" update=":form:msgs :form:tabview:attributname :form:tabview:attributtype :form:tabview:classeditor :form:tabview:changeattribut" />
+        <p:column headerText="Name">
+            <h:outputText value="#{attribut.name}" />
+        </p:column>
+        <p:column headerText="Type">
+            <h:outputText value="#{attribut.attributetype}" />
+        </p:column>
+        <p:column headerText="Identity">
+            <h:outputText value="#{attribut.identity}" />
+        </p:column>
+        <p:column headerText="Autoinc">
+            <h:outputText value="#{attribut.autoincrementor}" />
+        </p:column>
+        <p:column headerText="Index">
+            <h:outputText value="#{attribut.isindex}" />
+        </p:column>
+        <p:column headerText="Mutable">
+            <h:outputText value="#{attribut.ext_mutable}" />
+        </p:column>
+        <p:column headerText="Class">
+            <h:outputText value="#{attribut.relationref}" />
+        </p:column>
+        <p:column headerText="Relation">
+            <h:outputText value="#{attribut.relationtypeFull}" />
+        </p:column>
+        <p:column headerText="Default">
+            <h:outputText value="#{attribut.default_val}" />
+        </p:column>
+        <p:column headerText="Mandatory">
+            <h:outputText value="#{attribut.mandatory}" />
+        </p:column>
+        <p:column headerText="Min">
+            <h:outputText value="#{attribut.min_val}" />
+        </p:column>
+        <p:column headerText="Max">
+            <h:outputText value="#{attribut.max_val}" />
+        </p:column>
+        <p:column headerText="Description">
+            <h:outputText value="#{attribut.description}" />
+        </p:column>
+    </p:dataTable>
+
+    <p:panel id="classeditor">
+        <div class="flex flex-row pb-2">
+            <div class="flex align-items-center pr-2">
+                <p:outputLabel for="attributname" style="margin-right: 0.5rem">Name</p:outputLabel>
+                <p:inputText id="attributname" value="#{classList.attributName}" required="false">
+                    <f:validateRegex pattern="^([a-zA-Z][0-9a-zA-Z_]+)?$"/>
+                    <p:ajax event="keyup" listener="#{classList.onChangeAttributName(changeEvent)}" update=":form:tabview:newattribut" />
+                </p:inputText>
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:outputLabel for="attributtype" value="Typ:" style="margin-right: 0.5rem" />
+                <p:selectOneMenu id="attributtype" value="#{classList.selectedAttributeType}" required="true" converter="#{attributetypeConverterBean}">
+                    <p:ajax listener="#{classList.onChangeAttributtype}" update=":form:tabview:classeditor" />
+                    <f:selectItems value="#{classList.attributetypelist}" />
+                </p:selectOneMenu>
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:outputLabel for="attributidentity" value="Identity:" style="margin-right: 0.5rem" />
+                <p:selectBooleanCheckbox id="attributidentity" value="#{classList.identity}" disabled="#{!classList.canidentity}" />
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:outputLabel for="attributautoinc" value="Autoinc:" style="margin-right: 0.5rem" />
+                <p:selectBooleanCheckbox id="attributautoinc" value="#{classList.autoinc}" disabled="#{!classList.canautoinc}" />
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:outputLabel for="attributextmutable" value="Mutable:" style="margin-right: 0.5rem" />
+                <p:selectBooleanCheckbox id="attributextmutable" value="#{classList.extmutable}" />
+            </div>
+
+            <div class="flex align-items-center pr-2">
+            <p:outputLabel for="attributisindex" value="Index:" style="margin-right: 0.5rem" />
+            <p:selectBooleanCheckbox id="attributisindex" value="#{classList.isindex}" disabled="#{!classList.canindex}" />
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:outputLabel for="relationclass" value="Class:" rendered="#{classList.renderClass}" style="margin-right: 0.5rem" />
+                <p:selectOneMenu id="relationclass" value="#{classList.selectedClassRef}" required="false" converter="#{classConverterBean}" rendered="#{classList.renderClass}">
+                    <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                    <f:selectItems value="#{classList.classListeRef}" />
+                </p:selectOneMenu>
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:outputLabel for="relationtype" value="Relation:" rendered="#{classList.renderClass}" style="margin-right: 0.5rem" />
+                <p:selectOneMenu id="relationtype" value="#{classList.selectedRelType}" required="false" rendered="#{classList.renderClass}">
+                    <f:selectItem itemValue="0" itemLabel="n:m" />
+                    <f:selectItem itemValue="1" itemLabel="1:n" />
+                </p:selectOneMenu>
+            </div>
+        </div>    
+        <div class="flex flex-row pb-2">    
+            <div class="flex align-items-center pr-2">
+            <p:outputLabel for="attributdefaultval" value="Default:" style="margin-right: 0.5rem" />
+            <p:inputText id="attributdefaultval" value="#{classList.defaultval}" />
+            </div>
+
+            <div class="flex align-items-center pr-2">
+            <p:outputLabel for="attributmandatory" value="Mandatory:" style="margin-right: 0.5rem" />
+            <p:selectBooleanCheckbox id="attributmandatory" value="#{classList.mandatory}" />
+            </div>
+
+            <div class="flex align-items-center pr-2">
+            <p:outputLabel for="attributminval" value="Min:" style="margin-right: 0.5rem" />
+            <p:inputText id="attributminval" value="#{classList.minval}" />
+            </div>
+
+            <div class="flex align-items-center pr-2">
+            <p:outputLabel for="attributmaxval" value="Max:" style="margin-right: 0.5rem" />
+            <p:inputText id="attributmaxval" value="#{classList.maxval}" />
+            </div>
+
+            <div class="flex align-items-center pr-2">
+            <p:outputLabel for="attributdescription" value="Description" style="margin-right: 0.5rem" />
+            <p:inputText id="attributdescription" value="#{classList.description}" />
+            </div>
+        </div>    
+        <div class="flex flex-row pb-2">
+            <div class="flex align-items-center pr-2">
+                <p:commandButton id="newattribut" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{classList.onCreateAttribut}" update=":form:msgs :form:tabview:attributlist :form:tabview:classname" disabled="#{classList.newAttributButtonDisabled}" />
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:commandButton id="changeattribut" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{classList.onChangeAttribut}" update=":form:msgs :form:tabview:attributlist" disabled="#{classList.editAttributButtonDisabled}" />
+            </div>
+
+            <div class="flex align-items-center pr-2">
+                <p:commandButton id="deleteattribut" icon="pi pi-trash" process="form" value="Delete" actionListener="#{classList.onDeleteAttribut}" update=":form:msgs :form:tabview:attributlist" disabled="#{classList.deleteAttributButtonDisabled}" />
+            </div>
+        </div>
+    </p:panel>
+    
+</ui:composition>

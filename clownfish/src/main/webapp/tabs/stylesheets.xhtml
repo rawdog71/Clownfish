@@ -1,0 +1,78 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    
+    <div class="flex flex-row pb-2">
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel value="Stylesheets" for="@next" style="margin-right: 0.5rem" rendered="#{loginBean.cfuser.superadmin}"/>
+            <p:autoComplete id="stylesheetlist" dropdown="true" value="#{stylesheetList.selectedStylesheet}" completeMethod="#{stylesheetList.completeText}" converter="#{stylesheetConverterBean}" scrollHeight="250" rendered="#{loginBean.cfuser.superadmin}">
+                <p:ajax listener="#{stylesheetList.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheetpanel :form:tabview:stylesheet-invisible"/>
+            </p:autoComplete>
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:outputLabel value="Stylesheets" for="@next" style="margin-right: 0.5rem" rendered="#{!loginBean.cfuser.superadmin}"/>
+            <p:autoComplete id="invis-stylesheetlist" dropdown="true" value="#{stylesheetList.selectedStylesheet}" completeMethod="#{stylesheetList.completeInvisText}" converter="#{stylesheetConverterBean}" scrollHeight="250" rendered="#{!loginBean.cfuser.superadmin}">
+                <p:ajax listener="#{stylesheetList.onSelect}" update=":form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheetpanel :form:tabview:stylesheet-invisible"/>
+            </p:autoComplete>
+        </div>
+
+        <div class="flex align-items-center pr-2">    
+            <p:outputLabel for="stylesheetname" style="margin-right: 0.5rem">Name</p:outputLabel>
+            <p:inputText id="stylesheetname" value="#{stylesheetList.stylesheetName}" >
+                <p:ajax event="keyup" listener="#{stylesheetList.onChangeName(changeEvent)}" update=":form:tabview:newstylesheet :form:tabview:changestylesheet" />
+            </p:inputText>
+        </div>
+
+        <div class="flex align-items-center pr-2">    
+            <p:commandButton id="newstylesheet" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{stylesheetList.onCreate}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:editstylesheet :form:tabview:tabsiteview:selectstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup" disabled="#{stylesheetList.newButtonDisabled}" />
+        </div>
+
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="changestylesheet" icon="pi pi-pencil" process="form" value="Change" actionListener="#{stylesheetList.onChange}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:tabsiteview:selectstylesheet" disabled="#{stylesheetList.newButtonDisabled}" />
+        </div>
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="copystylesheetButton" icon="pi pi-copy" process="form" value="Copy" actionListener="#{stylesheetList.onCopy}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:stylesheetname :form:tabview:editstylesheet :form:tabview:tabsiteview:selectstylesheet :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup">
+            </p:commandButton>
+        </div>
+        <div class="flex align-items-center pr-2">
+            <p:commandButton id="deletestylesheetButton" icon="pi pi-trash" value="Delete" actionListener="#{stylesheetList.onDelete}" update=":form:msgs :form:tabview:stylesheetlist :form:tabview:tabsiteview:selectstylesheet">
+                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+            </p:commandButton>
+        </div>
+        <div class="flex align-items-center pr-2">
+            <p:selectBooleanCheckbox id="stylesheet-invisible" value="#{stylesheetList.invisible}" disabled="#{stylesheetList.selectedStylesheet == null}" rendered="#{loginBean.cfuser.superadmin}"/>
+            <p:outputLabel for="stylesheet-invisible" value="Invisible" rendered="#{loginBean.cfuser.superadmin}"/>
+        </div>
+    </div>
+
+    <h:panelGroup id="editstylesheetpanel">
+        <div class="flex flex-row pb-2">
+            <pe:monacoEditor id="editstylesheet" disabled="false" widgetVar="monacostylesheet" readonly="#{!stylesheetList.checkedout}" editorOptions="#{stylesheetList.editorOptions}" value="#{stylesheetList.content}" locale="de" width="100%" height="600px" autoResize="true" rendered="#{!stylesheetList.showDiff}" />
+            <pe:monacoDiffEditor id="editstylesheetdiff" widgetVar="monacostylesheetdiff" rendered="#{stylesheetList.showDiff}" 
+                                 value="#{stylesheetList.contentDiff}" editorOptions="#{stylesheetList.editorOptionsDiff}" language="#{stylesheetList.editorOptions.language}" readonly="#{!stylesheetList.checkedout}"
+                                 locale="de" width="100%" height="600px" autoResize="true" />
+        </div>
+    </h:panelGroup>
+
+    <h:panelGroup id="diffstylesheetBtnGroup">
+        <p:commandButton id="savestylesheet" icon="pi pi-save" process="form" value="Save" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onSave}" update=":form:msgs :form:tabview:templateversion :form:tabview:diffstylesheetBtnGroup" />
+        <p:commandButton id="checkinstylesheet" icon="pi pi-arrow-up" process="form" value="CheckIn" rendered="#{stylesheetList.checkedout}" actionListener="#{stylesheetList.onCheckIn}"  update=":form:msgs :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet" />
+        <p:commandButton id="checkoutstylesheet" icon="pi pi-arrow-down" process="form" value="CheckOut" rendered="#{!stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCheckOut}" update=":form:msgs :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheet :form:tabview:editstylesheetpanel" />
+        <p:commandButton id="commitstylesheet" icon="pi pi-check-circle" process="form" value="Commit" rendered="#{stylesheetList.difference and !stylesheetList.checkedout and stylesheetList.access}" actionListener="#{stylesheetList.onCommit}"  update=":form:msgs :form:tabview:stylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:selectedstylesheetversion">
+            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+        </p:commandButton>
+
+        <p:outputLabel> Version </p:outputLabel><p:outputLabel id="stylesheetversion">#{stylesheetList.stylesheetUtility.currentVersion}</p:outputLabel>
+
+        <h5>Select Version</h5>           
+        <p:inputText id="selectedstylesheetversion" value="#{stylesheetList.selectedstylesheetversion}" disabled="true" />
+        <p:slider id="selectedstylesheetversionslider" for="selectedstylesheetversion" minValue="#{stylesheetList.stylesheetversionMin}" maxValue="#{stylesheetList.stylesheetversionMax}">
+            <p:ajax event="slideEnd" listener="#{stylesheetList.onSlideEnd}" update=":form:msgs :form:tabview:editstylesheet :form:tabview:stylesheetname :form:tabview:newstylesheet :form:tabview:stylesheetversion :form:tabview:selectedstylesheetversion :form:tabview:diffstylesheetBtnGroup :form:tabview:editstylesheetpanel" />
+        </p:slider>
+    </h:panelGroup>
+    
+</ui:composition>
