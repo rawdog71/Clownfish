@@ -26,6 +26,7 @@ import io.clownfish.clownfish.jdbc.TableFieldStructure;
 import io.clownfish.clownfish.serviceinterface.*;
 import io.clownfish.clownfish.utils.ContentUtil;
 import io.clownfish.clownfish.utils.HibernateUtil;
+import java.io.UnsupportedEncodingException;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.olingo.commons.api.data.ComplexValue;
@@ -56,6 +57,8 @@ import javax.persistence.NoResultException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -71,6 +74,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.joda.time.DateTimeZone;
 
@@ -1522,9 +1527,15 @@ public class EntityUtil {
     
     private URI createId(String entitySetName, Object id) {
         try {
-            return new URI(entitySetName + "(" + id.toString().replaceAll(" ", "_") + ")");
+            String rawData = entitySetName + "(" + id.toString().replaceAll(" ", "_") + ")";
+            // Wir kodieren den String, damit Zeichen wie ":" und "(" sicher sind
+            String encodedData = URLEncoder.encode(rawData, StandardCharsets.UTF_8.toString());
+            return new URI(encodedData);
         } catch (URISyntaxException e) {
             throw new ODataRuntimeException("Unable to create id for entity: " + entitySetName, e);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(EntityUtil.class.getName()).log(Level.SEVERE, null, ex);
+            throw new ODataRuntimeException("Unable to create id for entity: " + entitySetName, ex);
         }
     }
     
