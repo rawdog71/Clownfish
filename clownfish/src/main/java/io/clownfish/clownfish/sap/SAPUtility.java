@@ -15,6 +15,7 @@
  */
 package io.clownfish.clownfish.sap;
 
+import com.sap.conn.jco.ConversionException;
 import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoStructure;
@@ -32,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -195,7 +197,65 @@ public class SAPUtility {
                     if (rfcfunctionparam.getParamclass().compareToIgnoreCase("I") == 0) {
                         if (null != postmap_async) {
                             postmap_async.stream().filter((jfp) -> (jfp.getName().compareToIgnoreCase(rfcfunctionparam.getParameter()) == 0)).forEach((jfp) -> {
-                                function.getImportParameterList().setValue(rfcfunctionparam.getParameter(), (String)jfp.getValue());
+
+                                String paramName = rfcfunctionparam.getParameter();
+                                Object rawValue = jfp.getValue();
+
+                                try {
+                                    // 1. Prüfen: Ist es eine Tabelle oder eine Struktur?
+                                    boolean isTable = false;
+                                    try {
+                                        isTable = function.getImportParameterList().getListMetaData().isTable(paramName);
+                                    } catch (Exception e) { isTable = false; }
+
+                                    if (isTable) {
+                                        // --- FALL: TABELLE ---
+                                        JCoTable table = function.getImportParameterList().getTable(paramName); // WICHTIG: Nicht hardcoded "I_ZPRUDRUCK"!
+
+                                        if (rawValue instanceof List) {
+                                            // Es wurde eine Liste übergeben (mehrere Zeilen)
+                                            List<Map<String, Object>> listVal = (List<Map<String, Object>>) rawValue;
+                                            for (Map<String, Object> row : listVal) {
+                                                table.appendRow();
+                                                for (Map.Entry<String, Object> entry : row.entrySet()) {
+                                                    if (table.getMetaData().hasField(entry.getKey())) {
+                                                        table.setValue(entry.getKey(), entry.getValue());
+                                                    }
+                                                }
+                                            }
+                                        } else if (rawValue instanceof Map) {
+                                            // Es wurde eine Map übergeben (nur eine Zeile) -> Das fixt deinen aktuellen Fehler
+                                            Map<String, Object> mapVal = (Map<String, Object>) rawValue;
+                                            table.appendRow();
+                                            for (Map.Entry<String, Object> entry : mapVal.entrySet()) {
+                                                if (table.getMetaData().hasField(entry.getKey())) {
+                                                    table.setValue(entry.getKey(), entry.getValue());
+                                                }
+                                            }
+                                        }
+                                        // Hinweis: table ist eine Referenz, setValue auf function ist oft nicht nötig, aber schadet nicht
+                                        // function.getChangingParameterList().setValue(paramName, table); 
+
+                                    } else {
+                                        // --- FALL: STRUKTUR ---
+                                        // Changing Parameter können auch Strukturen sein
+                                        if (function.getImportParameterList().getListMetaData().isStructure(paramName)) {
+                                            JCoStructure structure = function.getImportParameterList().getStructure(paramName);
+
+                                            if (rawValue instanceof Map) {
+                                                Map<String, Object> mapVal = (Map<String, Object>) rawValue;
+                                                for (Map.Entry<String, Object> entry : mapVal.entrySet()) {
+                                                    if (structure.getMetaData().hasField(entry.getKey())) {
+                                                        structure.setValue(entry.getKey(), entry.getValue());
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    LOGGER.error("Fehler beim Setzen des Changing-Parameters " + paramName + ": " + e.getMessage());
+                                    e.printStackTrace();
+                                }
                             });
                         }
                     }
