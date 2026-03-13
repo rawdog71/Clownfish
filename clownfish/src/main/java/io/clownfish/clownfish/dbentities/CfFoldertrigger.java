@@ -21,6 +21,8 @@ import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -50,8 +52,8 @@ public class CfFoldertrigger implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @NotNull
     @Column(name = "id")
     private Long id;
     @Basic(optional = false)
@@ -62,7 +64,7 @@ public class CfFoldertrigger implements Serializable {
     @Size(max = 512)
     @Column(name = "folder")
     private String folder;
-    @Column(name = "recursive")
+    @Column(name = "rekursiv")
     private boolean recursive;
     @Column(name = "active")
     private boolean active;

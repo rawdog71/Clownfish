@@ -20,6 +20,9 @@ import io.clownfish.clownfish.dbentities.CfFoldertrigger;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.serviceinterface.CfFoldertriggerService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
+import java.io.File;
+import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.event.ActionEvent;
@@ -28,7 +31,10 @@ import javax.inject.Named;
 import javax.validation.ConstraintViolationException;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +62,10 @@ public class FoldertriggerList {
     private @Getter @Setter boolean foldertriggeractive;
     private @Getter @Setter String foldertriggerparameter;
     private @Getter @Setter CfSite siteref;
+    private transient @Getter @Setter List<CfSite> sitelist = null;
     private Clownfish clownfish;
+    private TreeNode rootNode;          // Der Baum für PrimeFaces
+    private TreeNode selectedNode;      // Das aktuell gewählte Element im Baum
     
     final transient Logger LOGGER = LoggerFactory.getLogger(PropertyList.class);
 
@@ -67,7 +76,30 @@ public class FoldertriggerList {
     public void init() {
         LOGGER.info("INIT FOLDERTRIGGERLIST START");
         foldertriggerlist = cffoldertriggerService.findAll();
+        sitelist = cfsiteService.findAll();
         newFoldertriggerButtonDisabled = false;
+        
+        String os = System.getProperty("os.name").toLowerCase();
+        String baseDir;
+
+        if (os.contains("win")) {
+            // Pfad für Windows
+            baseDir = "C:/";
+        } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
+            // Pfad für Linux, Unix oder macOS
+            baseDir = "/";
+        } else {
+            // Fallback für unbekannte Systeme
+            baseDir = System.getProperty("user.home");
+        }
+        
+        File rootDir = new File(baseDir);
+        
+        if (rootDir.exists()) {
+            rootNode = new DefaultTreeNode(new FileWrapper(rootDir), null);
+            buildTree(rootDir, rootNode);
+        }
+        
         LOGGER.info("INIT FOLDERTRIGGERLIST END");
     }
     
@@ -94,6 +126,7 @@ public class FoldertriggerList {
             newfoldertrigger.setRecursive(foldertriggerrecursive);
             newfoldertrigger.setActive(foldertriggeractive);
             newfoldertrigger.setParameter(foldertriggerparameter);
+            newfoldertrigger.setSiteref(BigInteger.valueOf(siteref.getId()));
             cffoldertriggerService.create(newfoldertrigger);
             clownfish.setInitmessage(false);
             clownfish.init();
@@ -130,4 +163,34 @@ public class FoldertriggerList {
             newFoldertriggerButtonDisabled = !selectedFoldertrigger.getName().isEmpty();
         }
     }
+    
+    // Rekursive Methode zum Einlesen der Ordner
+    private void buildTree(File dir, TreeNode parent) {
+        File[] files = dir.listFiles(File::isDirectory); // Nur Ordner anzeigen
+        if (files != null) {
+            for (File file : files) {
+                TreeNode node = new DefaultTreeNode(new FileWrapper(file), parent);
+                // Optional: rekursiv weiter (Vorsicht bei riesigen Strukturen!)
+                // buildTree(file, node); 
+            }
+        }
+    }
+
+    // Listener für die Auswahl im Baum
+    public void onFolderSelect(NodeSelectEvent event) {
+        FileWrapper wrapper = (FileWrapper) event.getTreeNode().getData();
+        this.foldertriggerfolder = wrapper.getFile().getAbsolutePath();
+    }
+
+    // Hilfsklasse für den Tree-Inhalt
+    public static class FileWrapper implements Serializable {
+        private File file;
+        public FileWrapper(File file) { this.file = file; }
+        public String getName() { return file.getName(); }
+        public File getFile() { return file; }
+    }
+
+    public TreeNode getRootNode() { return rootNode; }
+    public TreeNode getSelectedNode() { return selectedNode; }
+    public void setSelectedNode(TreeNode selectedNode) { this.selectedNode = selectedNode; }
 }

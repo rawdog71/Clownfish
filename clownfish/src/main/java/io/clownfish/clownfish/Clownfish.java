@@ -21,6 +21,7 @@ import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import de.destrukt.sapconnection.SAPConnection;
 import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.TemplateException;
+import io.clownfish.clownfish.beans.FoldertriggerList;
 import io.clownfish.clownfish.beans.JsonFormParameter;
 import io.clownfish.clownfish.beans.MavenList;
 import io.clownfish.clownfish.beans.PropertyList;
@@ -169,6 +170,7 @@ public class Clownfish {
     @Autowired TemplateUtil templateUtil;
     @Autowired PropertyList propertylist;
     @Autowired QuartzList quartzlist;
+    @Autowired FoldertriggerList foldertriggerlist;
     @Autowired CfTemplateLoaderImpl freemarkerTemplateloader;
     @Autowired CfStringTemplateLoaderImpl freemarkerStringTemplateloader;
     @Autowired SiteUtil siteutil;
@@ -598,6 +600,8 @@ public class Clownfish {
                     }
                 });
             }
+            
+            foldertriggerlist.setClownfish(this);
             AnsiConsole.systemUninstall();
         } catch (IOException | SchedulerException ex) {
             LOGGER.error(ex.getMessage());

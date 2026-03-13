@@ -224,35 +224,7 @@
                         <h:outputText value="Properties"/>
                     </f:facet>
                     
-                    <p:dataTable id="propertylist" size="small" scrollable="true" scrollHeight="250" var="propertycontent" value="#{propertylist.propertylist}" 
-                                 selectionMode="single" selection="#{propertylist.selectedProperty}" rowKey="#{propertycontent.hashkey}"
-                                 emptyMessage="No content available" filteredValue="#{propertylist.filteredProperty}" widgetVar="propertylist" sortMode="single">
-                        <p:ajax event="rowSelect" listener="#{propertylist.onSelect}" update=":form:tabview:propertypanel :form:tabview:propertybtnpanel" />
-                        <p:column headerText="Key" filterBy="#{propertycontent.hashkey}" filterMatchMode="contains" sortBy="#{propertycontent.hashkey}">
-                            <h:outputText value="#{propertycontent.hashkey}" />
-                        </p:column>
-                        <p:column headerText="Value" filterBy="#{propertycontent.value}" filterMatchMode="contains">
-                            <h:outputText value="#{propertycontent.value}" />
-                        </p:column>
-                    </p:dataTable>
-                    
-                    <p:panelGrid id="propertypanel" columns="2">
-                        <p:outputLabel for="propertykey">Property Key</p:outputLabel>
-                        <p:inputText id="propertykey" value="#{propertylist.propertykey}" >
-                            <p:ajax event="keyup" listener="#{propertylist.onChangeName(changeEvent)}" update=":form:tabview:propertybtnpanel" />
-                        </p:inputText>
-
-                        <p:outputLabel for="propertyvalue">Property Value</p:outputLabel>
-                        <p:inputText id="propertyvalue" value="#{propertylist.propertyvalue}" ></p:inputText>
-                    </p:panelGrid>
-                    
-                    <p:panelGrid id="propertybtnpanel" columns="3">
-                        <p:commandButton id="newproperty" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{propertylist.onCreateProperty}" update=":form:msgs :form:tabview:propertylist" disabled="#{propertylist.newPropertyButtonDisabled}" />
-                        <p:commandButton id="editproperty" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{propertylist.onEditProperty}" update=":form:msgs :form:tabview:propertylist" />
-                        <p:commandButton id="deleteproperty" icon="pi pi-trash" process="form" value="Delete" actionListener="#{propertylist.onDeleteProperty}" disabled="#{propertylist.deletePropertyButtonDisabled}" update=":form:msgs :form:tabview:propertylist">
-                            <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
-                        </p:commandButton>
-                    </p:panelGrid>
+                    <ui:include src="/tabs/properties.xhtml" />
                     
                 </p:tab>
 

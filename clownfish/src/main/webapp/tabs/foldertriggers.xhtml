@@ -4,16 +4,72 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <p:panelGrid columns="1" style="width: 100%;">
-        <p:dataTable id="folderrriggerlist" size="small" scrollable="true" scrollHeight="250" var="propertycontent" value="#{propertylist.propertylist}" 
-                 selectionMode="single" selection="#{propertylist.selectedProperty}" rowKey="#{propertycontent.hashkey}"
-                 emptyMessage="No content available" filteredValue="#{propertylist.filteredProperty}" widgetVar="propertylist" sortMode="single">
-            <p:ajax event="rowSelect" listener="#{propertylist.onSelect}" update=":form:tabview:propertypanel :form:tabview:propertybtnpanel" />
-            <p:column headerText="Key" filterBy="#{propertycontent.hashkey}" filterMatchMode="contains" sortBy="#{propertycontent.hashkey}">
-                <h:outputText value="#{propertycontent.hashkey}" />
+        <p:dataTable id="folderrriggerlist" size="small" scrollable="true" scrollHeight="250" var="foldertriggercontent" value="#{foldertriggerlist.foldertriggerlist}" 
+                 selectionMode="single" selection="#{foldertriggerlist.selectedFoldertrigger}" rowKey="#{foldertriggercontent.id}"
+                 emptyMessage="No content available" filteredValue="#{foldertriggerlist.filteredProperty}" widgetVar="foldertriggerlist" sortMode="single">
+            <p:ajax event="rowSelect" listener="#{foldertriggerlist.onSelect}" update=":form:tabview:foldertriggerpanelcustomize" />
+            <p:column headerText="Name" filterBy="#{foldertriggercontent.name}" filterMatchMode="contains" sortBy="#{foldertriggercontent.name}">
+                <h:outputText value="#{foldertriggercontent.name}" />
             </p:column>
-            <p:column headerText="Value" filterBy="#{propertycontent.value}" filterMatchMode="contains">
-                <h:outputText value="#{propertycontent.value}" />
+            <p:column headerText="Folder" filterBy="#{foldertriggercontent.folder}" filterMatchMode="contains">
+                <h:outputText value="#{foldertriggercontent.folder}" />
             </p:column>
         </p:dataTable>
+        
+        <p:panelGrid id="foldertriggerpanelcustomize" columns="2">
+           <p:outputLabel for="foldertriggername">Name</p:outputLabel>
+           <p:inputText id="foldertriggername" value="#{foldertriggerlist.foldertriggername}" >
+               <p:ajax event="keyup" listener="#{foldertriggerlist.onChangeName(changeEvent)}" update=":form:tabview:foldertriggerbtnpanel" />
+           </p:inputText>
+
+           <h:panelGrid columns="3" cellpadding="5">
+                <p:outputLabel for="foldertriggerpath" value="Pfad:" />
+
+                <p:inputText id="foldertriggerpath" 
+                             value="#{foldertriggerlist.foldertriggerfolder}" 
+                             style="width: 400px;" />
+
+                <p:commandButton id="folderBtn" icon="pi pi-folder-open" type="button" value="Wählen" />
+            </h:panelGrid>
+
+            <p:overlayPanel for="folderBtn" widgetVar="folderPanel" dismissable="true" showCloseIcon="true" style="width:450px">
+                <p:tree value="#{foldertriggerlist.rootNode}" var="node" 
+                        selectionMode="single" 
+                        selection="#{foldertriggerlist.selectedNode}"
+                        dynamic="true">
+
+                    <p:ajax event="select" listener="#{foldertriggerlist.onFolderSelect}" 
+                            update=":form:tabview:foldertriggerpath" 
+                            oncomplete="PF('folderPanel').hide()" />
+
+                    <p:treeNode icon="pi pi-folder">
+                        <h:outputText value="#{node.name}" />
+                    </p:treeNode>
+                </p:tree>
+            </p:overlayPanel>
+           
+           <p:outputLabel for="foldertriggerrecursive">Rekursiv</p:outputLabel>
+           <p:selectBooleanCheckbox id="foldertriggerrecursive" value="#{foldertriggerlist.foldertriggerrecursive}" />
+
+           <p:outputLabel for="foldertriggeractive">Active</p:outputLabel>
+           <p:selectBooleanCheckbox id="foldertriggeractive" value="#{foldertriggerlist.foldertriggeractive}" />
+
+           <p:outputLabel for="foldertriggersiteref" value="Site" />
+           <p:selectOneMenu id="foldertriggersiteref" value="#{foldertriggerlist.siteref}" required="false" converter="#{siteConverterBean}">
+               <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+               <f:selectItems value="#{foldertriggerlist.sitelist}" />
+           </p:selectOneMenu>
+
+           <p:outputLabel for="foldertriggerparameterlist" value="Parameters" />
+           <p:inputText id="foldertriggerparameterlist" value="#{foldertriggerlist.foldertriggerparameter}"/>
+       </p:panelGrid>
+        
+       <p:panelGrid id="foldertriggerbtnpanel" columns="3">
+            <p:commandButton id="newfoldertrigger" icon="pi pi-plus-circle" process="form" value="New" actionListener="#{foldertriggerlist.onCreateFoldertrigger}" update=":form:msgs :form:tabview:folderrriggerlist" disabled="#{foldertriggerlist.newFoldertriggerButtonDisabled}" />
+            <p:commandButton id="editfoldertrigger" icon="pi pi-pencil" process="form" value="Edit" actionListener="#{foldertriggerlist.onEditFoldertrigger}" update=":form:msgs :form:tabview:folderrriggerlist" />
+            <p:commandButton id="deletefoldertrigger" icon="pi pi-trash" process="form" value="Delete" actionListener="#{foldertriggerlist.onDeleteFoldertrigger}" update=":form:msgs :form:tabview:folderrriggerlist">
+                <p:confirm type="popup" header="Confirmation" message="Are you sure?" icon="pi pi-exclamation-triangle" />
+            </p:commandButton>
+        </p:panelGrid>
     </p:panelGrid>
 </ui:composition>
