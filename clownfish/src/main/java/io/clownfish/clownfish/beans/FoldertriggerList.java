@@ -20,6 +20,7 @@ import io.clownfish.clownfish.dbentities.CfFoldertrigger;
 import io.clownfish.clownfish.dbentities.CfSite;
 import io.clownfish.clownfish.serviceinterface.CfFoldertriggerService;
 import io.clownfish.clownfish.serviceinterface.CfSiteService;
+import io.clownfish.clownfish.utils.FolderWatcherService;
 import java.io.File;
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -51,6 +52,7 @@ import org.springframework.stereotype.Component;
 public class FoldertriggerList {
     @Autowired CfFoldertriggerService cffoldertriggerService;
     @Autowired CfSiteService cfsiteService;
+    @Autowired FolderWatcherService folderWatcherService;
     
     private @Getter @Setter List<CfFoldertrigger> foldertriggerlist;
     private @Getter @Setter CfFoldertrigger selectedFoldertrigger;
@@ -128,6 +130,7 @@ public class FoldertriggerList {
             newfoldertrigger.setParameter(foldertriggerparameter);
             newfoldertrigger.setSiteref(BigInteger.valueOf(siteref.getId()));
             cffoldertriggerService.create(newfoldertrigger);
+            folderWatcherService.rebuild();
             clownfish.setInitmessage(false);
             clownfish.init();
         } catch (ConstraintViolationException ex) {
@@ -138,7 +141,14 @@ public class FoldertriggerList {
     public void onEditFoldertrigger(ActionEvent actionEvent) {
         try {
             if (null != selectedFoldertrigger) {
+                selectedFoldertrigger.setName(foldertriggername);
+                selectedFoldertrigger.setFolder(foldertriggerfolder);
+                selectedFoldertrigger.setActive(foldertriggeractive);
+                selectedFoldertrigger.setRecursive(foldertriggerrecursive);
+                selectedFoldertrigger.setParameter(foldertriggerparameter);
+                selectedFoldertrigger.setSiteref(BigInteger.valueOf(siteref.getId()));
                 cffoldertriggerService.edit(selectedFoldertrigger);
+                folderWatcherService.rebuild();
                 clownfish.setInitmessage(false);
                 clownfish.init();
             }
@@ -150,6 +160,7 @@ public class FoldertriggerList {
     public void onDeleteFoldertrigger(ActionEvent actionEvent) {
         if (null != selectedFoldertrigger) {
             cffoldertriggerService.delete(selectedFoldertrigger);
+            folderWatcherService.rebuild();
             clownfish.setInitmessage(false);
             clownfish.init();
         }

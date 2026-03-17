@@ -41,7 +41,7 @@ public class DownloadTemplateBean implements Serializable {
     }
     
     
-    public void downloadJson(String url, String downloadproperty, String filename) {
-        downloadutil.downloadJson(url, propertyUtil.getPropertyValue(downloadproperty), filename);
+    public boolean downloadJson(String url, String downloadproperty, String filename) {
+        return downloadutil.downloadJson(url, propertyUtil.getPropertyValue(downloadproperty), filename);
     }
 }

@@ -250,6 +250,8 @@ public class SAPUtility {
                                                     }
                                                 }
                                             }
+                                        } else {
+                                            function.getImportParameterList().setValue(rfcfunctionparam.getParameter(), (String)jfp.getValue());
                                         }
                                     }
                                 } catch (Exception e) {

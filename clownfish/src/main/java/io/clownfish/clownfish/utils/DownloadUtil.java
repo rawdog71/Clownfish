@@ -36,15 +36,19 @@ import org.apache.http.util.EntityUtils;
  */
 public class DownloadUtil {
     
-    public void downloadJson(String url, String path, String filename) {
+    public boolean downloadJson(String url, String path, String filename) {
         try {
             String jsoncontent = getJsonFromWebservice(url);
             if (!jsoncontent.isEmpty()) {
                 String jsoncontentformatted = formatJsonString(jsoncontent);
                 saveJsonToFile(jsoncontentformatted, path + File.separator + filename);
+                return true;
+            } else {
+                return false;
             }
         } catch (IOException ex) {
             Logger.getLogger(DownloadUtil.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
     }
     
