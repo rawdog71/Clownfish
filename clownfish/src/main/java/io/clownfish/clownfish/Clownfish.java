@@ -637,208 +637,77 @@ public class Clownfish {
      */
     @GetMapping(path = "/{name}/**")
     public void universalGet(@PathVariable("name") String name, @Context HttpServletRequest request, @Context HttpServletResponse response) {
-        if (servicestatus.isOnline()) {
+        if (!servicestatus.isOnline()) {
+            writeOfflineMessage(response);
+            return;
+        }
+
+        try {
             Cookie[] cookies = request.getCookies();
             String referrer = getCookieVal(cookies, "cf_referrer");
             addHeader(response, clownfishutil.getVersion());
             ClientInformation clientinfo = getClientinformation(request.getRemoteAddr());
             String token = getCookieVal(cookies, "cf_token");
             String login_token = getCookieVal(cookies, "cf_login_token");
-            boolean alias = false;
-            String aliasname = "";
-            try {
-                ArrayList urlParams = new ArrayList();
-                // fetch site by name or aliasname
-                CfSite cfsite = null;
-                cfsite = cfsiteService.findByName(name);
-                if (null == cfsite) {
-                    aliasname = name;
-                    cfsite = cfsiteService.findByAliaspath(name);
-                    if (null != cfsite) {
-                        name = cfsite.getName();
-                        alias = true;
-                    } else {
-                        aliasname = name;
-                        cfsite = cfsiteService.findByShorturl(name);
-                        if (null != cfsite) {
-                            name = cfsite.getName();
-                            alias = true;
-                        } else {
-                            throw new PageNotFoundException("PageNotFound Exception: " + name);
-                        }
-                    }
+            
+            // 1. Site auflösen (Redundanz entfernt)
+            CfSite cfsite = resolveSite(name);
+            boolean alias = !name.equalsIgnoreCase(cfsite.getName());
+            String originalName = name;
+            name = cfsite.getName();
+
+            response.setContentType(cfsite.getContenttype());
+            response.setCharacterEncoding(cfsite.getCharacterencoding());
+            
+            ArrayList<String> urlParams = new ArrayList<>();
+            String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+
+            // 2. Suche oder URL-Parameter verarbeiten
+            if (cfsite.isSearchresult()) {
+                String query = extractSearchQuery(request, path);
+                executeSearch(query); // Redundanz entfernt!
+            } else {
+                searchmetadata.clear();
+                
+                if (alias) {
+                    path = path.replaceFirst(originalName, name);
                 }
                 
-                response.setContentType(cfsite.getContenttype());
-                response.setCharacterEncoding(cfsite.getCharacterencoding());
-                
-                if (!cfsite.isSearchresult()) {
-                    String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-                    if (alias) {
-                        path = path.replaceFirst(aliasname, name);
-                    } else {
-                        path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-                    }
-
-                    if (path.contains("/")) {
-                        String[] params = path.split("/");
-                        for (int i = 1; i < params.length; i++) {
-                            if (1 == i) {
-                                path = params[i];
-                            } else {
-                                urlParams.add(params[i]);
-                            }
-                        }
-                    }
-
-                    if (name.compareToIgnoreCase(path) != 0) {
-                        if (path.startsWith("/")) {
-                            name = path.substring(1);
+                if (path.contains("/")) {
+                    String[] params = path.split("/");
+                    for (int i = 1; i < params.length; i++) {
+                        if (i == 1) {
+                            path = params[i];
                         } else {
-                            name = path;
-                        }
-                        if (name.lastIndexOf("/")+1 == name.length()) {
-                            name = name.substring(0, name.length()-1);
-                        }
-                    }
-                } else {
-                    searchmetadata.clear();
-                    String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-                    String query = "";
-                    if (path.contains("/")) {
-                        String[] params = path.split("/");
-                        for (int i = 1; i < params.length; i++) {
-                            if (1 == i) {
-                                path = params[i];
-                            } else {
-                                query += params[i];
-                            }
-                        }
-                    }
-                    if (query.isEmpty()) {
-                        Map<String, String[]> parammap = request.getParameterMap();
-                        if (parammap.containsKey("query")) {
-                            query = parammap.get("query")[0];
-                        } else {
-                            query = "";
-                        }
-                    }
-
-                    String[] searchexpressions = query.split(" ");
-                    searchUtil.updateSearchhistory(searchexpressions);
-
-                    searcher.setIndexPath(folderUtil.getIndex_folder());
-                    long startTime = System.currentTimeMillis();
-                    SearchResult searchresult = searcher.search(query, searchlimit);
-                    long endTime = System.currentTimeMillis();
-
-                    LOGGER.info("Search Time :" + (endTime - startTime));
-                    searchmetadata.clear();
-                    searchmetadata.put("cfSearchQuery", query);
-                    searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
-                    searchcontentmap.clear();
-                    if (null != searchresult) {
-                        if (null != searchresult.getFoundSites()) {
-                            searchresult.getFoundSites().stream().forEach((site) -> {
-                                if (null != site) {
-                                    searchcontentmap.put(site.getName(), site);
-                                }
-                            });
-                        }
-                        searchassetmap.clear();
-                        if (null != searchresult.getFoundAssets()) {
-                            searchresult.getFoundAssets().stream().forEach((asset) -> {
-                                if (null != asset) {
-                                    searchassetmap.put(asset.getName(), asset);
-                                }
-                            });
-                        }
-                        searchassetmetadatamap.clear();
-                        if (null != searchresult.getFoundAssetsMetadata()) {
-                            searchresult.getFoundAssetsMetadata().keySet().stream().forEach((key) -> {
-                                searchassetmetadatamap.put(key, searchresult.getFoundAssetsMetadata().get(key));
-                            });
-                        }
-                        searchclasscontentmap.clear();
-                        if (null != searchresult.getFoundClasscontent()) {
-                            searchresult.getFoundClasscontent().keySet().stream().forEach((key) -> {
-                                searchclasscontentmap.put(key, searchresult.getFoundClasscontent().get(key));
-                            });
+                            urlParams.add(params[i]);
                         }
                     }
                 }
 
-                userSession = request.getSession();
-                Map<String, String[]> querymap = request.getParameterMap();
-
-                ArrayList queryParams = new ArrayList();
-                if ((null != token) && (!token.isEmpty())) {
-                    JsonFormParameter jfp = new JsonFormParameter();
-                    jfp.setName("cf_token");
-                    jfp.setValue(token);
-                    queryParams.add(jfp);
-                }
-                if ((null != login_token) && (!login_token.isEmpty())) {
-                    JsonFormParameter jfp = new JsonFormParameter();
-                    jfp.setName("cf_login_token");
-                    jfp.setValue(login_token);
-                    queryParams.add(jfp);
-                }
-                querymap.keySet().stream().map((key) -> {
-                    JsonFormParameter jfp = new JsonFormParameter();
-                    jfp.setName((String) key);
-                    String[] values = querymap.get((String) key);
-                    jfp.setValue(values[0]);
-                    return jfp;
-                }).forEach((jfp) -> {
-                    queryParams.add(jfp);
-                });
-
-                //addHeader(response, clownfishutil.getVersion());
-                //LOGGER.info("MAKERESPONSE: " + name);
-                ClownfishResponse cfResponse = makeResponse(name, queryParams, urlParams, false, null, clientinfo, referrer);
-                Cookie refcookie = new Cookie("cf_referrer", "");
-                response.addCookie(refcookie);
-                if (0 != cfResponse.getErrorcode()) {
-                    switch (cfResponse.getErrorcode()) {
-                        case 1:
-                        case 2:
-                        case 4:
-                            response.setContentType("text/html");
-                            response.setCharacterEncoding("UTF-8");
-                            break;
-                        case 3:
-                        case 5:
-                            refcookie = new Cookie("cf_referrer", name);
-                            response.addCookie(refcookie);
-                            response.sendRedirect("/" + cfResponse.getRelocation());
-                            break;
-                    }
-                }
-                ServletOutputStream out = response.getOutputStream();
-                out.write(cfResponse.getOutput().getBytes(this.characterencoding));
-            } catch (IOException | ParseException ex) {
-                LOGGER.error(ex.getMessage());
-            } catch (PageNotFoundException ex) {
-                String error_site = propertyUtil.getPropertyValue("site_error");
-                if (null == error_site) {
-                    error_site = "error";
-                }
-                request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, error_site);
-                universalGet(error_site, request, response);
-            }
-        } else {
-            PrintWriter outwriter = null;
-            try {
-                outwriter = response.getWriter();
-                outwriter.println(servicestatus.getMessage());
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage());
-            } finally {
-                if (null != outwriter) {
-                    outwriter.close();
+                if (!name.equalsIgnoreCase(path)) {
+                    name = path.startsWith("/") ? path.substring(1) : path;
+                    if (name.endsWith("/")) name = name.substring(0, name.length() - 1);
                 }
             }
+
+            // 3. Query Parameter zusammenbauen
+            userSession = request.getSession();
+            List<JsonFormParameter> queryParams = buildQueryParams(request.getParameterMap(), token, login_token);
+
+            // 4. Response generieren
+            ClownfishResponse cfResponse = makeResponse(name, queryParams, urlParams, false, null, clientinfo, referrer);
+            
+            // Referrer zurücksetzen
+            Cookie refcookie = new Cookie("cf_referrer", "");
+            response.addCookie(refcookie);
+            
+            // 5. Output an den Client senden
+            handleClownfishResponse(cfResponse, response, name);
+
+        } catch (PageNotFoundException ex) {
+            handlePageNotFound(request, response);
+        } catch (Exception ex) {
+            LOGGER.error("Fehler in universalGet: " + ex.getMessage(), ex);
         }
     }
 
@@ -2381,6 +2250,160 @@ public class Clownfish {
             }
         } else {
             return "";
+        }
+    }
+    
+    /**
+     * Sucht eine CfSite anhand des Namens, Alias oder der Short-URL.
+     */
+    private CfSite resolveSite(String name) throws PageNotFoundException {
+        try {
+            CfSite site = cfsiteService.findByName(name);
+            if (site != null) return site;
+        } catch (Exception ignored) { }
+
+        try {
+            CfSite site = cfsiteService.findByAliaspath(name);
+            if (site != null) return site;
+        } catch (Exception ignored) { }
+
+        try {
+            CfSite site = cfsiteService.findByShorturl(name);
+            if (site != null) return site;
+        } catch (Exception ignored) { }
+        
+        throw new PageNotFoundException("PageNotFound Exception: " + name);
+    }
+
+    /**
+     * Führt eine Lucene-Suche aus und befüllt die klassenweiten Maps.
+     */
+    private void executeSearch(String query) {
+        try {
+            String[] searchexpressions = query.split(" ");
+            searchUtil.updateSearchhistory(searchexpressions);
+            
+            searcher.setIndexPath(folderUtil.getIndex_folder());
+            long startTime = System.currentTimeMillis();
+            SearchResult searchresult = searcher.search(query, searchlimit);
+            long endTime = System.currentTimeMillis();
+            
+            LOGGER.info("Search Time :" + (endTime - startTime));
+            
+            searchmetadata.clear();
+            searchcontentmap.clear();
+            searchassetmap.clear();
+            searchassetmetadatamap.clear();
+            searchclasscontentmap.clear();
+            
+            searchmetadata.put("cfSearchQuery", query);
+            searchmetadata.put("cfSearchTime", String.valueOf(endTime - startTime));
+            
+            if (searchresult != null) {
+                if (searchresult.getFoundSites() != null) {
+                    searchresult.getFoundSites().forEach(site -> {
+                        if (site != null) searchcontentmap.put(site.getName(), site);
+                    });
+                }
+                if (searchresult.getFoundAssets() != null) {
+                    searchresult.getFoundAssets().forEach(asset -> {
+                        if (asset != null) searchassetmap.put(asset.getName(), asset);
+                    });
+                }
+                if (searchresult.getFoundAssetsMetadata() != null) {
+                    searchassetmetadatamap.putAll(searchresult.getFoundAssetsMetadata());
+                }
+                if (searchresult.getFoundClasscontent() != null) {
+                    searchclasscontentmap.putAll(searchresult.getFoundClasscontent());
+                }
+            }
+        } catch (IOException | ParseException ex) {
+            java.util.logging.Logger.getLogger(Clownfish.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Extrahiert den Suchstring aus dem Pfad oder den URL-Parametern.
+     */
+    private String extractSearchQuery(HttpServletRequest request, String path) {
+        StringBuilder queryBuilder = new StringBuilder();
+        if (path.contains("/")) {
+            String[] params = path.split("/");
+            for (int i = 2; i < params.length; i++) {
+                queryBuilder.append(params[i]);
+            }
+        }
+        String query = queryBuilder.toString();
+        if (query.isEmpty()) {
+            Map<String, String[]> parammap = request.getParameterMap();
+            if (parammap.containsKey("query")) {
+                query = parammap.get("query")[0];
+            }
+        }
+        return query;
+    }
+
+    /**
+     * Baut die Parameter für den makeResponse-Aufruf zusammen.
+     */
+    private List<JsonFormParameter> buildQueryParams(Map<String, String[]> querymap, String token, String login_token) {
+        List<JsonFormParameter> queryParams = new ArrayList<>();
+        if (token != null && !token.isEmpty()) {
+            queryParams.add(new JsonFormParameter("cf_token", token));
+        }
+        if (login_token != null && !login_token.isEmpty()) {
+            queryParams.add(new JsonFormParameter("cf_login_token", login_token));
+        }
+        querymap.forEach((key, values) -> {
+            queryParams.add(new JsonFormParameter(key, values[0]));
+        });
+        return queryParams;
+    }
+
+    /**
+     * Verarbeitet das Resultat von makeResponse (Redirects, Error Codes, Output).
+     */
+    private void handleClownfishResponse(ClownfishResponse cfResponse, HttpServletResponse response, String name) throws IOException {
+        if (cfResponse.getErrorcode() != 0) {
+            switch (cfResponse.getErrorcode()) {
+                case 1:
+                case 2:
+                case 4:
+                    response.setContentType("text/html");
+                    response.setCharacterEncoding("UTF-8");
+                    break;
+                case 3:
+                case 5:
+                    Cookie refcookie = new Cookie("cf_referrer", name);
+                    response.addCookie(refcookie);
+                    response.sendRedirect("/" + cfResponse.getRelocation());
+                    return;
+            }
+        }
+        ServletOutputStream out = response.getOutputStream();
+        out.write(cfResponse.getOutput().getBytes(this.characterencoding));
+    }
+
+    /**
+     * Fallback für eine nicht gefundene Seite (Error-Page).
+     */
+    private void handlePageNotFound(HttpServletRequest request, HttpServletResponse response) {
+        String error_site = propertyUtil.getPropertyValue("site_error");
+        if (error_site == null || error_site.isEmpty()) {
+            error_site = "error";
+        }
+        request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, error_site);
+        universalGet(error_site, request, response);
+    }
+
+    /**
+     * Schreibt die Offline-Nachricht in den Response.
+     */
+    private void writeOfflineMessage(HttpServletResponse response) {
+        try (PrintWriter outwriter = response.getWriter()) {
+            outwriter.println(servicestatus.getMessage());
+        } catch (IOException ex) {
+            LOGGER.error("Fehler beim Schreiben der Offline-Nachricht: " + ex.getMessage());
         }
     }
 }
